@@ -1,0 +1,1 @@
+Program to scrape data based on rules collected through collectjs/collect app
