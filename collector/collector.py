@@ -1,11 +1,42 @@
-import argparse
-import os
+import json
+import requests
+from bs4 import BeautifulSoup
 
-directory = os.path.dirname(os.path.realpath(__file__))
+class Rule(object):
+    def __init__(self, rule_dict, helpers):
+        self.name = rule_dict['name']
+        self.selector = rule_dict['selector']
+        self.capture = rule_dict['capture']
+        self.helpers = helpers
 
-if __name__=="__main__":
-    parser = argparse.ArgumentParser(description='Crawl sites with saved rules')
-    parser.add_argument('--folder', '-F', dest='directory', 
-                   help='folder to open crawl rules from')
-    args = parser.parse_args()
-    directory = args.directory or directory
+    def parse(self, soup):
+        pass
+
+    def clean(self):
+        """
+        iterate over all helper functions to get the desired value
+        """
+        for helper in self.helpers:
+            self.value = helper(self.value)
+
+class Page(object):
+    def __init__(self, url, rules):
+        self.rules = rules
+        self.url = url
+
+    def get(self):
+        resp = requests.get(self.url)
+        # need to make sure the page doesn't 404
+        self.soup = BeautifulSoup(resp.text)
+
+class IndexPage(Page):
+    """
+    An index page is a webpage that contains links to the pages with the desired data
+
+    """
+    def __init__(self, url, rules):
+        super(IndexPage, self).__init__(url, rules)
+
+class DataPage(Page):
+    def __init__(self, url, rules):
+        super(DataPage, self).__init__(url, rules)
