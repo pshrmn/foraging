@@ -1,7 +1,9 @@
 import json
 import requests
+import exceptions
 from bs4 import BeautifulSoup
 
+"""
 class Rule(object):
     def __init__(self, rule_dict, helpers):
         self.name = rule_dict['name']
@@ -14,10 +16,11 @@ class Rule(object):
 
     def clean(self):
         """
-        iterate over all helper functions to get the desired value
+        #iterate over all helper functions to get the desired value
         """
         for helper in self.helpers:
             self.value = helper(self.value)
+"""
 
 class Page(object):
     def __init__(self, url, rules):
@@ -26,7 +29,8 @@ class Page(object):
 
     def get(self):
         resp = requests.get(self.url)
-        # need to make sure the page doesn't 404
+        if resp.status_code != 200:
+            raise exceptions.FailedGetException(self.url)
         self.soup = BeautifulSoup(resp.text)
 
 class IndexPage(Page):
