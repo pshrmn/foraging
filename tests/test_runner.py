@@ -1,4 +1,4 @@
-import runner
+from collector import runner
 import os
 import unittest
 
@@ -9,7 +9,8 @@ class RunnerTestCase(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def test
+    def test(self):
+        pass
 
 if __name__=="__main__":
     unittest.main()
