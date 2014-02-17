@@ -11,12 +11,12 @@ class ManageTestCase(unittest.TestCase):
 
     def test_get_sites(self):
         sites = manage.get_sites()
-        self.assertEqual(sites, ['example.com'])
+        self.assertEqual(sites, [os.path.join(manage.settings.rules_directory, 'example.com')])
 
 
 class NewSiteTestCase(unittest.TestCase):
     def setUp(self):
-        self.dirname = os.path.join(manage.settings.rules_directory, 'www.foo.bar')
+        self.dirname = os.path.join(manage.settings.rules_directory, 'www_foo_bar')
 
     def tearDown(self):
         shutil.rmtree(self.dirname)
@@ -24,7 +24,7 @@ class NewSiteTestCase(unittest.TestCase):
     def test_new_site(self):
         is_new = manage.new_site("www.foo.bar")
         self.assertTrue(is_new)
-        dirname = os.path.join(manage.settings.rules_directory, 'www.foo.bar')
+        dirname = os.path.join(manage.settings.rules_directory, 'www_foo_bar')
         self.assertTrue(os.path.isdir(dirname))
         for filename in ['data.json', 'links.json', 'pages.txt']:
             self.assertTrue(os.path.exists(os.path.join(dirname, filename)))

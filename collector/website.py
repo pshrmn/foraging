@@ -8,16 +8,20 @@ from lxml import etree
 
 import exceptions, rule
 
-def crawl_delay(fn):
-    def wrapper(*args, **kwargs):
-        try:
-            ret = fn(*args, **kwargs)
-            time.sleep(5)
-        except Exception:
-            time.sleep(5)
-            raise
-        return ret
-    return wrapper
+def crawl_delay(delay=5):
+    if delay < 5:
+        delay = 5
+    def wrapped_fn(fn):
+        def wrapper(*args, **kwargs):
+            try:
+                ret = fn(*args, **kwargs)
+                time.sleep(delay)
+            except Exception:
+                time.sleep(delay)
+                raise
+            return ret
+        return wrapper
+    return wrapped_fn
 
 class Site(object):
     """
@@ -34,6 +38,7 @@ class Site(object):
         folder_split = folder.rsplit(os.sep, 2)
         # index -2 if there is a trailing slash
         self.domain = folder_split[-1] if folder_split[-1] != '' else folder_split[-2]
+        self.domain = self.domain.replace('_', '.')
 
         with open("%s/pages.txt" % folder) as fp:
             index_list = fp.read().split('\n')
@@ -61,10 +66,14 @@ class Site(object):
         """
         count = 0
         done = False
+        self.failed_pages = []
         while not self.index_pages.empty() and not done:
             index = IndexPage(self.index_pages.get(False), self.index_rules)
-
-            data = index.get_and_apply()
+            try:
+                data = index.get_and_apply()
+            except exceptions.GetException:
+                self.failed_pages.append(index.url)
+                continue
             if "next" in data:
                 for url in data["next"]:
                     # handle relative urls
@@ -83,6 +92,9 @@ class Site(object):
         unique_data = set(self.data_pages)
         for page in unique_data:
             self.data_queue.put(page)
+
+    def __str__(self):
+        return self.domain
 
 class Page(object):
     """
