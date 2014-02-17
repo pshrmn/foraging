@@ -1,4 +1,4 @@
-from collector import site, exceptions
+from collector import website, exceptions
 import unittest
 import os
 
@@ -10,20 +10,21 @@ class CollectorTestCase(unittest.TestCase):
         bad_rules = {"test":"ing"}
         good_rules = {"links": {"name": "links", "selector": "a", "capture": "attr-href"}}
         url = "http://www.example.com"
-        good_index = site.IndexPage(url, good_rules)
+        good_index = website.IndexPage(url, good_rules)
         self.assertEqual(good_index.url, url)
         self.assertEqual(good_index.rules, good_rules)
-        self.assertRaises(exceptions.RulesException, site.IndexPage, url, bad_rules)
+        self.assertRaises(exceptions.RulesException, website.IndexPage, url, bad_rules)
 
     def test_create_data_page(self):
         rules = {"test":"ing"}
         url = "http://www.example.com"
-        data = site.DataPage(url, rules)
+        data = website.DataPage(url, rules)
         self.assertEqual(data.url, url)
         self.assertEqual(data.rules, rules)
 
     def test_new_site(self):
-        s = site.Site("%s\\data\\example.com" % directory)
+        site_path = os.path.join(directory, 'data', 'example_com')
+        s = website.Site(site_path)
         self.assertEqual(s.domain, "example.com")
         link_pages = []
         # iterate over queue and place in list
@@ -33,7 +34,8 @@ class CollectorTestCase(unittest.TestCase):
         self.assertEqual(link_pages, example_links)
 
     def test_new_site_trailing_slash(self):
-        s = site.Site("%s\\data\\example.com\\" % directory)
+        site_path = os.path.join(directory, 'data', 'example_com')
+        s = website.Site(site_path)
         self.assertEqual(s.domain, "example.com")
 
 if __name__=="__main__":

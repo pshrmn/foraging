@@ -2,6 +2,8 @@ import os
 import argparse
 import website, settings
 
+import time
+
 def has_files(folder):
     """
     returns true if a folder has all the necessary files, otherwise false
@@ -37,9 +39,10 @@ def new_site(name):
     #make sure the site doesn't already exist
     if not os.path.isdir(site_path):
         os.mkdir(site_path)
+        settings.info("created site <%s>" % name)
     else:
         is_new = False
-        print "site folder already exists"
+        settings.info("site <%s> already exists" % name)
     for filename in ['data.json', 'links.json', 'pages.txt']:
         full_filename = os.path.join(site_path, filename)
         if not os.path.isfile(full_filename):

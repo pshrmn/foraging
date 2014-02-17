@@ -2,3 +2,4 @@
 venv
 notes.txt
 collector/rules/*
+collector/log.txt

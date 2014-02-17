@@ -37,8 +37,8 @@ class Site(object):
 
         folder_split = folder.rsplit(os.sep, 2)
         # index -2 if there is a trailing slash
-        self.domain = folder_split[-1] if folder_split[-1] != '' else folder_split[-2]
-        self.domain = self.domain.replace('_', '.')
+        last_folder = folder_split[-1] if folder_split[-1] != '' else folder_split[-2]
+        self.domain = last_folder.replace('_', '.')
 
         with open("%s/pages.txt" % folder) as fp:
             index_list = fp.read().split('\n')
