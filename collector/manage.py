@@ -2,6 +2,17 @@ import os
 import argparse
 import website, settings
 
+def has_files(folder):
+    """
+    returns true if a folder has all the necessary files, otherwise false
+    """
+    needed_files = ['data.json', 'links.json', 'pages.txt']
+    files = os.listdir(folder)
+    for f in needed_files:
+        if f not in files:
+            return False
+    return True
+
 def get_sites():
     """
     returns a list of folders in the directory folder
@@ -10,10 +21,9 @@ def get_sites():
     site_folders = []
     for f in files:
         long_path = os.path.join(settings.rules_directory, f)
-        if os.path.isdir(long_path):
+        if os.path.isdir(long_path) and has_files(long_path):
             site_folders.append(long_path)
     return site_folders
-    #return [os.path.join(settings.rules_directory, f) for f in files if os.path.isdir(os.path.join(settings.rules_directory, f))]
 
 def new_site(name):
     """
