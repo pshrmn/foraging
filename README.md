@@ -1,4 +1,10 @@
-Program to scrape data based on rules collected through collectjs/collect app
+##Collector
+
+Still in early states, not yet fully functional
+
+Program to scrape data, goes along with:
+    https://github.com/psherman/collectjs-chrome
+    https://github.com/psherman/collectapp
 
 Each domain should have a folder with specs:
     name of folder is the domain name (eg www.example.com)

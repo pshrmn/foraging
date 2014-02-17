@@ -1,1 +1,1 @@
-{"links": {"name": "links", "selector": "a", "capture": "attr-href"}}
+{"links": {"name": "links", "selector": "a", "capture": "attr-href", "index": ""}}

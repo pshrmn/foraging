@@ -39,6 +39,10 @@ class Rule(object):
         return self.capture_fn(eles)
 
     def attr(self, eles):
+        """
+        called when self.capture is attr-___
+        iterate over all matches, returns a list of attributes
+        """
         return [ele.get(self.capture_attr) for ele in eles]
 
     def text(self, eles):
