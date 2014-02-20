@@ -3,6 +3,7 @@ import time
 import os
 from Queue import Queue
 from urlparse import urlparse
+import logging
 
 import requests
 from lxml import html
@@ -56,33 +57,39 @@ class Site(object):
         self.index_rules = {key: rule.Rule(val) for key, val in index_rules.iteritems()}
         self.data_rules = {key: rule.Rule(val) for key, val in data_rules.iteritems()}
 
+        # setup logging for a site
+        self.logger = logging.getLogger(__name__)
+        self.logger.setLevel(logging.INFO)
+        log_file = logging.FileHandler(os.path.join(self.folder, "log.txt"))
+        log_file.setLevel(logging.INFO)
+
+        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        log_file.setFormatter(formatter)
+        self.logger.addHandler(log_file)
+
     def crawl(self, max_index=None):
         self.crawl_index(max_index)
         self.crawl_data()
 
-    def crawl_index(self, max=None):
+    def crawl_index(self, max=1):
         """
         iterate over index_pages
         """
         count = 0
-        done = False
-        self.failed_pages = []
-        while not self.index_pages.empty() and not done:
+        while not self.index_pages.empty() and count < max:
             index = IndexPage(self.index_pages.get(False), self.index_rules)
             try:
                 data = index.get_and_apply()
+                self.logger.info('got <%s> (index)' % index.url)
             except exceptions.GetException:
-                self.failed_pages.append(index.url)
+                self.logger.error('<%s> failed' % index.url)
                 continue
             if "next" in data:
                 for url in data["next"]:
                     self.index_pages.put(url)
             for link in data["links"]:
                 self.data_pages.append(link)
-            if max is not None:
-                count += 1
-                if count >= max:
-                    done = True
+            count += 1
 
     def crawl_data(self):
         """
@@ -94,6 +101,7 @@ class Site(object):
         for page in unique_data[:2]:
             data = DataPage(page, self.data_rules)
             self.compiled_data[page] = data.get_and_apply()
+            self.logger.info('got <%s> (data)' % data.url)
 
     def __str__(self):
         return self.domain
