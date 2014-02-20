@@ -67,7 +67,7 @@ class Site(object):
         log_file.setFormatter(formatter)
         self.logger.addHandler(log_file)
 
-    def crawl(self, max_index=None):
+    def crawl(self, max_index=1):
         self.crawl_index(max_index)
         self.crawl_data()
 
@@ -102,6 +102,28 @@ class Site(object):
             data = DataPage(page, self.data_rules)
             self.compiled_data[page] = data.get_and_apply()
             self.logger.info('got <%s> (data)' % data.url)
+
+    def preview_index(self, url):
+        """
+        apply the index rules to a specific page
+        """
+        index = IndexPage(url, self.index_rules)
+        try:
+            data = index.get_and_apply()
+        except exceptions.GetException:
+            return None
+        return data
+
+    def preview_data(self, url):
+        """
+        apply the data rules to a specific page
+        """
+        data_page = DataPage(url, self.data_rules)
+        try:
+            data = data_page.get_and_apply()
+        except exceptions.GetException:
+            return None
+        return data
 
     def __str__(self):
         return self.domain
