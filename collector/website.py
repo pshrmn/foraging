@@ -2,11 +2,12 @@ import json
 import time
 import os
 from Queue import Queue
+from urlparse import urlparse
 
 import requests
-from lxml import etree
+from lxml import html
 
-import exceptions, rule
+import exceptions, rule, settings
 
 def crawl_delay(delay=5):
     if delay < 5:
@@ -55,10 +56,9 @@ class Site(object):
         self.index_rules = {key: rule.Rule(val) for key, val in index_rules.iteritems()}
         self.data_rules = {key: rule.Rule(val) for key, val in data_rules.iteritems()}
 
-    def fix_relative(self, url):
-        if url.startswith("/"):
-            url = url[1:]
-        return "https://%s/%s" % (self.domain, url)
+    def crawl(self, max_index=None):
+        self.crawl_index(max_index)
+        self.crawl_data()
 
     def crawl_index(self, max=None):
         """
@@ -76,9 +76,6 @@ class Site(object):
                 continue
             if "next" in data:
                 for url in data["next"]:
-                    # handle relative urls
-                    if not url.startswith("http"):
-                        url = self.fix_relative(url)
                     self.index_pages.put(url)
             for link in data["links"]:
                 self.data_pages.append(link)
@@ -88,10 +85,15 @@ class Site(object):
                     done = True
 
     def crawl_data(self):
-        self.data_queue = Queue()
-        unique_data = set(self.data_pages)
-        for page in unique_data:
-            self.data_queue.put(page)
+        """
+        iterate over compiled list of index_pages
+        """
+        unique_data = list(set(self.data_pages))
+        # just dumping the data to a dict for the time being
+        self.compiled_data = {}
+        for page in unique_data[:2]:
+            data = DataPage(page, self.data_rules)
+            self.compiled_data[page] = data.get_and_apply()
 
     def __str__(self):
         return self.domain
@@ -115,12 +117,16 @@ class Page(object):
         self.apply()
         return self.data
 
-    @crawl_delay
+    @crawl_delay()
     def get(self):
         resp = requests.get(self.url)
         if resp.status_code != 200:
             raise exceptions.GetException(self.url)
-        self.html = etree.HTML(resp.text)
+        self.html = html.document_fromstring(resp.text)
+        url = urlparse(self.url)
+        base_url = "%s://%s" % (url.scheme, url.hostname)
+        self.html.make_links_absolute(base_url)
+        self.apply()
 
     def apply(self):
         for key, val in self.rules.iteritems():

@@ -4,6 +4,9 @@ import website, settings
 
 import time
 
+if not os.path.isdir(settings.rules_directory):
+    os.mkdir(settings.rules_directory)
+
 def has_files(folder):
     """
     returns true if a folder has all the necessary files, otherwise false
@@ -39,10 +42,10 @@ def new_site(name):
     #make sure the site doesn't already exist
     if not os.path.isdir(site_path):
         os.mkdir(site_path)
-        settings.info("created site <%s>" % name)
+        settings.logging.info("created site <%s>" % name)
     else:
         is_new = False
-        settings.info("site <%s> already exists" % name)
+        settings.logging.info("site <%s> already exists" % name)
     for filename in ['data.json', 'links.json', 'pages.txt']:
         full_filename = os.path.join(site_path, filename)
         if not os.path.isfile(full_filename):
