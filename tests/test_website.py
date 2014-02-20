@@ -38,5 +38,12 @@ class CollectorTestCase(unittest.TestCase):
         s = website.Site(site_path)
         self.assertEqual(s.domain, "example.com")
 
+    def test_new_site_sleep(self):
+        site_path = os.path.join(directory, 'data', 'example_com')
+
+        for arg, val in [(None, 5), (10, 10), (4, 5)]:
+            s = website.Site(site_path, arg)
+            self.assertEqual(s.sleep, val)
+
 if __name__=="__main__":
     unittest.main()

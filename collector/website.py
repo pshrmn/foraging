@@ -10,21 +10,6 @@ from lxml import html
 
 import exceptions, rule, settings
 
-def crawl_delay(delay=5):
-    if delay < 5:
-        delay = 5
-    def wrapped_fn(fn):
-        def wrapper(*args, **kwargs):
-            try:
-                ret = fn(*args, **kwargs)
-                time.sleep(delay)
-            except Exception:
-                time.sleep(delay)
-                raise
-            return ret
-        return wrapper
-    return wrapped_fn
-
 class Site(object):
     """
     a Site represents a unique website
@@ -34,9 +19,12 @@ class Site(object):
         links.json, which contains the rules for an IndexPage
         data.json, which contains rules for a DataPage
     """
-    def __init__(self, folder):
+    def __init__(self, folder, sleep=5):
         self.folder = folder
-
+        self.sleep = sleep
+        # minimum sleep time of 5 seconds
+        if not isinstance(self.sleep, int) or self.sleep <= 5:
+            self.sleep = 5
         folder_split = folder.rsplit(os.sep, 2)
         # index -2 if there is a trailing slash
         last_folder = folder_split[-1] if folder_split[-1] != '' else folder_split[-2]
@@ -80,8 +68,10 @@ class Site(object):
             index = IndexPage(self.index_pages.get(False), self.index_rules)
             try:
                 data = index.get_and_apply()
+                time.sleep(self.sleep)
                 self.logger.info('got <%s> (index)' % index.url)
             except exceptions.GetException:
+                time.sleep(self.sleep)
                 self.logger.error('<%s> failed' % index.url)
                 continue
             if "next" in data:
@@ -98,9 +88,10 @@ class Site(object):
         unique_data = list(set(self.data_pages))
         # just dumping the data to a dict for the time being
         self.compiled_data = {}
-        for page in unique_data[:2]:
+        for page in unique_data:
             data = DataPage(page, self.data_rules)
             self.compiled_data[page] = data.get_and_apply()
+            tims.sleep(self.sleep)
             self.logger.info('got <%s> (data)' % data.url)
 
     def preview_index(self, url):
@@ -147,7 +138,6 @@ class Page(object):
         self.apply()
         return self.data
 
-    @crawl_delay()
     def get(self):
         resp = requests.get(self.url)
         if resp.status_code != 200:
