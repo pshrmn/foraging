@@ -2,6 +2,9 @@ from collector import website, exceptions
 import unittest
 import os
 
+import logging
+logging.disable(logging.CRITICAL)
+
 directory = os.path.dirname(os.path.realpath(__file__))
 
 class CollectorTestCase(unittest.TestCase):

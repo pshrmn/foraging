@@ -4,6 +4,9 @@ import shutil
 
 from collector import manage
 
+import logging
+logging.disable(logging.CRITICAL)
+
 class ManageTestCase(unittest.TestCase):
 
     def setUp(self):

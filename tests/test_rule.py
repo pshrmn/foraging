@@ -1,7 +1,9 @@
 from collector import rule
 import unittest
-
 from lxml.etree import fromstring
+
+import logging
+logging.disable(logging.CRITICAL)
 
 class RuleTestCase(unittest.TestCase):
 
