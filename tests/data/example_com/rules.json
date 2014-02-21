@@ -1,0 +1,1 @@
+{"links": {"links": {"name": "links", "selector": "a", "capture": "attr-href", "index": ""}}, "data": {"data": {"name": "title", "selector": "h1", "capture": "text", "index": ""}}}

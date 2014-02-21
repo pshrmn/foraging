@@ -3,3 +3,6 @@ class GetException(Exception):
 
 class RulesException(Exception):
     pass
+
+class SiteException(Exception):
+    pass

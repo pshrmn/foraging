@@ -32,7 +32,7 @@ class NewSiteTestCase(unittest.TestCase):
         self.assertTrue(is_new)
         dirname = os.path.join(manage.settings.rules_directory, 'www_foo_bar')
         self.assertTrue(os.path.isdir(dirname))
-        for filename in ['data.json', 'links.json', 'pages.txt']:
+        for filename in ['rules.json', 'pages.txt']:
             self.assertTrue(os.path.exists(os.path.join(dirname, filename)))
     
     def test_existing_site(self):

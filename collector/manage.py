@@ -11,7 +11,7 @@ def has_files(folder):
     """
     returns true if a folder has all the necessary files, otherwise false
     """
-    needed_files = ['data.json', 'links.json', 'pages.txt']
+    needed_files = ['rules.json', 'pages.txt']
     files = os.listdir(folder)
     for f in needed_files:
         if f not in files:
@@ -46,13 +46,13 @@ def new_site(name):
     else:
         is_new = False
         settings.logging.info("site <%s> already exists" % name)
-    for filename in ['data.json', 'links.json', 'pages.txt']:
+    for filename in ['rules.json', 'pages.txt']:
         full_filename = os.path.join(site_path, filename)
         if not os.path.isfile(full_filename):
             with open("%s/%s" % (site_path, filename), "w+") as fp:
                 # need an empty json object for json.load to not have a ValueError
                 if filename[-5:] == '.json':
-                    fp.write("{}")
+                    fp.write('{"links":{}, "data":{}}')
     return is_new
 
 

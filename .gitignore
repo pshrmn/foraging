@@ -3,3 +3,4 @@ venv
 notes.txt
 collector/rules/*
 collector/log.txt
+tests/data/example_com/log.txt

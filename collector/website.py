@@ -16,12 +16,15 @@ class Site(object):
     the name of the folder is the domain
     the folder needs to contain:
         pages.txt file, which is a list of "index pages" to crawl, separated by newlines
-        links.json, which contains the rules for an IndexPage
-        data.json, which contains rules for a DataPage
+        rules.json, json object which contains a links object, which is used to create an IndexPage
+            and another object @data_name, which is used to create a DataPage
     """
-    def __init__(self, folder, sleep=5):
+    def __init__(self, folder, data_name='data', sleep=5):
         self.folder = folder
+        self.data_name = data_name
         self.sleep = sleep
+        self.data_pages = []
+
         # minimum sleep time of 5 seconds
         if not isinstance(self.sleep, int) or self.sleep <= 5:
             self.sleep = 5
@@ -29,21 +32,6 @@ class Site(object):
         # index -2 if there is a trailing slash
         last_folder = folder_split[-1] if folder_split[-1] != '' else folder_split[-2]
         self.domain = last_folder.replace('_', '.')
-
-        with open("%s/pages.txt" % folder) as fp:
-            index_list = fp.read().split('\n')
-        self.index_pages = Queue()
-        for page in index_list:
-            self.index_pages.put(page)
-
-        with open("%s/links.json" % folder) as fp:
-            index_rules = json.load(fp)
-        with open("%s/data.json" % folder) as fp:
-            data_rules = json.load(fp)
-        
-        self.data_pages = []
-        self.index_rules = {key: rule.Rule(val) for key, val in index_rules.iteritems()}
-        self.data_rules = {key: rule.Rule(val) for key, val in data_rules.iteritems()}
 
         # setup logging for a site
         self.logger = logging.getLogger(__name__)
@@ -54,6 +42,40 @@ class Site(object):
         formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         log_file.setFormatter(formatter)
         self.logger.addHandler(log_file)
+
+        self.index_pages = Queue()
+        self._setup_initial_pages()
+        self._parse_rules()
+
+    def _setup_initial_pages(self):
+        """
+        read's the lines in pages.txt into a list, then iterates over the list placing each
+        page into a queue
+        """
+        with open("%s/pages.txt" % self.folder) as fp:
+            index_list = fp.read().split('\n')
+        for page in index_list:
+            self.index_pages.put(page)
+
+    def _parse_rules(self):
+        """
+        opens rules.json and parses the rules
+        rules.json needs a 
+        """
+        with open("%s/rules.json" % self.folder) as fp:
+            rules = json.load(fp)
+        if 'links' in rules:
+            self.index_rules = {key: rule.Rule(val) for key, val in rules['links'].iteritems()}
+        else:
+            self.logger.error("no links object in rules for <%s>" % self.domain)
+            raise exceptions.SiteException("no links object")
+
+        if self.data_name in rules:
+            self.data_rules = {key: rule.Rule(val) for key, val in rules[self.data_name].iteritems()}
+        else:
+            self.logger.error("<%s> not in rules for <%s>" % (data_name, self.domain))
+            raise exceptions.SiteException("no %s object" % self.data_name)
+        
 
     def crawl(self, max_index=1):
         self.crawl_index(max_index)

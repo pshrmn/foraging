@@ -42,7 +42,7 @@ class CollectorTestCase(unittest.TestCase):
         site_path = os.path.join(directory, 'data', 'example_com')
 
         for arg, val in [(None, 5), (10, 10), (4, 5)]:
-            s = website.Site(site_path, arg)
+            s = website.Site(site_path, 'data', arg)
             self.assertEqual(s.sleep, val)
 
 if __name__=="__main__":
