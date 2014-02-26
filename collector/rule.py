@@ -13,18 +13,11 @@ class Rule(object):
         self.name = rule_dict['name']
         self.selector = rule_dict['selector']
         self.capture = rule_dict['capture']
-        self.index = rule_dict['index']
-        if self.index != "":
-            self.index = int(self.index)
-        else:
-            self.index = None
         self.xpath = CSSSelector(self.selector)
 
-        # default to text, but override for attrs
-        self.capture_fn = self.text
-        if self.capture.startswith('attr-'):
-            self.capture_attr = self.capture[5:]
-            self.capture_fn = self.attr
+        index = rule_dict['index']
+        self.index = int(index) if index != "" else None   
+        self.values = self.set_capture()
         
     def get(self, html):
         """
@@ -36,17 +29,28 @@ class Rule(object):
                 eles = eles[:self.index]
             else:
                 eles = eles[self.index:]
-        return self.capture_fn(eles)
+        return self.values(eles)
 
-    def attr(self, eles):
+    def set_capture(self):
         """
-        called when self.capture is attr-___
-        iterate over all matches, returns a list of attributes
+        returns a function that captures the desired attribute or the text based
+        on the self.capture value
         """
-        return [ele.get(self.capture_attr) for ele in eles]
+        if self.capture.startswith('attr-'):
+            attr_name = self.capture[5:]
+            def attr(eles):
+                """
+                called when self.capture is attr-<attr_name>
+                iterate over all matches, returns a list of attributes
+                """
+                return [ele.get(attr_name) for ele in eles]
+            return attr
+        else:
+            def text(eles):
+                """
+                iterate over all matches, returns a list of text strings
+                """
+                return ["".join(ele.itertext()) for ele in eles]
+            return text
 
-    def text(self, eles):
-        """
-        iterate over all matches, returns a list of text strings
-        """
-        return ["".join(ele.itertext()) for ele in eles]
+    
