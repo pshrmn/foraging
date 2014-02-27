@@ -27,7 +27,7 @@ class CollectorTestCase(unittest.TestCase):
 
     def test_new_site(self):
         site_path = os.path.join(directory, 'data', 'example_com')
-        s = website.Site(site_path)
+        s = website.Website(site_path)
         self.assertEqual(s.domain, "example.com")
         link_pages = []
         # iterate over queue and place in list
@@ -38,14 +38,14 @@ class CollectorTestCase(unittest.TestCase):
 
     def test_new_site_trailing_slash(self):
         site_path = os.path.join(directory, 'data', 'example_com')
-        s = website.Site(site_path)
+        s = website.Website(site_path)
         self.assertEqual(s.domain, "example.com")
 
     def test_new_site_sleep(self):
         site_path = os.path.join(directory, 'data', 'example_com')
 
         for arg, val in [(None, 5), (10, 10), (4, 5)]:
-            s = website.Site(site_path, 'data', arg)
+            s = website.Website(site_path, 'data', arg)
             self.assertEqual(s.sleep, val)
 
 if __name__=="__main__":

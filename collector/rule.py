@@ -22,6 +22,7 @@ class Rule(object):
     def get(self, html):
         """
         html is an lxml parsed html etree
+        returns a list of values based on self.capture
         """
         eles = self.xpath(html)
         if self.index is not None:

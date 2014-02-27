@@ -10,7 +10,7 @@ from lxml import html
 
 import exceptions, rule, settings
 
-class Site(object):
+class Website(object):
     """
     a Site represents a unique website
     the name of the folder is the domain

@@ -57,7 +57,7 @@ def new_site(name):
 
 
 def main(dirname=None):
-    sites = [website.Site(s) for s in get_sites()]
+    sites = [website.Website(s) for s in get_sites()]
 
 if __name__=="__main__":
     parser = argparse.ArgumentParser(description='Crawl sites with saved rules')
