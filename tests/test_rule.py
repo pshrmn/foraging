@@ -2,6 +2,7 @@ from collector import rule
 import unittest
 from lxml.etree import fromstring
 
+# don't log while testing
 import logging
 logging.disable(logging.CRITICAL)
 

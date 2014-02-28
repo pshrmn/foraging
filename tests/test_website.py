@@ -1,7 +1,9 @@
-from collector import website, exceptions
+from collector import exceptions
+from collector.website import Website, IndexPage, DataPage
 import unittest
 import os
 
+# don't log while testing
 import logging
 logging.disable(logging.CRITICAL)
 
@@ -13,21 +15,21 @@ class CollectorTestCase(unittest.TestCase):
         bad_rules = {"test":"ing"}
         good_rules = {"links": {"name": "links", "selector": "a", "capture": "attr-href"}}
         url = "http://www.example.com"
-        good_index = website.IndexPage(url, good_rules)
+        good_index = IndexPage(url, good_rules)
         self.assertEqual(good_index.url, url)
         self.assertEqual(good_index.rules, good_rules)
-        self.assertRaises(exceptions.RulesException, website.IndexPage, url, bad_rules)
+        self.assertRaises(exceptions.RulesException, IndexPage, url, bad_rules)
 
     def test_create_data_page(self):
         rules = {"test":"ing"}
         url = "http://www.example.com"
-        data = website.DataPage(url, rules)
+        data = DataPage(url, rules)
         self.assertEqual(data.url, url)
         self.assertEqual(data.rules, rules)
 
     def test_new_site(self):
         site_path = os.path.join(directory, 'data', 'example_com')
-        s = website.Website(site_path)
+        s = Website(site_path)
         self.assertEqual(s.domain, "example.com")
         link_pages = []
         # iterate over queue and place in list
@@ -38,14 +40,14 @@ class CollectorTestCase(unittest.TestCase):
 
     def test_new_site_trailing_slash(self):
         site_path = os.path.join(directory, 'data', 'example_com')
-        s = website.Website(site_path)
+        s = Website(site_path)
         self.assertEqual(s.domain, "example.com")
 
     def test_new_site_sleep(self):
         site_path = os.path.join(directory, 'data', 'example_com')
 
         for arg, val in [(None, 5), (10, 10), (4, 5)]:
-            s = website.Website(site_path, 'data', arg)
+            s = Website(site_path, 'data', arg)
             self.assertEqual(s.sleep, val)
 
 if __name__=="__main__":
