@@ -28,9 +28,10 @@ class CollectorTestCase(unittest.TestCase):
         self.assertEqual(data.rules, rules)
 
     def test_new_site(self):
-        site_path = os.path.join(directory, 'data', 'example_com')
-        s = Website(site_path)
-        self.assertEqual(s.domain, "example.com")
+        # don't care about rules
+        s = Website("www.example.com", [], [],
+            ["http://www.example.com/index1", "http://www.example.com/index2"])
+        self.assertEqual(s.domain, "www.example.com")
         link_pages = []
         # iterate over queue and place in list
         while not s.index_pages.empty():
@@ -38,16 +39,10 @@ class CollectorTestCase(unittest.TestCase):
         example_links = ["http://www.example.com/index1", "http://www.example.com/index2"]
         self.assertEqual(link_pages, example_links)
 
-    def test_new_site_trailing_slash(self):
-        site_path = os.path.join(directory, 'data', 'example_com')
-        s = Website(site_path)
-        self.assertEqual(s.domain, "example.com")
-
     def test_new_site_sleep(self):
-        site_path = os.path.join(directory, 'data', 'example_com')
-
         for arg, val in [(None, 5), (10, 10), (4, 5)]:
-            s = Website(site_path, 'data', arg)
+            # don't care about rules or start_pages
+            s = Website("www.example.com", [], [], [], arg)
             self.assertEqual(s.sleep, val)
 
 if __name__=="__main__":

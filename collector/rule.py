@@ -9,14 +9,12 @@ class Rule(object):
         eg. attr-href means that you want to get the element's href attribute
         text means that you want the text content of the element
     """
-    def __init__(self, rule_dict):
-        self.name = rule_dict['name']
-        self.selector = rule_dict['selector']
-        self.capture = rule_dict['capture']
+    def __init__(self, name, selector, capture, index=None):
+        self.name = name
+        self.selector = selector
+        self.capture = capture
         self.xpath = CSSSelector(self.selector)
-
-        index = rule_dict['index']
-        self.index = int(index) if index != "" else None   
+        self.index = index
         self.values = self.set_capture()
         
     def get(self, html):
