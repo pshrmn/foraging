@@ -8,7 +8,8 @@ import logging
 import requests
 from lxml import html
 
-import exceptions, rule, settings
+import exceptions
+from .rule import Rule
 
 class Website(object):
     """
@@ -65,13 +66,13 @@ class Website(object):
         with open("%s/rules.json" % self.folder) as fp:
             rules = json.load(fp)
         if 'links' in rules:
-            self.index_rules = {key: rule.Rule(val) for key, val in rules['links'].iteritems()}
+            self.index_rules = {key: Rule(val) for key, val in rules['links'].iteritems()}
         else:
             self.logger.error("no links object in rules for <%s>" % self.domain)
             raise exceptions.SiteException("no links object")
 
         if self.data_name in rules:
-            self.data_rules = {key: rule.Rule(val) for key, val in rules[self.data_name].iteritems()}
+            self.data_rules = {key: Rule(val) for key, val in rules[self.data_name].iteritems()}
         else:
             self.logger.error("<%s> not in rules for <%s>" % (data_name, self.domain))
             raise exceptions.SiteException("no %s object" % self.data_name)
