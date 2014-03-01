@@ -1,4 +1,5 @@
 from collector.rule import Rule
+from collector import helpers
 import unittest
 from lxml.etree import fromstring
 
@@ -23,6 +24,20 @@ class RuleTestCase(unittest.TestCase):
 
         bad_rules = {"selector": "a", "capture": "attr-href"}
         self.assertRaises(TypeError, Rule, bad_rules)
+
+    def test_helpers(self):
+        rules = {"name": "price", "selector": ".price", "capture": "text"}
+        html = fromstring('''<div class="price">$29.99</div>''')
+        r = Rule(helpers=[helpers.dollars], **rules)
+        money = r.get(html)
+        self.assertEqual(money, [29.99])
+
+    def test_chain_helpers(self):
+        rules = {"name": "text", "selector": "div", "capture": "text"}
+        html = fromstring('''<div>THIS SENTENCE IS PROPERLY CAPITALIZED</div>''')
+        r = Rule(helpers=[helpers.lowercase, helpers.capitalize], **rules)
+        sentence = r.get(html)
+        self.assertEqual(sentence, ["This sentence is properly capitalized"])
 
     def test_text(self):
         self.good_rules["capture"] = "text"

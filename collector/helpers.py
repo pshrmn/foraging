@@ -8,8 +8,11 @@ import re
 def dollars(value):
     # change must be 1 or 2 characters
     # does not properly check comma's position because they are discarded
-    dollar_match = re.match(r'\$(?P<val>[\d,]+(?:\.\d{1,2})?)', value)
-    value = dollar_match.group('val').replace(',','')
+    # only matches the first dollar value found in value
+    dollar_match = re.findall(r'\$([\d,]+(?:\.\d{1,2})?)', value)
+    if len(dollar_match) == 0:
+        return 0
+    value = dollar_match[0].replace(',','')
     return float(value)
 
 def lowercase(value):

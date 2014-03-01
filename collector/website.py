@@ -168,7 +168,8 @@ class IndexPage(Page):
 
 class DataPage(Page):
     """
-
+    A data page is a webpage that contains the desired data
     """
     def __init__(self, url, rules):
         super(DataPage, self).__init__(url, rules)
+        self.data = {"url": url}
