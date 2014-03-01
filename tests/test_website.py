@@ -1,5 +1,5 @@
-from collector import exceptions
-from collector.website import Website, IndexPage, DataPage
+from collector.crawl import exceptions
+from collector.crawl.website import Website, IndexPage, DataPage
 import unittest
 import os
 

@@ -1,5 +1,5 @@
-from collector.rule import Rule
-from collector import helpers
+from collector.crawl.rule import Rule
+from collector.crawl import helpers
 import unittest
 from lxml.etree import fromstring
 

@@ -1,5 +1,5 @@
 import unittest
-from collector import boilerplate
+from collector.crawl import boilerplate
 
 class HelperTestCase(unittest.TestCase):
     
