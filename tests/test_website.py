@@ -1,5 +1,6 @@
 from collector.crawl import exceptions
 from collector.crawl.website import Website, IndexPage, DataPage
+from collector.crawl.rule import Rule
 import unittest
 import os
 
@@ -12,8 +13,8 @@ directory = os.path.dirname(os.path.realpath(__file__))
 class CollectorTestCase(unittest.TestCase):
     
     def test_create_index_page(self):
-        bad_rules = {"test":"ing"}
-        good_rules = {"links": {"name": "links", "selector": "a", "capture": "attr-href"}}
+        bad_rules = {"test": None}
+        good_rules = {"links": Rule(**{"name": "links", "selector": "a", "capture": "attr-href"})}
         url = "http://www.example.com"
         good_index = IndexPage(url, good_rules)
         self.assertEqual(good_index.url, url)
@@ -21,11 +22,18 @@ class CollectorTestCase(unittest.TestCase):
         self.assertRaises(exceptions.RulesException, IndexPage, url, bad_rules)
 
     def test_create_data_page(self):
-        rules = {"test":"ing"}
+        rules = {"test": None}
         url = "http://www.example.com"
         data = DataPage(url, rules)
         self.assertEqual(data.url, url)
         self.assertEqual(data.rules, rules)
+        self.assertEqual(data.data["url"], url)
+
+    def test_create_data_page_with_data_arg(self):
+        rules = {"test": None}
+        url = "http://www.example.com"
+        data = DataPage(url, rules, {"preset": True})
+        self.assertEqual(data.data["preset"], True)
 
     def test_new_site(self):
         # don't care about rules

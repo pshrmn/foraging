@@ -1,5 +1,5 @@
 """
-Helpers' functions take the value argument, do something with it, and return a new value
+Cleaners' functions take the value argument, do something with it, and return a new value
 eg. dollars("$1.99") returns the float 1.99
 They use this format so that you can chain together a list of functions
 """

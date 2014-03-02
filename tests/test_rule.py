@@ -1,5 +1,5 @@
 from collector.crawl.rule import Rule
-from collector.crawl import helpers
+from collector.crawl import cleaners
 import unittest
 from lxml.etree import fromstring
 
@@ -25,17 +25,17 @@ class RuleTestCase(unittest.TestCase):
         bad_rules = {"selector": "a", "capture": "attr-href"}
         self.assertRaises(TypeError, Rule, bad_rules)
 
-    def test_helpers(self):
+    def test_cleaners(self):
         rules = {"name": "price", "selector": ".price", "capture": "text"}
         html = fromstring('''<div class="price">$29.99</div>''')
-        r = Rule(helpers=[helpers.dollars], **rules)
+        r = Rule(cleaners=[cleaners.dollars], **rules)
         money = r.get(html)
         self.assertEqual(money, [29.99])
 
-    def test_chain_helpers(self):
+    def test_chain_cleaners(self):
         rules = {"name": "text", "selector": "div", "capture": "text"}
         html = fromstring('''<div>THIS SENTENCE IS PROPERLY CAPITALIZED</div>''')
-        r = Rule(helpers=[helpers.lowercase, helpers.capitalize], **rules)
+        r = Rule(cleaners=[cleaners.lowercase, cleaners.capitalize], **rules)
         sentence = r.get(html)
         self.assertEqual(sentence, ["This sentence is properly capitalized"])
 

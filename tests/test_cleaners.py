@@ -1,5 +1,5 @@
 import unittest
-from collector.crawl import helpers
+from collector.crawl import cleaners
 
 class HelperTestCase(unittest.TestCase):
     
@@ -11,7 +11,7 @@ class HelperTestCase(unittest.TestCase):
             ("the price is $1.99", 1.99)
         ]
         for word, number in money:
-            self.assertEqual(number, helpers.dollars(word))
+            self.assertEqual(number, cleaners.dollars(word))
         
 
     def test_lowercase(self):
@@ -21,7 +21,7 @@ class HelperTestCase(unittest.TestCase):
             ("Cool, calm, and Collected", "cool, calm, and collected")
         ]
         for word, expected in words:
-            self.assertEqual(expected, helpers.lowercase(word))
+            self.assertEqual(expected, cleaners.lowercase(word))
 
     def test_uppercase(self):
         words = [
@@ -30,7 +30,7 @@ class HelperTestCase(unittest.TestCase):
             ("Cool, calm, and Collected", "COOL, CALM, AND COLLECTED")
         ]
         for word, expected in words:
-            self.assertEqual(expected, helpers.uppercase(word))
+            self.assertEqual(expected, cleaners.uppercase(word))
 
     def test_capitalize(self):
         words = [
@@ -39,7 +39,7 @@ class HelperTestCase(unittest.TestCase):
             ("Cool, calm, and Collected", "Cool, calm, and collected")
         ]
         for word, expected in words:
-            self.assertEqual(expected, helpers.capitalize(word))
+            self.assertEqual(expected, cleaners.capitalize(word))
 
 if __name__=="__main__":
     unittest.main()
