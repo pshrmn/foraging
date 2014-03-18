@@ -1,2 +1,0 @@
-http://www.example.com/index1
-http://www.example.com/index2

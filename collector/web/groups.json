@@ -8,12 +8,5 @@
             "colors",
             "description"
         ]
-    },
-    {
-        "name": "links",
-        "rules":[
-            "links",
-            "next"
-        ]
     }
 ]}

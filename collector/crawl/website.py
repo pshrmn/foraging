@@ -38,8 +38,8 @@ class Website(object):
         self.logger = logging.getLogger(__name__)
         self.logger.setLevel(logging.INFO)
         #probably not what I want
-        self.folder = os.path.dirname(os.path.abspath(__name__))
-        log_file = logging.FileHandler(os.path.join(self.folder, "log.txt"))
+        folder = os.path.dirname(os.path.abspath(__name__))
+        log_file = logging.FileHandler(os.path.join(folder, "log.txt"))
         log_file.setLevel(logging.INFO)
 
         formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
