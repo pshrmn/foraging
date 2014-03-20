@@ -12,10 +12,6 @@ if not os.path.exists(RULES_DIRECTORY):
 
 app = Flask(__name__)
 
-# open up the groups.json file and save the contents to the attributes list
-with open(os.path.join(DIRECTORY, 'groups.json')) as fp:
-    groups = json.load(fp)
-
 def site_folder(domain):
     """
     given a domain, create a folder for it if it doesn't exist, and return path to folder
@@ -83,11 +79,6 @@ def remove_index():
         except ValueError:
             pass            
     return jsonify({"error": False})
-
-
-@app.route('/groups', methods=['GET'])
-def send_groups():
-    return jsonify(groups)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Server to run with collect-chrome')

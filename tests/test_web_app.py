@@ -25,11 +25,6 @@ class CollectTestCase(unittest.TestCase):
         open(os.path.join(self.example, 'rules.json'), 'w').close()
         open(os.path.join(self.example, 'index.txt'), 'w').close()
 
-    def test_get_groups(self):
-        groups = self.app.get('/groups')
-        self.assertEqual(groups.headers.get('Content-Type'), 'application/json')
-        self.assertEqual(json.loads(groups.data), collect.groups)
-
     def test_site_folder(self):
         domain = "www.example.com"
         expected_folder = os.path.join(collect.RULES_DIRECTORY, 'www_example_com')

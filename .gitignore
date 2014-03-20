@@ -1,6 +1,5 @@
 *.pyc
 venv
-notes.txt
 collector/web/rules
 log.txt
 collector/crawl/log.txt
