@@ -9,9 +9,10 @@ class CollectTestCase(unittest.TestCase):
     
     def setUp(self):
         collect.app.testing = True
-        collect.SITE_DIRECTORY = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'rules')
+        parent_directory = os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir)
+        real_directory = os.path.abspath(parent_directory)
+        collect.SITE_DIRECTORY = os.path.join(parent_directory, 'rules')
         self.app = collect.app.test_client()
-
 
     def test_underscore_host(self):
         hosts = [("www.example.com", "www_example_com"),
