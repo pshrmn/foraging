@@ -29,10 +29,7 @@ var Collect = {
     */
     setFamily: function(family){
         this.family = family;
-        // clear out current html
-        while (this.html.family.lastChild) {
-            this.html.family.removeChild(this.html.family.lastChild);
-        }
+        this.html.family.innerHTML = "";
         if ( family !== undefined ) {
             this.updateSelectorText();
             this.html.family.appendChild(this.family.ele);
@@ -56,7 +53,7 @@ var Collect = {
     */
     setParent: function(){
         this.parentSelector = this.selector();
-        if ( this.parentSelector  === "") {
+        if ( this.parentSelector === "") {
             this.parentSelector = undefined;
             return false;
         }
@@ -287,7 +284,6 @@ function resetInterface(){
 
     // divs to hide
     document.getElementById("selectorPreview").style.display = "none";    
-    
     document.getElementById("selectorItems").style.display = "none";
     document.getElementById("ruleItems").style.display = "none";
 }
@@ -422,6 +418,9 @@ function applyRuleRange(event){
     } else {
         rangeElement.value = "";
     }
+    clearClass("queryCheck");
+    addClass("queryCheck", Collect.elements);
+    
     document.getElementById("currentCount").textContent = Collect.elements.length;
     generatePreviewElements(document.getElementById("ruleAttr").value, Collect.elements);
 }
