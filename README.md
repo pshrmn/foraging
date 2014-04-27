@@ -39,3 +39,5 @@ Rules format:
         ...
     }
 
+
+Uses https://github.com/psherman/selector and https://github.com/psherman/tabs

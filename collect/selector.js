@@ -4,6 +4,7 @@
 /*
 ele is the child element you want to build a selector from
 parent is the most senior element you want to build a selector up to
+text is the element in the interface/page that will hold the SelectorFamily's css string
 */
 function SelectorFamily(ele, parent){
     this.parent = parent;
@@ -22,29 +23,71 @@ SelectorFamily.prototype.buildFamily = function(ele){
     // reset selectors before generating
     this.selectors = [];
     while ( ele !== null && ele.tagName !== "BODY" ) {
-        sel = new Selector(ele);
+        sel = new Selector(ele, this);
         if ( this.parent && sel.matches(this.parent)) {
             break;
         }
         this.selectors.push(sel);
         ele = ele.parentElement;
     }
+    // reverse selectors so 0-index is selector closest to body
     this.selectors.reverse();
     for ( var i=0, len=this.selectors.length; i<len; i++ ) {
         sel = this.selectors[i];
         this.ele.appendChild(sel.ele);
+        sel.index = i;
     }
     this.selectors[this.selectors.length-1].setAll();
 };
 
-SelectorFamily.prototype.removeElement = function(index){
+SelectorFamily.prototype.removeSelector = function(index){
     this.selectors.splice(index, 1);
+    // reset index values after splice
+    for ( var i=0, len=this.selectors.length; i<len; i++ ) {
+        this.selectors[i].index = i;
+    }
+    this.update();
+}
+
+/*********
+SelectorFamily Interface methods
+these are the only ones an outside program should need to call
+*********/
+/*
+text is an element whose textContent will be set based on SelectorFamily.toString in update
+fn is a function to be called when SelectorFamily.update is called
+*/
+SelectorFamily.prototype.setup = function(holder, text, fn){
+    this.holder = holder;
+    this.text = text;
+    this.updateFunction = fn;
+    // clear out holder, then attach SelectorFamily.ele
+    this.holder.innerHTML = "";
+    this.holder.appendChild(this.ele);
+}
+
+SelectorFamily.prototype.remove = function(){
+    if ( this.holder ) {
+        this.holder.innerHTML = "";    
+    }
+}
+
+/*
+called when something changes with the selectors/fragments
+*/
+SelectorFamily.prototype.update = function(){
+    if ( this.text ) {
+        this.text.textContent = this.toString();
+    }
+    if ( this.updateFunction ) {
+        this.updateFunction();
+    }
 }
 
 /*
 Turn on Fragments that match
 */
-SelectorFamily.prototype.matchSelector = function(selector){
+SelectorFamily.prototype.match = function(selector){
     var copy = this.selectors.slice(0, this.selectors.length),
         selectorParts = selector.split(' '),
         currSelector, currPart;
@@ -58,6 +101,7 @@ SelectorFamily.prototype.matchSelector = function(selector){
         }
         currSelector = copy.pop();
     }
+    this.update();
 }
 
 SelectorFamily.prototype.toString = function(){
@@ -72,29 +116,31 @@ SelectorFamily.prototype.toString = function(){
     return selectors.join(' ');
 }
 
+
 /***************************
-Functions shares by Fragment and PseudoFragment
+Functions shared by Fragment and NthFragment
 ***************************/
 var fragments = {
     on: function(){
-        return !this.ele.classList.contains("off");    
+        return !this.ele.classList.contains("off");
     },
     turnOn: function(){
         this.ele.classList.remove("off");
     },
     turnOff: function(){
         this.ele.classList.add("off");
+    },
+    toggleOff: function(event){
+        this.ele.classList.toggle("off");
+        this.selector.family.update();
     }
-}
-
-function toggleOff(event){
-    this.classList.toggle("off");    
 }
 
 /********************
     FRAGMENT
 ********************/
-function Fragment(name, on){
+function Fragment(name, selector, on){
+    this.selector = selector;
     this.name = name;
     this.ele = document.createElement("span");
     this.ele.classList.add("toggleable", "realselector", "noSelect");
@@ -102,7 +148,9 @@ function Fragment(name, on){
         this.ele.classList.add("off");
     }
     this.ele.textContent = this.name;
-    this.ele.addEventListener("click", toggleOff, false);
+
+    //Events
+    this.ele.addEventListener("click", fragments.toggleOff.bind(this), false);
 }
 Fragment.prototype.on = fragments.on;
 Fragment.prototype.turnOn = fragments.turnOn;
@@ -112,38 +160,65 @@ Fragment.prototype.matches = function(name){
 }
 
 /********************
-    PSEUDOFRAGMENT
+    NTHFRAGMENT
+a fragment representing an nth-ot-type css pseudoselector
 ********************/
-function PseudoFragment(text, on){
+function NthFragment(selector, on){
+    this.selector = selector;
     this.ele = document.createElement("span");
     this.ele.classList.add("toggleable", "noSelect");
-    this.ele.innerHTML = text;
+    this.beforeText = document.createTextNode(":nth-of-type(");
+    this.afterText = document.createTextNode(")");
+    this.input = document.createElement("input");
+    this.input.setAttribute("type", "text");
+    this.input.classList.add("noSelect");
+    this.input.classList.add("childToggle");
+    this.input.setAttribute("title", "options: an+b (a & b are integers), a positive integer (1,2,3...), odd, even");
+
+    this.ele.appendChild(this.beforeText);
+    this.ele.appendChild(this.input);
+    this.ele.appendChild(this.afterText);
+    
     // default to
     if ( on === false ) {
         this.ele.classList.add("off");
     }
-    this.ele.addEventListener("click", toggleOff, false);
+
+    //Events
+    this.ele.addEventListener("click", fragments.toggleOff.bind(this), false);
+    this.input.addEventListener("click", function(event){
+        // don't toggle .off when clicking/focusing the input element
+        event.stopPropagation();
+    });
+    this.input.addEventListener("blur", (function(event){
+        this.selector.family.update();
+    }).bind(this));
 }
-PseudoFragment.prototype.on = fragments.on;
-PseudoFragment.prototype.turnOn = fragments.turnOn;
-PseudoFragment.prototype.turnOff = fragments.turnOff;
-PseudoFragment.prototype.matches = function(text){
-    return this.ele.textContent === text;
+NthFragment.prototype.on = fragments.on;
+NthFragment.prototype.turnOn = fragments.turnOn;
+NthFragment.prototype.turnOff = fragments.turnOff;
+NthFragment.prototype.matches = function(text){
+    return this.text() === text;
+}
+NthFragment.prototype.text = function(){
+    return this.beforeText.textContent + this.input.value + this.afterText.textContent;
 }
 
 /********************
     SELECTOR
 ********************/
-function Selector( ele ){
-    this.tag = new Fragment(ele.tagName.toLowerCase());
-    this.id = ele.hasAttribute('id') ? new Fragment('#' + ele.getAttribute('id')) : undefined;
+function Selector(ele, family){
+    this.family = family;
+    this.tag = new Fragment(ele.tagName.toLowerCase(), this);
+    this.id = ele.hasAttribute('id') ? new Fragment('#' + ele.getAttribute('id'), this) : undefined;
     this.classes = [];
+    var curr;
     for ( var i=0, len=ele.classList.length; i<len; i++ ) {
-        var curr = ele.classList[i];
+        curr = ele.classList[i];
         if ( curr === "collectHighlight" || curr === "queryCheck" ) {
             continue;
         }
-        this.classes.push(new Fragment('.' + curr));
+        this.classes.push(new Fragment('.' + curr, this));
     }
     this.setupElements();
 }
@@ -152,12 +227,12 @@ Selector.prototype.addNthofType = function(){
     if ( this.nthoftype ) {
         return;
     }
-    this.nthoftype = new PseudoFragment(":nth-of-type(<span class='child_toggle noSelect' title='options: an+b " + 
-        "(a & b are integers), a positive integer (1,2,3...), odd, even' contenteditable='true'>1</span>)");
-    var selectors = this.ele.getElementsByClassName("realselector");
-        len = selectors.length;
+    this.nthoftype = new NthFragment(this);
     this.ele.removeChild(this.nthtypeCreator);
     this.nthtypeCreator = undefined;
+    
+    var selectors = this.ele.getElementsByClassName("realselector");
+        len = selectors.length;
     this.ele.insertBefore(this.nthoftype.ele, selectors[len-1].nextSibling);
 }
 
@@ -180,13 +255,13 @@ Selector.prototype.setupElements = function(){
 
     deltog = selectorSpan("x", ["deltog", "noSelect"]);
     this.ele.appendChild(deltog);
-    deltog.addEventListener('click', removeSelectorGroup, false);
-    //this.onlychildCreator = selectorSpan(">", ["onlychild"], "next selector must be direct child (> in css)"),
-    //this.ele.appendChild(this.onlychildCreator);
-    
-    
+    deltog.addEventListener('click', removeSelectorGroup.bind(this), false);
 }
 
+/*
+turn on (remove .off) from all toggleable parts of a selector if bool is undefined or true
+turn off (add .off) to all toggleable parts if bool is false
+*/
 Selector.prototype.setAll = function(bool){
     if ( bool === true || bool === undefined ) {
         if ( this.id ) {
@@ -295,7 +370,7 @@ Selector.prototype.toString = function(){
         }
     }
     if ( this.nthoftype && this.nthoftype.on() ) {
-        selector += this.nthoftype.ele.textContent;
+        selector += this.nthoftype.text();
     }
     return selector;
 }
@@ -306,8 +381,9 @@ function createNthofType(event){
 }
 
 function removeSelectorGroup(event){
-    var parent = this.parentElement;
-    parent.parentElement.removeChild(parent);
+    // get rid of the html element
+    this.ele.parentElement.removeChild(this.ele);
+    this.family.removeSelector(this.index);
 }
 
 /*********************************

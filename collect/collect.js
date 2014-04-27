@@ -4,73 +4,143 @@
             COLLECT
 *********************************/
 var Collect = {
-    /*
-    relevant html elements
-    */
-    family: undefined,
-    parentSelector: undefined,
     // elements within the page that can be selected by collectJS
     allElements: [],
     not: ":not(.noSelect)",
     indexPage: false,
-    /*
-    create a SelectorFamily given a css selector string
-    */
-    buildFamily: function(selector){
-        var element = this.selectorElements(true);
-        if ( element ) {
-            var family = new SelectorFamily(element, this.parentSelector);
-            family.matchSelector(selector);
-            this.setFamily(family);
+    family: {
+        selectorFamily: undefined,
+        create: function(event){
+            event.stopPropagation();
+            event.preventDefault();
+            resetInterface();
+            Collect.family.selectorFamily = new SelectorFamily(this, Collect.parent.selector);
+            Collect.family.selectorFamily.setup(Collect.html.family, Collect.html.text,
+                Collect.family.test.bind(Collect.family));
+            Collect.family.selectorFamily.update();
+            document.getElementById('selectorPreview').style.display = "block";
+            document.getElementById("selectorItems").style.display = "inline-block";
+        },
+        remove: function(){
+            if ( this.selectorFamily ) {
+                this.selectorFamily.remove();
+                this.selectorFamily = undefined;
+            }
+        },
+        // create a SelectorFamily given a css selector string
+        fromSelector: function(selector){
+            var element = this.elements(true);
+            if ( element ) {
+                this.selectorFamily = new SelectorFamily(element, Collect.parent.selector);
+                this.selectorFamily.setup(Collect.html.family, Collect.html.text,
+                    Collect.family.test.bind(Collect.family));
+                document.getElementById('selectorPreview').style.display = "block";
+                this.selectorFamily.match(selector);
+            }    
+        },
+        selector: function(){
+            if ( this.selectorFamily ) {
+                return this.selectorFamily.toString();
+            } else {
+                return "";
+            }
+        },
+        elements: function(one){
+            var selector = this.selector(),
+                longSelector;
+            if ( selector === "") {
+                return ( one ? undefined : []);
+            }
+            longSelector = (Collect.parent.selector ? Collect.parent.selector: "body") +
+                " " + selector + Collect.not;
+            if ( one ) {
+                return document.querySelector(longSelector);
+            } else {
+                return document.querySelectorAll(longSelector);    
+            }
+        },
+        /*
+        sets Collect.elements to elements matching the current selector and resets elementIndex
+        */
+        match: function(){
+            Collect.elements = this.elements();
+            Collect.elementIndex = 0;
+        },
+        test: function(){
+            clearClass("queryCheck");
+            clearClass("collectHighlight");
+            var elements = this.elements(),
+                count;
+            for ( var i=0, len=elements.length; i<len; i++ ) {
+                elements[i].classList.add("queryCheck");
+            }
+            count = elements.length ? elements.length : "";
+            document.getElementById("currentCount").textContent = count;
+        },
+        /*
+        applies a range to the elements selected by the current selector
+        if val is positive, it sets Collect.elements to (val, elements.length)
+        if val is negative, it sets Collect.elements to (0, elements.length-val)
+
+        */
+        range: function(val){
+            var rangeElement = document.getElementById("ruleRange"),
+                range = parseInt(rangeElement.value, 10),
+                len;
+
+            Collect.family.match();
+            len = Collect.elements.length;
+            if ( isNaN(range) || -1*range > len || range > len-1 ) {
+                rangeElement.value = "";
+            } else {
+               if ( range < 0 ) {
+                    Collect.elements = Array.prototype.slice.call(Collect.elements).slice(0, range);
+                    Collect.elementIndex = 0;
+                    addSelectorTextHTML(Collect.elements[0]);
+                } else if ( range > 0 ) {
+                    Collect.elements = Array.prototype.slice.call(Collect.elements).slice(range);
+                    Collect.elementIndex = 0;
+                    addSelectorTextHTML(Collect.elements[0]);
+                }    
+            }
         }
     },
-    /*
-    setup Collect interface given a SelectorFamily object
-    */
-    setFamily: function(family){
-        this.family = family;
-        this.html.family.innerHTML = "";
-        if ( family !== undefined ) {
-            this.updateSelectorText();
-            this.html.family.appendChild(this.family.ele);
-            this.testSelector();
+    parent: {
+        selector: undefined,
+        set: function(){
+            this.selector = Collect.family.selector();
+            if ( this.selector === "") {
+                this.selector = undefined;
+                return false;
+            }
+            // parent to select elements from is the first element in the page matching the selector
+            Collect.html.parent.textContent = this.selector;
+            resetInterface();
+            Collect.turnOn();
+            return true;
+        },
+        remove: function(){
+            this.selector = undefined;
+            Collect.html.parent.textContent = "";
+            resetInterface();
+            Collect.turnOn();
+        },
+        toggle: function(event){
+            event.preventDefault();
+            if ( !Collect.parent.selector ){
+                var success = Collect.parent.set();
+                if ( success ) {
+                    this.textContent = "×";
+                    this.setAttribute("title", "remove parent selector");    
+                }        
+            } else {
+                Collect.parent.remove();
+                this.textContent = "+";
+                this.setAttribute("title", "add parent selector");
+            }
+            
         }
-        document.getElementById('selectorPreview').style.display = "block";
-    },
-    clearFamily: function(){
-        this.family = undefined;
-        resetInterface();
-    },
-    /*
-    set the text of the SelectorFamily's selector string in the interface
-    */
-    updateSelectorText: function(){
-        this.html.text.innerHTML = this.selector();
-    },
-    /*
-    sets Collect.parent, stores the selector in parentSelector and turns on events for only    
-    the elements whose parent is the first element matching the selector
-    */
-    setParent: function(){
-        this.parentSelector = this.selector();
-        if ( this.parentSelector === "") {
-            this.parentSelector = undefined;
-            return false;
-        }
-        // parent to select elements from is the first element in the page matching the selector
-        this.html.parent.textContent = this.parentSelector;
-        this.clearFamily();
-        this.turnOn();
-        return true;
-    },
-    /*
-    remove parent & parentSelector, attaches events to all non-.noSelect elements
-    */
-    removeParent: function(){
-        this.parentSelector = undefined;
-        this.html.parent.textContent = "";
-        this.clearFamily();
-        this.turnOn();
+
     },
     /*
     adds events listeners based on whether or not this.parentSelector is set
@@ -79,13 +149,13 @@ var Collect = {
     store elements with eventlisteners in this.ele
     */
     turnOn: function(){
-        var prefix = this.parentSelector ? this.parentSelector : "body",
+        var prefix = this.parent.selector ? this.parent.selector : "body",
             curr;
         this.turnOff();
         this.allElements = document.querySelectorAll(prefix + " *" + this.not);
         for ( var i=0, len=this.allElements.length; i<len; i++ ) {
             curr = this.allElements[i];
-            curr.addEventListener('click', createSelectorFamily, false);
+            curr.addEventListener('click', Collect.family.create, false);
             curr.addEventListener('mouseenter', highlightElement, false);
             curr.addEventListener('mouseleave', unhighlightElement, false);
         }
@@ -99,57 +169,12 @@ var Collect = {
         var curr;
         for ( var i=0, len=this.allElements.length; i<len; i++ ) {
             curr = this.allElements[i];
-            curr.removeEventListener('click', createSelectorFamily);
+            curr.removeEventListener('click', Collect.family.create);
             curr.removeEventListener('mouseenter', highlightElement);
             curr.removeEventListener('mouseleave', unhighlightElement);
             
         }
         this.allElements = [];
-    },
-    /*
-    selector string based on whether toggleable elements are off or not
-    */
-    selector: function(){
-        if ( this.family === undefined ) {
-            return "";
-        }
-        return this.family.toString();
-    },
-    /*
-    return the currently selected string with the parent selector, if one is selected
-    */
-    selectorElements: function(one){
-        var selector = this.selector(),
-            longSelector;
-        if ( selector === "") {
-            return ( one ? undefined : []);
-        }
-        longSelector = (this.parentSelector ? this.parentSelector: "body") + " " + selector + this.not;
-
-        if ( one ) {
-            return document.querySelector(longSelector);
-        } else {
-            return document.querySelectorAll(longSelector);    
-        }
-    },
-    matchSelector: function(){
-        this.elements = this.selectorElements();
-        this.elementIndex = 0;
-    },
-    /*
-    returns the first element matching the current selector as well as how many total elements
-    match the selector string
-    */
-    testSelector: function(){
-        clearClass("queryCheck");
-        clearClass("collectHighlight");
-        var elements = this.selectorElements(),
-            count;
-        for ( var i=0, len=elements.length; i<len; i++ ) {
-            elements[i].classList.add("queryCheck");
-        }
-        count = elements.length ? elements.length : "";
-        document.getElementById("currentCount").textContent = count;
     },
     /*
     messy proof of concept
@@ -169,7 +194,6 @@ var Collect = {
         setupHostname(this.loadSavedItems);
         this.turnOn();
         this.interfaceEvents();
-        this.bubbleEvents();
     },
     loadSavedItems: function(){
         // add option elements for all of the groups in sites[window.location.hostname].groups
@@ -205,47 +229,13 @@ var Collect = {
         // tabs
         document.getElementById("addIndex").addEventListener("click", toggleIndex, false);
         document.getElementById('closeCollect').addEventListener('click', removeInterface, false);
-        document.getElementById("toggleParent").addEventListener("click", toggleParentEvent, false);
+        document.getElementById("toggleParent").addEventListener("click", Collect.parent.toggle, false);
 
         // groups
         document.getElementById("newGroup").addEventListener("click", createGroup, false);
         document.getElementById("deleteGroup").addEventListener("click", deleteGroup, false);
         document.getElementById("allGroups").addEventListener("change", loadGroup, false);
     },
-    /*
-    events that bubble up from selector elements, but interact with the interface
-    */
-    bubbleEvents: function(){
-        /*
-        events that bubble up to the interface
-        */
-        function update(event){
-            if ( event.target.classList.contains("toggleable") ) {
-                Collect.updateSelectorText();
-                Collect.testSelector();    
-            }
-        }
-
-        function removeSelectorFromFamily(event){
-            if ( event.target.classList.contains("deltog")) {
-                event.stopPropagation();
-                // .selectorGroup is the parent
-                var parent = event.target.parentElement,
-                    groups = document.getElementsByClassName("selectorGroup");
-                for ( var i=0, len=groups.length; i<len; i++ ) {
-                    if ( groups[i] === parent ) {
-                        Collect.family.removeElement(i);
-                        break;
-                    }
-                }
-                Collect.updateSelectorText();
-                Collect.testSelector();
-            }
-        }
-        this.html.family.addEventListener("click", update, false);
-        this.html.family.addEventListener("click", removeSelectorFromFamily, false);
-
-    }
 };
 
 Collect.setup();
@@ -263,15 +253,10 @@ function addInterface(){
 
 function resetInterface(){
     clearClass("queryCheck");
-    Collect.html.text.textContent = '';
     document.getElementById("currentCount").textContent = "";
 
-    // selectorItems
-    var family = Collect.html.family;
-    while (family.lastChild) {
-        family.removeChild(family.lastChild);
-    }
-
+    Collect.family.remove();
+    
     // ruleItems
     Collect.selectorTabs.hide();
     document.getElementById("rulePreview").innerHTML = "";
@@ -291,18 +276,6 @@ function resetInterface(){
 /******************
     EVENTS
 ******************/
-/*
-event to create a SelectorFamily from this element
-*/
-function createSelectorFamily(event){
-    event.stopPropagation();
-    event.preventDefault();
-    resetInterface();
-    var family = new SelectorFamily(this, Collect.parentSelector);
-    document.getElementById("selectorItems").style.display = "inline-block";
-    Collect.setFamily(family);
-}
-
 /*
 add .collectHighlight to an element on mouseenter
 */
@@ -369,11 +342,11 @@ clear the current SelectorFamily
 function removeSelectorEvent(event){
     event.stopPropagation();
     event.preventDefault();
-    Collect.clearFamily();
+    resetInterface();
 }
 
 function showRuleInputs(event){
-    Collect.matchSelector();
+    Collect.family.match();
     var ele = Collect.elements[0];
     if ( ele ) {
         document.getElementById("selectorItems").style.display = "none";
@@ -391,33 +364,7 @@ function hideRuleInputs(event){
 on blur, update Collect.elements based on the value of #ruleRange
 */
 function applyRuleRange(event){
-    var rangeElement = document.getElementById("ruleRange"),
-        range = rangeElement.value,
-        rangeInt = parseInt(range, 10),
-        len;
-    Collect.matchSelector();
-    len = Collect.elements.length;
-    if ( !isNaN(rangeInt) ) {
-        if ( rangeInt < 0 ) {
-            if ( -1*rangeInt > len ) {
-                rangeElement.value = "";
-            } else {
-                Collect.elements = Array.prototype.slice.call(Collect.elements).slice(0, rangeInt);
-                Collect.elementIndex = 0;
-                addSelectorTextHTML(Collect.elements[0]);
-            }
-        } else if ( range > 0 ) {
-            if ( rangeInt > len-1) {
-                rangeElement.value = "";
-            } else {
-                Collect.elements = Array.prototype.slice.call(Collect.elements).slice(rangeInt);
-                Collect.elementIndex = 0;
-                addSelectorTextHTML(Collect.elements[0]);
-            }
-        }
-    } else {
-        rangeElement.value = "";
-    }
+    Collect.family.range();
     clearClass("queryCheck");
     addClass("queryCheck", Collect.elements);
     
@@ -457,7 +404,7 @@ toggle .selected class
 function capturePreview(event){
     if ( !this.classList.contains("selected") ){
         clearClass("selected");
-        var elements = Collect.selectorElements(),
+        var elements = Collect.family.elements(),
             capture = this.dataset.capture;
         generatePreviewElements(capture, elements);
         document.getElementById("ruleAttr").value = capture;
@@ -475,7 +422,7 @@ function saveRuleEvent(event){
         capture = document.getElementById("ruleAttr").value,
         range = document.getElementById("ruleRange").value,
         error = false,
-        rule;
+        rule = {};
     clearErrors();
     document.getElementById("ruleAlert").innerHTML = "";
     if ( name === "") {
@@ -496,17 +443,15 @@ function saveRuleEvent(event){
     if ( error ) {
         return;
     }
-    rule = {
-        name: name,
-        capture: capture,
-        selector: selector,
-        index: Collect.indexPage
-    };
+    rule.name = name;
+    rule.capture = capture;
+    rule.selector = selector;
+    rule.index = Collect.indexPage;
     if ( range !== "" ) {
         rule.range = range;
     }
-    if ( Collect.parentSelector ) {
-        rule.parent = Collect.parentSelector;
+    if ( Collect.parent.selector ) {
+        rule.parent = Collect.parent.selector;
     }
     saveRule(rule);
     resetInterface();
@@ -542,22 +487,6 @@ function deleteRuleEvent(event){
         name = parent.dataset.name;
     deleteRule(name);
     parent.parentElement.removeChild(parent);
-}
-
-function toggleParentEvent(event){
-    event.preventDefault();
-    if ( !Collect.parentSelector ){
-        var success = Collect.setParent();
-        if ( success ) {
-            this.textContent = "×";
-            this.setAttribute("title", "remove parent selector");    
-        }        
-    } else {
-        Collect.removeParent();
-        this.textContent = "+";
-        this.setAttribute("title", "add parent selector");
-    }
-    
 }
 
 function uploadRules(event){
