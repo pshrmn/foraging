@@ -361,6 +361,11 @@ body{
             padding: 0 3px 0 2px;
             color: $white;
         }
+
+        .childToggle{
+            border-width: 0 0 1px;
+            width: 50px;
+        }
     }
 
     .selectorGroup:hover{

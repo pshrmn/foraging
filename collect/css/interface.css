@@ -234,6 +234,9 @@ body {
     font-weight: bold;
     padding: 0 3px 0 2px;
     color: white; }
+  #selectorHolder .selectorGroup .childToggle {
+    border-width: 0 0 1px;
+    width: 50px; }
 #selectorHolder .selectorGroup:hover .deltog, #selectorHolder .selectorGroup:hover .onlychild, #selectorHolder .selectorGroup:hover .nthtype {
   color: #777; }
 

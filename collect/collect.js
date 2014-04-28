@@ -66,6 +66,11 @@ var Collect = {
             Collect.elements = this.elements();
             Collect.elementIndex = 0;
         },
+        /*
+        add queryCheck class to all elements matching selector
+        set the count based on number of matching elements
+        set the preview
+        */
         test: function(){
             clearClass("queryCheck");
             clearClass("collectHighlight");
@@ -669,6 +674,9 @@ function markCapture(){
 generate paragraphs html for the captured attribute on all of the elements and attach them to #rulePreview
 */
 function generatePreviewElements(capture, elements) {
+    if ( capture === "" ) {
+        return;
+    }
     var fn = captureFunction(capture),
         previewHTML = "";
     for ( var i=0, len=elements.length; i<len; i++ ) {

@@ -47,7 +47,7 @@ SelectorFamily.prototype.removeSelector = function(index){
         this.selectors[i].index = i;
     }
     this.update();
-}
+};
 
 /*********
 SelectorFamily Interface methods
@@ -64,13 +64,16 @@ SelectorFamily.prototype.setup = function(holder, text, fn){
     // clear out holder, then attach SelectorFamily.ele
     this.holder.innerHTML = "";
     this.holder.appendChild(this.ele);
-}
+};
 
 SelectorFamily.prototype.remove = function(){
     if ( this.holder ) {
         this.holder.innerHTML = "";    
     }
-}
+    if ( this.text ) {
+        this.text.textContent = "";
+    }
+};
 
 /*
 called when something changes with the selectors/fragments
@@ -82,7 +85,7 @@ SelectorFamily.prototype.update = function(){
     if ( this.updateFunction ) {
         this.updateFunction();
     }
-}
+};
 
 /*
 Turn on Fragments that match
@@ -102,7 +105,7 @@ SelectorFamily.prototype.match = function(selector){
         currSelector = copy.pop();
     }
     this.update();
-}
+};
 
 SelectorFamily.prototype.toString = function(){
     var selectors = [],
@@ -114,7 +117,7 @@ SelectorFamily.prototype.toString = function(){
         }
     }
     return selectors.join(' ');
-}
+};
 
 
 /***************************
@@ -134,7 +137,7 @@ var fragments = {
         this.ele.classList.toggle("off");
         this.selector.family.update();
     }
-}
+};
 
 /********************
     FRAGMENT
@@ -152,12 +155,13 @@ function Fragment(name, selector, on){
     //Events
     this.ele.addEventListener("click", fragments.toggleOff.bind(this), false);
 }
+
 Fragment.prototype.on = fragments.on;
 Fragment.prototype.turnOn = fragments.turnOn;
 Fragment.prototype.turnOff = fragments.turnOff;
 Fragment.prototype.matches = function(name){
     return name === this.name;
-}
+};
 
 /********************
     NTHFRAGMENT
@@ -171,6 +175,7 @@ function NthFragment(selector, on){
     this.afterText = document.createTextNode(")");
     this.input = document.createElement("input");
     this.input.setAttribute("type", "text");
+    this.input.value = 1;
     this.input.classList.add("noSelect");
     this.input.classList.add("childToggle");
     this.input.setAttribute("title", "options: an+b (a & b are integers), a positive integer (1,2,3...), odd, even");
@@ -194,15 +199,17 @@ function NthFragment(selector, on){
         this.selector.family.update();
     }).bind(this));
 }
+
 NthFragment.prototype.on = fragments.on;
 NthFragment.prototype.turnOn = fragments.turnOn;
 NthFragment.prototype.turnOff = fragments.turnOff;
 NthFragment.prototype.matches = function(text){
     return this.text() === text;
-}
+};
+
 NthFragment.prototype.text = function(){
     return this.beforeText.textContent + this.input.value + this.afterText.textContent;
-}
+};
 
 /********************
     SELECTOR
@@ -220,7 +227,7 @@ function Selector(ele, family){
         }
         this.classes.push(new Fragment('.' + curr, this));
     }
-    this.setupElements();
+    this.setup();
 }
 
 Selector.prototype.addNthofType = function(){
@@ -231,12 +238,13 @@ Selector.prototype.addNthofType = function(){
     this.ele.removeChild(this.nthtypeCreator);
     this.nthtypeCreator = undefined;
     
-    var selectors = this.ele.getElementsByClassName("realselector");
-        len = selectors.length;
-    this.ele.insertBefore(this.nthoftype.ele, selectors[len-1].nextSibling);
-}
+    var selectors = this.ele.getElementsByClassName("realselector"),
+        len = selectors.length,
+        sibling = selectors[len-1].nextSibling;
+    this.ele.insertBefore(this.nthoftype.ele, sibling);
+};
 
-Selector.prototype.setupElements = function(){
+Selector.prototype.setup = function(){
     var curr, deltog;
     this.ele = document.createElement("div");
     this.ele.classList.add("selectorGroup", "noSelect");
@@ -256,7 +264,7 @@ Selector.prototype.setupElements = function(){
     deltog = selectorSpan("x", ["deltog", "noSelect"]);
     this.ele.appendChild(deltog);
     deltog.addEventListener('click', removeSelectorGroup.bind(this), false);
-}
+};
 
 /*
 turn on (remove .off) from all toggleable parts of a selector if bool is undefined or true
@@ -264,23 +272,29 @@ turn off (add .off) to all toggleable parts if bool is false
 */
 Selector.prototype.setAll = function(bool){
     if ( bool === true || bool === undefined ) {
+        this.tag.ele.classList.remove("off");
         if ( this.id ) {
             this.id.ele.classList.remove("off");
         }
-        this.tag.ele.classList.remove("off");
         for ( var i=0, len=this.classes.length; i<len; i++ ) {
             this.classes[i].ele.classList.remove("off");
         }
+        if ( this.nthoftype ) {
+            this.nthoftype.classList.remove("off");
+        }
     } else {
+        this.tag.ele.classList.add("off");
         if ( this.id ) {
             this.id.ele.classList.add("off");
         }
-        this.tag.ele.classList.add("off");
-        for ( var i=0, len=this.classes.length; i<len; i++ ) {
-            this.classes[i].ele.classList.add("off");
+        for ( var j=0, classLen=this.classes.length; j<classLen; j++ ) {
+            this.classes[j].ele.classList.add("off");
+        }
+        if ( this.nthoftype ) {
+            this.nthoftype.classList.add("off");
         }
     }
-}
+};
 
 /*
 Given a selector string, return true if the Selector has attributes matching the query string
@@ -289,7 +303,6 @@ If returning true, also turn on the matching Fragments
 Selector.prototype.matches = function(selector){
     var tag, id, classes, nthoftype,
         onlist = [];
-
     // element tag
     tag = selector.match(/^[a-z][\w0-9-]*/i);
     if ( tag !== null) {
@@ -301,7 +314,7 @@ Selector.prototype.matches = function(selector){
     }
 
     // element id
-    id = selector.match(/#(?:[a-z][\w0-9-]*)/i)
+    id = selector.match(/#(?:[a-z][\w0-9-]*)/i);
     if ( id !== null ) {
         if ( this.id === undefined || !this.id.matches(id[0])) {
             return false;
@@ -311,7 +324,7 @@ Selector.prototype.matches = function(selector){
     }
 
     // element classes
-    classes = selector.match(/(\.[a-z][\w0-9-]*)/ig)
+    classes = selector.match(/(\.[a-z][\w0-9-]*)/ig);
     if ( classes !== null ) {
         // if the provided selector has more classes than the selector, know it doesn't match
         if ( classes.length > this.classes.length ) {
@@ -346,11 +359,11 @@ Selector.prototype.matches = function(selector){
     }
 
     // everything matches, turn framents on and return true
-    for ( var i=0, len=onlist.length; i<len; i++ ) {
-        onlist[i].turnOn();
+    for ( var k=0, len=onlist.length; k<len; k++ ) {
+        onlist[k].turnOn();
     }
     return true;
-}
+};
 
 Selector.prototype.toString = function(){
     var selector = "",
@@ -373,7 +386,7 @@ Selector.prototype.toString = function(){
         selector += this.nthoftype.text();
     }
     return selector;
-}
+};
 
 function createNthofType(event){
     event.stopPropagation();
