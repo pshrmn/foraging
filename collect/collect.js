@@ -143,9 +143,7 @@ var Collect = {
                 this.textContent = "+";
                 this.setAttribute("title", "add parent selector");
             }
-            
         }
-
     },
     /*
     adds events listeners based on whether or not this.parentSelector is set
@@ -196,28 +194,9 @@ var Collect = {
         
         // don't call loadSavedItems until hostname has been setup because it is asynchronous
         // and will throw errors the first time visiting a site and opening collectJS
-        setupHostname(this.loadSavedItems);
+        setupHostname();
         this.turnOn();
         this.interfaceEvents();
-    },
-    loadSavedItems: function(){
-        // add option elements for all of the groups in sites[window.location.hostname].groups
-        chrome.storage.local.get('sites', function loadGroupsChrome(storage){
-            var host = window.location.hostname,
-                site = storage.sites[host],
-                groups = site.groups,
-                select = document.getElementById("allGroups"),
-                newOption;
-
-            for ( var key in groups ) {
-                newOption = document.createElement("option");
-                newOption.setAttribute("value", key);
-                newOption.textContent = key;
-                select.appendChild(newOption);
-            }
-
-            loadGroupObject(groups["default"]);
-        });
     },
     interfaceEvents: function(){
         // preview
@@ -229,17 +208,30 @@ var Collect = {
         document.getElementById("ruleCyclePrevious").addEventListener("click", showPreviousElement, false);
         document.getElementById("ruleCycleNext").addEventListener("click", showNextElement, false);
         document.getElementById("ruleRange").addEventListener("blur", applyRuleRange, false);
-        document.getElementById("uploadRules").addEventListener("click", uploadRules, false);
+        document.getElementById("uploadRules").addEventListener("click", function(event){
+            uploadRules();
+        }, false);
 
         // tabs
-        document.getElementById("addIndex").addEventListener("click", toggleIndex, false);
+        document.getElementById("addIndex").addEventListener("click", function(){
+            toggleIndex();
+        }, false);
         document.getElementById('closeCollect').addEventListener('click', removeInterface, false);
         document.getElementById("toggleParent").addEventListener("click", Collect.parent.toggle, false);
 
         // groups
-        document.getElementById("newGroup").addEventListener("click", createGroup, false);
-        document.getElementById("deleteGroup").addEventListener("click", deleteGroup, false);
-        document.getElementById("allGroups").addEventListener("change", loadGroup, false);
+        document.getElementById("newGroup").addEventListener("click", function(event){
+            event.preventDefault();
+            createGroup();
+        }, false);
+        document.getElementById("deleteGroup").addEventListener("click", function(event){
+            event.preventDefault();
+            deleteGroup();
+        }, false);
+        document.getElementById("allGroups").addEventListener("change", function(event){
+            event.preventDefault();
+            loadGroup(this);
+        }, false);
     },
 };
 
@@ -293,35 +285,6 @@ remove .collectHighlight from an element on mouseleave
 */
 function unhighlightElement(event){
     this.classList.remove("collectHighlight");
-}
-
-/*
-toggle whether the current page's url represents an index page for the crawler.
-saves index page in chrome.storage
-*/
-function toggleIndex(event){  
-    chrome.storage.local.get("sites", function(storage){
-        var host = window.location.hostname,
-            url = window.location.href,
-            tab = document.getElementById("indexTab"),
-            group = Collect.currentGroup;
-        // adding
-        if ( !tab.classList.contains("set")) {
-            // set right away, remove if there is an error
-            tab.classList.add("set");
-            storage.sites[host].groups[group].indices[url] = true;
-        }
-        // removing
-        else {
-            // remove right away, reset if there is an error
-            tab.classList.remove("set");
-            if ( storage.sites[host].groups[group].indices[url] ) {
-                delete storage.sites[host].groups[group].indices[url];    
-            }
-        }
-        document.getElementById("parentTab").classList.toggle("hidden");
-        chrome.storage.local.set({"sites": storage.sites});
-    });
 }
 
 /*
@@ -494,98 +457,6 @@ function deleteRuleEvent(event){
     parent.parentElement.removeChild(parent);
 }
 
-function uploadRules(event){
-    chrome.storage.local.get(null, function(storage){
-        var host = window.location.hostname,
-            site = storage.sites[host],
-            group = Collect.currentGroup;
-        chrome.runtime.sendMessage({'type': 'upload', data: site.groups[group]});
-    });
-}
-
-function createGroup(event){
-    event.preventDefault();
-    var name = prompt("Group Name");
-    // make sure name isn't empty string
-    if ( name === "" || !legalFilename(name)) {
-        return;
-    }
-    
-    chrome.storage.local.get("sites", function(storage){
-        var host = window.location.hostname,
-            site = storage.sites[host],
-            newOption;
-
-        // if group already exists, set it as the currentGroup
-        if ( site.groups[name] ) {
-            setCurrentGroup(document.querySelector("#allGroups option[value=" + name + "]"));
-            return;
-        } else {
-            newOption = document.createElement("option");
-            newOption.setAttribute("value", name);
-            newOption.textContent = name;
-            document.getElementById("allGroups").appendChild(newOption);
-            setCurrentGroup(newOption);
-            
-            storage.sites[host].groups[name] = {
-                name: name,
-                indices: {},
-                rules: {}
-            };
-            chrome.storage.local.set({'sites': storage.sites});
-            Collect.collectTabs.hide();
-        }
-    });
-}
-
-/*
-deletes the group currently selected, and removes its associated option from #allGroups
-if the current group is "default", delete the rules for the group but don't delete the group
-*/
-function deleteGroup(event){
-    event.preventDefault();
-    var currGroup = document.querySelector("#allGroups option:checked"),
-        groupName = currGroup.value,
-        defaultGroup = (groupName === "default"),
-        confirmed;
-    if ( groupName === "default" ) {
-        confirmed = confirm("Cannot delete \"default\" group. Do you want to clear out all of its rules instead?");
-    } else {
-        confirmed = confirm("Are you sure you want to delete this group and all of its related rules?");    
-    }
-    if ( !confirmed ) {
-        return;
-    }
-    chrome.storage.local.get("sites", function deleteGroupChrome(storage){
-        var host = window.location.hostname,
-            site = storage.sites[host],
-            currOption = document.querySelector("#allGroups option:checked");
-        // just delete all of the rules for "default" option
-        if ( defaultGroup ) {
-            site.groups["default"] = {};
-        } else {
-            delete site.groups[groupName];
-            currOption.parentElement.removeChild(currOption);
-            Collect.currentGroup = "default";
-            setCurrentGroup(document.querySelector("#allGroups option[value=default]"));
-        }
-        storage.sites[host] = site;
-        chrome.storage.local.set({'sites': storage.sites});
-        Collect.collectTabs.hide();
-    });
-}
-
-function loadGroup(event){
-    event.preventDefault();
-    var option = this.querySelector('option:checked'),
-        name = option.value;
-    chrome.storage.local.get('sites', function loadGroupsChrome(storage){
-        var host = window.location.hostname,
-            site = storage.sites[host],
-            group = site.groups[name];
-        loadGroupObject(group);
-    });
-}
 
 /***********************
     EVENT HELPERS
@@ -600,49 +471,6 @@ function addSelectorTextHTML(ele){
     rule.innerHTML = selectorTextHTML(ele);
     capture = rule.getElementsByClassName("capture");
     addEvents(capture, "click", capturePreview);
-}
-
-function setCurrentGroup(option){
-    Collect.currentGroup = option.value;
-    option.setAttribute("selected", true);
-    document.getElementById("groupName").textContent = ": " + option.value;
-}
-
-/*
-given a group object (rules, indices)
-*/
-function loadGroupObject(group){
-    var currOption = document.querySelector("#allGroups option[value=" + group.name + "]");
-    setCurrentGroup(currOption);
-    if ( group.rules ) {
-        clearRules();
-        for (var key in group.rules){
-            addRule(group.rules[key]);                    
-        }
-    }
-    if ( group.indices[window.location.href] ) {
-        Collect.indexPage = true;
-        document.getElementById("indexTab").classList.add("set");
-        document.getElementById("addIndex").checked = true;
-        document.getElementById("parentTab").classList.remove("hidden");
-    } else {
-        Collect.indexPage = false;
-        document.getElementById("indexTab").classList.remove("set");
-        document.getElementById("addIndex").checked = false;
-        document.getElementById("parentTab").classList.add("hidden");
-    }
-}
-
-function clearGroup(name){
-    var currOption = document.querySelector("#allGroups option[value=" + name + "]");
-        setCurrentGroup(currOption);
-
-    chrome.storage.local.get('sites', function clearGroupChrome(storage){
-        var host = window.location.hostname,
-            site = storage.sites[host],
-            group = site.groups[name],
-            rules = group.rules;
-    });   
 }
 
 function clearRules(){
@@ -818,19 +646,6 @@ function captureFunction(capture){
     }
 }
 
-/*
-rejects if name contains characters not allowed in filename: <, >, :, ", \, /, |, ?, *
-*/
-function legalFilename(name){
-    if ( name === null ) {
-        return false;
-    }
-    var badCharacters = /[<>:"\/\\\|\?\*]/,
-        match = name.match(badCharacters);
-    return ( match === null );
-}
-
-
 /***********************
         STORAGE
 ***********************/
@@ -844,28 +659,35 @@ the object is:
                 name: <name>,
                 indices: {},
                 rules: {}
-Because the necessary storage structure doesn't exist the first time visiting a site, callback is 
-used to call any functions that require storage to be setup after the initial setup is complete
+If the site object exists for a host, load the saved rules
 */
-function setupHostname(callback){
+function setupHostname(){
     chrome.storage.local.get("sites", function setupHostnameChrome(storage){
-        var host = window.location.hostname;
-        if ( !storage.sites[host] ) {
+        var host = window.location.hostname,
+            site = storage.sites[host],
+            select = document.getElementById("allGroups");
+        if ( !site ) {
+            var defaultGroup = {
+                name: "default",
+                indices: {},
+                rules: {}
+            };
             storage.sites[host] = {
                 site: host,
                 groups: {
-                    "default": {
-                        name: "default",
-                        indices: {},
-                        rules: {}
-                    }
+                    "default": defaultGroup
                 }
             };
-            chrome.storage.local.set({'sites': storage.sites}, function(){
-                callback();
-            });
+            chrome.storage.local.set({'sites': storage.sites});
+
+            addSelectOption("default", select);
+            loadGroupObject(defaultGroup);
         } else {
-            callback();
+            for ( var key in site.groups ) {
+                addSelectOption(key, select);
+            }
+
+            loadGroupObject(site.groups["default"]);
         }
     });
 }
@@ -892,6 +714,184 @@ function deleteRule(name){
         delete sites[host].groups[group].rules[name];
         chrome.storage.local.set({'sites': sites});
     });  
+}
+
+/*
+toggle whether the current page's url represents an index page for the crawler.
+saves index page in chrome.storage
+*/
+function toggleIndex(){
+    chrome.storage.local.get("sites", function(storage){
+        var host = window.location.hostname,
+            url = window.location.href,
+            tab = document.getElementById("indexTab"),
+            group = Collect.currentGroup;
+        // adding
+        if ( !tab.classList.contains("set")) {
+            // set right away, remove if there is an error
+            tab.classList.add("set");
+            storage.sites[host].groups[group].indices[url] = true;
+        }
+        // removing
+        else {
+            // remove right away, reset if there is an error
+            tab.classList.remove("set");
+            if ( storage.sites[host].groups[group].indices[url] ) {
+                delete storage.sites[host].groups[group].indices[url];    
+            }
+        }
+        document.getElementById("parentTab").classList.toggle("hidden");
+        chrome.storage.local.set({"sites": storage.sites});
+    });
+
+}
+
+function uploadRules(){
+    chrome.storage.local.get(null, function(storage){
+        var host = window.location.hostname,
+            site = storage.sites[host],
+            group = Collect.currentGroup;
+        chrome.runtime.sendMessage({'type': 'upload', data: site.groups[group]});
+    });
+}
+
+function createGroup(){
+    var name = prompt("Group Name");
+    // make sure name isn't empty string
+    if ( name === "" || !legalFilename(name)) {
+        return;
+    }
+    
+    chrome.storage.local.get("sites", function(storage){
+        var host = window.location.hostname,
+            site = storage.sites[host],
+            newOption;
+
+        // if group already exists, set it as the currentGroup
+        if ( site.groups[name] ) {
+            setCurrentGroup(document.querySelector("#allGroups option[value=" + name + "]"));
+            return;
+        } else {
+            newOption = document.createElement("option");
+            newOption.setAttribute("value", name);
+            newOption.textContent = name;
+            document.getElementById("allGroups").appendChild(newOption);
+            setCurrentGroup(newOption);
+            
+            storage.sites[host].groups[name] = {
+                name: name,
+                indices: {},
+                rules: {}
+            };
+            chrome.storage.local.set({'sites': storage.sites});
+            Collect.collectTabs.hide();
+        }
+    });
+}
+
+/*
+deletes the group currently selected, and removes its associated option from #allGroups
+if the current group is "default", delete the rules for the group but don't delete the group
+*/
+function deleteGroup(){
+    var currGroup = document.querySelector("#allGroups option:checked"),
+        groupName = currGroup.value,
+        defaultGroup = (groupName === "default"),
+        confirmed;
+    if ( groupName === "default" ) {
+        confirmed = confirm("Cannot delete \"default\" group. Do you want to clear out all of its rules instead?");
+    } else {
+        confirmed = confirm("Are you sure you want to delete this group and all of its related rules?");    
+    }
+    if ( !confirmed ) {
+        return;
+    }
+    chrome.storage.local.get("sites", function deleteGroupChrome(storage){
+        var host = window.location.hostname,
+            site = storage.sites[host],
+            currOption = document.querySelector("#allGroups option:checked");
+        // just delete all of the rules for "default" option
+        if ( defaultGroup ) {
+            site.groups["default"] = {
+                name: "default",
+                indices: {},
+                rules: {}
+            };
+        } else {
+            delete site.groups[groupName];
+            currOption.parentElement.removeChild(currOption);
+            Collect.currentGroup = "default";
+            setCurrentGroup(document.querySelector("#allGroups option[value=default]"));
+        }
+        storage.sites[host] = site;
+        chrome.storage.local.set({'sites': storage.sites});
+        Collect.collectTabs.hide();
+    });
+}
+
+function loadGroup(ele){
+    var option = ele.querySelector('option:checked'),
+        name = option.value;
+    chrome.storage.local.get('sites', function loadGroupsChrome(storage){
+        var host = window.location.hostname,
+            site = storage.sites[host],
+            group = site.groups[name];
+        loadGroupObject(group);
+    });
+}
+
+/***********************
+    STORAGE HELPERS
+***********************/
+
+/*
+rejects if name contains characters not allowed in filename: <, >, :, ", \, /, |, ?, *
+*/
+function legalFilename(name){
+    if ( name === null ) {
+        return false;
+    }
+    var badCharacters = /[<>:"\/\\\|\?\*]/,
+        match = name.match(badCharacters);
+    return ( match === null );
+}
+
+function setCurrentGroup(option){
+    Collect.currentGroup = option.value;
+    option.setAttribute("selected", true);
+    document.getElementById("groupName").textContent = ": " + option.value;
+}
+
+/*
+given a group object (rules, indices)
+*/
+function loadGroupObject(group){
+    var currOption = document.querySelector("#allGroups option[value=" + group.name + "]");
+    setCurrentGroup(currOption);
+    if ( group.rules ) {
+        clearRules();
+        for (var key in group.rules){
+            addRule(group.rules[key]);                    
+        }
+    }
+    if ( group.indices[window.location.href] ) {
+        Collect.indexPage = true;
+        document.getElementById("indexTab").classList.add("set");
+        document.getElementById("addIndex").checked = true;
+        document.getElementById("parentTab").classList.remove("hidden");
+    } else {
+        Collect.indexPage = false;
+        document.getElementById("indexTab").classList.remove("set");
+        document.getElementById("addIndex").checked = false;
+        document.getElementById("parentTab").classList.add("hidden");
+    }
+}
+
+function addSelectOption(name, select){
+    var newOption = document.createElement("option");
+    newOption.setAttribute("value", name);
+    newOption.textContent = name;
+    select.appendChild(newOption);
 }
 
 /***********************
@@ -1022,4 +1022,3 @@ function wrapTextHTML(text, type){
     return '<span class="capture no_select" title="click to capture ' + type + 
         ' property" data-capture="' + type + '">' + text + '</span>';
 }
-

@@ -2,47 +2,6 @@ describe("collect", function(){
 
 });
 
-describe("event helpers", function(){
-    
-    /*
-    missing:
-        addSelectorTextHTML
-    */
-
-    describe("setCurrentGroup", function(){
-        it("sets the option element as the current group of rules for Collect", function(){
-            var option = document.createElement("option"),
-                groupName = document.createElement("div");
-            option.value = "test";
-            groupName.setAttribute("id", "groupName");
-            document.body.appendChild(groupName);
-
-            setCurrentGroup(option);
-            expect(Collect.currentGroup).toEqual("test");
-            expect(option.getAttribute("selected")).toEqual("true");
-            expect(groupName.textContent).toEqual(": test");
-
-            // remove from DOM
-            document.body.removeChild(groupName);
-        });
-    });
-
-    /*
-    missing:
-        loadGroupObject
-        clearGroup
-        clearRules
-        markCapture
-        generatePreviewElements
-        clearErrors
-        ruleAlertMessage
-        addRule
-        showActive
-        hideActive
-
-    */
-});
-
 describe("utility functions", function(){
     describe("noSelectElement", function(){
         it("returns element with the correct tagname", function(){
@@ -197,7 +156,9 @@ describe("utility functions", function(){
             expect(captureHREF(ele)).toEqual("http://www.example.com");
         });
     });
+});
 
+describe("storage helpers", function(){
     describe("legalFilename", function(){
         it("returns true for legal filenames", function(){
             var goodNames = ["test", "good.jpg", "this is legal !"];
@@ -217,8 +178,37 @@ describe("utility functions", function(){
             expect(legalFilename(null)).toBe(false);
         });
     });
-});
 
+    describe("setCurrentGroup", function(){
+        it("sets the option element as the current group of rules for Collect", function(){
+            var option = document.createElement("option"),
+                groupName = document.createElement("div");
+            option.value = "test";
+            groupName.setAttribute("id", "groupName");
+            document.body.appendChild(groupName);
+
+            setCurrentGroup(option);
+            expect(Collect.currentGroup).toEqual("test");
+            expect(option.getAttribute("selected")).toEqual("true");
+            expect(groupName.textContent).toEqual(": test");
+
+            // remove from DOM
+            document.body.removeChild(groupName);
+        });
+    });
+
+    describe("addSelectOption", function(){
+        it("creates option element and attaches it to select", function(){
+            var select = document.createElement("select");
+            addSelectOption("test", select);
+            var options = select.getElementsByTagName("option"),
+                test = options[0];
+            expect(options.length).toEqual(1);
+            expect(test.value).toEqual("test");
+            expect(test.textContent).toEqual("test");
+        });
+    });
+});
 
 describe("html functions", function(){    
     describe("ruleHTML", function(){
