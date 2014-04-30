@@ -156,6 +156,49 @@ describe("utility functions", function(){
             expect(captureHREF(ele)).toEqual("http://www.example.com");
         });
     });
+
+    describe("isLink", function(){
+        it("returns true if an element is an anchor", function(){
+            var link = document.createElement("a");
+            expect(isLink(link)).toBe(true);
+        });
+
+        it("returns false if an element is not an anchor", function(){
+            var div = document.createElement("div"),
+                span = document.createElement("span");
+            expect(isLink(div)).toBe(false);
+            expect(isLink(span)).toBe(false);
+        });
+    });
+
+    describe("allLinks", function(){
+        it("returns true if all elements in an array are anchors", function(){
+            var links = [];
+            for ( var i=0; i<10; i++ ) {
+                links.push(document.createElement("a"));
+            }
+            expect(allLinks(links)).toBe(true);
+        });
+
+        it("works for a nodelist", function(){
+            var div = document.createElement("div"),
+                links;
+            for ( var i=0; i<10; i++ ) {
+                div.appendChild( document.createElement("a") );
+            }
+            links = div.getElementsByTagName("a");
+            expect(allLinks(links)).toBe(true);
+        });
+
+        it("returns false if even one element is not an anchor", function(){
+            var links = [];
+            for ( var i=0; i<10; i++ ) {
+                links.push(document.createElement("a"));
+            }
+            links.push(document.createElement("span"));
+            expect(allLinks(links)).toBe(false);
+        });
+    });
 });
 
 describe("storage helpers", function(){

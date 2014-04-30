@@ -263,6 +263,7 @@ function resetInterface(){
     for ( var i=0; i<len; i++ ) {
         inputs[i].value = "";
     }
+    document.getElementById("ruleFollow").checked = false;
 
     // divs to hide
     document.getElementById("selectorPreview").style.display = "none";    
@@ -377,6 +378,17 @@ function capturePreview(event){
         generatePreviewElements(capture, elements);
         document.getElementById("ruleAttr").value = capture;
         this.classList.add("selected");
+
+        var follow = document.getElementById("ruleFollow");
+        if ( capture === "attr-href" && allLinks(Collect.elements) ){
+            follow.removeAttribute("disabled");
+            follow.setAttribute("title", "Follow link to get data for more rules");
+        } else {
+            follow.checked = false;
+            follow.setAttribute("disabled", "true");
+            follow.setAttribute("title", "Can only follow rules that get href attribute from links");
+        }
+
     } else {
         document.getElementById("ruleAttr").value ='';
         document.getElementById("rulePreview").innerHTML = "";
@@ -389,6 +401,7 @@ function saveRuleEvent(event){
         selector = document.getElementById("selectorText").textContent,
         capture = document.getElementById("ruleAttr").value,
         range = document.getElementById("ruleRange").value,
+        follow = document.getElementById("ruleFollow").checked,
         error = false,
         rule = {};
     clearErrors();
@@ -420,6 +433,9 @@ function saveRuleEvent(event){
     }
     if ( Collect.parent.selector ) {
         rule.parent = Collect.parent.selector;
+    }
+    if ( follow ) {
+        rule.follow = true;
     }
     saveRule(rule);
     resetInterface();
@@ -644,6 +660,15 @@ function captureFunction(capture){
             return ele.getAttribute(attribute);
         };
     }
+}
+
+function isLink(element, index, array){
+    return element.tagName === "A";
+}
+
+function allLinks(elements){
+    elements = Array.prototype.slice.call(elements);
+    return elements.every(isLink);
 }
 
 /***********************
