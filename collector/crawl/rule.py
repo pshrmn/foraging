@@ -8,13 +8,18 @@ class Rule(object):
     capture is the attribute of the item(s) that you want to store
         eg. attr-href means that you want to get the element's href attribute
         text means that you want the text content of the element
+    parent is the parent selector for the element (ie if the selector is a and the parent is .group,
+        the full selector is .group a)
     """
-    def __init__(self, name, selector, capture, index=None, cleaners=None):
+    def __init__(self, name, selector, capture, parent=None, index=None, cleaners=None):
         self.name = name
         self.selector = selector
         self.capture = capture
-        self.xpath = CSSSelector(self.selector)
+        self.parent = parent
         self.index = index
+
+        self.xpath = CSSSelector(self.selector)
+        
         self.values = self.set_capture()
         self.cleaners = cleaners or []
         
