@@ -314,23 +314,36 @@ body{
     .selected{
         background: $light-green;
     }
-
-    .rule{
-        color: $black;
-        font-size: 14px;
-
-        label{
-            width: 100px;
-        }
-
-        label, input{
-            margin: 0;
-            display: inline-block;
-        }
-    }
-
+    
     input[type=text]{
         width: 250px;
+    }
+}
+
+.rule{
+    color: $black;
+    font-size: 14px;
+
+    label{
+        width: 100px;
+    }
+
+    label, input{
+        margin: 0;
+        display: inline-block;
+    }
+}
+
+
+#rulePage{
+    div{
+        display: inline-block;
+        width: 100px;
+    }
+
+    label{
+        width: auto;
+        margin-right: 5px;
     }
 }
 

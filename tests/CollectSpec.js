@@ -251,6 +251,90 @@ describe("storage helpers", function(){
             expect(test.textContent).toEqual("test");
         });
     });
+
+    describe("uniqueRuleName", function(){
+        var rules = {
+            "index": {
+                "one": {},
+                "two": {"follow": true},
+                "three": {},
+            },
+            "two": {
+                "foo": {},
+                "bar": {},
+                "baz": {},
+            }
+        };
+
+        it("returns true if name doesn't exist for any current rule", function(){
+            expect(uniqueRuleName("test", rules)).toBe(true);
+        });
+
+        it("returns false if a rule already has name", function(){
+            var names = ["one", "two", "three", "foo", "bar", "baz"];
+            for ( var i=0, len=names.length; i<len; i++ ) {
+                expect(uniqueRuleName(names[i], rules)).toBe(false);
+            }
+        });
+    });
+
+    describe("addPage", function(){
+        var holder;
+        beforeEach(function(){
+            holder = document.createElement("div");
+            holder.id = "rulePage";
+            document.body.appendChild(holder);
+        });
+
+        afterEach(function(){
+            holder.parentElement.removeChild(holder);
+        });
+
+        it("creates input/label and appends to #rulePage", function(){
+            addPage("test");
+            var inputs = holder.getElementsByTagName("input"),
+                input = inputs[0],
+                labels = holder.getElementsByTagName("label"),
+                label = labels[0];
+            expect(inputs.length).toEqual(1);
+            expect(labels.length).toEqual(1);
+            expect(input.value).toEqual("test");
+            expect(label.textContent).toEqual("test");
+            expect(label.getAttribute("for")).toEqual("testRulePage");
+        });
+    });
+
+    describe("removePage", function(){
+        var holder;
+        beforeEach(function(){
+            holder = document.createElement("div");
+            holder.id = "rulePage";
+            document.body.appendChild(holder);
+        });
+
+        afterEach(function(){
+            holder.parentElement.removeChild(holder);
+        });
+
+        it("removes input/label from #rulePage", function(){
+            addPage("foo");
+            addPage("bar");
+            var inputs = holder.getElementsByTagName("input"),
+                labels = holder.getElementsByTagName("label");
+            expect(inputs.length).toEqual(2);
+            expect(labels.length).toEqual(2);
+
+            removePage("bar");
+            var barInput = document.getElementById("barRulePage"),
+                barLabel = document.getElementById("barInputLabel");
+            inputs = holder.getElementsByTagName("input"),
+            labels = holder.getElementsByTagName("label");
+            expect(inputs.length).toEqual(1);
+            expect(labels.length).toEqual(1);
+            expect(barInput).toBeNull();
+            expect(barLabel).toBeNull();
+        });
+    });
 });
 
 describe("html functions", function(){    

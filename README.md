@@ -21,16 +21,20 @@ Rules format:
             groups: {
                 name: {
                     name: name,
-                    indices: [...],
+                    index_pages: {...},
                     rules: {
-                        name: {
-                            capture: ...,
-                            index: ...,
-                            name: ...,
-                            selector: ...,
-                            parent: ...,
-                            range: ...        
-                        }
+                        default: {
+                            name: {
+                                capture: ...,
+                                index: ...,
+                                name: ...,
+                                selector: ...,
+                                parent: ...,
+                                range: ...
+                            },
+                            ...
+                        },
+                        ...
                     }
                 },
                 ...

@@ -205,16 +205,24 @@ body {
   cursor: pointer; }
 #ruleItems .selected {
   background: #bddbce; }
-#ruleItems .rule {
-  color: black;
-  font-size: 14px; }
-  #ruleItems .rule label {
-    width: 100px; }
-  #ruleItems .rule label, #ruleItems .rule input {
-    margin: 0;
-    display: inline-block; }
 #ruleItems input[type=text] {
   width: 250px; }
+
+.rule {
+  color: black;
+  font-size: 14px; }
+  .rule label {
+    width: 100px; }
+  .rule label, .rule input {
+    margin: 0;
+    display: inline-block; }
+
+#rulePage div {
+  display: inline-block;
+  width: 100px; }
+#rulePage label {
+  width: auto;
+  margin-right: 5px; }
 
 /* Selector */
 #selectorHolder .selectorGroup {

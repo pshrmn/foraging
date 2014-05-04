@@ -38,6 +38,7 @@
             <div class="group rules">
                 <div id="savedRuleHolder">
                     <div class="ruleGroup" data-selector="default">
+                        <h2>default</h2>
                         <div class="groupRules"></div>
                     </div>
                 </div>
@@ -62,21 +63,24 @@
             <button id="ruleCycleNext" class="cycle" title="next element matching selector">Next</button>
         </div>
         <div id="ruleInputs">
+            <div class="rule">Page:
+                <div id="rulePage"></div>
+            </div>
             <div class="rule">
                 <label for="ruleName">Name:</label>
-                <input id="ruleName" name="ruleName" type="text"></input>
+                <input id="ruleName" name="ruleName" type="text" />
             </div>
             <div class="rule">
                 <label for="ruleAttr">Attribute:</label>
-                <input id="ruleAttr" name="ruleAttr" type="text"></input>
+                <input id="ruleAttr" name="ruleAttr" type="text" />
             </div>
             <div class="rule">
                 <label for="ruleRange">Range:</label>
-                <input id="ruleRange" name="ruleRange" type="text"></input>
+                <input id="ruleRange" name="ruleRange" type="text" />
             </div>
             <div class="rule">
                 <label for="ruleFollow">Follow:</label>
-                <input id="ruleFollow" name="ruleFollow" type="checkbox" disabled="true" title="Can only follow rules that get href attribute from links"></input>
+                <input id="ruleFollow" name="ruleFollow" type="checkbox" disabled="true" title="Can only follow rules that get href attribute from links" />
             </div>
         </div>
         <button id="saveRule">Save Rule</button>
