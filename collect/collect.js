@@ -263,7 +263,9 @@ function resetInterface(){
     for ( var i=0; i<len; i++ ) {
         inputs[i].value = "";
     }
-    document.getElementById("ruleFollow").checked = false;
+    var follow = document.getElementById("ruleFollow");
+    follow.checked = false;
+    follow.disabled = true;
 
     // divs to hide
     document.getElementById("selectorPreview").style.display = "none";    
@@ -392,6 +394,7 @@ function capturePreview(event){
     } else {
         document.getElementById("ruleAttr").value ='';
         document.getElementById("rulePreview").innerHTML = "";
+        document.getElementById("ruleFollow").disabled = true;
         this.classList.remove("selected");
     }   
 }
@@ -764,18 +767,15 @@ function deleteRule(name, element){
                 delete sites[host].groups[group].rules[page][name];
                 delete sites[host].groups[group].rules[name];
                 removePage(name);
-
-                // get rid of html elements
-                element.parentElement.removeChild(element);
-
                 chrome.storage.local.set({'sites': sites});
+                element.parentElement.removeChild(element);
             }
-            
         } else {
             delete sites[host].groups[group].rules[page][name];    
             chrome.storage.local.set({'sites': sites});
+            // get rid of html elements
+            element.parentElement.removeChild(element);
         }
-        
     });  
 }
 
@@ -1006,6 +1006,7 @@ function removePage(name){
         rules = document.querySelector('.ruleGroup[data-selector="' + name + '"]');
     input.parentElement.removeChild(input);
     label.parentElement.removeChild(label);
+    // get rid of the .ruleGroup for the page
     if ( rules ) {
         rules.parentElement.removeChild(rules);
     }
