@@ -278,11 +278,11 @@ describe("storage helpers", function(){
         });
     });
 
-    describe("addPage", function(){
+    describe("addSet", function(){
         var holder;
         beforeEach(function(){
             holder = document.createElement("div");
-            holder.id = "rulePage";
+            holder.id = "ruleSet";
             document.body.appendChild(holder);
         });
 
@@ -290,8 +290,8 @@ describe("storage helpers", function(){
             holder.parentElement.removeChild(holder);
         });
 
-        it("creates input/label and appends to #rulePage", function(){
-            addPage("test");
+        it("creates input/label and appends to #ruleSet", function(){
+            addSet("test");
             var inputs = holder.getElementsByTagName("input"),
                 input = inputs[0],
                 labels = holder.getElementsByTagName("label"),
@@ -300,15 +300,15 @@ describe("storage helpers", function(){
             expect(labels.length).toEqual(1);
             expect(input.value).toEqual("test");
             expect(label.textContent).toEqual("test");
-            expect(label.getAttribute("for")).toEqual("testRulePage");
+            expect(label.getAttribute("for")).toEqual("testRuleSet");
         });
     });
 
-    describe("removePage", function(){
+    describe("removeSet", function(){
         var holder;
         beforeEach(function(){
             holder = document.createElement("div");
-            holder.id = "rulePage";
+            holder.id = "ruleSet";
             document.body.appendChild(holder);
         });
 
@@ -316,16 +316,16 @@ describe("storage helpers", function(){
             holder.parentElement.removeChild(holder);
         });
 
-        it("removes input/label from #rulePage", function(){
-            addPage("foo");
-            addPage("bar");
+        it("removes input/label from #ruleSet", function(){
+            addSet("foo");
+            addSet("bar");
             var inputs = holder.getElementsByTagName("input"),
                 labels = holder.getElementsByTagName("label");
             expect(inputs.length).toEqual(2);
             expect(labels.length).toEqual(2);
 
-            removePage("bar");
-            var barInput = document.getElementById("barRulePage"),
+            removeSet("bar");
+            var barInput = document.getElementById("barRuleSet"),
                 barLabel = document.getElementById("barInputLabel");
             inputs = holder.getElementsByTagName("input"),
             labels = holder.getElementsByTagName("label");
@@ -344,12 +344,11 @@ describe("html functions", function(){
             selectorObj = {
                 name: 'link',
                 selector: 'a',
-                capture: 'attr-href',
-                index: false
+                capture: 'attr-href'
             };
         });
         it("sets savedSelector class when complete", function(){
-            var html = '<span class="noSelect collectGroup" data-selector="a" data-name="link" data-capture="attr-href" data-index="false">' + 
+            var html = '<span class="noSelect collectGroup" data-selector="a" data-name="link" data-capture="attr-href">' + 
                 '<span class="noSelect savedSelector">link</span><span class="noSelect deltog">×</span></span>';
             expect(ruleHTML(selectorObj).outerHTML).toEqual(html);
         });

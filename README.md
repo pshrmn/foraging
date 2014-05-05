@@ -21,8 +21,8 @@ Rules format:
             groups: {
                 name: {
                     name: name,
-                    index_pages: {...},
-                    rules: {
+                    index_urls: {...},
+                    sets: {
                         default: {
                             name: {
                                 capture: ...,
@@ -43,5 +43,6 @@ Rules format:
         ...
     }
 
+"default" set is called on index_urls
 
 Uses https://github.com/psherman/selector and https://github.com/psherman/tabs
