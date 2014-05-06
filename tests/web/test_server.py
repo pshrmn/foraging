@@ -3,28 +3,28 @@ import shutil
 import unittest
 import json
 
-from collector.web import app as collect
+from collector.web import server
 
 class CollectTestCase(unittest.TestCase):
     
     def setUp(self):
-        collect.app.testing = True
+        server.app.testing = True
         parent_directory = os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir)
         real_directory = os.path.abspath(parent_directory)
-        collect.SITE_DIRECTORY = os.path.join(parent_directory, 'rules')
-        self.app = collect.app.test_client()
+        server.SITE_DIRECTORY = os.path.join(parent_directory, 'rules')
+        self.app = server.app.test_client()
 
     def test_underscore_host(self):
         hosts = [("www.example.com", "www_example_com"),
             ("test.ing", "test_ing")]
         for before, after in hosts:
-            self.assertEqual(collect.underscore_host(before), after)
+            self.assertEqual(server.underscore_host(before), after)
     
     def test_host_folder(self):
         host = "www.example.com"
 
-        folder = collect.host_folder(host)
-        expected_folder = os.path.join(collect.SITE_DIRECTORY, "www_example_com")
+        folder = server.host_folder(host)
+        expected_folder = os.path.join(server.SITE_DIRECTORY, "www_example_com")
         self.assertEqual(folder, expected_folder)
         self.assertTrue(os.path.isdir(folder))
 
@@ -74,7 +74,7 @@ class CollectTestCase(unittest.TestCase):
         }
         rules = self.app.post('/upload', headers=headers, data=json.dumps(example_rules))
         self.assertEqual(rules.status_code, 200)
-        data_folder = os.path.join(collect.SITE_DIRECTORY, 'www_example_com')
+        data_folder = os.path.join(server.SITE_DIRECTORY, 'www_example_com')
         data_file = os.path.join(data_folder, 'example.json')
         with open(data_file) as fp:
             saved_rules = json.load(fp)
