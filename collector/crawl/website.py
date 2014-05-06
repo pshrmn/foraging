@@ -14,16 +14,33 @@ class RuleGroup(object):
         self.name = name
         self.index_urls = index_urls
         self.make_sets(rules)
-        self.order = Queue()
         self.data = []
 
     def make_sets(self, rules):
+        # create (Index)Set's
         self.sets = {}
-        for key in rules:
+        for key, val in rules.iteritems():
             if key == "default":
-                self.sets[key] = IndexSet(key, rules[key])
+                self.sets[key] = IndexSet(key, val)
             else:
-                self.sets[key] = Set(key, rules[key])
+                self.sets[key] = Set(key, val)
+
+        # determine the order to crawl the sets
+        self.set_order = ["default"]
+        new_sets = self.follow_sets(rules["default"])
+        while new_sets:
+            name = new_sets.pop()
+            name_set = rules.get(name)
+            # make sure set exists in rules and only add it once to self.sets
+            if name_set is not None and name not in self.set_order:
+                self.set_order.append(name)
+                new_sets.extend(self.follow_sets(name_set))
+
+    def follow_sets(self, rules):
+        """
+        iterate over rules in a set and return a list of names of rules with "follow" attribute
+        """
+        return [name for name in rules if rules[name].get("follow")]
 
     def crawl(self):
         data = {}
@@ -34,7 +51,8 @@ class RuleGroup(object):
 
 class Website(object):
     """
-    A Website is a queue of RuleGroups for a domain
+    A Website is a queue of RuleGroups for a domain, only running one at a time to limit hits
+    to the server
     """
 
     def __init__(self, folder):
@@ -48,7 +66,7 @@ class Website(object):
         for filename in glob.glob(os.path.join(self.folder, "*.json")):
             with open(filename) as fp:
                 rule_dict = json.load(fp)
-                index_pages = rule_dict.get("indices", [])
+                index_pages = rule_dict.get("index_pages", [])
                 rules = rule_dict.get("rules", {})
                 name = rule_dict.get("name", None)
                 self.queue.put(RuleGroup(name, index_pages, rules))

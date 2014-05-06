@@ -11,7 +11,7 @@ class Rule(object):
     parent is the parent selector for the element (ie if the selector is a and the parent is .group,
         the full selector is .group a)
     """
-    def __init__(self, name, selector, capture, index=None):
+    def __init__(self, name, selector, capture, index=None, **kwargs):
         self.name = name
         self.selector = selector
         self.capture = capture
