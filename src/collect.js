@@ -435,7 +435,7 @@ function saveRuleEvent(event){
     rule.name = name;
     rule.capture = capture;
     rule.selector = selector;
-    rule.set = set;
+
     if ( range !== "" ) {
         rule.range = range;
     }
@@ -709,7 +709,6 @@ function setupHostname(){
 
             addSelectOption("default", select);
             loadGroupObject(defaultGroup);
-            loadGroupSets(defaultGroup.sets);
         } else {
             for ( key in site.groups ) {
                 addSelectOption(key, select);
@@ -720,7 +719,6 @@ function setupHostname(){
             Collect.indexPage = site.groups["default"].index_urls[window.location.href] ? true : false;
 
             loadGroupObject(site.groups["default"]);
-            loadGroupSets(site.groups["default"].sets);
         }
     });
 }
@@ -833,29 +831,30 @@ function createGroup(){
     chrome.storage.local.get("sites", function(storage){
         var host = window.location.hostname,
             site = storage.sites[host],
-            newOption;
+            newOption, group;
 
         // if group already exists, set it as the currentGroup
         if ( site.groups[name] ) {
-            setCurrentGroup(document.querySelector("#allGroups option[value=" + name + "]"));
-            return;
+            group = site.groups[name];
         } else {
             newOption = document.createElement("option");
             newOption.setAttribute("value", name);
             newOption.textContent = name;
             document.getElementById("allGroups").appendChild(newOption);
-            setCurrentGroup(newOption);
             
-            storage.sites[host].groups[name] = {
+            group = {
                 name: name,
                 index_urls: {},
-                rules: {
+                sets: {
                     "default": {}
                 }
             };
+            storage.sites[host].groups[name] = group;
+
             chrome.storage.local.set({'sites': storage.sites});
             Collect.collectTabs.hide();
         }
+        loadGroupObject(group);
     });
 }
 
@@ -885,7 +884,7 @@ function deleteGroup(){
             site.groups["default"] = {
                 name: "default",
                 index_urls: {},
-                rules: {
+                sets: {
                     "default": {}
                 }
             };
@@ -910,7 +909,6 @@ function loadGroup(ele){
             group = site.groups[name];
         resetInterface();
         loadGroupObject(group);
-        loadGroupSets(group.sets);
     });
 }
 
@@ -963,6 +961,8 @@ function loadGroupObject(group){
         document.getElementById("addIndex").checked = false;
         document.getElementById("parentTab").classList.add("hidden");
     }
+
+    loadGroupSets(group.sets);
 }
 
 function addSelectOption(name, select){
