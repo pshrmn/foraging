@@ -34,7 +34,7 @@ class CollectTestCase(unittest.TestCase):
         headers = [('Content-Type', 'application/json')]
         example_rules = {
             "name": "example",
-            "index_pages": {
+            "index_urls": {
                 "http://www.example.com/pageone.html": True,
                 "http://www.example.com/pagetwo.html": True
             },
@@ -55,7 +55,7 @@ class CollectTestCase(unittest.TestCase):
         }
         example_saved_rules = {
             "name": "example",
-            "index_pages": ["http://www.example.com/pageone.html",
+            "index_urls": ["http://www.example.com/pageone.html",
                 "http://www.example.com/pagetwo.html" ],
             "rules": {
                 "links": {
