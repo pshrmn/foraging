@@ -31,8 +31,8 @@ def upload():
     """
     data = request.json
     # change indices from a dict (useful for toggling in collectjs) to an array
-    data["indices"] = [key for key in data["indices"]]
-    hostname = urlparse(data["indices"][0]).netloc
+    data["index_pages"] = [key for key in data["index_pages"]]
+    hostname = urlparse(data["index_pages"][0]).netloc
     folder = host_folder(hostname)
     filename = "%s.json" % (data["name"])
     path = os.path.join(folder, filename)

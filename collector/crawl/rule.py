@@ -11,17 +11,13 @@ class Rule(object):
     parent is the parent selector for the element (ie if the selector is a and the parent is .group,
         the full selector is .group a)
     """
-    def __init__(self, name, selector, capture, parent=None, index=None, cleaners=None):
+    def __init__(self, name, selector, capture, index=None):
         self.name = name
         self.selector = selector
         self.capture = capture
-        self.parent = parent
         self.index = index
-
         self.xpath = CSSSelector(self.selector)
-        
         self.values = self.set_capture()
-        self.cleaners = cleaners or []
         
     def get(self, html):
         """
@@ -34,12 +30,7 @@ class Rule(object):
                 eles = eles[:self.index]
             else:
                 eles = eles[self.index:]
-        return map(self.filter, self.values(eles))
-
-    def filter(self, value):
-        for clean in self.cleaners:
-            value = clean(value)
-        return value
+        return self.values(eles)
 
     def set_capture(self):
         """
