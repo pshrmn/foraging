@@ -255,14 +255,18 @@ describe("storage helpers", function(){
     describe("uniqueRuleName", function(){
         var rules = {
             "index": {
-                "one": {},
-                "two": {"follow": true},
-                "three": {},
+                "rules": {
+                    "one": {},
+                    "two": {"follow": true},
+                    "three": {},    
+                }
             },
             "two": {
-                "foo": {},
-                "bar": {},
-                "baz": {},
+                "rules": {
+                    "foo": {},
+                    "bar": {},
+                    "baz": {},    
+                }
             }
         };
 
@@ -309,6 +313,9 @@ describe("storage helpers", function(){
         beforeEach(function(){
             holder = document.createElement("div");
             holder.id = "ruleSet";
+            // need default input to check when deleting another set
+            holder.innerHTML = "<label>Default</label>" + 
+                "<input type=\"radio\" class=\"ruleGroup\" data-selector=\"default\" />";
             document.body.appendChild(holder);
         });
 
@@ -321,16 +328,16 @@ describe("storage helpers", function(){
             addSet("bar");
             var inputs = holder.getElementsByTagName("input"),
                 labels = holder.getElementsByTagName("label");
-            expect(inputs.length).toEqual(2);
-            expect(labels.length).toEqual(2);
+            expect(inputs.length).toEqual(3);
+            expect(labels.length).toEqual(3);
 
             removeSet("bar");
             var barInput = document.getElementById("barRuleSet"),
                 barLabel = document.getElementById("barInputLabel");
             inputs = holder.getElementsByTagName("input"),
             labels = holder.getElementsByTagName("label");
-            expect(inputs.length).toEqual(1);
-            expect(labels.length).toEqual(1);
+            expect(inputs.length).toEqual(2);
+            expect(labels.length).toEqual(2);
             expect(barInput).toBeNull();
             expect(barLabel).toBeNull();
         });

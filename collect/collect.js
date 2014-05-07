@@ -129,16 +129,16 @@ var Collect = {
             event.preventDefault();
             var clear = true;
             if ( !Collect.parent.selector ){
-                this.selector = Collect.family.selector();
-                if ( this.selector !== "") {
-                    Collect.parent.set(this.selector);
+                Collect.parent.selector = Collect.family.selector();
+                if ( Collect.parent.selector !== "") {
+                    Collect.parent.set(Collect.parent.selector);
                     clear = false;
                 }
             }
             if ( clear ) {
                 Collect.parent.remove();
             }
-            toggleSetParent(this.selector);
+            toggleSetParent(Collect.parent.selector);
             resetInterface();
             Collect.turnOn();
         }
@@ -181,19 +181,24 @@ var Collect = {
     messy proof of concept
     */
     setup: function(){
-        // make sure there is a rules object for the current hostname
-        
         addInterface();
+        // call after addInterface otherwise html elements won't exist
         this.html = {
             family: document.getElementById("selectorHolder"),
             text: document.getElementById("selectorText"),
-            parent: document.getElementById("parentSelector")
+            parent: document.getElementById("parentSelector"),
+            form: {
+                name: document.getElementById("ruleName"),
+                attr: document.getElementById("ruleAttr"),
+                multiple: document.getElementById("ruleMultiple"),
+                range: document.getElementById("ruleRange"),
+                follow: document.getElementById("ruleFollow")
+            }
         };
         
         // don't call loadSavedItems until hostname has been setup because it is asynchronous
         // and will throw errors the first time visiting a site and opening collectJS
         setupHostname();
-        this.turnOn();
         this.interfaceEvents();
     },
     interfaceEvents: function(){
@@ -202,10 +207,13 @@ var Collect = {
         document.getElementById("saveSelector").addEventListener("click", showRuleInputs, false);
 
         // rules
+        Collect.html.form.range.addEventListener("blur", applyRuleRange, false);
+        Collect.html.form.multiple.addEventListener("change", function(event){
+            Collect.html.form.range.disabled = !Collect.html.form.range.disabled;
+        });
         document.getElementById("saveRule").addEventListener("click", saveRuleEvent, false);
         document.getElementById("ruleCyclePrevious").addEventListener("click", showPreviousElement, false);
         document.getElementById("ruleCycleNext").addEventListener("click", showNextElement, false);
-        document.getElementById("ruleRange").addEventListener("blur", applyRuleRange, false);
         document.getElementById("uploadRules").addEventListener("click", function(event){
             uploadRules();
         }, false);
@@ -238,7 +246,7 @@ Collect.setup();
 function addInterface(){
     var div = noSelectElement("div");
     div.setAttribute("id", "collectjs");
-    div.innerHTML = "<div id=\"collectTopbar\"><div id=\"selectorButtons\" class=\"topbarGroup\"><div id=\"selectorTabs\" class=\"tabs\"><div class=\"tab hidden\" id=\"parentTab\"><div id=\"parentWrapper\" title=\"parent selector\">Parent <span id=\"parentSelector\"></span><button id=\"toggleParent\" title=\"add parent selector\">+</button></div></div><div class=\"tab\" id=\"selectorCount\">Count <span id=\"currentCount\"></span></div><div class=\"tab toggle\" id=\"previewTab\" data-for=\"previews\">Preview</div><div class=\"tab\" id=\"clearSelector\">Clear</div></div><div id=\"selectorGroups\" class=\"groups\"><div class=\"group previews\"><div id=\"rulePreview\"></div></div></div></div><div id=\"collectOptions\" class=\"topbarGroup\"><div id=\"collectTabs\" class=\"tabs\"><div class=\"tab toggle\" id=\"groupTab\" data-for=\"groups\">Group<span id=\"groupName\"></span></div><div class=\"tab toggle\" id=\"ruleTab\" data-for=\"rules\">Rules</div><div class=\"tab toggle\" id=\"optionTab\" data-for=\"options\">Options</div><div class=\"tab\" id=\"indexTab\">Index Page<input type=\"checkbox\" id=\"addIndex\"></div><div class=\"tab\" id=\"closeCollect\" title=\"close collectjs\">&times;</div></div><div id=\"tabGroups\" class=\"groups\"><div class=\"group groups\"><select id=\"allGroups\"></select><button id=\"newGroup\">Add Rule Group</button><button id=\"deleteGroup\">Remove Rule Group</button></div><div class=\"group options\"></div><div class=\"group rules\"><div id=\"savedRuleHolder\"><div class=\"ruleGroup\" data-selector=\"default\"><h2>default</h2><div class=\"groupRules\"></div></div></div><button id=\"uploadRules\">Upload Saved Rules</button></div></div></div></div><div id=\"collectMain\"><div id=\"selectorPreview\">Selector: <span id=\"selectorText\"></span></div><div id=\"selectorItems\" class=\"items\"><div id=\"selectorHolder\"></div><button id=\"saveSelector\">Confirm Selector</button></div><div id=\"ruleItems\" class=\"items\"><div id=\"ruleAlert\"></div><div id=\"ruleHTMLHolder\"><button id=\"ruleCyclePrevious\" class=\"cycle\" title=\"previous element matching selector\">Previous</button><span id=\"ruleHTML\"></span><button id=\"ruleCycleNext\" class=\"cycle\" title=\"next element matching selector\">Next</button></div><div id=\"ruleInputs\"><div class=\"rule\">Set:<div id=\"ruleSet\"></div></div><div class=\"rule\"><label for=\"ruleName\">Name:</label><input id=\"ruleName\" name=\"ruleName\" type=\"text\" /></div><div class=\"rule\"><label for=\"ruleAttr\">Attribute:</label><input id=\"ruleAttr\" name=\"ruleAttr\" type=\"text\" /></div><div class=\"rule\"><label for=\"ruleRange\">Range:</label><input id=\"ruleRange\" name=\"ruleRange\" type=\"text\" /></div><div class=\"rule\"><label for=\"ruleFollow\">Follow:</label><input id=\"ruleFollow\" name=\"ruleFollow\" type=\"checkbox\" disabled=\"true\" title=\"Can only follow rules that get href attribute from links\" /></div></div><button id=\"saveRule\">Save Rule</button></div></div>";
+    div.innerHTML = "<div id=\"collectTopbar\"><div id=\"selectorButtons\" class=\"topbarGroup\"><div id=\"selectorTabs\" class=\"tabs\"><div class=\"tab hidden\" id=\"parentTab\"><div id=\"parentWrapper\" title=\"parent selector\">Parent <span id=\"parentSelector\"></span><button id=\"toggleParent\" title=\"add parent selector\">+</button></div></div><div class=\"tab\" id=\"selectorCount\">Count <span id=\"currentCount\"></span></div><div class=\"tab toggle\" id=\"previewTab\" data-for=\"previews\">Preview</div><div class=\"tab\" id=\"clearSelector\">Clear</div></div><div id=\"selectorGroups\" class=\"groups\"><div class=\"group previews\"><div id=\"rulePreview\"></div></div></div></div><div id=\"collectOptions\" class=\"topbarGroup\"><div id=\"collectTabs\" class=\"tabs\"><div class=\"tab toggle\" id=\"groupTab\" data-for=\"groups\">Group<span id=\"groupName\"></span></div><div class=\"tab toggle\" id=\"ruleTab\" data-for=\"rules\">Rules</div><div class=\"tab toggle\" id=\"optionTab\" data-for=\"options\">Options</div><div class=\"tab\" id=\"indexTab\">Index Page<input type=\"checkbox\" id=\"addIndex\"></div><div class=\"tab\" id=\"closeCollect\" title=\"close collectjs\">&times;</div></div><div id=\"tabGroups\" class=\"groups\"><div class=\"group groups\"><select id=\"allGroups\"></select><button id=\"newGroup\">Add Rule Group</button><button id=\"deleteGroup\">Remove Rule Group</button></div><div class=\"group options\"></div><div class=\"group rules\"><div id=\"savedRuleHolder\"><div class=\"ruleGroup\" data-selector=\"default\"><h2>default</h2><div class=\"groupRules\"></div></div></div><button id=\"uploadRules\">Upload Saved Rules</button></div></div></div></div><div id=\"collectMain\"><div id=\"selectorPreview\">Selector: <span id=\"selectorText\"></span></div><div id=\"selectorItems\" class=\"items\"><div id=\"selectorHolder\"></div><button id=\"saveSelector\">Confirm Selector</button></div><div id=\"ruleItems\" class=\"items\"><div id=\"ruleAlert\"></div><div id=\"ruleHTMLHolder\"><button id=\"ruleCyclePrevious\" class=\"cycle\" title=\"previous element matching selector\">Previous</button><span id=\"ruleHTML\"></span><button id=\"ruleCycleNext\" class=\"cycle\" title=\"next element matching selector\">Next</button></div><div id=\"ruleInputs\"><div class=\"rule\">Set:<div id=\"ruleSet\"></div></div><div class=\"rule\"><label for=\"ruleName\">Name:</label><input id=\"ruleName\" name=\"ruleName\" type=\"text\" /></div><div class=\"rule\"><label for=\"ruleAttr\">Attribute:</label><input id=\"ruleAttr\" name=\"ruleAttr\" type=\"text\" /></div><div class=\"rule\"><label for=\"ruleMultiple\">Multiple:</label><input id=\"ruleMultiple\" name=\"ruleMultiple\" type=\"checkbox\" /></div><div class=\"rule\"><label for=\"ruleRange\">Range:</label><input id=\"ruleRange\" name=\"ruleRange\" type=\"text\" disabled=\"true\"/></div><div class=\"rule\"><label for=\"ruleFollow\">Follow:</label><input id=\"ruleFollow\" name=\"ruleFollow\" type=\"checkbox\" disabled=\"true\" title=\"Can only follow rules that get href attribute from links\" /></div></div><button id=\"saveRule\">Save Rule</button></div></div>";
     document.body.appendChild(div);
     addNoSelect(div.querySelectorAll("*"));
 
@@ -256,14 +264,15 @@ function resetInterface(){
     Collect.selectorTabs.hide();
     document.getElementById("rulePreview").innerHTML = "";
     document.getElementById("ruleHTML").innerHTML = "";
-    var inputs = document.querySelectorAll("#ruleInputs input[type=text]"),
-        len = inputs.length;
-    for ( var i=0; i<len; i++ ) {
-        inputs[i].value = "";
-    }
-    var follow = document.getElementById("ruleFollow");
-    follow.checked = false;
-    follow.disabled = true;
+    
+    // reset form
+    Collect.html.form.name.value = "";
+    Collect.html.form.attr.value = "";
+    Collect.html.form.range.value = "";
+    Collect.html.form.range.disabled = true;
+    Collect.html.form.multiple.checked = false;
+    Collect.html.form.follow.checked = false;
+    Collect.html.form.follow.disabled = true;
 
     // divs to hide
     document.getElementById("selectorPreview").style.display = "none";    
@@ -398,12 +407,12 @@ function capturePreview(event){
 }
 
 function saveRuleEvent(event){
-    var name = document.getElementById("ruleName").value,
+    var name = Collect.html.form.name.value,
         selector = document.getElementById("selectorText").textContent,
-        capture = document.getElementById("ruleAttr").value,
-        range = document.getElementById("ruleRange").value,
-        follow = document.getElementById("ruleFollow").checked,
-        set = document.querySelector("#ruleSet input:checked").value,
+        capture = Collect.html.form.attr.value,
+        range = Collect.html.form.range.value,
+        follow = Collect.html.form.follow.checked,
+        set = Collect.currentSet,
         error = false,
         rule = {};
     clearErrors();
@@ -434,7 +443,7 @@ function saveRuleEvent(event){
     rule.capture = capture;
     rule.selector = selector;
 
-    if ( range !== "" ) {
+    if ( range !== "" && !Collect.html.form.range.disabled ) {
         rule.range = range;
     }
     /*
@@ -554,9 +563,9 @@ function ruleAlertMessage(msg){
 /*
 add's a rule element to it's respective location in #ruleGroup
 */
-function addRule(rule){
+function addRule(rule, set){
     var holder, ruleElement;
-    holder = ruleHolderHTML(rule.set);
+    holder = ruleHolderHTML(set);
     ruleElement = ruleHTML(rule);
     holder.appendChild(ruleElement);
 }
@@ -681,7 +690,11 @@ the object is:
             <name>:
                 name: <name>,
                 index_urls: {},
-                sets: {}
+                sets: {
+                    default: {
+                        rules: {}
+                    }
+                }
 If the site object exists for a host, load the saved rules
 */
 function setupHostname(){
@@ -696,7 +709,9 @@ function setupHostname(){
                 name: "default",
                 index_urls: {},
                 sets: {
-                    "default": {}
+                    "default": {
+                        rules: {}
+                    }
                 }
             };
             storage.sites[host] = {
@@ -713,13 +728,14 @@ function setupHostname(){
             for ( key in site.groups ) {
                 addSelectOption(key, select);
             }
-
+            loadGroupObject(site.groups["default"]);
             // check if index page
             // set true/false to avoid indexPage being undefined
             Collect.indexPage = site.groups["default"].index_urls[window.location.href] ? true : false;
 
-            loadGroupObject(site.groups["default"]);
+            
         }
+        Collect.turnOn();
     });
 }
 
@@ -729,13 +745,15 @@ function saveRule(rule){
             site = storage.sites[host],
             name = rule.name,
             group = Collect.currentGroup,
-            set = document.querySelector("#ruleSet input:checked").value;
+            set = Collect.currentSet;
         // can't have a rule named default
         if (name !== "default" && uniqueRuleName(name, site.groups[group].sets) ) {
-            site.groups[group].sets[set][name] = rule;
+            site.groups[group].sets[set].rules[name] = rule;
             // create a rule set for rules with "follow" property
             if ( rule.follow ) {
-                site.groups[group].sets[name] = {};    
+                site.groups[group].sets[name] = {
+                    rules: {}
+                };    
                 addSet(name);
             }
             storage.sites[host] = site;
@@ -744,7 +762,7 @@ function saveRule(rule){
             // hide preview after saving rule
             Collect.selectorTabs.hide();
             resetInterface();
-            addRule(rule);
+            addRule(rule, set);
         } else {
             // some markup to signify you need to change the rule's name
             ruleAlertMessage("Rule name is not unique");
@@ -758,25 +776,19 @@ function deleteRule(name, element){
         var host = window.location.hostname,
             sites = storage.sites,
             group = Collect.currentGroup,
-            set = document.querySelector("#ruleSet input:checked").value;
-        
-        // if there is an associated set for a rule, deleting the rule will also delete that set
-        // so confirm with user before deleting
-        if ( sites[host].groups[group].sets[name]) {
-            var deleteSet = confirm("Deleting this rule will also delete the set of rules associated with it. Continue?");
-            if ( deleteSet ) {
-                delete sites[host].groups[group].sets[set][name];
-                delete sites[host].groups[group].sets[name];
-                removeSet(name);
-                chrome.storage.local.set({'sites': sites});
-                element.parentElement.removeChild(element);
-            }
-        } else {
-            delete sites[host].groups[group].sets[set][name];    
-            chrome.storage.local.set({'sites': sites});
-            // get rid of html elements
-            element.parentElement.removeChild(element);
+            set = Collect.currentSet,
+            deleteSet = false;
+
+        if ( sites[host].groups[group].sets[name] ) {
+            // if there is an associated set for a rule, deleting the rule will also delete that set
+            // so confirm with user before deleting
+            deleteSet = confirm("Deleting this rule will also delete the set of rules associated with it. Continue?"); 
         }
+           
+        sites[host].groups[group].sets = deleteRuleFromSet(name, sites[host].groups[group].sets, deleteSet);
+
+        chrome.storage.local.set({'sites': sites});
+        element.parentElement.removeChild(element);
     });  
 }
 
@@ -846,7 +858,9 @@ function createGroup(){
                 name: name,
                 index_urls: {},
                 sets: {
-                    "default": {}
+                    "default": {
+                        rules: {}
+                    }
                 }
             };
             storage.sites[host].groups[name] = group;
@@ -885,7 +899,9 @@ function deleteGroup(){
                 name: "default",
                 index_urls: {},
                 sets: {
-                    "default": {}
+                    "default": {
+                        rules: {}
+                    }
                 }
             };
         } else {
@@ -916,7 +932,7 @@ function toggleSetParent(parent){
     chrome.storage.local.get('sites', function loadGroupsChrome(storage){
         var host = window.location.hostname,
             site = storage.sites[host],
-            set = document.querySelector("#ruleSet input:checked").value;
+            set = Collect.currentSet;
         if ( parent ){
             site.groups[Collect.currentGroup].sets[set].parent = parent;
         } else {
@@ -925,6 +941,41 @@ function toggleSetParent(parent){
         storage.sites[host] = site;
         chrome.storage.local.set({'sites': storage.sites});
     });
+}
+
+/*
+given sets, iterate over all the sets to find a rule with name and delete that rule
+*/
+function deleteRuleFromSet(name, sets, deleteSet){
+    var found = false,
+        set, rules, rule;
+    for ( set in sets) {
+        rules = sets[set].rules;
+        for ( rule in rules ) {
+            if ( rule === name ) {
+                delete sets[set].rules[name];
+                found = true;
+                break;
+            }
+        }
+        if ( found ) {
+            break;
+        }
+    }
+
+    // delete set
+    if ( deleteSet ) {
+        // recursive delete for nested sets
+        for ( rule in sets[name].rules ) {
+            if ( sets[rule] ) {
+                sets = deleteRuleFromSet(rule, sets, true);
+            }
+        }
+        delete sets[name];
+        removeSet(name);
+    }             
+
+    return sets;
 }
 
 /***********************
@@ -954,20 +1005,22 @@ given a group object (rules, index_urls)
 */
 function loadGroupObject(group){
     var currOption = document.querySelector("#allGroups option[value=" + group.name + "]"),
-        curr;
+        rules;
     setCurrentGroup(currOption);
+    // use default set when loading a group
+    Collect.currentSet = "default";
+    clearRules();
     if ( group.sets ) {
-        clearRules();
         for (var set in group.sets){
-            curr = group.sets[set];
-            for ( var key in curr) {
-                addRule(curr[key]);
+            rules = group.sets[set].rules;
+            for ( var key in rules) {
+                addRule(rules[key], set);
             }
         }
     }
     // clear out the parent selector
     Collect.parent.remove();
-    
+
     if ( group.index_urls[window.location.href] ) {
         Collect.indexPage = true;
         document.getElementById("indexTab").classList.add("set");
@@ -976,6 +1029,7 @@ function loadGroupObject(group){
 
         // if parent is set for an index_url, make sure that its set
         if ( group.sets["default"].parent ) {
+            Collect.parent.selector = group.sets["default"].parent;
             Collect.parent.set(group.sets["default"].parent);
         }
     } else {
@@ -1003,7 +1057,7 @@ function uniqueRuleName(name, sets){
     var curr, set, rule;
     for ( set in sets ) {
         curr = sets[set];
-        for ( rule in curr ) {
+        for ( rule in curr.rules ) {
             if ( rule === name ) {
                 return false;
             }
@@ -1026,6 +1080,9 @@ function addSet(name){
     label.id = name + "InputLabel";
     holder.appendChild(label);
     holder.appendChild(input);
+    input.addEventListener("change", function(event){
+        Collect.currentSet = this.value;
+    }, false);
 }
 
 function removeSet(name){
@@ -1038,6 +1095,10 @@ function removeSet(name){
     if ( rules ) {
         rules.parentElement.removeChild(rules);
     }
+
+    // set default set to checked
+    document.querySelector('.ruleGroup[data-selector="default"]').checked = true;
+    Collect.currentSet = "default";
 }
 
 function loadGroupSets(group){

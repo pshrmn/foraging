@@ -39,6 +39,9 @@ body {
     height: 24px;
     padding: 2px;
     font-family: sans-serif; }
+  #collectjs input[type=text]:disabled {
+    background: #efefef;
+    border-color: #cccccc; }
 
 #collectTopbar {
   position: relative; }

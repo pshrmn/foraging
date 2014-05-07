@@ -61,6 +61,11 @@ body{
         padding: 2px;
         font-family: sans-serif;
     }
+
+    input[type=text]:disabled{
+        background: $light-gray;
+        border-color: $gray;
+    }
 }
 
 #collectTopbar{

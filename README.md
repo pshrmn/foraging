@@ -12,14 +12,16 @@ A Chrome extension that allows you to get information necessary to crawl a page.
                     index_urls: {...},
                     sets: {
                         default: {
-                            name: {
-                                name: ...,
-                                capture: ...,
-                                selector: ...,
-                                parent: ..., (optional)
-                                range: ... (optional)
-                            },
-                            ...
+                            parent: ... (optional),
+                            rules: {
+                                name: {
+                                    name: ...,
+                                    capture: ...,
+                                    selector: ...,
+                                    range: ... (optional)
+                                },
+                                ...
+                            }
                         },
                         ...
                     }
