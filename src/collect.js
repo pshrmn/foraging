@@ -112,37 +112,35 @@ var Collect = {
     },
     parent: {
         selector: undefined,
-        set: function(){
-            this.selector = Collect.family.selector();
-            if ( this.selector === "") {
-                this.selector = undefined;
-                return false;
-            }
-            // parent to select elements from is the first element in the page matching the selector
-            Collect.html.parent.textContent = this.selector;
-            resetInterface();
-            Collect.turnOn();
-            return true;
+        set: function(name){
+            Collect.html.parent.textContent = name;
+            var toggle = document.getElementById("toggleParent");
+            toggle.textContent = "×";
+            toggle.setAttribute("title", "remove parent selector");
         },
         remove: function(){
             this.selector = undefined;
             Collect.html.parent.textContent = "";
-            resetInterface();
-            Collect.turnOn();
+            var toggle = document.getElementById("toggleParent");
+            toggle.textContent = "+";
+            toggle.setAttribute("title", "add parent selector");
         },
         toggle: function(event){
             event.preventDefault();
+            var clear = true;
             if ( !Collect.parent.selector ){
-                var success = Collect.parent.set();
-                if ( success ) {
-                    this.textContent = "×";
-                    this.setAttribute("title", "remove parent selector");    
-                }        
-            } else {
-                Collect.parent.remove();
-                this.textContent = "+";
-                this.setAttribute("title", "add parent selector");
+                this.selector = Collect.family.selector();
+                if ( this.selector !== "") {
+                    Collect.parent.set(this.selector);
+                    clear = false;
+                }
             }
+            if ( clear ) {
+                Collect.parent.remove();
+            }
+            toggleSetParent(this.selector);
+            resetInterface();
+            Collect.turnOn();
         }
     },
     /*
@@ -439,9 +437,11 @@ function saveRuleEvent(event){
     if ( range !== "" ) {
         rule.range = range;
     }
+    /*
     if ( Collect.parent.selector ) {
         rule.parent = Collect.parent.selector;
     }
+    */
     if ( follow ) {
         rule.follow = true;
     }
@@ -912,6 +912,21 @@ function loadGroup(ele){
     });
 }
 
+function toggleSetParent(parent){
+    chrome.storage.local.get('sites', function loadGroupsChrome(storage){
+        var host = window.location.hostname,
+            site = storage.sites[host],
+            set = document.querySelector("#ruleSet input:checked").value;
+        if ( parent ){
+            site.groups[Collect.currentGroup].sets[set].parent = parent;
+        } else {
+            delete site.groups[Collect.currentGroup].sets[set].parent;
+        }
+        storage.sites[host] = site;
+        chrome.storage.local.set({'sites': storage.sites});
+    });
+}
+
 /***********************
     STORAGE HELPERS
 ***********************/
@@ -950,11 +965,19 @@ function loadGroupObject(group){
             }
         }
     }
+    // clear out the parent selector
+    Collect.parent.remove();
+    
     if ( group.index_urls[window.location.href] ) {
         Collect.indexPage = true;
         document.getElementById("indexTab").classList.add("set");
         document.getElementById("addIndex").checked = true;
         document.getElementById("parentTab").classList.remove("hidden");
+
+        // if parent is set for an index_url, make sure that its set
+        if ( group.sets["default"].parent ) {
+            Collect.parent.set(group.sets["default"].parent);
+        }
     } else {
         Collect.indexPage = false;
         document.getElementById("indexTab").classList.remove("set");
