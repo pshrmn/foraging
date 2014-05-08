@@ -8,16 +8,15 @@ class Rule(object):
     capture is the attribute of the item(s) that you want to store
         eg. attr-href means that you want to get the element's href attribute
         text means that you want the text content of the element
-    parent is the parent selector for the element (ie if the selector is a and the parent is .group,
-        the full selector is .group a)
     """
-    def __init__(self, name, selector, capture, index=None, **kwargs):
+    def __init__(self, name, selector, capture, index=None, follow=False):
         self.name = name
         self.selector = selector
         self.capture = capture
         self.index = index
         self.xpath = CSSSelector(self.selector)
         self.values = self.set_capture()
+        self.follow = follow
         
     def get(self, html):
         """
@@ -25,11 +24,14 @@ class Rule(object):
         returns a list of values based on self.capture
         """
         eles = self.xpath(html)
-        if self.index is not None:
-            if self.index < 0:
-                eles = eles[:self.index]
-            else:
-                eles = eles[self.index:]
+        # return None if the xpath gets no matches
+        if len(eles) == 0:
+            return None
+        # only return one value if no index is provided
+        if self.index is None:
+            eles = eles[0]
+        else:
+            eles = eles[:self.index] if self.index < 0 else eles[self.index:]
         return self.values(eles)
 
     def set_capture(self):
@@ -44,14 +46,22 @@ class Rule(object):
                 called when self.capture is attr-<attr_name>
                 iterate over all matches, returns a list of attributes
                 """
-                return [ele.get(attr_name) for ele in eles]
+                if isinstance(eles, list):
+                    return [ele.get(attr_name) for ele in eles]
+                else:
+                    return eles.get(attr_name)
             return attr
         else:
             def text(eles):
                 """
                 iterate over all matches, returns a list of text strings
                 """
-                return ["".join(ele.itertext()) for ele in eles]
+                if isinstance(eles, list):
+                    return ["".join(ele.itertext()) for ele in eles]
+                else:
+                    return "".join(eles.itertext())
             return text
 
     
+    def __str__(self):
+        return "Rule(%s, %s, %s, %s)" % (self.name, self.selector, self.capture, self.index)

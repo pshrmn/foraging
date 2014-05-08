@@ -28,20 +28,33 @@ class RuleTestCase(unittest.TestCase):
         self.good_rules["capture"] = "text"
         r = Rule(**self.good_rules)
         captured_text = r.get(self.html)
+        self.assertEqual(captured_text, "Testing more testing")
+
+    def test_multiple_test(self):
+        self.good_rules["capture"] = "text"
+        self.good_rules["index"] = 0
+        r = Rule(**self.good_rules)
+        captured_text = r.get(self.html)
         self.assertEqual(captured_text, ["Testing more testing", "Second"])
 
     def test_attr(self):
         r = Rule(**self.good_rules)
         captured_attrs = r.get(self.html)
-        self.assertEqual(captured_attrs, ["#", "http://www.example.com"])
+        self.assertEqual(captured_attrs, "#")
+
+    def test_multiple_attr(self):
+        self.good_rules["index"] = 0
+        r = Rule(**self.good_rules)
+        captured_attrs = r.get(self.html)
+        self.assertEqual(captured_attrs, ["#", "http://www.example.com"])        
 
     def test_index(self):
         # no index
         r = Rule(**self.good_rules)
         self.assertEqual(r.index, None)
         captured_attrs = r.get(self.html)
-        self.assertEqual(len(captured_attrs), 2)
-        self.assertEqual(captured_attrs, ["#", "http://www.example.com"])
+        self.assertEqual(len(captured_attrs), 1)
+        self.assertEqual(captured_attrs, "#")
 
         # positive index
         self.good_rules["index"] = 1

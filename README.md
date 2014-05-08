@@ -7,7 +7,9 @@ for default folder to save files, call
 
     python collector.web.server.py
 
-to specify which folder to save rules to, use -F <folder> or --folder <folder>
+to specify which folder to save rules to, use 
+
+    -F <folder> or --folder <folder>
 
 #####Rules Format
 
@@ -19,14 +21,16 @@ to specify which folder to save rules to, use -F <folder> or --folder <folder>
                     index_urls: {...},
                     sets: {
                         default: {
-                            name: {
-                                name: ...,
-                                capture: ...,
-                                selector: ...,
-                                parent: ..., (optional)
-                                range: ... (optional)
-                            },
-                            ...
+                            parent: ... (optional),
+                            rules: {
+                                name: {
+                                    name: ...,
+                                    capture: ...,
+                                    selector: ...,
+                                    range: ... (optional)
+                                },
+                                ...
+                            }
                         },
                         ...
                     }
