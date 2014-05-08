@@ -342,6 +342,87 @@ describe("storage helpers", function(){
             expect(barLabel).toBeNull();
         });
     });
+
+    describe("deleteRuleFromSet", function(){
+        var sets,
+            holder;
+
+        beforeEach(function(){
+            sets = {
+                default: {
+                    rules: {
+                        set2: {
+                            name: "set2",
+                            follow: true
+                        }
+                    }
+                },
+                set2: {
+                    rules: {
+                        foo: {
+                            name: "foo"
+                        },
+                        set3: {
+                            name: "set3",
+                            follow: true
+                        }
+                    }
+                },
+                set3: {
+                    rules: {
+                        bar: {
+                            name: "bar"
+                        }
+                    }
+                }
+            };
+
+            holder = document.createElement("div");
+            holder.id = "ruleSet";
+            // need default input to check when deleting another set
+            holder.innerHTML = "<label>Default</label>" + 
+                "<input type=\"radio\" class=\"ruleGroup\" data-selector=\"default\" />";
+            document.body.appendChild(holder);
+        });
+         
+        afterEach(function(){
+            holder.parentElement.removeChild(holder);
+        });
+
+        it("deletes rule from set", function(){
+            expect(sets.set2.rules.foo).toBeDefined();
+            deleteRuleFromSet("foo", sets);
+            expect(sets.set2.rules.foo).toBeUndefined();
+        });
+
+        it("deletes set with same name as rule if deleteSet=true", function(){
+            // so removeset doesn't fail
+            addSet("set3");
+            deleteRuleFromSet("set3", sets, true);
+            expect(sets.set2.rules.set3).toBeUndefined();
+            expect(sets.set3).toBeUndefined();
+        });
+
+        it("doesn't delete a rule/set with same name if deleteSet=false or is undefined", function(){
+            deleteRuleFromSet("set2", sets, false);
+            expect(sets.default.rules.set2).toBeDefined();
+            expect(sets.set2).toBeDefined();
+
+            deleteRuleFromSet("set2", sets);
+            expect(sets.default.rules.set2).toBeDefined();
+            expect(sets.set2).toBeDefined();
+        });
+
+        it("deletes nested sets", function(){
+            addSet("set2");
+            addSet("set3");
+
+            deleteRuleFromSet("set2", sets, true);
+            expect(sets.default.rules.set2).toBeUndefined();
+            expect(sets.set2).toBeUndefined();
+            expect(sets.set3).toBeUndefined();
+        });
+    });
 });
 
 describe("html functions", function(){    

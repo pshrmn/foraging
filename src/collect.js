@@ -943,41 +943,6 @@ function toggleSetParent(parent){
     });
 }
 
-/*
-given sets, iterate over all the sets to find a rule with name and delete that rule
-*/
-function deleteRuleFromSet(name, sets, deleteSet){
-    var found = false,
-        set, rules, rule;
-    for ( set in sets) {
-        rules = sets[set].rules;
-        for ( rule in rules ) {
-            if ( rule === name ) {
-                delete sets[set].rules[name];
-                found = true;
-                break;
-            }
-        }
-        if ( found ) {
-            break;
-        }
-    }
-
-    // delete set
-    if ( deleteSet ) {
-        // recursive delete for nested sets
-        for ( rule in sets[name].rules ) {
-            if ( sets[rule] ) {
-                sets = deleteRuleFromSet(rule, sets, true);
-            }
-        }
-        delete sets[name];
-        removeSet(name);
-    }             
-
-    return sets;
-}
-
 /***********************
     STORAGE HELPERS
 ***********************/
@@ -1109,6 +1074,48 @@ function loadGroupSets(group){
     // default to using default set
     document.querySelector("#ruleSet input[value=default]").checked = true;
 }
+
+/*
+given sets, iterate over all the sets to find a rule with name and delete that rule
+*/
+function deleteRuleFromSet(name, sets, deleteSet){
+    var found = false,
+        set, rules, rule;
+
+    // if there is a set associated with a rule and deleteSet=false, return;
+    if ( sets[name] && !deleteSet ) {
+        return;
+    }
+
+    for ( set in sets) {
+        rules = sets[set].rules;
+        for ( rule in rules ) {
+            if ( rule === name ) {
+                delete sets[set].rules[name];
+                found = true;
+                break;
+            }
+        }
+        if ( found ) {
+            break;
+        }
+    }
+
+    // delete set
+    if ( deleteSet ) {
+        // recursive delete for nested sets
+        for ( rule in sets[name].rules ) {
+            if ( sets[rule] ) {
+                sets = deleteRuleFromSet(rule, sets, true);
+            }
+        }
+        delete sets[name];
+        removeSet(name);
+    }             
+
+    return sets;
+}
+
 
 /***********************
     HTML FUNCTIONS
