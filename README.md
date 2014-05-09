@@ -4,26 +4,28 @@ A Chrome extension that allows you to get information necessary to crawl a page.
 
 #####Rules Format
 
+For each site (determined by window.location.host), you can have multiple groups. A group is made up of a list of index url's that are used to start getting the data from, and a basic tree of rule sets for different pages. A rule set is either a ParentSet, which has a parent selector and returns an array of data objects given a url, or a regular Set, which returns one data object. The name of a Set corresponds to the name of another rule, which provides the url for that rule set (ie. a rule named URL with follow=true and capture=attr-href will have a corresponding Set named URL)
+
     sites: {
         example.com: {
             groups: {
                 name: {
                     name: name,
                     index_urls: {...},
-                    sets: {
-                        default: {
-                            parent: ... (optional),
-                            rules: {
-                                name: {
-                                    name: ...,
-                                    capture: ...,
-                                    selector: ...,
-                                    range: ... (optional)
-                                },
-                                ...
-                            }
+                    nodes: {
+                        parent: ... (optional),
+                        rules: {
+                            name: {
+                                name: ...,
+                                capture: ...,
+                                selector: ...,
+                                range: ... (optional)
+                            },
+                            ...
                         },
-                        ...
+                        children: {
+                            <node>
+                        }
                     }
                 },
                 ...
@@ -31,6 +33,20 @@ A Chrome extension that allows you to get information necessary to crawl a page.
         },
         ...
     }
+
+A node is:
+
+    {
+        parent (optional): string,
+        rules: {
+            ...
+        },
+        children: {
+            name: <node>
+        }
+    }
+
+
 
 #####Sets
 The "default" set is called on index_urls, other sets are references to rules which capture the href from an anchor.

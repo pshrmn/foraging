@@ -690,9 +690,13 @@ the object is:
             <name>:
                 name: <name>,
                 index_urls: {},
-                sets: {
+                nodes: {
                     default: {
-                        rules: {}
+                        name: default,
+                        rules: {},
+                        children: {
+                            ...
+                        }
                     }
                 }
 If the site object exists for a host, load the saved rules
@@ -708,10 +712,8 @@ function setupHostname(){
             var defaultGroup = {
                 name: "default",
                 index_urls: {},
-                sets: {
-                    "default": {
-                        rules: {}
-                    }
+                nodes: {
+                    "default": addNode("default")
                 }
             };
             storage.sites[host] = {
@@ -729,11 +731,6 @@ function setupHostname(){
                 addSelectOption(key, select);
             }
             loadGroupObject(site.groups["default"]);
-            // check if index page
-            // set true/false to avoid indexPage being undefined
-            Collect.indexPage = site.groups["default"].index_urls[window.location.href] ? true : false;
-
-            
         }
         Collect.turnOn();
     });
@@ -747,15 +744,8 @@ function saveRule(rule){
             group = Collect.currentGroup,
             set = Collect.currentSet;
         // can't have a rule named default
-        if (name !== "default" && uniqueRuleName(name, site.groups[group].sets) ) {
-            site.groups[group].sets[set].rules[name] = rule;
-            // create a rule set for rules with "follow" property
-            if ( rule.follow ) {
-                site.groups[group].sets[name] = {
-                    rules: {}
-                };    
-                addSet(name);
-            }
+        if ( uniqueRuleName(name, site.groups[group].nodes) ) {
+            site.groups[group].nodes = addRuleToSet(rule, site.groups[group].nodes);      
             storage.sites[host] = site;
             chrome.storage.local.set({'sites': storage.sites});
 
@@ -779,13 +769,7 @@ function deleteRule(name, element){
             set = Collect.currentSet,
             deleteSet = false;
 
-        if ( sites[host].groups[group].sets[name] ) {
-            // if there is an associated set for a rule, deleting the rule will also delete that set
-            // so confirm with user before deleting
-            deleteSet = confirm("Deleting this rule will also delete the set of rules associated with it. Continue?"); 
-        }
-           
-        sites[host].groups[group].sets = deleteRuleFromSet(name, sites[host].groups[group].sets, deleteSet);
+        sites[host].groups[group].nodes = deleteRuleFromSet(name, sites[host].groups[group].nodes);
 
         chrome.storage.local.set({'sites': sites});
         element.parentElement.removeChild(element);
@@ -857,10 +841,8 @@ function createGroup(){
             group = {
                 name: name,
                 index_urls: {},
-                sets: {
-                    "default": {
-                        rules: {}
-                    }
+                nodes: {
+                    "default": addNode("default")
                 }
             };
             storage.sites[host].groups[name] = group;
@@ -881,7 +863,7 @@ function deleteGroup(){
         groupName = currGroup.value,
         defaultGroup = (groupName === "default"),
         confirmed;
-    if ( groupName === "default" ) {
+    if ( defaultGroup ) {
         confirmed = confirm("Cannot delete \"default\" group. Do you want to clear out all of its rules instead?");
     } else {
         confirmed = confirm("Are you sure you want to delete this group and all of its related rules?");    
@@ -898,17 +880,16 @@ function deleteGroup(){
             site.groups["default"] = {
                 name: "default",
                 index_urls: {},
-                sets: {
-                    "default": {
-                        rules: {}
-                    }
+                nodes: {
+                    "default": addNode("default")
                 }
             };
         } else {
             delete site.groups[groupName];
             currOption.parentElement.removeChild(currOption);
             Collect.currentGroup = "default";
-            setCurrentGroup(document.querySelector("#allGroups option[value=default]"));
+            document.querySelector("#allGroups option[value=default]").selected = true;
+            document.getElementById("groupName").textContent = ": default";
         }
         storage.sites[host] = site;
         chrome.storage.local.set({'sites': storage.sites});
@@ -932,12 +913,9 @@ function toggleSetParent(parent){
     chrome.storage.local.get('sites', function loadGroupsChrome(storage){
         var host = window.location.hostname,
             site = storage.sites[host],
-            set = Collect.currentSet;
-        if ( parent ){
-            site.groups[Collect.currentGroup].sets[set].parent = parent;
-        } else {
-            delete site.groups[Collect.currentGroup].sets[set].parent;
-        }
+            group = Collect.currentGroup;
+
+        site.groups[group].nodes = toggleParentFromSet(parent, site.groups[group].nodes);
         storage.sites[host] = site;
         chrome.storage.local.set({'sites': storage.sites});
     });
@@ -946,6 +924,14 @@ function toggleSetParent(parent){
 /***********************
     STORAGE HELPERS
 ***********************/
+
+function addNode(name){
+    return {
+        name: name,
+        rules: {},
+        children: {}
+    };
+}
 
 /*
 rejects if name contains characters not allowed in filename: <, >, :, ", \, /, |, ?, *
@@ -959,30 +945,24 @@ function legalFilename(name){
     return ( match === null );
 }
 
-function setCurrentGroup(option){
-    Collect.currentGroup = option.value;
-    option.setAttribute("selected", true);
-    document.getElementById("groupName").textContent = ": " + option.value;
-}
-
 /*
 given a group object (rules, index_urls)
 */
 function loadGroupObject(group){
-    var currOption = document.querySelector("#allGroups option[value=" + group.name + "]"),
-        rules;
-    setCurrentGroup(currOption);
-    // use default set when loading a group
+    // load group and set
+    Collect.currentGroup = group.name;
+    document.querySelector("#allGroups option[value=" + group.name + "]").selected = true;
+    document.getElementById("groupName").textContent = ": " + group.name;
+
     Collect.currentSet = "default";
+    document.getElementById("ruleSet").innerHTML = "";
+    addSets(group.nodes["default"]);
+    document.querySelector("#ruleSet input[value=default]").checked = true;
+
+    // use default set when loading a group
     clearRules();
-    if ( group.sets ) {
-        for (var set in group.sets){
-            rules = group.sets[set].rules;
-            for ( var key in rules) {
-                addRule(rules[key], set);
-            }
-        }
-    }
+    addRules(group.nodes["default"]);
+
     // clear out the parent selector
     Collect.parent.remove();
 
@@ -992,10 +972,10 @@ function loadGroupObject(group){
         document.getElementById("addIndex").checked = true;
         document.getElementById("parentTab").classList.remove("hidden");
 
-        // if parent is set for an index_url, make sure that its set
-        if ( group.sets["default"].parent ) {
-            Collect.parent.selector = group.sets["default"].parent;
-            Collect.parent.set(group.sets["default"].parent);
+        // if parent is set for an index_url, make sure that its loaded
+        if ( group.nodes["default"].parent ) {
+            Collect.parent.selector = group.nodes["default"].parent;
+            Collect.parent.set(group.nodes["default"].parent);
         }
     } else {
         Collect.indexPage = false;
@@ -1003,119 +983,149 @@ function loadGroupObject(group){
         document.getElementById("addIndex").checked = false;
         document.getElementById("parentTab").classList.add("hidden");
     }
-
-    loadGroupSets(group.sets);
 }
 
-function addSelectOption(name, select){
-    var newOption = document.createElement("option");
-    newOption.setAttribute("value", name);
-    newOption.textContent = name;
-    select.appendChild(newOption);
+/*
+recursive pass over nodes to get an array of rule names
+*/
+function nodeRules(node){
+    var rules = [];
+    for ( var key in node.rules ) {
+        rules.push(key);
+    }
+
+    for ( var child in node.children ) {
+        rules = rules.concat(nodeRules(node.children[child]));
+    }
+    return rules;
+}
+
+/*
+add saved rules from the node to the #savedRuleHolder
+*/
+function addRules(node){
+    for ( var key in node.rules ) {
+        addRule(node.rules[key], node.name);
+    }
+
+    for ( var child in node.children ) {
+        addRules(node.children[child]);
+    }    
 }
 
 /*
 iterate over all rules in a rule group
 return false if name already exists for a rule, otherwise true
 */
-function uniqueRuleName(name, sets){
-    var curr, set, rule;
-    for ( set in sets ) {
-        curr = sets[set];
-        for ( rule in curr.rules ) {
-            if ( rule === name ) {
-                return false;
-            }
+function uniqueRuleName(name, nodes){
+    // can't have name default
+    if ( name === "default" ) {
+        return false;
+    }
+    var names = nodeRules(nodes);
+    for ( var i=0, len=names.length; i<len; i++ ) {
+
+        if ( names[i] === name ) {
+            return false;
         }
     }
+
     return true;
 }
 
-function addSet(name){
-    var input = document.createElement("input"),
-        label = document.createElement("label"),
-        holder = document.getElementById("ruleSet"),
-        id = name + "RuleSet";
-    input.type = "radio";
-    input.name = "ruleSet";
-    input.setAttribute("value", name);
-    input.setAttribute("id", id);
-    label.setAttribute("for", id);
-    label.textContent = name;
-    label.id = name + "InputLabel";
-    holder.appendChild(label);
-    holder.appendChild(input);
-    input.addEventListener("change", function(event){
-        Collect.currentSet = this.value;
-    }, false);
+function addSets(node){
+    addSet(node.name);
+    for ( var key in node.children ) {
+        addSets(node.children[key]);
+    }
 }
 
-function removeSet(name){
-    var input = document.getElementById(name+"RuleSet"),
-        label = document.getElementById(name+"InputLabel"),
-        rules = document.querySelector('.ruleGroup[data-selector="' + name + '"]');
-    input.parentElement.removeChild(input);
-    label.parentElement.removeChild(label);
-    // get rid of the .ruleGroup for the set
-    if ( rules ) {
-        rules.parentElement.removeChild(rules);
+function addRuleToSet(rule, nodes){
+    var set = Collect.currentSet,
+        found = false;
+
+    function findSet(node){
+        if ( found ) {
+            return;
+        }
+        if ( node.name == set ){
+            node.rules[rule.name] = rule;
+            if ( rule.follow ) {
+                node.children[rule.name] = addNode(rule.name);
+                addSet(rule.name);
+            }
+            found = true;
+        } else {
+            for ( var child in node.children ) {
+                findSet(node.children[child]);
+            }
+        }
     }
 
-    // set default set to checked
-    document.querySelector('.ruleGroup[data-selector="default"]').checked = true;
-    Collect.currentSet = "default";
-}
+    findSet(nodes["default"]);
 
-function loadGroupSets(group){
-    document.getElementById("ruleSet").innerHTML = "";
-    for ( var key in group ) {
-        addSet(key);
-    }
-    // default to using default set
-    document.querySelector("#ruleSet input[value=default]").checked = true;
+    return nodes;
 }
 
 /*
 given sets, iterate over all the sets to find a rule with name and delete that rule
 */
-function deleteRuleFromSet(name, sets, deleteSet){
-    var found = false,
-        set, rules, rule;
-
-    // if there is a set associated with a rule and deleteSet=false, return;
-    if ( sets[name] && !deleteSet ) {
-        return;
-    }
-
-    for ( set in sets) {
-        rules = sets[set].rules;
-        for ( rule in rules ) {
-            if ( rule === name ) {
-                delete sets[set].rules[name];
-                found = true;
-                break;
-            }
-        }
+function deleteRuleFromSet(name, nodes){
+    var found = false;
+    function findRule(node){
+        var rule;
         if ( found ) {
-            break;
+            return;
+        }
+
+        for ( var r in node.rules ) {
+            rule = node.rules[r];
+            if ( rule.name === name ) {
+                found = true;
+                delete node.rules[r];
+                if ( rule.follow ) {
+                    delete node.children[r];
+                }
+            }
+        }
+        if ( !found ) {
+            for ( var child in node.children ) {
+                findRule(node.children[child]);
+            }    
         }
     }
 
-    // delete set
-    if ( deleteSet ) {
-        // recursive delete for nested sets
-        for ( rule in sets[name].rules ) {
-            if ( sets[rule] ) {
-                sets = deleteRuleFromSet(rule, sets, true);
-            }
-        }
-        delete sets[name];
-        removeSet(name);
-    }             
+    findRule(nodes["default"]);
 
-    return sets;
+    return nodes;
 }
 
+function toggleParentFromSet(parent, nodes){
+    var set = Collect.currentSet,
+        found = false;
+
+    function findSet(node){
+        if ( found ) {
+            return;
+        }
+        if ( node.name == set ){
+            if ( parent ) {
+                node.parent = parent;
+            } else {
+                delete node.parent;
+            }
+            found = true;
+        } else {
+            for ( var child in node.children ) {
+                findSet(node.children[child]);
+            }
+        }
+    }
+
+    findSet(nodes["default"]);
+
+    return nodes;
+}
 
 /***********************
     HTML FUNCTIONS
@@ -1244,3 +1254,46 @@ function wrapTextHTML(text, type){
     return '<span class="capture no_select" title="click to capture ' + type + 
         ' property" data-capture="' + type + '">' + text + '</span>';
 }
+
+function addSelectOption(name, select){
+    var newOption = document.createElement("option");
+    newOption.setAttribute("value", name);
+    newOption.textContent = name;
+    select.appendChild(newOption);
+}
+
+function addSet(name){
+    var input = document.createElement("input"),
+        label = document.createElement("label"),
+        holder = document.getElementById("ruleSet"),
+        id = name + "RuleSet";
+    input.type = "radio";
+    input.name = "ruleSet";
+    input.setAttribute("value", name);
+    input.setAttribute("id", id);
+    label.setAttribute("for", id);
+    label.textContent = name;
+    label.id = name + "InputLabel";
+    holder.appendChild(label);
+    holder.appendChild(input);
+    input.addEventListener("change", function(event){
+        Collect.currentSet = this.value;
+    }, false);
+}
+
+function removeSet(name){
+    var input = document.getElementById(name+"RuleSet"),
+        label = document.getElementById(name+"InputLabel"),
+        rules = document.querySelector('.ruleGroup[data-selector="' + name + '"]');
+    input.parentElement.removeChild(input);
+    label.parentElement.removeChild(label);
+    // get rid of the .ruleGroup for the set
+    if ( rules ) {
+        rules.parentElement.removeChild(rules);
+    }
+
+    // set default set to checked
+    document.querySelector('.ruleGroup[data-selector="default"]').checked = true;
+    Collect.currentSet = "default";
+}
+
