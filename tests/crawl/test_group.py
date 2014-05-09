@@ -1,4 +1,4 @@
-from collector.crawl.website import Website, RuleGroup
+from collector.crawl.group import RuleGroup, Set, ParentSet
 import unittest
 import os
 import json
@@ -15,21 +15,59 @@ class RuleGroupTestCase(unittest.TestCase):
     def test_constructor(self):
         filename = os.path.join(DIRECTORY, 'rules', 'test_site_com', 'product.json')
         rules = open_group(filename)
-        rg = RuleGroup(rules["name"], rules["index_urls"], rules["rules"])
-        self.assertEqual(rg.index_set.name, "default")
-        self.assertEqual([curr_set.name for curr_set in rg.ordered_sets], ["url"])
+        rg = RuleGroup(**rules)
+        self.assertEqual(rg.tree.name, "default")
+        self.assertEqual([child.name for child in rg.tree.children], ["url"])
 
-    def test_prevent_circular_order(self):
-        filename = os.path.join(DIRECTORY, 'rules', 'test_site_com', 'circular.json')
-        rules = open_group(filename)
-        rg = RuleGroup(rules["name"], rules["index_urls"], rules["rules"])
-        self.assertEqual([curr_set.name for curr_set in rg.ordered_sets], ["url"])        
+class SetTestCase(unittest.TestCase):
 
-    def test_chain_order(self):
-        filename = os.path.join(DIRECTORY, 'rules', 'test_site_com', 'chain.json')
-        rules = open_group(filename)
-        rg = RuleGroup(rules["name"], rules["index_urls"], rules["rules"])
-        self.assertEqual([curr_set.name for curr_set in rg.ordered_sets], ["page2", "page4", "page3"])
+    def test_set_with_children(self):
+        set_json = {
+            "name": "foobar",
+            "rules": {
+                "test": {
+                    "name": "test",
+                    "selector": "a",
+                    "capture": "attr-href"
+                }
+            },
+            "children": {
+                "test": {
+                    "name": "test",
+                    "rules": {
+                        "baz": {
+                            "name": "baz",
+                            "selector": "h1",
+                            "capture": "text"
+                        }
+                    },
+                    "children": {}
+                }
+            }
+        }
+
+        foo = Set(**set_json)
+        self.assertEqual(foo.name, "foobar")
+        self.assertEqual(len(foo.children), 1)
+
+    def test_set_without_children(self):
+        set_json = {
+            "name": "foobar",
+            "rules": {
+                "test": {
+                    "name": "test",
+                    "selector": "a",
+                    "capture": "text"
+                }
+            }
+        }
+        foo = Set(**set_json)
+        self.assertEqual(foo.name, "foobar")
+        self.assertEqual(len(foo.children), 0)
+    
+
+class ParentSetTestCase(unittest.TestCase):
+    pass
 
 if __name__=="__main__":
     unittest.main()

@@ -1,0 +1,35 @@
+{
+  "nodes": {
+    "default": {
+      "rules": {
+        "ties": {
+          "capture": "text", 
+          "name": "ties", 
+          "selector": "td:nth-of-type(8)"
+        }, 
+        "losses": {
+          "capture": "text", 
+          "name": "losses", 
+          "selector": "td:nth-of-type(7)"
+        }, 
+        "year": {
+          "capture": "text", 
+          "name": "year", 
+          "selector": "td:nth-of-type(1)"
+        }, 
+        "wins": {
+          "capture": "text", 
+          "name": "wins", 
+          "selector": "td:nth-of-type(6)"
+        }
+      }, 
+      "children": {}, 
+      "parent": ".wikitable tr", 
+      "name": "default"
+    }
+  }, 
+  "index_urls": [
+    "http://en.wikipedia.org/wiki/List_of_Green_Bay_Packers_seasons"
+  ], 
+  "name": "packers"
+}

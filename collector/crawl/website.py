@@ -22,10 +22,7 @@ class Website(object):
         for filename in glob.glob(os.path.join(self.folder, "*.json")):
             with open(filename) as fp:
                 rule_dict = json.load(fp)
-                index_urls = rule_dict.get("index_urls", [])
-                rules = rule_dict.get("rules", {})
-                name = rule_dict.get("name", None)
-                self.queue.put(RuleGroup(name, index_urls, rules))
+                self.queue.put(RuleGroup(**rule_dict))
 
     def crawl(self):
         """

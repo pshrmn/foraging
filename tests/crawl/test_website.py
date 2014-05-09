@@ -13,7 +13,7 @@ class WebsiteTestCase(unittest.TestCase):
     def test_populate(self):
         ws = Website(self.folder)
         ws.populate()
-        self.assertEqual(ws.queue.qsize(), 3)
+        self.assertEqual(ws.queue.qsize(), 1)
 
 if __name__=="__main__":
     unittest.main()
