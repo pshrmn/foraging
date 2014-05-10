@@ -42,6 +42,8 @@ body {
   #collectjs input[type=text]:disabled {
     background: #efefef;
     border-color: #cccccc; }
+  #collectjs label {
+    cursor: pointer; }
 
 #collectTopbar {
   position: relative; }
@@ -62,10 +64,21 @@ body {
     display: inline-block;
     padding: 0 5px;
     height: 29px;
-    line-height: 1.5;
-    cursor: pointer; }
+    line-height: 1.5; }
     #selectorTabs .tab div, #collectTabs .tab div {
       display: inline-block; }
+    #selectorTabs .tab button, #collectTabs .tab button {
+      background: transparent;
+      font-size: 18px;
+      line-height: 1;
+      font-weight: bold;
+      border: 0;
+      cursor: pointer;
+      height: 18px;
+      font-family: sans-serif;
+      vertical-align: inherit; }
+  #selectorTabs .toggle, #collectTabs .toggle {
+    cursor: pointer; }
   #selectorTabs .toggle:hover, #collectTabs .toggle:hover {
     background: #e0bd00; }
   #selectorTabs .tab.active, #collectTabs .tab.active {
@@ -115,16 +128,18 @@ body {
 
 #collectOptions {
   right: 0; }
+  #collectOptions select {
+    font-size: 16px; }
 
 #selectorGroups, #tabGroups {
   background: white;
   font-size: 16px;
-  min-width: 600px; }
+  min-width: 650px; }
   #selectorGroups .group, #tabGroups .group {
     border-color: #444444;
     border-style: solid;
     display: none;
-    min-width: 600px;
+    min-width: 650px;
     padding: 15px; }
   #selectorGroups .show, #tabGroups .show {
     display: block; }
@@ -152,17 +167,6 @@ body {
   .rules .ruleGroup h2 {
     text-decoration: underline;
     margin: 10px 0; }
-
-#parentWrapper button {
-  background: #45aacc;
-  font-size: 18px;
-  line-height: 1;
-  font-weight: bold;
-  border: 0;
-  cursor: pointer;
-  height: 18px;
-  font-family: sans-serif;
-  vertical-align: inherit; }
 
 #clearSelector {
   background: #f296a3; }

@@ -830,7 +830,7 @@ function createGroup(){
     chrome.storage.local.get("sites", function(storage){
         var host = window.location.hostname,
             site = storage.sites[host],
-            newOption, group;
+            group;
 
         // if group already exists, set it as the currentGroup
         if ( site.groups[name] ) {
@@ -888,7 +888,6 @@ function deleteGroup(){
             currOption.parentElement.removeChild(currOption);
             Collect.currentGroup = "default";
             document.querySelector("#allGroups option[value=default]").selected = true;
-            document.getElementById("groupName").textContent = ": default";
         }
         storage.sites[host] = site;
         chrome.storage.local.set({'sites': storage.sites});
@@ -951,7 +950,6 @@ function loadGroupObject(group){
     // load group and set
     Collect.currentGroup = group.name;
     document.querySelector("#allGroups option[value=" + group.name + "]").selected = true;
-    document.getElementById("groupName").textContent = ": " + group.name;
 
     document.getElementById("allSets").innerHTML = "";
     Collect.currentSet = "default";

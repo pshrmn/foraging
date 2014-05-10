@@ -19,7 +19,12 @@
     </div>
     <div id="collectOptions" class="topbarGroup">
         <div id="collectTabs" class="tabs">
-            <div class="tab toggle" id="groupTab" data-for="groups">Group<span id="groupName"></span></div>
+            <div class="tab" id="groupTab">
+                Group
+                <select id="allGroups"></select>
+                <button id="deleteGroup">×</button>
+                <button id="newGroup">+</button>
+            </div>
             <div class="tab" id="setTab">
                 Set
                 <select id="allSets"></select>
@@ -27,17 +32,12 @@
             <div class="tab toggle" id="ruleTab" data-for="rules">Rules</div>
             <div class="tab toggle" id="optionTab" data-for="options">Options</div>
             <div class="tab" id="indexTab">
-                Index Page
+                <label for="addIndex">Index Page</label>
                 <input type="checkbox" id="addIndex">
             </div>
             <div class="tab" id="closeCollect" title="close collectjs">&times;</div>
         </div>
         <div id="tabGroups" class="groups">
-            <div class="group groups">
-                <select id="allGroups"></select>
-                <button id="newGroup">Add Rule Group</button>
-                <button id="deleteGroup">Remove Rule Group</button>
-            </div>
             <div class="group options"></div>
             <div class="group rules">
                 <div id="savedRuleHolder">

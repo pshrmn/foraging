@@ -66,6 +66,10 @@ body{
         background: $light-gray;
         border-color: $gray;
     }
+
+    label{
+        cursor: pointer;
+    }
 }
 
 #collectTopbar{
@@ -94,11 +98,26 @@ body{
         padding: 0 5px;
         height: 29px;
         line-height: 1.5;
-        cursor: pointer;
 
         div{
             display: inline-block;
         }
+
+        button{
+            background: transparent;
+            font-size: 18px;
+            line-height: 1;
+            font-weight: bold;
+            border: 0;
+            cursor: pointer;
+            height: 18px;
+            font-family: sans-serif;
+            vertical-align: inherit;
+        }
+    }
+
+    .toggle{
+        cursor: pointer;
     }
 
     .toggle:hover{
@@ -176,18 +195,22 @@ body{
 
 #collectOptions{
     right: 0;
+
+    select{
+        font-size: 16px;
+    }
 }
 
 #selectorGroups, #tabGroups{
     background: $white;
     font-size: 16px;
-    min-width: 600px;
+    min-width: 650px;
 
     .group{
         border-color: $dark-gray;
         border-style: solid;
         display: none;
-        min-width: 600px;
+        min-width: 650px;
         padding: 15px;
     }
 
@@ -237,18 +260,6 @@ body{
             margin: 10px 0;
         }
     }
-}
-
-#parentWrapper button{
-    background: $blue;
-    font-size: 18px;
-    line-height: 1;
-    font-weight: bold;
-    border: 0;
-    cursor: pointer;
-    height: 18px;
-    font-family: sans-serif;
-    vertical-align: inherit;
 }
 
 #clearSelector{
