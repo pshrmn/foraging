@@ -1,7 +1,7 @@
 <div id="collectTopbar">
     <div id="selectorButtons" class="topbarGroup">
         <div id="selectorTabs" class="tabs">
-            <div class="tab hidden" id="parentTab">
+            <div class="tab" id="parentTab">
                 <div id="parentWrapper" title="parent selector">
                     Parent <span id="parentSelector"></span>
                     <button id="toggleParent" title="add parent selector">+</button>
@@ -20,6 +20,10 @@
     <div id="collectOptions" class="topbarGroup">
         <div id="collectTabs" class="tabs">
             <div class="tab toggle" id="groupTab" data-for="groups">Group<span id="groupName"></span></div>
+            <div class="tab" id="setTab">
+                Set
+                <select id="allSets"></select>
+            </div>
             <div class="tab toggle" id="ruleTab" data-for="rules">Rules</div>
             <div class="tab toggle" id="optionTab" data-for="options">Options</div>
             <div class="tab" id="indexTab">
@@ -63,9 +67,6 @@
             <button id="ruleCycleNext" class="cycle" title="next element matching selector">Next</button>
         </div>
         <div id="ruleInputs">
-            <div class="rule">Set:
-                <div id="ruleSet"></div>
-            </div>
             <div class="rule">
                 <label for="ruleName">Name:</label>
                 <input id="ruleName" name="ruleName" type="text" />

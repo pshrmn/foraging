@@ -279,9 +279,13 @@ describe("storage helpers", function(){
     });
 
     describe("deleteRuleFromSet", function(){
-        var nodes;
+        var nodes,
+            select;
 
         beforeEach(function(){
+            select = document.createElement("select");
+            select.setAttribute("id", "allSets");
+            document.body.appendChild(select);
             nodes = {
                 default: {
                     rules: {
@@ -316,6 +320,10 @@ describe("storage helpers", function(){
             };
         });
 
+        afterEach(function(){
+            document.body.removeChild(select);
+        });
+
         it("deletes rule from set", function(){
             expect(nodes.default.children.set2.rules.foo).toBeDefined();
             deleteRuleFromSet("foo", nodes);
@@ -323,6 +331,7 @@ describe("storage helpers", function(){
         });
 
         it("deletes nested sets", function(){
+            select.appendChild(newOption("default"));
             deleteRuleFromSet("set2", nodes);
             expect(nodes.default.rules.set2).toBeUndefined();
             expect(nodes.default.children.set2).toBeUndefined();
@@ -410,77 +419,12 @@ describe("html functions", function(){
         });
     });
 
-    describe("addSelectOption", function(){
-        it("creates option element and attaches it to select", function(){
-            var select = document.createElement("select");
-            addSelectOption("test", select);
-            var options = select.getElementsByTagName("option"),
-                test = options[0];
-            expect(options.length).toEqual(1);
-            expect(test.value).toEqual("test");
-            expect(test.textContent).toEqual("test");
-        });
-    });
-
-
-    describe("addSet", function(){
-        var holder;
-        beforeEach(function(){
-            holder = document.createElement("div");
-            holder.id = "ruleSet";
-            document.body.appendChild(holder);
-        });
-
-        afterEach(function(){
-            holder.parentElement.removeChild(holder);
-        });
-
-        it("creates input/label and appends to #ruleSet", function(){
-            addSet("test");
-            var inputs = holder.getElementsByTagName("input"),
-                input = inputs[0],
-                labels = holder.getElementsByTagName("label"),
-                label = labels[0];
-            expect(inputs.length).toEqual(1);
-            expect(labels.length).toEqual(1);
-            expect(input.value).toEqual("test");
-            expect(label.textContent).toEqual("test");
-            expect(label.getAttribute("for")).toEqual("testRuleSet");
-        });
-    });
-
-    describe("removeSet", function(){
-        var holder;
-        beforeEach(function(){
-            holder = document.createElement("div");
-            holder.id = "ruleSet";
-            // need default input to check when deleting another set
-            holder.innerHTML = "<label>Default</label>" + 
-                "<input type=\"radio\" class=\"ruleGroup\" data-selector=\"default\" />";
-            document.body.appendChild(holder);
-        });
-
-        afterEach(function(){
-            holder.parentElement.removeChild(holder);
-        });
-
-        it("removes input/label from #ruleSet", function(){
-            addSet("foo");
-            addSet("bar");
-            var inputs = holder.getElementsByTagName("input"),
-                labels = holder.getElementsByTagName("label");
-            expect(inputs.length).toEqual(3);
-            expect(labels.length).toEqual(3);
-
-            removeSet("bar");
-            var barInput = document.getElementById("barRuleSet"),
-                barLabel = document.getElementById("barInputLabel");
-            inputs = holder.getElementsByTagName("input"),
-            labels = holder.getElementsByTagName("label");
-            expect(inputs.length).toEqual(2);
-            expect(labels.length).toEqual(2);
-            expect(barInput).toBeNull();
-            expect(barLabel).toBeNull();
+    describe("newOption", function(){
+        it("creates a new option element with value as name", function(){
+            var option = newOption("foobar");
+            expect(option.tagName).toEqual("OPTION");
+            expect(option.textContent).toEqual("foobar");
+            expect(option.value).toEqual("foobar");
         });
     });
 

@@ -170,8 +170,6 @@ body{
     display: inline-block;
 }
 
-
-
 #selectorTabs{
     left: 0;
 }
@@ -183,13 +181,13 @@ body{
 #selectorGroups, #tabGroups{
     background: $white;
     font-size: 16px;
-    min-width: 500px;
+    min-width: 600px;
 
     .group{
         border-color: $dark-gray;
         border-style: solid;
         display: none;
-        min-width: 500px;
+        min-width: 600px;
         padding: 15px;
     }
 
@@ -323,22 +321,21 @@ body{
     input[type=text]{
         width: 250px;
     }
-}
 
-.rule{
-    color: $black;
-    font-size: 14px;
+    .rule{
+        color: $black;
+        font-size: 14px;
 
-    label{
-        width: 100px;
+        label{
+            width: 100px;
+        }
+
+        label, input{
+            margin: 0;
+            display: inline-block;
+        }
     }
-
-    label, input{
-        margin: 0;
-        display: inline-block;
-    }
 }
-
 
 #rulePage{
     div{
