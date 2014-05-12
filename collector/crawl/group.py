@@ -78,7 +78,11 @@ class Set(object):
             if url:
                 child_data = child.get(url)
                 if child_data:
-                    data.update(child_data)
+                    # for nested parentsets, pluralize name of the set and add returned array
+                    if isinstance(child, ParentSet):
+                        data[child.name + "s"] = child_data
+                    else:
+                        data.update(child_data)
         return data
 
 class ParentSet(Set):
