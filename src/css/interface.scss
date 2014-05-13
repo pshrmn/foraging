@@ -3,6 +3,7 @@ $light-red: #F296A3;
 $green: #489675;
 $light-green: #BDDBCE;
 $blue: #45AACC;
+$dark-blue: #2E829E;
 $light-gray: #efefef;
 $dark-gray: #444444;
 $gray: #CCCCCC;
@@ -120,12 +121,20 @@ body{
         cursor: pointer;
     }
 
-    .toggle:hover{
-        background: $dark-gold;    
-    }
-
     .tab.active{
         height: 30px;
+    }
+}
+
+#collectTabs{
+    .toggle:hover{
+        background: $dark-gold;
+    }
+}
+
+#selectorTabs{
+    .toggle:hover{
+        background: $dark-blue;
     }
 }
 
@@ -264,6 +273,7 @@ body{
 
 #clearSelector{
     background: $light-red;
+    cursor: pointer;
 }
 
 #rulePreview{

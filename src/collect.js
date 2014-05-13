@@ -269,7 +269,7 @@ function resetInterface(){
     
     // ruleItems
     Collect.selectorTabs.hide();
-    document.getElementById("rulePreview").innerHTML = "";
+    document.getElementById("rulePreview").innerHTML = "No selector/attribute to capture selected";
     document.getElementById("ruleHTML").innerHTML = "";
     
     // reset form
@@ -407,7 +407,7 @@ function capturePreview(event){
 
     } else {
         document.getElementById("ruleAttr").value ='';
-        document.getElementById("rulePreview").innerHTML = "";
+        document.getElementById("rulePreview").innerHTML = "No selector/attribute to capture selected";
         document.getElementById("ruleFollow").disabled = true;
         this.classList.remove("selected");
     }   
@@ -541,6 +541,9 @@ function generatePreviewElements(capture, elements) {
         previewHTML = "";
     for ( var i=0, len=elements.length; i<len; i++ ) {
         previewHTML += "<p class=\"noSelect\">" + fn(elements[i]) + "</p>";
+    }
+    if ( previewHTML === "" ) {
+        previewHTML = "No selector/attribute to capture selected";
     }
     document.getElementById("rulePreview").innerHTML = previewHTML;
 }

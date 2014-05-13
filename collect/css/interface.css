@@ -79,10 +79,14 @@ body {
       vertical-align: inherit; }
   #selectorTabs .toggle, #collectTabs .toggle {
     cursor: pointer; }
-  #selectorTabs .toggle:hover, #collectTabs .toggle:hover {
-    background: #e0bd00; }
   #selectorTabs .tab.active, #collectTabs .tab.active {
     height: 30px; }
+
+#collectTabs .toggle:hover {
+  background: #e0bd00; }
+
+#selectorTabs .toggle:hover {
+  background: #2e829e; }
 
 #selectorTabs {
   left: 0;
@@ -169,7 +173,8 @@ body {
     margin: 10px 0; }
 
 #clearSelector {
-  background: #f296a3; }
+  background: #f296a3;
+  cursor: pointer; }
 
 #rulePreview {
   font-size: 16px;
