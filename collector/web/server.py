@@ -4,8 +4,6 @@ import os
 import argparse
 from urlparse import urlparse
 
-from pprint import pprint
-
 DIRECTORY = os.path.dirname(os.path.realpath(__file__))
 SITE_DIRECTORY = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'rules')
 
@@ -28,8 +26,12 @@ def upload():
     """
     save rules json in <sitename>/<groupname>.json
     dangerous because on save, overwrites existing saved site
+    manually load request.data in case content-type: application/json isn't set
     """
-    data = request.json
+    try:
+        data = json.loads(request.data)
+    except ValueError:
+        return jsonify({"error": True})
     # change indices from a dict (useful for toggling in collectjs) to an array
     data["index_urls"] = [key for key in data["index_urls"]]
     hostname = urlparse(data["index_urls"][0]).netloc

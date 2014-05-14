@@ -30,6 +30,12 @@ class CollectTestCase(unittest.TestCase):
 
         os.rmdir(folder)
 
+    def test_empty_upload(self):
+        headers = [('Content-Type', 'application/json')]
+        resp = self.app.post('/upload', headers=headers)
+        resp_json = json.loads(resp.data)
+        self.assertTrue(resp_json["error"])
+
     def test_upload(self):
         headers = [('Content-Type', 'application/json')]
         example_rules = {
@@ -38,42 +44,57 @@ class CollectTestCase(unittest.TestCase):
                 "http://www.example.com/pageone.html": True,
                 "http://www.example.com/pagetwo.html": True
             },
-            "rules": {
-                "links": {
-                    "name": "links",
-                    "capture": "attr-href",
-                    "selector": "a",
-                    "index": True
-                },
-                "images": {
-                    "name": "images",
-                    "capture": "attr-src",
-                    "selector": "#main img",
-                    "index": False
+            "nodes": {
+                "default": {
+                    "rules": {
+                        "links": {
+                            "name": "links",
+                            "capture": "attr-href",
+                            "selector": "a"
+                        },
+                        "images": {
+                            "name": "images",
+                            "capture": "attr-src",
+                            "selector": "#main img",
+                            "which": 1
+                        }
+                    },
+                    "children": {},
+                    "name": "default"
                 }
             }
         }
-        example_saved_rules = {
+        example_saved_rules =  {
             "name": "example",
-            "index_urls": ["http://www.example.com/pageone.html",
-                "http://www.example.com/pagetwo.html" ],
-            "rules": {
-                "links": {
-                    "name": "links",
-                    "capture": "attr-href",
-                    "selector": "a",
-                    "index": True
-                },
-                "images": {
-                    "name": "images",
-                    "capture": "attr-src",
-                    "selector": "#main img",
-                    "index": False
+            "index_urls": [
+                "http://www.example.com/pageone.html", "http://www.example.com/pagetwo.html"
+            ],
+            "nodes": {
+                "default": {
+                    "rules": {
+                        "links": {
+                            "name": "links",
+                            "capture": "attr-href",
+                            "selector": "a",
+                        },
+                        "images": {
+                            "name": "images",
+                            "capture": "attr-src",
+                            "selector": "#main img",
+                            "which": 1
+                        }
+                    },
+                    "children": {},
+                    "name": "default"
                 }
             }
         }
-        rules = self.app.post('/upload', headers=headers, data=json.dumps(example_rules))
-        self.assertEqual(rules.status_code, 200)
+
+        resp = self.app.post('/upload', headers=headers, data=json.dumps(example_rules))
+        self.assertEqual(resp.status_code, 200)
+        resp_json = json.loads(resp.data)
+        self.assertFalse(resp_json["error"])
+
         data_folder = os.path.join(server.SITE_DIRECTORY, 'www_example_com')
         data_file = os.path.join(data_folder, 'example.json')
         with open(data_file) as fp:

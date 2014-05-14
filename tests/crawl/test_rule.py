@@ -32,7 +32,7 @@ class RuleTestCase(unittest.TestCase):
 
     def test_multiple_test(self):
         self.good_rules["capture"] = "text"
-        self.good_rules["index"] = 0
+        self.good_rules["which"] = 0
         r = Rule(**self.good_rules)
         captured_text = r.get(self.html)
         self.assertEqual(captured_text, ["Testing more testing", "Second"])
@@ -43,31 +43,39 @@ class RuleTestCase(unittest.TestCase):
         self.assertEqual(captured_attrs, "#")
 
     def test_multiple_attr(self):
-        self.good_rules["index"] = 0
+        self.good_rules["which"] = 0
         r = Rule(**self.good_rules)
         captured_attrs = r.get(self.html)
         self.assertEqual(captured_attrs, ["#", "http://www.example.com"])        
 
-    def test_index(self):
-        # no index
+    def test_which(self):
+        # no which
         r = Rule(**self.good_rules)
-        self.assertEqual(r.index, None)
+        self.assertEqual(r.which, None)
         captured_attrs = r.get(self.html)
         self.assertEqual(len(captured_attrs), 1)
         self.assertEqual(captured_attrs, "#")
 
-        # positive index
-        self.good_rules["index"] = 1
+        # zero which
+        self.good_rules["which"] = 0
         r = Rule(**self.good_rules)
-        self.assertEqual(r.index, 1)
+        self.assertEqual(r.which, 0)
+        captured_attrs = r.get(self.html)
+        self.assertEqual(len(captured_attrs), 2)
+        self.assertEqual(captured_attrs, ["#", "http://www.example.com"])
+
+        # positive which
+        self.good_rules["which"] = 1
+        r = Rule(**self.good_rules)
+        self.assertEqual(r.which, 1)
         captured_attrs = r.get(self.html)
         self.assertEqual(len(captured_attrs), 1)
         self.assertEqual(captured_attrs[0], "http://www.example.com")
 
-        # negative index
-        self.good_rules["index"] = -1
+        # negative which
+        self.good_rules["which"] = -1
         r = Rule(**self.good_rules)
-        self.assertEqual(r.index, -1)
+        self.assertEqual(r.which, -1)
         captured_attrs = r.get(self.html)
         self.assertEqual(len(captured_attrs), 1)
         self.assertEqual(captured_attrs[0], "#")

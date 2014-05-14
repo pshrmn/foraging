@@ -8,12 +8,17 @@ class Rule(object):
     capture is the attribute of the item(s) that you want to store
         eg. attr-href means that you want to get the element's href attribute
         text means that you want the text content of the element
+    which is which rules to get if a selector returns multiple elements
+        if which is None, returns the first element
+        if which is 0, returns all matching elements
+        if which is > 0, returns elements which to end of list
+        if which is < 0, returns elements start of list to which
     """
-    def __init__(self, name, selector, capture, index=None, follow=False):
+    def __init__(self, name, selector, capture, which=None, follow=False):
         self.name = name
         self.selector = selector
         self.capture = capture
-        self.index = index
+        self.which = which
         self.xpath = CSSSelector(self.selector)
         self.values = self.set_capture()
         self.follow = follow
@@ -27,11 +32,11 @@ class Rule(object):
         # return None if the xpath gets no matches
         if len(eles) == 0:
             return None
-        # only return one value if no index is provided
-        if self.index is None:
+        # only return one value if no which is provided
+        if self.which is None:
             eles = eles[0]
         else:
-            eles = eles[:self.index] if self.index < 0 else eles[self.index:]
+            eles = eles[:self.which] if self.which < 0 else eles[self.which:]
         return self.values(eles)
 
     def set_capture(self):
@@ -64,4 +69,4 @@ class Rule(object):
 
     
     def __str__(self):
-        return "Rule(%s, %s, %s, %s)" % (self.name, self.selector, self.capture, self.index)
+        return "Rule(%s, %s, %s, %s)" % (self.name, self.selector, self.capture, self.which)
