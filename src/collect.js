@@ -450,8 +450,10 @@ function saveRuleEvent(event){
     rule.capture = capture;
     rule.selector = selector;
 
-    if ( range !== "" && !Collect.html.form.range.disabled ) {
-        rule.range = range;
+    // non-int range value converts to 0
+    if ( !Collect.html.form.range.disabled ) {
+        var rangeInt = parseInt(range, 10);
+        rule.which = (isNaN(rangeInt)) ? 0 : rangeInt;
     }
 
     if ( follow ) {
