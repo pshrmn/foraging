@@ -71,7 +71,8 @@ class Set(object):
         """
         data = {name: self.rules[name].get(dom) for name in self.rules}
         for val in data.itervalues():
-            if not val:
+            # allow empty strings
+            if val is None:
                 return None
         for child in self.children:
             url = data.get(child.name)
