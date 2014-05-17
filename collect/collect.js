@@ -983,6 +983,8 @@ function loadGroupObject(group){
         document.getElementById("indexTab").classList.remove("set");
         document.getElementById("addIndex").checked = false;
     }
+
+    Collect.turnOn();
 }
 
 /*

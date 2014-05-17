@@ -734,7 +734,6 @@ function setupHostname(){
             }
             loadGroupObject(site.groups["default"]);
         }
-        Collect.turnOn();
     });
 }
 
@@ -983,6 +982,8 @@ function loadGroupObject(group){
         document.getElementById("indexTab").classList.remove("set");
         document.getElementById("addIndex").checked = false;
     }
+
+    Collect.turnOn();
 }
 
 /*
