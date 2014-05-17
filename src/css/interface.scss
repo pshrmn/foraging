@@ -23,6 +23,7 @@ body{
     position: fixed;
     bottom: 0;
     width: 100%;
+    min-width: 1050px;
     min-height: 30px;
     border-top: 1px solid $dark-gray;
     background: $white;
@@ -168,10 +169,13 @@ body{
         background: $white;
     }
 
+    .toggle{
+        cursor: pointer;
+    }
     
 }
 
-#collectTabs .toggle, #closeCollect, #addIndex{
+#addIndex{
     cursor: pointer;
 }
 
@@ -210,38 +214,35 @@ body{
     }
 }
 
+#tabGroups{
+    min-width: 650px;
+    .group{
+        border-width: 1px 0 0 1px;
+    }
+}
+
+#selectorGroups{
+    min-width: 400px;
+    .group{
+        border-width: 1px 1px 0 0;
+    }
+}
+
 #selectorGroups, #tabGroups{
     background: $white;
     font-size: 16px;
-    min-width: 650px;
 
     .group{
         border-color: $dark-gray;
         border-style: solid;
         display: none;
-        min-width: 650px;
+        min-width: 100%;
         padding: 15px;
     }
 
     .show{
         display: block;
     }    
-}
-
-#selectorGroups{
-    .group{
-        border-width: 1px 1px 0 0;
-    }
-}
-
-#tabGroups{
-    .group{
-        border-width: 1px 0 0 1px;
-    }
-}
-
-#optionGroup{
-    height: 250px;
 }
 
 .rules{
@@ -271,7 +272,7 @@ body{
     }
 }
 
-#clearSelector{
+#clearSelector, #closeCollect{
     background: $light-red;
     cursor: pointer;
 }

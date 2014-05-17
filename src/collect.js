@@ -113,7 +113,13 @@ var Collect = {
     parent: {
         selector: undefined,
         set: function(name){
-            Collect.html.parent.textContent = name;
+            if ( name === undefined || name === "" ) {
+                this.remove();
+                return;
+            }
+            this.selector = name;
+            Collect.html.parent.textContent = parentName(name);
+            Collect.html.parent.setAttribute("title", name);
             var toggle = document.getElementById("toggleParent");
             toggle.textContent = "×";
             toggle.setAttribute("title", "remove parent selector");
@@ -129,9 +135,9 @@ var Collect = {
             event.preventDefault();
             var clear = true;
             if ( !Collect.parent.selector ){
-                Collect.parent.selector = Collect.family.selector();
-                if ( Collect.parent.selector !== "") {
-                    Collect.parent.set(Collect.parent.selector);
+                var selector = Collect.family.selector();
+                if ( selector !== "") {
+                    Collect.parent.set(selector);
                     clear = false;
                 }
             }
@@ -584,6 +590,17 @@ function addRule(rule, set){
 general helper functions
 ***********************/
 
+function parentName(name){
+    // if name is less than 12 characters, just use it
+    if ( name.length < 8 ) {
+        return name;
+    }
+    
+    // just return the first selector succeeded by an ellipsis
+    return name.substr(0, 5) + "..."; 
+
+}
+
 function noSelectElement(type){
     var ele = document.createElement(type);
     ele.classList.add("noSelect");
@@ -977,17 +994,15 @@ function loadGroupObject(group){
 
     // clear out the parent selector
     Collect.parent.remove();
+    // if parent is set for an index_url, make sure that its loaded
+    if ( group.nodes["default"].parent ) {
+        Collect.parent.set(group.nodes["default"].parent);
+    }
 
     if ( group.index_urls[window.location.href] ) {
         Collect.indexPage = true;
         document.getElementById("indexTab").classList.add("set");
         document.getElementById("addIndex").checked = true;
-
-        // if parent is set for an index_url, make sure that its loaded
-        if ( group.nodes["default"].parent ) {
-            Collect.parent.selector = group.nodes["default"].parent;
-            Collect.parent.set(group.nodes["default"].parent);
-        }
     } else {
         Collect.indexPage = false;
         document.getElementById("indexTab").classList.remove("set");
@@ -1158,7 +1173,6 @@ function loadSetParent(nodes){
         }
         if ( node.name == set ){
             if ( node.parent ) {
-                Collect.parent.selector = node.parent;
                 Collect.parent.set(node.parent);
             } else {
                 Collect.parent.remove();

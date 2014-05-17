@@ -3,6 +3,18 @@ describe("collect", function(){
 });
 
 describe("utility functions", function(){
+    describe("parentName", function(){
+        it("returns name when length < 8 characters", function(){
+            expect(parentName("short")).toEqual("short");
+            expect(parentName("1234567")).toEqual("1234567");
+        });
+
+        it("returns shortened name when length >= 8 characters", function(){
+            expect(parentName("this is too long")).toEqual("this ...");
+            expect(parentName("12345678")).toEqual("12345...");
+        });
+    });
+
     describe("noSelectElement", function(){
         it("returns element with the correct tagname", function(){
             expect(noSelectElement("div").tagName).toEqual("DIV");

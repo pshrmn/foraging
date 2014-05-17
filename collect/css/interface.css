@@ -8,6 +8,7 @@ body {
   position: fixed;
   bottom: 0;
   width: 100%;
+  min-width: 1050px;
   min-height: 30px;
   border-top: 1px solid #444444;
   background: white;
@@ -106,8 +107,10 @@ body {
     background: #bddbce; }
   #collectTabs .active {
     background: white; }
+  #collectTabs .toggle {
+    cursor: pointer; }
 
-#collectTabs .toggle, #closeCollect, #addIndex {
+#addIndex {
   cursor: pointer; }
 
 /* Preview */
@@ -135,27 +138,27 @@ body {
   #collectOptions select {
     font-size: 16px; }
 
+#tabGroups {
+  min-width: 650px; }
+  #tabGroups .group {
+    border-width: 1px 0 0 1px; }
+
+#selectorGroups {
+  min-width: 400px; }
+  #selectorGroups .group {
+    border-width: 1px 1px 0 0; }
+
 #selectorGroups, #tabGroups {
   background: white;
-  font-size: 16px;
-  min-width: 650px; }
+  font-size: 16px; }
   #selectorGroups .group, #tabGroups .group {
     border-color: #444444;
     border-style: solid;
     display: none;
-    min-width: 650px;
+    min-width: 100%;
     padding: 15px; }
   #selectorGroups .show, #tabGroups .show {
     display: block; }
-
-#selectorGroups .group {
-  border-width: 1px 1px 0 0; }
-
-#tabGroups .group {
-  border-width: 1px 0 0 1px; }
-
-#optionGroup {
-  height: 250px; }
 
 .rules .collectGroup {
   margin-right: 10px;
@@ -172,7 +175,7 @@ body {
     text-decoration: underline;
     margin: 10px 0; }
 
-#clearSelector {
+#clearSelector, #closeCollect {
   background: #f296a3;
   cursor: pointer; }
 
