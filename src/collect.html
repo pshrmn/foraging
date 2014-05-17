@@ -52,33 +52,26 @@
     </div>
 </div>
 <div id="collectMain">
-    <div id="selectorPreview">
-        Selector: <span id="selectorText"></span>
-    </div>
-    <div id="selectorItems" class="items">
-        <div id="selectorHolder"></div>
-        <button id="saveSelector">Confirm Selector</button>
-    </div>
-    <div id="ruleItems" class="items">
+    <div id="ruleItems">
         <div id="ruleAlert"></div>
-        <div id="ruleHTMLHolder">
-            <button id="ruleCyclePrevious" class="cycle" title="previous element matching selector">Previous</button>
-            <span id="ruleHTML"></span>
-            <button id="ruleCycleNext" class="cycle" title="next element matching selector">Next</button>
-        </div>
-        <div id="ruleInputs">
+        <div class="rulesForm">
             <div class="rule">
                 <label for="ruleName">Name:</label>
-                <input id="ruleName" name="ruleName" type="text" />
+                <input id="ruleName" name="ruleName2" type="text" />
             </div>
             <div class="rule">
-                <label for="ruleAttr">Attribute:</label>
-                <input id="ruleAttr" name="ruleAttr" type="text" />
+                <label>Selector:</label>
+                <span id="ruleSelector"></span>
+            </div>
+            <div class="rule">
+                <label>Capture:</label>
+                <span id="ruleAttr"></span>
             </div>
             <div class="rule">
                 <label for="ruleMultiple">Multiple:</label>
                 <input id="ruleMultiple" name="ruleMultiple" type="checkbox" />
             </div>
+            
             <div class="rule">
                 <label for="ruleRange">Range:</label>
                 <input id="ruleRange" name="ruleRange" type="text" disabled="true"/>
@@ -88,6 +81,15 @@
                 <input id="ruleFollow" name="ruleFollow" type="checkbox" disabled="true" title="Can only follow rules that get href attribute from links" />
             </div>
         </div>
+        <div class="modifiers">
+            <div id="selectorHolder"></div>
+            <div id="ruleHTMLHolder">
+                <button id="ruleCyclePrevious" class="cycle" title="previous element matching selector">&lt;&lt;</button>
+                <button id="ruleCycleNext" class="cycle" title="next element matching selector">&gt;&gt;</button>
+                <span id="ruleHTML"></span>
+            </div>
+        </div>
         <button id="saveRule">Save Rule</button>
     </div>
+
 </div>

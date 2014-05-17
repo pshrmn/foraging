@@ -81,7 +81,8 @@ body {
   #selectorTabs .toggle, #collectTabs .toggle {
     cursor: pointer; }
   #selectorTabs .tab.active, #collectTabs .tab.active {
-    height: 30px; }
+    height: 30px;
+    background: white; }
 
 #collectTabs .toggle:hover {
   background: #e0bd00; }
@@ -105,27 +106,66 @@ body {
     border-left: 1px solid #444444; }
   #collectTabs .tab.set {
     background: #bddbce; }
-  #collectTabs .active {
-    background: white; }
   #collectTabs .toggle {
     cursor: pointer; }
 
 #addIndex {
   cursor: pointer; }
 
+#ruleItems {
+  display: none;
+  font-size: 16px;
+  color: black; }
+  #ruleItems .rule {
+    font-size: 1em;
+    margin-bottom: 5px; }
+    #ruleItems .rule span {
+      min-width: 50px; }
+    #ruleItems .rule label {
+      font-weight: bold;
+      width: 100px; }
+    #ruleItems .rule label, #ruleItems .rule input {
+      margin: 0;
+      display: inline-block; }
+  #ruleItems input.error {
+    border-color: #c91900;
+    border-style: solid; }
+  #ruleItems span.error {
+    border-bottom: 1px solid #c91900; }
+  #ruleItems input[type=text] {
+    width: 150px;
+    border-width: 0 0 1px; }
+  #ruleItems .rulesForm, #ruleItems .modifiers {
+    display: inline-block; }
+  #ruleItems .rulesForm {
+    width: 25%;
+    min-width: 250px;
+    border-right: 1px dashed #444444; }
+  #ruleItems .modifiers {
+    vertical-align: top;
+    padding-left: 15px;
+    max-width: 75%; }
+    #ruleItems .modifiers > div {
+      padding: 10px 0; }
+
+#saveRule {
+  display: block; }
+
+#ruleHTMLHolder .capture {
+  background: #ddd;
+  padding: 2px;
+  cursor: pointer; }
+#ruleHTMLHolder .selected {
+  background: #bddbce; }
+#ruleHTMLHolder .cycle {
+  margin: 0 5px;
+  padding: 2px 3px;
+  cursor: pointer; }
+
+#ruleHTML {
+  line-height: 2; }
+
 /* Preview */
-#selectorPreview {
-  padding: 5px;
-  background: white; }
-
-#selectorPreview {
-  display: none; }
-
-#selectorText {
-  margin-right: 15px; }
-  #selectorText .parent {
-    background: #bddbce; }
-
 #parentSelector {
   padding: 0 3px;
   display: inline-block; }
@@ -194,42 +234,10 @@ body {
   padding: 5px 5px 15px;
   color: black; }
   #collectMain .items {
-    display: none;
     margin-top: 15px; }
-
-#selectorHolder {
-  display: inline-block; }
-
-#ruleHTMLHolder .cycle {
-  margin: 0 10px;
-  padding: 2px 3px;
-  cursor: pointer; }
 
 #ruleAlert {
   font-size: 0.75em; }
-
-#ruleItems div {
-  margin: 5px 0; }
-#ruleItems .error {
-  border-color: #c91900;
-  border-style: solid;
-  border-width: 2px; }
-#ruleItems .capture {
-  background: #ddd;
-  padding: 2px;
-  cursor: pointer; }
-#ruleItems .selected {
-  background: #bddbce; }
-#ruleItems input[type=text] {
-  width: 250px; }
-#ruleItems .rule {
-  color: black;
-  font-size: 14px; }
-  #ruleItems .rule label {
-    width: 100px; }
-  #ruleItems .rule label, #ruleItems .rule input {
-    margin: 0;
-    display: inline-block; }
 
 #rulePage div {
   display: inline-block;
@@ -239,28 +247,31 @@ body {
   margin-right: 5px; }
 
 /* Selector */
-#selectorHolder .selectorGroup {
-  display: inline-block;
-  white-space: nowrap;
-  padding: 2px 0 0 2px;
-  position: relative;
-  cursor: pointer; }
-  #selectorHolder .selectorGroup * {
-    font-size: 16px; }
-  #selectorHolder .selectorGroup .toggleable {
-    color: #444444;
-    border-bottom: 1px solid #777; }
-  #selectorHolder .selectorGroup .toggleable.off {
-    color: #ccc; }
-  #selectorHolder .selectorGroup .deltog, #selectorHolder .selectorGroup .nthtype, #selectorHolder .selectorGroup .onlychild {
-    font-weight: bold;
-    padding: 0 3px 0 2px;
-    color: white; }
-  #selectorHolder .selectorGroup .childToggle {
-    border-width: 0 0 1px;
-    width: 50px; }
-#selectorHolder .selectorGroup:hover .deltog, #selectorHolder .selectorGroup:hover .onlychild, #selectorHolder .selectorGroup:hover .nthtype {
-  color: #777; }
+#selectorHolder {
+  border-bottom: 1px dashed #444444;
+  line-height: 1.5; }
+  #selectorHolder .selectorGroup {
+    display: inline-block;
+    white-space: nowrap;
+    padding: 2px 0 0 2px;
+    position: relative;
+    cursor: pointer; }
+    #selectorHolder .selectorGroup * {
+      font-size: 16px; }
+    #selectorHolder .selectorGroup .toggleable {
+      color: #444444;
+      border-bottom: 1px solid #777; }
+    #selectorHolder .selectorGroup .toggleable.off {
+      color: #ccc; }
+    #selectorHolder .selectorGroup .deltog, #selectorHolder .selectorGroup .nthtype, #selectorHolder .selectorGroup .onlychild {
+      font-weight: bold;
+      padding: 0 3px 0 2px;
+      color: white; }
+    #selectorHolder .selectorGroup .childToggle {
+      border-width: 0 0 1px;
+      width: 50px; }
+  #selectorHolder .selectorGroup:hover .deltog, #selectorHolder .selectorGroup:hover .onlychild, #selectorHolder .selectorGroup:hover .nthtype {
+    color: #777; }
 
 .collectHighlight {
   background: rgba(50, 50, 50, 0.1) !important;
