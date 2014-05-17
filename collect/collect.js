@@ -242,7 +242,8 @@ var Collect = {
             event.preventDefault();
             var selected = this.querySelector("option:checked");
             if ( selected ) {
-                Collect.currentSet = selected.value;    
+                Collect.currentSet = selected.value;
+                loadSet();
             }
         });
     }
@@ -912,6 +913,16 @@ function loadGroup(ele){
     });
 }
 
+function loadSet(){
+    chrome.storage.local.get('sites', function loadSetChrome(storage){
+        var host = window.location.hostname,
+            site = storage.sites[host],
+            group = site.groups[Collect.currentGroup];
+
+        loadSetParent(group.nodes);
+    });
+}
+
 function toggleSetParent(parent){
     chrome.storage.local.get('sites', function loadGroupsChrome(storage){
         var host = window.location.hostname,
@@ -1101,6 +1112,11 @@ function deleteRuleFromSet(name, nodes){
     return nodes;
 }
 
+/*
+iterate over sets to find current set
+if parent is defined, set it for the node
+if parent is undefined, delete the parent string from the set
+*/
 function toggleParentFromSet(parent, nodes){
     var set = Collect.currentSet,
         found = false;
@@ -1109,7 +1125,7 @@ function toggleParentFromSet(parent, nodes){
         if ( found ) {
             return;
         }
-        if ( node.name == set ){
+        if ( node.name === set ){
             if ( parent ) {
                 node.parent = parent;
             } else {
@@ -1127,6 +1143,38 @@ function toggleParentFromSet(parent, nodes){
 
     return nodes;
 }
+
+/*
+find set, and if there is a parent, set it
+*/
+function loadSetParent(nodes){
+    var set = Collect.currentSet,
+        found = false,
+        select = document.getElementById("allSets");
+
+    function findSet(node){
+        if ( found ) {
+            return;
+        }
+        if ( node.name == set ){
+            if ( node.parent ) {
+                Collect.parent.selector = node.parent;
+                Collect.parent.set(node.parent);
+            } else {
+                Collect.parent.remove();
+            }
+            found = true;
+        } else {
+            for ( var child in node.children ) {
+                findSet(node.children[child]);
+            }
+        }
+    }
+
+    findSet(nodes["default"]);
+    toggleSetParent(Collect.parent.selector);
+}
+
 
 /***********************
     HTML FUNCTIONS
