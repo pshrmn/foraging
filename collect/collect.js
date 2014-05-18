@@ -734,7 +734,6 @@ function setupHostname(){
             }
             loadGroupObject(site.groups["default"]);
         }
-        Collect.turnOn();
     });
 }
 

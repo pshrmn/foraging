@@ -59,7 +59,9 @@ body{
     }
 
     input[type=text]{
-        height: 24px;
+        height: 20px;
+        max-height: 20px;
+        min-height: 20px;
         padding: 2px;
         font-family: sans-serif;
     }
@@ -70,7 +72,9 @@ body{
     }
 
     label{
+        font-size: 1em;
         cursor: pointer;
+        font-weight: normal;
     }
 }
 
@@ -182,8 +186,11 @@ body{
     color: $black;
 
     .rule{
+        height: 20px;
         font-size: 1em;
         margin-bottom: 5px;
+        border: 0;
+        overflow: visible;
 
         span{
             min-width: 50px;
