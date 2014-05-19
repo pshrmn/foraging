@@ -261,20 +261,22 @@ describe("storage helpers", function(){
 
     describe("uniqueRuleName", function(){
         var rules = {
-            "rules": {
-                "one": {},
-                "two": {"follow": true},
-                "three": {},    
-            },
-            "children": {
-                "two": {
-                    "rules": {
-                        "foo": {},
-                        "bar": {},
-                        "baz": {},    
-                    },
-                    "children": {}
-                }
+            "default": {
+                "rules": {
+                    "one": {},
+                    "two": {"follow": true},
+                    "three": {},    
+                },
+                "children": {
+                    "two": {
+                        "rules": {
+                            "foo": {},
+                            "bar": {},
+                            "baz": {},    
+                        },
+                        "children": {}
+                    }
+                }    
             }
         };
 
@@ -362,7 +364,7 @@ describe("html functions", function(){
             };
         });
         it("sets savedSelector class when complete", function(){
-            var html = '<span class="noSelect collectGroup" data-selector="a" data-name="link" data-capture="attr-href">' + 
+            var html = '<span class="noSelect collectGroup" data-name="link">' + 
                 '<span class="noSelect savedSelector">link</span><span class="noSelect deltog">×</span></span>';
             expect(ruleHTML(selectorObj).outerHTML).toEqual(html);
         });

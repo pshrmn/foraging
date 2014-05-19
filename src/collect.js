@@ -13,7 +13,12 @@ var Collect = {
         create: function(event){
             event.stopPropagation();
             event.preventDefault();
-            resetInterface();
+            resetInterface();    
+            // preserve name when switching selector while editing
+            if ( Collect.editing ) {
+                Collect.html.form.name.value = Collect.editing;
+            }
+            
             var sf = new SelectorFamily(this, Collect.parent.selector);
             sf.setup(Collect.html.family, Collect.html.form.selector, Collect.family.test.bind(Collect.family));
             Collect.family.selectorFamily = sf;
@@ -28,11 +33,14 @@ var Collect = {
         },
         // create a SelectorFamily given a css selector string
         fromSelector: function(selector){
-            var element = this.elements(true);
+            var longSelector = (Collect.parent.selector ? Collect.parent.selector: "body") +
+                " " + selector + Collect.not;
+            var element = document.querySelector(longSelector);
             if ( element ) {
-                this.selectorFamily = new SelectorFamily(element, Collect.parent.selector);
-                this.selectorFamily.setup(Collect.html.family, Collect.html.form.selector,
+                var sf = new SelectorFamily(element, Collect.parent.selector);
+                sf.setup(Collect.html.family, Collect.html.form.selector,
                     Collect.family.test.bind(Collect.family));
+                this.selectorFamily = sf;
                 document.getElementById("ruleItems").style.display = "block";
                 this.selectorFamily.match(selector);
             }    
@@ -287,6 +295,10 @@ function resetInterface(){
     document.getElementById("rulePreview").innerHTML = "No selector/attribute to capture selected";
     document.getElementById("ruleHTML").innerHTML = "";
     
+    resetForm();
+}
+
+function resetForm(){
     // reset form
     Collect.html.form.name.value = "";
     Collect.html.form.capture.textContent = "";
@@ -342,15 +354,8 @@ clear the current SelectorFamily
 function removeSelectorEvent(event){
     event.stopPropagation();
     event.preventDefault();
+    deleteEditing();
     resetInterface();
-}
-
-function updateMatchedElements(){
-    Collect.family.match();
-    var ele = Collect.elements[0];
-    if ( ele ) {
-        addSelectorTextHTML(ele);
-    }
 }
 
 /*
@@ -487,6 +492,12 @@ function unpreviewSavedRule(event){
     clearClass("savedPreview");
 }
 
+function editSavedRule(event){
+    var name = this.textContent;
+    deleteEditing();
+    editRule(name, this);
+}
+
 function deleteRuleEvent(event){
     var parent = this.parentElement,
         name = parent.dataset.name;
@@ -497,6 +508,15 @@ function deleteRuleEvent(event){
 /***********************
     EVENT HELPERS
 ***********************/
+
+function updateMatchedElements(){
+    Collect.family.match();
+    var ele = Collect.elements[0];
+    if ( ele ) {
+        addSelectorTextHTML(ele);
+    }
+}
+
 /*
 given an element, generate the html to represent an element and its "captureable" attributes and
 create the event listeners for it to work
@@ -756,8 +776,15 @@ function saveRule(rule){
             name = rule.name,
             group = Collect.currentGroup,
             set = Collect.currentSet;
-        // can't have a rule named default
-        if ( uniqueRuleName(name, site.groups[group].nodes) ) {
+        // if editing, overwrite the rule
+        if ( Collect.editing ) {
+            site.groups[group].nodes = editRuleFromGroup(rule, site.groups[group].nodes);
+            storage.sites[host] = site;
+            chrome.storage.local.set({'sites': storage.sites});
+            Collect.selectorTabs.hide();
+            resetInterface();
+            // need to rename rule in Rules tab
+        } else if ( uniqueRuleName(name, site.groups[group].nodes) ) {
             site.groups[group].nodes = addRuleToSet(rule, site.groups[group].nodes);      
             storage.sites[host] = site;
             chrome.storage.local.set({'sites': storage.sites});
@@ -938,6 +965,17 @@ function toggleSetParent(parent){
     });
 }
 
+function editRule(name, element){
+    chrome.storage.local.get('sites', function editRuleChrome(storage){
+        var host = window.location.hostname,
+            sites = storage.sites,
+            group = Collect.currentGroup,
+            set = Collect.currentSet;
+        findRuleFromGroup(name, element, sites[host].groups[group].nodes);
+    });  
+}
+
+
 /***********************
     STORAGE HELPERS
 ***********************/
@@ -1035,7 +1073,7 @@ function uniqueRuleName(name, nodes){
     if ( name === "default" ) {
         return false;
     }
-    var names = nodeRules(nodes);
+    var names = nodeRules(nodes["default"]);
     for ( var i=0, len=names.length; i<len; i++ ) {
 
         if ( names[i] === name ) {
@@ -1152,8 +1190,7 @@ find set, and if there is a parent, set it
 */
 function loadSetParent(nodes){
     var set = Collect.currentSet,
-        found = false,
-        select = document.getElementById("allSets");
+        found = false;
 
     function findSet(node){
         if ( found ) {
@@ -1177,6 +1214,153 @@ function loadSetParent(nodes){
     toggleSetParent(Collect.parent.selector);
 }
 
+/*
+
+*/
+function findRuleFromGroup(name, element, nodes){
+    var foundRule;
+    function findRule(node){
+        var rule;
+        for ( var r in node.rules ) {
+            rule = node.rules[r];
+            if ( rule.name === name ) {
+                foundRule = rule;
+
+                // load set for rule that you're editing
+                Collect.currentSet = node.name;
+                if ( node.parent ) {
+                    Collect.parent.set(node.parent);
+                } else {
+                    Collect.parent.remove();
+                }
+                document.querySelector("#allSets option[value=" + node.name + "]").selected = true;
+                return;
+            }
+        }
+        if ( foundRule === undefined ) {
+            for ( var child in node.children ) {
+                findRule(node.children[child]);    
+                if ( foundRule ) {
+                    break;
+                }
+            }    
+        }
+    }
+    findRule(nodes["default"]);
+    loadSavedRule(foundRule, element);
+}
+
+/*
+sets a rules name/capture/selector and follow/multiple/range if they exist
+*/
+function loadSavedRule(rule, element){
+    resetForm();
+
+    Collect.editing = rule.name;
+    Collect.editingElement = element;
+    element.classList.add("editing");
+    Collect.family.fromSelector(rule.selector);
+
+    document.getElementById("ruleItems").style.display = "block";
+    Collect.html.form.name.value = rule.name;
+    Collect.html.form.selector.textContent = rule.selector;
+    Collect.html.form.capture.textContent = rule.capture;
+    if ( rule.which !== undefined ){
+        Collect.html.form.range = rule.which;
+        Collect.html.form.rangeHolder.style.display = "block";
+        Collect.html.form.multiple.checked = true;
+    }
+    // show follow if capture is attr-href, check follow if rule.follow
+    if ( rule.capture === "attr-href" ) {
+        Collect.html.form.follow.disabled = false;
+        Collect.html.form.followHolder.style.display = "block";    
+    }
+    if ( rule.follow ) {
+        Collect.html.form.follow.checked = true;
+    }
+    markCapture();
+}
+
+
+function editRuleFromGroup(newRule, nodes){
+    var found = false,
+        set = Collect.currentSet,
+        oldName = Collect.editing,
+        newName = newRule.name;
+
+    function findRule(node){
+        var rule;
+        if ( found ) {
+            return;
+        }
+
+        for ( var r in node.rules ) {
+            rule = node.rules[r];
+            // look for old name in case thats changing
+            if ( rule.name === oldName ) {
+                found = true;
+                if ( node.name === Collect.currentSet ) {
+                    
+                    if ( oldName === newRule.name ) {
+                        // easier if rule is still in the same set
+                        if ( rule.follow && !newRule.follow ) {
+                            // remove set if no longer following
+                            delete node.children[oldName];
+                            removeSet(oldName);
+                        } else if ( !rule.follow && newRule.follow ) {
+                            // create a set if now following
+                            node.children[rule.name] = addNode(newRule.name);
+                            document.getElementById("allSets").appendChild(newOption(rule.name));
+                        }
+
+                        // name didn't change, so just overwrite current rule
+                        node.rules[r] = newRule;
+                    } else {
+                        if ( rule.follow && !newRule.follow ) {
+                            // remove set if no longer following
+                            delete node.children[oldName];
+                            removeSet(oldName);
+                        } else if ( !rule.follow && newRule.follow ) {
+                            // create a set if now following
+                            node.children[rule.name] = addNode(newName);
+                            document.getElementById("allSets").appendChild(newOption(rule.name));
+                        } else if ( rule.follow && newRule.follow ) {
+                            // need to rename set
+                            node.children[newName] = node.children[oldName];
+                            node.children[newName].name = newName;
+                            delete node.children[oldName];
+                            updateSetName(oldName, newName);
+                        }
+                        updateRuleName(oldName, newName);
+
+                        delete node.rules[oldName];
+                        node.rules[newRule.name] = newRule;
+                    }
+                } else {
+                    // not handling this yet
+                }
+            }
+        }
+        if ( !found ) {
+            for ( var child in node.children ) {
+                findRule(node.children[child]);
+            }    
+        }
+    }
+
+    findRule(nodes["default"]);
+    // no longer editing
+    deleteEditing();
+    return nodes;
+}
+
+function deleteEditing(){
+    delete Collect.editing;
+    if ( Collect.editingElement ) {
+        Collect.editingElement.classList.remove("editing");
+        delete Collect.editingElement;
+    }
+}
 
 /***********************
     HTML FUNCTIONS
@@ -1188,15 +1372,7 @@ function ruleHTML(obj){
     var span = noSelectElement("span"),
         nametag = noSelectElement("span"),
         deltog = noSelectElement("span");
-    span.dataset.selector = obj.selector;
     span.dataset.name = obj.name;
-    span.dataset.capture = obj.capture;
-    if ( obj.range) {
-        span.dataset.range = obj.range;
-    }
-    if ( obj.parent ) {
-        span.dataset.parent = obj.parent;
-    }
 
     span.classList.add("collectGroup");
     nametag.classList.add("savedSelector");
@@ -1210,6 +1386,7 @@ function ruleHTML(obj){
 
     nametag.addEventListener("mouseenter", previewSavedRule, false);
     nametag.addEventListener("mouseleave", unpreviewSavedRule, false);
+    nametag.addEventListener("click", editSavedRule, false);
     deltog.addEventListener("click", deleteRuleEvent, false);
     
     return span;
@@ -1313,11 +1490,33 @@ function newOption(name){
     return option;
 }
 
-function removeSet(name){
-    var options = document.querySelectorAll("#allSets option"),
-        rules = document.querySelector('.ruleGroup[data-selector="' + name + '"]'),
-        curr;
+function updateRuleName(oldName, newName){
+    var collectGroup = document.querySelector('.collectGroup[data-name="' + oldName + '"]'),
+        savedSelector = collectGroup.getElementsByClassName('savedSelector')[0];
+    collectGroup.dataset.name = newName;
+    savedSelector.textContent = newName;
+}
 
+function updateSetName(oldName, newName){
+    var ruleGroup = document.querySelector('.ruleGroup[data-selector="' + oldName + '"]'),
+        h2 = ruleGroup.getElementsByTagName('h2')[0],
+        option = document.querySelector("#allSets option[value=" + oldName + "]");  
+    
+    if ( ruleGroup ){
+        ruleGroup.dataset.selector = newName;    
+    }
+    if ( h2 ) {
+        h2.textContent = newName;    
+    }
+    if ( option ) {
+        option.value = newName;
+        option.textContent = newName;
+    }
+}
+
+function removeSetOption(name){
+    var options = document.querySelectorAll("#allSets option"),
+        curr;
     for ( var i=0, len=options.length; i<len; i++ ) {
         curr = options[i];
         if ( curr.value === name ) {
@@ -1325,6 +1524,16 @@ function removeSet(name){
             break;
         }
     }
+
+}
+
+/*
+removes option and .ruleGroup associated with a rule set
+*/
+function removeSet(name){
+    var rules = document.querySelector('.ruleGroup[data-selector="' + name + '"]');
+
+    removeSetOption(name);
 
     // get rid of the .ruleGroup for the set
     if ( rules ) {

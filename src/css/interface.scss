@@ -334,11 +334,19 @@ body{
         span{
             padding: 3px;
         }
+    }
 
-        .deltog{
-            cursor: pointer;
-            background: $light-gray;
-        }
+    .deltog{
+        cursor: pointer;
+        background: $light-gray;
+    }
+
+    .savedSelector{
+        cursor: pointer;
+    }
+
+    .savedSelector.editing{
+        background: $gold;
     }
 
     .ruleGroup{

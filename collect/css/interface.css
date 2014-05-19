@@ -215,9 +215,13 @@ body {
   border: 1px solid #444444; }
   .rules .collectGroup span {
     padding: 3px; }
-  .rules .collectGroup .deltog {
-    cursor: pointer;
-    background: #efefef; }
+.rules .deltog {
+  cursor: pointer;
+  background: #efefef; }
+.rules .savedSelector {
+  cursor: pointer; }
+.rules .savedSelector.editing {
+  background: gold; }
 .rules .ruleGroup {
   margin-bottom: 15px; }
   .rules .ruleGroup h2 {
