@@ -198,7 +198,9 @@ var Collect = {
                 selector: document.getElementById("ruleSelector"),
                 multiple: document.getElementById("ruleMultiple"),
                 range: document.getElementById("ruleRange"),
-                follow: document.getElementById("ruleFollow")
+                rangeHolder: document.querySelector("#ruleItems .range"),
+                follow: document.getElementById("ruleFollow"),
+                followHolder: document.querySelector("#ruleItems .follow")
             }
         };
         
@@ -216,6 +218,12 @@ var Collect = {
         Collect.html.form.range.addEventListener("blur", applyRuleRange, false);
         Collect.html.form.multiple.addEventListener("change", function(event){
             Collect.html.form.range.disabled = !Collect.html.form.range.disabled;
+            if ( Collect.html.form.disabled ) {
+                Collect.html.form.rangeHolder.style.display = "none";
+            } else {
+                Collect.html.form.rangeHolder.style.display = "block";
+            }
+            
         });
         document.getElementById("saveRule").addEventListener("click", saveRuleEvent, false);
         document.getElementById("ruleCyclePrevious").addEventListener("click", showPreviousElement, false);
@@ -287,6 +295,8 @@ function resetInterface(){
     Collect.html.form.multiple.checked = false;
     Collect.html.form.follow.checked = false;
     Collect.html.form.follow.disabled = true;
+    Collect.html.form.followHolder.style.display = "none";
+    Collect.html.form.rangeHolder.style.display = "none";
 
     // divs to hide
     document.getElementById("ruleItems").style.display = "none";
@@ -393,20 +403,22 @@ function capturePreview(event){
         Collect.html.form.capture.textContent = capture;
         this.classList.add("selected");
 
-        var follow = document.getElementById("ruleFollow");
         if ( capture === "attr-href" && allLinks(Collect.elements) ){
-            follow.removeAttribute("disabled");
-            follow.setAttribute("title", "Follow link to get data for more rules");
+            Collect.html.form.followHolder.style.display = "block";
+            Collect.html.form.follow.removeAttribute("disabled");
+            Collect.html.form.follow.setAttribute("title", "Follow link to get data for more rules");
         } else {
-            follow.checked = false;
-            follow.setAttribute("disabled", "true");
-            follow.setAttribute("title", "Can only follow rules that get href attribute from links");
+            Collect.html.form.followHolder.style.display = "none";
+            Collect.html.form.follow.checked = false;
+            Collect.html.form.follow.setAttribute("disabled", "true");
+            Collect.html.form.follow.setAttribute("title", "Can only follow rules that get href attribute from links");
         }
 
     } else {
         Collect.html.form.capture.textContent ="";
         document.getElementById("rulePreview").innerHTML = "No selector/attribute to capture selected";
-        document.getElementById("ruleFollow").disabled = true;
+        Collect.html.form.follow.disabled = true;
+        Collect.html.form.followHolder.style.display = "none";
         this.classList.remove("selected");
     }   
 }

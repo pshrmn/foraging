@@ -207,6 +207,10 @@ body{
         }
     }
 
+    .rule.follow, .rule.range{
+        display: none;
+    }
+
     input.error{
         border-color: $red;
         border-style: solid;

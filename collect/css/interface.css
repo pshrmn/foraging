@@ -134,6 +134,8 @@ body {
     #ruleItems .rule label, #ruleItems .rule input {
       margin: 0;
       display: inline-block; }
+  #ruleItems .rule.follow, #ruleItems .rule.range {
+    display: none; }
   #ruleItems input.error {
     border-color: #c91900;
     border-style: solid; }
