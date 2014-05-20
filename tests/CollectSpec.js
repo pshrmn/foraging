@@ -291,66 +291,6 @@ describe("storage helpers", function(){
             }
         });
     });
-
-    describe("deleteRuleFromSet", function(){
-        var nodes,
-            select;
-
-        beforeEach(function(){
-            select = document.createElement("select");
-            select.setAttribute("id", "allSets");
-            document.body.appendChild(select);
-            nodes = {
-                default: {
-                    rules: {
-                        set2: {
-                            name: "set2",
-                            follow: true
-                        }
-                    },
-                    children: {
-                        set2: {
-                            rules: {
-                                foo: {
-                                    name: "foo"
-                                },
-                                set3: {
-                                    name: "set3",
-                                    follow: true
-                                }
-                            },
-                            children: {
-                                set3: {
-                                    rules: {
-                                        bar: {
-                                            name: "bar"
-                                        }
-                                    }
-                                }                
-                            }
-                        }        
-                    }
-                }
-            };
-        });
-
-        afterEach(function(){
-            document.body.removeChild(select);
-        });
-
-        it("deletes rule from set", function(){
-            expect(nodes.default.children.set2.rules.foo).toBeDefined();
-            deleteRuleFromSet("foo", nodes);
-            expect(nodes.default.children.set2.rules.foo).toBeUndefined();
-        });
-
-        it("deletes nested sets", function(){
-            select.appendChild(newOption("default"));
-            deleteRuleFromSet("set2", nodes);
-            expect(nodes.default.rules.set2).toBeUndefined();
-            expect(nodes.default.children.set2).toBeUndefined();
-        });
-    });
 });
 
 describe("html functions", function(){    

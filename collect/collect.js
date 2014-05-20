@@ -209,7 +209,8 @@ var Collect = {
                 rangeHolder: document.querySelector("#ruleItems .range"),
                 follow: document.getElementById("ruleFollow"),
                 followHolder: document.querySelector("#ruleItems .follow")
-            }
+            },
+            ruleGroups: {}
         };
         
         // don't call loadSavedItems until hostname has been setup because it is asynchronous
@@ -276,7 +277,7 @@ Collect.setup();
 function addInterface(){
     var div = noSelectElement("div");
     div.setAttribute("id", "collectjs");
-    div.innerHTML = "<div id=\"collectTopbar\"><div id=\"selectorButtons\" class=\"topbarGroup\"><div id=\"selectorTabs\" class=\"tabs\"><div class=\"tab\" id=\"parentTab\"><div id=\"parentWrapper\" title=\"parent selector\">Parent <span id=\"parentSelector\"></span><button id=\"toggleParent\" title=\"add parent selector\">+</button></div></div><div class=\"tab\" id=\"selectorCount\">Count <span id=\"currentCount\"></span></div><div class=\"tab toggle\" id=\"previewTab\" data-for=\"previews\">Preview</div><div class=\"tab\" id=\"clearSelector\">Clear</div></div><div id=\"selectorGroups\" class=\"groups\"><div class=\"group previews\"><div id=\"rulePreview\">No selector/attribute to capture selected</div></div></div></div><div id=\"collectOptions\" class=\"topbarGroup\"><div id=\"collectTabs\" class=\"tabs\"><div class=\"tab\" id=\"groupTab\">Group<select id=\"allGroups\"></select><button id=\"deleteGroup\">×</button><button id=\"newGroup\">+</button></div><div class=\"tab\" id=\"setTab\"><span title=\"create a new set by capturing the 'href' attribute of links\">Set</span><select id=\"allSets\"></select></div><div class=\"tab toggle\" id=\"ruleTab\" data-for=\"rules\">Rules</div><div class=\"tab toggle\" id=\"optionTab\" data-for=\"options\">Options</div><div class=\"tab\" id=\"indexTab\"><label for=\"addIndex\">Index Page</label><input type=\"checkbox\" id=\"addIndex\"></div><div class=\"tab\" id=\"closeCollect\" title=\"close collectjs\">&times;</div></div><div id=\"tabGroups\" class=\"groups\"><div class=\"group options\"></div><div class=\"group rules\"><div id=\"savedRuleHolder\"><div class=\"ruleGroup\" data-selector=\"default\"><h2>default</h2><div class=\"groupRules\"></div></div></div><button id=\"uploadRules\">Upload Saved Rules</button></div></div></div></div><div id=\"collectMain\"><div id=\"ruleItems\"><div id=\"ruleAlert\"></div><div class=\"rulesForm\"><div class=\"rule\"><label for=\"ruleName\">Name:</label><input id=\"ruleName\" name=\"ruleName2\" type=\"text\" /></div><div class=\"rule\"><label>Selector:</label><span id=\"ruleSelector\"></span></div><div class=\"rule\"><label>Capture:</label><span id=\"ruleAttr\"></span></div><div class=\"rule\"><label for=\"ruleMultiple\">Multiple:</label><input id=\"ruleMultiple\" name=\"ruleMultiple\" type=\"checkbox\" /></div><div class=\"rule range\"><label for=\"ruleRange\">Range:</label><input id=\"ruleRange\" name=\"ruleRange\" type=\"text\" disabled=\"true\"/></div><div class=\"rule follow\"><label for=\"ruleFollow\">Follow:</label><input id=\"ruleFollow\" name=\"ruleFollow\" type=\"checkbox\" disabled=\"true\" title=\"Can only follow rules that get href attribute from links\" /></div></div><div class=\"modifiers\"><div id=\"selectorHolder\"></div><div id=\"ruleHTMLHolder\"><button id=\"ruleCyclePrevious\" class=\"cycle\" title=\"previous element matching selector\">&lt;&lt;</button><button id=\"ruleCycleNext\" class=\"cycle\" title=\"next element matching selector\">&gt;&gt;</button><span id=\"ruleHTML\"></span></div></div><button id=\"saveRule\">Save Rule</button></div></div>";
+    div.innerHTML = "<div id=\"collectTopbar\"><div id=\"selectorButtons\" class=\"topbarGroup\"><div id=\"selectorTabs\" class=\"tabs\"><div class=\"tab\" id=\"parentTab\"><div id=\"parentWrapper\" title=\"parent selector\">Parent <span id=\"parentSelector\"></span><button id=\"toggleParent\" title=\"add parent selector\">+</button></div></div><div class=\"tab\" id=\"selectorCount\">Count <span id=\"currentCount\"></span></div><div class=\"tab toggle\" id=\"previewTab\" data-for=\"previews\">Preview</div><div class=\"tab\" id=\"clearSelector\">Clear</div></div><div id=\"selectorGroups\" class=\"groups\"><div class=\"group previews\"><div id=\"rulePreview\">No selector/attribute to capture selected</div></div></div></div><div id=\"collectOptions\" class=\"topbarGroup\"><div id=\"collectTabs\" class=\"tabs\"><div class=\"tab\" id=\"groupTab\">Group<select id=\"allGroups\"></select><button id=\"deleteGroup\">×</button><button id=\"newGroup\">+</button></div><div class=\"tab\" id=\"setTab\"><span title=\"create a new set by capturing the 'href' attribute of links\">Set</span><select id=\"allSets\"></select></div><div class=\"tab toggle\" id=\"ruleTab\" data-for=\"rules\">Rules</div><div class=\"tab toggle\" id=\"optionTab\" data-for=\"options\">Options</div><div class=\"tab\" id=\"indexTab\"><label for=\"addIndex\">Index Page</label><input type=\"checkbox\" id=\"addIndex\"></div><div class=\"tab\" id=\"closeCollect\" title=\"close collectjs\">&times;</div></div><div id=\"tabGroups\" class=\"groups\"><div class=\"group options\"></div><div class=\"group rules\"><div id=\"savedRuleHolder\"></div><button id=\"uploadRules\">Upload Saved Rules</button></div></div></div></div><div id=\"collectMain\"><div id=\"ruleItems\"><div id=\"ruleAlert\"></div><div class=\"rulesForm\"><div class=\"rule\"><label for=\"ruleName\">Name:</label><input id=\"ruleName\" name=\"ruleName2\" type=\"text\" /></div><div class=\"rule\"><label>Selector:</label><span id=\"ruleSelector\"></span></div><div class=\"rule\"><label>Capture:</label><span id=\"ruleAttr\"></span></div><div class=\"rule\"><label for=\"ruleMultiple\">Multiple:</label><input id=\"ruleMultiple\" name=\"ruleMultiple\" type=\"checkbox\" /></div><div class=\"rule range\"><label for=\"ruleRange\">Range:</label><input id=\"ruleRange\" name=\"ruleRange\" type=\"text\" disabled=\"true\"/></div><div class=\"rule follow\"><label for=\"ruleFollow\">Follow:</label><input id=\"ruleFollow\" name=\"ruleFollow\" type=\"checkbox\" disabled=\"true\" title=\"Can only follow rules that get href attribute from links\" /></div></div><div class=\"modifiers\"><div id=\"selectorHolder\"></div><div id=\"ruleHTMLHolder\"><button id=\"ruleCyclePrevious\" class=\"cycle\" title=\"previous element matching selector\">&lt;&lt;</button><button id=\"ruleCycleNext\" class=\"cycle\" title=\"next element matching selector\">&gt;&gt;</button><span id=\"ruleHTML\"></span></div></div><button id=\"saveRule\">Save Rule</button></div></div>";
     document.body.appendChild(div);
     addNoSelect(div.querySelectorAll("*"));
 
@@ -516,20 +517,6 @@ function addSelectorTextHTML(ele){
     addEvents(capture, "click", capturePreview);
 }
 
-function clearRules(){
-    // clear out, don't delete default ruleGroup
-    var groups = document.getElementsByClassName("ruleGroup"),
-        curr;
-    for ( var i=0, len=groups.length; i<len; i++ ) {
-        curr = groups[i];
-        if ( curr.dataset.selector === "default" ) {
-            curr.querySelector(".groupRules").innerHTML = "";
-        } else {
-            curr.parentElement.removeChild(curr);
-        }
-    }
-}
-
 /*
 if #ruleAttr is set, add .selected class to the matching #ruleHTML .capture span
 */
@@ -763,13 +750,19 @@ function saveRule(rule){
             name = rule.name,
             group = Collect.currentGroup,
             set = Collect.currentSet;
-        // if editing, overwrite the rule
+
+        // make sure the name is unique first
+            // if editing, overwrite the rule
         if ( Collect.editing ) {
-            site.groups[group].nodes = editRuleFromGroup(rule, site.groups[group].nodes);
-            storage.sites[host] = site;
-            chrome.storage.local.set({'sites': storage.sites});
-            Collect.selectorTabs.hide();
-            resetInterface();
+            var editObj = editRuleFromGroup(rule, site.groups[group].nodes);
+            if ( editObj.success ) {
+                site.groups[group].nodes = editObj.nodes;
+                storage.sites[host] = site;
+                chrome.storage.local.set({'sites': storage.sites});
+                Collect.selectorTabs.hide();
+                resetInterface();    
+            }
+            
             // need to rename rule in Rules tab
         } else if ( uniqueRuleName(name, site.groups[group].nodes) ) {
             site.groups[group].nodes = addRuleToSet(rule, site.groups[group].nodes);      
@@ -1037,7 +1030,7 @@ function loadGroupObject(group){
 
     // use default set when loading a group
     clearRules();
-    addRules(group.nodes["default"]);
+    addSavedRules(group.nodes["default"]);
 
     // clear out the parent selector
     Collect.parent.remove();
@@ -1075,19 +1068,6 @@ function nodeRules(node){
 }
 
 /*
-add saved rules from the node to the #savedRuleHolder
-*/
-function addRules(node){
-    for ( var key in node.rules ) {
-        addRule(node.rules[key], node.name);
-    }
-
-    for ( var child in node.children ) {
-        addRules(node.children[child]);
-    }    
-}
-
-/*
 iterate over all rules in a rule group
 return false if name already exists for a rule, otherwise true
 */
@@ -1107,6 +1087,28 @@ function uniqueRuleName(name, nodes){
     return true;
 }
 
+/*
+add saved rules from the node to the #savedRuleHolder
+*/
+function addSavedRules(node){
+    for ( var key in node.rules ) {
+        addRule(node.rules[key], node.name);
+    }
+
+    for ( var child in node.children ) {
+        addSavedRules(node.children[child]);
+    }    
+}
+
+function clearRules(){
+    var curr;
+    for ( var key in Collect.html.ruleGroups ) {
+        curr = Collect.html.ruleGroups[key];
+        curr.parentElement.removeChild(curr);
+    }
+    Collect.html.ruleGroups = {};
+}
+
 function addSets(node, select){
     select.appendChild(newOption(node.name));
     for ( var key in node.children ) {
@@ -1120,9 +1122,6 @@ function addRuleToSet(rule, nodes){
         select = document.getElementById("allSets");
 
     function findSet(node){
-        if ( found ) {
-            return;
-        }
         if ( node.name == set ){
             node.rules[rule.name] = rule;
             if ( rule.follow ) {
@@ -1130,9 +1129,12 @@ function addRuleToSet(rule, nodes){
                 select.appendChild(newOption(rule.name));
             }
             found = true;
+            return;
         } else {
             for ( var child in node.children ) {
-                findSet(node.children[child]);
+                if ( !found ){
+                    findSet(node.children[child]);
+                }
             }
         }
     }
@@ -1146,26 +1148,23 @@ function addRuleToSet(rule, nodes){
 given sets, iterate over all the sets to find a rule with name and delete that rule
 */
 function deleteRuleFromSet(name, nodes){
-    var found = false;
+    var found = false,
+        rule;
     function findRule(node){
-        var rule;
-        if ( found ) {
-            return;
-        }
-
         for ( var r in node.rules ) {
             rule = node.rules[r];
             if ( rule.name === name ) {
-                found = true;
                 delete node.rules[r];
                 if ( rule.follow ) {
                     delete node.children[r];
                     removeSet(rule.name);
                 }
+                found = true;
+                return;
             }
         }
-        if ( !found ) {
-            for ( var child in node.children ) {
+        for ( var child in node.children ) {
+            if ( !found ) {
                 findRule(node.children[child]);
             }    
         }
@@ -1186,9 +1185,6 @@ function toggleParentFromSet(parent, nodes){
         found = false;
 
     function findSet(node){
-        if ( found ) {
-            return;
-        }
         if ( node.name === set ){
             if ( parent ) {
                 node.parent = parent;
@@ -1196,9 +1192,12 @@ function toggleParentFromSet(parent, nodes){
                 delete node.parent;
             }
             found = true;
+            return;
         } else {
             for ( var child in node.children ) {
-                findSet(node.children[child]);
+                if ( !found ) {
+                    findSet(node.children[child]);
+                }
             }
         }
     }
@@ -1216,9 +1215,6 @@ function loadSetParent(nodes){
         found = false;
 
     function findSet(node){
-        if ( found ) {
-            return;
-        }
         if ( node.name == set ){
             if ( node.parent ) {
                 Collect.parent.set(node.parent);
@@ -1226,9 +1222,12 @@ function loadSetParent(nodes){
                 Collect.parent.remove();
             }
             found = true;
+            return;
         } else {
             for ( var child in node.children ) {
-                findSet(node.children[child]);
+                if ( !found ) {
+                    findSet(node.children[child]);
+                }
             }
         }
     }
@@ -1238,7 +1237,7 @@ function loadSetParent(nodes){
 }
 
 /*
-
+iterate over all rules to find the one to be edited, then load the saved rule
 */
 function findRuleFromGroup(name, element, nodes){
     var foundRule;
@@ -1249,7 +1248,7 @@ function findRuleFromGroup(name, element, nodes){
             if ( rule.name === name ) {
                 foundRule = rule;
 
-                // load set for rule that you're editing
+                // load set's parent for rule that you're editing
                 Collect.currentSet = node.name;
                 if ( node.parent ) {
                     Collect.parent.set(node.parent);
@@ -1270,7 +1269,9 @@ function findRuleFromGroup(name, element, nodes){
         }
     }
     findRule(nodes["default"]);
-    loadSavedRule(foundRule, element);
+    if ( foundRule ) {
+        loadSavedRule(foundRule, element);    
+    }
 }
 
 /*
@@ -1305,12 +1306,18 @@ function loadSavedRule(rule, element){
 }
 
 
+/*
+when saving an edited rule, handle special cases for following, make sure it isn't
+in its own set (for capture="attr-href" elements), and if changing names, make sure
+that the new name is unique
+*/
 function editRuleFromGroup(newRule, nodes){
     var found = false,
         setFound = false,
         set = Collect.currentSet,
         oldName = Collect.editing,
         newName = newRule.name,
+        success = true,
         childrenCopy;
 
     function findRule(node){
@@ -1377,6 +1384,8 @@ function editRuleFromGroup(newRule, nodes){
         }
     }
 
+    // finds current set and adds child node to it, using childrenCopy if it exists otherwise
+    // creates a new node
     function moveSet(node){
         if ( node.name == set ){
             node.rules[newName] = newRule;
@@ -1398,17 +1407,34 @@ function editRuleFromGroup(newRule, nodes){
             }
         }
     }
-
+    /*
     // don't let a rule be in its own children
     if ( newRule.name === set ) {
         deleteEditing();
         return nodes;
     }
+    */
 
-    findRule(nodes["default"]);
-    // no longer editing
-    deleteEditing();
-    return nodes;
+    // if changing names, make sure that it is unique
+    if ( oldName !== newName && !uniqueRuleName(newName, nodes) ){
+        success = false;
+        ruleAlertMessage("Rule name is not unique");
+        document.getElementById("ruleName").classList.add("error");
+    } else if ( newName === set ){
+        success = false;
+        ruleAlertMessage("Rule cannot be in its own set");
+        document.getElementById("ruleName").classList.add("error");
+    }
+
+    if ( success ) {
+        findRule(nodes["default"]);
+        // no longer editing
+        deleteEditing();        
+    }
+    return {
+        "nodes": nodes,
+        "success": success
+    };
 }
 
 function deleteEditing(){
@@ -1453,7 +1479,7 @@ function ruleHTML(obj){
 returns an element for all rules with the same parent to append to
 */
 function ruleHolderHTML(name){
-    var set = document.querySelector('.ruleGroup[data-selector="' + name + '"]'),
+    var set = Collect.html.ruleGroups[name],
         div, h2;
     if ( !set ) {
         set = noSelectElement("div");
@@ -1461,12 +1487,14 @@ function ruleHolderHTML(name){
         div = noSelectElement("div");
 
         set.classList.add("ruleGroup");
-        set.dataset.selector = name;
+        set.dataset.name = name;
         h2.textContent = name;
         div.classList.add("groupRules");
 
         set.appendChild(h2);
         set.appendChild(div);
+
+        Collect.html.ruleGroups[name] = set;
 
         document.getElementById("savedRuleHolder").appendChild(set);
     } else {
@@ -1555,12 +1583,14 @@ function updateRuleName(oldName, newName){
 }
 
 function updateSetName(oldName, newName){
-    var ruleGroup = document.querySelector('.ruleGroup[data-selector="' + oldName + '"]'),
+    var ruleGroup = Collect.html.ruleGroups[oldName],
         h2 = ruleGroup.getElementsByTagName('h2')[0],
         option = document.querySelector("#allSets option[value=" + oldName + "]");  
     
     if ( ruleGroup ){
-        ruleGroup.dataset.selector = newName;    
+        ruleGroup.dataset.name = newName;    
+        Collect.html.ruleGroups[newName] = ruleGroup;
+        delete Collect.html.ruleGroups[oldName];
     }
     if ( h2 ) {
         h2.textContent = newName;    
@@ -1588,13 +1618,13 @@ function removeSetOption(name){
 removes option and .ruleGroup associated with a rule set
 */
 function removeSet(name){
-    var rules = document.querySelector('.ruleGroup[data-selector="' + name + '"]');
-
     removeSetOption(name);
 
+    var rules = Collect.html.ruleGroups[name];
     // get rid of the .ruleGroup for the set
     if ( rules ) {
         rules.parentElement.removeChild(rules);
+        delete Collect.html.ruleGroups[name];
     }
 
     // set default set to be selected
