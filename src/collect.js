@@ -472,20 +472,7 @@ function saveRuleEvent(event){
 function previewSavedRule(event){
     clearClass("queryCheck");
     clearClass("collectHighlight");
-
-    var parent = this.parentElement,
-        parentSelector, selector, elements;
-
-    if ( Collect.indexPage ) {
-        parentSelector = parent.dataset.parent ? parent.dataset.parent + " " : "",
-        selector = parentSelector + parent.dataset.selector + Collect.not,
-        elements = document.querySelectorAll(selector);
-        addClass("savedPreview", elements);    
-    } else {
-        selector = parent.dataset.selector + Collect.not,
-        elements = document.querySelectorAll(selector);
-        addClass("savedPreview", elements);    
-    }
+    previewRule(this.textContent);
 }
 
 function unpreviewSavedRule(event){
@@ -976,6 +963,40 @@ function editRule(name, element){
 }
 
 
+function previewRule(name){
+    chrome.storage.local.get('sites', function previewRuleChrome(storage){
+        var host = window.location.hostname,
+            site = storage.sites[host],
+            group = Collect.currentGroup,
+            set = Collect.currentSet,
+            found = false,
+            parentSelector, selector, elements;
+        
+        function findRule(node){
+            var rule;
+            for ( var r in node.rules ) {
+                rule = node.rules[r];
+                if ( rule.name === name ) {
+                    found = true;
+                    parentSelector = node.parent ? node.parent + " ": "";
+                    selector = parentSelector + rule.selector + Collect.not,
+                    elements = document.querySelectorAll(selector);
+                    addClass("savedPreview", elements);
+                    return;
+                }
+            }
+            for ( var child in node.children ) {
+                if ( !found ) {
+                    findRule(node.children[child]);
+                }    
+            }
+        }
+
+        findRule(site.groups[group].nodes["default"]);
+    });
+}
+
+
 /***********************
     STORAGE HELPERS
 ***********************/
@@ -1005,7 +1026,7 @@ given a group object (rules, index_urls)
 */
 function loadGroupObject(group){
     deleteEditing();
-    
+
     // load group and set
     Collect.currentGroup = group.name;
     document.querySelector("#allGroups option[value=" + group.name + "]").selected = true;
