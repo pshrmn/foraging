@@ -283,6 +283,16 @@ function addInterface(){
 
     Collect.collectTabs = tabs(document.getElementById("collectOptions")),
     Collect.selectorTabs = tabs(document.getElementById("selectorButtons"));
+
+
+    // some some margin at the bottom of the page
+    var currentMargin = parseInt(document.body.style.marginBottom, 10);
+    if ( isNaN(currentMargin) ) {
+        Collect.marginBottom = 0;
+    } else {
+        Collect.marginBottom = currentMargin;
+    }
+    document.body.style.marginBottom = (Collect.marginBottom + 300) + "px";
 }
 
 function resetInterface(){
@@ -347,6 +357,9 @@ function removeInterface(event){
         curr = document.getElementById(elesToRemove[i]);
         curr.parentElement.removeChild(curr);
     }
+
+    document.body.style.marginBottom = (Collect.marginBottom) + "px";
+    console.log("margin bottom removed");
 }
 
 /*
