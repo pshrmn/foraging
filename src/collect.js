@@ -1004,6 +1004,8 @@ function legalFilename(name){
 given a group object (rules, index_urls)
 */
 function loadGroupObject(group){
+    deleteEditing();
+    
     // load group and set
     Collect.currentGroup = group.name;
     document.querySelector("#allGroups option[value=" + group.name + "]").selected = true;
@@ -1284,68 +1286,102 @@ function loadSavedRule(rule, element){
 
 function editRuleFromGroup(newRule, nodes){
     var found = false,
+        setFound = false,
         set = Collect.currentSet,
         oldName = Collect.editing,
-        newName = newRule.name;
+        newName = newRule.name,
+        childrenCopy;
 
     function findRule(node){
         var rule;
-        if ( found ) {
-            return;
-        }
-
         for ( var r in node.rules ) {
             rule = node.rules[r];
             // look for old name in case thats changing
             if ( rule.name === oldName ) {
-                found = true;
                 if ( node.name === Collect.currentSet ) {
-                    
-                    if ( oldName === newRule.name ) {
-                        // easier if rule is still in the same set
-                        if ( rule.follow && !newRule.follow ) {
-                            // remove set if no longer following
-                            delete node.children[oldName];
-                            removeSet(oldName);
-                        } else if ( !rule.follow && newRule.follow ) {
-                            // create a set if now following
-                            node.children[rule.name] = addNode(newRule.name);
-                            document.getElementById("allSets").appendChild(newOption(rule.name));
-                        }
+                    // handle rule.follow
+                    if ( rule.follow && !newRule.follow ) {
+                        // remove set if no longer following
+                        delete node.children[oldName];
+                        removeSet(oldName);
+                    } else if ( !rule.follow && newRule.follow ) {
+                        // create a set if now following
+                        node.children[rule.name] = addNode(newName);
+                        document.getElementById("allSets").appendChild(newOption(newName));
+                    } else if ( rule.follow && newRule.follow && oldName !== newName) {
+                        // need to rename set
+                        node.children[newName] = node.children[oldName];
+                        node.children[newName].name = newName;
+                        delete node.children[oldName];
+                        updateSetName(oldName, newName);
+                    }
 
-                        // name didn't change, so just overwrite current rule
+                    if ( oldName === newName ) {
                         node.rules[r] = newRule;
                     } else {
-                        if ( rule.follow && !newRule.follow ) {
-                            // remove set if no longer following
-                            delete node.children[oldName];
-                            removeSet(oldName);
-                        } else if ( !rule.follow && newRule.follow ) {
-                            // create a set if now following
-                            node.children[rule.name] = addNode(newName);
-                            document.getElementById("allSets").appendChild(newOption(rule.name));
-                        } else if ( rule.follow && newRule.follow ) {
-                            // need to rename set
-                            node.children[newName] = node.children[oldName];
-                            node.children[newName].name = newName;
-                            delete node.children[oldName];
-                            updateSetName(oldName, newName);
-                        }
                         updateRuleName(oldName, newName);
-
                         delete node.rules[oldName];
-                        node.rules[newRule.name] = newRule;
+                        node.rules[newName] = newRule;
                     }
                 } else {
-                    // not handling this yet
+                    if ( rule.follow && !newRule.follow ) {
+                        delete node.children[oldName];
+                    } else if ( rule.follow && newRule.follow ) {
+                        childrenCopy = node.children[oldName];
+                        delete node.children[oldName];
+                        updateSetName(oldName, newName);
+                    }
+
+                    delete node.rules[oldName];
+                    moveSet(nodes["default"]);
+
+                    // need to move rule element to new set
+                    var holder = ruleHolderHTML(set),
+                        collectGroup = document.querySelector('.collectGroup[data-name="' + oldName + '"]');
+                    holder.appendChild(collectGroup);
+
+                    if ( oldName !== newName ) {
+                        updateRuleName(oldName, newName);
+                    }
                 }
+                found = true;
+                return;
             }
         }
-        if ( !found ) {
-            for ( var child in node.children ) {
+        
+        for ( var child in node.children ) {
+            if ( !found ) {
                 findRule(node.children[child]);
             }    
         }
+    }
+
+    function moveSet(node){
+        if ( node.name == set ){
+            node.rules[newName] = newRule;
+            if ( newRule.follow ) {
+                if ( childrenCopy ) {
+                    node.children[newName] = childrenCopy;
+                } else {
+                    node.children[newName] = addNode(newName);
+                    document.getElementById("allSets").appendChild(newOption(newName));
+                }
+            }
+            setFound = true;
+            return;
+        } else {
+            for ( var child in node.children ) {
+                if ( !setFound ) {
+                    moveSet(node.children[child]);
+                }
+            }
+        }
+    }
+
+    // don't let a rule be in its own children
+    if ( newRule.name === set ) {
+        deleteEditing();
+        return nodes;
     }
 
     findRule(nodes["default"]);
