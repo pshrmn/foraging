@@ -1005,9 +1005,9 @@ function toggleSetNext(selector){
             group = Collect.currentGroup;
 
         if ( selector ) {
-            site.groups[group].nodes.default.next = selector;
+            site.groups[group].next = selector;
         } else {
-            delete site.groups[group].nodes.default.next;
+            delete site.groups[group].next;
         }
         
         storage.sites[host] = site;
