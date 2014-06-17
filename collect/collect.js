@@ -157,6 +157,45 @@ var Collect = {
             Collect.turnOn();
         }
     },
+    next: {
+        selector: undefined,
+        set: function(name){
+            if ( name === undefined || name === "" ) {
+                this.remove();
+                return;
+            }
+            this.selector = name;
+            Collect.html.next.textContent = parentName(name);
+            Collect.html.next.setAttribute("title", name);
+            var toggle = document.getElementById("toggleNext");
+            toggle.textContent = "×";
+            toggle.setAttribute("title", "remove next selector");
+        },
+        remove: function(){
+            this.selector = undefined;
+            Collect.html.next.textContent = "";
+            var toggle = document.getElementById("toggleNext");
+            toggle.textContent = "+";
+            toggle.setAttribute("title", "add next selector");
+        },
+        toggle: function(event){
+            event.preventDefault();
+            var clear = true;
+            if ( !Collect.next.selector ){
+                var selector = Collect.family.selector();
+                if ( selector !== "") {
+                    Collect.next.set(selector);
+                    clear = false;
+                }
+            }
+            if ( clear ) {
+                Collect.next.remove();
+            }
+            toggleSetNext(Collect.next.selector);
+            resetInterface();
+            Collect.turnOn();
+        }
+    },
     /*
     adds events listeners based on whether or not this.parentSelector is set
     if it is, only add them to children of that element, otherwise add them to all elements
@@ -200,6 +239,7 @@ var Collect = {
         this.html = {
             family: document.getElementById("selectorHolder"),
             parent: document.getElementById("parentSelector"),
+            next: document.getElementById("nextSelector"),
             form: {
                 name: document.getElementById("ruleName"),
                 capture: document.getElementById("ruleAttr"),
@@ -209,6 +249,10 @@ var Collect = {
                 rangeHolder: document.querySelector("#ruleItems .range"),
                 follow: document.getElementById("ruleFollow"),
                 followHolder: document.querySelector("#ruleItems .follow")
+            },
+            tabs: {
+                parent: document.getElementById("parentTab"),
+                next: document.getElementById("nextTab")
             },
             ruleGroups: {}
         };
@@ -247,6 +291,8 @@ var Collect = {
         }, false);
         document.getElementById('closeCollect').addEventListener('click', removeInterface, false);
         document.getElementById("toggleParent").addEventListener("click", Collect.parent.toggle, false);
+        document.getElementById("toggleNext").addEventListener("click", Collect.next.toggle, false);
+
 
         // groups
         document.getElementById("newGroup").addEventListener("click", function(event){
@@ -277,7 +323,7 @@ Collect.setup();
 function addInterface(){
     var div = noSelectElement("div");
     div.setAttribute("id", "collectjs");
-    div.innerHTML = "<div id=\"collectTopbar\"><div id=\"selectorButtons\" class=\"topbarGroup\"><div id=\"selectorTabs\" class=\"tabs\"><div class=\"tab\" id=\"parentTab\"><div id=\"parentWrapper\" title=\"parent selector\">Parent <span id=\"parentSelector\"></span><button id=\"toggleParent\" title=\"add parent selector\">+</button></div></div><div class=\"tab\" id=\"selectorCount\">Count <span id=\"currentCount\"></span></div><div class=\"tab toggle\" id=\"previewTab\" data-for=\"previews\">Preview</div><div class=\"tab\" id=\"clearSelector\">Clear</div></div><div id=\"selectorGroups\" class=\"groups\"><div class=\"group previews\"><div id=\"rulePreview\">No selector/attribute to capture selected</div></div></div></div><div id=\"collectOptions\" class=\"topbarGroup\"><div id=\"collectTabs\" class=\"tabs\"><div class=\"tab\" id=\"groupTab\">Group<select id=\"allGroups\"></select><button id=\"deleteGroup\">×</button><button id=\"newGroup\">+</button></div><div class=\"tab\" id=\"setTab\"><span title=\"create a new set by capturing the 'href' attribute of links\">Set</span><select id=\"allSets\"></select></div><div class=\"tab toggle\" id=\"ruleTab\" data-for=\"rules\">Rules</div><div class=\"tab toggle\" id=\"optionTab\" data-for=\"options\">Options</div><div class=\"tab\" id=\"indexTab\"><label for=\"addIndex\">Index Page</label><input type=\"checkbox\" id=\"addIndex\"></div><div class=\"tab\" id=\"closeCollect\" title=\"close collectjs\">&times;</div></div><div id=\"tabGroups\" class=\"groups\"><div class=\"group options\"></div><div class=\"group rules\"><div id=\"savedRuleHolder\"></div><button id=\"uploadRules\">Upload Saved Rules</button></div></div></div></div><div id=\"collectMain\"><div id=\"ruleItems\"><div id=\"ruleAlert\"></div><div class=\"rulesForm\"><div class=\"rule\"><label for=\"ruleName\">Name:</label><input id=\"ruleName\" name=\"ruleName2\" type=\"text\" /></div><div class=\"rule\"><label>Selector:</label><span id=\"ruleSelector\"></span></div><div class=\"rule\"><label>Capture:</label><span id=\"ruleAttr\"></span></div><div class=\"rule\"><label for=\"ruleMultiple\">Multiple:</label><input id=\"ruleMultiple\" name=\"ruleMultiple\" type=\"checkbox\" /></div><div class=\"rule range\"><label for=\"ruleRange\">Range:</label><input id=\"ruleRange\" name=\"ruleRange\" type=\"text\" disabled=\"true\"/></div><div class=\"rule follow\"><label for=\"ruleFollow\">Follow:</label><input id=\"ruleFollow\" name=\"ruleFollow\" type=\"checkbox\" disabled=\"true\" title=\"Can only follow rules that get href attribute from links\" /></div></div><div class=\"modifiers\"><div id=\"selectorHolder\"></div><div id=\"ruleHTMLHolder\"><button id=\"ruleCyclePrevious\" class=\"cycle\" title=\"previous element matching selector\">&lt;&lt;</button><button id=\"ruleCycleNext\" class=\"cycle\" title=\"next element matching selector\">&gt;&gt;</button><span id=\"ruleHTML\"></span></div></div><button id=\"saveRule\">Save Rule</button></div></div>";
+    div.innerHTML = "<div id=\"collectTopbar\"><div id=\"selectorButtons\" class=\"topbarGroup\"><div id=\"selectorTabs\" class=\"tabs\"><div class=\"tab\" id=\"parentTab\"><div id=\"parentWrapper\" title=\"parent selector\">Parent <span id=\"parentSelector\"></span><button id=\"toggleParent\" title=\"add parent selector\">+</button></div></div><div class=\"tab hidden\" id=\"nextTab\"><div id=\"tabWrapper\" title=\"next page selector\">Next <span id=\"nextSelector\"></span><button id=\"toggleNext\" title=\"add next selector\">+</button></div></div><div class=\"tab\" id=\"selectorCount\">Count <span id=\"currentCount\"></span></div><div class=\"tab toggle\" id=\"previewTab\" data-for=\"previews\">Preview</div><div class=\"tab\" id=\"clearSelector\">Clear</div></div><div id=\"selectorGroups\" class=\"groups\"><div class=\"group previews\"><div id=\"rulePreview\">No selector/attribute to capture selected</div></div></div></div><div id=\"collectOptions\" class=\"topbarGroup\"><div id=\"collectTabs\" class=\"tabs\"><div class=\"tab\" id=\"groupTab\">Group<select id=\"allGroups\"></select><button id=\"deleteGroup\">×</button><button id=\"newGroup\">+</button></div><div class=\"tab\" id=\"setTab\"><span title=\"create a new set by capturing the 'href' attribute of links\">Set</span><select id=\"allSets\"></select></div><div class=\"tab toggle\" id=\"ruleTab\" data-for=\"rules\">Rules</div><div class=\"tab toggle\" id=\"optionTab\" data-for=\"options\">Options</div><div class=\"tab\" id=\"indexTab\"><label for=\"addIndex\">Index Page</label><input type=\"checkbox\" id=\"addIndex\"></div><div class=\"tab\" id=\"closeCollect\" title=\"close collectjs\">&times;</div></div><div id=\"tabGroups\" class=\"groups\"><div class=\"group options\"></div><div class=\"group rules\"><div id=\"savedRuleHolder\"></div><button id=\"uploadRules\">Upload Saved Rules</button></div></div></div></div><div id=\"collectMain\"><div id=\"ruleItems\"><div id=\"ruleAlert\"></div><div class=\"rulesForm\"><div class=\"rule\"><label for=\"ruleName\">Name:</label><input id=\"ruleName\" name=\"ruleName2\" type=\"text\" /></div><div class=\"rule\"><label>Selector:</label><span id=\"ruleSelector\"></span></div><div class=\"rule\"><label>Capture:</label><span id=\"ruleAttr\"></span></div><div class=\"rule\"><label for=\"ruleMultiple\">Multiple:</label><input id=\"ruleMultiple\" name=\"ruleMultiple\" type=\"checkbox\" /></div><div class=\"rule range\"><label for=\"ruleRange\">Range:</label><input id=\"ruleRange\" name=\"ruleRange\" type=\"text\" disabled=\"true\"/></div><div class=\"rule follow\"><label for=\"ruleFollow\">Follow:</label><input id=\"ruleFollow\" name=\"ruleFollow\" type=\"checkbox\" disabled=\"true\" title=\"Can only follow rules that get href attribute from links\" /></div></div><div class=\"modifiers\"><div id=\"selectorHolder\"></div><div id=\"ruleHTMLHolder\"><button id=\"ruleCyclePrevious\" class=\"cycle\" title=\"previous element matching selector\">&lt;&lt;</button><button id=\"ruleCycleNext\" class=\"cycle\" title=\"next element matching selector\">&gt;&gt;</button><span id=\"ruleHTML\"></span></div></div><button id=\"saveRule\">Save Rule</button></div></div>";
     document.body.appendChild(div);
     addNoSelect(div.querySelectorAll("*"));
 
@@ -359,7 +405,6 @@ function removeInterface(event){
     }
 
     document.body.style.marginBottom = (Collect.marginBottom) + "px";
-    console.log("margin bottom removed");
 }
 
 /*
@@ -504,7 +549,6 @@ function deleteRuleEvent(event){
         name = parent.dataset.name;
     deleteRule(name, parent);
 }
-
 
 /***********************
     EVENT HELPERS
@@ -821,16 +865,12 @@ function toggleIndex(){
             group = Collect.currentGroup;
         // adding
         if ( !tab.classList.contains("set")) {
-            // set right away, remove if there is an error
-            tab.classList.add("set");
+            toggleIndexPage(true);
             storage.sites[host].groups[group].index_urls[url] = true;
-            Collect.indexPage = true;
         }
         // removing
         else {
-            // remove right away, reset if there is an error
-            Collect.indexPage = false;
-            tab.classList.remove("set");
+            toggleIndexPage(false);
             if ( storage.sites[host].groups[group].index_urls[url] ) {
                 delete storage.sites[host].groups[group].index_urls[url];    
             }
@@ -958,6 +998,23 @@ function toggleSetParent(parent){
     });
 }
 
+function toggleSetNext(selector){
+    chrome.storage.local.get('sites', function loadGroupsChrome(storage){
+        var host = window.location.hostname,
+            site = storage.sites[host],
+            group = Collect.currentGroup;
+
+        if ( selector ) {
+            site.groups[group].nodes.default.next = selector;
+        } else {
+            delete site.groups[group].nodes.default.next;
+        }
+        
+        storage.sites[host] = site;
+        chrome.storage.local.set({'sites': storage.sites});
+    });
+}
+
 function editRule(name, element){
     chrome.storage.local.get('sites', function editRuleChrome(storage){
         var host = window.location.hostname,
@@ -1052,17 +1109,24 @@ function loadGroupObject(group){
         Collect.parent.set(group.nodes["default"].parent);
     }
 
-    if ( group.index_urls[window.location.href] ) {
+    var turnOn = group.index_urls[window.location.href] !== undefined;
+    toggleIndexPage(turnOn);
+    
+    Collect.turnOn();
+}
+
+function toggleIndexPage(on){
+    if ( on ) {
         Collect.indexPage = true;
+        Collect.html.tabs.next.classList.remove("hidden");
         document.getElementById("indexTab").classList.add("set");
         document.getElementById("addIndex").checked = true;
     } else {
         Collect.indexPage = false;
+        Collect.html.tabs.next.classList.add("hidden");
         document.getElementById("indexTab").classList.remove("set");
         document.getElementById("addIndex").checked = false;
-    }
-
-    Collect.turnOn();
+    }   
 }
 
 /*

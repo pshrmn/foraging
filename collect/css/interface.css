@@ -87,6 +87,8 @@ body {
   #selectorTabs .tab.active, #collectTabs .tab.active {
     height: 30px;
     background: white; }
+  #selectorTabs .tab.hidden, #collectTabs .tab.hidden {
+    display: none; }
 
 #collectTabs .toggle:hover {
   background: #e0bd00; }

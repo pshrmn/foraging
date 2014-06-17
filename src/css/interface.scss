@@ -130,6 +130,10 @@ body{
         height: 30px;
         background: $white;
     }
+
+    .tab.hidden{
+        display: none;
+    }
 }
 
 #collectTabs{
