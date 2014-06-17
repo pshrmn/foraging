@@ -1,8 +1,9 @@
-from urlparse import urlparse
+import time
+from Queue import Queue
+
 import requests
 from lxml import html
 from lxml.cssselect import CSSSelector
-import time
 
 from .rule import Rule
 
@@ -15,10 +16,9 @@ def get_html(url):
     if resp.status_code != 200:
         return
     dom = html.document_fromstring(resp.text)
-    parsed_url = urlparse(url)
-    base_url = "%s://%s" % (parsed_url.scheme, parsed_url.hostname)
-    dom.make_links_absolute(base_url)
+    dom.make_links_absolute(url)
     print("got:\t%s" % url)
+    # don't hit a server too often
     time.sleep(5)
     return dom
 
@@ -27,17 +27,32 @@ class RuleGroup(object):
     A RuleGroup is made up of sets of rules that get data that corresponds to a rdb tuple
     rule sets are stored in a
     """
-    def __init__(self, name, index_urls, nodes):
+    def __init__(self, name, index_urls, nodes, next=None):
         self.name = name
-        self.index_urls = index_urls
+        self.urls = Queue()
+        for url in index_urls:
+            self.urls.put(url)
+        #self.index_urls = index_urls
+        if next:
+            self.next = Rule("next", next, "attr-href")
         self.nodes = nodes
         self.data = []
         self.tree = make_set(self.nodes["default"])
 
     def crawl(self):
         data = []
-        for url in self.index_urls:
-            data.extend(self.tree.get(url))
+        while not self.urls.empty():
+            url = self.urls.get()
+            dom = get_html(url)
+            if dom is not None:
+                # if there is a "next" selector, push that url to the urls queue
+                if self.next:
+                    next = self.next.get(dom)
+                    if next is not None:
+                        self.urls.put(next)
+                new_data = self.tree.get(dom)
+                if new_data is not None:
+                    data.extend(new_data)
         return data
 
 def make_set(node):
@@ -59,31 +74,28 @@ class Set(object):
         else:
             self.children = [make_set(child) for child in children.itervalues()]
 
-    def get(self, url):
-        dom = get_html(url)
-        if dom is None:
-            return
-        return self.get_from_dom(dom)
-
-    def get_from_dom(self, dom):
+    def get(self, dom):
         """
         given an lxml parsed dom, apply rules for the set, then call child sets given data
         """
         data = {name: self.rules[name].get(dom) for name in self.rules}
         for val in data.itervalues():
-            # allow empty strings
+            # allow empty strings, but if any rule isn't matched, return None
+            # TBD: set None values to empty string?
             if val is None:
                 return None
         for child in self.children:
             url = data.get(child.name)
             if url:
-                child_data = child.get(url)
-                if child_data:
-                    # for nested parentsets, pluralize name of the set and add returned array
-                    if isinstance(child, ParentSet):
-                        data[child.name + "s"] = child_data
-                    else:
-                        data.update(child_data)
+                child_dom = get_html(url)
+                if child_dom:
+                    child_data = child.get(child_dom)
+                    if child_data:
+                        # for nested parentsets, pluralize name of the set and add returned array
+                        if isinstance(child, ParentSet):
+                            data[child.name + "s"] = child_data
+                        else:
+                            data.update(child_data)
         return data
 
 class ParentSet(Set):
@@ -101,17 +113,14 @@ class ParentSet(Set):
         self.xpath = CSSSelector(self.parent)
         super(ParentSet, self).__init__(name, rules, children)
 
-    def get(self, url):
+    def get(self, dom):
         """
         returns an array of data for each dom element selected by the parent selector
         """
-        dom = get_html(url)
-        if dom is None:
-            return
         elements = self.xpath(dom)
         data = []
         for ele in elements:
             new_data = self.get_from_dom(ele)
-            if new_data:
+            if new_data is not None:
                 data.append(new_data)
         return data
