@@ -118,84 +118,6 @@ var Collect = {
             }
         }
     },
-    parent: {
-        selector: undefined,
-        set: function(name){
-            if ( name === undefined || name === "" ) {
-                this.remove();
-                return;
-            }
-            this.selector = name;
-            Collect.html.parent.textContent = parentName(name);
-            Collect.html.parent.setAttribute("title", name);
-            var toggle = document.getElementById("toggleParent");
-            toggle.textContent = "×";
-            toggle.setAttribute("title", "remove parent selector");
-        },
-        remove: function(){
-            this.selector = undefined;
-            Collect.html.parent.textContent = "";
-            var toggle = document.getElementById("toggleParent");
-            toggle.textContent = "+";
-            toggle.setAttribute("title", "add parent selector");
-        },
-        toggle: function(event){
-            event.preventDefault();
-            var clear = true;
-            if ( !Collect.parent.selector ){
-                var selector = Collect.family.selector();
-                if ( selector !== "") {
-                    Collect.parent.set(selector);
-                    clear = false;
-                }
-            }
-            if ( clear ) {
-                Collect.parent.remove();
-            }
-            toggleSetParent(Collect.parent.selector);
-            resetInterface();
-            Collect.turnOn();
-        }
-    },
-    next: {
-        selector: undefined,
-        set: function(name){
-            if ( name === undefined || name === "" ) {
-                this.remove();
-                return;
-            }
-            this.selector = name;
-            Collect.html.next.textContent = parentName(name);
-            Collect.html.next.setAttribute("title", name);
-            var toggle = document.getElementById("toggleNext");
-            toggle.textContent = "×";
-            toggle.setAttribute("title", "remove next selector");
-        },
-        remove: function(){
-            this.selector = undefined;
-            Collect.html.next.textContent = "";
-            var toggle = document.getElementById("toggleNext");
-            toggle.textContent = "+";
-            toggle.setAttribute("title", "add next selector");
-        },
-        toggle: function(event){
-            event.preventDefault();
-            var clear = true;
-            if ( !Collect.next.selector ){
-                var selector = Collect.family.selector();
-                if ( selector !== "") {
-                    Collect.next.set(selector);
-                    clear = false;
-                }
-            }
-            if ( clear ) {
-                Collect.next.remove();
-            }
-            toggleSetNext(Collect.next.selector);
-            resetInterface();
-            Collect.turnOn();
-        }
-    },
     /*
     adds events listeners based on whether or not this.parentSelector is set
     if it is, only add them to children of that element, otherwise add them to all elements
@@ -238,8 +160,6 @@ var Collect = {
         // call after addInterface otherwise html elements won't exist
         this.html = {
             family: document.getElementById("selectorHolder"),
-            parent: document.getElementById("parentSelector"),
-            next: document.getElementById("nextSelector"),
             form: {
                 name: document.getElementById("ruleName"),
                 capture: document.getElementById("ruleAttr"),
@@ -290,8 +210,8 @@ var Collect = {
             toggleIndex();
         }, false);
         document.getElementById('closeCollect').addEventListener('click', removeInterface, false);
-        document.getElementById("toggleParent").addEventListener("click", Collect.parent.toggle, false);
-        document.getElementById("toggleNext").addEventListener("click", Collect.next.toggle, false);
+        //document.getElementById("toggleParent").addEventListener("click", Collect.parent.toggle, false);
+        //document.getElementById("toggleNext").addEventListener("click", Collect.next.toggle, false);
 
 
         // groups
@@ -320,16 +240,71 @@ var Collect = {
 
 Collect.setup();
 
+function toggleTab(property, parent, toggleFn){
+
+    var nameTag = document.createTextNode(property[0].toUpperCase() + property.slice(1)),
+        selectorName = document.createElement("span"),
+        toggleable = document.createElement("button"),
+        obj = {
+            selector: undefined,
+            set: function(selector){
+                if ( selector === undefined || selector === "" ) {
+                    this.remove();
+                    return;
+                }
+                this.selector = selector;
+                selectorName.textContent = parentName(selector);
+                selectorName.setAttribute("title", selector);
+                toggleable.textContent = "×";
+                toggleable.setAttribute("title", "remove " + property + "selector");
+            },
+            remove: function(){
+                this.selector = undefined;
+                selectorName.textContent = "";
+                selectorName.removeAttribute("title");
+                toggleable.textContent = "+";
+                toggleable.setAttribute("title", "add " + property + "selector");
+            },
+            toggle: function(event){
+                event.preventDefault();
+                var clear = true;
+                if ( !obj.selector ){
+                    var selector = Collect.family.selector();
+                    if ( selector !== "") {
+                        obj.set(selector);
+                        clear = false;
+                    }
+                }
+                if ( clear ) {
+                    obj.remove();
+                }
+                toggleFn(obj.selector);
+                resetInterface();
+                Collect.turnOn();
+            }
+        };
+
+    toggleable.textContent = "+";
+    parent.appendChild(nameTag);
+    parent.appendChild(selectorName);
+    parent.appendChild(toggleable);
+
+    toggleable.addEventListener("click", obj.toggle, false);
+    return obj;
+}
+
 function addInterface(){
     var div = noSelectElement("div");
     div.setAttribute("id", "collectjs");
-    div.innerHTML = "<div id=\"collectTopbar\"><div id=\"selectorButtons\" class=\"topbarGroup\"><div id=\"selectorTabs\" class=\"tabs\"><div class=\"tab\" id=\"parentTab\"><div id=\"parentWrapper\" title=\"parent selector\">Parent <span id=\"parentSelector\"></span><button id=\"toggleParent\" title=\"add parent selector\">+</button></div></div><div class=\"tab hidden\" id=\"nextTab\"><div id=\"tabWrapper\" title=\"next page selector\">Next <span id=\"nextSelector\"></span><button id=\"toggleNext\" title=\"add next selector\">+</button></div></div><div class=\"tab\" id=\"selectorCount\">Count <span id=\"currentCount\"></span></div><div class=\"tab toggle\" id=\"previewTab\" data-for=\"previews\">Preview</div><div class=\"tab\" id=\"clearSelector\">Clear</div></div><div id=\"selectorGroups\" class=\"groups\"><div class=\"group previews\"><div id=\"rulePreview\">No selector/attribute to capture selected</div></div></div></div><div id=\"collectOptions\" class=\"topbarGroup\"><div id=\"collectTabs\" class=\"tabs\"><div class=\"tab\" id=\"groupTab\">Group<select id=\"allGroups\"></select><button id=\"deleteGroup\">×</button><button id=\"newGroup\">+</button></div><div class=\"tab\" id=\"setTab\"><span title=\"create a new set by capturing the 'href' attribute of links\">Set</span><select id=\"allSets\"></select></div><div class=\"tab toggle\" id=\"ruleTab\" data-for=\"rules\">Rules</div><div class=\"tab toggle\" id=\"optionTab\" data-for=\"options\">Options</div><div class=\"tab\" id=\"indexTab\"><label for=\"addIndex\">Index Page</label><input type=\"checkbox\" id=\"addIndex\"></div><div class=\"tab\" id=\"closeCollect\" title=\"close collectjs\">&times;</div></div><div id=\"tabGroups\" class=\"groups\"><div class=\"group options\"></div><div class=\"group rules\"><div id=\"savedRuleHolder\"></div><button id=\"uploadRules\">Upload Saved Rules</button></div></div></div></div><div id=\"collectMain\"><div id=\"ruleItems\"><div id=\"ruleAlert\"></div><div class=\"rulesForm\"><div class=\"rule\"><label for=\"ruleName\">Name:</label><input id=\"ruleName\" name=\"ruleName2\" type=\"text\" /></div><div class=\"rule\"><label>Selector:</label><span id=\"ruleSelector\"></span></div><div class=\"rule\"><label>Capture:</label><span id=\"ruleAttr\"></span></div><div class=\"rule\"><label for=\"ruleMultiple\">Multiple:</label><input id=\"ruleMultiple\" name=\"ruleMultiple\" type=\"checkbox\" /></div><div class=\"rule range\"><label for=\"ruleRange\">Range:</label><input id=\"ruleRange\" name=\"ruleRange\" type=\"text\" disabled=\"true\"/></div><div class=\"rule follow\"><label for=\"ruleFollow\">Follow:</label><input id=\"ruleFollow\" name=\"ruleFollow\" type=\"checkbox\" disabled=\"true\" title=\"Can only follow rules that get href attribute from links\" /></div></div><div class=\"modifiers\"><div id=\"selectorHolder\"></div><div id=\"ruleHTMLHolder\"><button id=\"ruleCyclePrevious\" class=\"cycle\" title=\"previous element matching selector\">&lt;&lt;</button><button id=\"ruleCycleNext\" class=\"cycle\" title=\"next element matching selector\">&gt;&gt;</button><span id=\"ruleHTML\"></span></div></div><button id=\"saveRule\">Save Rule</button></div></div>";
+    div.innerHTML = "<div id=\"collectTopbar\"><div id=\"selectorButtons\" class=\"topbarGroup\"><div id=\"selectorTabs\" class=\"tabs\"><div class=\"tab\" id=\"parentTab\"></div><div class=\"tab hidden\" id=\"nextTab\"></div><div class=\"tab\" id=\"selectorCount\">Count <span id=\"currentCount\"></span></div><div class=\"tab toggle\" id=\"previewTab\" data-for=\"previews\">Preview</div><div class=\"tab\" id=\"clearSelector\">Clear</div></div><div id=\"selectorGroups\" class=\"groups\"><div class=\"group previews\"><div id=\"rulePreview\">No selector/attribute to capture selected</div></div></div></div><div id=\"collectOptions\" class=\"topbarGroup\"><div id=\"collectTabs\" class=\"tabs\"><div class=\"tab\" id=\"groupTab\">Group<select id=\"allGroups\"></select><button id=\"deleteGroup\">×</button><button id=\"newGroup\">+</button></div><div class=\"tab\" id=\"setTab\"><span title=\"create a new set by capturing the 'href' attribute of links\">Set</span><select id=\"allSets\"></select></div><div class=\"tab toggle\" id=\"ruleTab\" data-for=\"rules\">Rules</div><div class=\"tab toggle\" id=\"optionTab\" data-for=\"options\">Options</div><div class=\"tab\" id=\"indexTab\"><label for=\"addIndex\">Index Page</label><input type=\"checkbox\" id=\"addIndex\"></div><div class=\"tab\" id=\"closeCollect\" title=\"close collectjs\">&times;</div></div><div id=\"tabGroups\" class=\"groups\"><div class=\"group options\"></div><div class=\"group rules\"><div id=\"savedRuleHolder\"></div><button id=\"uploadRules\">Upload Saved Rules</button></div></div></div></div><div id=\"collectMain\"><div id=\"ruleItems\"><div id=\"ruleAlert\"></div><div class=\"rulesForm\"><div class=\"rule\"><label for=\"ruleName\">Name:</label><input id=\"ruleName\" name=\"ruleName2\" type=\"text\" /></div><div class=\"rule\"><label>Selector:</label><span id=\"ruleSelector\"></span></div><div class=\"rule\"><label>Capture:</label><span id=\"ruleAttr\"></span></div><div class=\"rule\"><label for=\"ruleMultiple\">Multiple:</label><input id=\"ruleMultiple\" name=\"ruleMultiple\" type=\"checkbox\" /></div><div class=\"rule range\"><label for=\"ruleRange\">Range:</label><input id=\"ruleRange\" name=\"ruleRange\" type=\"text\" disabled=\"true\"/></div><div class=\"rule follow\"><label for=\"ruleFollow\">Follow:</label><input id=\"ruleFollow\" name=\"ruleFollow\" type=\"checkbox\" disabled=\"true\" title=\"Can only follow rules that get href attribute from links\" /></div></div><div class=\"modifiers\"><div id=\"selectorHolder\"></div><div id=\"ruleHTMLHolder\"><button id=\"ruleCyclePrevious\" class=\"cycle\" title=\"previous element matching selector\">&lt;&lt;</button><button id=\"ruleCycleNext\" class=\"cycle\" title=\"next element matching selector\">&gt;&gt;</button><span id=\"ruleHTML\"></span></div></div><button id=\"saveRule\">Save Rule</button></div></div>";
     document.body.appendChild(div);
     addNoSelect(div.querySelectorAll("*"));
 
+    // tabs
     Collect.collectTabs = tabs(document.getElementById("collectOptions")),
     Collect.selectorTabs = tabs(document.getElementById("selectorButtons"));
-
+    Collect.parent = toggleTab("parent", document.getElementById("parentTab"), toggleSetParent);
+    Collect.next = toggleTab("next", document.getElementById("nextTab"), toggleSetNext);
 
     // some some margin at the bottom of the page
     var currentMargin = parseInt(document.body.style.marginBottom, 10);

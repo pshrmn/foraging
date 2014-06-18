@@ -118,84 +118,6 @@ var Collect = {
             }
         }
     },
-    parent: {
-        selector: undefined,
-        set: function(name){
-            if ( name === undefined || name === "" ) {
-                this.remove();
-                return;
-            }
-            this.selector = name;
-            Collect.html.parent.textContent = parentName(name);
-            Collect.html.parent.setAttribute("title", name);
-            var toggle = document.getElementById("toggleParent");
-            toggle.textContent = "×";
-            toggle.setAttribute("title", "remove parent selector");
-        },
-        remove: function(){
-            this.selector = undefined;
-            Collect.html.parent.textContent = "";
-            var toggle = document.getElementById("toggleParent");
-            toggle.textContent = "+";
-            toggle.setAttribute("title", "add parent selector");
-        },
-        toggle: function(event){
-            event.preventDefault();
-            var clear = true;
-            if ( !Collect.parent.selector ){
-                var selector = Collect.family.selector();
-                if ( selector !== "") {
-                    Collect.parent.set(selector);
-                    clear = false;
-                }
-            }
-            if ( clear ) {
-                Collect.parent.remove();
-            }
-            toggleSetParent(Collect.parent.selector);
-            resetInterface();
-            Collect.turnOn();
-        }
-    },
-    next: {
-        selector: undefined,
-        set: function(name){
-            if ( name === undefined || name === "" ) {
-                this.remove();
-                return;
-            }
-            this.selector = name;
-            Collect.html.next.textContent = parentName(name);
-            Collect.html.next.setAttribute("title", name);
-            var toggle = document.getElementById("toggleNext");
-            toggle.textContent = "×";
-            toggle.setAttribute("title", "remove next selector");
-        },
-        remove: function(){
-            this.selector = undefined;
-            Collect.html.next.textContent = "";
-            var toggle = document.getElementById("toggleNext");
-            toggle.textContent = "+";
-            toggle.setAttribute("title", "add next selector");
-        },
-        toggle: function(event){
-            event.preventDefault();
-            var clear = true;
-            if ( !Collect.next.selector ){
-                var selector = Collect.family.selector();
-                if ( selector !== "") {
-                    Collect.next.set(selector);
-                    clear = false;
-                }
-            }
-            if ( clear ) {
-                Collect.next.remove();
-            }
-            toggleSetNext(Collect.next.selector);
-            resetInterface();
-            Collect.turnOn();
-        }
-    },
     /*
     adds events listeners based on whether or not this.parentSelector is set
     if it is, only add them to children of that element, otherwise add them to all elements
@@ -238,8 +160,6 @@ var Collect = {
         // call after addInterface otherwise html elements won't exist
         this.html = {
             family: document.getElementById("selectorHolder"),
-            parent: document.getElementById("parentSelector"),
-            next: document.getElementById("nextSelector"),
             form: {
                 name: document.getElementById("ruleName"),
                 capture: document.getElementById("ruleAttr"),
@@ -290,8 +210,8 @@ var Collect = {
             toggleIndex();
         }, false);
         document.getElementById('closeCollect').addEventListener('click', removeInterface, false);
-        document.getElementById("toggleParent").addEventListener("click", Collect.parent.toggle, false);
-        document.getElementById("toggleNext").addEventListener("click", Collect.next.toggle, false);
+        //document.getElementById("toggleParent").addEventListener("click", Collect.parent.toggle, false);
+        //document.getElementById("toggleNext").addEventListener("click", Collect.next.toggle, false);
 
 
         // groups
@@ -320,6 +240,59 @@ var Collect = {
 
 Collect.setup();
 
+function toggleTab(property, parent, toggleFn){
+
+    var nameTag = document.createTextNode(property[0].toUpperCase() + property.slice(1)),
+        selectorName = document.createElement("span"),
+        toggleable = document.createElement("button"),
+        obj = {
+            selector: undefined,
+            set: function(selector){
+                if ( selector === undefined || selector === "" ) {
+                    this.remove();
+                    return;
+                }
+                this.selector = selector;
+                selectorName.textContent = parentName(selector);
+                selectorName.setAttribute("title", selector);
+                toggleable.textContent = "×";
+                toggleable.setAttribute("title", "remove " + property + "selector");
+            },
+            remove: function(){
+                this.selector = undefined;
+                selectorName.textContent = "";
+                selectorName.removeAttribute("title");
+                toggleable.textContent = "+";
+                toggleable.setAttribute("title", "add " + property + "selector");
+            },
+            toggle: function(event){
+                event.preventDefault();
+                var clear = true;
+                if ( !obj.selector ){
+                    var selector = Collect.family.selector();
+                    if ( selector !== "") {
+                        obj.set(selector);
+                        clear = false;
+                    }
+                }
+                if ( clear ) {
+                    obj.remove();
+                }
+                toggleFn(obj.selector);
+                resetInterface();
+                Collect.turnOn();
+            }
+        };
+
+    toggleable.textContent = "+";
+    parent.appendChild(nameTag);
+    parent.appendChild(selectorName);
+    parent.appendChild(toggleable);
+
+    toggleable.addEventListener("click", obj.toggle, false);
+    return obj;
+}
+
 function addInterface(){
     var div = noSelectElement("div");
     div.setAttribute("id", "collectjs");
@@ -327,9 +300,11 @@ function addInterface(){
     document.body.appendChild(div);
     addNoSelect(div.querySelectorAll("*"));
 
+    // tabs
     Collect.collectTabs = tabs(document.getElementById("collectOptions")),
     Collect.selectorTabs = tabs(document.getElementById("selectorButtons"));
-
+    Collect.parent = toggleTab("parent", document.getElementById("parentTab"), toggleSetParent);
+    Collect.next = toggleTab("next", document.getElementById("nextTab"), toggleSetNext);
 
     // some some margin at the bottom of the page
     var currentMargin = parseInt(document.body.style.marginBottom, 10);
