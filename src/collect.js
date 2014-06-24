@@ -184,8 +184,7 @@ var Collect = {
     },
     interfaceEvents: function(){
         // preview
-        document.getElementById("clearSelector").addEventListener('click', removeSelectorEvent, false);
-        //document.getElementById("saveSelector").addEventListener("click", showRuleInputs, false);
+        idEvent("clearSelector", "click", removeSelectorEvent);
 
         // rules
         Collect.html.form.range.addEventListener("blur", applyRuleRange, false);
@@ -198,43 +197,23 @@ var Collect = {
             }
             
         });
-        document.getElementById("saveRule").addEventListener("click", saveRuleEvent, false);
-        document.getElementById("ruleCyclePrevious").addEventListener("click", showPreviousElement, false);
-        document.getElementById("ruleCycleNext").addEventListener("click", showNextElement, false);
-        document.getElementById("uploadRules").addEventListener("click", function(event){
+
+        idEvent("saveRule", "click", saveRuleEvent);
+        idEvent("ruleCyclePrevious", "click", showPreviousElement);
+        idEvent("ruleCycleNext", "click", showNextElement);
+        idEvent("uploadRules", "click", function(event){
             uploadRules();
-        }, false);
+        });
 
         // tabs
-        document.getElementById("addIndex").addEventListener("click", function(){
-            toggleIndex();
-        }, false);
-        document.getElementById('closeCollect').addEventListener('click', removeInterface, false);
-        //document.getElementById("toggleParent").addEventListener("click", Collect.parent.toggle, false);
-        //document.getElementById("toggleNext").addEventListener("click", Collect.next.toggle, false);
-
+        idEvent("addIndex", "click", addIndexEvent);
+        idEvent("closeCollect", "click", removeInterface);
 
         // groups
-        document.getElementById("newGroup").addEventListener("click", function(event){
-            event.preventDefault();
-            createGroup();
-        }, false);
-        document.getElementById("deleteGroup").addEventListener("click", function(event){
-            event.preventDefault();
-            deleteGroup();
-        }, false);
-        document.getElementById("allGroups").addEventListener("change", function(event){
-            event.preventDefault();
-            loadGroup(this);
-        }, false);
-        document.getElementById("allSets").addEventListener("change", function(event){
-            event.preventDefault();
-            var selected = this.querySelector("option:checked");
-            if ( selected ) {
-                Collect.currentSet = selected.value;
-                loadSet();
-            }
-        });
+        idEvent("newGroup", "click", newGroupEvent);
+        idEvent("deleteGroup", "click", deleteGroupEvent);
+        idEvent("allGroups", "change", loadGroupEvent);
+        idEvent("allSets", "change", loadSetEvent);
     }
 };
 
@@ -525,6 +504,34 @@ function deleteRuleEvent(event){
     deleteRule(name, parent);
 }
 
+function addIndexEvent(event){
+    toggleIndex();
+}
+
+function newGroupEvent(event){
+    event.preventDefault();
+    createGroup();
+}
+
+function deleteGroupEvent(event){
+    event.preventDefault();
+    deleteGroup();
+}
+
+function loadGroupEvent(event){
+    event.preventDefault();
+    loadGroup(this);
+}
+
+function loadSetEvent(event){
+    event.preventDefault();
+    var selected = this.querySelector("option:checked");
+    if ( selected ) {
+        Collect.currentSet = selected.value;
+        loadSet();
+    }
+}
+
 /***********************
     EVENT HELPERS
 ***********************/
@@ -662,6 +669,13 @@ function addEvents(eles, type, fn){
     for ( var i=0; i<len; i++ ) {
         eles[i].addEventListener(type, fn, false);
     }
+}
+
+/*
+add an EventListener to a an element, given the id of the element
+*/
+function idEvent(id, type, fn){
+    document.getElementById(id).addEventListener(type, fn, false);
 }
 
 /*
@@ -1069,9 +1083,11 @@ function loadGroupObject(group){
     Collect.currentGroup = group.name;
     document.querySelector("#allGroups option[value=" + group.name + "]").selected = true;
 
-    document.getElementById("allSets").innerHTML = "";
+    var allSets = document.getElementById("allSets");
+
+    allSets.innerHTML = "";
     Collect.currentSet = "default";
-    addSets(group.nodes["default"], document.getElementById("allSets"));
+    addSets(group.nodes["default"], allSets);
 
     // use default set when loading a group
     clearRules();
