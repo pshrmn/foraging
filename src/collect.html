@@ -1,6 +1,6 @@
-<div id="topbarHolder">
-    <div id="collectTopbar">
-        <div id="collectTabs" class="tabs">
+<div class="topbarHolder">
+    <div class="topbar">
+        <div class="tabs">
             <div class="tab" id="parentTab"></div>
             <div class="tab hidden" id="nextTab"></div>
             <div class="tab" id="groupTab">
@@ -21,24 +21,23 @@
             </div>
             <div class="tab" id="closeCollect" title="close collectjs">&times;</div>
         </div>
-        <div id="tabGroups" class="groups">
+        <div class="groups">
             <div class="group options"></div>
             <div class="group rules">
                 <div id="savedRuleHolder"></div>
                 <button id="uploadRules">Upload Saved Rules</button>
             </div>
-            <!-- currently broken, not showing, will fix soon-->
             <div class="group preview" id="rulePreview"></div>
         </div>
     </div>
 </div>
 <div id="collectMain">
-    <div id="ruleItems">
+    <div id="ruleItems" class="items">
         <div id="ruleAlert"></div>
         <div class="rulesForm">
             <div class="rule">
                 <label for="ruleName">Name:</label>
-                <input id="ruleName" name="ruleName2" type="text" />
+                <input id="ruleName" name="ruleName" type="text" />
             </div>
             <div class="rule">
                 <label>Selector:</label>
@@ -64,7 +63,7 @@
         </div>
         <div class="modifiers">
             <div id="selectorHolder"></div>
-            <div id="ruleHTMLHolder">
+            <div class="ruleHTMLHolder">
                 <button id="ruleCyclePrevious" class="cycle" title="previous element matching selector">&lt;&lt;</button>
                 <button id="ruleCycleNext" class="cycle" title="next element matching selector">&gt;&gt;</button>
                 <span id="ruleHTML"></span>

@@ -77,250 +77,280 @@ body{
         cursor: pointer;
         font-weight: normal;
     }
-}
 
-#topbarHolder{
-    position: relative;
-    width: 100%
-}
+    .topbarHolder{
+        position: relative;
+        width: 100%
+    }
 
-#collectTopbar{
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    font-size: 16px;
-    width: 100%
-
-    select{
+    .topbar{
+        position: absolute;
+        bottom: 0;
+        left: 0;
         font-size: 16px;
-    }
-}
+        width: 100%
 
-
-#collectTabs{
-    height: 30px;
-    padding: 0;
-    margin: 0;
-    border-top: 1px solid $dark-gray;
-    word-spacing: -6px;
-    width: 100%;
-
-    background: $gold;
-
-    .tab{
-        border-left: 1px solid $dark-gray;
-    }
-
-    .tab.set{
-        background: $light-green;
-    }
-
-    .toggle{
-        cursor: pointer;
-    }
-    
-    .toggle:hover{
-        background: $dark-gold;
-    }
-
-    .tab{
-        word-spacing: normal;
-        display: inline-block;
-        padding: 0 5px;
-        height: 29px;
-        line-height: 29px;
-
-        div{
-            display: inline-block;
-        }
-
-        button{
-            background: transparent;
-            font-size: 100%;
-            line-height: 1;
-            border: 0;
-            cursor: pointer;
-            height: 18px;
-            font-family: sans-serif;
-            vertical-align: inherit;
-        }
-
-        .smallSelector{
-            font-size: 0.75em;
-            margin: 0 3px;
+        select{
+            font-size: 16px;
         }
     }
 
-    .toggle{
-        cursor: pointer;
-    }
 
-    .tab.active{
+    .tabs{
         height: 30px;
+        padding: 0;
+        margin: 0;
+        word-spacing: -6px;
+        width: 100%;
+        background: transparent;
+
+        .tab{
+            background: $gold;
+            border-top: 1px solid $dark-gray;
+            border-right: 1px solid $dark-gray;
+        }
+
+        .tab.set{
+            background: $light-green;
+        }
+
+        .toggle{
+            cursor: pointer;
+        }
+        
+        .toggle:hover{
+            background: $dark-gold;
+        }
+
+        .tab{
+            word-spacing: normal;
+            display: inline-block;
+            padding: 0 5px;
+            height: 30px;
+            line-height: 30px;
+
+            div{
+                display: inline-block;
+            }
+
+            button{
+                background: transparent;
+                font-size: 100%;
+                line-height: 1;
+                border: 0;
+                cursor: pointer;
+                height: 18px;
+                font-family: sans-serif;
+                vertical-align: inherit;
+            }
+
+            label{
+                cursor: pointer;
+            }
+
+            .smallSelector{
+                font-size: 0.75em;
+                margin: 0 3px;
+            }
+        }
+
+        .toggle{
+            cursor: pointer;
+        }
+
+        .tab.active{
+            height: 30px;
+            background: $white;
+        }
+
+        .tab.hidden{
+            display: none;
+        }
+    }
+
+    .groups{
         background: $white;
+
+        .group{
+            border-color: $dark-gray;
+            border-style: solid;
+            border-width: 1px 1px 0 0;
+            display: none;
+            min-width: 100%;
+            padding: 15px;
+        }
+
+        .show{
+            display: block;
+        }    
     }
 
-    .tab.hidden{
+    .rules{
+        .collectGroup{
+            margin-right: 10px;
+            padding: 3px 0 3px 3px;
+            border: 1px solid $dark-gray;
+
+            span{
+                padding: 3px;
+            }
+        }
+
+        .deltog{
+            cursor: pointer;
+            background: $light-gray;
+        }
+
+        .savedSelector{
+            cursor: pointer;
+        }
+
+        .savedSelector.editing{
+            background: $gold;
+        }
+
+        .ruleGroup{
+            margin-bottom: 15px;
+
+            h2{
+                text-decoration: underline;
+                margin: 10px 0;
+            }
+        }
+    }
+
+    .ruleHTMLHolder{    
+        .capture{
+            background: #ddd;
+            padding: 2px;
+            cursor: pointer; 
+        }
+
+        .selected{
+            background: $light-green;
+        }
+
+        .cycle {
+            margin: 0 5px;
+            padding: 2px 3px;
+            cursor: pointer;
+        }
+    }
+
+    .items{
         display: none;
-    }
-}
+        font-size: 16px;
+        color: $black;
 
-#addIndex{
-    cursor: pointer;
-}
+        .rule{
+            height: 20px;
+            font-size: 1em;
+            margin-bottom: 5px;
+            border: 0;
+            overflow: visible;
 
-#ruleItems{
-    display: none;
-    font-size: 16px;
-    color: $black;
+            span{
+                min-width: 50px;
+            }
 
-    .rule{
-        height: 20px;
-        font-size: 1em;
-        margin-bottom: 5px;
-        border: 0;
-        overflow: visible;
+            label{
+                width: 75px;
+            }
 
-        span{
-            min-width: 50px;
+            label, input{
+                margin: 0;
+                display: inline-block;
+            }
         }
 
-        label{
-            font-weight: bold;
-            width: 100px;
+        .rule.follow, .rule.range{
+            display: none;
         }
 
-        label, input{
-            margin: 0;
+        input.error{
+            border-color: $red;
+            border-style: solid;
+        }
+
+        span.error{
+            border-bottom: 1px solid $red;
+        }
+
+        
+        input[type=text]{
+            width: 150px;
+            border-width: 0 0 1px;
+        }
+
+        .rulesForm, .modifiers{
             display: inline-block;
         }
+
+        .rulesForm{
+            width: 25%;
+            min-width: 250px;
+            border-right: 1px dashed $dark-gray;
+        }
+
+        .modifiers{
+            vertical-align: top;
+            padding-left: 15px;
+            max-width: 75%;
+
+            > div{
+                padding: 10px 0;
+            }
+        }
+
     }
 
-    .rule.follow, .rule.range{
-        display: none;
-    }
-
-    input.error{
-        border-color: $red;
-        border-style: solid;
-    }
-
-    span.error{
-        border-bottom: 1px solid $red;
-    }
-
-    
-    input[type=text]{
-        width: 150px;
-        border-width: 0 0 1px;
-    }
-
-    .rulesForm, .modifiers{
+    .selectorGroup{
         display: inline-block;
+        white-space: nowrap;
+        padding: 2px 0 0 2px;
+        position: relative;
+        cursor: pointer;
+
+        *{
+            font-size: 16px;
+        }
+
+        .toggleable{
+            color: $dark-gray;
+            border-bottom: 1px solid #777;   
+        }
+
+        .toggleable.off{
+            color: #ccc;
+        }
+
+        .deltog, .nthtype, .onlychild{
+            font-weight: bold;
+            padding: 0 3px 0 2px;
+            color: $white;
+        }
+
+        .childToggle{
+            border-width: 0 0 1px;
+            width: 50px;
+        }
     }
 
-    .rulesForm{
-        width: 25%;
-        min-width: 250px;
-        border-right: 1px dashed $dark-gray;
-    }
-
-    .modifiers{
-        vertical-align: top;
-        padding-left: 15px;
-        max-width: 75%;
-
-        > div{
-            padding: 10px 0;
+    .selectorGroup:hover{
+        .deltog, .onlychild, .nthtype{
+            color: #777;
         }
     }
 
 }
 
-#ruleHTMLHolder{    
-    .capture{
-        background: #ddd;
-        padding: 2px;
-        cursor: pointer; 
-    }
-
-    .selected{
-        background: $light-green;
-    }
-
-    .cycle {
-        margin: 0 5px;
-        padding: 2px 3px;
-        cursor: pointer;
-    }
-}
 
 #ruleHTML{
     line-height: 2;
 }
 
-/* Preview */
-
-#parentSelector{
-    padding: 0 3px;
-    display: inline-block;
-}
-
-#tabGroups{
-    background: $white;
-    width: 100%;
-
-    .group{
-        border-color: $dark-gray;
-        border-style: solid;
-        border-width: 1px 0 0 1px;
-        display: none;
-        min-width: 100%;
-        padding: 15px;
-    }
-
-    .show{
-        display: block;
-    }    
-}
-
-.rules{
-
-    .collectGroup{
-        margin-right: 10px;
-        padding: 3px 0 3px 3px;
-        border: 1px solid $dark-gray;
-
-        span{
-            padding: 3px;
-        }
-    }
-
-    .deltog{
-        cursor: pointer;
-        background: $light-gray;
-    }
-
-    .savedSelector{
-        cursor: pointer;
-    }
-
-    .savedSelector.editing{
-        background: $gold;
-    }
-
-    .ruleGroup{
-        margin-bottom: 15px;
-
-        h2{
-            text-decoration: underline;
-            margin: 10px 0;
-        }
-    }
-}
-
-#clearSelector, #closeCollect{
-    background: $light-red;
+#closeCollect{
+    background: $light-red !important;
     cursor: pointer;
 }
 
@@ -369,44 +399,6 @@ body{
 #selectorHolder{
     border-bottom: 1px dashed $dark-gray;
     line-height: 1.5;
-
-    .selectorGroup{
-        display: inline-block;
-        white-space: nowrap;
-        padding: 2px 0 0 2px;
-        position: relative;
-        cursor: pointer;
-
-        *{
-            font-size: 16px;
-        }
-
-        .toggleable{
-            color: $dark-gray;
-            border-bottom: 1px solid #777;   
-        }
-
-        .toggleable.off{
-            color: #ccc;
-        }
-
-        .deltog, .nthtype, .onlychild{
-            font-weight: bold;
-            padding: 0 3px 0 2px;
-            color: $white;
-        }
-
-        .childToggle{
-            border-width: 0 0 1px;
-            width: 50px;
-        }
-    }
-
-    .selectorGroup:hover{
-        .deltog, .onlychild, .nthtype{
-            color: #777;
-        }
-    }
 }
 
 @import 'page';

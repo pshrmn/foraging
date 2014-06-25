@@ -50,160 +50,168 @@ body {
     font-size: 1em;
     cursor: pointer;
     font-weight: normal; }
-
-#topbarHolder {
-  position: relative;
-  width: 100%; }
-
-#collectTopbar {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  font-size: 16px;
-  width: 100% select;
-    width-font-size: 16px; }
-
-#collectTabs {
-  height: 30px;
-  padding: 0;
-  margin: 0;
-  border-top: 1px solid #444444;
-  word-spacing: -6px;
-  width: 100%;
-  background: gold; }
-  #collectTabs .tab {
-    border-left: 1px solid #444444; }
-  #collectTabs .tab.set {
-    background: #bddbce; }
-  #collectTabs .toggle {
-    cursor: pointer; }
-  #collectTabs .toggle:hover {
-    background: #e0bd00; }
-  #collectTabs .tab {
-    word-spacing: normal;
-    display: inline-block;
-    padding: 0 5px;
-    height: 29px;
-    line-height: 29px; }
-    #collectTabs .tab div {
-      display: inline-block; }
-    #collectTabs .tab button {
-      background: transparent;
-      font-size: 100%;
-      line-height: 1;
-      border: 0;
-      cursor: pointer;
-      height: 18px;
-      font-family: sans-serif;
-      vertical-align: inherit; }
-    #collectTabs .tab .smallSelector {
-      font-size: 0.75em;
-      margin: 0 3px; }
-  #collectTabs .toggle {
-    cursor: pointer; }
-  #collectTabs .tab.active {
+  #collectjs .topbarHolder {
+    position: relative;
+    width: 100%; }
+  #collectjs .topbar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    font-size: 16px;
+    width: 100% select;
+      width-font-size: 16px; }
+  #collectjs .tabs {
     height: 30px;
+    padding: 0;
+    margin: 0;
+    word-spacing: -6px;
+    width: 100%;
+    background: transparent; }
+    #collectjs .tabs .tab {
+      background: gold;
+      border-top: 1px solid #444444;
+      border-right: 1px solid #444444; }
+    #collectjs .tabs .tab.set {
+      background: #bddbce; }
+    #collectjs .tabs .toggle {
+      cursor: pointer; }
+    #collectjs .tabs .toggle:hover {
+      background: #e0bd00; }
+    #collectjs .tabs .tab {
+      word-spacing: normal;
+      display: inline-block;
+      padding: 0 5px;
+      height: 30px;
+      line-height: 30px; }
+      #collectjs .tabs .tab div {
+        display: inline-block; }
+      #collectjs .tabs .tab button {
+        background: transparent;
+        font-size: 100%;
+        line-height: 1;
+        border: 0;
+        cursor: pointer;
+        height: 18px;
+        font-family: sans-serif;
+        vertical-align: inherit; }
+      #collectjs .tabs .tab label {
+        cursor: pointer; }
+      #collectjs .tabs .tab .smallSelector {
+        font-size: 0.75em;
+        margin: 0 3px; }
+    #collectjs .tabs .toggle {
+      cursor: pointer; }
+    #collectjs .tabs .tab.active {
+      height: 30px;
+      background: white; }
+    #collectjs .tabs .tab.hidden {
+      display: none; }
+  #collectjs .groups {
     background: white; }
-  #collectTabs .tab.hidden {
-    display: none; }
-
-#addIndex {
-  cursor: pointer; }
-
-#ruleItems {
-  display: none;
-  font-size: 16px;
-  color: black; }
-  #ruleItems .rule {
-    height: 20px;
-    font-size: 1em;
-    margin-bottom: 5px;
-    border: 0;
-    overflow: visible; }
-    #ruleItems .rule span {
-      min-width: 50px; }
-    #ruleItems .rule label {
-      font-weight: bold;
-      width: 100px; }
-    #ruleItems .rule label, #ruleItems .rule input {
-      margin: 0;
+    #collectjs .groups .group {
+      border-color: #444444;
+      border-style: solid;
+      border-width: 1px 1px 0 0;
+      display: none;
+      min-width: 100%;
+      padding: 15px; }
+    #collectjs .groups .show {
+      display: block; }
+  #collectjs .rules .collectGroup {
+    margin-right: 10px;
+    padding: 3px 0 3px 3px;
+    border: 1px solid #444444; }
+    #collectjs .rules .collectGroup span {
+      padding: 3px; }
+  #collectjs .rules .deltog {
+    cursor: pointer;
+    background: #efefef; }
+  #collectjs .rules .savedSelector {
+    cursor: pointer; }
+  #collectjs .rules .savedSelector.editing {
+    background: gold; }
+  #collectjs .rules .ruleGroup {
+    margin-bottom: 15px; }
+    #collectjs .rules .ruleGroup h2 {
+      text-decoration: underline;
+      margin: 10px 0; }
+  #collectjs .ruleHTMLHolder .capture {
+    background: #ddd;
+    padding: 2px;
+    cursor: pointer; }
+  #collectjs .ruleHTMLHolder .selected {
+    background: #bddbce; }
+  #collectjs .ruleHTMLHolder .cycle {
+    margin: 0 5px;
+    padding: 2px 3px;
+    cursor: pointer; }
+  #collectjs .items {
+    display: none;
+    font-size: 16px;
+    color: black; }
+    #collectjs .items .rule {
+      height: 20px;
+      font-size: 1em;
+      margin-bottom: 5px;
+      border: 0;
+      overflow: visible; }
+      #collectjs .items .rule span {
+        min-width: 50px; }
+      #collectjs .items .rule label {
+        width: 75px; }
+      #collectjs .items .rule label, #collectjs .items .rule input {
+        margin: 0;
+        display: inline-block; }
+    #collectjs .items .rule.follow, #collectjs .items .rule.range {
+      display: none; }
+    #collectjs .items input.error {
+      border-color: #c91900;
+      border-style: solid; }
+    #collectjs .items span.error {
+      border-bottom: 1px solid #c91900; }
+    #collectjs .items input[type=text] {
+      width: 150px;
+      border-width: 0 0 1px; }
+    #collectjs .items .rulesForm, #collectjs .items .modifiers {
       display: inline-block; }
-  #ruleItems .rule.follow, #ruleItems .rule.range {
-    display: none; }
-  #ruleItems input.error {
-    border-color: #c91900;
-    border-style: solid; }
-  #ruleItems span.error {
-    border-bottom: 1px solid #c91900; }
-  #ruleItems input[type=text] {
-    width: 150px;
-    border-width: 0 0 1px; }
-  #ruleItems .rulesForm, #ruleItems .modifiers {
-    display: inline-block; }
-  #ruleItems .rulesForm {
-    width: 25%;
-    min-width: 250px;
-    border-right: 1px dashed #444444; }
-  #ruleItems .modifiers {
-    vertical-align: top;
-    padding-left: 15px;
-    max-width: 75%; }
-    #ruleItems .modifiers > div {
-      padding: 10px 0; }
-
-#ruleHTMLHolder .capture {
-  background: #ddd;
-  padding: 2px;
-  cursor: pointer; }
-#ruleHTMLHolder .selected {
-  background: #bddbce; }
-#ruleHTMLHolder .cycle {
-  margin: 0 5px;
-  padding: 2px 3px;
-  cursor: pointer; }
+    #collectjs .items .rulesForm {
+      width: 25%;
+      min-width: 250px;
+      border-right: 1px dashed #444444; }
+    #collectjs .items .modifiers {
+      vertical-align: top;
+      padding-left: 15px;
+      max-width: 75%; }
+      #collectjs .items .modifiers > div {
+        padding: 10px 0; }
+  #collectjs .selectorGroup {
+    display: inline-block;
+    white-space: nowrap;
+    padding: 2px 0 0 2px;
+    position: relative;
+    cursor: pointer; }
+    #collectjs .selectorGroup * {
+      font-size: 16px; }
+    #collectjs .selectorGroup .toggleable {
+      color: #444444;
+      border-bottom: 1px solid #777; }
+    #collectjs .selectorGroup .toggleable.off {
+      color: #ccc; }
+    #collectjs .selectorGroup .deltog, #collectjs .selectorGroup .nthtype, #collectjs .selectorGroup .onlychild {
+      font-weight: bold;
+      padding: 0 3px 0 2px;
+      color: white; }
+    #collectjs .selectorGroup .childToggle {
+      border-width: 0 0 1px;
+      width: 50px; }
+  #collectjs .selectorGroup:hover .deltog, #collectjs .selectorGroup:hover .onlychild, #collectjs .selectorGroup:hover .nthtype {
+    color: #777; }
 
 #ruleHTML {
   line-height: 2; }
 
-/* Preview */
-#parentSelector {
-  padding: 0 3px;
-  display: inline-block; }
-
-#tabGroups {
-  background: white;
-  width: 100%; }
-  #tabGroups .group {
-    border-color: #444444;
-    border-style: solid;
-    border-width: 1px 0 0 1px;
-    display: none;
-    min-width: 100%;
-    padding: 15px; }
-  #tabGroups .show {
-    display: block; }
-
-.rules .collectGroup {
-  margin-right: 10px;
-  padding: 3px 0 3px 3px;
-  border: 1px solid #444444; }
-  .rules .collectGroup span {
-    padding: 3px; }
-.rules .deltog {
-  cursor: pointer;
-  background: #efefef; }
-.rules .savedSelector {
-  cursor: pointer; }
-.rules .savedSelector.editing {
-  background: gold; }
-.rules .ruleGroup {
-  margin-bottom: 15px; }
-  .rules .ruleGroup h2 {
-    text-decoration: underline;
-    margin: 10px 0; }
-
-#clearSelector, #closeCollect {
-  background: #f296a3;
+#closeCollect {
+  background: #f296a3 !important;
   cursor: pointer; }
 
 #rulePreview {
@@ -237,28 +245,6 @@ body {
 #selectorHolder {
   border-bottom: 1px dashed #444444;
   line-height: 1.5; }
-  #selectorHolder .selectorGroup {
-    display: inline-block;
-    white-space: nowrap;
-    padding: 2px 0 0 2px;
-    position: relative;
-    cursor: pointer; }
-    #selectorHolder .selectorGroup * {
-      font-size: 16px; }
-    #selectorHolder .selectorGroup .toggleable {
-      color: #444444;
-      border-bottom: 1px solid #777; }
-    #selectorHolder .selectorGroup .toggleable.off {
-      color: #ccc; }
-    #selectorHolder .selectorGroup .deltog, #selectorHolder .selectorGroup .nthtype, #selectorHolder .selectorGroup .onlychild {
-      font-weight: bold;
-      padding: 0 3px 0 2px;
-      color: white; }
-    #selectorHolder .selectorGroup .childToggle {
-      border-width: 0 0 1px;
-      width: 50px; }
-  #selectorHolder .selectorGroup:hover .deltog, #selectorHolder .selectorGroup:hover .onlychild, #selectorHolder .selectorGroup:hover .nthtype {
-    color: #777; }
 
 .collectHighlight {
   background: rgba(50, 50, 50, 0.1) !important;
