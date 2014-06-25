@@ -263,6 +263,8 @@ function toggleTab(property, parent, toggleFn){
             }
         };
 
+    selectorName.classList.add("smallSelector");
+
     toggleable.textContent = "+";
     parent.appendChild(nameTag);
     parent.appendChild(selectorName);
@@ -275,13 +277,12 @@ function toggleTab(property, parent, toggleFn){
 function addInterface(){
     var div = noSelectElement("div");
     div.setAttribute("id", "collectjs");
-    div.innerHTML = "<div id=\"collectTopbar\"><div id=\"selectorButtons\" class=\"topbarGroup\"><div id=\"selectorTabs\" class=\"tabs\"><div class=\"tab\" id=\"parentTab\"></div><div class=\"tab hidden\" id=\"nextTab\"></div><div class=\"tab\" id=\"selectorCount\">Count <span id=\"currentCount\"></span></div><div class=\"tab toggle\" id=\"previewTab\" data-for=\"previews\">Preview</div><div class=\"tab\" id=\"clearSelector\">Clear</div></div><div id=\"selectorGroups\" class=\"groups\"><div class=\"group previews\"><div id=\"rulePreview\">No selector/attribute to capture selected</div></div></div></div><div id=\"collectOptions\" class=\"topbarGroup\"><div id=\"collectTabs\" class=\"tabs\"><div class=\"tab\" id=\"groupTab\">Group<select id=\"allGroups\"></select><button id=\"deleteGroup\">×</button><button id=\"newGroup\">+</button></div><div class=\"tab\" id=\"setTab\"><span title=\"create a new set by capturing the 'href' attribute of links\">Set</span><select id=\"allSets\"></select></div><div class=\"tab toggle\" id=\"ruleTab\" data-for=\"rules\">Rules</div><div class=\"tab toggle\" id=\"optionTab\" data-for=\"options\">Options</div><div class=\"tab\" id=\"indexTab\"><label for=\"addIndex\">Index Page</label><input type=\"checkbox\" id=\"addIndex\"></div><div class=\"tab\" id=\"closeCollect\" title=\"close collectjs\">&times;</div></div><div id=\"tabGroups\" class=\"groups\"><div class=\"group options\"></div><div class=\"group rules\"><div id=\"savedRuleHolder\"></div><button id=\"uploadRules\">Upload Saved Rules</button></div></div></div></div><div id=\"collectMain\"><div id=\"ruleItems\"><div id=\"ruleAlert\"></div><div class=\"rulesForm\"><div class=\"rule\"><label for=\"ruleName\">Name:</label><input id=\"ruleName\" name=\"ruleName2\" type=\"text\" /></div><div class=\"rule\"><label>Selector:</label><span id=\"ruleSelector\"></span></div><div class=\"rule\"><label>Capture:</label><span id=\"ruleAttr\"></span></div><div class=\"rule\"><label for=\"ruleMultiple\">Multiple:</label><input id=\"ruleMultiple\" name=\"ruleMultiple\" type=\"checkbox\" /></div><div class=\"rule range\"><label for=\"ruleRange\">Range:</label><input id=\"ruleRange\" name=\"ruleRange\" type=\"text\" disabled=\"true\"/></div><div class=\"rule follow\"><label for=\"ruleFollow\">Follow:</label><input id=\"ruleFollow\" name=\"ruleFollow\" type=\"checkbox\" disabled=\"true\" title=\"Can only follow rules that get href attribute from links\" /></div></div><div class=\"modifiers\"><div id=\"selectorHolder\"></div><div id=\"ruleHTMLHolder\"><button id=\"ruleCyclePrevious\" class=\"cycle\" title=\"previous element matching selector\">&lt;&lt;</button><button id=\"ruleCycleNext\" class=\"cycle\" title=\"next element matching selector\">&gt;&gt;</button><span id=\"ruleHTML\"></span></div></div><button id=\"saveRule\">Save Rule</button></div></div>";
+    div.innerHTML = "<div id=\"topbarHolder\"><div id=\"collectTopbar\"><div id=\"collectTabs\" class=\"tabs\"><div class=\"tab\" id=\"parentTab\"></div><div class=\"tab hidden\" id=\"nextTab\"></div><div class=\"tab\" id=\"groupTab\">Group<select id=\"allGroups\"></select><button id=\"deleteGroup\">×</button><button id=\"newGroup\">+</button></div><div class=\"tab\" id=\"setTab\"><span title=\"create a new set by capturing the 'href' attribute of links\">Set</span><select id=\"allSets\"></select></div><div class=\"tab toggle\" id=\"ruleTab\" data-for=\"rules\">Rules</div><div class=\"tab toggle\" id=\"optionTab\" data-for=\"options\">Options</div><div class=\"tab\" id=\"indexTab\"><label for=\"addIndex\">Index Page</label><input type=\"checkbox\" id=\"addIndex\"></div><div class=\"tab\" id=\"closeCollect\" title=\"close collectjs\">&times;</div></div><div id=\"tabGroups\" class=\"groups\"><div class=\"group options\"></div><div class=\"group rules\"><div id=\"savedRuleHolder\"></div><button id=\"uploadRules\">Upload Saved Rules</button></div><!-- currently broken, not showing, will fix soon--><div class=\"group preview\" id=\"rulePreview\"></div></div></div></div><div id=\"collectMain\"><div id=\"ruleItems\"><div id=\"ruleAlert\"></div><div class=\"rulesForm\"><div class=\"rule\"><label for=\"ruleName\">Name:</label><input id=\"ruleName\" name=\"ruleName2\" type=\"text\" /></div><div class=\"rule\"><label>Selector:</label><span id=\"ruleSelector\"></span></div><div class=\"rule\"><label>Capture:</label><span id=\"ruleAttr\"></span></div><div class=\"rule\"><label for=\"ruleMultiple\">Multiple:</label><input id=\"ruleMultiple\" name=\"ruleMultiple\" type=\"checkbox\" /></div><div class=\"rule range\"><label for=\"ruleRange\">Range:</label><input id=\"ruleRange\" name=\"ruleRange\" type=\"text\" disabled=\"true\"/></div><div class=\"rule follow\"><label for=\"ruleFollow\">Follow:</label><input id=\"ruleFollow\" name=\"ruleFollow\" type=\"checkbox\" disabled=\"true\" title=\"Can only follow rules that get href attribute from links\" /></div></div><div class=\"modifiers\"><div id=\"selectorHolder\"></div><div id=\"ruleHTMLHolder\"><button id=\"ruleCyclePrevious\" class=\"cycle\" title=\"previous element matching selector\">&lt;&lt;</button><button id=\"ruleCycleNext\" class=\"cycle\" title=\"next element matching selector\">&gt;&gt;</button><span id=\"ruleHTML\"></span></div></div><div id=\"buttonContainer\">Count: <span id=\"currentCount\"></span><button id=\"saveRule\">Save Rule</button><button id=\"previewSelector\">Preview Capture</button><button id=\"clearSelector\">Clear</button></div></div></div>";
     document.body.appendChild(div);
     addNoSelect(div.querySelectorAll("*"));
 
     // tabs
-    Collect.collectTabs = tabs(document.getElementById("collectOptions")),
-    Collect.selectorTabs = tabs(document.getElementById("selectorButtons"));
+    Collect.collectTabs = tabs(document.getElementById("collectTopbar")),
     Collect.parent = toggleTab("parent", document.getElementById("parentTab"), toggleSetParent);
     Collect.next = toggleTab("next", document.getElementById("nextTab"), toggleSetNext);
 
@@ -302,8 +303,6 @@ function resetInterface(){
     Collect.family.remove();
     
     // ruleItems
-    Collect.selectorTabs.hide();
-    document.getElementById("rulePreview").innerHTML = "No selector/attribute to capture selected";
     document.getElementById("ruleHTML").innerHTML = "";
     
     resetForm();
@@ -805,7 +804,6 @@ function saveRule(rule){
                 site.groups[group].nodes = editObj.nodes;
                 storage.sites[host] = site;
                 chrome.storage.local.set({'sites': storage.sites});
-                Collect.selectorTabs.hide();
                 resetInterface();    
             }
             
@@ -816,7 +814,6 @@ function saveRule(rule){
             chrome.storage.local.set({'sites': storage.sites});
 
             // hide preview after saving rule
-            Collect.selectorTabs.hide();
             resetInterface();
             addRule(rule, set);
         } else {
@@ -1475,13 +1472,6 @@ function editRuleFromGroup(newRule, nodes){
             }
         }
     }
-    /*
-    // don't let a rule be in its own children
-    if ( newRule.name === set ) {
-        deleteEditing();
-        return nodes;
-    }
-    */
 
     // if changing names, make sure that it is unique
     if ( oldName !== newName && !uniqueRuleName(newName, nodes) ){

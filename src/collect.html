@@ -1,20 +1,8 @@
-<div id="collectTopbar">
-    <div id="selectorButtons" class="topbarGroup">
-        <div id="selectorTabs" class="tabs">
+<div id="topbarHolder">
+    <div id="collectTopbar">
+        <div id="collectTabs" class="tabs">
             <div class="tab" id="parentTab"></div>
             <div class="tab hidden" id="nextTab"></div>
-            <div class="tab" id="selectorCount">Count <span id="currentCount"></span></div>
-            <div class="tab toggle" id="previewTab" data-for="previews">Preview</div>
-            <div class="tab" id="clearSelector">Clear</div>
-        </div>
-        <div id="selectorGroups" class="groups">
-            <div class="group previews">
-                <div id="rulePreview">No selector/attribute to capture selected</div>
-            </div>
-        </div>
-    </div>
-    <div id="collectOptions" class="topbarGroup">
-        <div id="collectTabs" class="tabs">
             <div class="tab" id="groupTab">
                 Group
                 <select id="allGroups"></select>
@@ -39,6 +27,8 @@
                 <div id="savedRuleHolder"></div>
                 <button id="uploadRules">Upload Saved Rules</button>
             </div>
+            <!-- currently broken, not showing, will fix soon-->
+            <div class="group preview" id="rulePreview"></div>
         </div>
     </div>
 </div>
@@ -80,7 +70,12 @@
                 <span id="ruleHTML"></span>
             </div>
         </div>
-        <button id="saveRule">Save Rule</button>
+        <div id="buttonContainer">
+            Count: <span id="currentCount"></span>
+            <button id="saveRule">Save Rule</button>
+            <button id="previewSelector">Preview Capture</button>
+            <button id="clearSelector">Clear</button>
+        </div>
     </div>
 
 </div>

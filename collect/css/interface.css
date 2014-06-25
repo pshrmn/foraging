@@ -1,5 +1,6 @@
 /* general */
 body {
+  /* can break things */
   margin: 0; }
 
 /* Interface */
@@ -50,63 +51,25 @@ body {
     cursor: pointer;
     font-weight: normal; }
 
-#collectTopbar {
-  position: relative; }
-  #collectTopbar .topbarGroup {
-    position: absolute;
-    bottom: 0; }
+#topbarHolder {
+  position: relative;
+  width: 100%; }
 
-#selectorTabs, #collectTabs {
+#collectTopbar {
   position: absolute;
-  top: -30px;
+  bottom: 0;
+  right: 0;
+  font-size: 16px;
+  width: 100% select;
+    width-font-size: 16px; }
+
+#collectTabs {
   height: 30px;
   padding: 0;
   margin: 0;
   border-top: 1px solid #444444;
-  word-spacing: -6px; }
-  #selectorTabs .tab, #collectTabs .tab {
-    word-spacing: normal;
-    display: inline-block;
-    padding: 0 5px;
-    height: 29px;
-    line-height: 1.5; }
-    #selectorTabs .tab div, #collectTabs .tab div {
-      display: inline-block; }
-    #selectorTabs .tab button, #collectTabs .tab button {
-      background: transparent;
-      font-size: 18px;
-      line-height: 1;
-      font-weight: bold;
-      border: 0;
-      cursor: pointer;
-      height: 18px;
-      font-family: sans-serif;
-      vertical-align: inherit; }
-  #selectorTabs .toggle, #collectTabs .toggle {
-    cursor: pointer; }
-  #selectorTabs .tab.active, #collectTabs .tab.active {
-    height: 30px;
-    background: white; }
-  #selectorTabs .tab.hidden, #collectTabs .tab.hidden {
-    display: none; }
-
-#collectTabs .toggle:hover {
-  background: #e0bd00; }
-
-#selectorTabs .toggle:hover {
-  background: #2e829e; }
-
-#selectorTabs {
-  left: 0;
-  border-top: 1px solid #444444;
-  background: #45aacc; }
-  #selectorTabs .tab {
-    border-right: 1px solid #444444; }
-  #selectorTabs .tab.hidden {
-    display: none; }
-
-#collectTabs {
-  right: 0;
+  word-spacing: -6px;
+  width: 100%;
   background: gold; }
   #collectTabs .tab {
     border-left: 1px solid #444444; }
@@ -114,6 +77,35 @@ body {
     background: #bddbce; }
   #collectTabs .toggle {
     cursor: pointer; }
+  #collectTabs .toggle:hover {
+    background: #e0bd00; }
+  #collectTabs .tab {
+    word-spacing: normal;
+    display: inline-block;
+    padding: 0 5px;
+    height: 29px;
+    line-height: 29px; }
+    #collectTabs .tab div {
+      display: inline-block; }
+    #collectTabs .tab button {
+      background: transparent;
+      font-size: 100%;
+      line-height: 1;
+      border: 0;
+      cursor: pointer;
+      height: 18px;
+      font-family: sans-serif;
+      vertical-align: inherit; }
+    #collectTabs .tab .smallSelector {
+      font-size: 0.75em;
+      margin: 0 3px; }
+  #collectTabs .toggle {
+    cursor: pointer; }
+  #collectTabs .tab.active {
+    height: 30px;
+    background: white; }
+  #collectTabs .tab.hidden {
+    display: none; }
 
 #addIndex {
   cursor: pointer; }
@@ -159,9 +151,6 @@ body {
     #ruleItems .modifiers > div {
       padding: 10px 0; }
 
-#saveRule {
-  display: block; }
-
 #ruleHTMLHolder .capture {
   background: #ddd;
   padding: 2px;
@@ -181,34 +170,17 @@ body {
   padding: 0 3px;
   display: inline-block; }
 
-#selectorTabs {
-  left: 0; }
-
-#collectOptions {
-  right: 0; }
-  #collectOptions select {
-    font-size: 16px; }
-
 #tabGroups {
-  min-width: 650px; }
-  #tabGroups .group {
-    border-width: 1px 0 0 1px; }
-
-#selectorGroups {
-  min-width: 400px; }
-  #selectorGroups .group {
-    border-width: 1px 1px 0 0; }
-
-#selectorGroups, #tabGroups {
   background: white;
-  font-size: 16px; }
-  #selectorGroups .group, #tabGroups .group {
+  width: 100%; }
+  #tabGroups .group {
     border-color: #444444;
     border-style: solid;
+    border-width: 1px 0 0 1px;
     display: none;
     min-width: 100%;
     padding: 15px; }
-  #selectorGroups .show, #tabGroups .show {
+  #tabGroups .show {
     display: block; }
 
 .rules .collectGroup {

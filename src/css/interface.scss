@@ -14,6 +14,7 @@ $black: #000000;
 
 /* general */
 body{
+    /* can break things */
     margin: 0;
 }
 
@@ -78,32 +79,56 @@ body{
     }
 }
 
-#collectTopbar{
+#topbarHolder{
     position: relative;
+    width: 100%
+}
 
-    .topbarGroup{
-        position: absolute;
-        bottom: 0;
+#collectTopbar{
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    font-size: 16px;
+    width: 100%
+
+    select{
+        font-size: 16px;
     }
 }
 
 
-#selectorTabs, #collectTabs{
-    position: absolute;
-    top: -30px;
+#collectTabs{
     height: 30px;
     padding: 0;
     margin: 0;
     border-top: 1px solid $dark-gray;
     word-spacing: -6px;
+    width: 100%;
 
+    background: $gold;
+
+    .tab{
+        border-left: 1px solid $dark-gray;
+    }
+
+    .tab.set{
+        background: $light-green;
+    }
+
+    .toggle{
+        cursor: pointer;
+    }
+    
+    .toggle:hover{
+        background: $dark-gold;
+    }
 
     .tab{
         word-spacing: normal;
         display: inline-block;
         padding: 0 5px;
         height: 29px;
-        line-height: 1.5;
+        line-height: 29px;
 
         div{
             display: inline-block;
@@ -111,14 +136,18 @@ body{
 
         button{
             background: transparent;
-            font-size: 18px;
+            font-size: 100%;
             line-height: 1;
-            font-weight: bold;
             border: 0;
             cursor: pointer;
             height: 18px;
             font-family: sans-serif;
             vertical-align: inherit;
+        }
+
+        .smallSelector{
+            font-size: 0.75em;
+            margin: 0 3px;
         }
     }
 
@@ -134,50 +163,6 @@ body{
     .tab.hidden{
         display: none;
     }
-}
-
-#collectTabs{
-    .toggle:hover{
-        background: $dark-gold;
-    }
-}
-
-#selectorTabs{
-    .toggle:hover{
-        background: $dark-blue;
-    }
-}
-
-#selectorTabs{
-    left: 0;
-    border-top: 1px solid $dark-gray;
-    background: $blue;
-
-    .tab{
-        border-right: 1px solid $dark-gray;
-    }
-
-    .tab.hidden{
-        display: none;
-    }
-}
-
-#collectTabs{
-    right: 0;
-    background: $gold;
-
-    .tab{
-        border-left: 1px solid $dark-gray;
-    }
-
-    .tab.set{
-        background: $light-green;
-    }
-
-    .toggle{
-        cursor: pointer;
-    }
-    
 }
 
 #addIndex{
@@ -252,10 +237,6 @@ body{
 
 }
 
-#saveRule{
-    display: block;
-}
-
 #ruleHTMLHolder{    
     .capture{
         background: #ddd;
@@ -285,39 +266,14 @@ body{
     display: inline-block;
 }
 
-#selectorTabs{
-    left: 0;
-}
-
-#collectOptions{
-    right: 0;
-
-    select{
-        font-size: 16px;
-    }
-}
-
 #tabGroups{
-    min-width: 650px;
-    .group{
-        border-width: 1px 0 0 1px;
-    }
-}
-
-#selectorGroups{
-    min-width: 400px;
-    .group{
-        border-width: 1px 1px 0 0;
-    }
-}
-
-#selectorGroups, #tabGroups{
     background: $white;
-    font-size: 16px;
+    width: 100%;
 
     .group{
         border-color: $dark-gray;
         border-style: solid;
+        border-width: 1px 0 0 1px;
         display: none;
         min-width: 100%;
         padding: 15px;

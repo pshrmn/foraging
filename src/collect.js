@@ -263,6 +263,8 @@ function toggleTab(property, parent, toggleFn){
             }
         };
 
+    selectorName.classList.add("smallSelector");
+
     toggleable.textContent = "+";
     parent.appendChild(nameTag);
     parent.appendChild(selectorName);
@@ -280,8 +282,7 @@ function addInterface(){
     addNoSelect(div.querySelectorAll("*"));
 
     // tabs
-    Collect.collectTabs = tabs(document.getElementById("collectOptions")),
-    Collect.selectorTabs = tabs(document.getElementById("selectorButtons"));
+    Collect.collectTabs = tabs(document.getElementById("collectTopbar")),
     Collect.parent = toggleTab("parent", document.getElementById("parentTab"), toggleSetParent);
     Collect.next = toggleTab("next", document.getElementById("nextTab"), toggleSetNext);
 
@@ -302,8 +303,6 @@ function resetInterface(){
     Collect.family.remove();
     
     // ruleItems
-    Collect.selectorTabs.hide();
-    document.getElementById("rulePreview").innerHTML = "No selector/attribute to capture selected";
     document.getElementById("ruleHTML").innerHTML = "";
     
     resetForm();
@@ -805,7 +804,6 @@ function saveRule(rule){
                 site.groups[group].nodes = editObj.nodes;
                 storage.sites[host] = site;
                 chrome.storage.local.set({'sites': storage.sites});
-                Collect.selectorTabs.hide();
                 resetInterface();    
             }
             
@@ -816,7 +814,6 @@ function saveRule(rule){
             chrome.storage.local.set({'sites': storage.sites});
 
             // hide preview after saving rule
-            Collect.selectorTabs.hide();
             resetInterface();
             addRule(rule, set);
         } else {
@@ -1475,13 +1472,6 @@ function editRuleFromGroup(newRule, nodes){
             }
         }
     }
-    /*
-    // don't let a rule be in its own children
-    if ( newRule.name === set ) {
-        deleteEditing();
-        return nodes;
-    }
-    */
 
     // if changing names, make sure that it is unique
     if ( oldName !== newName && !uniqueRuleName(newName, nodes) ){
