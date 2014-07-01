@@ -8,9 +8,7 @@ var Collect = {
     allElements: [],
     not: ":not(.noSelect)",
     indexPage: false,
-    options: {
-        noTable: false
-    },
+    options: {},
     family: {
         selectorFamily: undefined,
         create: function(event){
@@ -189,8 +187,7 @@ var Collect = {
             }
         };
         
-        // don't call loadSavedItems until hostname has been setup because it is asynchronous
-        // and will throw errors the first time visiting a site and opening collectJS
+        loadOptions();
         setupHostname();
         setupTabs();
         this.interfaceEvents();
@@ -574,7 +571,13 @@ function toggleGroups(event){
 }
 
 function toggleTabOption(event){
-    Collect.options.noTable = !Collect.options.noTable;
+    // if option exists, toggle it, otherwise set based on whether or not html element is checked
+    if ( Collect.options.noTable ) {
+        Collect.options.noTable = !Collect.options.noTable;
+    } else {
+        Collect.options.noTable = document.getElementById("noTable").checked;
+    }
+    setOptions(Collect.options);
 }
 
 /***********************
@@ -1110,6 +1113,25 @@ function previewRule(name){
     });
 }
 
+function loadOptions(){
+    chrome.storage.local.get("options", function(storage){
+        var input;
+        Collect.options = storage.options;
+        for ( var key in storage.options ) {
+            if ( storage.options[key] ) {
+                input = document.getElementById(key);
+                if ( input ) {
+                    input.checked = true;
+                }
+            }
+        }
+    });
+}
+
+// override current options with passed in options
+function setOptions(options){
+    chrome.storage.local.set({"options": options});
+}
 
 /***********************
     STORAGE HELPERS
