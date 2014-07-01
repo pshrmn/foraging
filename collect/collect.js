@@ -8,6 +8,9 @@ var Collect = {
     allElements: [],
     not: ":not(.noSelect)",
     indexPage: false,
+    options: {
+        noTable: false
+    },
     family: {
         selectorFamily: undefined,
         create: function(event){
@@ -19,7 +22,7 @@ var Collect = {
                 Collect.html.form.name.value = Collect.editing;
             }
             
-            var sf = new SelectorFamily(this, Collect.parent.selector);
+            var sf = new SelectorFamily(this, Collect.parent.selector, Collect.options);
             sf.setup(Collect.html.family, Collect.html.form.selector, Collect.family.test.bind(Collect.family));
             Collect.family.selectorFamily = sf;
             sf.update();
@@ -37,7 +40,7 @@ var Collect = {
                 " " + selector + Collect.not;
             var element = document.querySelector(longSelector);
             if ( element ) {
-                var sf = new SelectorFamily(element, Collect.parent.selector);
+                var sf = new SelectorFamily(element, Collect.parent.selector, Collect.options);
                 sf.setup(Collect.html.family, Collect.html.form.selector,
                     Collect.family.test.bind(Collect.family));
                 this.selectorFamily = sf;
@@ -225,6 +228,9 @@ var Collect = {
         idEvent("deleteGroup", "click", deleteGroupEvent);
         idEvent("allGroups", "change", loadGroupEvent);
         idEvent("allSets", "change", loadSetEvent);
+
+        // options
+        idEvent("noTable", "change", toggleTabOption);
     }
 };
 
@@ -233,7 +239,7 @@ Collect.setup();
 function addInterface(){
     var div = noSelectElement("div");
     div.setAttribute("id", "collectjs");
-    div.innerHTML = "<div class=\"topbarHolder\"><div class=\"topbar\"><div class=\"tabs\"><div class=\"tab\" id=\"parentTab\"></div><div class=\"tab hidden\" id=\"nextTab\"></div><div class=\"tab\" id=\"groupTab\">Group<select id=\"allGroups\"></select><button id=\"deleteGroup\">×</button><button id=\"newGroup\">+</button></div><div class=\"tab\" id=\"setTab\"><span title=\"create a new set by capturing the 'href' attribute of links\">Set</span><select id=\"allSets\"></select></div><div class=\"tab toggle\" id=\"ruleTab\" data-for=\"rules\">Rules</div><div class=\"tab toggle\" id=\"optionTab\" data-for=\"options\">Options</div><div class=\"tab\" id=\"indexTab\"><label for=\"addIndex\">Index Page</label><input type=\"checkbox\" id=\"addIndex\"></div><div class=\"tab\" id=\"closeCollect\" title=\"close collectjs\">&times;</div></div><div class=\"groups\"><div class=\"group options\"></div><div class=\"group rules\"><div id=\"savedRuleHolder\"></div><button id=\"uploadRules\">Upload Saved Rules</button></div><div class=\"group preview\" id=\"rulePreview\"></div></div></div></div><div id=\"collectMain\"><div id=\"ruleItems\" class=\"items\"><div id=\"ruleAlert\"></div><div class=\"rulesForm\"><div class=\"rule\"><label for=\"ruleName\">Name:</label><input id=\"ruleName\" name=\"ruleName\" type=\"text\" /></div><div class=\"rule\"><label>Selector:</label><span id=\"ruleSelector\"></span></div><div class=\"rule\"><label>Capture:</label><span id=\"ruleAttr\"></span></div><div class=\"rule\"><label for=\"ruleMultiple\">Multiple:</label><input id=\"ruleMultiple\" name=\"ruleMultiple\" type=\"checkbox\" /></div><div class=\"rule range\"><label for=\"ruleRange\">Range:</label><input id=\"ruleRange\" name=\"ruleRange\" type=\"text\" disabled=\"true\"/></div><div class=\"rule follow\"><label for=\"ruleFollow\">Follow:</label><input id=\"ruleFollow\" name=\"ruleFollow\" type=\"checkbox\" disabled=\"true\" title=\"Can only follow rules that get href attribute from links\" /></div></div><div class=\"modifiers\"><div id=\"selectorHolder\"></div><div class=\"ruleHTMLHolder\">Count: <span id=\"currentCount\"></span><button id=\"ruleCyclePrevious\" class=\"cycle\" title=\"previous element matching selector\">&lt;&lt;</button><button id=\"ruleCycleNext\" class=\"cycle\" title=\"next element matching selector\">&gt;&gt;</button><span id=\"ruleHTML\"></span></div></div><div id=\"buttonContainer\"><button id=\"saveRule\">Save Rule</button><button id=\"previewSelector\">Preview Capture</button><button id=\"clearSelector\">Clear</button></div></div></div>";
+    div.innerHTML = "<div class=\"topbarHolder\"><div class=\"topbar\"><div class=\"tabs\"><div class=\"tab\" id=\"parentTab\"></div><div class=\"tab hidden\" id=\"nextTab\"></div><div class=\"tab\" id=\"groupTab\">Group<select id=\"allGroups\"></select><button id=\"deleteGroup\">×</button><button id=\"newGroup\">+</button></div><div class=\"tab\" id=\"setTab\"><span title=\"create a new set by capturing the 'href' attribute of links\">Set</span><select id=\"allSets\"></select></div><div class=\"tab toggle\" id=\"ruleTab\" data-for=\"rules\">Rules</div><div class=\"tab toggle\" id=\"optionTab\" data-for=\"options\">Options</div><div class=\"tab\" id=\"indexTab\"><label for=\"addIndex\">Index Page</label><input type=\"checkbox\" id=\"addIndex\"></div><div class=\"tab\" id=\"closeCollect\" title=\"close collectjs\">&times;</div></div><div class=\"groups\"><div class=\"group options\"><p><label for=\"noTable\">Don't include base table elements</label><input type=\"checkbox\" id=\"noTable\" /></p></div><div class=\"group rules\"><div id=\"savedRuleHolder\"></div><button id=\"uploadRules\">Upload Saved Rules</button></div><div class=\"group preview\" id=\"rulePreview\"></div></div></div></div><div id=\"collectMain\"><div id=\"ruleItems\" class=\"items\"><div id=\"ruleAlert\"></div><div class=\"rulesForm\"><div class=\"rule\"><label for=\"ruleName\">Name:</label><input id=\"ruleName\" name=\"ruleName\" type=\"text\" /></div><div class=\"rule\"><label>Selector:</label><span id=\"ruleSelector\"></span></div><div class=\"rule\"><label>Capture:</label><span id=\"ruleAttr\"></span></div><div class=\"rule\"><label for=\"ruleMultiple\">Multiple:</label><input id=\"ruleMultiple\" name=\"ruleMultiple\" type=\"checkbox\" /></div><div class=\"rule range\"><label for=\"ruleRange\">Range:</label><input id=\"ruleRange\" name=\"ruleRange\" type=\"text\" disabled=\"true\"/></div><div class=\"rule follow\"><label for=\"ruleFollow\">Follow:</label><input id=\"ruleFollow\" name=\"ruleFollow\" type=\"checkbox\" disabled=\"true\" title=\"Can only follow rules that get href attribute from links\" /></div></div><div class=\"modifiers\"><div id=\"selectorHolder\"></div><div class=\"ruleHTMLHolder\">Count: <span id=\"currentCount\"></span><button id=\"ruleCyclePrevious\" class=\"cycle\" title=\"previous element matching selector\">&lt;&lt;</button><button id=\"ruleCycleNext\" class=\"cycle\" title=\"next element matching selector\">&gt;&gt;</button><span id=\"ruleHTML\"></span></div></div><div id=\"buttonContainer\"><button id=\"saveRule\">Save Rule</button><button id=\"previewSelector\">Preview Capture</button><button id=\"clearSelector\">Clear</button></div></div></div>";
     document.body.appendChild(div);
     addNoSelect(div.querySelectorAll("*"));
 
@@ -565,6 +571,10 @@ function toggleGroups(event){
         showGroup(".group." + this.dataset.for);
         this.classList.add("active");
     }
+}
+
+function toggleTabOption(event){
+    Collect.options.noTable = !Collect.options.noTable;
 }
 
 /***********************

@@ -6,23 +6,29 @@ ele is the child element you want to build a selector from
 parent is the most senior element you want to build a selector up to
 text is the element in the interface/page that will hold the SelectorFamily's css string
 */
-function SelectorFamily(ele, parent){
+function SelectorFamily(ele, parent, options){
     this.parent = parent;
     this.selectors;
     this.ele = document.createElement("div");
     this.ele.classList.add("selectorFamily", "noSelect");
-    this.buildFamily(ele);
+    this.buildFamily(ele, options || {});
 }
 
 /*
 Populates the selectors array with Selectors from ele to parent (ignoring document.body)
 Order is from most senior element to provided ele
 */
-SelectorFamily.prototype.buildFamily = function(ele){
+SelectorFamily.prototype.buildFamily = function(ele, options){
     var sel;
     // reset selectors before generating
     this.selectors = [];
     while ( ele !== null && ele.tagName !== "BODY" ) {
+        // ignore element if it isn't allowed
+        if ( options.noTable && !allowedElement(ele.tagName) ) {
+            ele = ele.parentElement;
+            continue;
+        }
+
         sel = new Selector(ele, this);
         if ( this.parent && sel.matches(this.parent)) {
             break;
@@ -39,6 +45,19 @@ SelectorFamily.prototype.buildFamily = function(ele){
     }
     this.selectors[this.selectors.length-1].setAll();
 };
+
+function allowedElement(tag){
+    // make sure that these are capitalized
+    var illegal = ["TBODY", "CENTER"],
+        allowed = true;
+    for ( var i=0, len=illegal.length; i<len; i++){
+        if ( tag === illegal[i] ) {
+            allowed = false;
+            break;
+        }
+    }
+    return allowed;
+}
 
 SelectorFamily.prototype.removeSelector = function(index){
     this.selectors.splice(index, 1);
@@ -146,7 +165,9 @@ function Fragment(name, selector, on){
     this.selector = selector;
     this.name = name;
     this.ele = document.createElement("span");
-    this.ele.classList.add("toggleable", "realselector", "noSelect");
+    this.ele.classList.add("toggleable");
+    this.ele.classList.add("realselector");
+    this.ele.classList.add("noSelect");
     if ( !on ) {
         this.ele.classList.add("off");
     }
@@ -239,15 +260,17 @@ Selector.prototype.addNthofType = function(){
     this.nthtypeCreator = undefined;
     
     var selectors = this.ele.getElementsByClassName("realselector"),
-        len = selectors.length,
-        sibling = selectors[len-1].nextSibling;
+        len = selectors.length;
+
+    var sibling = selectors[len-1].nextSibling;
     this.ele.insertBefore(this.nthoftype.ele, sibling);
 };
 
 Selector.prototype.setup = function(){
     var curr, deltog;
     this.ele = document.createElement("div");
-    this.ele.classList.add("selectorGroup", "noSelect");
+    this.ele.classList.add("selectorGroup");
+    this.ele.classList.add("noSelect");
     this.ele.appendChild(this.tag.ele);
     if ( this.id ) {
         this.ele.appendChild(this.id.ele);

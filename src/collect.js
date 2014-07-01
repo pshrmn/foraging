@@ -8,6 +8,9 @@ var Collect = {
     allElements: [],
     not: ":not(.noSelect)",
     indexPage: false,
+    options: {
+        noTable: false
+    },
     family: {
         selectorFamily: undefined,
         create: function(event){
@@ -19,7 +22,7 @@ var Collect = {
                 Collect.html.form.name.value = Collect.editing;
             }
             
-            var sf = new SelectorFamily(this, Collect.parent.selector);
+            var sf = new SelectorFamily(this, Collect.parent.selector, Collect.options);
             sf.setup(Collect.html.family, Collect.html.form.selector, Collect.family.test.bind(Collect.family));
             Collect.family.selectorFamily = sf;
             sf.update();
@@ -37,7 +40,7 @@ var Collect = {
                 " " + selector + Collect.not;
             var element = document.querySelector(longSelector);
             if ( element ) {
-                var sf = new SelectorFamily(element, Collect.parent.selector);
+                var sf = new SelectorFamily(element, Collect.parent.selector, Collect.options);
                 sf.setup(Collect.html.family, Collect.html.form.selector,
                     Collect.family.test.bind(Collect.family));
                 this.selectorFamily = sf;
@@ -225,6 +228,9 @@ var Collect = {
         idEvent("deleteGroup", "click", deleteGroupEvent);
         idEvent("allGroups", "change", loadGroupEvent);
         idEvent("allSets", "change", loadSetEvent);
+
+        // options
+        idEvent("noTable", "change", toggleTabOption);
     }
 };
 
@@ -565,6 +571,10 @@ function toggleGroups(event){
         showGroup(".group." + this.dataset.for);
         this.classList.add("active");
     }
+}
+
+function toggleTabOption(event){
+    Collect.options.noTable = !Collect.options.noTable;
 }
 
 /***********************
