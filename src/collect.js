@@ -227,7 +227,7 @@ var Collect = {
         idEvent("allSets", "change", loadSetEvent);
 
         // options
-        idEvent("noTable", "change", toggleTabOption);
+        idEvent("ignore", "change", toggleTabOption);
     }
 };
 
@@ -572,10 +572,10 @@ function toggleGroups(event){
 
 function toggleTabOption(event){
     // if option exists, toggle it, otherwise set based on whether or not html element is checked
-    if ( Collect.options.noTable ) {
-        Collect.options.noTable = !Collect.options.noTable;
+    if ( Collect.options.ignore ) {
+        Collect.options.ignore = !Collect.options.ignore;
     } else {
-        Collect.options.noTable = document.getElementById("noTable").checked;
+        Collect.options.ignore = document.getElementById("ignore").checked;
     }
     setOptions(Collect.options);
 }

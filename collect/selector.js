@@ -24,7 +24,7 @@ SelectorFamily.prototype.buildFamily = function(ele, options){
     this.selectors = [];
     while ( ele !== null && ele.tagName !== "BODY" ) {
         // ignore element if it isn't allowed
-        if ( options.noTable && !allowedElement(ele.tagName) ) {
+        if ( options.ignore && !allowedElement(ele.tagName) ) {
             ele = ele.parentElement;
             continue;
         }
@@ -48,7 +48,7 @@ SelectorFamily.prototype.buildFamily = function(ele, options){
 
 function allowedElement(tag){
     // make sure that these are capitalized
-    var illegal = ["TBODY", "CENTER"],
+    var illegal = ["CENTER", "TBODY", "THEAD", "TFOOT", "COLGROUP"],
         allowed = true;
     for ( var i=0, len=illegal.length; i<len; i++){
         if ( tag === illegal[i] ) {
