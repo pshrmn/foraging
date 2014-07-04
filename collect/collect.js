@@ -302,8 +302,8 @@ function toggleTab(property, parent, toggleFn){
                 Collect.turnOn();
             }
         };
-
-    selectorName.classList.add("smallSelector");
+    toggleable.classList.add("noSelect");
+    selectorName.classList.add("smallSelector", "noSelect");
 
     toggleable.textContent = "+";
     parent.appendChild(nameTag);

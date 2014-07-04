@@ -102,7 +102,7 @@ body {
     #collectjs .tabs .toggle {
       cursor: pointer; }
     #collectjs .tabs .tab.active {
-      height: 30px;
+      height: 31px;
       background: white; }
     #collectjs .tabs .tab.hidden {
       display: none; }
