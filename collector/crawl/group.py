@@ -45,15 +45,20 @@ class RuleGroup(object):
             url = self.urls.get()
             dom = get_html(url)
             if dom is not None:
-                # if there is a "next" selector, push that url to the urls queue
                 if self.next:
-                    next = self.next.get(dom)
-                    if next is not None:
-                        self.urls.put(next)
+                    self.add_next_url(dom)
                 new_data = self.tree.get(dom)
                 if new_data is not None:
                     data.extend(new_data)
         return data
+
+    def add_next_url(self, dom):
+        """
+        apply the next selector and if it returns a url, add that to the crawl queue
+        """
+        next = self.next.get(dom)
+        if next is not None:
+            self.urls.put(next)
 
 def make_set(node):
     if node.get("parent"):
@@ -61,6 +66,18 @@ def make_set(node):
     else:
         new_set = Set(**node)
     return new_set
+
+def canonical(dom):
+    """
+    gets the canonical url for a page
+    not yet used, but will be useful to prevent duplicate elements
+    """
+    canon = CSSSelector("link[rel=canonical]")
+    matches = canon.get(dom)
+    if len(matches)==0:
+        return
+    return matches[0].get("href")
+
 
 class Set(object):
     """

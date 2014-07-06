@@ -23,7 +23,7 @@ class Website(object):
             with open(filename) as fp:
                 rule_dict = json.load(fp)
                 self.queue.put(RuleGroup(**rule_dict))
-
+                
     def crawl(self):
         """
         crawl over every RuleGroup for a website
