@@ -20,8 +20,13 @@ var Collect = {
                 Collect.html.form.name.value = Collect.editing;
             }
             
-            var sf = new SelectorFamily(this, Collect.parent.selector, Collect.options);
-            sf.setup(Collect.html.family, Collect.html.form.selector, Collect.family.test.bind(Collect.family));
+            var sf = new SelectorFamily(this,
+                Collect.parent.selector,
+                Collect.html.family,
+                Collect.html.form.selector,
+                Collect.family.test.bind(Collect.family),
+                Collect.options
+            );
             Collect.family.selectorFamily = sf;
             sf.update();
             Collect.html.ruleItems.style.display = "block";
@@ -38,9 +43,13 @@ var Collect = {
                 " " + selector + Collect.not;
             var element = document.querySelector(longSelector);
             if ( element ) {
-                var sf = new SelectorFamily(element, Collect.parent.selector, Collect.options);
-                sf.setup(Collect.html.family, Collect.html.form.selector,
-                    Collect.family.test.bind(Collect.family));
+                var sf = new SelectorFamily(element,
+                    Collect.parent.selector,
+                    Collect.html.family,
+                    Collect.html.form.selector,
+                    Collect.family.test.bind(Collect.family),
+                    Collect.options
+                );
                 this.selectorFamily = sf;
                 Collect.html.ruleItems.style.display = "block";
                 this.selectorFamily.match(selector);

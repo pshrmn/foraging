@@ -4,47 +4,52 @@
 /*
 ele is the child element you want to build a selector from
 parent is the most senior element you want to build a selector up to
-text is the element in the interface/page that will hold the SelectorFamily's css string
+text is an element whose textContent will be set based on SelectorFamily.toString in update
+fn is a function to be called when SelectorFamily.update is called
+options are optional
 */
-function SelectorFamily(ele, parent, options){
-    this.parent = parent;
-    this.selectors;
+function SelectorFamily(ele, parent, holder, text, fn, options){
+    this.parent = parent || "body";
+    this.selectors = [];
     this.ele = noSelectEle("div", ["selectorFamily"]);
-    this._buildFamily(ele, options || {});
+    // Generates the selectors array with Selectors from ele to parent (ignoring document.body)
+    // Order is from most senior element to provided ele
+    var sel;
+    options = options || {};
+    while ( ele !== null && ele.tagName !== "BODY" ) {
+        // ignore element if it isn't allowed
+        if ( options.ignore && !allowedElement(ele.tagName) ) {
+            ele = ele.parentElement;
+            continue;
+        }
+
+        sel = new Selector(ele, this);
+        if ( this.parent && sel.matches(this.parent)) {
+            break;
+        }
+        this.selectors.push(sel);
+        ele = ele.parentElement;
+    }
+    // reverse selectors so 0-index is selector closest to body
+    this.selectors.reverse();
+    for ( var i=0, len=this.selectors.length; i<len; i++ ) {
+        sel = this.selectors[i];
+        this.ele.appendChild(sel.ele);
+        sel.index = i;
+    }
+    this.selectors[this.selectors.length-1].setAll();
+
+    this.holder = holder;
+    this.text = text;
+    this.updateFunction = fn;
+    // clear out holder, then attach SelectorFamily.ele
+    this.holder.innerHTML = "";
+    this.holder.appendChild(this.ele);
 }
 
 SelectorFamily.prototype = {
     // "Private" methods
-    /* Populates the selectors array with Selectors from ele to parent (ignoring document.body)
-    Order is from most senior element to provided ele */
-    _buildFamily: function(ele, options){
-        var sel;
-        // reset selectors before generating
-        this.selectors = [];
-        while ( ele !== null && ele.tagName !== "BODY" ) {
-            // ignore element if it isn't allowed
-            if ( options.ignore && !allowedElement(ele.tagName) ) {
-                ele = ele.parentElement;
-                continue;
-            }
-
-            sel = new Selector(ele, this);
-            if ( this.parent && sel.matches(this.parent)) {
-                break;
-            }
-            this.selectors.push(sel);
-            ele = ele.parentElement;
-        }
-        // reverse selectors so 0-index is selector closest to body
-        this.selectors.reverse();
-        for ( var i=0, len=this.selectors.length; i<len; i++ ) {
-            sel = this.selectors[i];
-            this.ele.appendChild(sel.ele);
-            sel.index = i;
-        }
-        this.selectors[this.selectors.length-1].setAll();
-    },
-    _removeSelector: function(index){
+    removeSelector: function(index){
         this.selectors.splice(index, 1);
         // reset index values after splice
         for ( var i=0, len=this.selectors.length; i<len; i++ ) {
@@ -53,16 +58,6 @@ SelectorFamily.prototype = {
         this.update();
     },
     // "Public" methods
-    /* text is an element whose textContent will be set based on SelectorFamily.toString in update
-    fn is a function to be called when SelectorFamily.update is called */
-    setup: function(holder, text, fn){
-        this.holder = holder;
-        this.text = text;
-        this.updateFunction = fn;
-        // clear out holder, then attach SelectorFamily.ele
-        this.holder.innerHTML = "";
-        this.holder.appendChild(this.ele);
-    },
     remove: function(){
         if ( this.holder ) {
             this.holder.innerHTML = "";    
@@ -381,7 +376,7 @@ function createNthofType(event){
 function removeSelectorGroup(event){
     // get rid of the html element
     this.ele.parentElement.removeChild(this.ele);
-    this.family._removeSelector(this.index);
+    this.family.removeSelector(this.index);
 }
 
 /*********************************
