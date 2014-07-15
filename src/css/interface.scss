@@ -349,6 +349,11 @@ body{
     line-height: 2;
 }
 
+#refreshCollect{
+    background: $blue !important;
+    cursor: pointer;
+}
+
 #closeCollect{
     background: $light-red !important;
     cursor: pointer;

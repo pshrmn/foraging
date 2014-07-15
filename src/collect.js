@@ -227,6 +227,7 @@ var Collect = {
 
         // tabs
         idEvent("addIndex", "click", addIndexEvent);
+        idEvent("refreshCollect", "click", refreshElements);
         idEvent("closeCollect", "click", removeInterface);
 
         // groups
@@ -386,6 +387,10 @@ function removeInterface(event){
     }
 
     document.body.style.marginBottom = (Collect.marginBottom) + "px";
+}
+
+function refreshElements(event){
+    Collect.turnOn();
 }
 
 /*

@@ -210,6 +210,10 @@ body {
 #ruleHTML {
   line-height: 2; }
 
+#refreshCollect {
+  background: #45aacc !important;
+  cursor: pointer; }
+
 #closeCollect {
   background: #f296a3 !important;
   cursor: pointer; }
