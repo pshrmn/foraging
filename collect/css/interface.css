@@ -53,7 +53,7 @@ body {
   #collectjs .topbarHolder {
     position: relative;
     width: 100%; }
-  #collectjs .topbar {
+  #collectjs .collectTopbar {
     position: absolute;
     bottom: 0;
     left: 0;
