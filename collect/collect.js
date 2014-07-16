@@ -349,7 +349,6 @@ function resetForm(){
     Collect.html.form.rangeHolder.style.display = "none";
 
     // divs to hide
-
     Collect.html.ruleItems.style.display = "none";
 }
 
@@ -390,6 +389,7 @@ function removeInterface(event){
 }
 
 function refreshElements(event){
+    resetInterface();
     Collect.turnOn();
 }
 
