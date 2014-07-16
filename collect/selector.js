@@ -3,7 +3,8 @@
 ********************/
 /*
 ele is the child element you want to build a selector from
-parent is the most senior element you want to build a selector up to
+parent is the selector for the most senior element you want to build a selector up to
+    or "body" if parent is undefined or an empty string
 text is an element whose textContent will be set based on SelectorFamily.toString in update
 fn is a function to be called when SelectorFamily.update is called
 options are optional
@@ -133,7 +134,7 @@ var fragments = {
     },
     toggleOff: function(event){
         this.ele.classList.toggle("off");
-        this.selector.family.update();
+        //this.selector.family.update();
     }
 };
 
@@ -244,6 +245,28 @@ function Selector(ele, family){
     deltog = selectorSpan("x", ["deltog", "noSelect"]);
     this.ele.appendChild(deltog);
     deltog.addEventListener('click', removeSelectorGroup.bind(this), false);
+
+    this.ele.addEventListener("click", cleanSelector.bind(this), false);
+}
+
+function cleanSelector(event){
+    if ( !event.target.classList.contains("toggleable") ) {
+        return;
+    }
+
+    // only care if nthoftype exists
+    if ( this.nthoftype ) {
+        // if turning on nthoftype and no other fragments are on, turn tag on
+        if ( event.target === this.nthoftype.ele  &&
+            this.nthoftype.on() && this.toString().charAt(0) === ":") {
+                this.tag.turnOn();
+        }
+        // if turning a fragment off and nthoftype is only fragment left on, turn it off as well
+        else if ( this.nthoftype.on() && this.toString().charAt(0) === ":") {
+            this.nthoftype.turnOff();    
+        }
+    }
+    this.family.update();
 }
 
 Selector.prototype = {
@@ -251,15 +274,23 @@ Selector.prototype = {
         if ( this.nthoftype ) {
             return;
         }
+        // if the current string for selector is empty, turn on the tag
+        // needs to be called before nthoftype is created
+        if ( this.toString() === "") {
+            this.tag.turnOn();
+        }
         this.nthoftype = new NthFragment(this);
         this.ele.removeChild(this.nthtypeCreator);
         this.nthtypeCreator = undefined;
         
+
         var selectors = this.ele.getElementsByClassName("realselector"),
             len = selectors.length;
 
         var sibling = selectors[len-1].nextSibling;
         this.ele.insertBefore(this.nthoftype.ele, sibling);
+
+
     },
     /* turn on (remove .off) from all toggleable parts of a selector if bool is undefined or true
     turn off (add .off) to all toggleable parts if bool is false */

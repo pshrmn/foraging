@@ -195,15 +195,15 @@ body {
     #collectjs .selectorGroup .toggleable {
       color: #444444;
       border-bottom: 1px solid #777; }
+      #collectjs .selectorGroup .toggleable .childtoggle {
+        border-width: 0 0 1px;
+        width: 50px; }
     #collectjs .selectorGroup .toggleable.off {
       color: #ccc; }
     #collectjs .selectorGroup .deltog, #collectjs .selectorGroup .nthtype, #collectjs .selectorGroup .onlychild {
       font-weight: bold;
       padding: 0 3px 0 2px;
       color: white; }
-    #collectjs .selectorGroup .childToggle {
-      border-width: 0 0 1px;
-      width: 50px; }
   #collectjs .selectorGroup:hover .deltog, #collectjs .selectorGroup:hover .onlychild, #collectjs .selectorGroup:hover .nthtype {
     color: #777; }
 

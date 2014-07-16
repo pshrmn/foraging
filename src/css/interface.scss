@@ -317,6 +317,11 @@ body{
         .toggleable{
             color: $dark-gray;
             border-bottom: 1px solid #777;   
+            
+            .childtoggle{
+                border-width: 0 0 1px;
+                width: 50px;
+            }
         }
 
         .toggleable.off{
@@ -329,10 +334,6 @@ body{
             color: $white;
         }
 
-        .childToggle{
-            border-width: 0 0 1px;
-            width: 50px;
-        }
     }
 
     .selectorGroup:hover{
