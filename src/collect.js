@@ -781,7 +781,7 @@ function removeEvents(eles, type, fn){
 }
 
 /*
-add the .no_select class to eles array, so that collect.js doesn't try to select them
+add the .noSelect class to eles array, so that collect.js doesn't try to select them
 */
 function addNoSelect(eles){
     var len = eles.length;
@@ -1727,7 +1727,7 @@ function wrapTextHTML(text, type){
     if ( text.indexOf('=""') !== -1 ) {
         return '';
     }
-    return '<span class="capture no_select" title="click to capture ' + type + 
+    return '<span class="capture noSelect" title="click to capture ' + type + 
         ' property" data-capture="' + type + '">' + text + '</span>';
 }
 
