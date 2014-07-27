@@ -32,6 +32,7 @@ class RuleGroup(object):
         self.urls = Queue()
         for url in index_urls:
             self.urls.put(url)
+        self.next = None
         if next:
             self.next = Rule("next", next, "attr-href")
         self.nodes = nodes

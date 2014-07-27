@@ -33,6 +33,7 @@ def upload():
     except ValueError:
         return jsonify({"error": True})
     # change indices from a dict (useful for toggling in collectjs) to an array
+    # fails if no index_url is provided
     data["index_urls"] = [key for key in data["index_urls"]]
     hostname = urlparse(data["index_urls"][0]).netloc
     folder = host_folder(hostname)
