@@ -30,6 +30,7 @@ class RuleGroup(object):
     def __init__(self, name, index_urls, nodes, next=None):
         self.name = name
         self.urls = Queue()
+        self.single_page = True if len(index_urls) == 1 else False
         for url in index_urls:
             self.urls.put(url)
         self.next = None
@@ -41,16 +42,28 @@ class RuleGroup(object):
 
     def crawl(self):
         data = []
-        while not self.urls.empty():
-            url = self.urls.get()
-            dom = get_html(url)
+
+        if self.single_page:
+            dom = self.next_page()
             if dom is not None:
+                data = self.tree.get(dom)
+        else:                
+            while not self.urls.empty():
+                dom = self.next_page()
+                if not dom:
+                    continue
                 if self.next:
                     self.add_next_url(dom)
                 new_data = self.tree.get(dom)
+                # only works when self.tree is a ParentSet, need to fix
+                # single page workaround for now
                 if new_data is not None:
                     data.extend(new_data)
         return data
+
+    def next_page(self):
+        url = self.urls.get()
+        return get_html(url)
 
     def add_next_url(self, dom):
         """
@@ -94,6 +107,7 @@ class Set(object):
     def get(self, dom):
         """
         given an lxml parsed dom, apply rules for the set, then call child sets given data
+        returns a dict
         """
         data = {name: self.rules[name].get(dom) for name in self.rules}
         for val in data.itervalues():
