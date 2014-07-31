@@ -73,8 +73,13 @@ body {
     box-sizing: border-box;
     min-height: 250px;
     padding: 15px; }
+    .collectjs .views .permanent {
+      font-size: 0.75em; }
     .collectjs .views .view {
-      display: none; }
+      display: none;
+      padding: 5px; }
+      .collectjs .views .view .column {
+        display: inline-block; }
     .collectjs .views .view.active {
       display: block; }
   .collectjs input {
@@ -151,9 +156,9 @@ body {
     .collectjs .items input[type=text] {
       width: 150px;
       border-width: 0 0 1px; }
-    .collectjs .items .rulesForm, .collectjs .items .modifiers {
+    .collectjs .items #rulesForm, .collectjs .items .modifiers {
       display: inline-block; }
-    .collectjs .items .rulesForm {
+    .collectjs .items #rulesForm {
       width: 25%;
       min-width: 250px;
       border-right: 1px dashed #444444; }

@@ -116,8 +116,17 @@ body{
         min-height: 250px;
         padding: 15px;
 
+        .permanent{
+            font-size: 0.75em;
+        }
+
         .view{
             display: none;
+            padding: 5px;
+
+            .column{
+                display: inline-block;
+            }
         }
 
         .view.active{
@@ -249,11 +258,11 @@ body{
             border-width: 0 0 1px;
         }
 
-        .rulesForm, .modifiers{
+        #rulesForm, .modifiers{
             display: inline-block;
         }
 
-        .rulesForm{
+        #rulesForm{
             width: 25%;
             min-width: 250px;
             border-right: 1px dashed $dark-gray;

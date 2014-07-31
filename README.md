@@ -30,24 +30,29 @@ A parent is a selector for how to match an object within the DOM. This is useful
 
 A page can have multiple sets in it, in case parts of it require a parent selector while others do not
 
-    page = [
-        {
-            name: <string>
-            rules: {...},
-            parent: parent
-        },
-        {
-            name: <string>,
-            rules: {...}
-        }
-    ]
+    page = {
+        name: <string>,
+        sets: [
+            {
+                name: <string>
+                rules: {...},
+                parent: parent
+            },
+            {
+                name: <string>,
+                rules: {...}
+            }
+        ]
+    }
+
+A group is made up of an object of pages, one of which must be a "default" page. urls is an object containing urls for the default page to crawl as keys (the object is converted to an array before uploading)
 
 A group is an array made up of one or more pages whose data are all related. The URL to get the second page is determined by a rule in the page1 page that has the name page2
 
     group = {
         name: <string>
-        pages: [page1, page2],
-        urls: []
+        pages: {default: page, <page2: page, ...>},
+        urls: {}
     }
 
 And a site can have multiple, independent groups, each of which is uploaded individually to the server
@@ -57,6 +62,13 @@ And a site can have multiple, independent groups, each of which is uploaded indi
             group1: {...},
             group2: {...}
         }
+
+Naming of groups, pages, and rule_sets is up to the user, but there a few reserverd words.
+
+* default (page) - first page to be crawled in a group
+* next (rule_set) - a next rule_set can be added to a "default" page and contains one rule: a link with a capture of attr-href in order to generate more URLs for the default page to be applied to
+
+When a domain is visited (and collectjs is opened) for the first time, a "default" group with a "default" page is generated. This can be used, although creating a new group with a more relevant name is encouraged.
 
 #####How to Use
 To pack extension and use:

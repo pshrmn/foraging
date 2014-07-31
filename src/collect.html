@@ -1,8 +1,8 @@
 <div class="tabHolder">
     <div class="tabs">
-        <div class="tab active" data-for="createView">Create</div>
-        <div class="tab" data-for="ruleView">Rule</div>
+        <div class="tab active" data-for="ruleView">Rule</div>
         <div class="tab" data-for="groupsView">Groups</div>
+        <div class="tab" data-for="previewView">Preview</div>
         <div class="tab" data-for="optionsView">Options</div>
         <div class="tab" id="refreshCollect">&#8635;</div>
         <div class="tab" id="closeCollect">&times;</div>
@@ -10,13 +10,16 @@
 </div>
 
 <div class="views">
-    <div class="view" id="emptyView"></div>
-    <div class="view active" id="createView">
-        <button id="createGroup">Create Group</button>
-        <button id="createPage">Create Page</button>
-        <button id="createSet">Create Rule Set</button>
+    <div class="permanent">
+        <div id="currentInfo">
+            Group: <span id="currGroup"></span>
+            Page: <span id="currPage"></span>
+            Rule Set: <span id="currRuleSet"></span>
+        </div>
+        <div id="collectAlert"></div>
     </div>
-    <div class="view" id="ruleView">
+    <div class="view" id="emptyView"></div>
+    <div class="view active" id="ruleView">
         <div id="ruleItems" class="items">
             <div id="ruleAlert"></div>
             <form id="rulesForm">
@@ -57,12 +60,20 @@
             </div>
             <div id="buttonContainer">
                 <button id="saveRule">Save Rule</button>
-                <button id="previewSelector">Preview Rule</button>
                 <button id="clearSelector">Clear</button>
             </div>
         </div>
     </div>
     <div class="view" id="groupsView">
+        <p>
+            Group: <select id="groupSelect"></select>
+            <button id="createGroup">Create Group</button>
+        </p>
+        <p>
+            Page: <select id="pageSelect"></select>
+        </p>
+        <button id="createSet">Create Rule Set</button>
+        <div id="ruleSetsPreview"></div>
     </div>
     <div class="view" id="previewView">
         <p>
