@@ -4,7 +4,7 @@ body {
   margin: 0; }
 
 /* Interface */
-#collectjs {
+.collectjs {
   z-index: 1000;
   position: fixed;
   bottom: 0;
@@ -18,12 +18,12 @@ body {
   color: black;
   text-align: left;
   box-sizing: border-box; }
-  #collectjs * {
+  .collectjs * {
     color: black;
     box-sizing: border-box; }
-  #collectjs .tabHolder {
+  .collectjs .tabHolder {
     position: relative; }
-  #collectjs .tabs {
+  .collectjs .tabs {
     position: absolute;
     left: 0;
     bottom: 0;
@@ -33,11 +33,11 @@ body {
     word-spacing: -6px;
     width: 100%;
     background: transparent; }
-    #collectjs .tabs .tab:hover {
+    .collectjs .tabs .tab:hover {
       background: #e0bd00; }
-    #collectjs .tabs .tab.active:hover {
+    .collectjs .tabs .tab.active:hover {
       background: #efefef; }
-    #collectjs .tabs .tab {
+    .collectjs .tabs .tab {
       background: gold;
       border-top: 1px solid #444444;
       border-right: 1px solid #444444;
@@ -47,9 +47,9 @@ body {
       height: 30px;
       line-height: 30px;
       cursor: pointer; }
-      #collectjs .tabs .tab div {
+      .collectjs .tabs .tab div {
         display: inline-block; }
-      #collectjs .tabs .tab button {
+      .collectjs .tabs .tab button {
         background: transparent;
         font-size: 100%;
         line-height: 1;
@@ -58,180 +58,160 @@ body {
         height: 18px;
         font-family: sans-serif;
         vertical-align: inherit; }
-      #collectjs .tabs .tab label {
+      .collectjs .tabs .tab label {
         cursor: pointer; }
-      #collectjs .tabs .tab .smallSelector {
+      .collectjs .tabs .tab .smallSelector {
         font-size: 0.75em;
         margin: 0 3px; }
-    #collectjs .tabs .toggle {
+    .collectjs .tabs .toggle {
       cursor: pointer; }
-    #collectjs .tabs .tab.active {
+    .collectjs .tabs .tab.active {
       background: white; }
-    #collectjs .tabs .tab.set {
+    .collectjs .tabs .tab.set {
       background: #bddbce; }
-  #collectjs .views {
+  .collectjs .views {
     box-sizing: border-box;
     min-height: 250px;
     padding: 15px; }
-    #collectjs .views .view {
+    .collectjs .views .view {
       display: none; }
-    #collectjs .views .view.active {
+    .collectjs .views .view.active {
       display: block; }
-  #collectjs button {
-    padding: 5px;
-    height: 100%;
-    border-radius: 3px;
-    background-color: #ccc;
-    border: 1px outset #7a7b7a;
-    font-size: 14px;
-    line-height: 1.2;
-    text-transform: none; }
-  #collectjs input {
+  .collectjs input {
     box-shadow: none;
     border-radius: 0;
     background: white;
     border: 1px solid #444444;
     font-size: 16px;
     line-height: 1.2; }
-  #collectjs input[type=text] {
+  .collectjs input[type=text] {
     height: 20px;
     max-height: 20px;
     min-height: 20px;
     padding: 2px;
     font-family: sans-serif; }
-  #collectjs input[type=text]:disabled {
+  .collectjs input[type=text]:disabled {
     background: #efefef;
     border-color: #cccccc; }
-  #collectjs label {
+  .collectjs label {
     font-size: 1em;
     cursor: pointer;
     font-weight: normal; }
-  #collectjs .rules .collectGroup {
+  .collectjs .rules .collectGroup {
     margin-right: 10px;
     padding: 3px 0 3px 3px;
     border: 1px solid #444444; }
-    #collectjs .rules .collectGroup span {
+    .collectjs .rules .collectGroup span {
       padding: 3px; }
-  #collectjs .rules .deltog {
+  .collectjs .rules .deltog {
     cursor: pointer;
     background: #efefef; }
-  #collectjs .rules .savedSelector {
+  .collectjs .rules .savedSelector {
     cursor: pointer; }
-  #collectjs .rules .savedSelector.editing {
+  .collectjs .rules .savedSelector.editing {
     background: gold; }
-  #collectjs .rules .ruleGroup {
+  .collectjs .rules .ruleGroup {
     margin-bottom: 15px; }
-    #collectjs .rules .ruleGroup h2 {
+    .collectjs .rules .ruleGroup h2 {
       text-decoration: underline;
       margin: 10px 0; }
-  #collectjs .ruleHTMLHolder .capture {
+  .collectjs .ruleHTMLHolder .capture {
     background: #ddd;
     padding: 2px;
     cursor: pointer; }
-  #collectjs .ruleHTMLHolder .selected {
+  .collectjs .ruleHTMLHolder .selected {
     background: #bddbce; }
-  #collectjs .ruleHTMLHolder .cycle {
+  .collectjs .ruleHTMLHolder .cycle {
     margin: 0 5px;
     padding: 2px 3px;
     cursor: pointer; }
-  #collectjs .items {
+  .collectjs .items {
     font-size: 16px;
     color: black; }
-    #collectjs .items .rule {
+    .collectjs .items .rule {
       height: 20px;
       font-size: 1em;
       margin-bottom: 5px;
       border: 0;
       overflow: visible; }
-      #collectjs .items .rule span {
+      .collectjs .items .rule span {
         min-width: 50px; }
-      #collectjs .items .rule label {
+      .collectjs .items .rule label {
         width: 75px; }
-      #collectjs .items .rule label, #collectjs .items .rule input {
+      .collectjs .items .rule label, .collectjs .items .rule input {
         margin: 0;
         display: inline-block; }
-    #collectjs .items .rule.follow, #collectjs .items .rule.range {
+    .collectjs .items .rule.follow, .collectjs .items .rule.range {
       display: none; }
-    #collectjs .items input.error {
+    .collectjs .items input.error {
       border-color: #c91900;
       border-style: solid; }
-    #collectjs .items span.error {
+    .collectjs .items span.error {
       border-bottom: 1px solid #c91900; }
-    #collectjs .items input[type=text] {
+    .collectjs .items input[type=text] {
       width: 150px;
       border-width: 0 0 1px; }
-    #collectjs .items .rulesForm, #collectjs .items .modifiers {
+    .collectjs .items .rulesForm, .collectjs .items .modifiers {
       display: inline-block; }
-    #collectjs .items .rulesForm {
+    .collectjs .items .rulesForm {
       width: 25%;
       min-width: 250px;
       border-right: 1px dashed #444444; }
-    #collectjs .items .modifiers {
+    .collectjs .items .modifiers {
       vertical-align: top;
       padding-left: 15px;
       max-width: 75%; }
-      #collectjs .items .modifiers > div {
+      .collectjs .items .modifiers > div {
         padding: 10px 0; }
-  #collectjs .selectorGroup {
+  .collectjs .selectorGroup {
     display: inline-block;
     white-space: nowrap;
     padding: 2px 0 0 2px;
     position: relative;
     cursor: pointer; }
-    #collectjs .selectorGroup * {
+    .collectjs .selectorGroup * {
       font-size: 16px; }
-    #collectjs .selectorGroup .toggleable {
+    .collectjs .selectorGroup .toggleable {
       color: #444444;
       border-bottom: 1px solid #777; }
-      #collectjs .selectorGroup .toggleable .childtoggle {
+      .collectjs .selectorGroup .toggleable .childtoggle {
         border-width: 0 0 1px;
         width: 50px; }
-    #collectjs .selectorGroup .toggleable.off {
+    .collectjs .selectorGroup .toggleable.off {
       color: #ccc; }
-    #collectjs .selectorGroup .deltog, #collectjs .selectorGroup .nthtype, #collectjs .selectorGroup .onlychild {
+    .collectjs .selectorGroup .deltog, .collectjs .selectorGroup .nthtype, .collectjs .selectorGroup .onlychild {
       font-weight: bold;
       padding: 0 3px 0 2px;
       color: white; }
-  #collectjs .selectorGroup:hover .deltog, #collectjs .selectorGroup:hover .onlychild, #collectjs .selectorGroup:hover .nthtype {
+  .collectjs .selectorGroup:hover .deltog, .collectjs .selectorGroup:hover .onlychild, .collectjs .selectorGroup:hover .nthtype {
     color: #777; }
+
+/* tab buttons */
+#refreshCollect {
+  background: #45aacc; }
+
+#closeCollect {
+  background: #f296a3; }
 
 #ruleHTML {
   line-height: 2; }
 
-#refreshCollect {
-  background: #45aacc !important;
-  cursor: pointer; }
-
-#closeCollect {
-  background: #f296a3 !important;
-  cursor: pointer; }
-
-#rulePreview {
+/* views */
+/* previewView */
+#previewContents {
   font-size: 16px;
   overflow-y: scroll;
   height: 200px;
   border: 2px inset; }
-  #rulePreview p {
+  #previewContents p {
     margin-bottom: 5px;
     padding: 2px 15px; }
-  #rulePreview p:nth-of-type(even) {
+  #previewContents p:nth-of-type(even) {
     background: #efefef; }
 
-#collectMain {
-  padding: 5px 5px 15px;
-  color: black; }
-  #collectMain .items {
-    margin-top: 15px; }
-
+/* rulesView */
 #ruleAlert {
   font-size: 0.75em; }
-
-#rulePage div {
-  display: inline-block;
-  width: 100px; }
-#rulePage label {
-  width: auto;
-  margin-right: 5px; }
 
 /* Selector */
 #selectorHolder {

@@ -19,7 +19,7 @@ body{
 }
 
 /* Interface */
-#collectjs{
+.collectjs{
     z-index:1000;
     position: fixed;
     bottom: 0;
@@ -123,18 +123,6 @@ body{
         .view.active{
             display: block;
         }
-    }
-
-
-    button{
-        padding: 5px;
-        height: 100%;
-        border-radius: 3px;
-        background-color: #ccc;
-        border: 1px outset #7a7b7a;
-        font-size: 14px;
-        line-height: 1.2;
-        text-transform: none;
     }
 
     input{
@@ -324,21 +312,22 @@ body{
 
 }
 
+/* tab buttons */
+#refreshCollect{
+    background: $blue;
+}
+
+#closeCollect{
+    background: $light-red;
+}
+
 #ruleHTML{
     line-height: 2;
 }
 
-#refreshCollect{
-    background: $blue !important;
-    cursor: pointer;
-}
-
-#closeCollect{
-    background: $light-red !important;
-    cursor: pointer;
-}
-
-#rulePreview{
+/* views */
+/* previewView */
+#previewContents{
     font-size: 16px;
     overflow-y: scroll;
     height: 200px;
@@ -353,29 +342,9 @@ body{
     }
 }
 
-#collectMain{
-    padding: 5px 5px 15px;
-    color: $black;
-
-    .items{
-        margin-top: 15px;
-    }    
-}
-
+/* rulesView */
 #ruleAlert{
     font-size: 0.75em;
-}
-
-#rulePage{
-    div{
-        display: inline-block;
-        width: 100px;
-    }
-
-    label{
-        width: auto;
-        margin-right: 5px;
-    }
 }
 
 /* Selector */

@@ -4,7 +4,7 @@ var marginBottom;
 // add the interface first
 (function addInterface(){
     var div = noSelectElement("div");
-    div.setAttribute("id", "collectjs");
+    div.classList.add("collectjs");
     div.innerHTML = "<div class=\"tabHolder\"><div class=\"tabs\"><div class=\"tab active\" data-for=\"createView\">Create</div><div class=\"tab\" data-for=\"ruleView\">Rule</div><div class=\"tab\" data-for=\"groupsView\">Groups</div><div class=\"tab\" data-for=\"optionsView\">Options</div><div class=\"tab\" id=\"refreshCollect\">&#8635;</div><div class=\"tab\" id=\"closeCollect\">&times;</div></div></div><div class=\"views\"><div class=\"view\" id=\"emptyView\"></div><div class=\"view active\" id=\"createView\"><button id=\"createGroup\">Create Group</button><button id=\"createPage\">Create Page</button><button id=\"createSet\">Create Rule Set</button></div><div class=\"view\" id=\"ruleView\"><div id=\"ruleItems\" class=\"items\"><div id=\"ruleAlert\"></div><form id=\"rulesForm\"><div class=\"rule\"><label for=\"ruleName\">Name:</label><input id=\"ruleName\" name=\"ruleName\" type=\"text\" /></div><div class=\"rule\"><label>Selector:</label><span id=\"ruleSelector\"></span></div><div class=\"rule\"><label>Capture:</label><span id=\"ruleAttr\"></span></div><div class=\"rule\"><label for=\"ruleMultiple\">Multiple:</label><input id=\"ruleMultiple\" name=\"ruleMultiple\" type=\"checkbox\" /></div><div class=\"rule range\"><label for=\"ruleRange\">Range:</label><input id=\"ruleRange\" name=\"ruleRange\" type=\"text\" disabled=\"true\"/></div><div class=\"rule follow\"><label for=\"ruleFollow\">Follow:</label><input id=\"ruleFollow\" name=\"ruleFollow\" type=\"checkbox\" disabled=\"true\" title=\"Can only follow rules that get href attribute from links\" /></div></form><div class=\"modifiers\"><div id=\"selectorHolder\"></div><div class=\"ruleHTMLHolder\">Count: <span id=\"currentCount\"></span><button id=\"ruleCyclePrevious\" class=\"cycle\" title=\"previous element matching selector\">&lt;&lt;</button><button id=\"ruleCycleNext\" class=\"cycle\" title=\"next element matching selector\">&gt;&gt;</button><span id=\"ruleHTML\"></span></div></div><div id=\"buttonContainer\"><button id=\"saveRule\">Save Rule</button><button id=\"previewSelector\">Preview Rule</button><button id=\"clearSelector\">Clear</button></div></div></div><div class=\"view\" id=\"groupsView\"></div><div class=\"view\" id=\"previewView\"><p>Name: <span id=\"previewName\"></span>Selector: <span id=\"previewSelector\"></span>Capture: <span id=\"previewCapture\"></span></p><div id=\"previewContents\"></div></div><div class=\"view\" id=\"optionsView\"><p><label for=\"ignore\">Ignore helper elements (eg tbody)</label><input type=\"checkbox\" id=\"ignore\" /></p></div></div>";
     document.body.appendChild(div);
     addNoSelect(div.querySelectorAll("*"));
@@ -101,68 +101,6 @@ var Interface = {
         */
     }
 };
-
-/*
-encapsulate event to keep track of current tab/view
-*/
-function tabEvents(){
-    // querySelectorAll because getElementsByClassName could overlap with native elements
-    var tabs = document.querySelectorAll(".tabHolder .tab"),
-        currentTab = document.querySelector(".tab.active"),
-        currentView = document.querySelector(".view.active");
-    
-    for ( var i=0, len=tabs.length; i<len; i++ ) {
-        tabs[i].addEventListener("click", activeTabEvent, false);
-    }
-
-
-    function activeTabEvent(event){
-        var target = this.dataset.for,
-            view = document.getElementById(target);
-        // fail if either data-for or related element is undefined
-        if ( !target || !view || this === currentTab) {
-            return;
-        }
-        currentTab.classList.remove("active");
-        currentView.classList.remove("active");
-
-        currentTab = this;
-        currentView = view;
-        currentTab.classList.add("active");
-        currentView.classList.add("active");
-    }
-
-    idEvent("refreshCollect", "click", refreshElements);
-    idEvent("closeCollect", "click", removeInterface);
-}
-
-function ruleViewEvents(){
-    HTML.form.range.addEventListener("blur", applyRuleRange, false);
-    HTML.form.multiple.addEventListener("change", function(event){
-        HTML.form.range.disabled = !HTML.form.range.disabled;
-        if ( HTML.form.disabled ) {
-            HTML.form.rangeHolder.style.display = "none";
-        } else {
-            HTML.form.rangeHolder.style.display = "block";
-        }
-        
-    });
-
-    idEvent("saveRule", "click", saveRuleEvent);
-    idEvent("previewSelector", "click", previewSelectorEvent);
-    idEvent("ruleCyclePrevious", "click", showPreviousElement);
-    idEvent("ruleCycleNext", "click", showNextElement);
-}
-
-function createViewEvents(){
-    idEvent("createGroup", "click", undefined);
-    idEvent("createPage", "click", undefined);
-    idEvent("createSet", "click", undefined);
-}
-
-function optionsViewEvents(){
-    idEvent("ignore", "change", toggleTabOption);
-}
 
 // save commonly referenced to elements
 var HTML = {
@@ -342,6 +280,67 @@ function resetForm(){
 /******************
     EVENTS
 ******************/
+
+// encapsulate event activeTabEvent to keep track of current tab/view
+function tabEvents(){
+    // querySelectorAll because getElementsByClassName could overlap with native elements
+    var tabs = document.querySelectorAll(".tabHolder .tab"),
+        currentTab = document.querySelector(".tab.active"),
+        currentView = document.querySelector(".view.active");
+    
+    for ( var i=0, len=tabs.length; i<len; i++ ) {
+        tabs[i].addEventListener("click", activeTabEvent, false);
+    }
+
+
+    function activeTabEvent(event){
+        var target = this.dataset.for,
+            view = document.getElementById(target);
+        // fail if either data-for or related element is undefined
+        if ( !target || !view || this === currentTab) {
+            return;
+        }
+        currentTab.classList.remove("active");
+        currentView.classList.remove("active");
+
+        currentTab = this;
+        currentView = view;
+        currentTab.classList.add("active");
+        currentView.classList.add("active");
+    }
+
+    idEvent("refreshCollect", "click", refreshElements);
+    idEvent("closeCollect", "click", removeInterface);
+}
+
+function ruleViewEvents(){
+    HTML.form.range.addEventListener("blur", applyRuleRange, false);
+    HTML.form.multiple.addEventListener("change", function(event){
+        HTML.form.range.disabled = !HTML.form.range.disabled;
+        if ( HTML.form.disabled ) {
+            HTML.form.rangeHolder.style.display = "none";
+        } else {
+            HTML.form.rangeHolder.style.display = "block";
+        }
+        
+    });
+
+    idEvent("saveRule", "click", saveRuleEvent);
+    idEvent("previewSelector", "click", previewSelectorEvent);
+    idEvent("ruleCyclePrevious", "click", showPreviousElement);
+    idEvent("ruleCycleNext", "click", showNextElement);
+}
+
+function createViewEvents(){
+    idEvent("createGroup", "click", undefined);
+    idEvent("createPage", "click", undefined);
+    idEvent("createSet", "click", undefined);
+}
+
+function optionsViewEvents(){
+    idEvent("ignore", "change", toggleTabOption);
+}
+
 /*
 add .collectHighlight to an element on mouseenter
 */
@@ -827,10 +826,8 @@ function setupHostname(){
         if ( !site ) {
             var defaultGroup = {
                 name: "default",
-                index_urls: {},
-                nodes: {
-                    "default": addNode("default")
-                }
+                pages: [newPage("default", false)],
+                urls: []
             };
             storage.sites[host] = {
                 site: host,
@@ -840,16 +837,24 @@ function setupHostname(){
             };
             chrome.storage.local.set({'sites': storage.sites});
 
-            HTML.groups.appendChild(newOption("default"));
+            //HTML.groups.appendChild(newOption("default"));
 
             loadGroupObject(defaultGroup);
         } else {
-            for ( key in site.groups ) {
+            /*for ( key in site.groups ) {
                 HTML.groups.appendChild(newOption(key));
-            }
+            }*/
             loadGroupObject(site.groups["default"]);
         }
     });
+}
+
+function newPage(name, index){
+    return {
+        name: name,
+        index: index,
+        rule_sets: {}
+    };
 }
 
 function saveRule(rule){

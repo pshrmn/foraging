@@ -4,7 +4,7 @@ var marginBottom;
 // add the interface first
 (function addInterface(){
     var div = noSelectElement("div");
-    div.setAttribute("id", "collectjs");
+    div.classList.add("collectjs");
     div.innerHTML = {{src/collect.html}};
     document.body.appendChild(div);
     addNoSelect(div.querySelectorAll("*"));
@@ -116,6 +116,12 @@ var HTML = {
         rangeHolder: document.querySelector("#ruleItems .range"),
         follow: document.getElementById("ruleFollow"),
         followHolder: document.querySelector("#ruleItems .follow")
+    },
+    preview: {
+        name: document.getElementById("previewName"),
+        selector: document.getElementById("previewselector"),
+        capture: document.getElementById("previewCapture"),
+        contents: document.getElementById("previewContents"),
     },
     groups: document.getElementById("allGroups"),
     preview: document.getElementById("rulePreview"),
@@ -251,17 +257,14 @@ Interface.setup();
 
 function resetInterface(){
     clearClass("queryCheck");
-    HTML.count.textContent = "";
-
-    Family.remove();
     
-    // ruleItems
-    HTML.ruleHTML.innerHTML = "";
-    
-    resetForm();
+    resetRulesView();
+    resetPreviewView();
 }
 
-function resetForm(){
+function resetRulesView(){
+    Family.remove();
+    
     // reset form
     HTML.form.name.value = "";
     HTML.form.capture.textContent = "";
@@ -273,8 +276,15 @@ function resetForm(){
     HTML.form.followHolder.style.display = "none";
     HTML.form.rangeHolder.style.display = "none";
 
-    // divs to hide
-    //HTML.ruleItems.style.display = "none";
+    HTML.count.textContent = "";
+    HTML.ruleHTML.innerHTML = "";
+}
+
+function resetPrevieView(){
+    HTML.preview.name.textContent = "";
+    HTML.preview.selector.textContent = "";
+    HTML.preview.capture.textContent = "";
+    HTML.preview.contents.innerHTML = "";
 }
 
 /******************
@@ -452,7 +462,7 @@ function capturePreview(event){
 
     } else {
         HTML.form.capture.textContent ="";
-        HTML.preview.innerHTML = "No selector/attribute to capture selected";
+        //HTML.preview.innerHTML = "No selector/attribute to capture selected";
         HTML.form.follow.disabled = true;
         HTML.form.followHolder.style.display = "none";
         this.classList.remove("selected");
@@ -624,7 +634,7 @@ function generatePreviewElements(capture, elements) {
     if ( previewHTML === "" ) {
         previewHTML = "No selector/attribute to capture selected";
     }
-    HTML.preview.innerHTML = previewHTML;
+    //HTML.preview.innerHTML = previewHTML;
 }
 
 /*
@@ -1110,7 +1120,7 @@ function setOptions(options){
 /***********************
     STORAGE HELPERS
 ***********************/
-/*
+
 function addNode(name){
     return {
         name: name,
@@ -1118,7 +1128,7 @@ function addNode(name){
         children: {}
     };
 }
-*/
+
 /*
 rejects if name contains characters not allowed in filename: <, >, :, ", \, /, |, ?, *
 */
@@ -1386,7 +1396,7 @@ function findRuleFromGroup(name, element, nodes){
 sets a rules name/capture/selector and follow/multiple/range if they exist
 */
 function loadSavedRule(rule, element){
-    resetForm();
+    resetRulesView();
 
     Interface.editing = rule.name;
     Interface.editingElement = element;
