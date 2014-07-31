@@ -39,8 +39,7 @@ Object that controls the functionality of the interface
 var Interface = {
     setup: function(){        
         loadOptions();
-        setupHostname();
-        setupTabs();
+        //setupHostname();
         this.events();
     },
     /*
@@ -78,42 +77,28 @@ var Interface = {
         Collect.allElements = [];
     },
     events: function(){
+        // tabs
+        tabEvents();
+
+        //views
+        createViewEvents();
+        ruleViewEvents();
+        optionsViewEvents();
+
         // preview
         idEvent("clearSelector", "click", removeSelectorEvent);
 
-        // rules
-        HTML.form.range.addEventListener("blur", applyRuleRange, false);
-        HTML.form.multiple.addEventListener("change", function(event){
-            HTML.form.range.disabled = !HTML.form.range.disabled;
-            if ( HTML.form.disabled ) {
-                HTML.form.rangeHolder.style.display = "none";
-            } else {
-                HTML.form.rangeHolder.style.display = "block";
-            }
-            
-        });
-
-        idEvent("saveRule", "click", saveRuleEvent);
-        idEvent("previewSelector", "click", previewSelectorEvent);
-        idEvent("ruleCyclePrevious", "click", showPreviousElement);
-        idEvent("ruleCycleNext", "click", showNextElement);
+        /*
         idEvent("uploadRules", "click", function(event){
             uploadRules();
         });
-
-        // tabs
-        idEvent("addIndex", "click", addIndexEvent);
-        idEvent("refreshCollect", "click", refreshElements);
-        idEvent("closeCollect", "click", removeInterface);
 
         // groups
         idEvent("newGroup", "click", newGroupEvent);
         idEvent("deleteGroup", "click", deleteGroupEvent);
         idEvent("allGroups", "change", loadGroupEvent);
         idEvent("allSets", "change", loadSetEvent);
-
-        // options
-        idEvent("ignore", "change", toggleTabOption);
+        */
     }
 };
 
@@ -139,12 +124,6 @@ var HTML = {
     ruleItems: document.getElementById("ruleItems"),
     sets: document.getElementById("allSets"),
     saved: document.getElementById("savedRuleHolder"),
-    tabs: {
-        parent: document.getElementById("parentTab"),
-        next: document.getElementById("nextTab"),
-        index: document.getElementById("indexTab"),
-        add: document.getElementById("addIndex")
-    }
 };
 
 // Family derived from clicked element in the page
@@ -269,69 +248,6 @@ var Family = {
 
 Interface.setup();
 
-function setupTabs(){
-    Interface.parent = toggleTab("parent", HTML.tabs.parent, toggleSetParent);
-    Interface.next = toggleTab("next", HTML.tabs.next, toggleSetNext);
-
-    var eles = Array.prototype.slice.call(document.querySelectorAll(".tab.toggle"));
-    for ( var i=0, len=eles.length; i<len; i++ ) {
-        eles[i].addEventListener("click", toggleGroups, false);
-    }
-}
-
-function toggleTab(property, parent, toggleFn){
-    var nameTag = document.createTextNode(property[0].toUpperCase() + property.slice(1)),
-        selectorName = document.createElement("span"),
-        toggleable = document.createElement("button"),
-        obj = {
-            selector: undefined,
-            set: function(selector){
-                if ( selector === undefined || selector === "" ) {
-                    this.remove();
-                    return;
-                }
-                this.selector = selector;
-                selectorName.textContent = parentName(selector);
-                selectorName.setAttribute("title", selector);
-                toggleable.textContent = "×";
-                toggleable.setAttribute("title", "remove " + property + "selector");
-            },
-            remove: function(){
-                this.selector = undefined;
-                selectorName.textContent = "";
-                selectorName.removeAttribute("title");
-                toggleable.textContent = "+";
-                toggleable.setAttribute("title", "add " + property + "selector");
-            },
-            toggle: function(event){
-                event.preventDefault();
-                var clear = true;
-                if ( !obj.selector ){
-                    var selector = Family.selector();
-                    if ( selector !== "") {
-                        obj.set(selector);
-                        clear = false;
-                    }
-                }
-                if ( clear ) {
-                    obj.remove();
-                }
-                toggleFn(obj.selector);
-                resetInterface();
-                Interface.turnOn();
-            }
-        };
-    toggleable.classList.add("noSelect");
-    selectorName.classList.add("smallSelector", "noSelect");
-
-    toggleable.textContent = "+";
-    parent.appendChild(nameTag);
-    parent.appendChild(selectorName);
-    parent.appendChild(toggleable);
-
-    toggleable.addEventListener("click", obj.toggle, false);
-    return obj;
-}
 
 function resetInterface(){
     clearClass("queryCheck");
@@ -358,12 +274,73 @@ function resetForm(){
     HTML.form.rangeHolder.style.display = "none";
 
     // divs to hide
-    HTML.ruleItems.style.display = "none";
+    //HTML.ruleItems.style.display = "none";
 }
 
 /******************
     EVENTS
 ******************/
+
+// encapsulate event activeTabEvent to keep track of current tab/view
+function tabEvents(){
+    // querySelectorAll because getElementsByClassName could overlap with native elements
+    var tabs = document.querySelectorAll(".tabHolder .tab"),
+        currentTab = document.querySelector(".tab.active"),
+        currentView = document.querySelector(".view.active");
+    
+    for ( var i=0, len=tabs.length; i<len; i++ ) {
+        tabs[i].addEventListener("click", activeTabEvent, false);
+    }
+
+
+    function activeTabEvent(event){
+        var target = this.dataset.for,
+            view = document.getElementById(target);
+        // fail if either data-for or related element is undefined
+        if ( !target || !view || this === currentTab) {
+            return;
+        }
+        currentTab.classList.remove("active");
+        currentView.classList.remove("active");
+
+        currentTab = this;
+        currentView = view;
+        currentTab.classList.add("active");
+        currentView.classList.add("active");
+    }
+
+    idEvent("refreshCollect", "click", refreshElements);
+    idEvent("closeCollect", "click", removeInterface);
+}
+
+function ruleViewEvents(){
+    HTML.form.range.addEventListener("blur", applyRuleRange, false);
+    HTML.form.multiple.addEventListener("change", function(event){
+        HTML.form.range.disabled = !HTML.form.range.disabled;
+        if ( HTML.form.disabled ) {
+            HTML.form.rangeHolder.style.display = "none";
+        } else {
+            HTML.form.rangeHolder.style.display = "block";
+        }
+        
+    });
+
+    idEvent("saveRule", "click", saveRuleEvent);
+    idEvent("previewSelector", "click", previewSelectorEvent);
+    idEvent("ruleCyclePrevious", "click", showPreviousElement);
+    idEvent("ruleCycleNext", "click", showNextElement);
+}
+
+function createViewEvents(){
+    idEvent("createGroup", "click", undefined);
+    idEvent("createPage", "click", undefined);
+    idEvent("createSet", "click", undefined);
+}
+
+function optionsViewEvents(){
+    idEvent("ignore", "change", toggleTabOption);
+}
+
 /*
 add .collectHighlight to an element on mouseenter
 */
@@ -543,10 +520,6 @@ function deleteRuleEvent(event){
     var parent = this.parentElement,
         name = parent.dataset.name;
     deleteRule(name, parent);
-}
-
-function addIndexEvent(event){
-    toggleIndex();
 }
 
 function newGroupEvent(event){
@@ -853,10 +826,8 @@ function setupHostname(){
         if ( !site ) {
             var defaultGroup = {
                 name: "default",
-                index_urls: {},
-                nodes: {
-                    "default": addNode("default")
-                }
+                pages: [newPage("default", false)],
+                urls: []
             };
             storage.sites[host] = {
                 site: host,
@@ -866,16 +837,24 @@ function setupHostname(){
             };
             chrome.storage.local.set({'sites': storage.sites});
 
-            HTML.groups.appendChild(newOption("default"));
+            //HTML.groups.appendChild(newOption("default"));
 
             loadGroupObject(defaultGroup);
         } else {
-            for ( key in site.groups ) {
+            /*for ( key in site.groups ) {
                 HTML.groups.appendChild(newOption(key));
-            }
+            }*/
             loadGroupObject(site.groups["default"]);
         }
     });
+}
+
+function newPage(name, index){
+    return {
+        name: name,
+        index: index,
+        rule_sets: {}
+    };
 }
 
 function saveRule(rule){
@@ -927,32 +906,6 @@ function deleteRule(name, element){
         chrome.storage.local.set({'sites': sites});
         element.parentElement.removeChild(element);
     });  
-}
-
-/*
-toggle whether the current page's url represents an index page for the crawler.
-saves index page in chrome.storage
-*/
-function toggleIndex(){
-    chrome.storage.local.get("sites", function(storage){
-        var host = window.location.hostname,
-            url = window.location.href,
-            group = Collect.currentGroup;
-        // adding
-        if ( !HTML.tabs.index.classList.contains("set")) {
-            toggleIndexPage(true);
-            storage.sites[host].groups[group].index_urls[url] = true;
-        }
-        // removing
-        else {
-            toggleIndexPage(false);
-            if ( storage.sites[host].groups[group].index_urls[url] ) {
-                delete storage.sites[host].groups[group].index_urls[url];    
-            }
-        }
-        chrome.storage.local.set({"sites": storage.sites});
-    });
-
 }
 
 function uploadRules(){
@@ -1157,7 +1110,7 @@ function setOptions(options){
 /***********************
     STORAGE HELPERS
 ***********************/
-
+/*
 function addNode(name){
     return {
         name: name,
@@ -1165,7 +1118,7 @@ function addNode(name){
         children: {}
     };
 }
-
+*/
 /*
 rejects if name contains characters not allowed in filename: <, >, :, ", \, /, |, ?, *
 */
@@ -1204,23 +1157,8 @@ function loadGroupObject(group){
     }
 
     var turnOn = group.index_urls[window.location.href] !== undefined;
-    toggleIndexPage(turnOn);
     
     Interface.turnOn();
-}
-
-function toggleIndexPage(on){
-    if ( on ) {
-        Collect.indexPage = true;
-        HTML.tabs.next.classList.remove("hidden");
-        HTML.tabs.index.classList.add("set");
-        HTML.tabs.add.checked = true;
-    } else {
-        Collect.indexPage = false;
-        HTML.tabs.next.classList.add("hidden");
-        HTML.tabs.index.classList.remove("set");
-        HTML.tabs.add.checked = false;
-    }   
 }
 
 /*

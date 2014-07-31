@@ -4,53 +4,59 @@ A Chrome extension that allows you to get information necessary to crawl a page.
 
 #####Rules Format
 
-For each site (determined by window.location.host), you can have multiple groups. A group is made up of a list of index url's that are used to start getting the data from, and a basic tree of rule sets for different pages. A rule set is either a ParentSet, which has a parent selector and returns an array of data objects given a url, or a regular Set, which returns one data object. The name of a Set corresponds to the name of another rule, which provides the url for that rule set (ie. a rule named URL with follow=true and capture=attr-href will have a corresponding Set named URL)
+A rule set is a group of rules on a page. A rule consists of a name (semi-equivalent to a row in a tuple of a relational database), a selector to access the element in the page, what part of the element o capture (an attribute or text).
 
-    sites: {
-        example.com: {
-            groups: {
-                name: {
-                    name: name,
-                    index_urls: {...},
-                    nodes: {
-                        parent: ... (optional),
-                        rules: {
-                            name: {
-                                name: ...,
-                                capture: ...,
-                                selector: ...,
-                                range: ... (optional)
-                            },
-                            ...
-                        },
-                        children: {
-                            <node>
-                        }
-                    }
-                },
-                ...
-            }
-        },
-        ...
-    }
-
-A node is:
-
-    {
-        parent (optional): string,
+    rule_set = {
+        name: <string>,
         rules: {
+            name: {
+                name: <string>,
+                selector: <string>,
+                capture: <string>,
+                range: <int> (optional)
+            },
             ...
         },
-        children: {
-            name: <node>
-        }
+        parent: parent (optional)
     }
 
 
+A parent is a selector for how to match an object within the DOM. This is useful if there are multiple sets within a page
 
-#####Sets
-The "default" set is called on index_urls, other sets are references to rules which capture the href from an anchor.
-For example, a rule with the name "product_page" that captures "attr-href" will create a set called "product_page" and the data for that page will be attained by making a get call to the captured href url.
+    parent = {
+        selector: <string>,
+        range: <int> (optional)
+    }
+
+A page can have multiple sets in it, in case parts of it require a parent selector while others do not
+
+    page = [
+        {
+            name: <string>
+            rules: {...},
+            parent: parent
+        },
+        {
+            name: <string>,
+            rules: {...}
+        }
+    ]
+
+A group is an array made up of one or more pages whose data are all related. The URL to get the second page is determined by a rule in the page1 page that has the name page2
+
+    group = {
+        name: <string>
+        pages: [page1, page2],
+        urls: []
+    }
+
+And a site can have multiple, independent groups, each of which is uploaded individually to the server
+
+    site = {
+        groups: {
+            group1: {...},
+            group2: {...}
+        }
 
 #####How to Use
 To pack extension and use:

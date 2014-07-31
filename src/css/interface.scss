@@ -39,6 +39,93 @@ body{
         box-sizing: border-box;
     }
 
+    .tabHolder{
+        position: relative;
+    }
+
+    .tabs{
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        height: 30px;
+        padding: 0;
+        margin: 0;
+        word-spacing: -6px;
+        width: 100%;
+        background: transparent;
+        
+        .tab:hover{
+            background: $dark-gold;
+        }
+
+        .tab.active:hover{
+            background: $light-gray;
+        }
+
+        .tab{
+            background: $gold;
+            border-top: 1px solid $dark-gray;
+            border-right: 1px solid $dark-gray;
+            word-spacing: normal;
+            display: inline-block;
+            padding: 0 5px;
+            height: 30px;
+            line-height: 30px;
+            cursor: pointer;
+
+            div{
+                display: inline-block;
+            }
+
+            button{
+                background: transparent;
+                font-size: 100%;
+                line-height: 1;
+                border: 0;
+                cursor: pointer;
+                height: 18px;
+                font-family: sans-serif;
+                vertical-align: inherit;
+            }
+
+            label{
+                cursor: pointer;
+            }
+
+            .smallSelector{
+                font-size: 0.75em;
+                margin: 0 3px;
+            }
+        }
+
+        .toggle{
+            cursor: pointer;
+        }
+
+        .tab.active{
+            background: $white;
+        }
+
+        .tab.set{
+            background: $light-green;
+        }
+    }
+
+    .views{
+        box-sizing: border-box;        
+        min-height: 250px;
+        padding: 15px;
+
+        .view{
+            display: none;
+        }
+
+        .view.active{
+            display: block;
+        }
+    }
+
+
     button{
         padding: 5px;
         height: 100%;
@@ -76,112 +163,6 @@ body{
         font-size: 1em;
         cursor: pointer;
         font-weight: normal;
-    }
-
-    .topbarHolder{
-        position: relative;
-        width: 100%
-    }
-
-    .collectTopbar{
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        font-size: 16px;
-        width: 100%
-
-        select{
-            font-size: 16px;
-        }
-    }
-
-    .tabs{
-        height: 30px;
-        padding: 0;
-        margin: 0;
-        word-spacing: -6px;
-        width: 100%;
-        background: transparent;
-
-        .tab{
-            background: $gold;
-            border-top: 1px solid $dark-gray;
-            border-right: 1px solid $dark-gray;
-        }
-
-        .tab.set{
-            background: $light-green;
-        }
-
-        .toggle{
-            cursor: pointer;
-        }
-        
-        .toggle:hover{
-            background: $dark-gold;
-        }
-
-        .tab{
-            word-spacing: normal;
-            display: inline-block;
-            padding: 0 5px;
-            height: 30px;
-            line-height: 30px;
-
-            div{
-                display: inline-block;
-            }
-
-            button{
-                background: transparent;
-                font-size: 100%;
-                line-height: 1;
-                border: 0;
-                cursor: pointer;
-                height: 18px;
-                font-family: sans-serif;
-                vertical-align: inherit;
-            }
-
-            label{
-                cursor: pointer;
-            }
-
-            .smallSelector{
-                font-size: 0.75em;
-                margin: 0 3px;
-            }
-        }
-
-        .toggle{
-            cursor: pointer;
-        }
-
-        .tab.active{
-            height: 31px;
-            background: $white;
-        }
-
-        .tab.hidden{
-            display: none;
-        }
-    }
-
-    .groups{
-        background: $white;
-
-        .group{
-            border-color: $dark-gray;
-            border-style: solid;
-            border-width: 1px 1px 0 0;
-            display: none;
-            min-width: 100%;
-            padding: 15px;
-        }
-
-        .show{
-            display: block;
-        }    
     }
 
     .rules{
@@ -237,7 +218,6 @@ body{
     }
 
     .items{
-        display: none;
         font-size: 16px;
         color: $black;
 

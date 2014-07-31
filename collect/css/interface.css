@@ -21,6 +21,62 @@ body {
   #collectjs * {
     color: black;
     box-sizing: border-box; }
+  #collectjs .tabHolder {
+    position: relative; }
+  #collectjs .tabs {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 30px;
+    padding: 0;
+    margin: 0;
+    word-spacing: -6px;
+    width: 100%;
+    background: transparent; }
+    #collectjs .tabs .tab:hover {
+      background: #e0bd00; }
+    #collectjs .tabs .tab.active:hover {
+      background: #efefef; }
+    #collectjs .tabs .tab {
+      background: gold;
+      border-top: 1px solid #444444;
+      border-right: 1px solid #444444;
+      word-spacing: normal;
+      display: inline-block;
+      padding: 0 5px;
+      height: 30px;
+      line-height: 30px;
+      cursor: pointer; }
+      #collectjs .tabs .tab div {
+        display: inline-block; }
+      #collectjs .tabs .tab button {
+        background: transparent;
+        font-size: 100%;
+        line-height: 1;
+        border: 0;
+        cursor: pointer;
+        height: 18px;
+        font-family: sans-serif;
+        vertical-align: inherit; }
+      #collectjs .tabs .tab label {
+        cursor: pointer; }
+      #collectjs .tabs .tab .smallSelector {
+        font-size: 0.75em;
+        margin: 0 3px; }
+    #collectjs .tabs .toggle {
+      cursor: pointer; }
+    #collectjs .tabs .tab.active {
+      background: white; }
+    #collectjs .tabs .tab.set {
+      background: #bddbce; }
+  #collectjs .views {
+    box-sizing: border-box;
+    min-height: 250px;
+    padding: 15px; }
+    #collectjs .views .view {
+      display: none; }
+    #collectjs .views .view.active {
+      display: block; }
   #collectjs button {
     padding: 5px;
     height: 100%;
@@ -50,73 +106,6 @@ body {
     font-size: 1em;
     cursor: pointer;
     font-weight: normal; }
-  #collectjs .topbarHolder {
-    position: relative;
-    width: 100%; }
-  #collectjs .collectTopbar {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    font-size: 16px;
-    width: 100% select;
-      width-font-size: 16px; }
-  #collectjs .tabs {
-    height: 30px;
-    padding: 0;
-    margin: 0;
-    word-spacing: -6px;
-    width: 100%;
-    background: transparent; }
-    #collectjs .tabs .tab {
-      background: gold;
-      border-top: 1px solid #444444;
-      border-right: 1px solid #444444; }
-    #collectjs .tabs .tab.set {
-      background: #bddbce; }
-    #collectjs .tabs .toggle {
-      cursor: pointer; }
-    #collectjs .tabs .toggle:hover {
-      background: #e0bd00; }
-    #collectjs .tabs .tab {
-      word-spacing: normal;
-      display: inline-block;
-      padding: 0 5px;
-      height: 30px;
-      line-height: 30px; }
-      #collectjs .tabs .tab div {
-        display: inline-block; }
-      #collectjs .tabs .tab button {
-        background: transparent;
-        font-size: 100%;
-        line-height: 1;
-        border: 0;
-        cursor: pointer;
-        height: 18px;
-        font-family: sans-serif;
-        vertical-align: inherit; }
-      #collectjs .tabs .tab label {
-        cursor: pointer; }
-      #collectjs .tabs .tab .smallSelector {
-        font-size: 0.75em;
-        margin: 0 3px; }
-    #collectjs .tabs .toggle {
-      cursor: pointer; }
-    #collectjs .tabs .tab.active {
-      height: 31px;
-      background: white; }
-    #collectjs .tabs .tab.hidden {
-      display: none; }
-  #collectjs .groups {
-    background: white; }
-    #collectjs .groups .group {
-      border-color: #444444;
-      border-style: solid;
-      border-width: 1px 1px 0 0;
-      display: none;
-      min-width: 100%;
-      padding: 15px; }
-    #collectjs .groups .show {
-      display: block; }
   #collectjs .rules .collectGroup {
     margin-right: 10px;
     padding: 3px 0 3px 3px;
@@ -146,7 +135,6 @@ body {
     padding: 2px 3px;
     cursor: pointer; }
   #collectjs .items {
-    display: none;
     font-size: 16px;
     color: black; }
     #collectjs .items .rule {
