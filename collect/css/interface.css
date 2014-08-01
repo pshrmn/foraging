@@ -133,35 +133,8 @@ body {
   .collectjs .items {
     font-size: 16px;
     color: black; }
-    .collectjs .items .rule {
-      height: 20px;
-      font-size: 1em;
-      margin-bottom: 5px;
-      border: 0;
-      overflow: visible; }
-      .collectjs .items .rule span {
-        min-width: 50px; }
-      .collectjs .items .rule label {
-        width: 75px; }
-      .collectjs .items .rule label, .collectjs .items .rule input {
-        margin: 0;
-        display: inline-block; }
-    .collectjs .items .rule.follow, .collectjs .items .rule.range {
-      display: none; }
-    .collectjs .items input.error {
-      border-color: #c91900;
-      border-style: solid; }
-    .collectjs .items span.error {
-      border-bottom: 1px solid #c91900; }
-    .collectjs .items input[type=text] {
-      width: 150px;
-      border-width: 0 0 1px; }
-    .collectjs .items #rulesForm, .collectjs .items .modifiers {
+    .collectjs .items .column {
       display: inline-block; }
-    .collectjs .items #rulesForm {
-      width: 25%;
-      min-width: 250px;
-      border-right: 1px dashed #444444; }
     .collectjs .items .modifiers {
       vertical-align: top;
       padding-left: 15px;
@@ -215,8 +188,38 @@ body {
     background: #efefef; }
 
 /* rulesView */
-#ruleAlert {
-  font-size: 0.75em; }
+#ruleForm, #parentForm {
+  width: 25%;
+  min-width: 250px;
+  border-right: 1px dashed #444444; }
+  #ruleForm input.error, #parentForm input.error {
+    border-color: #c91900;
+    border-style: solid; }
+  #ruleForm span.error, #parentForm span.error {
+    border-bottom: 1px solid #c91900; }
+  #ruleForm input[type=text], #parentForm input[type=text] {
+    width: 150px;
+    border-width: 0 0 1px; }
+  #ruleForm .rule, #parentForm .rule {
+    height: 20px;
+    font-size: 1em;
+    margin-bottom: 5px;
+    border: 0;
+    overflow: visible; }
+    #ruleForm .rule span, #parentForm .rule span {
+      min-width: 50px; }
+    #ruleForm .rule label, #parentForm .rule label {
+      width: 75px; }
+    #ruleForm .rule label, #parentForm .rule label, #ruleForm .rule input, #parentForm .rule input {
+      margin: 0;
+      display: inline-block; }
+  #ruleForm .rule.follow, #parentForm .rule.follow, #ruleForm .rule.range, #parentForm .rule.range {
+    display: none; }
+
+#parentForm {
+  display: none; }
+  #parentForm .rule.range {
+    display: block; }
 
 /* Selector */
 #selectorHolder {

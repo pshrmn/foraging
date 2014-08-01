@@ -218,54 +218,8 @@ body{
         font-size: 16px;
         color: $black;
 
-        .rule{
-            height: 20px;
-            font-size: 1em;
-            margin-bottom: 5px;
-            border: 0;
-            overflow: visible;
-
-            span{
-                min-width: 50px;
-            }
-
-            label{
-                width: 75px;
-            }
-
-            label, input{
-                margin: 0;
-                display: inline-block;
-            }
-        }
-
-        .rule.follow, .rule.range{
-            display: none;
-        }
-
-        input.error{
-            border-color: $red;
-            border-style: solid;
-        }
-
-        span.error{
-            border-bottom: 1px solid $red;
-        }
-
-        
-        input[type=text]{
-            width: 150px;
-            border-width: 0 0 1px;
-        }
-
-        #rulesForm, .modifiers{
+        .column{
             display: inline-block;
-        }
-
-        #rulesForm{
-            width: 25%;
-            min-width: 250px;
-            border-right: 1px dashed $dark-gray;
         }
 
         .modifiers{
@@ -352,8 +306,60 @@ body{
 }
 
 /* rulesView */
-#ruleAlert{
-    font-size: 0.75em;
+#ruleForm{
+    width: 25%;
+    min-width: 250px;
+    border-right: 1px dashed $dark-gray;
+
+    input.error{
+        border-color: $red;
+        border-style: solid;
+    }
+
+    span.error{
+        border-bottom: 1px solid $red;
+    }
+
+    
+    input[type=text]{
+        width: 150px;
+        border-width: 0 0 1px;
+    }
+
+
+    .rule{
+        height: 20px;
+        font-size: 1em;
+        margin-bottom: 5px;
+        border: 0;
+        overflow: visible;
+
+        span{
+            min-width: 50px;
+        }
+
+        label{
+            width: 75px;
+        }
+
+        label, input{
+            margin: 0;
+            display: inline-block;
+        }
+    }
+
+    .rule.follow, .rule.range{
+        display: none;
+    }
+}
+
+#parentForm{
+    @extend #ruleForm;
+    display: none;
+
+    .rule.range{
+        display: block;
+    }
 }
 
 /* Selector */

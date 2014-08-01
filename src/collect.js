@@ -4,6 +4,7 @@
 Notes:
 need to fix editing a rule once everything is up and running
 Interface.parent refers to parent tab from previous iteration, will need to be replaced
+search for //update!
 */
 
 var marginBottom;
@@ -97,24 +98,9 @@ var Interface = {
         tabEvents();
 
         //views
-        createViewEvents();
         ruleViewEvents();
         optionsViewEvents();
-
-        // preview
-        idEvent("clearSelector", "click", removeSelectorEvent);
-
-        /*
-        idEvent("uploadRules", "click", function(event){
-            uploadRules();
-        });
-
-        // groups
-        idEvent("newGroup", "click", newGroupEvent);
-        idEvent("deleteGroup", "click", deleteGroupEvent);
-        */
-        idEvent("groupSelect", "change", loadGroupEvent);
-        idEvent("pageSelect", "change", loadPageEvent);
+        groupViewEvents();
     }
 };
 
@@ -152,6 +138,18 @@ var HTML = {
     ruleHTML: document.getElementById("ruleHTML"),
     ruleItems: document.getElementById("ruleItems"),
     saved: document.getElementById("savedRuleHolder"),
+    tabs: {
+        rule: document.getElementById("ruleTab"),
+        groups: document.getElementById("groupsTab"),
+        preview: document.getElementById("previewTab"),
+        options: document.getElementById("optionsTab")
+    },
+    views: {
+        rule: document.getElementById("ruleView"),
+        groups: document.getElementById("groupsView"),
+        preview: document.getElementById("previewView"),
+        options: document.getElementById("optionsView")
+    }
 };
 
 // Family derived from clicked element in the page
@@ -176,6 +174,7 @@ var Family = {
         Family.family = sf;
         sf.update();
         HTML.ruleItems.style.display = "block";
+        showTab(HTML.tabs.rule);
     },
     remove: function(){
         if ( this.family ) {
@@ -335,22 +334,6 @@ function tabEvents(){
     idEvent("closeCollect", "click", removeInterface);
 }
 
-function showTab(tab){
-    var target = tab.dataset.for,
-        view = document.getElementById(target);
-    // fail if either data-for or related element is undefined
-    if ( !target || !view || tab === Interface.tabs.tab) {
-        return;
-    }
-    Interface.tabs.tab.classList.remove("active");
-    Interface.tabs.view.classList.remove("active");
-
-    Interface.tabs.tab = tab;
-    Interface.tabs.view = view;
-    Interface.tabs.tab.classList.add("active");
-    Interface.tabs.view.classList.add("active");
-}
-
 function ruleViewEvents(){
     HTML.form.range.addEventListener("blur", applyRuleRange, false);
     HTML.form.multiple.addEventListener("change", function(event){
@@ -364,19 +347,25 @@ function ruleViewEvents(){
     });
 
     idEvent("saveRule", "click", saveRuleEvent);
-    //idEvent("previewSelector", "click", previewSelectorEvent);
     idEvent("ruleCyclePrevious", "click", showPreviousElement);
     idEvent("ruleCycleNext", "click", showNextElement);
-}
-
-function createViewEvents(){
-    idEvent("createGroup", "click", newGroupEvent);
-    //idEvent("createPage", "click", undefined);
-    idEvent("createSet", "click", undefined);
+    idEvent("clearSelector", "click", removeSelectorEvent);
 }
 
 function optionsViewEvents(){
     idEvent("ignore", "change", toggleTabOption);
+}
+
+function groupViewEvents(){
+    idEvent("createGroup", "click", newGroupEvent);
+    // don't need to create a page, those are automatically made when creating a rule that captures
+    // attr-href and follow=true
+    idEvent("createSet", "click", newRuleSetEvent);
+    idEvent("groupSelect", "change", loadGroupEvent);
+    idEvent("pageSelect", "change", loadPageEvent);
+    idEvent("uploadRules", "click", function(event){
+        uploadRules();
+    });
 }
 
 /*
@@ -567,6 +556,11 @@ function newGroupEvent(event){
     createGroup();
 }
 
+function newRuleSetEvent(event){
+    event.preventDefault();
+    createRuleSet();
+}
+
 function deleteGroupEvent(event){
     event.preventDefault();
     deleteGroup();
@@ -606,6 +600,22 @@ function toggleTabOption(event){
     EVENT HELPERS
 ***********************/
 
+function showTab(tab){
+    var target = tab.dataset.for,
+        view = document.getElementById(target);
+    // fail if either data-for or related element is undefined
+    if ( !target || !view || tab === Interface.tabs.tab) {
+        return;
+    }
+    Interface.tabs.tab.classList.remove("active");
+    Interface.tabs.view.classList.remove("active");
+
+    Interface.tabs.tab = tab;
+    Interface.tabs.view = view;
+    Interface.tabs.tab.classList.add("active");
+    Interface.tabs.view.classList.add("active");
+}
+
 function updateMatchedElements(){
     Family.match();
     var ele = Collect.elements[0];
@@ -638,6 +648,7 @@ function markCapture(){
 /*
 generate paragraphs html for the captured attribute on all of the elements and attach them to #rulePreview
 */
+//update
 function generatePreviewElements(capture, elements) {
     if ( capture === "" ) {
         return;
@@ -945,6 +956,7 @@ function createGroup(){
     var name = prompt("Group Name");
     // make sure name isn't empty string
     if ( name === "" || !legalFilename(name)) {
+        alertMessage("\"" + name + "\" is not a valid group name");
         return;
     }
     
@@ -954,7 +966,6 @@ function createGroup(){
             group;
 
         if ( !uniqueGroupName(name, site.groups)){
-            // alertMessage not yet defined
             alertMessage("a group named \"" + name + "\" already exists");
             return;
         }
@@ -970,6 +981,33 @@ function createGroup(){
         chrome.storage.local.set({'sites': storage.sites});
 
         loadGroupObject(group);
+    });
+}
+
+function createRuleSet(){
+    var name = prompt("Group Name");
+    if ( name === "" ) {
+        alertMessage("rule set name cannot be blank");
+        return;
+    }
+
+    chrome.storage.local.get("sites", function(storage){
+         var host = window.location.hostname,
+            site = storage.sites[host],
+            group = site.groups[Collect.current.group],
+            page = group.pages[Collect.current.page];
+        if ( !uniqueRuleSetName(name) ) {
+            alertMessage("a rule set named \"" + name + "\" already exists");
+            return;
+        }
+        page.sets[name] = {
+            name: name,
+            rules: {}
+        };
+        storage.sites[host].groups[Collect.current.group].pages[Collect.current.page] = page;
+        chrome.storage.local.set({'sites': storage.sites});
+
+        loadRuleSetObject(page.sets[name]);
     });
 }
 
@@ -1056,30 +1094,23 @@ function previewRule(name){
             group = Collect.current.group,
             page = Collect.current.page,
             ruleSet = Collect.current.ruleSet,
-            found = false,
-            parentSelector, selector, elements;
-        
-        function findRule(node){
-            var rule;
-            for ( var r in node.rules ) {
-                rule = node.rules[r];
-                if ( rule.name === name ) {
-                    found = true;
-                    parentSelector = node.parent ? node.parent + " ": "";
-                    selector = parentSelector + rule.selector + Collect.not,
-                    elements = document.querySelectorAll(selector);
-                    addClass("savedPreview", elements);
-                    return;
+            pages = site.groups[group].pages[page],
+            parentSelector, selector, elements, currPage, set, rule;
+        for ( var key in pages ) {
+            currPage = pages[key];
+            for ( var j=0, setLen=currPage.sets.length; j<setLen; j++ ) {
+                set = currPage.sets[j];
+                for ( var ruleName in set.rules ) {
+                    rule = set.rules[ruleName];
+                    if ( name === rule.name ) {
+                        parentSelector = set.parent ? set.parent.selector + " ": "";
+                        selector = parentSelector + rule.selector + Collect.not,
+                        elements = document.querySelectorAll(selector);
+                        addClass("savedPreview", elements);
+                    }
                 }
             }
-            for ( var child in node.children ) {
-                if ( !found ) {
-                    findRule(node.children[child]);
-                }    
-            }
         }
-
-        findRule(site.groups[group].nodes["default"]);
     });
 }
 
@@ -1222,6 +1253,11 @@ function loadGroupObject(group){
 function loadPageObject(page){
     deleteEditing();
     Collect.current.page = page.name;
+}
+
+function loadRuleSetObject(ruleSet){
+    // nothing for now
+    //update!
 }
 
 /*
@@ -1377,200 +1413,6 @@ function toggleParentFromSet(parent, nodes){
 
     return nodes;
 }
-
-/*
-iterate over all rules to find the one to be edited, then load the saved rule
-function findRuleFromGroup(name, element, nodes){
-    var foundRule;
-    function findRule(node){
-        var rule;
-        for ( var r in node.rules ) {
-            rule = node.rules[r];
-            if ( rule.name === name ) {
-                foundRule = rule;
-
-                // load set's parent for rule that you're editing
-                Collect.currentSet = node.name;
-                if ( node.parent ) {
-                    Interface.parent.set(node.parent);
-                } else {
-                    Interface.parent.remove();
-                }
-                HTML.sets.querySelector("option[value=" + node.name + "]").selected = true;
-                return;
-            }
-        }
-        if ( foundRule === undefined ) {
-            for ( var child in node.children ) {
-                findRule(node.children[child]);    
-                if ( foundRule ) {
-                    break;
-                }
-            }    
-        }
-    }
-    findRule(nodes["default"]);
-    if ( foundRule ) {
-        loadSavedRule(foundRule, element);    
-    }
-}
-*/
-
-/*
-sets a rules name/capture/selector and follow/multiple/range if they exist
-function loadSavedRule(rule, element){
-    resetRulesView();
-
-    Interface.editing = rule.name;
-    Interface.editingElement = element;
-    element.classList.add("editing");
-    Family.fromSelector(rule.selector);
-
-    HTML.ruleItems.style.display = "block";
-    HTML.form.name.value = rule.name;
-    HTML.form.selector.textContent = rule.selector;
-    HTML.form.capture.textContent = rule.capture;
-    if ( rule.which !== undefined ){
-        HTML.form.range = rule.which;
-        HTML.form.rangeHolder.style.display = "block";
-        HTML.form.multiple.checked = true;
-    }
-    // show follow if capture is attr-href, check follow if rule.follow
-    if ( rule.capture === "attr-href" ) {
-        HTML.form.follow.disabled = false;
-        HTML.form.followHolder.style.display = "block";    
-    }
-    if ( rule.follow ) {
-        HTML.form.follow.checked = true;
-    }
-    markCapture();
-}
-*/
-
-
-/*
-when saving an edited rule, handle special cases for following, make sure it isn't
-in its own set (for capture="attr-href" elements), and if changing names, make sure
-that the new name is unique
-function editRuleFromGroup(newRule, nodes){
-    var found = false,
-        setFound = false,
-        set = Collect.currentSet,
-        oldName = Interface.editing,
-        newName = newRule.name,
-        success = true,
-        childrenCopy;
-
-    function findRule(node){
-        var rule;
-        for ( var r in node.rules ) {
-            rule = node.rules[r];
-            // look for old name in case thats changing
-            if ( rule.name === oldName ) {
-                if ( node.name === Collect.currentSet ) {
-                    // handle rule.follow
-                    if ( rule.follow && !newRule.follow ) {
-                        // remove set if no longer following
-                        delete node.children[oldName];
-                        removeSet(oldName);
-                    } else if ( !rule.follow && newRule.follow ) {
-                        // create a set if now following
-                        node.children[rule.name] = addNode(newName);
-                        HTML.sets.appendChild(newOption(newName));
-                    } else if ( rule.follow && newRule.follow && oldName !== newName) {
-                        // need to rename set
-                        node.children[newName] = node.children[oldName];
-                        node.children[newName].name = newName;
-                        delete node.children[oldName];
-                        updateSetName(oldName, newName);
-                    }
-
-                    if ( oldName === newName ) {
-                        node.rules[r] = newRule;
-                    } else {
-                        updateRuleName(oldName, newName);
-                        delete node.rules[oldName];
-                        node.rules[newName] = newRule;
-                    }
-                } else {
-                    if ( rule.follow && !newRule.follow ) {
-                        delete node.children[oldName];
-                    } else if ( rule.follow && newRule.follow ) {
-                        childrenCopy = node.children[oldName];
-                        delete node.children[oldName];
-                        updateSetName(oldName, newName);
-                    }
-
-                    delete node.rules[oldName];
-                    moveSet(nodes["default"]);
-
-                    // need to move rule element to new set
-                    var holder = ruleHolderHTML(set),
-                        collectGroup = document.querySelector('.collectGroup[data-name="' + oldName + '"]');
-                    holder.appendChild(collectGroup);
-
-                    if ( oldName !== newName ) {
-                        updateRuleName(oldName, newName);
-                    }
-                }
-                found = true;
-                return;
-            }
-        }
-        
-        for ( var child in node.children ) {
-            if ( !found ) {
-                findRule(node.children[child]);
-            }    
-        }
-    }
-
-    // finds current set and adds child node to it, using childrenCopy if it exists otherwise
-    // creates a new node
-    function moveSet(node){
-        if ( node.name == set ){
-            node.rules[newName] = newRule;
-            if ( newRule.follow ) {
-                if ( childrenCopy ) {
-                    node.children[newName] = childrenCopy;
-                } else {
-                    node.children[newName] = addNode(newName);
-                    HTML.sets.appendChild(newOption(newName));
-                }
-            }
-            setFound = true;
-            return;
-        } else {
-            for ( var child in node.children ) {
-                if ( !setFound ) {
-                    moveSet(node.children[child]);
-                }
-            }
-        }
-    }
-
-    // if changing names, make sure that it is unique
-    if ( oldName !== newName && !uniqueRuleName(newName, nodes) ){
-        success = false;
-        ruleAlertMessage("Rule name is not unique");
-        HTML.form.ruleName.classList.add("error");
-    } else if ( newName === set ){
-        success = false;
-        ruleAlertMessage("Rule cannot be in its own set");
-        HTML.form.ruleName.classList.add("error");
-    }
-
-    if ( success ) {
-        findRule(nodes["default"]);
-        // no longer editing
-        deleteEditing();        
-    }
-    return {
-        "nodes": nodes,
-        "success": success
-    };
-}
-*/
 
 function deleteEditing(){
     delete Interface.editing;
