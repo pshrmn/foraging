@@ -12,9 +12,19 @@
 <div class="views">
     <div class="permanent">
         <div id="currentInfo">
+            <!--
             Group: <span id="currGroup"></span>
             Page: <span id="currPage"></span>
             Rule Set: <span id="currRuleSet"></span>
+            -->
+            Group: <select id="groupSelect"></select>
+            <button id="createGroup">+</button>
+            <button id="deleteGroup">x</button>
+            Page: <select id="pageSelect"></select>
+            <button id="deletePage">x</button>
+            Rule Set: <select id="ruleSetSelect"></select>
+            <button id="createRuleSet">+</button>
+            <button id="deleteRuleSet">x</button>
         </div>
         <div id="collectAlert"></div>
     </div>
@@ -74,15 +84,34 @@
         </div>
     </div>
     <div class="view" id="groupsView">
+        <!--
         <p>
             Group: <select id="groupSelect"></select>
             <button id="createGroup">Create Group</button>
+            <button id="deleteGroup">Delete Group</button>
         </p>
         <p>
             Page: <select id="pageSelect"></select>
+            <button id="deletePage">Delete Page</button>
         </p>
-        <button id="createSet">Create Rule Set</button>
-        <div id="ruleSetsPreview"></div>
+        <p>
+            Rule Set: <select id="ruleSetSelect"></select>
+            <button id="createRuleSet">Create Rule Set</button>
+            <button id="deleteRuleSet">Delete Rule Set</button>
+        </p>
+    -->
+        <div id="ruleSets">
+            <!-- example .ruleSet layout
+            <div class="ruleSet">
+                <h3>Name: {{name}}</h3>
+                <input type="checkbox" name="parent" />
+                <p>Rules</p>
+                <ul>
+                    <li>Rule...</li>
+                </ul>
+            </div>
+            -->
+        </div>
         <button id="uploadRules">Upload Group</button>
     </div>
     <div class="view" id="previewView">

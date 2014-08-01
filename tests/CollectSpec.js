@@ -234,49 +234,25 @@ describe("storage helpers", function(){
         });
     });
 
-    describe("nodeRules", function(){
-        var rules = {
-            "rules": {
-                "one": {},
-                "two": {"follow": true},
-                "three": {},    
-            },
-            "children": {
-                "two": {
-                    "rules": {
-                        "foo": {},
-                        "bar": {},
-                        "baz": {},    
-                    },
-                    "children": {}
-                }
-            }
-        };
-
-        it("returns a list of names of rules in the rules tree", function(){
-            var name = nodeRules(rules);
-            expect(name).toEqual(["one", "two", "three", "foo", "bar", "baz"]);
-        });
-    })
-
     describe("uniqueRuleName", function(){
         var rules = {
             "default": {
-                "rules": {
-                    "one": {},
-                    "two": {"follow": true},
-                    "three": {},    
-                },
-                "children": {
-                    "two": {
+                "sets": [
+                    {
+                        "rules": {
+                            "one": {},
+                            "two": {},
+                            "three": {},    
+                        }
+                    },
+                    {
                         "rules": {
                             "foo": {},
                             "bar": {},
                             "baz": {},    
-                        },
-                        "children": {}
+                        }
                     }
-                }    
+                ]
             }
         };
 
@@ -294,22 +270,6 @@ describe("storage helpers", function(){
 });
 
 describe("html functions", function(){    
-    describe("ruleHTML", function(){
-        var selectorObj;
-        beforeEach(function(){
-            selectorObj = {
-                name: 'link',
-                selector: 'a',
-                capture: 'attr-href'
-            };
-        });
-        it("sets savedSelector class when complete", function(){
-            var html = '<span class="noSelect collectGroup" data-name="link">' + 
-                '<span class="noSelect savedSelector">link</span><span class="noSelect deltog">×</span></span>';
-            expect(ruleHTML(selectorObj).outerHTML).toEqual(html);
-        });
-    });
-
     /*
     missing
         ruleHolderHTML
@@ -364,7 +324,7 @@ describe("html functions", function(){
 
     describe("wrapTextHTML", function(){
         it("returns proper string representation", function(){
-            var  html = '<span class="capture no_select" title="click to capture text property" ' + 
+            var  html = '<span class="capture noSelect" title="click to capture text property" ' + 
                 'data-capture="text">this is a text</span>';
             expect(wrapTextHTML("this is a text", "text")).toEqual(html);
         });

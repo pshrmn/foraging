@@ -32,17 +32,17 @@ A page can have multiple sets in it, in case parts of it require a parent select
 
     page = {
         name: <string>,
-        sets: [
-            {
+        sets: {
+            name: {
                 name: <string>
                 rules: {...},
                 parent: parent
             },
-            {
+            name: {
                 name: <string>,
                 rules: {...}
             }
-        ]
+        }
     }
 
 A group is made up of an object of pages, one of which must be a "default" page. urls is an object containing urls for the default page to crawl as keys (the object is converted to an array before uploading)
