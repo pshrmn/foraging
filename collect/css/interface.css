@@ -102,24 +102,29 @@ body {
     font-size: 1em;
     cursor: pointer;
     font-weight: normal; }
-  .collectjs .rules .collectGroup {
-    margin-right: 10px;
-    padding: 3px 0 3px 3px;
-    border: 1px solid #444444; }
-    .collectjs .rules .collectGroup span {
-      padding: 3px; }
-  .collectjs .rules .deltog {
-    cursor: pointer;
-    background: #efefef; }
-  .collectjs .rules .savedSelector {
-    cursor: pointer; }
-  .collectjs .rules .savedSelector.editing {
-    background: gold; }
-  .collectjs .rules .ruleGroup {
-    margin-bottom: 15px; }
-    .collectjs .rules .ruleGroup h2 {
-      text-decoration: underline;
-      margin: 10px 0; }
+  .collectjs .rules {
+    font-size: 12px;
+    list-style: none; }
+    .collectjs .rules h3 {
+      font-size: 1.1em; }
+    .collectjs .rules .collectGroup {
+      margin-right: 10px;
+      padding: 3px 0 3px 3px;
+      border: 1px solid #444444;
+      display: inline-block; }
+    .collectjs .rules .deltog {
+      cursor: pointer;
+      background: #efefef;
+      padding: 0 2px; }
+    .collectjs .rules .savedSelector {
+      cursor: pointer; }
+    .collectjs .rules .savedSelector.editing {
+      background: gold; }
+    .collectjs .rules .ruleGroup {
+      margin-bottom: 15px; }
+      .collectjs .rules .ruleGroup h2 {
+        text-decoration: underline;
+        margin: 10px 0; }
   .collectjs .ruleHTMLHolder .capture {
     background: #ddd;
     padding: 2px;

@@ -138,7 +138,6 @@ var HTML = {
         capture: document.getElementById("previewCapture"),
         contents: document.getElementById("previewContents"),
     },
-    ruleGroups: {},
     ruleHTML: document.getElementById("ruleHTML"),
     ruleItems: document.getElementById("ruleItems"),
     tabs: {
@@ -266,11 +265,11 @@ var Family = {
            if ( range < 0 ) {
                 Collect.elements = Array.prototype.slice.call(Collect.elements).slice(0, range);
                 Collect.elementIndex = 0;
-                addSelectorTextHTML(Collect.elements[0]);
+                setRuleHTML(Collect.elements[0]);
             } else if ( range > 0 ) {
                 Collect.elements = Array.prototype.slice.call(Collect.elements).slice(range);
                 Collect.elementIndex = 0;
-                addSelectorTextHTML(Collect.elements[0]);
+                setRuleHTML(Collect.elements[0]);
             }    
         }
     }
@@ -472,7 +471,7 @@ function showPreviousElement(event){
     var index = Collect.elementIndex,
         len = Collect.elements.length;
     Collect.elementIndex = (index=== 0) ? len-1 : index-1;
-    addSelectorTextHTML(Collect.elements[Collect.elementIndex]);
+    setRuleHTML(Collect.elements[Collect.elementIndex]);
     markCapture();
 }
 
@@ -484,7 +483,7 @@ function showNextElement(event){
     var index = Collect.elementIndex,
         len = Collect.elements.length;
     Collect.elementIndex = (index=== len-1) ? 0 : index+1;
-    addSelectorTextHTML(Collect.elements[Collect.elementIndex]);
+    setRuleHTML(Collect.elements[Collect.elementIndex]);
     markCapture();
 }
 
@@ -584,6 +583,7 @@ function editSavedRule(event){
 function deleteRuleEvent(event){
     var parent = this.parentElement,
         name = parent.dataset.name;
+
     deleteRule(name, parent);
 }
 
@@ -611,7 +611,7 @@ function updateMatchedElements(){
     Family.match();
     var ele = Collect.elements[0];
     if ( ele ) {
-        addSelectorTextHTML(ele);
+        setRuleHTML(ele);
     }
 }
 
@@ -619,7 +619,7 @@ function updateMatchedElements(){
 given an element, generate the html to represent an element and its "captureable" attributes and
 create the event listeners for it to work
 */
-function addSelectorTextHTML(element){
+function setRuleHTML(element){
     if ( element === undefined ) {
         return;
     }
@@ -711,9 +711,8 @@ function alertMessage(msg){
 add's a rule element to it's respective location in #ruleGroup
 */
 function addRule(rule, set){
-    var holder = ruleHolderHTML(set),
-        ele = ruleElement(rule);
-    holder.appendChild(ele);
+    var ele = ruleElement(rule);
+    HTML.groups.rules.appendChild(ele);
 }
 
 /***********************
@@ -1069,7 +1068,7 @@ function loadRuleSet(ele){
             group = site.groups[Collect.current.group],
             page = group.pages[Collect.current.page];
         resetInterface();
-        loadRuleSetObject(page.sets[Collect.current.ruleSet]);
+        loadRuleSetObject(page.sets[option.value]);
     });
 }
 
@@ -1120,6 +1119,12 @@ function saveRule(rule){
 
         site.groups[group].pages[page].sets[ruleSet].rules[rule.name] = rule;
 
+        // create a new page if rule.follow
+        if ( rule.follow ) {
+            site.groups[group].pages[rule.name] = newPage(rule.name);
+            HTML.groups.page.appendChild(newOption(rule.name));
+        }
+
         storage.sites[host] = site;
         chrome.storage.local.set({'sites': storage.sites});
 
@@ -1140,7 +1145,7 @@ function deleteRule(name, element){
         sites[host].groups[group].pages = deleteRuleFromSet(name, sites[host].groups[group].pages);
 
         chrome.storage.local.set({'sites': sites});
-        //element.parentElement.removeChild(element);
+        element.parentElement.removeChild(element);
     });  
 }
 
@@ -1307,13 +1312,13 @@ function loadGroupObject(group){
 
     // load the default page
     loadPageObject(group.pages.default);
-    clearRules();
 }
 
 function loadPageObject(page){
     deleteEditing();
     Collect.current.page = page.name;
     var currSet, setName;
+    HTML.groups.ruleSet.innerHTML = "";
     for ( setName in page.sets ) {
         currSet = page.sets[setName];
         HTML.groups.ruleSet.appendChild(newOption(currSet.name));
@@ -1336,15 +1341,6 @@ function loadRuleSetObject(ruleSet){
     // parent selector
     Interface.turnOn();
     Interface.update();
-}
-
-function clearRules(){
-    var curr;
-    for ( var key in HTML.ruleGroups ) {
-        curr = HTML.ruleGroups[key];
-        curr.parentElement.removeChild(curr);
-    }
-    HTML.ruleGroups = {};
 }
 
 /*
@@ -1432,34 +1428,6 @@ function deleteEditing(){
     HTML FUNCTIONS
 ***********************/
 /*
-returns an element for all rules with the same parent to append to
-*/
-function ruleHolderHTML(name){
-    var set = HTML.ruleGroups[name],
-        div, h2;
-    if ( !set ) {
-        set = noSelectElement("div");
-        h2 = noSelectElement("h2");
-        div = noSelectElement("div");
-
-        set.classList.add("ruleGroup");
-        set.dataset.name = name;
-        h2.textContent = name;
-        div.classList.add("groupRules");
-
-        set.appendChild(h2);
-        set.appendChild(div);
-
-        HTML.ruleGroups[name] = set;
-
-        HTML.saved.appendChild(set);
-    } else {
-        div = set.getElementsByTagName("div")[0];
-    }
-    return div;
-}
-
-/*
 takes an element and remove collectjs related classes and shorten text, then returns outerHTML
 */
 function cleanElement(ele){
@@ -1533,21 +1501,24 @@ function ruleSetElement(ruleSet){
     holder.appendChild(label);
     holder.appendChild(p);
     holder.appendChild(ul);
+
+    HTML.groups.rules = ul;
+
     return holder;
 }
 
 function ruleElement(rule){
-    var span = noSelectElement("span"),
+    var li = noSelectElement("li"),
         nametag = noSelectElement("span"),
         deltog = noSelectElement("span");
-    span.dataset.name = rule.name;
+    li.dataset.name = rule.name;
 
-    span.classList.add("collectGroup");
+    li.classList.add("collectGroup");
     nametag.classList.add("savedSelector");
     deltog.classList.add("deltog");
 
-    span.appendChild(nametag);
-    span.appendChild(deltog);
+    li.appendChild(nametag);
+    li.appendChild(deltog);
 
     nametag.textContent = rule.name;
     deltog.innerHTML = "&times;";
@@ -1557,5 +1528,5 @@ function ruleElement(rule){
     //nametag.addEventListener("click", editSavedRule, false);
     deltog.addEventListener("click", deleteRuleEvent, false);
     
-    return span;
+    return li;
 }

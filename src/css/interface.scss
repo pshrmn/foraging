@@ -163,19 +163,24 @@ body{
     }
 
     .rules{
+        font-size: 12px;
+        list-style: none;
+
+        h3{
+            font-size: 1.1em;
+        }
+
         .collectGroup{
             margin-right: 10px;
             padding: 3px 0 3px 3px;
             border: 1px solid $dark-gray;
-
-            span{
-                padding: 3px;
-            }
+            display: inline-block;
         }
 
         .deltog{
             cursor: pointer;
             background: $light-gray;
+            padding: 0 2px;
         }
 
         .savedSelector{
