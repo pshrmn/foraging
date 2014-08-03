@@ -273,7 +273,6 @@ describe("html functions", function(){
     /*
     missing
         ruleHolderHTML
-        selectorTextHTML
     */
 
     describe("cleanElement", function(){
@@ -322,14 +321,14 @@ describe("html functions", function(){
         });
     });
 
-    describe("wrapTextHTML", function(){
+    describe("captureAttribute", function(){
         it("returns proper string representation", function(){
-            var  html = '<span class="capture noSelect" title="click to capture text property" ' + 
+            var  html = '<span class="noSelect capture" title="click to capture text property" ' + 
                 'data-capture="text">this is a text</span>';
-            expect(wrapTextHTML("this is a text", "text")).toEqual(html);
+            expect(captureAttribute("this is a text", "text").outerHTML).toEqual(html);
         });
         it("ignores empty attributes", function(){
-            expect(wrapTextHTML("class=\"\"")).toEqual("");
+            expect(captureAttribute("class=\"\"")).toBeUndefined();
         });
     });
 

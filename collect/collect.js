@@ -141,7 +141,6 @@ var HTML = {
     ruleGroups: {},
     ruleHTML: document.getElementById("ruleHTML"),
     ruleItems: document.getElementById("ruleItems"),
-    saved: document.getElementById("savedRuleHolder"),
     tabs: {
         rule: document.getElementById("ruleTab"),
         groups: document.getElementById("groupsTab"),
@@ -433,7 +432,7 @@ function removeInterface(event){
     Interface.turnOff();
     clearClass('queryCheck');
     clearClass('collectHighlight');
-    HTML.Collect.parentElement.removeChild(HTML.interface);
+    HTML.interface.parentElement.removeChild(HTML.interface);
 
     document.body.style.marginBottom = marginBottom + "px";
 }
@@ -620,10 +619,49 @@ function updateMatchedElements(){
 given an element, generate the html to represent an element and its "captureable" attributes and
 create the event listeners for it to work
 */
-function addSelectorTextHTML(ele){
-    HTML.ruleHTML.innerHTML = selectorTextHTML(ele);
-    var capture = HTML.ruleHTML.getElementsByClassName("capture");
-    addEvents(capture, "click", capturePreview);
+function addSelectorTextHTML(element){
+    if ( element === undefined ) {
+        return;
+    }
+
+    var clone = cleanElement(element.cloneNode(true)),
+        html = clone.outerHTML,
+        attrs = clone.attributes,
+        curr, text, splitHTML, firstHalf, secondHalf, captureEle;
+    
+    for ( var i=0, len =attrs.length; i<len; i++ ) {
+        curr = attrs[i];
+        text = attributeText(curr);
+
+        splitHTML = html.split(text);
+        firstHalf = splitHTML[0];
+        secondHalf = splitHTML[1];
+
+        HTML.ruleHTML.appendChild(document.createTextNode(firstHalf));
+        captureEle = captureAttribute(text, 'attr-'+curr.name);
+        if ( captureEle) {
+            HTML.ruleHTML.appendChild(captureEle);
+        }
+        html = secondHalf;
+    }
+
+    if ( clone.textContent !== "" ) {
+        text = clone.textContent;
+        splitHTML = html.split(text);
+        firstHalf = splitHTML[0];
+        secondHalf = splitHTML[1];
+
+        HTML.ruleHTML.appendChild(document.createTextNode(firstHalf));
+        captureEle = captureAttribute(text, 'attr-'+curr.name);
+        if ( captureEle) {
+            HTML.ruleHTML.appendChild(captureEle);
+        }
+
+        html = secondHalf;
+    }
+
+    // append remaining text
+    HTML.ruleHTML.appendChild(document.createTextNode(html));
 }
 
 /*
@@ -1421,33 +1459,9 @@ function ruleHolderHTML(name){
     return div;
 }
 
-//given an element, return html for selector text with 
-//"capture"able parts wrapped
-function selectorTextHTML(element) {
-    if ( element === undefined ) {
-        return '';
-    }
-
-    var clone = cleanElement(element.cloneNode(true)),
-        html = clone.outerHTML.replace(/</g,'&lt;').replace(/>/g,'&gt;'),
-        attrs = clone.attributes,
-        curr, text;
-    
-    for ( var i=0, len =attrs.length; i<len; i++ ) {
-        curr = attrs[i];
-        text = attributeText(curr);
-        html = html.replace(text, wrapTextHTML(text, 'attr-'+curr.name));
-    }
-
-    if ( clone.textContent !== "" ) {
-        text = clone.textContent;
-        // wrap tags so the textContent and not something else is replaced
-        html = html.replace(("&gt;" + text + "&lt;"), ("&gt;" + wrapTextHTML(text, 'text') + "&lt;"));
-    }
-
-    return html;
-}
-
+/*
+takes an element and remove collectjs related classes and shorten text, then returns outerHTML
+*/
 function cleanElement(ele){
     ele.classList.remove('queryCheck');
     ele.classList.remove('collectHighlight');
@@ -1477,13 +1491,18 @@ function attributeText(attr) {
 
 //wrap an attribute or the text of an html string 
 //(used in #selector_text div)
-function wrapTextHTML(text, type){
+function captureAttribute(text, type){
     // don't include empty properties
     if ( text.indexOf('=""') !== -1 ) {
-        return '';
+        return;
     }
-    return '<span class="capture noSelect" title="click to capture ' + type + 
-        ' property" data-capture="' + type + '">' + text + '</span>';
+    var span = noSelectElement("span");
+    span.classList.add("capture");
+    span.setAttribute("title", "click to capture " + type + " property");
+    span.dataset.capture = type;
+    span.textContent = text;
+    span.addEventListener("click", capturePreview, false);
+    return span;
 }
 
 function newOption(name){
@@ -1500,7 +1519,7 @@ function ruleSetElement(ruleSet){
         p = noSelectElement("p"),
         ul = noSelectElement("ul");
     holder.classList.add("ruleSet");
-    holder.innerHTML = "<h3>Name: " + ruleSet.name + "</h3>";
+    holder.innerHTML = "<h3 class=\"noSelect\">Name: " + ruleSet.name + "</h3>";
     
     label.textContent = "Parent: ";
     label.appendChild(input);
