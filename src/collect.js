@@ -623,7 +623,7 @@ function addSelectorTextHTML(element){
     if ( element === undefined ) {
         return;
     }
-
+    HTML.ruleHTML.innerHTML = "";
     var clone = cleanElement(element.cloneNode(true)),
         html = clone.outerHTML,
         attrs = clone.attributes,
