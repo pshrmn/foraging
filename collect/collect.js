@@ -914,8 +914,6 @@ function uploadCurrentGroupRules(){
 
         group.urls = Object.keys(group.urls);
 
-        console.log(group);
-
         chrome.runtime.sendMessage({'type': 'upload', data: group});
     });
 }
@@ -1399,6 +1397,12 @@ function deletePageFromGroup(name, pages){
         pages = deletePageFromGroup(followedRules[i], pages);
     }
     delete pages[name];
+
+    // remove select
+    var option = HTML.groups.page.querySelector("option[value=" + name + "]");
+    if ( option ) {
+        option.parentElement.removeChild(option);
+    }
 
     return pages;
 }

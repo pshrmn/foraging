@@ -1398,6 +1398,12 @@ function deletePageFromGroup(name, pages){
     }
     delete pages[name];
 
+    // remove select
+    var option = HTML.groups.page.querySelector("option[value=" + name + "]");
+    if ( option ) {
+        option.parentElement.removeChild(option);
+    }
+
     return pages;
 }
 
