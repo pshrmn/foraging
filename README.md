@@ -6,7 +6,7 @@ A Chrome extension that allows you to get information necessary to crawl a page.
 
 A rule set is a group of rules on a page. A rule consists of a name (semi-equivalent to a row in a tuple of a relational database), a selector to access the element in the page, what part of the element o capture (an attribute or text).
 
-    rule_set = {
+    ruleSet = {
         name: <string>,
         rules: {
             name: {
@@ -63,10 +63,13 @@ And a site can have multiple, independent groups, each of which is uploaded indi
             group2: {...}
         }
 
-Naming of groups, pages, and rule_sets is up to the user, but there a few reserverd words.
+Naming of groups, pages, and ruleSets is up to the user, but there a few reserverd words.
 
+* default (group) - initial group when visiting a new site
 * default (page) - first page to be crawled in a group
-* next (rule_set) - a next rule_set can be added to a "default" page and contains one rule: a link with a capture of attr-href in order to generate more URLs for the default page to be applied to
+* default (ruleSet) - initial ruleSet for a page
+* default (rule) - because a page's name is based on an associated rule, cannot have a rule named default
+* next (ruleSet) - a next ruleSet can be added to a "default" page and contains one rule: a link with a capture of attr-href in order to generate more URLs for the default page to be applied to
 
 When a domain is visited (and collectjs is opened) for the first time, a "default" group with a "default" page is generated. This can be used, although creating a new group with a more relevant name is encouraged.
 

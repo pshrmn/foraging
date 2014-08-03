@@ -401,6 +401,10 @@ function groupViewEvents(){
         loadRuleSet(this);
     });
 
+    idEvent("deleteRuleSet", "click", function deleteRuleSetEvent(event){
+        event.preventDefault();
+        deleteRuleSet();
+    });
 
     idEvent("uploadRules", "click", function uploadEvent(event){
         event.preventDefault();
@@ -527,28 +531,26 @@ function saveRuleEvent(event){
         capture = HTML.form.capture.textContent,
         range = HTML.form.range.value,
         follow = HTML.form.follow.checked,
-        error = false,
-        rule = {};
+        rule;
+
+    // doing this instead of clearClass("error") in case the native page also uses the error class
+    var errors = HTML.interface.getElementsByClassName("error");
+    for ( var i=0, errorLen = errors.length; i<errorLen; i++ ) {
+        errors[i].classList.remove("error");
+    }
     HTML.alert.innerHTML = "";
-    if ( name === "") {
-        error = true;
-        alertMessage("Name needs to be filled in");
-    }
-    if ( selector === "" ) {
-        error = true;
-        alertMessage("No css selector");
-    }
-    if ( capture === "" ) {
-        error = true;
-        alertMessage("No attribute selected");
-    }
-    if ( error ) {
+
+    if ( errorCheck(name, HTML.form.name, "Name needs to be filled in") ||
+        errorCheck(selector, HTML.form.selector, "No CSS selector selected") ||
+        errorCheck(capture, HTML.form.capture, "No attribute selected") ) {
         return;
     }
     
-    rule.name = name;
-    rule.capture = capture;
-    rule.selector = selector;
+    rule = {
+        name: name,
+        capture: capture,
+        selector: selector
+    };
 
     // non-int range value converts to 0
     if ( !HTML.form.range.disabled ) {
@@ -560,6 +562,15 @@ function saveRuleEvent(event){
         rule.follow = true;
     }
     saveRule(rule);
+}
+
+function errorCheck(attr, ele, msg){
+    if ( attr === "" ) {
+        ele.classList.add("error");
+        alertMessage(msg);
+        return true;
+    }
+    return false;
 }
 
 function previewSavedRule(event){
@@ -652,7 +663,7 @@ function setRuleHTML(element){
         secondHalf = splitHTML[1];
 
         HTML.ruleHTML.appendChild(document.createTextNode(firstHalf));
-        captureEle = captureAttribute(text, 'attr-'+curr.name);
+        captureEle = captureAttribute(text, 'text');
         if ( captureEle) {
             HTML.ruleHTML.appendChild(captureEle);
         }
@@ -978,9 +989,9 @@ function deleteGroup(){
     var defaultGroup = (Collect.current.group === "default"),
         confirmed;
     if ( defaultGroup ) {
-        confirmed = confirm("Cannot delete \"default\" group. Do you want to clear out all of its rules instead?");
+        confirmed = confirm("Cannot delete \"default\" group. Do you want to clear out all of its pages instead?");
     } else {
-        confirmed = confirm("Are you sure you want to delete this group and all of its related rules?");    
+        confirmed = confirm("Are you sure you want to delete this group and all of its related pages?");    
     }
     if ( !confirmed ) {
         return;
@@ -1031,7 +1042,7 @@ function deletePage(){
     if ( defaultPage ) {
         confirmed = confirm("Cannot delete \"default\" page. Do you want to clear out all of its rule sets instead?");
     } else {
-        confirmed = confirm("Are you sure you want to delete this group and all of its related rules?");    
+        confirmed = confirm("Are you sure you want to delete this page and all of its related rule sets?");    
     }
     if ( !confirmed ) {
         return;
@@ -1083,10 +1094,13 @@ function createRuleSet(){
             site = storage.sites[host],
             group = site.groups[Collect.current.group],
             page = group.pages[Collect.current.page];
-        if ( !uniqueRuleSetName(name) ) {
+        if ( !uniqueRuleSetName(name, group.pages) ) {
             alertMessage("a rule set named \"" + name + "\" already exists");
             return;
         }
+
+        HTML.groups.ruleSet.appendChild(newOption(name));
+
         page.sets[name] = {
             name: name,
             rules: {}
@@ -1098,11 +1112,59 @@ function createRuleSet(){
     });
 }
 
+function deleteRuleSet(){
+    var defaultRuleSet = (Collect.current.ruleSet === "default"),
+        confirmed;
+    if ( defaultRuleSet ) {
+        confirmed = confirm("Cannot delete \"default\" rule set. Do you want to clear out all of its rules instead?");
+    } else {
+        confirmed = confirm("Are you sure you want to delete this rule set and all of its related rules?");    
+    }
+    if ( !confirmed ) {
+        return;
+    }
+    chrome.storage.local.get("sites", function deleteGroupChrome(storage){
+        var host = window.location.hostname,
+            site = storage.sites[host],
+            currOption = HTML.groups.ruleSet.querySelector("option:checked"),
+            currGroup = Collect.current.group,
+            currPage = Collect.current.page,
+            pages = site.groups[currGroup].pages,
+            ruleSet = pages[currPage].sets[currOption],
+            currRule, ruleName;
+        // delete any {follow: true} generated pages
+        for ( ruleName in ruleSet.rules ) {
+            currRule = ruleSet.rules[ruleName];
+            if ( currRule.follow ) {
+                deletePageFromGroup(ruleName, pages);
+            }
+        }
+        // just delete all of the rules for "default" option and return a new ruleSet
+        // Collect.current.ruleSet and the selected option are already set to default
+        if ( defaultRuleSet ) {
+            site.groups[currGroup].pages[currPage].sets["default"] = newRuleSet("default");
+        } else {
+            delete site.groups[Collect.current.group].pages[Collect.current.page].sets[currOption];
+            currOption.parentElement.removeChild(currOption);
+            Collect.current.ruleSet = "default";
+            HTML.groups.ruleSet.querySelector("option[value=default]").selected = true;
+        }
+        storage.sites[host] = site;
+        chrome.storage.local.set({'sites': storage.sites});
+        loadRuleSetObject(site.groups[currGroup].pages[currPage].sets[Collect.current.ruleSet]);
+    });
+}
+
 /***********************
     RULE STORAGE
 ***********************/
 
 function saveRule(rule){
+    if ( rule.name === "default" ) {
+        alertMessage("Rule cannot be named 'default'");
+        HTML.form.name.classList.add("error");
+        return;
+    }
     chrome.storage.local.get('sites', function saveRuleChrome(storage){
         var host = window.location.hostname,
             site = storage.sites[host],
@@ -1111,10 +1173,11 @@ function saveRule(rule){
             page = Collect.current.page,
             ruleSet = Collect.current.ruleSet;
 
-        if ( !uniqueRuleName(name, site.groups[group]) ) {
+        if ( !uniqueRuleName(name, site.groups[group].pages) ) {
             // some markup to signify you need to change the rule's name
             alertMessage("Rule name is not unique");
-            HTML.form.ruleName.classList.add("error");
+            HTML.form.name.classList.add("error");
+            return;
         }
 
         site.groups[group].pages[page].sets[ruleSet].rules[rule.name] = rule;
@@ -1384,6 +1447,10 @@ function deleteRuleFromSet(name, pages){
     return pages;
 }
 
+/*
+Find all of the {follow: true} rules in a page that is going to be deleted, and make a recursive
+call to delete those pages as well.
+*/
 function deletePageFromGroup(name, pages){
     var page = pages[name],
         followedRules;
