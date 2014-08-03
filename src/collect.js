@@ -914,7 +914,7 @@ function uploadCurrentGroupRules(){
 
         group.urls = Object.keys(group.urls);
 
-        chrome.runtime.sendMessage({'type': 'upload', data: site.groups[group]});
+        chrome.runtime.sendMessage({'type': 'upload', data: group});
     });
 }
 
