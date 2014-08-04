@@ -459,6 +459,7 @@ function removeInterface(event){
     Interface.turnOff();
     clearClass('queryCheck');
     clearClass('collectHighlight');
+    clearClass('parentGroup');
     HTML.interface.parentElement.removeChild(HTML.interface);
 
     document.body.style.marginBottom = marginBottom + "px";
@@ -606,6 +607,8 @@ function saveParentEvent(event){
     Collect.parent = parent;
 
     HTML.info.parent.textContent = "Parent: " + selector;
+
+    addParentGroup(selector);
     saveParent(parent);
     showRuleForm();
     refreshElements();
@@ -621,6 +624,7 @@ function toggleParentEvent(event){
         Collect.parent = {};
         HTML.info.parent.textContent = "";
         deleteParent();
+        clearClass("parentGroup");
         showRuleForm();
         Interface.turnOn();
     }
@@ -793,6 +797,14 @@ add's a rule element to it's respective location in #ruleGroup
 function addRule(rule, set){
     var ele = ruleElement(rule);
     HTML.groups.rules.appendChild(ele);
+}
+
+
+function addParentGroup(selector){
+    var elements = document.querySelectorAll(selector + Collect.not);
+    for ( var i=0, len=elements.length; i<len; i++ ){
+        elements[i].classList.add("parentGroup");
+    }
 }
 
 function showRuleForm(){
@@ -1540,9 +1552,11 @@ function loadRuleSetObject(ruleSet){
     if ( ruleSet.parent ) {
         HTML.info.parent.textContent ="Parent: " + ruleSet.parent.selector;
         HTML.info.parentCheckbox.checked = true;
+        addParentGroup(ruleSet.parent.selector);
     } else {
         HTML.info.parent.textContent = "";
         HTML.info.parentCheckbox.checked = false;
+        clearClass("parentGroup");
     }
     HTML.groups.ruleSetHolder.innerHTML = "";
     HTML.groups.ruleSetHolder.appendChild(ruleSetElement(ruleSet));
