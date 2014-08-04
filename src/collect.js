@@ -921,7 +921,9 @@ function uploadCurrentGroupRules(){
             site = storage.sites[host],
             group =site.groups[Collect.current.group];
 
+        // setup things for Collector
         group.urls = Object.keys(group.urls);
+        group.pages = nonEmptyPages(group.pages);
 
         chrome.runtime.sendMessage({'type': 'upload', data: group});
     });
@@ -1354,6 +1356,35 @@ function legalFilename(name){
         match = name.match(badCharacters);
     return ( match === null );
 }
+
+/*
+iterate over pages and only return pages/rule sets that contain rules
+*/
+function nonEmptyPages(pages){
+    var emptyPage = true,
+        page, ruleSet,
+        pageName, ruleSetName,
+        pageRules = {},
+        allPages = {};
+    for ( pageName in pages ) {
+        page = pages[pageName];
+        pageRules = {};
+        emptyPage = true;
+        for ( ruleSetName in page.sets ) {
+            ruleSet = page.sets[ruleSetName];
+            if ( Object.keys(ruleSet.rules).length > 0 ) {
+                pageRules[ruleSet.name] = ruleSet;
+                emptyPage = false;
+            }
+        }
+        if ( !emptyPage ) {
+            allPages[page.name] = page;
+        }
+    }
+
+    return allPages;
+}
+
 
 /*
 given a group object (rules, index_urls)
