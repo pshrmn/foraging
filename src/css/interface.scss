@@ -58,10 +58,6 @@ body{
             background: $dark-gold;
         }
 
-        .tab.active:hover{
-            background: $light-gray;
-        }
-
         .tab{
             background: $gold;
             border-top: 1px solid $dark-gray;
@@ -103,7 +99,7 @@ body{
         }
 
         .tab.active{
-            background: $white;
+            background: $light-gray;
         }
 
         .tab.set{
@@ -111,14 +107,25 @@ body{
         }
     }
 
+    .permanent{
+        font-size: 0.75em;
+        border-bottom: 1px solid $gray;
+        padding: 3px 15px;
+        background: $light-gray;
+
+        .currentInfo{
+            div{
+                display: inline-block;
+                margin-right: 15px;
+            }
+        }
+    }
+
     .views{
         box-sizing: border-box;        
         min-height: 250px;
-        padding: 15px;
+        padding: 15px;;
 
-        .permanent{
-            font-size: 0.75em;
-        }
 
         .view{
             display: none;
@@ -277,13 +284,6 @@ body{
             color: #777;
         }
     }
-
-    .currentInfo{
-        div{
-            display: inline-block;
-        }
-    }
-
 }
 
 /* tab buttons */

@@ -112,7 +112,6 @@ var Interface = {
 
 // save commonly referenced to elements
 var HTML = {
-    alert: document.getElementById("collectAlert"),
     family: document.getElementById("selectorHolder"),
     form: {
         rule: {
@@ -139,6 +138,7 @@ var HTML = {
         ruleSetHolder: document.getElementById("ruleSets")
     },
     info: {
+        alert: document.getElementById("collectAlert"),
         count: document.getElementById("currentCount"),
         parent: document.getElementById("currentParent")
     },
@@ -179,8 +179,6 @@ var Family = {
         
         var selectorElement = Interface.activeForm === "rule" ?
             HTML.form.rule.selector : HTML.form.parent.selector;
-
-        console.log(selectorElement);
 
         var sf = new SelectorFamily(this,
             Collect.parent.selector,
@@ -767,9 +765,9 @@ add the message to #ruleAlert
 function alertMessage(msg){
     var p = noSelectElement("p");
     p.textContent = msg;
-    HTML.alert.appendChild(p);
+    HTML.info.alert.appendChild(p);
     setTimeout(function(){
-        HTML.alert.removeChild(p);
+        HTML.info.alert.removeChild(p);
     }, 2000);
 }
 
@@ -801,12 +799,12 @@ function addRule(rule, set){
 function showRuleForm(){
     Interface.activeForm = "rule";
     HTML.form.parent.form.style.display = "none";
-    HTML.form.rule.form.style.display = "block";
+    HTML.form.rule.form.style.display = "inline-block";
 }
 
 function showParentForm(){
     Interface.activeForm = "parent";
-    HTML.form.parent.form.style.display = "block";
+    HTML.form.parent.form.style.display = "inline-block";
     HTML.form.rule.form.style.display = "none";
 }
 

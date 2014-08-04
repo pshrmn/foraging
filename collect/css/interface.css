@@ -35,8 +35,6 @@ body {
     background: transparent; }
     .collectjs .tabs .tab:hover {
       background: #e0bd00; }
-    .collectjs .tabs .tab.active:hover {
-      background: #efefef; }
     .collectjs .tabs .tab {
       background: gold;
       border-top: 1px solid #444444;
@@ -66,15 +64,21 @@ body {
     .collectjs .tabs .toggle {
       cursor: pointer; }
     .collectjs .tabs .tab.active {
-      background: white; }
+      background: #efefef; }
     .collectjs .tabs .tab.set {
       background: #bddbce; }
+  .collectjs .permanent {
+    font-size: 0.75em;
+    border-bottom: 1px solid #cccccc;
+    padding: 3px 15px;
+    background: #efefef; }
+    .collectjs .permanent .currentInfo div {
+      display: inline-block;
+      margin-right: 15px; }
   .collectjs .views {
     box-sizing: border-box;
     min-height: 250px;
     padding: 15px; }
-    .collectjs .views .permanent {
-      font-size: 0.75em; }
     .collectjs .views .view {
       display: none;
       padding: 5px; }
@@ -168,8 +172,6 @@ body {
       color: white; }
   .collectjs .selectorGroup:hover .deltog, .collectjs .selectorGroup:hover .onlychild, .collectjs .selectorGroup:hover .nthtype {
     color: #777; }
-  .collectjs .currentInfo div {
-    display: inline-block; }
 
 /* tab buttons */
 #refreshCollect {
