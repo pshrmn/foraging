@@ -168,6 +168,8 @@ body {
       color: white; }
   .collectjs .selectorGroup:hover .deltog, .collectjs .selectorGroup:hover .onlychild, .collectjs .selectorGroup:hover .nthtype {
     color: #777; }
+  .collectjs .currentInfo div {
+    display: inline-block; }
 
 /* tab buttons */
 #refreshCollect {

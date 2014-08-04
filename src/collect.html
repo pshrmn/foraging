@@ -11,20 +11,23 @@
 
 <div class="views">
     <div class="permanent">
-        <div id="currentInfo">
-            <!--
-            Group: <span id="currGroup"></span>
-            Page: <span id="currPage"></span>
-            Rule Set: <span id="currRuleSet"></span>
-            -->
-            Group: <select id="groupSelect"></select>
-            <button id="createGroup">+</button>
-            <button id="deleteGroup">x</button>
-            Page: <select id="pageSelect"></select>
-            <button id="deletePage">x</button>
-            Rule Set: <select id="ruleSetSelect"></select>
-            <button id="createRuleSet">+</button>
-            <button id="deleteRuleSet">x</button>
+        <div class="currentInfo">
+            <div>
+                Group: <select id="groupSelect"></select>
+                <button id="createGroup">+</button>
+                <button id="deleteGroup">x</button>
+            </div>
+            <div>
+                Page: <select id="pageSelect"></select>
+                <button id="deletePage">x</button>
+            </div>
+            <div>
+                Rule Set: <select id="ruleSetSelect"></select>
+                <button id="createRuleSet">+</button>
+                <button id="deleteRuleSet">x</button>
+            </div>
+            <div id="currentParent"></div>
+
         </div>
         <div id="collectAlert"></div>
     </div>
@@ -57,6 +60,10 @@
                     <label for="ruleFollow">Follow:</label>
                     <input id="ruleFollow" name="ruleFollow" type="checkbox" disabled="true" title="Can only follow rules that get href attribute from links" />
                 </div>
+                <div>
+                    <button id="saveRule">Save Rule</button>
+                    <button id="clearSelector">Clear</button>
+                </div>
             </form>
             <form id="parentForm" class="column">
                 <div class="rule">
@@ -66,6 +73,10 @@
                 <div class="rule range">
                     <label for="parentRange">Range:</label>
                     <input id="parentRange" name="parentRange" type="text" />
+                </div>
+                <div>
+                    <button id="saveParent">Save Parent</button>
+                    <button id="clearParent">Clear</button>
                 </div>
             </form>
             <div class="modifiers column">
@@ -77,18 +88,17 @@
                     <span id="ruleHTML"></span>
                 </div>
             </div>
-            <div id="buttonContainer">
-                <button id="saveRule">Save Rule</button>
-                <button id="clearSelector">Clear</button>
-            </div>
         </div>
     </div>
     <div class="view" id="groupsView">
         <div id="ruleSets" class="rules">
             <!-- example .ruleSet layout
             <div class="ruleSet">
-                <h3>Name: {{name}}</h3>
-                <input type="checkbox" name="parent" />
+                <h3>
+                    Name: {{name}}
+                    <input type="checkbox" name="parent" />
+                </h3>
+                <p class="selectorName">{{selector}}</p>
                 <p>Rules</p>
                 <ul>
                     <li>Rule...</li>
