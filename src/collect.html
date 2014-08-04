@@ -24,7 +24,10 @@
             <button id="createRuleSet">+</button>
             <button id="deleteRuleSet">x</button>
         </div>
-        <div id="currentParent"></div>
+        <div id="currentParent">
+            Parent <input type="checkbox" id="ruleSetParent" name="parent" />:
+            <span id="parentSelectorView"></span>
+        </div>
 
     </div>
     <div id="collectAlert"></div>
@@ -74,7 +77,7 @@
                     <input id="parentRange" name="parentRange" type="text" />
                 </div>
                 <div>
-                    <button id="saveParent">Save Parent</button>
+                    <button id="saveParent">Set Parent</button>
                     <button id="clearParent">Clear</button>
                 </div>
             </form>

@@ -140,7 +140,8 @@ var HTML = {
     info: {
         alert: document.getElementById("collectAlert"),
         count: document.getElementById("currentCount"),
-        parent: document.getElementById("currentParent")
+        parent: document.getElementById("parentSelectorView"),
+        parentCheckbox: document.getElementById("ruleSetParent")
     },
     interface: document.querySelector(".collectjs"),
     preview: {
@@ -426,6 +427,9 @@ function groupViewEvents(){
         deleteRuleSet();
     });
 
+    // parent events
+    idEvent("ruleSetParent", "change", toggleParentEvent);
+
     idEvent("uploadRules", "click", function uploadEvent(event){
         event.preventDefault();
         uploadCurrentGroupRules();
@@ -460,7 +464,7 @@ function removeInterface(event){
     document.body.style.marginBottom = marginBottom + "px";
 }
 
-function refreshElements(event){
+function refreshElements(){
     resetInterface();
     Interface.turnOn();
 }
@@ -604,27 +608,22 @@ function saveParentEvent(event){
     HTML.info.parent.textContent = "Parent: " + selector;
     saveParent(parent);
     showRuleForm();
-    // limit clickable elements to children of parent selector
-    Interface.turnOn();
+    refreshElements();
 }
 
-function toggleParent(selectorEle){
-
-    return function toggleParentEvent(event){
-        if ( this.checked ) {
-            // if parent selector doesn't exist, switch to parent form
-            showParentForm();
-            showTab(HTML.tabs.rule);
-        } else {
-            // if parent selector exists, remove it from current ruleSet
-            Collect.parent = {};
-            selectorEle.textContent = "";
-            HTML.info.parent.textContent = "";
-            deleteParent();
-            showRuleForm();
-            Interface.turnOn();
-        }
-    };
+function toggleParentEvent(event){
+    if ( this.checked ) {
+        // if parent selector doesn't exist, switch to parent form
+        showParentForm();
+        showTab(HTML.tabs.rule);
+    } else {
+        // if parent selector exists, remove it from current ruleSet
+        Collect.parent = {};
+        HTML.info.parent.textContent = "";
+        deleteParent();
+        showRuleForm();
+        Interface.turnOn();
+    }
 }
 
 function previewSavedRule(event){
@@ -1538,10 +1537,16 @@ function loadRuleSetObject(ruleSet){
     Collect.parent = ruleSet.parent || {};
     Collect.current.ruleSet = ruleSet.name;
 
-    HTML.info.parent.textContent = ruleSet.parent ? "Parent: " + ruleSet.parent.selector : "";
-
+    if ( ruleSet.parent ) {
+        HTML.info.parent.textContent ="Parent: " + ruleSet.parent.selector;
+        HTML.info.parentCheckbox.checked = true;
+    } else {
+        HTML.info.parent.textContent = "";
+        HTML.info.parentCheckbox.checked = false;
+    }
     HTML.groups.ruleSetHolder.innerHTML = "";
     HTML.groups.ruleSetHolder.appendChild(ruleSetElement(ruleSet));
+
 
     // don't call these in loadGroupObject or loadPageObject because we want to know if there is a
     // parent selector
@@ -1702,7 +1707,6 @@ function ruleSetElement(ruleSet){
         <div class="ruleSet">
             <h3>
                 Name: {{name}}
-                <input type="checkbox" name="parent" />
             </h3>
             <p class="selectorName">{{selector}}</p>
             <p>Rules</p>
@@ -1713,33 +1717,32 @@ function ruleSetElement(ruleSet){
         </div>
     *****/
     var holder = noSelectElement("div"),
-        label = noSelectElement("label"),
-        input = noSelectElement("input"),
-        selector = noSelectElement("p"),
-        p = noSelectElement("p"),
+        //label = noSelectElement("label"),
+        //selector = noSelectElement("p"),
+        //p = noSelectElement("p"),
         ul = noSelectElement("ul");
     holder.classList.add("ruleSet");
     holder.innerHTML = "<h3 class=\"noSelect\">Name: " + ruleSet.name + "</h3>";
     
 
-    label.textContent = "Parent: ";
-    label.appendChild(input);
-    input.setAttribute("type", "checkbox");
-    input.setAttribute("name", "parent");
-    input.addEventListener("change", toggleParent(selector), false);
+    //label.textContent = "Parent: ";
+    //label.appendChild(input);
+    //input.setAttribute("type", "checkbox");
+    //input.setAttribute("name", "parent");
+    //input.addEventListener("change", toggleParent(selector), false);
 
-    selector.classList.add("selectorName");
-    if ( ruleSet.parent ) {
-        selector.textContent = ruleSet.parent.selector;
-        input.checked = true;
-    }
+    //selector.classList.add("selectorName");
+    //if ( ruleSet.parent ) {
+        //selector.textContent = ruleSet.parent.selector;
+        //input.checked = true;
+    //}
     for ( var key in ruleSet.rules ) {
         ul.appendChild(ruleElement(ruleSet.rules[key]));
     }
 
-    holder.appendChild(label);
-    holder.appendChild(selector);
-    holder.appendChild(p);
+    //holder.appendChild(label);
+    //holder.appendChild(selector);
+    //holder.appendChild(p);
     holder.appendChild(ul);
 
     HTML.groups.rules = ul;
