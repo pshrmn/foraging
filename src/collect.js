@@ -67,10 +67,15 @@ var Interface = {
     store elements with eventlisteners in this.ele
     */
     turnOn: function(){
-        var prefix = Collect.parent.selector ? Collect.parent.selector : "body",
-            curr;
+        var curr;
+
         this.turnOff();
-        Collect.allElements = document.querySelectorAll(prefix + " *" + Collect.not);
+
+        // if which is supplied, limit allElements based on that value
+        // undefined check not necessary because negative numbers are truthy for existance
+        // but I'd rather be explicit
+        Collect.allElements = parentElements("*");
+
         for ( var i=0, len=Collect.allElements.length; i<len; i++ ) {
             curr = Collect.allElements[i];
             curr.addEventListener('click', Family.create, false);
@@ -141,7 +146,8 @@ var HTML = {
         alert: document.getElementById("collectAlert"),
         count: document.getElementById("currentCount"),
         parent: document.getElementById("parentSelectorView"),
-        parentCheckbox: document.getElementById("ruleSetParent")
+        parentCheckbox: document.getElementById("ruleSetParent"),
+        range: document.getElementById("parentRangeView")
     },
     interface: document.querySelector(".collectjs"),
     preview: {
@@ -224,19 +230,12 @@ var Family = {
             return "";
         }
     },
-    elements: function(one){
-        var selector = this.selector(),
-            longSelector;
+    elements: function(){
+        var selector = this.selector();
         if ( selector === "") {
-            return ( one ? undefined : []);
+            return [];
         }
-        longSelector = (Collect.parent.selector ? Collect.parent.selector: "body") +
-            " " + selector + Collect.not;
-        if ( one ) {
-            return document.querySelector(longSelector);
-        } else {
-            return document.querySelectorAll(longSelector);    
-        }
+        return parentElements(selector);
     },
     /*
     sets Collect.elements to elements matching the current selector and resets elementIndex
@@ -264,13 +263,11 @@ var Family = {
     },
     /*
     applies a range to the elements selected by the current selector
-    if val is positive, it sets Collect.elements to (val, elements.length)
-    if val is negative, it sets Collect.elements to (0, elements.length-val)
-
+    if range is positive, it sets Collect.elements to (range, elements.length)
+    if range is negative, it sets Collect.elements to (0, elements.length-range)
     */
-    range: function(val){
-        var range = parseInt(HTML.form.rule.range.value, 10),
-            len;
+    range: function(range){
+        var len;
 
         Family.match();
         len = Collect.elements.length;
@@ -358,6 +355,7 @@ function ruleViewEvents(){
     idEvent("clearParent", "click", removeSelectorEvent);
 
     HTML.form.rule.range.addEventListener("blur", applyRuleRange, false);
+    HTML.form.parent.range.addEventListener("blur", applyParentRange, false);
     HTML.form.rule.multiple.addEventListener("change", function(event){
         HTML.form.rule.range.disabled = !HTML.form.rule.range.disabled;
         if ( HTML.form.rule.disabled ) {
@@ -484,12 +482,20 @@ function removeSelectorEvent(event){
 on blur, update Collect.elements based on the value of #ruleRange
 */
 function applyRuleRange(event){
-    Family.range();
+    Family.range(parseInt(HTML.form.rule.range.value, 10));
     clearClass("queryCheck");
     addClass("queryCheck", Collect.elements);
     
     HTML.info.count.textContent = Collect.elements.length;
     generatePreviewElements(HTML.form.rule.capture.textContent, Collect.elements);
+}
+
+function applyParentRange(event){
+    Family.range(parseInt(HTML.form.parent.range.value, 10));
+    clearClass("queryCheck");
+    addClass("queryCheck", Collect.elements);
+    
+    HTML.info.count.textContent = Collect.elements.length;   
 }
 
 /*
@@ -600,15 +606,21 @@ function saveParentEvent(event){
     };
 
     var rangeInt = parseInt(range, 10);
-    if ( !isNaN(rangeInt) ) {
+    // 0 for range includes everything, so its useless to save
+    if ( !isNaN(rangeInt) && rangeInt !== 0 ) {
         parent.which = rangeInt;
+        if ( rangeInt > 0 ) {
+            HTML.info.range.textContent = "Range: (" + rangeInt + " to end)";
+        } else {
+            HTML.info.range.textContent = "Range: (start to " + rangeInt + ")";
+        }
     }
 
     Collect.parent = parent;
 
     HTML.info.parent.textContent = "Parent: " + selector;
-
-    addParentGroup(selector);
+    
+    addParentGroup(selector, parent.which);
     saveParent(parent);
     showRuleForm();
     refreshElements();
@@ -623,6 +635,7 @@ function toggleParentEvent(event){
         // if parent selector exists, remove it from current ruleSet
         Collect.parent = {};
         HTML.info.parent.textContent = "";
+        HTML.info.range.textContent = "";
         deleteParent();
         clearClass("parentGroup");
         showRuleForm();
@@ -800,11 +813,49 @@ function addRule(rule, set){
 }
 
 
-function addParentGroup(selector){
-    var elements = document.querySelectorAll(selector + Collect.not);
-    for ( var i=0, len=elements.length; i<len; i++ ){
-        elements[i].classList.add("parentGroup");
+function addParentGroup(selector, range){
+    var elements = document.querySelectorAll(selector + Collect.not),
+        start = 0,
+        end = elements.length;
+    if ( range ) {
+        if ( range > 0 ) {
+            start = range;
+        } else {
+            end -= range;
+        }
     }
+    for ( ; start<end ; start++ ){
+        elements[start].classList.add("parentGroup");
+    }
+}
+
+/*
+uses Collect.parent to limit selected elements to children of elements matching Collect.parent.seelctor
+if Collect.parent.which is defined, only use Collect.parent.selector elements within that range
+*/
+function parentElements(selector){
+    var range = Collect.parent.which,
+        allElements = [];
+    if ( range !== undefined ) {
+        var elements = document.querySelectorAll(Collect.parent.selector),
+            start = 0,
+            end = elements.length,
+            currElements;
+        if ( range > 0 ) {
+            start = range;
+        } else {
+            end -= range;
+        }
+        for ( ; start<end; start++ ) {
+            currElements = elements[start].querySelectorAll(selector+Collect.not);
+            allElements = allElements.concat(Array.prototype.slice.call(currElements));
+        }
+        return allElements;
+    } else {
+        var prefix = Collect.parent.selector ? Collect.parent.selector : "body";
+        allElements = Array.prototype.slice.call(document.querySelectorAll(prefix + " " + selector + Collect.not));
+    }
+    return allElements;
 }
 
 function showRuleForm(){
@@ -1552,10 +1603,17 @@ function loadRuleSetObject(ruleSet){
     if ( ruleSet.parent ) {
         HTML.info.parent.textContent ="Parent: " + ruleSet.parent.selector;
         HTML.info.parentCheckbox.checked = true;
-        addParentGroup(ruleSet.parent.selector);
+        addParentGroup(ruleSet.parent.selector, ruleSet.parent.which);
+
+        if ( ruleSet.parent.which > 0 ) {
+            HTML.info.range.textContent = "Range: (" + ruleSet.parent.which + " to end)";
+        } else {
+            HTML.info.range.textContent = "Range: (start to " + ruleSet.parent.which + ")";
+        }
     } else {
         HTML.info.parent.textContent = "";
         HTML.info.parentCheckbox.checked = false;
+        HTML.info.range.textContent = "";
         clearClass("parentGroup");
     }
     HTML.groups.ruleSetHolder.innerHTML = "";

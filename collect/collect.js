@@ -11,7 +11,7 @@ var marginBottom;
 (function addInterface(){
     var div = noSelectElement("div");
     div.classList.add("collectjs");
-    div.innerHTML = "<div class=\"tabHolder\"><div class=\"tabs\"><div class=\"tab active\" id=\"ruleTab\"data-for=\"ruleView\">Rule</div><div class=\"tab\" id=\"groupsTab\" data-for=\"groupsView\">Groups</div><div class=\"tab\" id=\"previewTab\" data-for=\"previewView\">Preview</div><div class=\"tab\" id=\"optionsTab\" data-for=\"optionsView\">Options</div><div class=\"tab\" id=\"refreshCollect\">&#8635;</div><div class=\"tab\" id=\"closeCollect\">&times;</div></div></div><div class=\"permanent\"><div class=\"currentInfo\"><div>Group: <select id=\"groupSelect\"></select><button id=\"createGroup\">+</button><button id=\"deleteGroup\">x</button></div><div>Page: <select id=\"pageSelect\"></select><button id=\"deletePage\">x</button></div><div>Rule Set: <select id=\"ruleSetSelect\"></select><button id=\"createRuleSet\">+</button><button id=\"deleteRuleSet\">x</button></div><div id=\"currentParent\">Parent <input type=\"checkbox\" id=\"ruleSetParent\" name=\"parent\" />:<span id=\"parentSelectorView\"></span></div></div><div id=\"collectAlert\"></div></div><div class=\"views\"><div class=\"view\" id=\"emptyView\"></div><div class=\"view active\" id=\"ruleView\"><div id=\"ruleItems\" class=\"items\"><form id=\"ruleForm\" class=\"column\"><div class=\"rule\"><label for=\"ruleName\">Name:</label><input id=\"ruleName\" name=\"ruleName\" type=\"text\" /></div><div class=\"rule\"><label>Selector:</label><span id=\"ruleSelector\"></span></div><div class=\"rule\"><label>Capture:</label><span id=\"ruleAttr\"></span></div><div class=\"rule\"><label for=\"ruleMultiple\">Multiple:</label><input id=\"ruleMultiple\" name=\"ruleMultiple\" type=\"checkbox\" /></div><div class=\"rule range\"><label for=\"ruleRange\">Range:</label><input id=\"ruleRange\" name=\"ruleRange\" type=\"text\" disabled=\"true\"/></div><div class=\"rule follow\"><label for=\"ruleFollow\">Follow:</label><input id=\"ruleFollow\" name=\"ruleFollow\" type=\"checkbox\" disabled=\"true\" title=\"Can only follow rules that get href attribute from links\" /></div><div><button id=\"saveRule\">Save Rule</button><button id=\"clearSelector\">Clear</button></div></form><form id=\"parentForm\" class=\"column\"><div class=\"rule\"><label>Selector:</label><span id=\"parentSelector\"></span></div><div class=\"rule range\"><label for=\"parentRange\">Range:</label><input id=\"parentRange\" name=\"parentRange\" type=\"text\" /></div><div><button id=\"saveParent\">Set Parent</button><button id=\"clearParent\">Clear</button></div></form><div class=\"modifiers column\"><div id=\"selectorHolder\"></div><div class=\"ruleHTMLHolder\">Count: <span id=\"currentCount\"></span><button id=\"ruleCyclePrevious\" class=\"cycle\" title=\"previous element matching selector\">&lt;&lt;</button><button id=\"ruleCycleNext\" class=\"cycle\" title=\"next element matching selector\">&gt;&gt;</button><span id=\"ruleHTML\"></span></div></div></div></div><div class=\"view\" id=\"groupsView\"><div id=\"ruleSets\" class=\"rules\"><!-- example .ruleSet layout<div class=\"ruleSet\"><h3>Name: {{name}}<input type=\"checkbox\" name=\"parent\" /></h3><p class=\"selectorName\">{{selector}}</p><p>Rules</p><ul><li>Rule...</li></ul></div>--></div><button id=\"uploadRules\">Upload Group</button></div><div class=\"view\" id=\"previewView\"><p>Name: <span id=\"previewName\"></span>Selector: <span id=\"previewSelector\"></span>Capture: <span id=\"previewCapture\"></span></p><div id=\"previewContents\"></div></div><div class=\"view\" id=\"optionsView\"><p><label for=\"ignore\">Ignore helper elements (eg tbody)</label><input type=\"checkbox\" id=\"ignore\" /></p></div></div>";
+    div.innerHTML = "<div class=\"tabHolder\"><div class=\"tabs\"><div class=\"tab active\" id=\"ruleTab\"data-for=\"ruleView\">Rule</div><div class=\"tab\" id=\"groupsTab\" data-for=\"groupsView\">Groups</div><div class=\"tab\" id=\"previewTab\" data-for=\"previewView\">Preview</div><div class=\"tab\" id=\"optionsTab\" data-for=\"optionsView\">Options</div><div class=\"tab\" id=\"refreshCollect\">&#8635;</div><div class=\"tab\" id=\"closeCollect\">&times;</div></div></div><div class=\"permanent\"><div class=\"currentInfo\"><div>Group: <select id=\"groupSelect\"></select><button id=\"createGroup\">+</button><button id=\"deleteGroup\">x</button></div><div>Page: <select id=\"pageSelect\"></select><button id=\"deletePage\">x</button></div><div>Rule Set: <select id=\"ruleSetSelect\"></select><button id=\"createRuleSet\">+</button><button id=\"deleteRuleSet\">x</button></div><div id=\"currentParent\">Parent <input type=\"checkbox\" id=\"ruleSetParent\" name=\"parent\" />:<span id=\"parentSelectorView\"></span><span id=\"parentRangeView\"></span></div></div><div id=\"collectAlert\"></div></div><div class=\"views\"><div class=\"view\" id=\"emptyView\"></div><div class=\"view active\" id=\"ruleView\"><div id=\"ruleItems\" class=\"items\"><form id=\"ruleForm\" class=\"column\"><div class=\"rule\"><label for=\"ruleName\">Name:</label><input id=\"ruleName\" name=\"ruleName\" type=\"text\" /></div><div class=\"rule\"><label>Selector:</label><span id=\"ruleSelector\"></span></div><div class=\"rule\"><label>Capture:</label><span id=\"ruleAttr\"></span></div><div class=\"rule\"><label for=\"ruleMultiple\">Multiple:</label><input id=\"ruleMultiple\" name=\"ruleMultiple\" type=\"checkbox\" /></div><div class=\"rule range\"><label for=\"ruleRange\">Range:</label><input id=\"ruleRange\" name=\"ruleRange\" type=\"text\" disabled=\"true\"/></div><div class=\"rule follow\"><label for=\"ruleFollow\">Follow:</label><input id=\"ruleFollow\" name=\"ruleFollow\" type=\"checkbox\" disabled=\"true\" title=\"Can only follow rules that get href attribute from links\" /></div><div><button id=\"saveRule\">Save Rule</button><button id=\"clearSelector\">Clear</button></div></form><form id=\"parentForm\" class=\"column\"><div class=\"rule\"><label>Selector:</label><span id=\"parentSelector\"></span></div><div class=\"rule range\"><label for=\"parentRange\">Range:</label><input id=\"parentRange\" name=\"parentRange\" type=\"text\" /></div><div><button id=\"saveParent\">Set Parent</button><button id=\"clearParent\">Clear</button></div></form><div class=\"modifiers column\"><div id=\"selectorHolder\"></div><div class=\"ruleHTMLHolder\">Count: <span id=\"currentCount\"></span><button id=\"ruleCyclePrevious\" class=\"cycle\" title=\"previous element matching selector\">&lt;&lt;</button><button id=\"ruleCycleNext\" class=\"cycle\" title=\"next element matching selector\">&gt;&gt;</button><span id=\"ruleHTML\"></span></div></div></div></div><div class=\"view\" id=\"groupsView\"><div id=\"ruleSets\" class=\"rules\"><!-- example .ruleSet layout<div class=\"ruleSet\"><h3>Name: {{name}}<input type=\"checkbox\" name=\"parent\" /></h3><p class=\"selectorName\">{{selector}}</p><p>Rules</p><ul><li>Rule...</li></ul></div>--></div><button id=\"uploadRules\">Upload Group</button></div><div class=\"view\" id=\"previewView\"><p>Name: <span id=\"previewName\"></span>Selector: <span id=\"previewSelector\"></span>Capture: <span id=\"previewCapture\"></span></p><div id=\"previewContents\"></div></div><div class=\"view\" id=\"optionsView\"><p><label for=\"ignore\">Ignore helper elements (eg tbody)</label><input type=\"checkbox\" id=\"ignore\" /></p></div></div>";
     document.body.appendChild(div);
     addNoSelect(div.querySelectorAll("*"));
 
@@ -67,10 +67,15 @@ var Interface = {
     store elements with eventlisteners in this.ele
     */
     turnOn: function(){
-        var prefix = Collect.parent.selector ? Collect.parent.selector : "body",
-            curr;
+        var curr;
+
         this.turnOff();
-        Collect.allElements = document.querySelectorAll(prefix + " *" + Collect.not);
+
+        // if which is supplied, limit allElements based on that value
+        // undefined check not necessary because negative numbers are truthy for existance
+        // but I'd rather be explicit
+        Collect.allElements = parentElements("*");
+
         for ( var i=0, len=Collect.allElements.length; i<len; i++ ) {
             curr = Collect.allElements[i];
             curr.addEventListener('click', Family.create, false);
@@ -141,7 +146,8 @@ var HTML = {
         alert: document.getElementById("collectAlert"),
         count: document.getElementById("currentCount"),
         parent: document.getElementById("parentSelectorView"),
-        parentCheckbox: document.getElementById("ruleSetParent")
+        parentCheckbox: document.getElementById("ruleSetParent"),
+        range: document.getElementById("parentRangeView")
     },
     interface: document.querySelector(".collectjs"),
     preview: {
@@ -224,19 +230,12 @@ var Family = {
             return "";
         }
     },
-    elements: function(one){
-        var selector = this.selector(),
-            longSelector;
+    elements: function(){
+        var selector = this.selector();
         if ( selector === "") {
-            return ( one ? undefined : []);
+            return [];
         }
-        longSelector = (Collect.parent.selector ? Collect.parent.selector: "body") +
-            " " + selector + Collect.not;
-        if ( one ) {
-            return document.querySelector(longSelector);
-        } else {
-            return document.querySelectorAll(longSelector);    
-        }
+        return parentElements(selector);
     },
     /*
     sets Collect.elements to elements matching the current selector and resets elementIndex
@@ -264,13 +263,11 @@ var Family = {
     },
     /*
     applies a range to the elements selected by the current selector
-    if val is positive, it sets Collect.elements to (val, elements.length)
-    if val is negative, it sets Collect.elements to (0, elements.length-val)
-
+    if range is positive, it sets Collect.elements to (range, elements.length)
+    if range is negative, it sets Collect.elements to (0, elements.length-range)
     */
-    range: function(val){
-        var range = parseInt(HTML.form.rule.range.value, 10),
-            len;
+    range: function(range){
+        var len;
 
         Family.match();
         len = Collect.elements.length;
@@ -358,6 +355,7 @@ function ruleViewEvents(){
     idEvent("clearParent", "click", removeSelectorEvent);
 
     HTML.form.rule.range.addEventListener("blur", applyRuleRange, false);
+    HTML.form.parent.range.addEventListener("blur", applyParentRange, false);
     HTML.form.rule.multiple.addEventListener("change", function(event){
         HTML.form.rule.range.disabled = !HTML.form.rule.range.disabled;
         if ( HTML.form.rule.disabled ) {
@@ -484,12 +482,20 @@ function removeSelectorEvent(event){
 on blur, update Collect.elements based on the value of #ruleRange
 */
 function applyRuleRange(event){
-    Family.range();
+    Family.range(parseInt(HTML.form.rule.range.value, 10));
     clearClass("queryCheck");
     addClass("queryCheck", Collect.elements);
     
     HTML.info.count.textContent = Collect.elements.length;
     generatePreviewElements(HTML.form.rule.capture.textContent, Collect.elements);
+}
+
+function applyParentRange(event){
+    Family.range(parseInt(HTML.form.parent.range.value, 10));
+    clearClass("queryCheck");
+    addClass("queryCheck", Collect.elements);
+    
+    HTML.info.count.textContent = Collect.elements.length;   
 }
 
 /*
@@ -600,15 +606,21 @@ function saveParentEvent(event){
     };
 
     var rangeInt = parseInt(range, 10);
-    if ( !isNaN(rangeInt) ) {
+    // 0 for range includes everything, so its useless to save
+    if ( !isNaN(rangeInt) && rangeInt !== 0 ) {
         parent.which = rangeInt;
+        if ( rangeInt > 0 ) {
+            HTML.info.range.textContent = "Range: (" + rangeInt + " to end)";
+        } else {
+            HTML.info.range.textContent = "Range: (start to " + rangeInt + ")";
+        }
     }
 
     Collect.parent = parent;
 
     HTML.info.parent.textContent = "Parent: " + selector;
-
-    addParentGroup(selector);
+    
+    addParentGroup(selector, parent.which);
     saveParent(parent);
     showRuleForm();
     refreshElements();
@@ -623,6 +635,7 @@ function toggleParentEvent(event){
         // if parent selector exists, remove it from current ruleSet
         Collect.parent = {};
         HTML.info.parent.textContent = "";
+        HTML.info.range.textContent = "";
         deleteParent();
         clearClass("parentGroup");
         showRuleForm();
@@ -800,11 +813,49 @@ function addRule(rule, set){
 }
 
 
-function addParentGroup(selector){
-    var elements = document.querySelectorAll(selector + Collect.not);
-    for ( var i=0, len=elements.length; i<len; i++ ){
-        elements[i].classList.add("parentGroup");
+function addParentGroup(selector, range){
+    var elements = document.querySelectorAll(selector + Collect.not),
+        start = 0,
+        end = elements.length;
+    if ( range ) {
+        if ( range > 0 ) {
+            start = range;
+        } else {
+            end -= range;
+        }
     }
+    for ( ; start<end ; start++ ){
+        elements[start].classList.add("parentGroup");
+    }
+}
+
+/*
+uses Collect.parent to limit selected elements to children of elements matching Collect.parent.seelctor
+if Collect.parent.which is defined, only use Collect.parent.selector elements within that range
+*/
+function parentElements(selector){
+    var range = Collect.parent.which,
+        allElements = [];
+    if ( range !== undefined ) {
+        var elements = document.querySelectorAll(Collect.parent.selector),
+            start = 0,
+            end = elements.length,
+            currElements;
+        if ( range > 0 ) {
+            start = range;
+        } else {
+            end -= range;
+        }
+        for ( ; start<end; start++ ) {
+            currElements = elements[start].querySelectorAll(selector+Collect.not);
+            allElements = allElements.concat(Array.prototype.slice.call(currElements));
+        }
+        return allElements;
+    } else {
+        var prefix = Collect.parent.selector ? Collect.parent.selector : "body";
+        allElements = Array.prototype.slice.call(document.querySelectorAll(prefix + " " + selector + Collect.not));
+    }
+    return allElements;
 }
 
 function showRuleForm(){
@@ -1552,10 +1603,17 @@ function loadRuleSetObject(ruleSet){
     if ( ruleSet.parent ) {
         HTML.info.parent.textContent ="Parent: " + ruleSet.parent.selector;
         HTML.info.parentCheckbox.checked = true;
-        addParentGroup(ruleSet.parent.selector);
+        addParentGroup(ruleSet.parent.selector, ruleSet.parent.which);
+
+        if ( ruleSet.parent.which > 0 ) {
+            HTML.info.range.textContent = "Range: (" + ruleSet.parent.which + " to end)";
+        } else {
+            HTML.info.range.textContent = "Range: (start to " + ruleSet.parent.which + ")";
+        }
     } else {
         HTML.info.parent.textContent = "";
         HTML.info.parentCheckbox.checked = false;
+        HTML.info.range.textContent = "";
         clearClass("parentGroup");
     }
     HTML.groups.ruleSetHolder.innerHTML = "";
