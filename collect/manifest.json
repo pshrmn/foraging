@@ -3,7 +3,7 @@
 
   "name": "CollectJS",
   "description": "Get's css selector rules for a crawler",
-  "version": "0.16.6",
+  "version": "0.16.6.1",
   "permissions": [
     "activeTab",
     "storage",

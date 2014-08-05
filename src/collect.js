@@ -407,13 +407,13 @@ function permanentBarEvents(){
     // parent events
     idEvent("ruleSetParent", "change", toggleParentEvent);
 
+    // upload events
     idEvent("uploadRules", "click", function uploadEvent(event){
         event.preventDefault();
         uploadCurrentGroupRules();
     });
 
     // index events
-
     idEvent("indexToggle", "change", toggleURLEvent);
 }
 
@@ -1039,7 +1039,7 @@ function uploadCurrentGroupRules(){
         // setup things for Collector
         group.urls = Object.keys(group.urls);
         group.pages = nonEmptyPages(group.pages);
-
+        
         chrome.runtime.sendMessage({'type': 'upload', data: group});
     });
 }
