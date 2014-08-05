@@ -102,7 +102,7 @@ var Interface = {
         //views
         ruleViewEvents();
         optionsViewEvents();
-        groupViewEvents();
+        permanentBarEvents();
     },
     update: function(){
         HTML.groups.group.querySelector("option[value=" + Collect.current.group + "]").selected = true;
@@ -138,6 +138,8 @@ var HTML = {
     info: {
         alert: document.getElementById("collectAlert"),
         count: document.getElementById("currentCount"),
+        index: document.getElementById("indexMarker"),
+        indexToggle: document.getElementById("indexToggle"),
         parent: document.getElementById("parentSelectorView"),
         parentCheckbox: document.getElementById("ruleSetParent"),
         range: document.getElementById("parentRangeView")
@@ -355,7 +357,7 @@ function optionsViewEvents(){
     });
 }
 
-function groupViewEvents(){
+function permanentBarEvents(){
     // group events
     idEvent("groupSelect", "change", function loadGroupEvent(event){
         event.preventDefault();
@@ -409,6 +411,10 @@ function groupViewEvents(){
         event.preventDefault();
         uploadCurrentGroupRules();
     });
+
+    // index events
+
+    idEvent("indexToggle", "change", toggleURLEvent);
 }
 
 /*
@@ -599,6 +605,10 @@ function toggleParentEvent(event){
         showRuleForm();
         Interface.turnOn();
     }
+}
+
+function toggleURLEvent(event){
+    toggleURL();
 }
 
 function previewSavedRule(event){
@@ -1031,6 +1041,24 @@ function uploadCurrentGroupRules(){
         group.pages = nonEmptyPages(group.pages);
 
         chrome.runtime.sendMessage({'type': 'upload', data: group});
+    });
+}
+
+function toggleURL(){
+    chrome.storage.local.get(null, function(storage){
+        var host = window.location.hostname,
+            site = storage.sites[host],
+            group =site.groups[Collect.current.group],
+            url = window.location.href;
+
+        if ( group.urls[url] ) {
+            delete group.urls[url];
+        } else {
+            group.urls[url] = true;
+        }
+
+        site.groups[Collect.current.group] = group;
+        chrome.storage.local.set({'sites': storage.sites});
     });
 }
 
@@ -1527,6 +1555,9 @@ function loadGroupObject(group){
     
     HTML.groups.group.querySelector("option[value=" + group.name + "]").selected = true;
 
+    var url = window.location.href;
+    HTML.info.indexToggle.checked = group.urls[url] !== undefined;
+
     // clear out current options and populate with current group's pages
     HTML.groups.page.innerHTML = "";
     for ( var key in group.pages ) {
@@ -1542,6 +1573,13 @@ function loadGroupObject(group){
 function loadPageObject(page){
     deleteEditing();
     Collect.current.page = page.name;
+
+    if ( page.name === "default" ) {
+        HTML.info.index.display = "inline-block";
+    } else {
+        HTML.info.index.display = "none";
+    }
+
     var currSet, setName;
     HTML.groups.ruleSet.innerHTML = "";
     for ( setName in page.sets ) {

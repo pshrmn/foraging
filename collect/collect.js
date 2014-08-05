@@ -11,7 +11,7 @@ var marginBottom;
 (function addInterface(){
     var div = noSelectElement("div");
     div.classList.add("collectjs");
-    div.innerHTML = "<div class=\"tabHolder\"><div class=\"tabs\"><div class=\"tab active\" id=\"ruleTab\"data-for=\"ruleView\">Rule</div><div class=\"tab\" id=\"groupsTab\" data-for=\"groupsView\">Saved Rules</div><div class=\"tab\" id=\"previewTab\" data-for=\"previewView\">Preview</div><div class=\"tab\" id=\"optionsTab\" data-for=\"optionsView\">Options</div><div class=\"tab\" id=\"refreshCollect\">&#8635;</div><div class=\"tab\" id=\"closeCollect\">&times;</div></div></div><div class=\"permanent\"><div class=\"currentInfo\"><div>Group: <select id=\"groupSelect\"></select><button id=\"createGroup\" title=\"create a new group\">+</button><button id=\"deleteGroup\" title=\"delete current group\">&times;</button></div><div>Page: <select id=\"pageSelect\"></select><button id=\"deletePage\" title=\"delete current page\">&times;</button></div><div>Rule Set: <select id=\"ruleSetSelect\"></select><button id=\"createRuleSet\" title=\"create a new rule set\">+</button><button id=\"deleteRuleSet\" title=\"delete current rule set\">&times;</button></div><div id=\"currentParent\">Parent <input type=\"checkbox\" id=\"ruleSetParent\" name=\"parent\" /><span id=\"parentSelectorView\"></span><span id=\"parentRangeView\"></span></div></div><div id=\"collectAlert\"></div></div><div class=\"views\"><div class=\"view\" id=\"emptyView\"></div><div class=\"view active\" id=\"ruleView\"><div id=\"ruleItems\" class=\"items\"><form id=\"ruleForm\" class=\"column\"><div class=\"rule\"><label for=\"ruleName\" title=\"the name of a rule\">Name:</label><input id=\"ruleName\" name=\"ruleName\" type=\"text\" /></div><div class=\"rule\"><label title=\"the selector to get the rule in the DOM\">Selector:</label><span id=\"ruleSelector\"></span></div><div class=\"rule\"><label title=\"the attribute of an element to capture\">Capture:</label><span id=\"ruleAttr\"></span></div><div class=\"rule follow\"><label for=\"ruleFollow\" title=\"create a new page from the element's captured url (capture must be attr-href)\">Follow:</label><input id=\"ruleFollow\" name=\"ruleFollow\" type=\"checkbox\" disabled=\"true\" title=\"Can only follow rules that get href attribute from links\" /></div><div><button id=\"saveRule\">Save Rule</button><button id=\"clearSelector\">Clear</button></div></form><form id=\"parentForm\" class=\"column\"><div class=\"rule\"><label>Selector:</label><span id=\"parentSelector\"></span></div><div class=\"rule range\"><label for=\"parentRange\">Range:</label><input id=\"parentRange\" name=\"parentRange\" type=\"text\" /></div><div><button id=\"saveParent\">Set Parent</button><button id=\"clearParent\">Clear</button></div></form><div class=\"modifiers column\"><div id=\"selectorHolder\"></div><div class=\"ruleHTMLHolder\">Count: <span id=\"currentCount\"></span><button id=\"ruleCyclePrevious\" class=\"cycle\" title=\"previous element matching selector\">&lt;&lt;</button><button id=\"ruleCycleNext\" class=\"cycle\" title=\"next element matching selector\">&gt;&gt;</button><span id=\"ruleHTML\"></span></div></div></div></div><div class=\"view\" id=\"groupsView\"><div id=\"ruleSets\" class=\"rules\"><!-- example .ruleSet layout<div class=\"ruleSet\"><h3>Name: {{name}}</h3><ul><li>Rule...</li></ul></div>--></div><button id=\"uploadRules\">Upload Group</button></div><div class=\"view\" id=\"previewView\"><p>Name: <span id=\"previewName\"></span>Selector: <span id=\"previewSelector\"></span>Capture: <span id=\"previewCapture\"></span></p><div id=\"previewContents\"></div></div><div class=\"view\" id=\"optionsView\"><p><label for=\"ignore\">Ignore helper elements (eg tbody)</label><input type=\"checkbox\" id=\"ignore\" /></p></div></div>";
+    div.innerHTML = "<div class=\"tabHolder\"><div class=\"tabs\"><div class=\"tab active\" id=\"ruleTab\"data-for=\"ruleView\">Rule</div><div class=\"tab\" id=\"groupsTab\" data-for=\"groupsView\">Saved Rules</div><div class=\"tab\" id=\"previewTab\" data-for=\"previewView\">Preview</div><div class=\"tab\" id=\"optionsTab\" data-for=\"optionsView\">Options</div><div class=\"tab\" id=\"refreshCollect\">&#8635;</div><div class=\"tab\" id=\"closeCollect\">&times;</div></div></div><div class=\"permanent\"><div class=\"currentInfo\"><div>Group: <select id=\"groupSelect\"></select><button id=\"createGroup\" title=\"create a new group\">+</button><button id=\"deleteGroup\" title=\"delete current group\">&times;</button></div><div>Page: <select id=\"pageSelect\"></select><button id=\"deletePage\" title=\"delete current page\">&times;</button></div><div>Rule Set: <select id=\"ruleSetSelect\"></select><button id=\"createRuleSet\" title=\"create a new rule set\">+</button><button id=\"deleteRuleSet\" title=\"delete current rule set\">&times;</button></div><div id=\"currentParent\">Parent <input type=\"checkbox\" id=\"ruleSetParent\" name=\"parent\" /><span id=\"parentSelectorView\"></span><span id=\"parentRangeView\"></span></div><div id=\"indexMarker\">Initial URL<input type=\"checkbox\" id=\"indexToggle\" /></div></div><div id=\"collectAlert\"></div></div><div class=\"views\"><div class=\"view\" id=\"emptyView\"></div><div class=\"view active\" id=\"ruleView\"><div id=\"ruleItems\" class=\"items\"><form id=\"ruleForm\" class=\"column\"><div class=\"rule\"><label for=\"ruleName\" title=\"the name of a rule\">Name:</label><input id=\"ruleName\" name=\"ruleName\" type=\"text\" /></div><div class=\"rule\"><label title=\"the selector to get the rule in the DOM\">Selector:</label><span id=\"ruleSelector\"></span></div><div class=\"rule\"><label title=\"the attribute of an element to capture\">Capture:</label><span id=\"ruleAttr\"></span></div><div class=\"rule follow\"><label for=\"ruleFollow\" title=\"create a new page from the element's captured url (capture must be attr-href)\">Follow:</label><input id=\"ruleFollow\" name=\"ruleFollow\" type=\"checkbox\" disabled=\"true\" title=\"Can only follow rules that get href attribute from links\" /></div><div><button id=\"saveRule\">Save Rule</button><button id=\"clearSelector\">Clear</button></div></form><form id=\"parentForm\" class=\"column\"><div class=\"rule\"><label>Selector:</label><span id=\"parentSelector\"></span></div><div class=\"rule range\"><label for=\"parentRange\">Range:</label><input id=\"parentRange\" name=\"parentRange\" type=\"text\" /></div><div><button id=\"saveParent\">Set Parent</button><button id=\"clearParent\">Clear</button></div></form><div class=\"modifiers column\"><div id=\"selectorHolder\"></div><div class=\"ruleHTMLHolder\">Count: <span id=\"currentCount\"></span><button id=\"ruleCyclePrevious\" class=\"cycle\" title=\"previous element matching selector\">&lt;&lt;</button><button id=\"ruleCycleNext\" class=\"cycle\" title=\"next element matching selector\">&gt;&gt;</button><span id=\"ruleHTML\"></span></div></div></div></div><div class=\"view\" id=\"groupsView\"><div id=\"ruleSets\" class=\"rules\"><!-- example .ruleSet layout<div class=\"ruleSet\"><h3>Name: {{name}}</h3><ul><li>Rule...</li></ul></div>--></div><button id=\"uploadRules\">Upload Group</button></div><div class=\"view\" id=\"previewView\"><p>Name: <span id=\"previewName\"></span>Selector: <span id=\"previewSelector\"></span>Capture: <span id=\"previewCapture\"></span></p><div id=\"previewContents\"></div></div><div class=\"view\" id=\"optionsView\"><p><label for=\"ignore\">Ignore helper elements (eg tbody)</label><input type=\"checkbox\" id=\"ignore\" /></p></div></div>";
     document.body.appendChild(div);
     addNoSelect(div.querySelectorAll("*"));
 
@@ -102,7 +102,7 @@ var Interface = {
         //views
         ruleViewEvents();
         optionsViewEvents();
-        groupViewEvents();
+        permanentBarEvents();
     },
     update: function(){
         HTML.groups.group.querySelector("option[value=" + Collect.current.group + "]").selected = true;
@@ -138,6 +138,8 @@ var HTML = {
     info: {
         alert: document.getElementById("collectAlert"),
         count: document.getElementById("currentCount"),
+        index: document.getElementById("indexMarker"),
+        indexToggle: document.getElementById("indexToggle"),
         parent: document.getElementById("parentSelectorView"),
         parentCheckbox: document.getElementById("ruleSetParent"),
         range: document.getElementById("parentRangeView")
@@ -355,7 +357,7 @@ function optionsViewEvents(){
     });
 }
 
-function groupViewEvents(){
+function permanentBarEvents(){
     // group events
     idEvent("groupSelect", "change", function loadGroupEvent(event){
         event.preventDefault();
@@ -409,6 +411,10 @@ function groupViewEvents(){
         event.preventDefault();
         uploadCurrentGroupRules();
     });
+
+    // index events
+
+    idEvent("indexToggle", "change", toggleURLEvent);
 }
 
 /*
@@ -599,6 +605,10 @@ function toggleParentEvent(event){
         showRuleForm();
         Interface.turnOn();
     }
+}
+
+function toggleURLEvent(event){
+    toggleURL();
 }
 
 function previewSavedRule(event){
@@ -1031,6 +1041,24 @@ function uploadCurrentGroupRules(){
         group.pages = nonEmptyPages(group.pages);
 
         chrome.runtime.sendMessage({'type': 'upload', data: group});
+    });
+}
+
+function toggleURL(){
+    chrome.storage.local.get(null, function(storage){
+        var host = window.location.hostname,
+            site = storage.sites[host],
+            group =site.groups[Collect.current.group],
+            url = window.location.href;
+
+        if ( group.urls[url] ) {
+            delete group.urls[url];
+        } else {
+            group.urls[url] = true;
+        }
+
+        site.groups[Collect.current.group] = group;
+        chrome.storage.local.set({'sites': storage.sites});
     });
 }
 
@@ -1527,6 +1555,9 @@ function loadGroupObject(group){
     
     HTML.groups.group.querySelector("option[value=" + group.name + "]").selected = true;
 
+    var url = window.location.href;
+    HTML.info.indexToggle.checked = group.urls[url] !== undefined;
+
     // clear out current options and populate with current group's pages
     HTML.groups.page.innerHTML = "";
     for ( var key in group.pages ) {
@@ -1542,6 +1573,13 @@ function loadGroupObject(group){
 function loadPageObject(page){
     deleteEditing();
     Collect.current.page = page.name;
+
+    if ( page.name === "default" ) {
+        HTML.info.index.display = "inline-block";
+    } else {
+        HTML.info.index.display = "none";
+    }
+
     var currSet, setName;
     HTML.groups.ruleSet.innerHTML = "";
     for ( setName in page.sets ) {
