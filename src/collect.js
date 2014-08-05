@@ -150,7 +150,6 @@ var HTML = {
         contents: document.getElementById("previewContents"),
     },
     ruleHTML: document.getElementById("ruleHTML"),
-    ruleItems: document.getElementById("ruleItems"),
     tabs: {
         rule: document.getElementById("ruleTab"),
         groups: document.getElementById("groupsTab"),
@@ -189,7 +188,6 @@ var Family = {
         );
         Family.family = sf;
         sf.update();
-        HTML.ruleItems.style.display = "block";
         showTab(HTML.tabs.rule);
     },
     remove: function(){
@@ -212,7 +210,6 @@ var Family = {
                 Collect.options
             );
             this.family = sf;
-            HTML.ruleItems.style.display = "block";
             this.family.match(selector);
         }    
     },

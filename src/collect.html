@@ -1,7 +1,7 @@
 <div class="tabHolder">
     <div class="tabs">
         <div class="tab active" id="ruleTab"data-for="ruleView">Rule</div>
-        <div class="tab" id="groupsTab" data-for="groupsView">Groups</div>
+        <div class="tab" id="groupsTab" data-for="groupsView">Saved Rules</div>
         <div class="tab" id="previewTab" data-for="previewView">Preview</div>
         <div class="tab" id="optionsTab" data-for="optionsView">Options</div>
         <div class="tab" id="refreshCollect">&#8635;</div>
@@ -12,17 +12,17 @@
     <div class="currentInfo">
         <div>
             Group: <select id="groupSelect"></select>
-            <button id="createGroup">+</button>
-            <button id="deleteGroup">x</button>
+            <button id="createGroup" title="create a new group">+</button>
+            <button id="deleteGroup" title="delete current group">&times;</button>
         </div>
         <div>
             Page: <select id="pageSelect"></select>
-            <button id="deletePage">x</button>
+            <button id="deletePage" title="delete current page">&times;</button>
         </div>
         <div>
             Rule Set: <select id="ruleSetSelect"></select>
-            <button id="createRuleSet">+</button>
-            <button id="deleteRuleSet">x</button>
+            <button id="createRuleSet" title="create a new rule set">+</button>
+            <button id="deleteRuleSet" title="delete current rule set">&times;</button>
         </div>
         <div id="currentParent">
             Parent <input type="checkbox" id="ruleSetParent" name="parent" />
@@ -39,19 +39,19 @@
         <div id="ruleItems" class="items">
             <form id="ruleForm" class="column">
                 <div class="rule">
-                    <label for="ruleName">Name:</label>
+                    <label for="ruleName" title="the name of a rule">Name:</label>
                     <input id="ruleName" name="ruleName" type="text" />
                 </div>
                 <div class="rule">
-                    <label>Selector:</label>
+                    <label title="the selector to get the rule in the DOM">Selector:</label>
                     <span id="ruleSelector"></span>
                 </div>
                 <div class="rule">
-                    <label>Capture:</label>
+                    <label title="the attribute of an element to capture">Capture:</label>
                     <span id="ruleAttr"></span>
                 </div>
                 <div class="rule follow">
-                    <label for="ruleFollow">Follow:</label>
+                    <label for="ruleFollow" title="create a new page from the element's captured url (capture must be attr-href)">Follow:</label>
                     <input id="ruleFollow" name="ruleFollow" type="checkbox" disabled="true" title="Can only follow rules that get href attribute from links" />
                 </div>
                 <div>
@@ -88,12 +88,7 @@
         <div id="ruleSets" class="rules">
             <!-- example .ruleSet layout
             <div class="ruleSet">
-                <h3>
-                    Name: {{name}}
-                    <input type="checkbox" name="parent" />
-                </h3>
-                <p class="selectorName">{{selector}}</p>
-                <p>Rules</p>
+                <h3>Name: {{name}}</h3>
                 <ul>
                     <li>Rule...</li>
                 </ul>
