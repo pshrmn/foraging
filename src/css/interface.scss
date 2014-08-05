@@ -359,7 +359,7 @@ body{
         }
     }
 
-    .rule.follow, .rule.range{
+    .rule.follow{
         display: none;
     }
 }
@@ -367,10 +367,6 @@ body{
 #parentForm{
     @extend #ruleForm;
     display: none;
-
-    .rule.range{
-        display: block;
-    }
 }
 
 /* Selector */

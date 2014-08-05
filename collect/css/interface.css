@@ -222,13 +222,11 @@ body {
     #ruleForm .rule label, #parentForm .rule label, #ruleForm .rule input, #parentForm .rule input {
       margin: 0;
       display: inline-block; }
-  #ruleForm .rule.follow, #parentForm .rule.follow, #ruleForm .rule.range, #parentForm .rule.range {
+  #ruleForm .rule.follow, #parentForm .rule.follow {
     display: none; }
 
 #parentForm {
   display: none; }
-  #parentForm .rule.range {
-    display: block; }
 
 /* Selector */
 #selectorHolder {
