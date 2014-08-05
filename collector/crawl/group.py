@@ -6,6 +6,7 @@ from lxml import html
 from lxml.cssselect import CSSSelector
 
 from .rule import Rule
+from .page import Page, IndexPage
 
 def get_html(url):
     """
@@ -22,64 +23,6 @@ def get_html(url):
     time.sleep(5)
     return dom
 
-class RuleGroup(object):
-    """
-    A RuleGroup is made up of sets of rules that get data that corresponds to a rdb tuple
-    rule sets are stored in a
-    """
-    def __init__(self, name, index_urls, nodes, next=None):
-        self.name = name
-        self.urls = Queue()
-        self.single_page = True if len(index_urls) == 1 else False
-        for url in index_urls:
-            self.urls.put(url)
-        self.next = None
-        if next:
-            self.next = Rule("next", next, "attr-href")
-        self.nodes = nodes
-        self.data = []
-        self.tree = make_set(self.nodes["default"])
-
-    def crawl(self):
-        data = []
-
-        if self.single_page:
-            dom = self.next_page()
-            if dom is not None:
-                data = self.tree.get(dom)
-        else:                
-            while not self.urls.empty():
-                dom = self.next_page()
-                if not dom:
-                    continue
-                if self.next:
-                    self.add_next_url(dom)
-                new_data = self.tree.get(dom)
-                # only works when self.tree is a ParentSet, need to fix
-                # single page workaround for now
-                if new_data is not None:
-                    data.extend(new_data)
-        return data
-
-    def next_page(self):
-        url = self.urls.get()
-        return get_html(url)
-
-    def add_next_url(self, dom):
-        """
-        apply the next selector and if it returns a url, add that to the crawl queue
-        """
-        next = self.next.get(dom)
-        if next is not None:
-            self.urls.put(next)
-
-def make_set(node):
-    if node.get("parent"):
-        new_set = ParentSet(**node)
-    else:
-        new_set = Set(**node)
-    return new_set
-
 def canonical(dom):
     """
     gets the canonical url for a page
@@ -90,6 +33,10 @@ def canonical(dom):
     if len(matches)==0:
         return
     return matches[0].get("href")
+
+
+class Group
+
 
 
 class Set(object):
