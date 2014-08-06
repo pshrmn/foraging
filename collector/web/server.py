@@ -32,15 +32,15 @@ def upload():
         data = json.loads(request.data)
     except ValueError:
         return jsonify({"error": True})
-    # change indices from a dict (useful for toggling in collectjs) to an array
-    # fails if no index_url is provided
-    data["index_urls"] = [key for key in data["index_urls"]]
-    hostname = urlparse(data["index_urls"][0]).netloc
-    folder = host_folder(hostname)
-    filename = "%s.json" % (data["name"])
+
+    site = data["site"]
+    name = data["group"]["name"]
+    folder = host_folder(site)
+
+    filename = "%s.json" % (name)
     path = os.path.join(folder, filename)
     with open(path, 'w') as fp:
-        json.dump(data, fp, indent=2)
+        json.dump(data["group"], fp, indent=2)
     return jsonify({"error": False})
 
 
