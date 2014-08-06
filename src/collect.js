@@ -1034,13 +1034,17 @@ function uploadCurrentGroupRules(){
     chrome.storage.local.get(null, function(storage){
         var host = window.location.hostname,
             site = storage.sites[host],
-            group =site.groups[Collect.current.group];
+            group =site.groups[Collect.current.group],
+            data = {};
 
         // setup things for Collector
         group.urls = Object.keys(group.urls);
         group.pages = nonEmptyPages(group.pages);
-        
-        chrome.runtime.sendMessage({'type': 'upload', data: group});
+
+        data.group = group;
+        data.site = window.location.host;
+
+        chrome.runtime.sendMessage({type: 'upload', data: data});
     });
 }
 
@@ -1539,7 +1543,7 @@ function nonEmptyPages(pages){
             }
         }
         if ( !emptyPage ) {
-            allPages[page.name] = page;
+            allPages[page.name] = pageRules;
         }
     }
 
