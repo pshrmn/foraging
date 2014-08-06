@@ -1529,21 +1529,25 @@ function nonEmptyPages(pages){
     var emptyPage = true,
         page, ruleSet,
         pageName, ruleSetName,
-        pageRules = {},
+        pageSets = {},
         allPages = {};
     for ( pageName in pages ) {
         page = pages[pageName];
-        pageRules = {};
+        pageSets = {};
         emptyPage = true;
         for ( ruleSetName in page.sets ) {
             ruleSet = page.sets[ruleSetName];
             if ( Object.keys(ruleSet.rules).length > 0 ) {
-                pageRules[ruleSet.name] = ruleSet;
+                pageSets[ruleSet.name] = ruleSet;
                 emptyPage = false;
             }
         }
         if ( !emptyPage ) {
-            allPages[page.name] = pageRules;
+            allPages[page.name] = {
+                name: page.name,
+                index: page.index,
+                sets: pageSets
+            };
         }
     }
 
