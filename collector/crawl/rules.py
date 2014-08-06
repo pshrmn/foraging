@@ -1,24 +1,5 @@
 from lxml.cssselect import CSSSelector
 
-class Parent(object):
-    """
-    selector is the selector break up the dom into multiple elements
-    range is used to skip certain elements when a selector is applied
-    if range is positive, skip from the beginning on the elements, if negative skip from the end
-    """
-    def __init__(self, selector, _range=None):
-        self.selector = CSSSelector(selector)
-        self.range = _range
-
-    def get(self, dom):
-        eles = self.selector(dom)
-        if self.range:
-            if self.range >= 0:
-                return eles[self.range:]
-            else:
-                return eles[:self.range]
-        return eles
-
 class RuleSet(object):
     """
     A RuleSet consists of a group of (related?) rules in a page
@@ -26,11 +7,16 @@ class RuleSet(object):
     parent (optional) is a dict with a selector and an optional range
     """
     def __init__(self, rules, parent=None):
-        self.rules = self.make_rules(rules)
-        self.parent = Parent(**parent) if parent else None
+        self.rules = rules
+        self.parent = parent if parent else None
 
-    def make_rules(self, rules):
-        self.rules = [Rule(**rule) for rule in rules]
+    @classmethod
+    def from_json(cls, rule_set_json):
+        rules = {rule["name"]: Rule.from_json(rule) for rule in rule_set_json["rules"].itervalues()}
+        parent = None
+        if rule_set_json["parent"]:
+            parent = Parent.from_json(rule_set_json["parent"])
+        return cls(rules, parent)
 
     def get(self, dom):
         """
@@ -46,6 +32,38 @@ class RuleSet(object):
     def apply(self, dom):
         return {rule.name: rule.get(dom) for rule in self.rules}
 
+    def __str__(self):
+        return "RuleSet(%s, %s)" % (self.rules, self.parent)
+
+class Parent(object):
+    """
+    selector is the selector break up the dom into multiple elements
+    range is used to skip certain elements when a selector is applied
+    if range is positive, skip from the beginning on the elements, if negative skip from the end
+    """
+    def __init__(self, selector, _range=None):
+        self.selector = selector
+        self.xpath = CSSSelector(selector)
+        self.range = _range
+
+    @classmethod
+    def from_json(cls, parent_json):
+        selector = parent_json["selector"]
+        _range = parent_json.get("which")
+        return cls(selector, _range)
+
+    def get(self, dom):
+        eles = self.xpath(dom)
+        if self.range:
+            if self.range >= 0:
+                return eles[self.range:]
+            else:
+                return eles[:self.range]
+        return eles
+
+    def __str__(self):
+        return "Parent(%s, %s)" % (self.selector, self.range)
+
 class Rule(object):
     """
     A rule corresponds to a column in a sql tuple
@@ -60,15 +78,23 @@ class Rule(object):
         if which is > 0, returns elements which to end of list
         if which is < 0, returns elements start of list to which
     """
-    def __init__(self, name, selector, capture, which=None, follow=False):
+    def __init__(self, name, selector, capture, follow=False):
         self.name = name
         self.selector = selector
         self.capture = capture
-        self.which = which
+        self.follow = follow
+
         self.xpath = CSSSelector(self.selector)
         self.values = self.set_capture()
-        self.follow = follow
-        
+
+    @classmethod
+    def from_json(cls, rule_json):
+        name = rule_json["name"]
+        selector = rule_json["selector"]
+        capture = rule_json["capture"]
+        follow = rule_json.get("follow", False)
+        return cls(name, selector, capture, follow)
+
     def get(self, html):
         """
         html is an lxml parsed html etree
@@ -78,12 +104,7 @@ class Rule(object):
         # return None if the xpath gets no matches
         if len(eles) == 0:
             return None
-        # only return one value if no which is provided
-        if self.which is None:
-            eles = eles[0]
-        else:
-            eles = eles[:self.which] if self.which < 0 else eles[self.which:]
-        return self.values(eles)
+        return self.values(eles[0])
 
     def set_capture(self):
         """
@@ -97,22 +118,16 @@ class Rule(object):
                 called when self.capture is attr-<attr_name>
                 iterate over all matches, returns a list of attributes
                 """
-                if isinstance(eles, list):
-                    return [ele.get(attr_name) for ele in eles]
-                else:
-                    return eles.get(attr_name)
+                return eles.get(attr_name)
             return attr
         else:
             def text(eles):
                 """
                 iterate over all matches, returns a list of text strings
                 """
-                if isinstance(eles, list):
-                    return ["".join(ele.itertext()) for ele in eles]
-                else:
-                    return "".join(eles.itertext())
+                return "".join(eles.itertext())
             return text
 
     
     def __str__(self):
-        return "Rule(%s, %s, %s, %s)" % (self.name, self.selector, self.capture, self.which)
+        return "Rule(%s, %s, %s, %s)" % (self.name, self.selector, self.capture, self.follow)

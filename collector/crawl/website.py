@@ -3,7 +3,7 @@ import glob
 import json
 from Queue import Queue
 
-from .group import RuleGroup
+from .group import Group
 
 class Website(object):
     """
@@ -22,7 +22,7 @@ class Website(object):
         for filename in glob.glob(os.path.join(self.folder, "*.json")):
             with open(filename) as fp:
                 rule_dict = json.load(fp)
-                self.queue.put(RuleGroup(**rule_dict))
+                self.queue.put(Group.from_json(rule_dict))
                 
     def crawl(self):
         """

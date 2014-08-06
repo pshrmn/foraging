@@ -3,9 +3,8 @@ from Queue import Queue
 
 import requests
 from lxml import html
-from lxml.cssselect import CSSSelector
 
-from .ruleset import RuleSet, Parent
+from .rules import RuleSet
 
 def get_html(url):
     """
@@ -22,58 +21,22 @@ def get_html(url):
     time.sleep(5)
     return dom
 
-def make_rule_set(rule_set):
-    RuleSet()
-
-class IndexPage(object):
-    """
-    An IndexPage is a specific type Page where:
-        - there is only one RuleSet
-        - there is a parent selector
-        - there is a list of urls to crawl
-        - there is an optional next selector to generate more urls to crawl
-    """
-    def __init__(self, index_dict, fetch=get_html):
-        #setup based on index_dict
-        self.rule_set = index_dict.get("rule_set")
-        self.parent = Parent(**index_dict.get("parent"))
-        self.urls = Queue()
-        for url in index_dict.get("urls"):
-            self.urls.put(Queue)
-        next = index_dict.get("next")
-        self.next = CSSSelector(next) if next else None
-
-        self.fetch = fetch
-
-    def get(self):
-        data = []
-        while not self.urls.empty():
-            url = self.urls.get()
-            dom = self.fetch(url)
-            self.add_next(dom)
-            for ele in self.parent(dom):
-                data.append(self.rule_set.get(ele))
-        
-
-    def add_next(self, dom):
-        if self.next:
-            next = self.next(dom)
-            href = next.get("href")
-            if href:
-                self.urls.put(href)
-
 class Page(object):
-    """
-    A Page is equivalent to 
-    """
-    def __init__(self, rule_sets, fetch=get_html):
-        """
-        sets is dict of RuleSet objects that exist in a page
-        fetch is a function that takes a url and returns an lxml.html.HtmlElement
-        """
-        self.fetch = fetch
-        self.rule_sets = rule_sets
+    def __init__(self, name, sets):
+        self.name = name
+        self.sets = sets    
 
-    def get(self, url):
-        dom = self.fetch(url)
-        return [rule_set.get(dom) for rule_set in self.rule_sets]
+    @classmethod
+    def from_json(cls, page_json):
+        name = page_json["name"]
+        sets = {rule_set["name"]: RuleSet.from_json(rule_set) for rule_set in page_json["sets"].itervalues()}
+        return cls(name, sets)
+
+    def get(self, dom):
+        data = {}
+        for key, val in self.sets.iteritems():
+            data[key] = val.get(dom)
+        return data
+
+    def __str__(self):
+        return "Page(%s, %s)" % (self.name, self.sets)

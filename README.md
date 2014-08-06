@@ -36,7 +36,6 @@ A page is a single web page, but can contain multiple rule sets
     page: {
         // order of operations within a page does not matter
         name: <string>,
-        index: <bool>,
         sets: {
             <name>: {...},
             ...
