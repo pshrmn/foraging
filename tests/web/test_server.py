@@ -38,59 +38,43 @@ class CollectTestCase(unittest.TestCase):
 
     def test_upload(self):
         headers = [('Content-Type', 'application/json')]
-        example_rules = {
-            "name": "example",
-            "index_urls": {
-                "http://www.example.com/pageone.html": True,
-                "http://www.example.com/pagetwo.html": True
-            },
-            "nodes": {
-                "default": {
-                    "rules": {
-                        "links": {
-                            "name": "links",
-                            "capture": "attr-href",
-                            "selector": "a"
-                        },
-                        "images": {
-                            "name": "images",
-                            "capture": "attr-src",
-                            "selector": "#main img",
-                            "which": 1
-                        }
-                    },
-                    "children": {},
-                    "name": "default"
-                }
-            }
-        }
-        example_saved_rules =  {
+        example_group = {
             "name": "example",
             "index_urls": [
-                "http://www.example.com/pageone.html", "http://www.example.com/pagetwo.html"
+                "http://www.example.com/pageone.html",
+                "http://www.example.com/pagetwo.html"
             ],
-            "nodes": {
+            "pages": {
                 "default": {
-                    "rules": {
-                        "links": {
-                            "name": "links",
-                            "capture": "attr-href",
-                            "selector": "a",
-                        },
-                        "images": {
-                            "name": "images",
-                            "capture": "attr-src",
-                            "selector": "#main img",
-                            "which": 1
+                    "name": "default",
+                    "index": False,
+                    "sets": {
+                        "default": {
+                            "name": "default",
+                            "rules": {
+                                "links": {
+                                    "name": "links",
+                                    "capture": "attr-href",
+                                    "selector": "a"
+                                },
+                                "images": {
+                                    "name": "images",
+                                    "capture": "attr-src",
+                                    "selector": "#main img",
+                                }
+                            }
                         }
-                    },
-                    "children": {},
-                    "name": "default"
+                    }
                 }
             }
         }
 
-        resp = self.app.post('/upload', headers=headers, data=json.dumps(example_rules))
+        upload = {
+            "group": example_group,
+            "site": "www.example.com"
+        }
+
+        resp = self.app.post('/upload', headers=headers, data=json.dumps(upload))
         self.assertEqual(resp.status_code, 200)
         resp_json = json.loads(resp.data)
         self.assertFalse(resp_json["error"])
@@ -99,7 +83,7 @@ class CollectTestCase(unittest.TestCase):
         data_file = os.path.join(data_folder, 'example.json')
         with open(data_file) as fp:
             saved_rules = json.load(fp)
-        self.assertEqual(saved_rules, example_saved_rules)
+        self.assertEqual(saved_rules, example_group)
 
         # clear out the directory
         os.remove(data_file)

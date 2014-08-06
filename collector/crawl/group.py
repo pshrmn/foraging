@@ -40,10 +40,10 @@ class Group(object):
         self.urls = urls if urls else []
 
     @classmethod
-    def  from_json(cls, group_json):
+    def from_json(cls, group_json):
         name = group_json["name"]
         pages = {page["name"]: Page.from_json(page) for page in group_json["pages"].itervalues()}
-        urls = group_json["urls"]
+        urls = group_json.get("urls")
         return cls(name, pages, urls)
 
     def __str__(self):

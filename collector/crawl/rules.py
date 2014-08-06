@@ -6,17 +6,19 @@ class RuleSet(object):
     rules is a dict containing rules for the set
     parent (optional) is a dict with a selector and an optional range
     """
-    def __init__(self, rules, parent=None):
+    def __init__(self, name, rules, parent=None):
+        self.name = name
         self.rules = rules
         self.parent = parent if parent else None
 
     @classmethod
     def from_json(cls, rule_set_json):
+        name = rule_set_json["name"]
         rules = {rule["name"]: Rule.from_json(rule) for rule in rule_set_json["rules"].itervalues()}
         parent = None
-        if rule_set_json["parent"]:
+        if rule_set_json.get("parent"):
             parent = Parent.from_json(rule_set_json["parent"])
-        return cls(rules, parent)
+        return cls(name, rules, parent)
 
     def get(self, dom):
         """
