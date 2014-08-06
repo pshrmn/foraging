@@ -34,14 +34,35 @@ class FromJSONTestCase(unittest.TestCase):
         self.assertEqual(rule_set.name, "default")
 
     def test_parent_from_json(self):
-        parent = self.group.pages["default"].sets["default"].parent
+        parent_json = {
+            "selector": ".product"
+        }
+        parent = Parent.from_json(parent_json)
         self.assertEqual(parent.selector, ".product")
 
+        parent_json["which"] = 3
+        range_parent = Parent.from_json(parent_json)
+        self.assertEqual(range_parent.range, 3)
+
     def test_rule_from_json(self):
-        rule = self.group.pages["default"].sets["default"].rules["name"]
-        self.assertEqual(rule.name, "name")
+        rule_json = {
+            "name": "title",
+            "selector": "h1",
+            "capture": "text"
+        }
+        rule = Rule.from_json(rule_json)
+        self.assertEqual(rule.name, "title")
         self.assertEqual(rule.capture, "text")
-        self.assertEqual(rule.selector, "a")
+        self.assertEqual(rule.selector, "h1")
+        
+        follow_rule_json = {
+            "name": "product_page",
+            "selector": ".product a",
+            "capture": "attr-href",
+            "follow": True
+        }
+        follow_rule = Rule.from_json(follow_rule_json)
+        self.assertTrue(follow_rule.follow)
 
 if __name__=="__main__":
     unittest.main()
