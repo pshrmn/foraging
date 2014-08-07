@@ -33,9 +33,14 @@ class Page(object):
         return cls(name, sets)
 
     def get(self, dom):
+        """
+        iterate over sets, returning a dict holding the captured values and a dict mapping
+        page names to "follow" urls
+        """
         data = {}
         for key, val in self.sets.iteritems():
-            data[key] = val.get(dom)
+            tup = val.get(dom)
+            data[key] = tup
         return data
 
     def __str__(self):

@@ -9,6 +9,10 @@ class RuleSet(object):
     def __init__(self, name, rules, parent=None):
         self.name = name
         self.rules = rules
+        self.follow = []
+        for rule in self.rules.itervalues():
+            if rule.follow:
+                self.follow.append(rule.name)
         self.parent = parent if parent else None
 
     @classmethod
@@ -28,11 +32,23 @@ class RuleSet(object):
         """
         if self.parent:
             return map(self.apply, self.parent.get(dom))
+            # if self.then, get the url fr
         else:    
             return self.apply(dom)
 
     def apply(self, dom):
-        return {rule.name: rule.get(dom) for rule in self.rules}
+        data = {}
+        follow = {}
+        for rule in self.rules.itervalues():
+            rule_data, follow_data = rule.get(dom)
+            # if any of the rules return None
+            if rule_data:
+                data[rule.name] = rule_data
+                if follow_data:
+                    follow[rule.name] = follow_data
+            else:
+                return None, None
+        return data, follow
 
     def __str__(self):
         return "RuleSet(%s, %s)" % (self.rules, self.parent)
@@ -87,7 +103,7 @@ class Rule(object):
         self.follow = follow
 
         self.xpath = CSSSelector(self.selector)
-        self.values = self.set_capture()
+        self.value = self.set_capture()
 
     @classmethod
     def from_json(cls, rule_json):
@@ -100,13 +116,17 @@ class Rule(object):
     def get(self, html):
         """
         html is an lxml parsed html etree
-        returns a list of values based on self.capture
+        returns a list of value based on self.capture
         """
         eles = self.xpath(html)
         # return None if the xpath gets no matches
         if len(eles) == 0:
-            return None
-        return self.values(eles[0])
+            return None, None
+        value = self.value(eles[0])
+        if self.follow:
+            return value, value
+        else:
+            return value, None
 
     def set_capture(self):
         """
