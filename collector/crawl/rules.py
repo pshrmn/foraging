@@ -32,16 +32,19 @@ class RuleSet(object):
         """
         if self.parent:
             return map(self.apply, self.parent.get(dom))
-            # if self.then, get the url fr
         else:    
             return self.apply(dom)
 
     def apply(self, dom):
+        """
+        iterate over rules given a dom, returning dict of {rule name:value} pairs and a dict of
+        {page name: url} pairs to crawl subsequent pages
+        """
         data = {}
         follow = {}
         for rule in self.rules.itervalues():
             rule_data, follow_data = rule.get(dom)
-            # if any of the rules return None
+            # if any of the rules return None, have the whole thing fail
             if rule_data:
                 data[rule.name] = rule_data
                 if follow_data:

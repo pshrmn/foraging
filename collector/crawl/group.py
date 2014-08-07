@@ -14,13 +14,14 @@ def get_html(url):
     """
     resp = requests.get(url)
     if resp.status_code != 200:
-        return
+        return None, url
     dom = html.document_fromstring(resp.text)
     dom.make_links_absolute(url)
     print("got:\t%s" % url)
     # don't hit a server too often
     time.sleep(5)
-    return dom
+    canonical_url = canonical(dom) or url
+    return dom, canonical_url
 
 def canonical(dom):
     """
@@ -28,7 +29,7 @@ def canonical(dom):
     not yet used, but will be useful to prevent duplicate elements
     """
     canon = CSSSelector("link[rel=canonical]")
-    matches = canon.get(dom)
+    matches = canon(dom)
     if len(matches)==0:
         return
     return matches[0].get("href")
@@ -47,18 +48,29 @@ class Group(object):
         return cls(name, pages, urls)
 
     def crawl_urls(self):
-        crawled_data = []
+        crawled_data = {}
         for url in self.urls:
             data = self.get(url)
-            if isinstance(data, list):
-                crawled_data.extend(data)
-            else:
-                crawled_data.append(data)
+            for key, val in data.iteritems():
+                new_data = crawled_data.get(key, [])
+                if isinstance(val, list):
+                    new_data.extend(val)
+                else:
+                    new_data.append(val)
+                crawled_data[key] = new_data
         return crawled_data
+
+    def get(self, url):
+        """
+        takes a url and iterates over pages, starting with the default page
+        """
+        return self.get_page(url, "default")
 
     def get_page(self, url, page_name):
         data = {}
-        dom = get_html(url)
+        dom, canonical_url = get_html(url)
+        if dom is None:
+            return {}
         page_data = self.pages[page_name].get(dom)
 
         for set_name, rule_set in page_data.iteritems():
@@ -88,17 +100,6 @@ class Group(object):
                     item.update({name+"_page": new_page_data})
                 data[set_name] = item
         return data
-
-    def get(self, url):
-        """
-        takes a url
-        """
-        data = self.get_page(url, "default")
-        # don't need wrapper, just the data
-        return data["default"]
-
-    def next_page(self):
-        pass
 
     def __str__(self):
         return "Group(%s, %s, %s)" % (self.name, self.pages, self.urls)

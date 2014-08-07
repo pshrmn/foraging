@@ -1,25 +1,7 @@
 import time
 from Queue import Queue
 
-import requests
-from lxml import html
-
 from .rules import RuleSet
-
-def get_html(url):
-    """
-    get request to url, if it succeeds, parses text and returns an lxml.html.HtmlElement
-    also makes links absolute
-    """
-    resp = requests.get(url)
-    if resp.ok:
-        return
-    dom = html.document_fromstring(resp.text)
-    dom.make_links_absolute(url)
-    print("got:\t%s" % url)
-    # don't hit a server too often
-    time.sleep(5)
-    return dom
 
 class Page(object):
     def __init__(self, name, sets):
