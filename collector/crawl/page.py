@@ -1,6 +1,3 @@
-import time
-from Queue import Queue
-
 from .rules import RuleSet
 
 class Page(object):

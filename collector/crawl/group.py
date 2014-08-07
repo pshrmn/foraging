@@ -1,38 +1,11 @@
-import time
 from Queue import Queue
-
-import requests
-from lxml import html
-from lxml.cssselect import CSSSelector
+import os
 
 from .page import Page
+from .cache import Cache, make_cache
 
-def get_html(url):
-    """
-    get request to url, if it succeeds, parses text and returns an lxml.html.HtmlElement
-    also makes links absolute
-    """
-    resp = requests.get(url)
-    if resp.status_code != 200:
-        return None, url
-    dom = html.document_fromstring(resp.text)
-    dom.make_links_absolute(url)
-    print("got:\t%s" % url)
-    # don't hit a server too often
-    time.sleep(5)
-    canonical_url = canonical(dom) or url
-    return dom, canonical_url
-
-def canonical(dom):
-    """
-    gets the canonical url for a page
-    not yet used, but will be useful to prevent duplicate elements
-    """
-    canon = CSSSelector("link[rel=canonical]")
-    matches = canon(dom)
-    if len(matches)==0:
-        return
-    return matches[0].get("href")
+cache_folder = make_cache(os.getcwd())
+group_cache = Cache(cache_folder)
 
 class Group(object):
     def __init__(self, name, pages, urls=None):
@@ -68,7 +41,7 @@ class Group(object):
 
     def get_page(self, url, page_name):
         data = {}
-        dom, canonical_url = get_html(url)
+        dom, canonical_url = group_cache.fetch(url)
         if dom is None:
             return {}
         page_data = self.pages[page_name].get(dom)
