@@ -79,5 +79,15 @@ class Cache(object):
         return dom, url
 
     def clear(self):
+        """
+        clear out all of the stored html files
+        """
         for f in self.filenames.iterkeys():
             os.remove(f)
+
+    def nuke(self):
+        """
+        remove the cache folder
+        """
+        self.clear()
+        os.rmdir(self.folder)

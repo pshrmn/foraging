@@ -21,6 +21,10 @@ class Group(object):
         return cls(name, pages, urls)
 
     def crawl_urls(self):
+        """
+        iterate over the urls in self.urls, then merge the resulting data based on the sets in the
+        default page of the group
+        """
         crawled_data = {}
         for url in self.urls:
             data = self.get(url)
@@ -40,6 +44,10 @@ class Group(object):
         return self.get_page(url, "default")
 
     def get_page(self, url, page_name):
+        """
+        takes a url and which page in self.pages, sends a request (or just opens if the url's html
+        is cached), and returns an lxml.html.HtmlElement
+        """
         data = {}
         dom, canonical_url = group_cache.fetch(url)
         if dom is None:
