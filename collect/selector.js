@@ -255,15 +255,15 @@ function cleanSelector(event){
     }
 
     // only care if nthoftype exists
-    if ( this.nthoftype ) {
-        // if turning on nthoftype and no other fragments are on, turn tag on
-        if ( event.target === this.nthoftype.ele  &&
-            this.nthoftype.on() && this.toString().charAt(0) === ":") {
-                this.tag.turnOn();
+    if ( this.nthoftype && this.nthoftype.on() ) {
+        // lxml requires a tag when using :nth-of-type
+        // if turning on nthoftype, turn on tag as well
+        if ( event.target === this.nthoftype.ele ) {
+            this.tag.turnOn();
         }
-        // if turning a fragment off and nthoftype is only fragment left on, turn it off as well
-        else if ( this.nthoftype.on() && this.toString().charAt(0) === ":") {
-            this.nthoftype.turnOff();    
+        // if turning off tag, turn off nthoftype as well
+        else if ( event.target === this.tag.ele && !this.tag.on() ) {
+            this.nthoftype.turnOff();
         }
     }
     this.family.update();
