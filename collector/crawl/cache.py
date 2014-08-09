@@ -2,10 +2,10 @@ import os
 import glob
 import re
 import time
+import urlparse
 
 from lxml import html
 from lxml.cssselect import CSSSelector
-
 import requests
 
 def clean_url_filename(url):
@@ -23,15 +23,17 @@ def canonical(dom):
         return
     return matches[0].get("href")
 
+def make_folder(path):
+    if not os.path.exists(path):
+        os.makedirs(path)
+    return path
+
 def make_cache(folder):
     """
     given a folder, check if cache folder exists in it. if it doesn't, create it
     return path to folder
     """
-    path = os.path.join(folder, 'cache')
-    if not os.path.exists(path):
-        os.makedirs(path)
-    return path
+    return make_folder(os.path.join(folder, 'cache'))
 
 class Cache(object):
     """
@@ -40,12 +42,48 @@ class Cache(object):
     """
     def __init__(self, folder):
         self.folder = folder
+        self.sites = {}
+        self._make_sites()
+        
+    def _make_sites(self):
+        walk_generator = os.walk(self.folder)
+        path, folders, files = walk_generator.next()
+        for folder in folders:
+            self.sites[folder] = Site(folder, self.folder)
+
+    def fetch(self, url):
+        domain = urlparse.urlparse(url).netloc.replace(".", "_")
+        if domain not in self.sites:
+            self.sites[domain] = Site(domain, self.folder)
+        site = self.sites.get(domain)
+        return site.fetch(url)
+
+    def clear(self):
+        """
+        clear out all of the stored html files
+        """
+        for name, site in self.sites.iteritems():
+            site.clear()
+            os.rmdir(os.path.join(self.folder, name))
+
+    def nuke(self):
+        """
+        remove the cache folder
+        """
+        self.clear()
+        os.rmdir(self.folder)
+
+class Site(object):
+    def __init__(self, name, parent):
+        self.name = name
+        self.parent = parent
+        self.folder = make_folder(os.path.join(self.parent, self.name))
         self.filenames = {name: True for name in glob.glob(os.path.join(self.folder, "*"))}
         self.wait = False
         self.wait_until = 0
 
     def fetch(self, url):
-        clean_url = clean_url_filename(url)
+        clean_url = os.path.join(self.folder, clean_url_filename(url))
         if clean_url in self.filenames:
             with open(os.path.join(self.folder, clean_url)) as fp:
                 text = fp.read()
@@ -79,15 +117,5 @@ class Cache(object):
         return dom, url
 
     def clear(self):
-        """
-        clear out all of the stored html files
-        """
         for f in self.filenames.iterkeys():
             os.remove(f)
-
-    def nuke(self):
-        """
-        remove the cache folder
-        """
-        self.clear()
-        os.rmdir(self.folder)
