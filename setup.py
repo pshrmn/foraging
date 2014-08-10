@@ -4,7 +4,7 @@ packages = find_packages()
 
 setup(
     name = "Collector",
-    version = "0.2.3",
+    version = "0.2.4",
     packages = packages,
     install_requires = ["Flask", "cssselect>=0.9.1", "requests>=2", "lxml>=3.3.1"],
     author = "Paul Sherman",

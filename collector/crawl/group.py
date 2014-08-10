@@ -11,7 +11,9 @@ class Group(object):
     def __init__(self, name, pages, urls=None):
         self.name = name
         self.pages = pages
-        self.urls = urls if urls else []
+        self.urls = Queue()
+        for url in urls[]:
+            self.urls.put(url)
 
     @classmethod
     def from_json(cls, group_json):
@@ -26,7 +28,8 @@ class Group(object):
         default page of the group
         """
         crawled_data = {}
-        for url in self.urls:
+        while not self.urls.empty():
+            url = self.urls.get()
             data = self.get(url)
             for key, val in data.iteritems():
                 new_data = crawled_data.get(key, [])
@@ -52,7 +55,12 @@ class Group(object):
         dom, canonical_url = group_cache.fetch(url)
         if dom is None:
             return {}
-        page_data = self.pages[page_name].get(dom)
+        page = self.pages[page_name]
+        page_data = page.get(dom)
+
+        if page_name == "default" and page.next:
+            new_url = page.next_page(dom)
+            self.urls.put(new_url)
 
         for set_name, rule_set in page_data.iteritems():
             if isinstance(rule_set, list):
@@ -80,7 +88,7 @@ class Group(object):
                     new_page_data = self.get_page(href, name)
                     item.update({name+"_page": new_page_data})
                 data[set_name] = item
-        return data
+    return data
 
     def __str__(self):
         return "Group(%s, %s, %s)" % (self.name, self.pages, self.urls)
