@@ -75,6 +75,8 @@ body {
     .collectjs .permanent .currentInfo div {
       display: inline-block;
       margin-right: 15px; }
+    .collectjs .permanent .currentInfo .info {
+      border-bottom: 1px dotted #444444; }
   .collectjs .views {
     box-sizing: border-box;
     min-height: 250px;

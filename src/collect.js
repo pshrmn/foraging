@@ -158,6 +158,7 @@ var HTML = {
         capture: document.getElementById("previewCapture"),
         contents: document.getElementById("previewContents"),
     },
+    cycle: document.getElementById("ruleCycle"),
     ruleHTML: document.getElementById("ruleHTML"),
     tabs: {
         rule: document.getElementById("ruleTab"),
@@ -297,7 +298,7 @@ Interface.setup();
 
 function resetInterface(){
     clearClass("queryCheck");
-    
+
     resetRulesView();
     resetPreviewView();
 }
@@ -634,10 +635,22 @@ function saveNextEvent(event){
 
     showRuleForm();
     saveNext(selector);
-    resetInterface();
+
+    if ( Collect.parent.selector ) {
+        addParentGroup(Collect.parent.selector, Collect.parent.which);
+    }
+
+    refreshElements();
 }
 
 function toggleParentEvent(event){
+    // can only be setting parent or next at once, so if setting next, return
+    if ( Interface.activeForm === "next" ) {
+        // revert checked
+        this.checked = !this.checked;
+        alertMessage("cannot set parent while setting next selector");
+        return;
+    }
     if ( this.checked ) {
         // if parent selector doesn't exist, switch to parent form
         showParentForm();
@@ -655,9 +668,18 @@ function toggleParentEvent(event){
 }
 
 function toggleNextEvent(event){
+    // can only be setting parent or next at once, so if setting parent, return
+    if ( Interface.activeForm === "parent" ) {
+        // revert checked
+        this.checked = !this.checked;
+        alertMessage("cannot set next while setting parent selector");
+        return;
+    }
     if ( this.checked ) {
         showNextForm();
         showTab(HTML.tabs.rule);
+        // remove parent selector limitation 
+        clearClass("parentGroup");
     } else {
         delete Collect.next;
         HTML.info.next.textContent = "";
@@ -845,6 +867,9 @@ function addRule(rule, set){
 }
 
 
+/*
+add .parentGroup to all elements matching parent selector and in range
+*/
 function addParentGroup(selector, range){
     var elements = document.querySelectorAll(selector + Collect.not),
         start = 0,
@@ -868,7 +893,11 @@ if Collect.parent.which is defined, only use Collect.parent.selector elements wi
 function parentElements(selector){
     var range = Collect.parent.which,
         allElements = [];
-    if ( range !== undefined ) {
+
+    // don't restrict to Collect.parent.selector when setting next selector
+    if ( Interface.activeForm === "next" ) {
+        allElements = Array.prototype.slice.call(document.querySelectorAll(selector + Collect.not));
+    } else if ( range !== undefined ) {
         var elements = document.querySelectorAll(Collect.parent.selector),
             start = 0,
             end = elements.length,
@@ -895,6 +924,7 @@ function showRuleForm(){
     HTML.form.rule.form.style.display = "inline-block";
     HTML.form.parent.form.style.display = "none";
     HTML.form.next.form.style.display = "none";
+    HTML.cycle.style.display = "block";
 }
 
 function showParentForm(){
@@ -902,6 +932,7 @@ function showParentForm(){
     HTML.form.parent.form.style.display = "inline-block";
     HTML.form.rule.form.style.display = "none";
     HTML.form.next.form.style.display = "none";
+    HTML.cycle.style.display = "none";
 }
 
 function showNextForm(){
@@ -909,6 +940,7 @@ function showNextForm(){
     HTML.form.next.form.style.display = "inline-block";
     HTML.form.parent.form.style.display = "none";
     HTML.form.rule.form.style.display = "none";
+    HTML.cycle.style.display = "none";
 }
 
 /***********************

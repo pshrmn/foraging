@@ -118,6 +118,10 @@ body{
                 display: inline-block;
                 margin-right: 15px;
             }
+
+            .info{
+                border-bottom: 1px dotted $dark-gray;
+            }
         }
     }
 

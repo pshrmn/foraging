@@ -1,6 +1,6 @@
 {
   "name": "collectJS",
-  "version": "0.16.9",
+  "version": "0.16.10",
   "repository": {
     "type": "git",
     "url": "git://github.com/psherman/collectjs-chrome.git"

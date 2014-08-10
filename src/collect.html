@@ -24,16 +24,16 @@
             <button id="createRuleSet" title="create a new rule set">+</button>
             <button id="deleteRuleSet" title="delete current rule set">&times;</button>
         </div>
-        <div id="currentParent">
+        <div id="currentParent" class="info">
             Parent <input type="checkbox" id="ruleSetParent" name="parent" />
             <span id="parentSelectorView"></span>
             <span id="parentRangeView"></span>
         </div>
-        <div id="defaultNext">
+        <div id="defaultNext" class="info">
             Next <input type="checkbox" id="pageNext" name="next" />
             <span id="nextSelectorView"></span>
         </div>
-        <div id="indexMarker">
+        <div id="indexMarker" class="info">
             Initial URL
             <input type="checkbox" id="indexToggle" />
         </div>
@@ -95,9 +95,11 @@
                 <div id="selectorHolder"></div>
                 <div class="ruleHTMLHolder">
                     Count: <span id="currentCount"></span>
-                    <button id="ruleCyclePrevious" class="cycle" title="previous element matching selector">&lt;&lt;</button>
-                    <button id="ruleCycleNext" class="cycle" title="next element matching selector">&gt;&gt;</button>
-                    <span id="ruleHTML"></span>
+                    <div id="ruleCycle">
+                        <button id="ruleCyclePrevious" class="cycle" title="previous element matching selector">&lt;&lt;</button>
+                        <button id="ruleCycleNext" class="cycle" title="next element matching selector">&gt;&gt;</button>
+                        <span id="ruleHTML"></span>
+                    </div>
                 </div>
             </div>
         </div>
