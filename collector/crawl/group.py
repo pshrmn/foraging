@@ -12,8 +12,9 @@ class Group(object):
         self.name = name
         self.pages = pages
         self.urls = Queue()
-        for url in urls[]:
-            self.urls.put(url)
+        if urls is not None:
+            for url in urls:
+                self.urls.put(url)
 
     @classmethod
     def from_json(cls, group_json):
@@ -88,7 +89,7 @@ class Group(object):
                     new_page_data = self.get_page(href, name)
                     item.update({name+"_page": new_page_data})
                 data[set_name] = item
-    return data
+        return data
 
     def __str__(self):
         return "Group(%s, %s, %s)" % (self.name, self.pages, self.urls)
