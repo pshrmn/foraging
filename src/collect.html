@@ -29,6 +29,10 @@
             <span id="parentSelectorView"></span>
             <span id="parentRangeView"></span>
         </div>
+        <div id="defaultNext">
+            Next <input type="checkbox" id="pageNext" name="next" />
+            <span id="nextSelectorView"></span>
+        </div>
         <div id="indexMarker">
             Initial URL
             <input type="checkbox" id="indexToggle" />
@@ -79,6 +83,14 @@
                     <button id="clearParent">Clear</button>
                 </div>
             </form>
+            <form id="nextForm" class="column">
+                <div class="rule">
+                    <label>Selector:</label>
+                    <span id="nextSelector"></span>
+                </div>
+                <button id="saveNext">Save Next Rule</button>
+                <button id="clearNext">Clear</button>
+            </form>
             <div class="modifiers column">
                 <div id="selectorHolder"></div>
                 <div class="ruleHTMLHolder">
@@ -91,16 +103,7 @@
         </div>
     </div>
     <div class="view" id="groupsView">
-        <div id="ruleSets" class="rules">
-            <!-- example .ruleSet layout
-            <div class="ruleSet">
-                <h3>Name: {{name}}</h3>
-                <ul>
-                    <li>Rule...</li>
-                </ul>
-            </div>
-            -->
-        </div>
+        <div id="ruleSets" class="rules"></div>
     </div>
     <div class="view" id="previewView">
         <p>

@@ -28,6 +28,13 @@ A parent is a selector for how to match an object within the DOM. This is useful
         range: <int> (optional)
     }
 
+Next is a selector that captures an element with an href attribute and can be used to generate more urls to apply the default page to.
+Can only be used on the "default" page (and for the time being can only be applied to one element)
+
+    next = {
+        selector: <string>
+    }
+
 A page can have multiple sets in it, in case parts of it require a parent selector while others do not
 
     page = {
