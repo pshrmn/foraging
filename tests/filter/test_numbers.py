@@ -3,7 +3,7 @@ import unittest
 
 class NumberTest(unittest.TestCase):
     """
-    test the functions in collector.filter.number
+    test the functions in collector.filter.numbers
     """
     def test_integer(self):
         values = [
