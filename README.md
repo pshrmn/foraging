@@ -31,7 +31,7 @@ A group contains a set of related rules across multiple pages
         urls: [<string>, ...]
     }
 
-A page is a single web page, but can contain multiple rule sets
+A page is a single web page, but can contain multiple rule sets. When index=true, there should generally only be one rule set, which has a parent selector and is used to generate an array of data, rather than a singular data point.
 
     page: {
         // order of operations within a page does not matter
@@ -40,6 +40,8 @@ A page is a single web page, but can contain multiple rule sets
             <name>: {...},
             ...
         },
+        index: <bool>,
+        next: <string> (optional)
     }
 
 A rule set contains related rules within a page. If there are multiple "groups" in the page that you want to get data for, use a parent selector to identify each group. For example, if you wanted to get different columns (td elements) from a table, the parent selector should specify how to select the rows (tr elements)

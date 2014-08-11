@@ -3,10 +3,11 @@ from .rules import RuleSet
 from lxml.cssselect import CSSSelector
 
 class Page(object):
-    def __init__(self, name, sets, next=None):
+    def __init__(self, name, sets, index=False, next=None):
         self.name = name
         self.sets = sets
         self.next = None
+        self.index = index
         # only set next on "default" page
         if self.name == "default" and next:
             self.next = CSSSelector(next)

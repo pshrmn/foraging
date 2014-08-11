@@ -58,6 +58,16 @@ class Cache(object):
         site = self.sites.get(domain)
         return site.fetch(url)
 
+    def visited(self, url):
+        """
+        check whether a url has been visited
+        """
+        domain = urlparse.urlparse(url).netloc.replace(".", "_")
+        if domain not in self.sites:
+            return False
+        site = self.sites.get(domain)
+        return site.visited(url)
+
     def clear(self):
         """
         clear out all of the stored html files
@@ -115,6 +125,10 @@ class Site(object):
         dom.make_links_absolute(url)
         canonical_url = canonical(dom) or url
         return dom, url
+
+    def visited(self, url):
+        clean_url = os.path.join(self.folder, clean_url_filename(url))
+        return clean_url in self.filenames
 
     def clear(self):
         for f in self.filenames.iterkeys():
