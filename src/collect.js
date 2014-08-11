@@ -696,7 +696,9 @@ function toggleURLEvent(event){
 function previewSavedRule(event){
     clearClass("queryCheck");
     clearClass("collectHighlight");
-    previewRule(this.textContent);
+    var selector = this.dataset.selector,
+        elements = parentElements(selector);
+    addClass("savedPreview", elements);
 }
 
 function unpreviewSavedRule(event){
@@ -1487,6 +1489,7 @@ function saveNext(selector){
             page = Collect.current.page,
             ruleSet = Collect.current.ruleSet;
 
+        site.groups[group].pages[page].index = true;
         site.groups[group].pages[page].next = selector;
         storage.sites[host] = site;
         chrome.storage.local.set({'sites': storage.sites});
@@ -1501,40 +1504,11 @@ function deleteNext(){
             page = Collect.current.page,
             ruleSet = Collect.current.ruleSet;
 
+        site.groups[group].pages[page].index = false;
         delete site.groups[group].pages[page].next;
         storage.sites[host] = site;
         chrome.storage.local.set({'sites': storage.sites});
     });         
-}
-
-function previewRule(name){
-    chrome.storage.local.get('sites', function previewRuleChrome(storage){
-        var host = window.location.hostname,
-            site = storage.sites[host],
-            group = Collect.current.group,
-            page = Collect.current.page,
-            ruleSet = Collect.current.ruleSet,
-            pages = site.groups[group].pages[page],
-            parentSelector, selector, elements,
-            currPage, set,
-            pageName, setName, ruleName;
-        for ( pageName in pages ) {
-            currPage = pages[pageName];
-            for ( setName in currPage.sets ) {
-                set = currPage.sets[setName];
-                for ( ruleName in set.rules ) {
-                    if ( name === ruleName ) {
-                        parentSelector = set.parent ? set.parent.selector + " ": "";
-                        selector = parentSelector + set.rules[ruleName].selector + Collect.not,
-                        elements = document.querySelectorAll(selector);
-                        addClass("savedPreview", elements);
-                        // return to quickly break out of the three loops :)
-                        return;
-                    }
-                }
-            }
-        }
-    });
 }
 
 /***********************
@@ -1968,6 +1942,7 @@ function ruleElement(rule){
     li.appendChild(deltog);
 
     nametag.textContent = rule.name;
+    nametag.dataset.selector = rule.selector;
     deltog.innerHTML = "&times;";
 
     nametag.addEventListener("mouseenter", previewSavedRule, false);
