@@ -11,7 +11,7 @@ var marginBottom;
 (function addInterface(){
     var div = noSelectElement("div");
     div.classList.add("collectjs");
-    div.innerHTML = {{src/collect.html}};
+    div.innerHTML = {{src/collector.html}};
     document.body.appendChild(div);
     addNoSelect(div.querySelectorAll("*"));
 
@@ -51,6 +51,8 @@ Object that controls the functionality of the interface
 */
 var Interface = {
     activeForm: "rule",
+    editing: false,
+    editingElement: undefined,
     tabs: {
         tab: document.querySelector(".tab.active"),
         view: document.querySelector(".view.active")
@@ -706,12 +708,13 @@ function unpreviewSavedRule(event){
 }
 
 /*
+does nothing yet
+*/
 function editSavedRule(event){
     var name = this.textContent;
     deleteEditing();
-    editRule(name, this);
+    //editRule(name, this);
 }
-*/
 
 function deleteRuleEvent(event){
     var parent = this.parentElement,
@@ -1947,7 +1950,7 @@ function ruleElement(rule){
 
     nametag.addEventListener("mouseenter", previewSavedRule, false);
     nametag.addEventListener("mouseleave", unpreviewSavedRule, false);
-    //nametag.addEventListener("click", editSavedRule, false);
+    nametag.addEventListener("click", editSavedRule, false);
     deltog.addEventListener("click", deleteRuleEvent, false);
     
     return li;

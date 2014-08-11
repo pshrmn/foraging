@@ -1,6 +1,6 @@
-###CollectJS
+###CollectorJS
 
-A Chrome extension that allows you to get information necessary to crawl a page. Creates rules that consist of a css selector to get an element (or more) in the page and a capture value, which is either text or an element attribute. Should be run in correlation with the web.app module in https://github.com/psherman/collector
+A Chrome extension that allows you to get information necessary to crawl a page. Creates rules that consist of a css selector to get an element (or more) in the page and a capture value, which is either text or an element attribute. Should be run in correlation with the web.server module in https://github.com/psherman/collector
 
 #####Rules Format
 

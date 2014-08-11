@@ -15,28 +15,28 @@ module.exports = function(grunt){
                 devel: true,
                 expr: true
             },
-            all: ['collect/collect.js']
+            all: ['collector/collector.js']
         },
         sass: {
             dist: {
                 files: {
-                    'collect/css/interface.css': 'src/css/interface.scss'
+                    'collector/css/interface.css': 'src/css/interface.scss'
                 }
             }
         },
         html_to_js_str: {
             test: {
                 files: {
-                  'collect/collect.js': 'src/collect.js'
+                  'collector/collector.js': 'src/collector.js'
                 }
             }
         },
         jasmine: {
             pivotal: {
-                src: 'collect/collect.js',
+                src: 'collector/collector.js',
                 options: {
-                    specs: 'tests/CollectSpec.js',
-                    helpers: 'tests/CollectHelper.js'
+                    specs: 'tests/CollectorSpec.js',
+                    helpers: 'tests/CollectorHelper.js'
                 }
             }
         }
