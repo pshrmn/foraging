@@ -1,11 +1,5 @@
 "use strict";
 
-/*
-Notes:
-need to fix editing a rule once everything is up and running
-implement ruleSet.parent once the rest of the storage things are fully functional
-*/
-
 var marginBottom;
 // add the interface first so that html elements are present
 (function addInterface(){
@@ -51,8 +45,6 @@ Object that controls the functionality of the interface
 */
 var Interface = {
     activeForm: "rule",
-    editing: false,
-    editingElement: undefined,
     tabs: {
         tab: document.querySelector(".tab.active"),
         view: document.querySelector(".view.active")
@@ -185,7 +177,7 @@ var Family = {
         resetInterface(); 
         // preserve name when switching selector while editing
         if ( Interface.editing ) {
-            HTML.form.rule.name.value = Interface.editing;
+            HTML.form.rule.name.value = Interface.editing.rule.name;
         }
         
         var selectorElement;
@@ -207,6 +199,23 @@ var Family = {
         Family.family = sf;
         sf.update();
         showTab(HTML.tabs.rule);
+    },
+    edit: function(selector){
+        //test
+        var eles = parentElements(selector);
+        if ( !eles.length ) {
+            return;
+        }
+        var sf = new SelectorFamily(eles[0],
+            Collect.parent.selector,
+            HTML.family,
+            HTML.form.rule.selector,
+            Family.test.bind(Family),
+            Collect.options
+        );
+        Family.family = sf;
+        sf.update();
+        showTab(HTML.tabs.rule);  
     },
     remove: function(){
         if ( this.family ) {
@@ -311,6 +320,7 @@ function resetRulesView(){
     // reset rule form
     HTML.form.rule.name.value = "";
     HTML.form.rule.capture.textContent = "";
+    HTML.form.rule.selector.textContent = "";
     HTML.form.rule.follow.checked = false;
     HTML.form.rule.follow.disabled = true;
     HTML.form.rule.followHolder.style.display = "none";
@@ -318,6 +328,9 @@ function resetRulesView(){
     // reset parent form
     HTML.form.parent.selector.textContent = "";
     HTML.form.parent.range.value = "";
+
+    // reset next form
+    HTML.form.next.selector.textContent = "";
 
     HTML.info.count.textContent = "";
     HTML.ruleHTML.innerHTML = "";
@@ -713,7 +726,9 @@ does nothing yet
 function editSavedRule(event){
     var name = this.textContent;
     deleteEditing();
-    //editRule(name, this);
+    editRule(name, this);
+    showTab(HTML.tabs.rule);
+    showRuleForm();
 }
 
 function deleteRuleEvent(event){
@@ -1419,26 +1434,64 @@ function saveRule(rule){
             page = Collect.current.page,
             ruleSet = Collect.current.ruleSet;
 
-        if ( !uniqueRuleName(name, site.groups[group].pages) ) {
-            // some markup to signify you need to change the rule's name
-            alertMessage("Rule name is not unique");
-            HTML.form.rule.name.classList.add("error");
-            return;
+        if ( !Interface.editing ) {
+            if ( !uniqueRuleName(name, site.groups[group].pages) ) {
+                    // some markup to signify you need to change the rule's name
+                    alertMessage("Rule name is not unique");
+                    HTML.form.rule.name.classList.add("error");
+                    return;
+            }
+            // for new rules, create a new page if rule.follow
+            if ( rule.follow ) {
+                site.groups[group].pages[rule.name] = newPage(rule.name);
+                HTML.groups.page.appendChild(newOption(rule.name));
+            }
+            addRule(rule, ruleSet);
+        } else {
+            Interface.editing.element.textContent = rule.name;
+            Interface.editing.element.dataset.selector = rule.selector;
+            var oldName = Interface.editing.rule.name;
+            // delete the old rule if changing name
+            if ( rule.name !== oldName ) {
+                delete site.groups[group].pages[page].sets[ruleSet].rules[oldName];
+            }
+            deleteEditing();
         }
 
         site.groups[group].pages[page].sets[ruleSet].rules[rule.name] = rule;
 
-        // create a new page if rule.follow
-        if ( rule.follow ) {
-            site.groups[group].pages[rule.name] = newPage(rule.name);
-            HTML.groups.page.appendChild(newOption(rule.name));
-        }
-
         storage.sites[host] = site;
         chrome.storage.local.set({'sites': storage.sites});
 
-        addRule(rule, ruleSet);
     });
+}
+
+function editRule(name, element){
+    chrome.storage.local.get('sites', function deleteRuleChrome(storage){
+        var host = window.location.hostname,
+            sites = storage.sites,
+            group = Collect.current.group,
+            page = Collect.current.page,
+            ruleSet = Collect.current.ruleSet,
+            rule = sites[host].groups[group].pages[page].sets[ruleSet].rules[name];
+
+        Interface.editing = {
+            rule: rule,
+            element: element
+        };
+
+        Family.edit(rule.selector);
+
+        // setup the form
+        HTML.form.rule.name.value = rule.name;
+        HTML.form.rule.selector.textContent = rule.selector;
+        HTML.form.rule.capture.textContent = rule.capture;
+        if ( rule.follow ) {
+            HTML.form.rule.follow.checked = rule.follow;
+            HTML.form.rule.follow.disabled = false;
+            HTML.form.rule.followHolder.style.display = "block";
+        }
+    });  
 }
 
 function deleteRule(name, element){
@@ -1838,11 +1891,14 @@ function followRulesInPage(page){
 }
 
 function deleteEditing(){
-    delete Interface.editing;
-    if ( Interface.editingElement ) {
-        Interface.editingElement.classList.remove("editing");
-        delete Interface.editingElement;
+    if ( !Interface.editing ) {
+        return;
     }
+    var element = Interface.editing.element;
+    if ( element ) {
+        element.classList.remove("editing");
+    }
+    delete Interface.editing;
 }
 
 /***********************
