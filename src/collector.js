@@ -117,6 +117,14 @@ var HTML = {
             follow: document.getElementById("ruleFollow"),
             followHolder: document.querySelector("#ruleItems .follow")
         },
+        edit: {
+            form: document.getElementById("editForm"),
+            name: document.getElementById("editName"),
+            capture: document.getElementById("editAttr"),
+            selector: document.getElementById("editSelector"),
+            follow: document.getElementById("editFollow"),
+            followHolder: document.querySelector("#ruleItems .editFollow")  
+        },
         parent: {
             form: document.getElementById("parentForm"),
             selector: document.getElementById("parentSelector"),
@@ -325,6 +333,14 @@ function resetRulesView(){
     HTML.form.rule.follow.disabled = true;
     HTML.form.rule.followHolder.style.display = "none";
 
+    // reset edit form
+    HTML.form.edit.name.value = "";
+    HTML.form.edit.capture.textContent = "";
+    HTML.form.edit.selector.textContent = "";
+    HTML.form.edit.follow.checked = false;
+    HTML.form.edit.follow.disabled = true;
+    HTML.form.edit.followHolder.style.display = "none";
+
     // reset parent form
     HTML.form.parent.selector.textContent = "";
     HTML.form.parent.range.value = "";
@@ -365,6 +381,7 @@ function tabEvents(){
 
 function ruleViewEvents(){
     idEvent("saveRule", "click", saveRuleEvent);
+    idEvent("saveEdit", "click", saveEditEvent);
     idEvent("saveParent", "click", saveParentEvent);
     idEvent("saveNext", "click", saveNextEvent);
 
@@ -589,7 +606,33 @@ function saveRuleEvent(event){
         rule.follow = true;
     }
     saveRule(rule);
-    resetInterface();
+}
+
+function saveEditEvent(event){
+    event.preventDefault();
+    var name = HTML.form.edit.name.value,
+        selector = HTML.form.edit.selector.textContent,
+        capture = HTML.form.edit.capture.textContent,
+        follow = HTML.form.edit.follow.checked,
+        rule;
+
+    clearErrors();
+    if ( emptyErrorCheck(name, HTML.form.edit.name, "Name needs to be filled in") ||
+        emptyErrorCheck(selector, HTML.form.edit.selector, "No CSS selector selected") ||
+        emptyErrorCheck(capture, HTML.form.edit.capture, "No attribute selected") ) {
+        return;
+    }
+    
+    rule = {
+        name: name,
+        capture: capture,
+        selector: selector
+    };
+
+    if ( follow ) {
+        rule.follow = true;
+    }
+    saveEditingRule(rule);
 }
 
 function saveParentEvent(event){
@@ -728,7 +771,7 @@ function editSavedRule(event){
     deleteEditing();
     editRule(name, this);
     showTab(HTML.tabs.rule);
-    showRuleForm();
+    showEditForm();
 }
 
 function deleteRuleEvent(event){
@@ -944,7 +987,17 @@ function showRuleForm(){
     HTML.form.rule.form.style.display = "inline-block";
     HTML.form.parent.form.style.display = "none";
     HTML.form.next.form.style.display = "none";
+    HTML.form.edit.form.style.display = "none";
     HTML.cycle.style.display = "block";
+}
+
+function showEditForm(){
+    Interface.activeForm = "rule";
+    HTML.form.edit.form.style.display = "inline-block";
+    HTML.form.rule.form.style.display = "none";
+    HTML.form.parent.form.style.display = "none";
+    HTML.form.next.form.style.display = "none";
+    HTML.cycle.style.display = "block";   
 }
 
 function showParentForm(){
@@ -952,6 +1005,7 @@ function showParentForm(){
     HTML.form.parent.form.style.display = "inline-block";
     HTML.form.rule.form.style.display = "none";
     HTML.form.next.form.style.display = "none";
+    HTML.form.edit.form.style.display = "none";
     HTML.cycle.style.display = "none";
 }
 
@@ -960,6 +1014,7 @@ function showNextForm(){
     HTML.form.next.form.style.display = "inline-block";
     HTML.form.parent.form.style.display = "none";
     HTML.form.rule.form.style.display = "none";
+    HTML.form.edit.form.style.display = "none";
     HTML.cycle.style.display = "none";
 }
 
@@ -1434,40 +1489,58 @@ function saveRule(rule){
             page = Collect.current.page,
             ruleSet = Collect.current.ruleSet;
 
-        if ( !Interface.editing ) {
-            if ( !uniqueRuleName(name, site.groups[group].pages) ) {
-                    // some markup to signify you need to change the rule's name
-                    alertMessage("Rule name is not unique");
-                    HTML.form.rule.name.classList.add("error");
-                    return;
-            }
-            // for new rules, create a new page if rule.follow
-            if ( rule.follow ) {
-                site.groups[group].pages[rule.name] = newPage(rule.name);
-                HTML.groups.page.appendChild(newOption(rule.name));
-            }
-            addRule(rule, ruleSet);
-        } else {
-            Interface.editing.element.textContent = rule.name;
-            Interface.editing.element.dataset.selector = rule.selector;
-            var oldName = Interface.editing.rule.name;
-            // delete the old rule if changing name
-            if ( rule.name !== oldName ) {
-                delete site.groups[group].pages[page].sets[ruleSet].rules[oldName];
-            }
-            deleteEditing();
+        if ( !uniqueRuleName(name, site.groups[group].pages) ) {
+                // some markup to signify you need to change the rule's name
+                alertMessage("Rule name is not unique");
+                HTML.form.rule.name.classList.add("error");
+                return;
         }
+        // for new rules, create a new page if rule.follow
+        if ( rule.follow ) {
+            site.groups[group].pages[rule.name] = newPage(rule.name);
+            HTML.groups.page.appendChild(newOption(rule.name));
+        }
+        addRule(rule, ruleSet);
 
         site.groups[group].pages[page].sets[ruleSet].rules[rule.name] = rule;
 
         storage.sites[host] = site;
         chrome.storage.local.set({'sites': storage.sites});
 
+        // don't reset until rule has actually been saved
+        resetInterface();
+    });
+}
+
+function saveEditingRule(rule){
+    chrome.storage.local.get('sites', function saveEditingRuleChrome(storage){
+        var host = window.location.hostname,
+            site = storage.sites[host],
+            name = rule.name,
+            group = Collect.current.group,
+            page = Collect.current.page,
+            ruleSet = Collect.current.ruleSet;
+
+        Interface.editing.element.textContent = rule.name;
+        Interface.editing.element.dataset.selector = rule.selector;
+        var oldName = Interface.editing.rule.name;
+        // delete the old rule if changing name
+        if ( rule.name !== oldName ) {
+            delete site.groups[group].pages[page].sets[ruleSet].rules[oldName];
+        }
+        deleteEditing();
+
+        site.groups[group].pages[page].sets[ruleSet].rules[rule.name] = rule;
+        storage.sites[host] = site;
+        chrome.storage.local.set({'sites': storage.sites});
+
+        showRuleForm();
+        resetInterface();
     });
 }
 
 function editRule(name, element){
-    chrome.storage.local.get('sites', function deleteRuleChrome(storage){
+    chrome.storage.local.get('sites', function editRuleChrome(storage){
         var host = window.location.hostname,
             sites = storage.sites,
             group = Collect.current.group,
@@ -1483,13 +1556,13 @@ function editRule(name, element){
         Family.edit(rule.selector);
 
         // setup the form
-        HTML.form.rule.name.value = rule.name;
-        HTML.form.rule.selector.textContent = rule.selector;
-        HTML.form.rule.capture.textContent = rule.capture;
+        HTML.form.edit.name.value = rule.name;
+        HTML.form.edit.selector.textContent = rule.selector;
+        HTML.form.edit.capture.textContent = rule.capture;
         if ( rule.follow ) {
-            HTML.form.rule.follow.checked = rule.follow;
-            HTML.form.rule.follow.disabled = false;
-            HTML.form.rule.followHolder.style.display = "block";
+            HTML.form.edit.follow.checked = rule.follow;
+            HTML.form.edit.follow.disabled = false;
+            HTML.form.edit.followHolder.style.display = "block";
         }
     });  
 }

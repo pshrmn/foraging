@@ -368,7 +368,7 @@ body{
     }
 }
 
-#parentForm, #nextForm{
+#parentForm, #nextForm, #editForm{
     @extend #ruleForm;
     display: none;
 }

@@ -199,35 +199,35 @@ body {
     background: #efefef; }
 
 /* rulesView */
-#ruleForm, #parentForm, #nextForm {
+#ruleForm, #parentForm, #nextForm, #editForm {
   width: 25%;
   min-width: 250px;
   border-right: 1px dashed #444444; }
-  #ruleForm input.error, #parentForm input.error, #nextForm input.error {
+  #ruleForm input.error, #parentForm input.error, #nextForm input.error, #editForm input.error {
     border-color: #c91900;
     border-style: solid; }
-  #ruleForm span.error, #parentForm span.error, #nextForm span.error {
+  #ruleForm span.error, #parentForm span.error, #nextForm span.error, #editForm span.error {
     border-bottom: 1px solid #c91900; }
-  #ruleForm input[type=text], #parentForm input[type=text], #nextForm input[type=text] {
+  #ruleForm input[type=text], #parentForm input[type=text], #nextForm input[type=text], #editForm input[type=text] {
     width: 150px;
     border-width: 0 0 1px; }
-  #ruleForm .rule, #parentForm .rule, #nextForm .rule {
+  #ruleForm .rule, #parentForm .rule, #nextForm .rule, #editForm .rule {
     height: 20px;
     font-size: 1em;
     margin-bottom: 5px;
     border: 0;
     overflow: visible; }
-    #ruleForm .rule span, #parentForm .rule span, #nextForm .rule span {
+    #ruleForm .rule span, #parentForm .rule span, #nextForm .rule span, #editForm .rule span {
       min-width: 50px; }
-    #ruleForm .rule label, #parentForm .rule label, #nextForm .rule label {
+    #ruleForm .rule label, #parentForm .rule label, #nextForm .rule label, #editForm .rule label {
       width: 75px; }
-    #ruleForm .rule label, #parentForm .rule label, #nextForm .rule label, #ruleForm .rule input, #parentForm .rule input, #nextForm .rule input {
+    #ruleForm .rule label, #parentForm .rule label, #nextForm .rule label, #editForm .rule label, #ruleForm .rule input, #parentForm .rule input, #nextForm .rule input, #editForm .rule input {
       margin: 0;
       display: inline-block; }
-  #ruleForm .rule.follow, #parentForm .rule.follow, #nextForm .rule.follow {
+  #ruleForm .rule.follow, #parentForm .rule.follow, #nextForm .rule.follow, #editForm .rule.follow {
     display: none; }
 
-#parentForm, #nextForm {
+#parentForm, #nextForm, #editForm {
   display: none; }
 
 /* Selector */
