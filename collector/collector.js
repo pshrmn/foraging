@@ -1401,7 +1401,10 @@ function loadRuleSet(ele){
 
 function createRuleSet(){
     var name = prompt("Group Name");
-    if ( name === "" ) {
+    if ( name === null ) {
+        return;
+    }
+    else if ( name === "" ) {
         alertMessage("rule set name cannot be blank");
         return;
     }
