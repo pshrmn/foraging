@@ -182,10 +182,11 @@ var Family = {
     create: function(event){
         event.stopPropagation();
         event.preventDefault();
+
         resetInterface(); 
-        // preserve name when switching selector while editing
         if ( Interface.editing ) {
-            HTML.form.rule.name.value = Interface.editing.rule.name;
+            // preserve name when switching selector while editing
+            HTML.form.edit.name.value = Interface.editing.rule.name;
         }
         
         var selectorElement;
@@ -195,6 +196,8 @@ var Family = {
             selectorElement = HTML.form.parent.selector;
         } else if ( Interface.activeForm === "next" ) {
             selectorElement = HTML.form.next.selector;
+        } else if ( Interface.activeForm === "edit" ) {
+            selectorElement = HTML.form.edit.selector;
         }
 
         var sf = new SelectorFamily(this,
@@ -209,7 +212,6 @@ var Family = {
         showTab(HTML.tabs.rule);
     },
     edit: function(selector){
-        //test
         var eles = parentElements(selector);
         if ( !eles.length ) {
             return;
@@ -385,15 +387,15 @@ function ruleViewEvents(){
     idEvent("saveParent", "click", saveParentEvent);
     idEvent("saveNext", "click", saveNextEvent);
 
-    idEvent("clearSelector", "click", removeSelectorEvent);
-    idEvent("clearParent", "click", removeSelectorEvent);
-    idEvent("clearNext", "click", removeSelectorEvent);
+    idEvent("cancelRule", "click", cancelRuleEvent);
+    idEvent("cancelEdit", "click", cancelEditEvent);
+    idEvent("cancelParent", "click", cancelParentEvent);
+    idEvent("cancelNext", "click", cancelNextEvent);
 
     idEvent("ruleCyclePrevious", "click", showPreviousElement);
     idEvent("ruleCycleNext", "click", showNextElement);
-    
 
-    HTML.form.parent.range.addEventListener("blur", applyParentRange, false);
+    idEvent("parentRange", "blue", applyParentRange);
 }
 
 function optionsViewEvents(){
@@ -505,14 +507,30 @@ function refreshElements(){
     Interface.turnOn();
 }
 
-/*
-clear the current SelectorFamily
-*/
-function removeSelectorEvent(event){
+function cancelRuleEvent(event){
     event.stopPropagation();
     event.preventDefault();
-    deleteEditing();
-    resetInterface();
+    baseCancel();
+}
+
+function cancelEditEvent(event){
+    event.stopPropagation();
+    event.preventDefault();
+    baseCancel();   
+}
+
+function cancelParentEvent(event){
+    event.stopPropagation();
+    event.preventDefault();
+    baseCancel();
+    HTML.info.parentCheckbox.checked = false;
+}
+
+function cancelNextEvent(event){
+    event.stopPropagation();
+    event.preventDefault();
+    baseCancel();    
+    HTML.info.nextCheckbox.checked = false;
 }
 
 function applyParentRange(event){
@@ -553,30 +571,40 @@ otherwise, clear the attribute to capture
 toggle .selected class
 */
 function capturePreview(event){
+    var capture, follow, followHolder;
+    if ( Interface.activeForm === "rule" ) {
+        capture = HTML.form.rule.capture;
+        follow = HTML.form.rule.follow;
+        followHolder = HTML.form.rule.followHolder;
+    } else if ( Interface.activeForm === "edit" ) {
+        capture = HTML.form.edit.capture;
+        follow = HTML.form.edit.follow;
+        followHolder = HTML.form.edit.followHolder;
+    }
+
     if ( !this.classList.contains("selected") ){
         clearClass("selected");
         var elements = Family.elements(),
-            capture = this.dataset.capture;
-        generatePreviewElements(capture, elements);
-        HTML.form.rule.capture.textContent = capture;
+            captureVal = this.dataset.capture;
+        generatePreviewElements(captureVal, elements);
+        capture.textContent = captureVal;
         this.classList.add("selected");
 
-        if ( capture === "attr-href" && allLinks(Collect.elements) ){
-            HTML.form.rule.followHolder.style.display = "block";
-            HTML.form.rule.follow.removeAttribute("disabled");
-            HTML.form.rule.follow.setAttribute("title", "Follow link to get data for more rules");
+        // toggle follow based on if capture is attr-href or something else
+        if ( captureVal === "attr-href" && allLinks(Collect.elements) ){
+            followHolder.style.display = "block";
+            follow.removeAttribute("disabled");
+            follow.setAttribute("title", "Follow link to get data for more rules");
         } else {
-            HTML.form.rule.followHolder.style.display = "none";
-            HTML.form.rule.follow.checked = false;
-            HTML.form.rule.follow.setAttribute("disabled", "true");
-            HTML.form.rule.follow.setAttribute("title", "Can only follow rules that get href attribute from links");
+            followHolder.style.display = "none";
+            follow.checked = false;
+            follow.setAttribute("disabled", "true");
+            follow.setAttribute("title", "Can only follow rules that get href attribute from links");
         }
-
     } else {
-        HTML.form.rule.capture.textContent ="";
-        //HTML.preview.innerHTML = "No selector/attribute to capture selected";
-        HTML.form.rule.follow.disabled = true;
-        HTML.form.rule.followHolder.style.display = "none";
+        capture.textContent ="";
+        follow.disabled = true;
+        followHolder.style.display = "none";
         this.classList.remove("selected");
     }   
 }
@@ -702,6 +730,7 @@ function saveNextEvent(event){
 }
 
 function toggleParentEvent(event){
+    deleteEditing();
     // can only be setting parent or next at once, so if setting next, return
     if ( Interface.activeForm === "next" ) {
         // revert checked
@@ -726,6 +755,7 @@ function toggleParentEvent(event){
 }
 
 function toggleNextEvent(event){
+    deleteEditing();
     // can only be setting parent or next at once, so if setting parent, return
     if ( Interface.activeForm === "parent" ) {
         // revert checked
@@ -992,7 +1022,7 @@ function showRuleForm(){
 }
 
 function showEditForm(){
-    Interface.activeForm = "rule";
+    Interface.activeForm = "edit";
     HTML.form.edit.form.style.display = "inline-block";
     HTML.form.rule.form.style.display = "none";
     HTML.form.parent.form.style.display = "none";
@@ -1016,6 +1046,12 @@ function showNextForm(){
     HTML.form.rule.form.style.display = "none";
     HTML.form.edit.form.style.display = "none";
     HTML.cycle.style.display = "none";
+}
+
+function baseCancel(){
+    deleteEditing();
+    resetInterface();
+    showRuleForm();
 }
 
 /***********************

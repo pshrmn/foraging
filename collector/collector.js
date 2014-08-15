@@ -5,7 +5,7 @@ var marginBottom;
 (function addInterface(){
     var div = noSelectElement("div");
     div.classList.add("collectjs");
-    div.innerHTML = "<div class=\"tabHolder\"><div class=\"tabs\"><div class=\"tab active\" id=\"ruleTab\"data-for=\"ruleView\">Rule</div><div class=\"tab\" id=\"groupsTab\" data-for=\"groupsView\">Saved Rules</div><div class=\"tab\" id=\"previewTab\" data-for=\"previewView\">Preview</div><div class=\"tab\" id=\"optionsTab\" data-for=\"optionsView\">Options</div><div class=\"tab\" id=\"refreshCollect\">&#8635;</div><div class=\"tab\" id=\"closeCollect\">&times;</div></div></div><div class=\"permanent\"><div class=\"currentInfo\"><div>Group: <select id=\"groupSelect\"></select><button id=\"createGroup\" title=\"create a new group\">+</button><button id=\"deleteGroup\" title=\"delete current group\">&times;</button></div><div>Page: <select id=\"pageSelect\"></select><button id=\"deletePage\" title=\"delete current page\">&times;</button></div><div>Rule Set: <select id=\"ruleSetSelect\"></select><button id=\"createRuleSet\" title=\"create a new rule set\">+</button><button id=\"deleteRuleSet\" title=\"delete current rule set\">&times;</button></div><div id=\"currentParent\" class=\"info\">Parent <input type=\"checkbox\" id=\"ruleSetParent\" name=\"parent\" /><span id=\"parentSelectorView\"></span><span id=\"parentRangeView\"></span></div><div id=\"defaultNext\" class=\"info\">Next <input type=\"checkbox\" id=\"pageNext\" name=\"next\" /><span id=\"nextSelectorView\"></span></div><div id=\"indexMarker\" class=\"info\">Initial URL<input type=\"checkbox\" id=\"indexToggle\" /></div><div></div><button id=\"uploadRules\">Upload Group</button></div><div id=\"collectAlert\"></div></div><div class=\"views\"><div class=\"view\" id=\"emptyView\"></div><div class=\"view active\" id=\"ruleView\"><div id=\"ruleItems\" class=\"items\"><form id=\"ruleForm\" class=\"column\"><div class=\"rule\"><label for=\"ruleName\" title=\"the name of a rule\">Name:</label><input id=\"ruleName\" name=\"ruleName\" type=\"text\" /></div><div class=\"rule\"><label title=\"the selector to get the rule in the DOM\">Selector:</label><span id=\"ruleSelector\"></span></div><div class=\"rule\"><label title=\"the attribute of an element to capture\">Capture:</label><span id=\"ruleAttr\"></span></div><div class=\"rule follow\"><label for=\"ruleFollow\" title=\"create a new page from the element's captured url (capture must be attr-href)\">Follow:</label><input id=\"ruleFollow\" name=\"ruleFollow\" type=\"checkbox\" disabled=\"true\" title=\"Can only follow rules that get href attribute from links\" /></div><div><button id=\"saveRule\">Save Rule</button><button id=\"clearSelector\">Clear</button></div></form><form id=\"editForm\" class=\"column\"><div class=\"rule\"><label for=\"ruleName\" title=\"the name of a rule\">Name:</label><input id=\"editName\" name=\"editName\" type=\"text\" /></div><div class=\"rule\"><label title=\"the selector to get the rule in the DOM\">Selector:</label><span id=\"editSelector\"></span></div><div class=\"rule\"><label title=\"the attribute of an element to capture\">Capture:</label><span id=\"editAttr\"></span></div><div class=\"rule editFollow\"><label for=\"editFollow\" title=\"create a new page from the element's captured url (capture must be attr-href)\">Follow:</label><input id=\"editFollow\" name=\"editFollow\" type=\"checkbox\" disabled=\"true\" title=\"Can only follow rules that get href attribute from links\" /></div><div><button id=\"saveEdit\">Save Edited Rule</button></div></form><form id=\"parentForm\" class=\"column\"><div class=\"rule\"><label>Selector:</label><span id=\"parentSelector\"></span></div><div class=\"rule range\"><label for=\"parentRange\">Range:</label><input id=\"parentRange\" name=\"parentRange\" type=\"text\" /></div><div><button id=\"saveParent\">Set Parent</button><button id=\"clearParent\">Clear</button></div></form><form id=\"nextForm\" class=\"column\"><div class=\"rule\"><label>Selector:</label><span id=\"nextSelector\"></span></div><button id=\"saveNext\">Save Next Rule</button><button id=\"clearNext\">Clear</button></form><div class=\"modifiers column\"><div id=\"selectorHolder\"></div><div class=\"ruleHTMLHolder\">Count: <span id=\"currentCount\"></span><div id=\"ruleCycle\"><button id=\"ruleCyclePrevious\" class=\"cycle\" title=\"previous element matching selector\">&lt;&lt;</button><button id=\"ruleCycleNext\" class=\"cycle\" title=\"next element matching selector\">&gt;&gt;</button><span id=\"ruleHTML\"></span></div></div></div></div></div><div class=\"view\" id=\"groupsView\"><div id=\"ruleSets\" class=\"rules\"></div></div><div class=\"view\" id=\"previewView\"><p>Name: <span id=\"previewName\"></span>Selector: <span id=\"previewSelector\"></span>Capture: <span id=\"previewCapture\"></span></p><div id=\"previewContents\"></div></div><div class=\"view\" id=\"optionsView\"><p><label for=\"ignore\">Ignore helper elements (eg tbody)</label><input type=\"checkbox\" id=\"ignore\" /></p></div></div>";
+    div.innerHTML = "<div class=\"tabHolder\"><div class=\"tabs\"><div class=\"tab active\" id=\"ruleTab\"data-for=\"ruleView\">Rule</div><div class=\"tab\" id=\"groupsTab\" data-for=\"groupsView\">Saved Rules</div><div class=\"tab\" id=\"previewTab\" data-for=\"previewView\">Preview</div><div class=\"tab\" id=\"optionsTab\" data-for=\"optionsView\">Options</div><div class=\"tab\" id=\"refreshCollect\">&#8635;</div><div class=\"tab\" id=\"closeCollect\">&times;</div></div></div><div class=\"permanent\"><div class=\"currentInfo\"><div>Group: <select id=\"groupSelect\"></select><button id=\"createGroup\" title=\"create a new group\">+</button><button id=\"deleteGroup\" title=\"delete current group\">&times;</button></div><div>Page: <select id=\"pageSelect\"></select><button id=\"deletePage\" title=\"delete current page\">&times;</button></div><div>Rule Set: <select id=\"ruleSetSelect\"></select><button id=\"createRuleSet\" title=\"create a new rule set\">+</button><button id=\"deleteRuleSet\" title=\"delete current rule set\">&times;</button></div><div id=\"currentParent\" class=\"info\">Parent <input type=\"checkbox\" id=\"ruleSetParent\" name=\"parent\" /><span id=\"parentSelectorView\"></span><span id=\"parentRangeView\"></span></div><div id=\"defaultNext\" class=\"info\">Next <input type=\"checkbox\" id=\"pageNext\" name=\"next\" /><span id=\"nextSelectorView\"></span></div><div id=\"indexMarker\" class=\"info\">Initial URL<input type=\"checkbox\" id=\"indexToggle\" /></div><div></div><button id=\"uploadRules\">Upload Group</button></div><div id=\"collectAlert\"></div></div><div class=\"views\"><div class=\"view\" id=\"emptyView\"></div><div class=\"view active\" id=\"ruleView\"><div id=\"ruleItems\" class=\"items\"><form id=\"ruleForm\" class=\"column\"><div class=\"rule\"><label for=\"ruleName\" title=\"the name of a rule\">Name:</label><input id=\"ruleName\" name=\"ruleName\" type=\"text\" /></div><div class=\"rule\"><label title=\"the selector to get the rule in the DOM\">Selector:</label><span id=\"ruleSelector\"></span></div><div class=\"rule\"><label title=\"the attribute of an element to capture\">Capture:</label><span id=\"ruleAttr\"></span></div><div class=\"rule follow\"><label for=\"ruleFollow\" title=\"create a new page from the element's captured url (capture must be attr-href)\">Follow:</label><input id=\"ruleFollow\" name=\"ruleFollow\" type=\"checkbox\" disabled=\"true\" title=\"Can only follow rules that get href attribute from links\" /></div><div><button id=\"saveRule\">Save Rule</button><button id=\"cancelRule\">Cancel</button></div></form><form id=\"editForm\" class=\"column\"><div class=\"rule\"><label for=\"ruleName\" title=\"the name of a rule\">Name:</label><input id=\"editName\" name=\"editName\" type=\"text\" /></div><div class=\"rule\"><label title=\"the selector to get the rule in the DOM\">Selector:</label><span id=\"editSelector\"></span></div><div class=\"rule\"><label title=\"the attribute of an element to capture\">Capture:</label><span id=\"editAttr\"></span></div><div class=\"rule editFollow\"><label for=\"editFollow\" title=\"create a new page from the element's captured url (capture must be attr-href)\">Follow:</label><input id=\"editFollow\" name=\"editFollow\" type=\"checkbox\" disabled=\"true\" title=\"Can only follow rules that get href attribute from links\" /></div><div><button id=\"saveEdit\">Save Edited Rule</button><button id=\"cancelEdit\">Cancel</button></div></form><form id=\"parentForm\" class=\"column\"><div class=\"rule\"><label>Selector:</label><span id=\"parentSelector\"></span></div><div class=\"rule range\"><label for=\"parentRange\">Range:</label><input id=\"parentRange\" name=\"parentRange\" type=\"text\" /></div><div><button id=\"saveParent\">Set Parent</button><button id=\"cancelParent\">Cancel</button></div></form><form id=\"nextForm\" class=\"column\"><div class=\"rule\"><label>Selector:</label><span id=\"nextSelector\"></span></div><button id=\"saveNext\">Save Next Rule</button><button id=\"cancelNext\">Cancel</button></form><div class=\"modifiers column\"><div id=\"selectorHolder\"></div><div class=\"ruleHTMLHolder\">Count: <span id=\"currentCount\"></span><div id=\"ruleCycle\"><button id=\"ruleCyclePrevious\" class=\"cycle\" title=\"previous element matching selector\">&lt;&lt;</button><button id=\"ruleCycleNext\" class=\"cycle\" title=\"next element matching selector\">&gt;&gt;</button><span id=\"ruleHTML\"></span></div></div></div></div></div><div class=\"view\" id=\"groupsView\"><div id=\"ruleSets\" class=\"rules\"></div></div><div class=\"view\" id=\"previewView\"><p>Name: <span id=\"previewName\"></span>Selector: <span id=\"previewSelector\"></span>Capture: <span id=\"previewCapture\"></span></p><div id=\"previewContents\"></div></div><div class=\"view\" id=\"optionsView\"><p><label for=\"ignore\">Ignore helper elements (eg tbody)</label><input type=\"checkbox\" id=\"ignore\" /></p></div></div>";
     document.body.appendChild(div);
     addNoSelect(div.querySelectorAll("*"));
 
@@ -182,10 +182,11 @@ var Family = {
     create: function(event){
         event.stopPropagation();
         event.preventDefault();
+
         resetInterface(); 
-        // preserve name when switching selector while editing
         if ( Interface.editing ) {
-            HTML.form.rule.name.value = Interface.editing.rule.name;
+            // preserve name when switching selector while editing
+            HTML.form.edit.name.value = Interface.editing.rule.name;
         }
         
         var selectorElement;
@@ -195,6 +196,8 @@ var Family = {
             selectorElement = HTML.form.parent.selector;
         } else if ( Interface.activeForm === "next" ) {
             selectorElement = HTML.form.next.selector;
+        } else if ( Interface.activeForm === "edit" ) {
+            selectorElement = HTML.form.edit.selector;
         }
 
         var sf = new SelectorFamily(this,
@@ -209,7 +212,6 @@ var Family = {
         showTab(HTML.tabs.rule);
     },
     edit: function(selector){
-        //test
         var eles = parentElements(selector);
         if ( !eles.length ) {
             return;
@@ -385,15 +387,15 @@ function ruleViewEvents(){
     idEvent("saveParent", "click", saveParentEvent);
     idEvent("saveNext", "click", saveNextEvent);
 
-    idEvent("clearSelector", "click", removeSelectorEvent);
-    idEvent("clearParent", "click", removeSelectorEvent);
-    idEvent("clearNext", "click", removeSelectorEvent);
+    idEvent("cancelRule", "click", cancelRuleEvent);
+    idEvent("cancelEdit", "click", cancelEditEvent);
+    idEvent("cancelParent", "click", cancelParentEvent);
+    idEvent("cancelNext", "click", cancelNextEvent);
 
     idEvent("ruleCyclePrevious", "click", showPreviousElement);
     idEvent("ruleCycleNext", "click", showNextElement);
-    
 
-    HTML.form.parent.range.addEventListener("blur", applyParentRange, false);
+    idEvent("parentRange", "blue", applyParentRange);
 }
 
 function optionsViewEvents(){
@@ -505,14 +507,30 @@ function refreshElements(){
     Interface.turnOn();
 }
 
-/*
-clear the current SelectorFamily
-*/
-function removeSelectorEvent(event){
+function cancelRuleEvent(event){
     event.stopPropagation();
     event.preventDefault();
-    deleteEditing();
-    resetInterface();
+    baseCancel();
+}
+
+function cancelEditEvent(event){
+    event.stopPropagation();
+    event.preventDefault();
+    baseCancel();   
+}
+
+function cancelParentEvent(event){
+    event.stopPropagation();
+    event.preventDefault();
+    baseCancel();
+    HTML.info.parentCheckbox.checked = false;
+}
+
+function cancelNextEvent(event){
+    event.stopPropagation();
+    event.preventDefault();
+    baseCancel();    
+    HTML.info.nextCheckbox.checked = false;
 }
 
 function applyParentRange(event){
@@ -553,30 +571,40 @@ otherwise, clear the attribute to capture
 toggle .selected class
 */
 function capturePreview(event){
+    var capture, follow, followHolder;
+    if ( Interface.activeForm === "rule" ) {
+        capture = HTML.form.rule.capture;
+        follow = HTML.form.rule.follow;
+        followHolder = HTML.form.rule.followHolder;
+    } else if ( Interface.activeForm === "edit" ) {
+        capture = HTML.form.edit.capture;
+        follow = HTML.form.edit.follow;
+        followHolder = HTML.form.edit.followHolder;
+    }
+
     if ( !this.classList.contains("selected") ){
         clearClass("selected");
         var elements = Family.elements(),
-            capture = this.dataset.capture;
-        generatePreviewElements(capture, elements);
-        HTML.form.rule.capture.textContent = capture;
+            captureVal = this.dataset.capture;
+        generatePreviewElements(captureVal, elements);
+        capture.textContent = captureVal;
         this.classList.add("selected");
 
-        if ( capture === "attr-href" && allLinks(Collect.elements) ){
-            HTML.form.rule.followHolder.style.display = "block";
-            HTML.form.rule.follow.removeAttribute("disabled");
-            HTML.form.rule.follow.setAttribute("title", "Follow link to get data for more rules");
+        // toggle follow based on if capture is attr-href or something else
+        if ( captureVal === "attr-href" && allLinks(Collect.elements) ){
+            followHolder.style.display = "block";
+            follow.removeAttribute("disabled");
+            follow.setAttribute("title", "Follow link to get data for more rules");
         } else {
-            HTML.form.rule.followHolder.style.display = "none";
-            HTML.form.rule.follow.checked = false;
-            HTML.form.rule.follow.setAttribute("disabled", "true");
-            HTML.form.rule.follow.setAttribute("title", "Can only follow rules that get href attribute from links");
+            followHolder.style.display = "none";
+            follow.checked = false;
+            follow.setAttribute("disabled", "true");
+            follow.setAttribute("title", "Can only follow rules that get href attribute from links");
         }
-
     } else {
-        HTML.form.rule.capture.textContent ="";
-        //HTML.preview.innerHTML = "No selector/attribute to capture selected";
-        HTML.form.rule.follow.disabled = true;
-        HTML.form.rule.followHolder.style.display = "none";
+        capture.textContent ="";
+        follow.disabled = true;
+        followHolder.style.display = "none";
         this.classList.remove("selected");
     }   
 }
@@ -702,6 +730,7 @@ function saveNextEvent(event){
 }
 
 function toggleParentEvent(event){
+    deleteEditing();
     // can only be setting parent or next at once, so if setting next, return
     if ( Interface.activeForm === "next" ) {
         // revert checked
@@ -726,6 +755,7 @@ function toggleParentEvent(event){
 }
 
 function toggleNextEvent(event){
+    deleteEditing();
     // can only be setting parent or next at once, so if setting parent, return
     if ( Interface.activeForm === "parent" ) {
         // revert checked
@@ -992,7 +1022,7 @@ function showRuleForm(){
 }
 
 function showEditForm(){
-    Interface.activeForm = "rule";
+    Interface.activeForm = "edit";
     HTML.form.edit.form.style.display = "inline-block";
     HTML.form.rule.form.style.display = "none";
     HTML.form.parent.form.style.display = "none";
@@ -1016,6 +1046,12 @@ function showNextForm(){
     HTML.form.rule.form.style.display = "none";
     HTML.form.edit.form.style.display = "none";
     HTML.cycle.style.display = "none";
+}
+
+function baseCancel(){
+    deleteEditing();
+    resetInterface();
+    showRuleForm();
 }
 
 /***********************
