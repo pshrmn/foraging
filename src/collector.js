@@ -1709,6 +1709,7 @@ function setOptions(options){
 
 // creates an empty page object
 function newPage(name, index){
+    index = index || false;
     return {
         name: name,
         index: index,

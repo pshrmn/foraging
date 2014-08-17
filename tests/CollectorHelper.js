@@ -6,4 +6,8 @@ var chrome = {
             }
         }
     }
-}
+};
+
+var Interface = {
+
+};

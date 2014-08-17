@@ -214,6 +214,146 @@ describe("utility functions", function(){
 });
 
 describe("storage helpers", function(){
+
+    /*
+    describe("", function(){
+        it("", function(){
+    
+        });
+    });
+    */
+
+    describe("newPage", function(){
+        it("returns a new page object with a default set", function(){
+            var nonIndexPage = newPage("George"),
+                indexPage = newPage("Bill", true);
+
+            expect(nonIndexPage.name).toEqual("George");
+            expect(nonIndexPage.index).toBe(false);
+            expect(nonIndexPage.sets["default"]).toBeDefined();
+
+            expect(indexPage.name).toEqual("Bill");
+            expect(indexPage.index).toBe(true);
+        });
+    });
+
+    describe("newRuleSet", function(){
+        it("returns a rule set with provided name", function(){
+            var ruleSet = newRuleSet("Barack");
+            expect(ruleSet.name).toEqual("Barack");
+        });
+    });
+
+    var groups = {
+        "Presidents": {
+            "George": {
+                name: "George",
+                sets: {
+                    "Washington": {
+                        name: "Washington",
+                        rules: {
+                            "one": {},
+                            "two": {}
+                        }
+                    },
+                    "Bush": {
+                        name: "Bush",
+                        rules: {
+                            "three": {},
+                            "four": {}
+                        }
+                    }
+                }
+            },
+            "John": {
+                name: "John",
+                sets: {
+                    "Adams": {
+                        name: "Adams",
+                        rules: {
+                            "five": {},
+                            "six": {}
+                        }
+                    },
+                    "Kennedy": {
+                        name: "Kennedy",
+                        rules: {}
+                    }
+                }
+            },
+            "Thomas": {
+                name: "Thomas",
+                sets: {
+                    "Jefferson": {
+                        name: "Jefferson",
+                        rules: {}
+                    }
+                }
+            },
+            "James": {
+                name: "James",
+                sets: {
+                    "Madison": {
+                        name: "Madison",
+                        rules: {}
+                    },
+                    "Monroe": {
+                        name: "Monroe",
+                        rules: {}
+                    }
+                }
+            }
+        }
+    };
+
+    describe("unique name functions", function(){
+        describe("uniqueGroupName", function(){
+            it("returns false if name already exists", function(){
+                expect(uniqueGroupName("Presidents", groups)).toBe(false);
+            });
+
+            it("returns true if name does not exist in", function(){
+                expect(uniqueGroupName("Prime Ministers", groups)).toBe(true);
+            });
+        });
+
+        describe("uniquePageName", function(){
+            it("returns false if name already exists", function(){
+                expect(uniquePageName("John", groups["Presidents"])).toBe(false);
+            });
+
+            it("returns true if name does not exist", function(){
+                expect(uniquePageName("Mitt", groups["Presidents"])).toBe(true);
+            });
+        });
+
+        describe("uniqueRuleSetName", function(){
+
+            it("returns false if a rule set with name already exists in any of the pages", function(){
+                expect(uniqueRuleSetName("Kennedy", groups["Presidents"])).toBe(false);
+            });
+
+            it("returns true if no rule set with name exists in any of the pages", function(){
+                expect(uniqueRuleSetName("Kerry", groups["Presidents"])).toBe(true);
+            });
+        });
+
+        describe("uniqueRuleName", function(){
+            it("returns true if name doesn't exist for any current rule", function(){
+                expect(uniqueRuleName("test", groups["Presidents"])).toBe(true);
+            });
+
+            it("returns false if a rule already has name", function(){
+                var names = ["one", "two", "three", "four", "five", "six"];
+                for ( var i=0, len=names.length; i<len; i++ ) {
+                    expect(uniqueRuleName(names[i], groups["Presidents"])).toBe(false);
+                }
+            });
+        });
+    });
+
+
+    
     describe("legalFilename", function(){
         it("returns true for legal filenames", function(){
             var goodNames = ["test", "good.jpg", "this is legal !"];
@@ -234,37 +374,42 @@ describe("storage helpers", function(){
         });
     });
 
-    describe("uniqueRuleName", function(){
-        var rules = {
-            "default": {
-                "sets": [
-                    {
-                        "rules": {
-                            "one": {},
-                            "two": {},
-                            "three": {},    
-                        }
-                    },
-                    {
-                        "rules": {
-                            "foo": {},
-                            "bar": {},
-                            "baz": {},    
-                        }
-                    }
-                ]
-            }
-        };
+    describe("nonEmptyPages", function(){
+        it("returns an object containing pages/sets that contain rules", function(){
+            var pages = nonEmptyPages(groups["Presidents"]);
+            expect(pages["George"]).toBeDefined();
+            expect(pages["Thomas"]).toBeUndefined();
+        });
+    });
 
-        it("returns true if name doesn't exist for any current rule", function(){
-            expect(uniqueRuleName("test", rules)).toBe(true);
+    describe("deleteEditing", function(){
+        it("doesn't need to do anything if not currently editing", function(){
+            // make sure it doesn't exist
+            delete Interface.editing;
+            expect(Interface.editing).toBeUndefined();
+            deleteEditing();
+            expect(Interface.editing).toBeUndefined();
         });
 
-        it("returns false if a rule already has name", function(){
-            var names = ["one", "two", "three", "foo", "bar", "baz"];
-            for ( var i=0, len=names.length; i<len; i++ ) {
-                expect(uniqueRuleName(names[i], rules)).toBe(false);
-            }
+        it("deletes Interface.editing and removes 'editing' class when editing", function(){
+            Interface.editing = {
+                rule: {}
+            };
+            expect(Interface.editing).toBeDefined();
+            deleteEditing();
+            expect(Interface.editing).toBeUndefined();
+        });
+
+        it("removes .editing if editing.element exists", function(){
+            var ele = document.createElement("div");
+            ele.classList.add("editing");
+            Interface.editing = {
+                rule: {},
+                element: ele
+            };
+            expect(Interface.editing.element.classList.contains("editing")).toBe(true);
+            deleteEditing();
+            expect(ele.classList.contains("editing")).toBe(false);
         });
     });
 });
