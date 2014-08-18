@@ -27,7 +27,16 @@ Object that stores information related to elements that match the current select
 (and how to select them)
 */
 var Collect = {
-    not: ":not(.noSelect)",
+    one: function(selector, prefix){
+        return document.querySelector(Collect.not(selector, prefix));
+    },
+    all: function(selector, prefix){
+        return document.querySelectorAll(Collect.not(selector, prefix));
+    },
+    not: function(selector, prefix){
+        selector += ":not(.noSelect)";
+        return prefix ? prefix + " " + selector : selector;
+    },
     options: {},
     allElements: [],
     indexPage: false,
@@ -235,9 +244,8 @@ var Family = {
     },
     // create a SelectorFamily given a css selector string
     fromSelector: function(selector){
-        var longSelector = (Collect.parent.selector ? Collect.parent.selector: "body") +
-            " " + selector + Collect.not;
-        var element = document.querySelector(longSelector);
+        var prefix = Collect.parent.selector ? Collect.parent.selector: "body",
+            element = Collect.one(selector, prefix);
         if ( element ) {
             var sf = new SelectorFamily(element,
                 Collect.parent.selector,
@@ -586,7 +594,6 @@ function capturePreview(event){
         clearClass("selected");
         var elements = Family.elements(),
             captureVal = this.dataset.capture;
-        generatePreviewElements(captureVal, elements);
         capture.textContent = captureVal;
         this.classList.add("selected");
 
@@ -840,55 +847,6 @@ function updateMatchedElements(){
 }
 
 /*
-given an element, generate the html to represent an element and its "captureable" attributes and
-create the event listeners for it to work
-*/
-function setRuleHTML(element){
-    if ( element === undefined ) {
-        return;
-    }
-    HTML.ruleHTML.innerHTML = "";
-    var clone = cleanElement(element.cloneNode(true)),
-        html = clone.outerHTML,
-        attrs = clone.attributes,
-        curr, text, splitHTML, firstHalf, secondHalf, captureEle;
-    
-    for ( var i=0, len =attrs.length; i<len; i++ ) {
-        curr = attrs[i];
-        text = attributeText(curr);
-
-        splitHTML = html.split(text);
-        firstHalf = splitHTML[0];
-        secondHalf = splitHTML[1];
-
-        HTML.ruleHTML.appendChild(document.createTextNode(firstHalf));
-        captureEle = captureAttribute(text, 'attr-'+curr.name);
-        if ( captureEle) {
-            HTML.ruleHTML.appendChild(captureEle);
-        }
-        html = secondHalf;
-    }
-
-    if ( clone.textContent !== "" ) {
-        text = clone.textContent;
-        splitHTML = html.split(text);
-        firstHalf = splitHTML[0];
-        secondHalf = splitHTML[1];
-
-        HTML.ruleHTML.appendChild(document.createTextNode(firstHalf));
-        captureEle = captureAttribute(text, 'text');
-        if ( captureEle) {
-            HTML.ruleHTML.appendChild(captureEle);
-        }
-
-        html = secondHalf;
-    }
-
-    // append remaining text
-    HTML.ruleHTML.appendChild(document.createTextNode(html));
-}
-
-/*
 if #ruleAttr is set, add .selected class to the matching #ruleHTML .capture span
 */
 function markCapture(){
@@ -901,7 +859,6 @@ function markCapture(){
 }
 /*
 generate paragraphs html for the captured attribute on all of the elements and attach them to #rulePreview
-*/
 //update
 function generatePreviewElements(capture, elements) {
     if ( capture === "" ) {
@@ -916,6 +873,21 @@ function generatePreviewElements(capture, elements) {
         previewHTML = "No selector/attribute to capture selected";
     }
     //HTML.preview.innerHTML = previewHTML;
+}
+*/
+
+function captureFunction(capture){
+    if (capture==="text") { 
+        return function(ele){
+            return ele.textContent;
+        };
+    } else if (capture.indexOf("attr-")===0) {
+        // return substring after first hyphen so that it works with data- attributes
+        var attribute = capture.slice(capture.indexOf("-")+1);
+        return function(ele){
+            return ele.getAttribute(attribute);
+        };
+    }
 }
 
 /*
@@ -940,7 +912,7 @@ function errorCheck(condition, ele, msg){
 }
 
 function emptyErrorCheck(attr, ele, msg){
-    errorCheck((attr === ""), ele, msg);
+    return errorCheck((attr === ""), ele, msg);
 }
 
 function clearErrors(){
@@ -964,7 +936,7 @@ function addRule(rule, set){
 add .parentGroup to all elements matching parent selector and in range
 */
 function addParentGroup(selector, range){
-    var elements = document.querySelectorAll(selector + Collect.not),
+    var elements = Collect.all(selector),
         start = 0,
         end = elements.length;
     if ( range ) {
@@ -989,7 +961,7 @@ function parentElements(selector){
 
     // don't restrict to Collect.parent.selector when setting next selector
     if ( Interface.activeForm === "next" ) {
-        allElements = Array.prototype.slice.call(document.querySelectorAll(selector + Collect.not));
+        allElements = Array.prototype.slice.call(Collect.all(selector));
     } else if ( range !== undefined ) {
         var elements = document.querySelectorAll(Collect.parent.selector),
             start = 0,
@@ -1001,13 +973,13 @@ function parentElements(selector){
             end -= range;
         }
         for ( ; start<end; start++ ) {
-            currElements = elements[start].querySelectorAll(selector+Collect.not);
+            currElements = elements[start].querySelectorAll(Collect.not(selector));
             allElements = allElements.concat(Array.prototype.slice.call(currElements));
         }
         return allElements;
     } else {
         var prefix = Collect.parent.selector ? Collect.parent.selector : "body";
-        allElements = Array.prototype.slice.call(document.querySelectorAll(prefix + " " + selector + Collect.not));
+        allElements = Array.prototype.slice.call(Collect.all(selector, prefix));
     }
     return allElements;
 }
@@ -1156,20 +1128,6 @@ function selectorIsComplete(selector_object){
     }
     return selector_object;
 }   
-
-function captureFunction(capture){
-    if (capture==="text") { 
-        return function(ele){
-            return ele.textContent;
-        };
-    } else if (capture.indexOf("attr-")===0) {
-        // return substring after first hyphen so that it works with data- attributes
-        var attribute = capture.slice(capture.indexOf("-")+1);
-        return function(ele){
-            return ele.getAttribute(attribute);
-        };
-    }
-}
 
 function isLink(element, index, array){
     return element.tagName === "A";
@@ -2123,4 +2081,53 @@ function ruleElement(rule){
     deltog.addEventListener("click", deleteRuleEvent, false);
     
     return li;
+}
+
+/*
+given an element, generate the html to represent an element and its "captureable" attributes and
+create the event listeners for it to work
+*/
+function setRuleHTML(element){
+    if ( element === undefined ) {
+        return;
+    }
+    HTML.ruleHTML.innerHTML = "";
+    var clone = cleanElement(element.cloneNode(true)),
+        html = clone.outerHTML,
+        attrs = clone.attributes,
+        curr, text, splitHTML, firstHalf, secondHalf, captureEle;
+    
+    for ( var i=0, len =attrs.length; i<len; i++ ) {
+        curr = attrs[i];
+        text = attributeText(curr);
+
+        splitHTML = html.split(text);
+        firstHalf = splitHTML[0];
+        secondHalf = splitHTML[1];
+
+        HTML.ruleHTML.appendChild(document.createTextNode(firstHalf));
+        captureEle = captureAttribute(text, 'attr-'+curr.name);
+        if ( captureEle) {
+            HTML.ruleHTML.appendChild(captureEle);
+        }
+        html = secondHalf;
+    }
+
+    if ( clone.textContent !== "" ) {
+        text = clone.textContent;
+        splitHTML = html.split(text);
+        firstHalf = splitHTML[0];
+        secondHalf = splitHTML[1];
+
+        HTML.ruleHTML.appendChild(document.createTextNode(firstHalf));
+        captureEle = captureAttribute(text, 'text');
+        if ( captureEle) {
+            HTML.ruleHTML.appendChild(captureEle);
+        }
+
+        html = secondHalf;
+    }
+
+    // append remaining text
+    HTML.ruleHTML.appendChild(document.createTextNode(html));
 }
