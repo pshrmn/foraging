@@ -215,14 +215,6 @@ describe("utility functions", function(){
 
 describe("storage helpers", function(){
 
-    /*
-    describe("", function(){
-        it("", function(){
-    
-        });
-    });
-    */
-
     describe("newPage", function(){
         it("returns a new page object with a default set", function(){
             var nonIndexPage = newPage("George"),
@@ -415,10 +407,6 @@ describe("storage helpers", function(){
 });
 
 describe("html functions", function(){    
-    /*
-    missing
-        ruleHolderHTML
-    */
 
     describe("cleanElement", function(){
         var ele;
@@ -486,4 +474,37 @@ describe("html functions", function(){
         });
     });
 
+    /*
+    // pass on this until I decide how to revampt the saved rules tab
+    describe("ruleSetElement", function(){
+        it("", function(){
+
+        });
+    });
+    */
+
+    describe("ruleElement", function(){
+        it("creates a set of html elements representing a saved rule", function(){
+            var rule = {
+                name: "Bill",
+                selector: ".bill",
+                capture: "text"
+            }
+
+            var ele = ruleElement(rule),
+                tag = ele.getElementsByTagName("span")[0];
+            expect(ele.tagName).toEqual("LI");
+            expect(ele.dataset.name).toEqual(rule.name);
+            expect(tag.textContent).toEqual(rule.name);
+            expect(tag.dataset.selector).toEqual(rule.selector);
+        });
+    });
 });
+
+/*
+describe("", function(){
+    it("", function(){
+
+    });
+});
+*/
