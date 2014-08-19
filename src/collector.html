@@ -14,6 +14,14 @@
             Group: <select id="groupSelect"></select>
             <button id="createGroup" title="create a new group">+</button>
             <button id="deleteGroup" title="delete current group">&times;</button>
+            <div id="indexMarker" class="info">
+                Initial URL
+                <input type="checkbox" id="indexToggle" />
+            </div>
+            <div id="defaultNext" class="info">
+                Next <input type="checkbox" id="pageNext" name="next" />
+                <span id="nextSelectorView"></span>
+            </div>
         </div>
         <div>
             Page: <select id="pageSelect"></select>
@@ -23,23 +31,13 @@
             Rule Set: <select id="ruleSetSelect"></select>
             <button id="createRuleSet" title="create a new rule set">+</button>
             <button id="deleteRuleSet" title="delete current rule set">&times;</button>
+            <div id="currentParent" class="info">
+                Parent <input type="checkbox" id="ruleSetParent" name="parent" />
+                <span id="parentSelectorView"></span>
+                <span id="parentRangeView"></span>
+            </div>
         </div>
-        <div id="currentParent" class="info">
-            Parent <input type="checkbox" id="ruleSetParent" name="parent" />
-            <span id="parentSelectorView"></span>
-            <span id="parentRangeView"></span>
-        </div>
-        <div id="defaultNext" class="info">
-            Next <input type="checkbox" id="pageNext" name="next" />
-            <span id="nextSelectorView"></span>
-        </div>
-        <div id="indexMarker" class="info">
-            Initial URL
-            <input type="checkbox" id="indexToggle" />
-        </div>
-        <div>
-
-        </div><button id="uploadRules">Upload Group</button>
+        <button id="uploadRules">Upload Group</button>
     </div>
     <div id="collectAlert"></div>
 </div>

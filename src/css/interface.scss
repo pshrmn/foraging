@@ -24,7 +24,7 @@ body{
     position: fixed;
     bottom: 0;
     width: 100%;
-    min-width: 1050px;
+    min-width: 450px;
     min-height: 30px;
     border-top: 1px solid $dark-gray;
     background: $white;
@@ -119,7 +119,7 @@ body{
                 margin-right: 15px;
             }
 
-            .info{
+            > div{
                 border-bottom: 1px dotted $dark-gray;
             }
         }

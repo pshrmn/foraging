@@ -199,14 +199,21 @@ var Family = {
         }
         
         var selectorElement;
-        if ( Interface.activeForm === "rule" ) {
+        switch ( Interface.activeForm ){
+        case "rule":
             selectorElement = HTML.form.rule.selector;
-        } else if ( Interface.activeForm === "parent" ) {
+            break;
+        case "parent":
             selectorElement = HTML.form.parent.selector;
-        } else if ( Interface.activeForm === "next" ) {
+            break;
+        case "next":
             selectorElement = HTML.form.next.selector;
-        } else if ( Interface.activeForm === "edit" ) {
+            break;
+        case "edit":
             selectorElement = HTML.form.edit.selector;
+            break;
+        default:
+            selectorElement = HTML.form.rule.selector;
         }
 
         var sf = new SelectorFamily(this,
@@ -376,7 +383,17 @@ function resetPreviewView(){
 // encapsulate event activeTabEvent to keep track of current tab/view
 function tabEvents(){
     idEvent("refreshCollect", "click", refreshElements);
-    idEvent("closeCollect", "click", removeInterface);
+    idEvent("closeCollect", "click", function removeInterface(event){
+        event.stopPropagation();
+        event.preventDefault();
+        Interface.turnOff();
+        clearClass('queryCheck');
+        clearClass('collectHighlight');
+        clearClass('parentGroup');
+        HTML.interface.parentElement.removeChild(HTML.interface);
+
+        document.body.style.marginBottom = marginBottom + "px";
+    });
 
     // querySelectorAll because getElementsByClassName could overlap with native elements
     var tabs = document.querySelectorAll(".tabHolder .tab");
@@ -493,21 +510,6 @@ remove .collectHighlight from an element on mouseleave
 */
 function unhighlightElement(event){
     this.classList.remove("collectHighlight");
-}
-
-/*
-removes the collectjs interface from the page
-*/
-function removeInterface(event){
-    event.stopPropagation();
-    event.preventDefault();
-    Interface.turnOff();
-    clearClass('queryCheck');
-    clearClass('collectHighlight');
-    clearClass('parentGroup');
-    HTML.interface.parentElement.removeChild(HTML.interface);
-
-    document.body.style.marginBottom = marginBottom + "px";
 }
 
 function refreshElements(){
@@ -1815,8 +1817,8 @@ function loadPageObject(page){
     Collect.current.page = page.name;
 
     if ( page.name === "default" ) {
-        HTML.info.index.display = "inline-block";
-        HTML.info.next.display = "inline-block";
+        HTML.info.index.style.display = "inline-block";
+        HTML.info.nextHolder.style.display = "inline-block";
         // handle whether or not next has already been set
         if ( page.next ) {
             Collect.next = page.next;
@@ -1828,8 +1830,8 @@ function loadPageObject(page){
             HTML.info.next.textContent = "";
         }
     } else {
-        HTML.info.index.display = "none";
-        HTML.info.next.display = "none";
+        HTML.info.index.style.display = "none";
+        HTML.info.nextHolder.style.display = "none";
     }
 
     var currSet, setName;

@@ -9,7 +9,7 @@ body {
   position: fixed;
   bottom: 0;
   width: 100%;
-  min-width: 1050px;
+  min-width: 450px;
   min-height: 30px;
   border-top: 1px solid #444444;
   background: white;
@@ -75,7 +75,7 @@ body {
     .collectjs .permanent .currentInfo div {
       display: inline-block;
       margin-right: 15px; }
-    .collectjs .permanent .currentInfo .info {
+    .collectjs .permanent .currentInfo > div {
       border-bottom: 1px dotted #444444; }
   .collectjs .views {
     box-sizing: border-box;
