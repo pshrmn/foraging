@@ -571,12 +571,16 @@ Group.prototype.html = function(){
 Group.prototype.deleteHTML = prototypeDeleteHTML;
 
 Group.prototype.addPage = function(page){
-    this.pages[page.name] = page;
+    var name = page.name;
+    if ( this.pages[name] ) {
+        this.removePage(name);
+    }
+    this.pages[name] = page;
     page.group = this;
     // if html for group exists, also generate html for page
     if ( this.elements.holder) {
         var ele = page.html();
-        this.elements.holder.appendChild(ele);
+        this.elements.pages.appendChild(ele);
     }
 };
 
@@ -709,12 +713,18 @@ Page.prototype.html = function(){
 Page.prototype.deleteHTML = prototypeDeleteHTML;
 
 Page.prototype.addSet = function(ruleSet){
-    this.sets[ruleSet.name] = ruleSet;
+    var name = ruleSet.name;
+    // if a set with the same name already exists, overwrite it
+    if ( this.sets[name]) {
+        this.removeSet(name);
+    }
+
+    this.sets[name] = ruleSet;
     ruleSet.page = this;
     // if html for page exists, also create html for RuleSet
     if ( this.elements.holder ) {
         var ele = ruleSet.html();
-        this.elements.holder.appendChild(ele);
+        this.elements.sets.appendChild(ele);
     }
 };
 
@@ -815,7 +825,7 @@ RuleSet.prototype.html = function(){
 
 RuleSet.prototype.deleteHTML = prototypeDeleteHTML;
 
-RuleSet.prototype.addRule = function(rule, events){
+RuleSet.prototype.addRule = function(rule, events){   
     this.rules[rule.name] = rule;
     rule.ruleSet = this;
 
