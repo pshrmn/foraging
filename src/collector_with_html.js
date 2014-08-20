@@ -867,9 +867,14 @@ function previewSavedRule(event){
 }
 
 function deleteRuleEvent(event){
-    // also need to remove rule from RuleSet
-    this.deleteHTML();
     clearClass("savedPreview");
+    // also need to remove rule from RuleSet
+    if ( this.follow ) {
+        var pageOption = HTML.groups.page.querySelector("option[value=" + this.name + "]");
+        pageOption.parentElement.removeChild(pageOption);
+    }
+    this.remove();
+    saveGroup();
 }
 
 /***********************

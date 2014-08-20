@@ -7,6 +7,7 @@ function Group(name, urls){
     this.pages = {
         "default": new Page("default")
     };
+    this.pages["default"].group = this;
     this.elements = {};
 }
 
@@ -45,14 +46,21 @@ Group.prototype.uploadObject = function(){
 
 Group.prototype.html = function(){
     var holder = noSelectElement("div"),
-        nametag = noSelectElement("p");
+        nametag = noSelectElement("p"),
+        pages = noSelectElement("ul");
 
     nametag.textContent = "Group: " + this.name;
     holder.appendChild(nametag);
+    holder.appendChild(pages);
+
+    for ( var key in this.pages ) {
+        pages.appendChild(this.pages[key].html());
+    }
 
     this.elements = {
         holder: holder,
-        nametag: nametag
+        nametag: nametag,
+        pages: pages
     };
 
     return holder;
@@ -71,8 +79,11 @@ Group.prototype.addPage = function(page){
 };
 
 Group.prototype.removePage = function(name){
-    this.pages[name].deleteHTML();
-    delete this.pages[name];
+    var page = this.pages[name];
+    if ( page ) {
+        this.pages[name].deleteHTML();
+        delete this.pages[name];
+    }
 };
 
 Group.prototype.uniquePageName = function(name){
@@ -124,6 +135,7 @@ function Page(name, index, next){
     this.sets = {
         "default": new RuleSet("default")
     };
+    this.sets["default"].page = this;
     this.elements = {};
     // added when a group calls addPage
     this.group;
@@ -171,15 +183,22 @@ Page.prototype.uploadObject = function(){
 };
 
 Page.prototype.html = function(){
-    var holder = noSelectElement("div"),
-        nametag = noSelectElement("p");
+    var holder = noSelectElement("li"),
+        nametag = noSelectElement("p"),
+        sets = noSelectElement("ul");
 
     nametag.textContent = "Page: " + this.name;
     holder.appendChild(nametag);
+    holder.appendChild(sets);
+
+    for ( var key in this.sets ) {
+        sets.appendChild(this.sets[key].html());
+    }
 
     this.elements = {
         holder: holder,
-        nametag: nametag
+        nametag: nametag,
+        sets: sets
     };
 
     return holder;
@@ -198,8 +217,21 @@ Page.prototype.addSet = function(ruleSet){
 };
 
 Page.prototype.removeSet = function(name){
-    this.sets[name].deleteHTML();
-    delete this.sets[name];
+    var set = this.sets[name];
+    if ( set ) {
+        set.remove();
+        delete this.sets[name];
+    }
+};
+
+Page.prototype.remove = function(){
+    this.deleteHTML();
+    for ( var key in this.sets ) {
+        this.removeSet(key);
+    }
+    if ( this.group ) {
+        delete this.group.pages[this.name];
+    }
 };
 
 Page.prototype.removeNext = function(){
@@ -260,7 +292,7 @@ RuleSet.prototype.uploadObject = function(){
 };
 
 RuleSet.prototype.html = function(){
-    var holder = noSelectElement("div"),
+    var holder = noSelectElement("li"),
         nametag = noSelectElement("h3"),
         ul = noSelectElement("ul");
     holder.classList.add("ruleSet");
@@ -300,20 +332,20 @@ RuleSet.prototype.addRule = function(rule, events){
 };
 
 RuleSet.prototype.removeRule = function(name){
-    var rule = this.rules[name],
-        follow = false;
-    if ( !rule ) {
-        return;
+    var rule = this.rules[name];
+    if ( rule ) {
+        rule.remove();
     }
-    // if rule that is being deleted has follow=true, make sure to delete corresponding page
-    if ( rule.follow ) {
-        follow = true;
-    }
+};
 
-    // remove the html element
-    rule.deleteHTML();
-    delete this.rules[name];
-    return follow;
+RuleSet.prototype.remove = function(){
+    this.deleteHTML();
+    for ( var key in this.rules ) {
+        this.removeRule(key);
+    }
+    if ( this.page ) {
+        delete this.page.sets[this.name];
+    }
 };
 
 /********************
@@ -401,6 +433,17 @@ Rule.prototype.update = function(object){
     this.selector = object.selector;
     this.capture = object.capture;
     this.follow = object.follow || false;
+};
+
+Rule.prototype.remove = function(){
+    this.deleteHTML();
+    if ( this.follow && this.ruleSet && this.ruleSet.page && this.ruleSet.page.group ) {
+        // find associated page and remove that
+        this.ruleSet.page.group.removePage(this.name);
+    }
+    if ( this.ruleSet ) {
+        delete this.ruleSet.rules[this.name];
+    }
 };
 
 // shared delete function

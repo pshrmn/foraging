@@ -62,6 +62,7 @@ describe("Group", function(){
             var g = new Group("Colts");
             var ele = g.html();
             expect(ele.tagName).toEqual("DIV");
+            expect(g.elements.pages.tagName).toEqual("UL");
             expect(g.elements.nametag.textContent).toEqual("Group: Colts");
         });
     });
@@ -291,7 +292,8 @@ describe("Page", function(){
         it("generates html to represent a page", function(){
             var p = new Page("Thunder"),
                 ele = p.html();
-            expect(ele.tagName).toEqual("DIV");
+            expect(ele.tagName).toEqual("LI");
+            expect(p.elements.sets.tagName).toEqual("UL");
             expect(p.elements.nametag.textContent).toEqual("Page: Thunder");
         });
     });
@@ -366,7 +368,8 @@ describe("RuleSet", function(){
         it("generates html to represent a RuleSet", function(){
             var s1 = new RuleSet("Cardinals"),
                 ele = s1.html();
-            expect(ele.tagName).toEqual("DIV");
+            expect(ele.tagName).toEqual("LI");
+            expect(s1.elements.rules.tagName).toEqual("UL");
             expect(s1.elements.nametag.textContent).toEqual("Rule Set: Cardinals");
         });
     });
@@ -380,7 +383,14 @@ describe("RuleSet", function(){
             s1.addRule(r1);
             expect(s1.rules["Players"]).toBeDefined();
             expect(r1.ruleSet).toBeDefined();
-        })
+        });
+
+        it("creates a new page if group/page are defined", function(){
+            var g = new Group("Pirates"),
+                r = new Rule("two", "a", "attr-href", true);
+            g.pages["default"].sets["default"].addRule(r);
+            expect(g.pages["two"]).toBeDefined();
+        });
     });
 
     describe("removeRule", function(){
@@ -389,16 +399,19 @@ describe("RuleSet", function(){
                 r1 = new Rule("Players", ".player", "text");
             s1.addRule(r1);
             expect(s1.rules["Players"]).toBeDefined();
-            expect(s1.removeRule(r1.name)).toBe(false);
-            expect(s1.rules["Players"]).toBeUndefined();
-            
+            s1.removeRule(r1.name)
+            expect(s1.rules["Players"]).toBeUndefined(); 
         });
+    });
 
-        it("returns true if removed rule has follow=true", function(){
-            var s1 = new RuleSet("Reds"),
-                r1 = new Rule("seasons", "a.season", "attr-href", true);
-            s1.addRule(r1);
-            expect(s1.removeRule(r1.name)).toBe(true);
+    describe("remove", function(){
+        it("removes all rules (and thus associated follow pages)", function(){
+            var g = new Group("One"),
+                r = new Rule("two", "a", "attr-href", true);
+            g.pages["default"].sets["default"].addRule(r);
+            expect(g.pages["two"]).toBeDefined();
+            g.pages["default"].sets["default"].removeRule("two");
+            expect(g.pages["two"]).toBeUndefined();
         });
     });
 });
@@ -477,6 +490,18 @@ describe("Rule", function(){
             expect(r1.name).toEqual("nombre");
             expect(s1.rules["nombre"]).toBeDefined();
             expect(s1.rules["name"]).toBeUndefined();
+        });
+    });
+
+    describe("remove", function(){
+        it("removes all rules (and thus associated follow pages)", function(){
+            var g = new Group("One"),
+                r = new Rule("two", "a", "attr-href", true);
+            g.pages["default"].sets["default"].addRule(r);
+            expect(g.pages["two"]).toBeDefined();
+            r.remove();
+            //g.pages["default"].sets["default"].removeRule("two");
+            expect(g.pages["two"]).toBeUndefined();
         });
     });
 });
