@@ -181,7 +181,7 @@ body{
             font-size: 1.1em;
         }
 
-        .collectGroup{
+        .savedRule{
             margin-right: 10px;
             padding: 3px 0 3px 3px;
             border: 1px solid $dark-gray;
@@ -194,12 +194,18 @@ body{
             padding: 0 2px;
         }
 
-        .savedSelector{
+        .savedRuleName{
             cursor: pointer;
         }
 
-        .savedSelector.editing{
+        .savedRuleName.editing{
             background: $gold;
+        }
+
+        .editRule, .previewRule{
+            cursor: pointer;
+            padding: 0 3px;
+            background: $light-gray;
         }
 
         .ruleGroup{

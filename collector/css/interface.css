@@ -113,7 +113,7 @@ body {
     list-style: none; }
     .collectjs .rules h3 {
       font-size: 1.1em; }
-    .collectjs .rules .collectGroup {
+    .collectjs .rules .savedRule {
       margin-right: 10px;
       padding: 3px 0 3px 3px;
       border: 1px solid #444444;
@@ -122,10 +122,14 @@ body {
       cursor: pointer;
       background: #efefef;
       padding: 0 2px; }
-    .collectjs .rules .savedSelector {
+    .collectjs .rules .savedRuleName {
       cursor: pointer; }
-    .collectjs .rules .savedSelector.editing {
+    .collectjs .rules .savedRuleName.editing {
       background: gold; }
+    .collectjs .rules .editRule, .collectjs .rules .previewRule {
+      cursor: pointer;
+      padding: 0 3px;
+      background: #efefef; }
     .collectjs .rules .ruleGroup {
       margin-bottom: 15px; }
       .collectjs .rules .ruleGroup h2 {

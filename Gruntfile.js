@@ -9,8 +9,7 @@ module.exports = function(grunt){
                 globalstrict: true,
                 globals: {
                     chrome: true,
-                    SelectorFamily: true,
-                    tabs: true
+                    //tabs: true
                 },
                 devel: true,
                 expr: true
@@ -27,16 +26,42 @@ module.exports = function(grunt){
         html_to_js_str: {
             test: {
                 files: {
-                  'collector/collector.js': 'src/collector.js'
+                  'src/collector_with_html.js': 'src/collector.js'
                 }
             }
         },
+        concat: {
+            dist: {
+                src: ['src/utility.js', 'src/selector.js', 'src/rule.js', 'src/collector_with_html.js'],
+                dest: 'collector/collector.js',
+                options: {
+                    banner: "'use strict';\n",
+                    process: function(src, filepath) {
+                      return '// Source: ' + filepath + '\n' +
+                        src.replace(/(^|\n)[ \t]*('use strict'|"use strict");?\s*/g, '$1');
+                    },
+                }
+            },
+        },
         jasmine: {
-            pivotal: {
-                src: 'collector/collector.js',
+            collector: {
+                src: 'src/collector_with_html.js',
                 options: {
                     specs: 'tests/CollectorSpec.js',
-                    helpers: 'tests/CollectorHelper.js'
+                    helpers: ['src/utility.js', 'tests/CollectorHelper.js']
+                }
+            },
+            utility: {
+                src: 'src/utility.js',
+                options: {
+                    specs: 'tests/UtilitySpec.js'
+                }
+            },
+            rule: {
+                src: 'src/rule.js',
+                options: {
+                    specs: 'tests/RuleSpec.js',
+                    helpers: 'src/utility.js'
                 }
             }
         }
@@ -46,8 +71,9 @@ module.exports = function(grunt){
     grunt.loadNpmTasks('grunt-contrib-sass');
     grunt.loadNpmTasks('grunt-html-to-js-str');
     grunt.loadNpmTasks('grunt-contrib-jasmine');
+    grunt.loadNpmTasks('grunt-contrib-concat');
     
-    grunt.registerTask('default', ['sass', 'html_to_js_str', 'jshint']);
+    grunt.registerTask('default', ['sass', 'html_to_js_str', 'concat', 'jshint']);
 
     grunt.registerTask('test', ['html_to_js_str', 'jasmine']);
 }

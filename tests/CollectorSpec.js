@@ -37,154 +37,7 @@ describe("event helpers", function(){
     });
 });
 
-describe("utility functions", function(){
-    describe("parentName", function(){
-        it("returns name when length < 8 characters", function(){
-            expect(parentName("short")).toEqual("short");
-            expect(parentName("1234567")).toEqual("1234567");
-        });
-
-        it("returns shortened name when length >= 8 characters", function(){
-            expect(parentName("this is too long")).toEqual("this ...");
-            expect(parentName("12345678")).toEqual("12345...");
-        });
-    });
-
-    describe("noSelectElement", function(){
-        it("returns element with the correct tagname", function(){
-            expect(noSelectElement("div").tagName).toEqual("DIV");
-            expect(noSelectElement("span").tagName).toEqual("SPAN");
-        });
-
-        it("adds noSelect class", function(){
-            expect(noSelectElement("div").classList.contains("noSelect")).toBe(true);
-        });
-    });
-
-    describe("hasClass", function(){
-        var ele;
-        beforeEach(function(){
-            ele = document.createElement("div");
-        });
-
-        it("does have class", function(){
-            ele.classList.add("foo");
-            expect(hasClass(ele, "foo")).toBe(true);
-        });
-        it("does not have class", function(){
-            expect(hasClass(ele, "foo")).toBe(false);
-        });
-    });
-
-    describe("clearClass", function(){
-        it("removes class from all elements with it", function(){
-            var holder = document.createElement("div"),
-                ele;
-            for ( var i=0; i<20; i++ ){
-                ele = document.createElement("div");
-                ele.classList.add("foo");
-                holder.appendChild(ele);
-            }
-            document.body.appendChild(holder);
-            expect(document.getElementsByClassName("foo").length).toEqual(20);
-            clearClass("foo");
-            expect(document.getElementsByClassName("foo").length).toEqual(0);
-            document.body.removeChild(holder);
-        });
-    });
-
-    describe("addClass", function(){
-        it ("adds class to each element in an array", function(){
-            var eles = [],
-                curr;
-            for ( var i=0; i<20; i++ ){
-                curr = document.createElement("div");
-                eles.push(curr);
-            }
-            addClass("test", eles);
-            for ( var i=0; i<20; i++ ){
-                expect(eles[i].classList.contains("test")).toBe(true);
-            }
-        });
-
-        it ("adds class to each element in a node list", function(){
-            var holder = document.createElement("div"),
-                curr;
-            for ( var i=0; i<20; i++ ){
-                curr = document.createElement("div");
-                holder.appendChild(curr);
-            }
-            var eles = holder.getElementsByTagName("div");
-            addClass("test", eles);
-            for ( var i=0; i<20; i++ ){
-                expect(eles[i].classList.contains("test")).toBe(true);
-            }
-        });
-    })
-
-    describe("swapClasses", function(){
-        it("removes oldClass and adds newClass", function(){
-            var ele = document.createElement("div");
-            ele.classList.add("first");
-            swapClasses(ele, "first", "second");
-            expect(ele.classList.contains("first")).toBe(false);
-            expect(ele.classList.contains("second")).toBe(true);
-        });
-    });
-
-    //addevents/removeevents, not sure how to check if an element has an eventlistener attached to it
-
-    describe("addNoSelect", function(){
-        it("adds .noSelect class to all elements in eles", function(){
-            var holder = document.createElement("div"),
-                holderEles;
-            for ( var i=0; i<20; i++ ){
-                holder.appendChild(document.createElement("div"));
-            }
-            document.body.appendChild(holder);
-            holderEles = holder.getElementsByTagName("div");
-            addNoSelect(holderEles);
-            expect(holder.getElementsByClassName("noSelect").length).toEqual(20);
-            document.body.removeChild(holder);
-        });
-    });
-
-    describe("selectorIsComplete", function(){
-        var obj;
-        beforeEach(function(){
-            obj = {
-                name: 'link',
-                selector: 'a',
-                capture: 'attr-href',
-                index: ''
-            };
-        })
-        it("does nothing for complete objects", function(){
-            obj = selectorIsComplete(obj);
-            expect(obj.incomplete).toBeUndefined();
-        });
-        it("sets obj.incomplete name is missing", function(){
-            obj.name = '';
-            obj = selectorIsComplete(obj);
-            expect(obj.incomplete).toBe(true); 
-        });
-        it("sets obj.incomplete selector is missing", function(){
-            obj.selector = '';
-            obj = selectorIsComplete(obj);
-            expect(obj.incomplete).toBe(true); 
-        });
-        it("sets obj.incomplete capture is missing", function(){
-            obj.capture = '';
-            obj = selectorIsComplete(obj);
-            expect(obj.incomplete).toBe(true); 
-        });
-        it("doesn't care about obj.index", function(){
-            delete obj.index;
-            obj = selectorIsComplete(obj);
-            expect(obj.incomplete).toBeUndefined(); 
-        });
-    });
-
+describe("misc.", function(){
     describe("captureFunction", function(){
         it("\"text\" argument returns a function to capture text of element", function(){
             var ele = document.createElement("div"),
@@ -270,116 +123,6 @@ describe("storage helpers", function(){
             expect(ruleSet.name).toEqual("Barack");
         });
     });
-
-    var groups = {
-        "Presidents": {
-            "George": {
-                name: "George",
-                sets: {
-                    "Washington": {
-                        name: "Washington",
-                        rules: {
-                            "one": {},
-                            "two": {}
-                        }
-                    },
-                    "Bush": {
-                        name: "Bush",
-                        rules: {
-                            "three": {},
-                            "four": {}
-                        }
-                    }
-                }
-            },
-            "John": {
-                name: "John",
-                sets: {
-                    "Adams": {
-                        name: "Adams",
-                        rules: {
-                            "five": {},
-                            "six": {}
-                        }
-                    },
-                    "Kennedy": {
-                        name: "Kennedy",
-                        rules: {}
-                    }
-                }
-            },
-            "Thomas": {
-                name: "Thomas",
-                sets: {
-                    "Jefferson": {
-                        name: "Jefferson",
-                        rules: {}
-                    }
-                }
-            },
-            "James": {
-                name: "James",
-                sets: {
-                    "Madison": {
-                        name: "Madison",
-                        rules: {}
-                    },
-                    "Monroe": {
-                        name: "Monroe",
-                        rules: {}
-                    }
-                }
-            }
-        }
-    };
-
-    describe("unique name functions", function(){
-        describe("uniqueGroupName", function(){
-            it("returns false if name already exists", function(){
-                expect(uniqueGroupName("Presidents", groups)).toBe(false);
-            });
-
-            it("returns true if name does not exist in", function(){
-                expect(uniqueGroupName("Prime Ministers", groups)).toBe(true);
-            });
-        });
-
-        describe("uniquePageName", function(){
-            it("returns false if name already exists", function(){
-                expect(uniquePageName("John", groups["Presidents"])).toBe(false);
-            });
-
-            it("returns true if name does not exist", function(){
-                expect(uniquePageName("Mitt", groups["Presidents"])).toBe(true);
-            });
-        });
-
-        describe("uniqueRuleSetName", function(){
-
-            it("returns false if a rule set with name already exists in any of the pages", function(){
-                expect(uniqueRuleSetName("Kennedy", groups["Presidents"])).toBe(false);
-            });
-
-            it("returns true if no rule set with name exists in any of the pages", function(){
-                expect(uniqueRuleSetName("Kerry", groups["Presidents"])).toBe(true);
-            });
-        });
-
-        describe("uniqueRuleName", function(){
-            it("returns true if name doesn't exist for any current rule", function(){
-                expect(uniqueRuleName("test", groups["Presidents"])).toBe(true);
-            });
-
-            it("returns false if a rule already has name", function(){
-                var names = ["one", "two", "three", "four", "five", "six"];
-                for ( var i=0, len=names.length; i<len; i++ ) {
-                    expect(uniqueRuleName(names[i], groups["Presidents"])).toBe(false);
-                }
-            });
-        });
-    });
-
-
     
     describe("legalFilename", function(){
         it("returns true for legal filenames", function(){
@@ -401,14 +144,6 @@ describe("storage helpers", function(){
         });
     });
 
-    describe("nonEmptyPages", function(){
-        it("returns an object containing pages/sets that contain rules", function(){
-            var pages = nonEmptyPages(groups["Presidents"]);
-            expect(pages["George"]).toBeDefined();
-            expect(pages["Thomas"]).toBeUndefined();
-        });
-    });
-
     describe("deleteEditing", function(){
         it("doesn't need to do anything if not currently editing", function(){
             // make sure it doesn't exist
@@ -416,27 +151,6 @@ describe("storage helpers", function(){
             expect(Interface.editing).toBeUndefined();
             deleteEditing();
             expect(Interface.editing).toBeUndefined();
-        });
-
-        it("deletes Interface.editing and removes 'editing' class when editing", function(){
-            Interface.editing = {
-                rule: {}
-            };
-            expect(Interface.editing).toBeDefined();
-            deleteEditing();
-            expect(Interface.editing).toBeUndefined();
-        });
-
-        it("removes .editing if editing.element exists", function(){
-            var ele = document.createElement("div");
-            ele.classList.add("editing");
-            Interface.editing = {
-                rule: {},
-                element: ele
-            };
-            expect(Interface.editing.element.classList.contains("editing")).toBe(true);
-            deleteEditing();
-            expect(ele.classList.contains("editing")).toBe(false);
         });
     });
 });
@@ -503,32 +217,6 @@ describe("html functions", function(){
             expect(option.tagName).toEqual("OPTION");
             expect(option.textContent).toEqual("foobar");
             expect(option.value).toEqual("foobar");
-        });
-    });
-
-    /*
-    // pass on this until I decide how to revampt the saved rules tab
-    describe("ruleSetElement", function(){
-        it("", function(){
-
-        });
-    });
-    */
-
-    describe("ruleElement", function(){
-        it("creates a set of html elements representing a saved rule", function(){
-            var rule = {
-                name: "Bill",
-                selector: ".bill",
-                capture: "text"
-            }
-
-            var ele = ruleElement(rule),
-                tag = ele.getElementsByTagName("span")[0];
-            expect(ele.tagName).toEqual("LI");
-            expect(ele.dataset.name).toEqual(rule.name);
-            expect(tag.textContent).toEqual(rule.name);
-            expect(tag.dataset.selector).toEqual(rule.selector);
         });
     });
 });
