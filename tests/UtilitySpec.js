@@ -10,21 +10,6 @@ describe("utility functions", function(){
         });
     });
 
-    describe("hasClass", function(){
-        var ele;
-        beforeEach(function(){
-            ele = document.createElement("div");
-        });
-
-        it("does have class", function(){
-            ele.classList.add("foo");
-            expect(hasClass(ele, "foo")).toBe(true);
-        });
-        it("does not have class", function(){
-            expect(hasClass(ele, "foo")).toBe(false);
-        });
-    });
-
     describe("clearClass", function(){
         it("removes class from all elements with it", function(){
             var holder = document.createElement("div"),
@@ -81,8 +66,6 @@ describe("utility functions", function(){
         });
     });
 
-    //addevents/removeevents, not sure how to check if an element has an eventlistener attached to it
-
     describe("addNoSelect", function(){
         it("adds .noSelect class to all elements in eles", function(){
             var holder = document.createElement("div"),
@@ -95,6 +78,38 @@ describe("utility functions", function(){
             addNoSelect(holderEles);
             expect(holder.getElementsByClassName("noSelect").length).toEqual(20);
             document.body.removeChild(holder);
+        });
+    });
+
+    describe("options", function(){
+        var select;
+        beforeEach(function(){
+            select = document.createElement("select");
+        });
+
+        it("adds a new option element to the holder for each item in keys", function(){
+            var keys = ["one", "two", "three"];
+            options(keys, select);
+            var opts = select.getElementsByTagName("option");
+            expect(opts.length).toEqual(3);
+        });
+
+        it("clears out existing options prior to adding new options", function(){
+            var preOpt = newOption("zero");
+            select.appendChild(preOpt);
+            var keys = ["one", "two", "three"];
+            options(keys, select);
+            var opts = select.getElementsByTagName("option");
+            expect(opts.length).toEqual(3);
+        });
+    });
+
+    describe("newOption", function(){
+        it("creates a new option element with value as name", function(){
+            var option = newOption("foobar");
+            expect(option.tagName).toEqual("OPTION");
+            expect(option.textContent).toEqual("foobar");
+            expect(option.value).toEqual("foobar");
         });
     });
 });

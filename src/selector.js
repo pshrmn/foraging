@@ -230,7 +230,7 @@ function Selector(ele, family){
     for ( var i=0, len=ele.classList.length; i<len; i++ ) {
         curr = ele.classList[i];
         // classes used collect.js, not native to page 
-        if ( curr === "collectHighlight" || curr === "queryCheck" ) {
+        if ( curr === "collectHighlight" || curr === "queryCheck" || curr === "savedPreview" ) {
             continue;
         }
         frag = new Fragment('.' + curr, this);

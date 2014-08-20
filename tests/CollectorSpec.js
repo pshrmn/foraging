@@ -210,15 +210,6 @@ describe("html functions", function(){
             expect(captureAttribute("class=\"\"")).toBeUndefined();
         });
     });
-
-    describe("newOption", function(){
-        it("creates a new option element with value as name", function(){
-            var option = newOption("foobar");
-            expect(option.tagName).toEqual("OPTION");
-            expect(option.textContent).toEqual("foobar");
-            expect(option.value).toEqual("foobar");
-        });
-    });
 });
 
 /*

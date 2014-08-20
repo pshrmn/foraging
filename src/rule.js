@@ -1,17 +1,12 @@
-function prototypeDeleteHTML(){
-    var holder = this.elements.holder;
-    if ( holder ) {
-        holder.parentElement.removeChild(holder);
-    }
-}
-
 /********************
         GROUP
 ********************/
 function Group(name, urls){
     this.name = name;
     this.urls = urls || {};
-    this.pages = {};
+    this.pages = {
+        "default": new Page("default")
+    };
     this.elements = {};
 }
 
@@ -126,7 +121,9 @@ function Page(name, index, next){
     this.name = name,
     this.index = index || false;
     this.next = next;
-    this.sets = {};
+    this.sets = {
+        "default": new RuleSet("default")
+    };
     this.elements = {};
     // added when a group calls addPage
     this.group;
@@ -284,20 +281,39 @@ RuleSet.prototype.html = function(){
 
 RuleSet.prototype.deleteHTML = prototypeDeleteHTML;
 
-RuleSet.prototype.addRule = function(rule, sE, usE, eE, pE, dE){
+RuleSet.prototype.addRule = function(rule, events){
     this.rules[rule.name] = rule;
     rule.ruleSet = this;
+
+    // if the Rule has follow=true and the RuleSet has a Page (which in turn has a Group)
+    // add a new Page to the group with the name of the Rule
+    if ( rule.follow && this.page && this.page.group ) {
+        var page = new Page(rule.name);
+        this.page.group.addPage(page);
+    }
+
     // if RuleSet html exists, also create html for rule
     if ( this.elements.rules ) {
-        var ele = rule.html(sE, usE, eE, pE, dE);
+        var ele = rule.html.apply(rule, events);
         this.elements.rules.appendChild(ele);
     }
 };
 
 RuleSet.prototype.removeRule = function(name){
+    var rule = this.rules[name],
+        follow = false;
+    if ( !rule ) {
+        return;
+    }
+    // if rule that is being deleted has follow=true, make sure to delete corresponding page
+    if ( rule.follow ) {
+        follow = true;
+    }
+
     // remove the html element
-    this.rules[name].deleteHTML();
+    rule.deleteHTML();
     delete this.rules[name];
+    return follow;
 };
 
 /********************
@@ -386,3 +402,11 @@ Rule.prototype.update = function(object){
     this.capture = object.capture;
     this.follow = object.follow || false;
 };
+
+// shared delete function
+function prototypeDeleteHTML(){
+    var holder = this.elements.holder;
+    if ( holder ) {
+        holder.parentElement.removeChild(holder);
+    }
+}

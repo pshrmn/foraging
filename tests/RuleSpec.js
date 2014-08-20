@@ -12,6 +12,11 @@ describe("Group", function(){
             var g = new Group("Vikings");
             expect(JSON.stringify(g.urls)).toEqual("{}");
         });
+
+        it("creates a default page", function(){
+            var g = new Group("Broncos");
+            expect(g.pages["default"]).toBeDefined();
+        });
     });
 
     describe("object", function(){
@@ -21,7 +26,18 @@ describe("Group", function(){
             var groupJSON = {
                 name: "Lions",
                 urls: urls,
-                pages: {}
+                pages: {
+                    "default": {
+                        name: "default",
+                        index: false,
+                        sets: {
+                            "default": {
+                                name: "default",
+                                rules: {}
+                            }
+                        }
+                    }
+                }
             }
             var g = new Group("Lions", urls);
             expect(JSON.stringify(g.object())).toEqual(JSON.stringify(groupJSON));
@@ -172,7 +188,12 @@ describe("Page", function(){
             var p1 = new Page("Supersonics");
             expect(p1.index).toBe(false);
             expect(p1.next).toBeUndefined();
-        })
+        });
+
+        it("creates a default RuleSet", function(){
+            var p1 = new Page("Knicks");
+            expect(p1.sets["default"]).toBeDefined();
+        });
     });
 
     describe("object", function(){
@@ -181,7 +202,12 @@ describe("Page", function(){
             var expected = {
                 name: "Suns",
                 index: true,
-                sets: {},
+                sets: {
+                    "default": {
+                        name: "default",
+                        rules: {}
+                    }
+                },
                 next: ".cssselector"
             };
             expect(JSON.stringify(p.object())).toEqual(JSON.stringify(expected));
@@ -192,7 +218,41 @@ describe("Page", function(){
             var expected = {
                 name: "Warriors",
                 index: false,
-                sets: {}
+                sets: {
+                    "default": {
+                        name: "default",
+                        rules: {}
+                    }
+                }
+            };
+            expect(JSON.stringify(p.object())).toEqual(JSON.stringify(expected));
+        });
+
+        it("works with RuleSets/Rules", function(){
+            var p = new Page("Nuggets"),
+                s1 = new RuleSet("Players"),
+                r1 = new Rule("Points", ".game .points", "text");
+            p.addSet(s1);
+            s1.addRule(r1);
+            var expected = {
+                name: "Nuggets",
+                index: false,
+                sets: {
+                    "default": {
+                        name: "default",
+                        rules: {}
+                    },
+                    "Players": {
+                        name: "Players",
+                        rules: {
+                            "Points": {
+                                name: "Points",
+                                selector: ".game .points",
+                                capture: "text"
+                            }
+                        }
+                    }
+                }
             };
             expect(JSON.stringify(p.object())).toEqual(JSON.stringify(expected));
         });
@@ -329,8 +389,16 @@ describe("RuleSet", function(){
                 r1 = new Rule("Players", ".player", "text");
             s1.addRule(r1);
             expect(s1.rules["Players"]).toBeDefined();
-            s1.removeRule(r1.name);
+            expect(s1.removeRule(r1.name)).toBe(false);
             expect(s1.rules["Players"]).toBeUndefined();
+            
+        });
+
+        it("returns true if removed rule has follow=true", function(){
+            var s1 = new RuleSet("Reds"),
+                r1 = new Rule("seasons", "a.season", "attr-href", true);
+            s1.addRule(r1);
+            expect(s1.removeRule(r1.name)).toBe(true);
         });
     });
 });

@@ -47,7 +47,8 @@ var Collect = {
     },
     // parent.selector is set when Collect.current.ruleSet index=true
     parent: {},
-    groups: {}
+    // currently loaded Group
+    group: undefined
 };
 
 /*
@@ -177,12 +178,6 @@ var HTML = {
         groups: document.getElementById("groupsTab"),
         preview: document.getElementById("previewTab"),
         options: document.getElementById("optionsTab")
-    },
-    views: {
-        rule: document.getElementById("ruleView"),
-        groups: document.getElementById("groupsView"),
-        preview: document.getElementById("previewView"),
-        options: document.getElementById("optionsView")
     }
 };
 
@@ -266,6 +261,7 @@ var Family = {
             this.family.match(selector);
         }    
     },
+    // returns a string representing the current selector or if none, an empty string
     selector: function(){
         if ( this.family ) {
             return this.family.toString();
@@ -273,6 +269,8 @@ var Family = {
             return "";
         }
     },
+    // uses current SelectorFamily's computed selector to match elements in the page
+    // uses Collect.parent to limit matches
     elements: function(){
         var selector = this.selector();
         if ( selector === "") {
@@ -281,10 +279,10 @@ var Family = {
         return parentElements(selector);
     },
     /*
-    sets Collect.elements to elements matching the current selector and resets elementIndex
+    sets Collect.matchedElements to elements matching the current selector and resets elementIndex
     */
     match: function(){
-        Collect.elements = this.elements();
+        Collect.matchedElements = this.elements();
         Collect.elementIndex = 0;
     },
     /*
@@ -302,29 +300,33 @@ var Family = {
         }
         count = elements.length ? elements.length : "";
         HTML.info.count.textContent = count;
-        updateMatchedElements();
+        this.match();
+        var ele = Collect.matchedElements[0];
+        if ( ele ) {
+            setRuleHTML(ele);
+        }
     },
     /*
     applies a range to the elements selected by the current selector
-    if range is positive, it sets Collect.elements to (range, elements.length)
-    if range is negative, it sets Collect.elements to (0, elements.length-range)
+    if range is positive, it sets Collect.matchedElements to (range, elements.length)
+    if range is negative, it sets Collect.matchedElements to (0, elements.length-range)
     */
     range: function(range){
         var len;
 
         Family.match();
-        len = Collect.elements.length;
+        len = Collect.matchedElements.length;
         if ( isNaN(range) || -1*range > len || range > len-1 ) {
             HTML.form.parent.range.value = "";
         } else {
            if ( range < 0 ) {
-                Collect.elements = Array.prototype.slice.call(Collect.elements).slice(0, range);
+                Collect.matchedElements = Array.prototype.slice.call(Collect.matchedElements).slice(0, range);
                 Collect.elementIndex = 0;
-                setRuleHTML(Collect.elements[0]);
+                setRuleHTML(Collect.matchedElements[0]);
             } else if ( range > 0 ) {
-                Collect.elements = Array.prototype.slice.call(Collect.elements).slice(range);
+                Collect.matchedElements = Array.prototype.slice.call(Collect.matchedElements).slice(range);
                 Collect.elementIndex = 0;
-                setRuleHTML(Collect.elements[0]);
+                setRuleHTML(Collect.matchedElements[0]);
             }    
         }
     }
@@ -335,7 +337,8 @@ Interface.setup();
 
 function resetInterface(){
     clearClass("queryCheck");
-
+    clearClass("collectHighlight");
+    clearClass("savedPreview");
     resetRulesView();
     resetPreviewView();
 }
@@ -391,8 +394,8 @@ function tabEvents(){
         clearClass('queryCheck');
         clearClass('collectHighlight');
         clearClass('parentGroup');
+        clearClass("savedPreview");
         HTML.interface.parentElement.removeChild(HTML.interface);
-
         document.body.style.marginBottom = marginBottom + "px";
     });
 
@@ -493,27 +496,23 @@ function permanentBarEvents(){
     idEvent("uploadRules", "click", function uploadEvent(event){
         event.preventDefault();
         uploadGroup();
-        //uploadCurrentGroupRules();
     });
 
     // index events
     idEvent("indexToggle", "change", toggleURLEvent);
 }
 
-/*
-add .collectHighlight to an element on mouseenter
-*/
+// add .collectHighlight to an element on mouseenter
 function highlightElement(event){
     this.classList.add("collectHighlight");
 }
 
-/*
-remove .collectHighlight from an element on mouseleave
-*/
+// remove .collectHighlight from an element on mouseleave
 function unhighlightElement(event){
     this.classList.remove("collectHighlight");
 }
 
+// 
 function refreshElements(){
     resetInterface();
     Interface.turnOn();
@@ -548,32 +547,32 @@ function cancelNextEvent(event){
 function applyParentRange(event){
     Family.range(parseInt(HTML.form.parent.range.value, 10));
     clearClass("queryCheck");
-    addClass("queryCheck", Collect.elements);
+    addClass("queryCheck", Collect.matchedElements);
     
-    HTML.info.count.textContent = Collect.elements.length;   
+    HTML.info.count.textContent = Collect.matchedElements.length;   
 }
 
 /*
-cycle to the previous element (based on Collect.elementIndex and Collect.elements) to represent an
+cycle to the previous element (based on Collect.elementIndex and Collect.matchedElements) to represent an
 element in #ruleHTML
 */
 function showPreviousElement(event){
     var index = Collect.elementIndex,
-        len = Collect.elements.length;
+        len = Collect.matchedElements.length;
     Collect.elementIndex = (index=== 0) ? len-1 : index-1;
-    setRuleHTML(Collect.elements[Collect.elementIndex]);
+    setRuleHTML(Collect.matchedElements[Collect.elementIndex]);
     markCapture();
 }
 
 /*
-cycle to the next element (`d on Collect.elementIndex and Collect.elements) to represent an
+cycle to the next element (`d on Collect.elementIndex and Collect.matchedElements) to represent an
 element in #ruleHTML
 */
 function showNextElement(event){
     var index = Collect.elementIndex,
-        len = Collect.elements.length;
+        len = Collect.matchedElements.length;
     Collect.elementIndex = (index=== len-1) ? 0 : index+1;
-    setRuleHTML(Collect.elements[Collect.elementIndex]);
+    setRuleHTML(Collect.matchedElements[Collect.elementIndex]);
     markCapture();
 }
 
@@ -602,7 +601,7 @@ function capturePreview(event){
         this.classList.add("selected");
 
         // toggle follow based on if capture is attr-href or something else
-        if ( captureVal === "attr-href" && allLinks(Collect.elements) ){
+        if ( captureVal === "attr-href" && allLinks(Collect.matchedElements) ){
             followHolder.style.display = "block";
             follow.removeAttribute("disabled");
             follow.setAttribute("title", "Follow link to get data for more rules");
@@ -620,13 +619,16 @@ function capturePreview(event){
     }   
 }
 
+
+/******************
+    RULE EVENTS
+******************/
 function saveRuleEvent(event){
     event.preventDefault();
     var name = HTML.form.rule.name.value,
         selector = HTML.form.rule.selector.textContent,
         capture = HTML.form.rule.capture.textContent,
         follow = HTML.form.rule.follow.checked,
-        page = Collect.group.pages[Collect.current.page],
         rule = {
             name: name,
             capture: capture,
@@ -641,7 +643,6 @@ function saveRuleEvent(event){
         errorCheck((rule.name === "default"), HTML.form.rule.name, "Rule cannot be named 'default'") ) {
         return;
     }
-    // redo with objects
     else if ( !Collect.group.uniqueRuleName(name) ) {
         // some markup to signify you need to change the rule's name
         alertMessage("Rule name is not unique");
@@ -651,10 +652,11 @@ function saveRuleEvent(event){
     
     if ( follow ) {
         rule.follow = true;
+        // page will be created when rule is added to ruleset, but add option now
+        HTML.groups.page.appendChild(newOption(rule.name));
     }
     
-    addRule(rule, page.sets[Collect.current.ruleSet]);
-
+    addRule(rule, Collect.group.pages[Collect.current.page].sets[Collect.current.ruleSet]);
     saveGroup();
     resetInterface();
 }
@@ -684,15 +686,7 @@ function saveEditEvent(event){
     var oldName = Interface.editing.name,
         ruleSet = Interface.editing.ruleSet;
     Interface.editing.update(rule);
-
-    ruleSet[rule.name] = Interface.editing.ruleSet;
-    // delete the old rule if changing name
-    if ( rule.name !== oldName ) {
-        ruleSet.removeRule(oldName);
-    }
-
-    var page = ruleSet.page;
-    Collect.group.pages[page.name].sets[ruleSet.name] = ruleSet;
+    Collect.group.pages[ruleSet.page.name].sets[ruleSet.name] = ruleSet;
     saveGroup();
 
     deleteEditing();
@@ -832,9 +826,9 @@ function toggleURLEvent(event){
     saveGroup();
 }
 
-/*******************
-    RULE EVENTS
-*******************/
+/************************
+    SAVED RULE EVENTS
+************************/
 function selectorViewRule(event){
     clearClass("queryCheck");
     clearClass("collectHighlight");
@@ -875,6 +869,7 @@ function previewSavedRule(event){
 function deleteRuleEvent(event){
     // also need to remove rule from RuleSet
     this.deleteHTML();
+    clearClass("savedPreview");
 }
 
 /***********************
@@ -895,14 +890,6 @@ function showTab(tab){
     Interface.tabs.view = view;
     Interface.tabs.tab.classList.add("active");
     Interface.tabs.view.classList.add("active");
-}
-
-function updateMatchedElements(){
-    Family.match();
-    var ele = Collect.elements[0];
-    if ( ele ) {
-        setRuleHTML(ele);
-    }
 }
 
 /*
@@ -994,14 +981,8 @@ function addRule(rule, ruleSet){
         Collect.parent.selector
     );
 
-    ruleSet.addRule(
-        ruleObject,
-        selectorViewRule,
-        unselectorViewRule,
-        editSavedRule,
-        previewSavedRule,
-        deleteRuleEvent
-    );
+    ruleSet.addRule(ruleObject,
+        [selectorViewRule, unselectorViewRule, editSavedRule, previewSavedRule, deleteRuleEvent]);
 }
 
 /*
@@ -1142,11 +1123,7 @@ function setupHostname(){
             key;
         // default setup if page hasn't been visited before
         if ( !site ) {
-            group = {
-                name: "default",
-                pages: {"default": newPage("default", false)},
-                urls: {}
-            };
+            group = newGroup("default");
             storage.sites[host] = {
                 site: host,
                 groups: {
@@ -1201,11 +1178,7 @@ function createGroup(){
         }
 
         HTML.groups.group.appendChild(newOption(name));
-        group = {
-            name: name,
-            pages: {"default": newPage("default", false)},
-            urls: {}
-        };
+        group = newGroup(name);
         storage.sites[host].groups[name] = group;
 
         chrome.storage.local.set({'sites': storage.sites});
@@ -1227,6 +1200,9 @@ function loadGroup(ele){
     });
 }
 
+/*
+saving function for all things group related
+*/
 function saveGroup(){
     chrome.storage.local.get('sites', function saveGroupChrome(storage){
         var host = window.location.hostname,
@@ -1258,22 +1234,15 @@ function deleteGroup(){
             currOption = HTML.groups.group.querySelector("option:checked");
         // just delete all of the rules for "default" option
         if ( defaultGroup ) {
-            site.groups["default"] = {
-                name: "default",
-                pages: {"default": newPage("default", false)},
-                urls: {}
-            };
+            site.groups["default"] = newGroup("default");
         } else {
             delete site.groups[Collect.current.group];
             currOption.parentElement.removeChild(currOption);
-            
-            Collect.current.group = "default";
-            HTML.groups.group.querySelector("option[value=default]").selected = true;
         }
         storage.sites[host] = site;
         chrome.storage.local.set({'sites': storage.sites});
         deleteEditing();
-        loadGroupObject(site.groups[Collect.current.group]);
+        loadGroupObject(site.groups["default"]);
     });
 }
 
@@ -1353,10 +1322,8 @@ function createRuleSet(){
     
     HTML.groups.ruleSet.appendChild(newOption(name));
     var page = Collect.group.pages[Collect.current.page],
-        ruleSet = new RuleSet(name, Collect.parent);
+        ruleSet = new RuleSet(name);
     page.addSet(ruleSet);
-    Collect.group.pages[ruleSet.page.name] = ruleSet;
-
     saveGroup();
 
     deleteEditing();
@@ -1388,6 +1355,8 @@ function deleteRuleSet(){
     var page = Collect.group.pages[Collect.current.page],
         ruleSet;
     page.removeSet(Collect.current.ruleSet);
+
+    // handle setting new current RuleSet
     if ( defaultRuleSet ) {
         ruleSet = new RuleSet("default");
         page.addSet(ruleSet);
@@ -1432,6 +1401,15 @@ function setOptions(options){
     STORAGE HELPERS
 ***********************/
 
+// creates an empty group object
+function newGroup(name){
+    return {
+        name: name,
+        pages: {"default": newPage("default", false)},
+        urls: {}
+    };
+}
+
 // creates an empty page object
 function newPage(name, index){
     index = index || false;
@@ -1473,8 +1451,8 @@ function legalFilename(name){
 }
 
 /*
-given a group object, set html based on group's properties, and load all pages/rule sets/rules
-associated with it
+given JSON representing a group, create that Group's object and all associated Page/RuleSet/Rule objects
+also setup relevant HTML data associated with the Group
 */
 function loadGroupObject(group){
     HTML.groups.group.querySelector("option[value=" + group.name + "]").selected = true;
@@ -1500,7 +1478,7 @@ function loadGroupObject(group){
     for ( pageName in group.pages ) {
         page = group.pages[pageName];
         pageObject = new Page(page.name, page.index, page.next);
-        groupObject.addpage(pageObject);
+        groupObject.addPage(pageObject);
         for ( ruleSetName in page.sets ) {
             ruleSet = page.sets[ruleSetName];
             ruleSetObject = new RuleSet(ruleSet.name, ruleSet.parent);
@@ -1619,66 +1597,6 @@ function deleteEditing(){
 /***********************
     HTML FUNCTIONS
 ***********************/
-/*
-takes an element and remove collectjs related classes and shorten text, then returns outerHTML
-*/
-function cleanElement(ele){
-    ele.classList.remove('queryCheck');
-    ele.classList.remove('collectHighlight');
-    if ( ele.hasAttribute('src') ) {
-        var value = ele.getAttribute('src'),
-            query = value.indexOf('?');
-        if ( query !== -1 ) {
-            value = value.slice(0, query);
-        }
-        ele.setAttribute('src', value);
-    }
-    if ( ele.textContent !== "" ) {
-        var innerText = ele.textContent.replace(/(\s{2,}|[\n\t]+)/g, ' ');
-        if ( innerText.length > 100 ){
-            innerText = innerText.slice(0, 25) + "..." + innerText.slice(-25);
-        }
-        ele.innerHTML = innerText;
-    }
-    return ele;
-}
-
-function attributeText(attr) {
-    // encode ampersand
-    attr.value = attr.value.replace("&", "&amp;");
-    return attr.name + "=\"" + attr.value + "\"";
-}
-
-//wrap an attribute or the text of an html string 
-//(used in #selector_text div)
-function captureAttribute(text, type){
-    // don't include empty properties
-    if ( text.indexOf('=""') !== -1 ) {
-        return;
-    }
-    var span = noSelectElement("span");
-    span.classList.add("capture");
-    span.setAttribute("title", "click to capture " + type + " property");
-    span.dataset.capture = type;
-    span.textContent = text;
-    span.addEventListener("click", capturePreview, false);
-    return span;
-}
-
-function options(keys, holder){
-    // clear out any existing options when adding multiple new options
-    holder.innerHTML = "";
-    for ( var i=0, len=keys.length; i<len; i++ ){
-        holder.appendChild(newOption(keys[i]));
-    }
-}
-
-function newOption(name){
-    var option = noSelectElement("option");
-    option.setAttribute("value", name);
-    option.textContent = name;
-    return option;
-}
 
 /*
 given an element, generate the html to represent an element and its "captureable" attributes and
@@ -1727,4 +1645,50 @@ function setRuleHTML(element){
 
     // append remaining text
     HTML.ruleHTML.appendChild(document.createTextNode(html));
+}
+
+/*
+takes an element and remove collectjs related classes and shorten text, then returns outerHTML
+*/
+function cleanElement(ele){
+    ele.classList.remove('queryCheck');
+    ele.classList.remove('collectHighlight');
+    if ( ele.hasAttribute('src') ) {
+        var value = ele.getAttribute('src'),
+            query = value.indexOf('?');
+        if ( query !== -1 ) {
+            value = value.slice(0, query);
+        }
+        ele.setAttribute('src', value);
+    }
+    if ( ele.textContent !== "" ) {
+        var innerText = ele.textContent.replace(/(\s{2,}|[\n\t]+)/g, ' ');
+        if ( innerText.length > 100 ){
+            innerText = innerText.slice(0, 25) + "..." + innerText.slice(-25);
+        }
+        ele.innerHTML = innerText;
+    }
+    return ele;
+}
+
+function attributeText(attr) {
+    // encode ampersand
+    attr.value = attr.value.replace("&", "&amp;");
+    return attr.name + "=\"" + attr.value + "\"";
+}
+
+//wrap an attribute or the text of an html string 
+//(used in #selector_text div)
+function captureAttribute(text, type){
+    // don't include empty properties
+    if ( text.indexOf('=""') !== -1 ) {
+        return;
+    }
+    var span = noSelectElement("span");
+    span.classList.add("capture");
+    span.setAttribute("title", "click to capture " + type + " property");
+    span.dataset.capture = type;
+    span.textContent = text;
+    span.addEventListener("click", capturePreview, false);
+    return span;
 }
