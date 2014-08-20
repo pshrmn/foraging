@@ -109,27 +109,36 @@ body {
     cursor: pointer;
     font-weight: normal; }
   .collectjs .rules {
-    font-size: 12px;
-    list-style: none; }
-    .collectjs .rules h3 {
-      font-size: 1.1em; }
+    font-size: 12px; }
+    .collectjs .rules .group, .collectjs .rules .page, .collectjs .rules .ruleSet {
+      padding: 5px 2px;
+      border-radius: 5px;
+      border-width: 1px;
+      border-style: solid;
+      border-color: #cccccc; }
+    .collectjs .rules .page {
+      margin: 3px 0; }
+    .collectjs .rules .ruleSet {
+      margin: 2px 0; }
+    .collectjs .rules .group ul, .collectjs .rules .page ul, .collectjs .rules .ruleSet ul {
+      list-style: none; }
     .collectjs .rules .savedRule {
+      font-size: 1.5em;
       margin-right: 10px;
-      padding: 3px 0 3px 3px;
-      border: 1px solid #444444;
+      padding: 5px;
+      border-bottom: 1px solid #444444;
       display: inline-block; }
-    .collectjs .rules .deltog {
-      cursor: pointer;
-      background: #efefef;
-      padding: 0 2px; }
     .collectjs .rules .savedRuleName {
-      cursor: pointer; }
+      cursor: pointer;
+      font-weight: bold;
+      padding: 0 5px; }
     .collectjs .rules .savedRuleName.editing {
       background: gold; }
-    .collectjs .rules .editRule, .collectjs .rules .previewRule {
+    .collectjs .rules .deltog, .collectjs .rules .editRule, .collectjs .rules .previewRule {
       cursor: pointer;
-      padding: 0 3px;
-      background: #efefef; }
+      padding: 0 3px; }
+    .collectjs .rules .deltog:hover, .collectjs .rules .editRule:hover, .collectjs .rules .previewRule:hover {
+      color: #c91900; }
     .collectjs .rules .ruleGroup {
       margin-bottom: 15px; }
       .collectjs .rules .ruleGroup h2 {

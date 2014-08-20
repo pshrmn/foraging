@@ -175,37 +175,52 @@ body{
 
     .rules{
         font-size: 12px;
-        list-style: none;
 
-        h3{
-            font-size: 1.1em;
+        .group, .page, .ruleSet{
+            padding: 5px 2px;
+            border-radius: 5px;
+            border-width: 1px;
+            border-style: solid;
+            border-color: $gray;
+        }
+
+        .page{
+            margin: 3px 0;
+        }
+
+        .ruleSet{
+            margin: 2px 0;
+        }
+
+        .group ul, .page ul, .ruleSet ul{
+            list-style: none;
         }
 
         .savedRule{
+            font-size: 1.5em;
             margin-right: 10px;
-            padding: 3px 0 3px 3px;
-            border: 1px solid $dark-gray;
+            padding: 5px;
+            border-bottom: 1px solid $dark-gray;
             display: inline-block;
-        }
-
-        .deltog{
-            cursor: pointer;
-            background: $light-gray;
-            padding: 0 2px;
         }
 
         .savedRuleName{
             cursor: pointer;
+            font-weight: bold;
+            padding: 0 5px;
         }
 
         .savedRuleName.editing{
             background: $gold;
         }
 
-        .editRule, .previewRule{
+        .deltog, .editRule, .previewRule{
             cursor: pointer;
             padding: 0 3px;
-            background: $light-gray;
+        }
+
+        .deltog:hover, .editRule:hover, .previewRule:hover{
+            color: $red;
         }
 
         .ruleGroup{

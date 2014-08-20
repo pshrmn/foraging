@@ -46,9 +46,10 @@ Group.prototype.uploadObject = function(){
 
 Group.prototype.html = function(){
     var holder = noSelectElement("div"),
-        nametag = noSelectElement("p"),
+        nametag = noSelectElement("h3"),
         pages = noSelectElement("ul");
 
+    holder.classList.add("group");
     nametag.textContent = "Group: " + this.name;
     holder.appendChild(nametag);
     holder.appendChild(pages);
@@ -188,9 +189,10 @@ Page.prototype.uploadObject = function(){
 
 Page.prototype.html = function(){
     var holder = noSelectElement("li"),
-        nametag = noSelectElement("p"),
+        nametag = noSelectElement("h4"),
         sets = noSelectElement("ul");
 
+    holder.classList.add("page");
     nametag.textContent = "Page: " + this.name;
     holder.appendChild(nametag);
     holder.appendChild(sets);
@@ -303,10 +305,10 @@ RuleSet.prototype.uploadObject = function(){
 
 RuleSet.prototype.html = function(){
     var holder = noSelectElement("li"),
-        nametag = noSelectElement("h3"),
+        nametag = noSelectElement("h5"),
         ul = noSelectElement("ul");
+        
     holder.classList.add("ruleSet");
-
     nametag.textContent = "Rule Set: " + this.name;
 
     holder.appendChild(nametag);
