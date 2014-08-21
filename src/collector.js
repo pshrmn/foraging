@@ -107,6 +107,7 @@ var Interface = {
         //views
         ruleViewEvents();
         optionsViewEvents();
+        previewViewEvents();
         permanentBarEvents();
     },
     update: function(){
@@ -170,6 +171,7 @@ var HTML = {
         selector: document.getElementById("previewSelector"),
         capture: document.getElementById("previewCapture"),
         contents: document.getElementById("previewContents"),
+        clear: document.getElementById("previewClear")
     },
     cycle: document.getElementById("ruleCycle"),
     ruleHTML: document.getElementById("ruleHTML"),
@@ -436,6 +438,13 @@ function optionsViewEvents(){
             Collect.options.ignore = document.getElementById("ignore").checked;
         }
         setOptions(Collect.options);
+    });
+}
+
+function previewViewEvents(){
+    idEvent("previewClear", "click", function(event){
+        event.preventDefault();
+        resetPreviewView();
     });
 }
 
@@ -861,9 +870,13 @@ function editSavedRule(event){
 }
 
 function previewSavedRule(event){
+    HTML.preview.name.textContent = this.name;
+    HTML.preview.selector.textContent = this.selector;
+    HTML.preview.capture.textContent = this.capture;
+    //HTML.preview.contents;
     var elements = parentElements(this.selector);
-
     generatePreviewElements(this.capture, elements);
+    showTab(HTML.tabs.preview);
 }
 
 function deleteRuleEvent(event){
@@ -923,7 +936,7 @@ function generatePreviewElements(capture, elements) {
     if ( previewHTML === "" ) {
         previewHTML = "No selector/attribute to capture selected";
     }
-    HTML.preview.innerHTML = previewHTML;
+    HTML.preview.contents.innerHTML = previewHTML;
 }
 
 

@@ -3,3 +3,4 @@
 *.crx
 .sass-cache
 node_modules
+src/collector_with_html.js
