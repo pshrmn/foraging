@@ -53,13 +53,13 @@ class Group(object):
         is cached), and returns an lxml.html.HtmlElement
         """
         data = {}
+        page = self.pages[page_name]
         # if an index page has been visited before, don't recrawl
         if page.index and group_cache.visited(url):
             return {}
         dom, canonical_url = group_cache.fetch(url)
         if dom is None:
             return {}
-        page = self.pages[page_name]
         page_data = page.get(dom)
 
         if page_name == "default" and page.next:
