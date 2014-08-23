@@ -74,9 +74,9 @@ body {
     background: #efefef; }
     .collectjs .permanent .currentInfo div {
       display: inline-block;
-      margin-right: 15px; }
+      margin: 0 8px; }
     .collectjs .permanent .currentInfo > div {
-      border-bottom: 1px dotted #444444; }
+      border-bottom: 1px solid #444444; }
   .collectjs .views {
     box-sizing: border-box;
     min-height: 250px;
@@ -109,24 +109,28 @@ body {
     cursor: pointer;
     font-weight: normal; }
   .collectjs .rules {
-    font-size: 12px; }
+    font-size: 16px; }
     .collectjs .rules .group, .collectjs .rules .page, .collectjs .rules .ruleSet {
       padding: 5px 2px;
       border-radius: 5px;
       border-width: 1px;
       border-style: solid;
       border-color: #cccccc; }
+    .collectjs .rules .group {
+      background: #efefef; }
     .collectjs .rules .page {
-      margin: 3px 0; }
+      margin: 3px 0;
+      background: white; }
     .collectjs .rules .ruleSet {
-      margin: 2px 0; }
+      margin: 2px 0;
+      background: #efefef; }
     .collectjs .rules .group ul, .collectjs .rules .page ul, .collectjs .rules .ruleSet ul {
       list-style: none; }
     .collectjs .rules .savedRule {
-      font-size: 1.5em;
       margin-right: 10px;
       padding: 5px;
-      border-bottom: 1px solid #444444;
+      border: 1px solid #444444;
+      background: white;
       display: inline-block; }
     .collectjs .rules .savedRuleName {
       cursor: pointer;
@@ -248,7 +252,6 @@ body {
 
 /* Selector */
 #selectorHolder {
-  border-bottom: 1px dashed #444444;
   line-height: 1.5; }
 
 .collectHighlight {

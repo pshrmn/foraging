@@ -156,6 +156,7 @@ var HTML = {
     info: {
         alert: document.getElementById("collectAlert"),
         count: document.getElementById("currentCount"),
+        cycleIndex: document.getElementById("currentElementIndex"),
         index: document.getElementById("indexMarker"),
         indexToggle: document.getElementById("indexToggle"),
         parent: document.getElementById("parentSelectorView"),
@@ -286,6 +287,7 @@ var Family = {
     match: function(){
         Collect.matchedElements = this.elements();
         Collect.elementIndex = 0;
+        setCurrentIndex();
     },
     /*
     add queryCheck class to all elements matching selector
@@ -324,10 +326,12 @@ var Family = {
            if ( range < 0 ) {
                 Collect.matchedElements = Array.prototype.slice.call(Collect.matchedElements).slice(0, range);
                 Collect.elementIndex = 0;
+                setCurrentIndex();
                 setRuleHTML(Collect.matchedElements[0]);
             } else if ( range > 0 ) {
                 Collect.matchedElements = Array.prototype.slice.call(Collect.matchedElements).slice(range);
                 Collect.elementIndex = 0;
+                setCurrentIndex();
                 setRuleHTML(Collect.matchedElements[0]);
             }    
         }
@@ -569,8 +573,15 @@ function showPreviousElement(event){
     var index = Collect.elementIndex,
         len = Collect.matchedElements.length;
     Collect.elementIndex = (index=== 0) ? len-1 : index-1;
+    setCurrentIndex();
     setRuleHTML(Collect.matchedElements[Collect.elementIndex]);
     markCapture();
+}
+
+function setCurrentIndex(){
+    var positive = Collect.elementIndex,
+        negative = Collect.elementIndex - Collect.matchedElements.length;
+    HTML.info.cycleIndex.textContent = (positive === 0 ) ? "" : positive + " / " + negative;
 }
 
 /*
@@ -581,6 +592,7 @@ function showNextElement(event){
     var index = Collect.elementIndex,
         len = Collect.matchedElements.length;
     Collect.elementIndex = (index=== len-1) ? 0 : index+1;
+    setCurrentIndex();
     setRuleHTML(Collect.matchedElements[Collect.elementIndex]);
     markCapture();
 }

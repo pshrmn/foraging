@@ -116,11 +116,11 @@ body{
         .currentInfo{
             div{
                 display: inline-block;
-                margin-right: 15px;
+                margin: 0 8px;
             }
 
             > div{
-                border-bottom: 1px dotted $dark-gray;
+                border-bottom: 1px solid $dark-gray;
             }
         }
     }
@@ -174,7 +174,7 @@ body{
     }
 
     .rules{
-        font-size: 12px;
+        font-size: 16px;
 
         .group, .page, .ruleSet{
             padding: 5px 2px;
@@ -184,12 +184,18 @@ body{
             border-color: $gray;
         }
 
+        .group{
+            background: $light-gray;
+        }
+
         .page{
             margin: 3px 0;
+            background: $white;
         }
 
         .ruleSet{
             margin: 2px 0;
+            background: $light-gray;
         }
 
         .group ul, .page ul, .ruleSet ul{
@@ -197,10 +203,10 @@ body{
         }
 
         .savedRule{
-            font-size: 1.5em;
             margin-right: 10px;
             padding: 5px;
-            border-bottom: 1px solid $dark-gray;
+            border: 1px solid $dark-gray;
+            background: $white;
             display: inline-block;
         }
 
@@ -402,7 +408,6 @@ body{
 
 /* Selector */
 #selectorHolder{
-    border-bottom: 1px dashed $dark-gray;
     line-height: 1.5;
 }
 
