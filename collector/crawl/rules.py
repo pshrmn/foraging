@@ -4,7 +4,7 @@ class RuleSet(object):
     """
     A RuleSet consists of a group of (related?) rules in a page
     rules is a dict containing rules for the set
-    parent (optional) is a dict with a selector and an optional range
+    parent (optional) is a dict with a selector and an optional low/high range
     """
     def __init__(self, name, rules, parent=None):
         self.name = name
@@ -59,31 +59,28 @@ class RuleSet(object):
 class Parent(object):
     """
     selector is the selector break up the dom into multiple elements
-    range is used to skip certain elements when a selector is applied
-    if range is positive, skip from the beginning on the elements, if negative skip from the end
+    low is the number of elements to skip from the beginning
+    high is the number of elements to skip from the end
     """
-    def __init__(self, selector, _range=None):
+    def __init__(self, selector, low=None, high=None):
         self.selector = selector
         self.xpath = CSSSelector(selector)
-        self.range = _range
+        self.low = low
+        self.high = high
 
     @classmethod
     def from_json(cls, parent_json):
         selector = parent_json["selector"]
-        _range = parent_json.get("which")
-        return cls(selector, _range)
+        low = parent_json.get("low")
+        high = parent_json.get("high")
+        return cls(selector, low, high)
 
     def get(self, dom):
         eles = self.xpath(dom)
-        if self.range:
-            if self.range >= 0:
-                return eles[self.range:]
-            else:
-                return eles[:self.range]
-        return eles
+        return eles[self.low:self.high]
 
     def __str__(self):
-        return "Parent(%s, %s)" % (self.selector, self.range)
+        return "Parent(%s, %s)" % (self.selector, self.low, self.high)
 
 class Rule(object):
     """
@@ -93,11 +90,6 @@ class Rule(object):
     capture is the attribute of the item(s) that you want to store
         eg. attr-href means that you want to get the element's href attribute
         text means that you want the text content of the element
-    which is which rules to get if a selector returns multiple elements
-        if which is None, returns the first element
-        if which is 0, returns all matching elements
-        if which is > 0, returns elements which to end of list
-        if which is < 0, returns elements start of list to which
     """
     def __init__(self, name, selector, capture, follow=False):
         self.name = name

@@ -2,10 +2,6 @@ from collector.crawl.rules import Rule
 import unittest
 from lxml.etree import fromstring
 
-# don't log while testing
-import logging
-logging.disable(logging.CRITICAL)
-
 class RuleTestCase(unittest.TestCase):
 
     def setUp(self):

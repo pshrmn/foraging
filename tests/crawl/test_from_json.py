@@ -40,9 +40,15 @@ class FromJSONTestCase(unittest.TestCase):
         parent = Parent.from_json(parent_json)
         self.assertEqual(parent.selector, ".product")
 
-        parent_json["which"] = 3
+        # test low
+        parent_json["low"] = 3
         range_parent = Parent.from_json(parent_json)
-        self.assertEqual(range_parent.range, 3)
+        self.assertEqual(range_parent.low, 3)
+
+        #test high
+        parent_json["high"] = -1
+        range_parent = Parent.from_json(parent_json)
+        self.assertEqual(range_parent.high, -1)
 
     def test_rule_from_json(self):
         rule_json = {
