@@ -5,7 +5,7 @@ var marginBottom;
 (function addInterface(){
     var div = noSelectElement("div");
     div.classList.add("collectjs");
-    div.innerHTML = "<div class=\"tabHolder\"><div class=\"tabs\"><div class=\"tab active\" id=\"ruleTab\"data-for=\"ruleView\">Rule</div><div class=\"tab\" id=\"groupsTab\" data-for=\"groupsView\">Current Group</div><div class=\"tab\" id=\"previewTab\" data-for=\"previewView\">Preview</div><div class=\"tab\" id=\"optionsTab\" data-for=\"optionsView\">Options</div><div class=\"tab\" id=\"refreshCollect\">&#8635;</div><div class=\"tab\" id=\"closeCollect\">&times;</div></div></div><div class=\"permanent\"><div class=\"currentInfo\"><div>Group: <select id=\"groupSelect\"></select><button id=\"createGroup\" title=\"create a new group\">+</button><button id=\"deleteGroup\" title=\"delete current group\">&times;</button><div id=\"indexMarker\" class=\"info\">Initial URL<input type=\"checkbox\" id=\"indexToggle\" /></div><div id=\"defaultNext\" class=\"info\">Next <input type=\"checkbox\" id=\"pageNext\" name=\"next\" /><span id=\"nextSelectorView\"></span></div></div><div>Page: <select id=\"pageSelect\"></select><button id=\"deletePage\" title=\"delete current page\">&times;</button></div><div>Rule Set: <select id=\"ruleSetSelect\"></select><button id=\"createRuleSet\" title=\"create a new rule set\">+</button><button id=\"deleteRuleSet\" title=\"delete current rule set\">&times;</button><div id=\"currentParent\" class=\"info\">Parent <input type=\"checkbox\" id=\"ruleSetParent\" name=\"parent\" /><span id=\"parentSelectorView\"></span><span id=\"parentRangeView\"></span></div></div><button id=\"uploadRules\">Upload Group</button></div><div id=\"collectAlert\"></div></div><div class=\"views\"><div class=\"view\" id=\"emptyView\"></div><div class=\"view active\" id=\"ruleView\"><div id=\"ruleItems\" class=\"items\"><form id=\"ruleForm\" class=\"column\"><div class=\"rule\"><label for=\"ruleName\" title=\"the name of a rule\">Name:</label><input id=\"ruleName\" name=\"ruleName\" type=\"text\" /></div><div class=\"rule\"><label title=\"the selector to get the rule in the DOM\">Selector:</label><span id=\"ruleSelector\"></span></div><div class=\"rule\"><label title=\"the attribute of an element to capture\">Capture:</label><span id=\"ruleAttr\"></span></div><div class=\"rule follow\"><label for=\"ruleFollow\" title=\"create a new page from the element's captured url (capture must be attr-href)\">Follow:</label><input id=\"ruleFollow\" name=\"ruleFollow\" type=\"checkbox\" disabled=\"true\" title=\"Can only follow rules that get href attribute from links\" /></div><div><button id=\"saveRule\">Save Rule</button><button id=\"cancelRule\">Cancel</button></div></form><form id=\"editForm\" class=\"column\"><div class=\"rule\"><label for=\"ruleName\" title=\"the name of a rule\">Name:</label><input id=\"editName\" name=\"editName\" type=\"text\" /></div><div class=\"rule\"><label title=\"the selector to get the rule in the DOM\">Selector:</label><span id=\"editSelector\"></span></div><div class=\"rule\"><label title=\"the attribute of an element to capture\">Capture:</label><span id=\"editAttr\"></span></div><div class=\"rule editFollow\"><label for=\"editFollow\" title=\"create a new page from the element's captured url (capture must be attr-href)\">Follow:</label><input id=\"editFollow\" name=\"editFollow\" type=\"checkbox\" disabled=\"true\" title=\"Can only follow rules that get href attribute from links\" /></div><div><button id=\"saveEdit\">Save Edited Rule</button><button id=\"cancelEdit\">Cancel</button></div></form><form id=\"parentForm\" class=\"column\"><div class=\"rule\"><label>Selector:</label><span id=\"parentSelector\"></span></div><div class=\"rule range\"><label for=\"parentRange\">Range:</label><input id=\"parentRange\" name=\"parentRange\" type=\"text\" /></div><div><button id=\"saveParent\">Set Parent</button><button id=\"cancelParent\">Cancel</button></div></form><form id=\"nextForm\" class=\"column\"><div class=\"rule\"><label>Selector:</label><span id=\"nextSelector\"></span></div><button id=\"saveNext\">Save Next Rule</button><button id=\"cancelNext\">Cancel</button></form><div class=\"modifiers column\"><div id=\"selectorHolder\"></div><div class=\"ruleHTMLHolder\">Count: <span id=\"currentCount\"></span><div id=\"ruleCycle\"><button id=\"ruleCyclePrevious\" class=\"cycle\" title=\"previous element matching selector\">&lt;&lt;</button><span id=\"currentElementIndex\"></span><button id=\"ruleCycleNext\" class=\"cycle\" title=\"next element matching selector\">&gt;&gt;</button><span id=\"ruleHTML\"></span></div></div></div></div></div><div class=\"view\" id=\"groupsView\"><div id=\"groupHolder\" class=\"rules\"></div></div><div class=\"view\" id=\"previewView\"><p>Name: <span id=\"previewName\" class=\"name\"></span>Selector: <span id=\"previewSelector\" class=\"name\"></span>Capture: <span id=\"previewCapture\" class=\"name\"></span><button id=\"previewClear\">Clear</button></p><div id=\"previewContents\"></div></div><div class=\"view\" id=\"optionsView\"><p><label for=\"ignore\">Ignore helper elements (eg tbody)</label><input type=\"checkbox\" id=\"ignore\" /></p></div></div>";
+    div.innerHTML = "<div class=\"tabHolder\"><div class=\"tabs\"><div class=\"tab active\" id=\"ruleTab\"data-for=\"ruleView\">Rule</div><div class=\"tab\" id=\"groupsTab\" data-for=\"groupsView\">Current Group</div><div class=\"tab\" id=\"previewTab\" data-for=\"previewView\">Preview</div><div class=\"tab\" id=\"optionsTab\" data-for=\"optionsView\">Options</div><div class=\"tab\" id=\"refreshCollect\">&#8635;</div><div class=\"tab\" id=\"closeCollect\">&times;</div></div></div><div class=\"permanent\"><div class=\"currentInfo\"><div>Group: <select id=\"groupSelect\"></select><button id=\"createGroup\" title=\"create a new group\">+</button><button id=\"deleteGroup\" title=\"delete current group\">&times;</button><div id=\"indexMarker\" class=\"info\">Initial URL<input type=\"checkbox\" id=\"indexToggle\" /></div><div id=\"defaultNext\" class=\"info\">Next <input type=\"checkbox\" id=\"pageNext\" name=\"next\" /><span id=\"nextSelectorView\"></span></div></div><div>Page: <select id=\"pageSelect\"></select><button id=\"deletePage\" title=\"delete current page\">&times;</button></div><div>Rule Set: <select id=\"ruleSetSelect\"></select><button id=\"createRuleSet\" title=\"create a new rule set\">+</button><button id=\"deleteRuleSet\" title=\"delete current rule set\">&times;</button><div id=\"currentParent\" class=\"info\">Parent <input type=\"checkbox\" id=\"ruleSetParent\" name=\"parent\" /><span id=\"parentSelectorView\"></span><span id=\"parentRangeView\"></span></div></div><button id=\"uploadRules\">Upload Group</button></div><div id=\"collectAlert\"></div></div><div class=\"views\"><div class=\"view\" id=\"emptyView\"></div><div class=\"view active\" id=\"ruleView\"><div id=\"ruleItems\" class=\"items\"><form id=\"ruleForm\" class=\"column\"><div class=\"rule\"><label for=\"ruleName\" title=\"the name of a rule\">Name:</label><input id=\"ruleName\" name=\"ruleName\" type=\"text\" /></div><div class=\"rule\"><label title=\"the selector to get the rule in the DOM\">Selector:</label><span id=\"ruleSelector\"></span></div><div class=\"rule\"><label title=\"the attribute of an element to capture\">Capture:</label><span id=\"ruleAttr\"></span></div><div class=\"rule follow\"><label for=\"ruleFollow\" title=\"create a new page from the element's captured url (capture must be attr-href)\">Follow:</label><input id=\"ruleFollow\" name=\"ruleFollow\" type=\"checkbox\" disabled=\"true\" title=\"Can only follow rules that get href attribute from links\" /></div><div><button id=\"saveRule\">Save Rule</button><button id=\"cancelRule\">Cancel</button></div></form><form id=\"editForm\" class=\"column\"><div class=\"rule\"><label for=\"ruleName\" title=\"the name of a rule\">Name:</label><input id=\"editName\" name=\"editName\" type=\"text\" /></div><div class=\"rule\"><label title=\"the selector to get the rule in the DOM\">Selector:</label><span id=\"editSelector\"></span></div><div class=\"rule\"><label title=\"the attribute of an element to capture\">Capture:</label><span id=\"editAttr\"></span></div><div class=\"rule editFollow\"><label for=\"editFollow\" title=\"create a new page from the element's captured url (capture must be attr-href)\">Follow:</label><input id=\"editFollow\" name=\"editFollow\" type=\"checkbox\" disabled=\"true\" title=\"Can only follow rules that get href attribute from links\" /></div><div><button id=\"saveEdit\">Save Edited Rule</button><button id=\"cancelEdit\">Cancel</button></div></form><form id=\"parentForm\" class=\"column\"><div class=\"rule\"><label>Selector:</label><span id=\"parentSelector\"></span></div><p>Range:</p><div class=\"rule\"><label for=\"parentLow\">Low:</label><input id=\"parentLow\" name=\"parentLow\" type=\"text\" /></div><div class=\"rule\"><label for=\"parentHigh\">High:</label><input id=\"parentHigh\" name=\"parentHigh\" type=\"text\" /></div><div><button id=\"saveParent\">Set Parent</button><button id=\"cancelParent\">Cancel</button></div></form><form id=\"nextForm\" class=\"column\"><div class=\"rule\"><label>Selector:</label><span id=\"nextSelector\"></span></div><button id=\"saveNext\">Save Next Rule</button><button id=\"cancelNext\">Cancel</button></form><div class=\"modifiers column\"><div id=\"selectorHolder\"></div><div class=\"ruleHTMLHolder\">Count: <span id=\"currentCount\"></span><div id=\"ruleCycle\"><button id=\"ruleCyclePrevious\" class=\"cycle\" title=\"previous element matching selector\">&lt;&lt;</button><span id=\"currentElementIndex\"></span><button id=\"ruleCycleNext\" class=\"cycle\" title=\"next element matching selector\">&gt;&gt;</button><span id=\"ruleHTML\"></span></div></div></div></div></div><div class=\"view\" id=\"groupsView\"><div id=\"groupHolder\" class=\"rules\"></div></div><div class=\"view\" id=\"previewView\"><p>Name: <span id=\"previewName\" class=\"name\"></span>Selector: <span id=\"previewSelector\" class=\"name\"></span>Capture: <span id=\"previewCapture\" class=\"name\"></span><button id=\"previewClear\">Clear</button></p><div id=\"previewContents\"></div></div><div class=\"view\" id=\"optionsView\"><p><label for=\"ignore\">Ignore helper elements (eg tbody)</label><input type=\"checkbox\" id=\"ignore\" /></p></div></div>";
     document.body.appendChild(div);
     addNoSelect(div.querySelectorAll("*"));
 
@@ -140,7 +140,8 @@ var HTML = {
         parent: {
             form: document.getElementById("parentForm"),
             selector: document.getElementById("parentSelector"),
-            range: document.getElementById("parentRange")
+            low: document.getElementById("parentLow"),
+            high: document.getElementById("parentHigh")
         },
         next: {
             form: document.getElementById("nextForm"),
@@ -311,30 +312,16 @@ var Family = {
         }
     },
     /*
+    only select elements that fall between low/elements.length + high (because high is negative)
     applies a range to the elements selected by the current selector
-    if range is positive, it sets Collect.matchedElements to (range, elements.length)
-    if range is negative, it sets Collect.matchedElements to (0, elements.length-range)
     */
-    range: function(range){
-        var len;
-
+    range: function(low, high){
         Family.match();
-        len = Collect.matchedElements.length;
-        if ( isNaN(range) || -1*range > len || range > len-1 ) {
-            HTML.form.parent.range.value = "";
-        } else {
-           if ( range < 0 ) {
-                Collect.matchedElements = Array.prototype.slice.call(Collect.matchedElements).slice(0, range);
-                Collect.elementIndex = 0;
-                setCurrentIndex();
-                setRuleHTML(Collect.matchedElements[0]);
-            } else if ( range > 0 ) {
-                Collect.matchedElements = Array.prototype.slice.call(Collect.matchedElements).slice(range);
-                Collect.elementIndex = 0;
-                setCurrentIndex();
-                setRuleHTML(Collect.matchedElements[0]);
-            }    
-        }
+        var len = Collect.matchedElements.length;
+        Collect.matchedElements = Array.prototype.slice.call(Collect.matchedElements).slice(low, len + high);
+        Collect.elementIndex = 0;
+        setCurrentIndex();
+        setRuleHTML(Collect.matchedElements[0]);
     }
 };
 
@@ -370,7 +357,8 @@ function resetRulesView(){
 
     // reset parent form
     HTML.form.parent.selector.textContent = "";
-    HTML.form.parent.range.value = "";
+    HTML.form.parent.low.value = "";
+    HTML.form.parent.high.value = "";
 
     // reset next form
     HTML.form.next.selector.textContent = "";
@@ -430,7 +418,8 @@ function ruleViewEvents(){
     idEvent("ruleCyclePrevious", "click", showPreviousElement);
     idEvent("ruleCycleNext", "click", showNextElement);
 
-    idEvent("parentRange", "blue", applyParentRange);
+    idEvent("parentLow", "blur", verifyAndApplyParentLow);
+    idEvent("parentHigh", "blur", verifyAndApplyParentHigh);
 }
 
 function optionsViewEvents(){
@@ -557,12 +546,40 @@ function cancelNextEvent(event){
     HTML.info.nextCheckbox.checked = false;
 }
 
-function applyParentRange(event){
-    Family.range(parseInt(HTML.form.parent.range.value, 10));
+function verifyAndApplyParentLow(event){
+    var low = parseInt(HTML.form.parent.low.value, 10),
+        high = parseInt(HTML.form.parent.high.value, 10) || 0;
+
+    if ( isNaN(low) || low <= 0 ) {
+        HTML.form.parent.low.value = "";
+        alertMessage("Low must be positive integer greater than 0");
+        return;
+    }
+
+    Family.range(low, high);
     clearClass("queryCheck");
     addClass("queryCheck", Collect.matchedElements);
     
     HTML.info.count.textContent = Collect.matchedElements.length;   
+}
+
+function verifyAndApplyParentHigh(event){
+    var low = parseInt(HTML.form.parent.low.value, 10) || 0,
+        high = parseInt(HTML.form.parent.high.value, 10);
+
+    if ( isNaN(high) || high > 0 ) {
+        HTML.form.parent.high.value = "";
+        alertMessage("High must be a negative integer");
+        return;
+    }
+    Family.range(low, high);
+    clearClass("queryCheck");
+    addClass("queryCheck", Collect.matchedElements);
+    
+    HTML.info.count.textContent = Collect.matchedElements.length;   
+}
+
+function applyParentRange(event){
 }
 
 /*
@@ -576,12 +593,6 @@ function showPreviousElement(event){
     setCurrentIndex();
     setRuleHTML(Collect.matchedElements[Collect.elementIndex]);
     markCapture();
-}
-
-function setCurrentIndex(){
-    var positive = Collect.elementIndex,
-        negative = Collect.elementIndex - Collect.matchedElements.length;
-    HTML.info.cycleIndex.textContent = (positive === 0 ) ? "" : positive + " / " + negative;
 }
 
 /*
@@ -718,31 +729,30 @@ function saveEditEvent(event){
 function saveParentEvent(event){
     event.preventDefault();
     var selector = HTML.form.parent.selector.textContent,
-        range = HTML.form.parent.range.value,
+        low = parseInt(HTML.form.parent.low.value, 10),
+        high = parseInt(HTML.form.parent.high.value, 10),
         parent = {
             selector: selector
         };
+
+    if ( !isNaN(low) ) {
+        parent.low = low;
+    }
+    if ( !isNaN(high) ) {
+        parent.high = high;
+    }
 
     clearErrors();
     if ( emptyErrorCheck(selector, HTML.form.parent.selector, "No CSS selector selected")) {
         return;
     }
 
-    var rangeInt = parseInt(range, 10);
-    // 0 for range includes everything, so its useless to save
-    if ( !isNaN(rangeInt) && rangeInt !== 0 ) {
-        parent.which = rangeInt;
-        if ( rangeInt > 0 ) {
-            HTML.info.range.textContent = "Range: (" + rangeInt + " to end)";
-        } else {
-            HTML.info.range.textContent = "Range: (start to " + rangeInt + ")";
-        }
-    }
+
+    HTML.info.range.textContent = setRangeString(low, high);
 
     Collect.parent = parent;
     HTML.info.parent.textContent = selector;
-    
-    addParentGroup(selector, parent.which);
+    addParentGroup(selector, parent.low, parent.high);
 
     Collect.group.pages[Collect.current.page].sets[Collect.current.ruleSet].parent = parent;
     saveGroup();
@@ -779,7 +789,7 @@ function saveNextEvent(event){
 
     showRuleForm();
     if ( Collect.parent.selector ) {
-        addParentGroup(Collect.parent.selector, Collect.parent.which);
+        addParentGroup(Collect.parent.selector, Collect.parent.low, Collect.parent.high);
     }
 
     refreshElements();
@@ -1018,19 +1028,14 @@ function addRule(rule, ruleSet){
 /*
 add .parentGroup to all elements matching parent selector and in range
 */
-function addParentGroup(selector, range){
+function addParentGroup(selector, low,  high){
     var elements = Collect.all(selector),
-        start = 0,
-        end = elements.length;
-    if ( range ) {
-        if ( range > 0 ) {
-            start = range;
-        } else {
-            end -= range;
-        }
-    }
-    for ( ; start<end ; start++ ){
-        elements[start].classList.add("parentGroup");
+        end = elements.length + high;
+    low = low || 0;
+    high = high || 0;
+        // add high because it is negative
+    for ( ; low<end ; low++ ){
+        elements[low].classList.add("parentGroup");
     }
 }
 
@@ -1039,24 +1044,20 @@ uses Collect.parent to limit selected elements to children of elements matching 
 if Collect.parent.which is defined, only use Collect.parent.selector elements within that range
 */
 function parentElements(selector){
-    var range = Collect.parent.which,
+    var low = Collect.parent.low || 0,
+        high = Collect.parent.high || 0,
         allElements = [];
 
     // don't restrict to Collect.parent.selector when setting next selector
     if ( Interface.activeForm === "next" ) {
         allElements = Array.prototype.slice.call(Collect.all(selector));
-    } else if ( range !== undefined ) {
+    } else if ( low !== 0 || high !== 0 ) {
         var elements = document.querySelectorAll(Collect.parent.selector),
-            start = 0,
-            end = elements.length,
+            // add high because it is negative
+            end = elements.length + high,
             currElements;
-        if ( range > 0 ) {
-            start = range;
-        } else {
-            end -= range;
-        }
-        for ( ; start<end; start++ ) {
-            currElements = elements[start].querySelectorAll(Collect.not(selector));
+        for ( ; low<end; low++ ) {
+            currElements = elements[low].querySelectorAll(Collect.not(selector));
             allElements = allElements.concat(Array.prototype.slice.call(currElements));
         }
         return allElements;
@@ -1091,7 +1092,7 @@ function showParentForm(){
     HTML.form.rule.form.style.display = "none";
     HTML.form.next.form.style.display = "none";
     HTML.form.edit.form.style.display = "none";
-    HTML.cycle.style.display = "none";
+    HTML.cycle.style.display = "block";
 }
 
 function showNextForm(){
@@ -1109,13 +1110,24 @@ function baseCancel(){
     showRuleForm();
 }
 
+function setCurrentIndex(){
+    var positive = Collect.elementIndex,
+        negative = Collect.elementIndex - Collect.matchedElements.length;
+    HTML.info.cycleIndex.textContent = (positive === 0 ) ? "" : positive + " / " + negative;
+}
+
+function setRangeString(low, high){
+    var rangeString = "Range: ";
+    rangeString += (low !== 0) ? low : "begging";
+    rangeString += " to ";
+    rangeString += (high !== 0) ? high : "end";
+    return rangeString;
+}
+
 /***********************
     UTILITY FUNCTIONS
 general helper functions
 ***********************/
-
-
-
 function isLink(element, index, array){
     return element.tagName === "A";
 }
@@ -1554,17 +1566,8 @@ function loadRuleSetObject(ruleSet){
     if ( ruleSet.parent ) {
         HTML.info.parent.textContent = ruleSet.parent.selector;
         HTML.info.parentCheckbox.checked = true;
-        addParentGroup(ruleSet.parent.selector, ruleSet.parent.which);
-
-        if ( ruleSet.parent.which ) {
-            if ( ruleSet.parent.which > 0 ) {
-                HTML.info.range.textContent = "Range: (" + ruleSet.parent.which + " to end)";
-            } else {
-                HTML.info.range.textContent = "Range: (start to " + ruleSet.parent.which + ")";
-            }
-        } else {
-            HTML.info.range.textContent = "";    
-        }
+        addParentGroup(ruleSet.parent.selector, ruleSet.parent.low, ruleSet.parent.high);
+        setRangeString();
     } else {
         HTML.info.parent.textContent = "";
         HTML.info.parentCheckbox.checked = false;

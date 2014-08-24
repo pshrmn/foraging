@@ -140,7 +140,8 @@ var HTML = {
         parent: {
             form: document.getElementById("parentForm"),
             selector: document.getElementById("parentSelector"),
-            range: document.getElementById("parentRange")
+            low: document.getElementById("parentLow"),
+            high: document.getElementById("parentHigh")
         },
         next: {
             form: document.getElementById("nextForm"),
@@ -311,30 +312,16 @@ var Family = {
         }
     },
     /*
+    only select elements that fall between low/elements.length + high (because high is negative)
     applies a range to the elements selected by the current selector
-    if range is positive, it sets Collect.matchedElements to (range, elements.length)
-    if range is negative, it sets Collect.matchedElements to (0, elements.length-range)
     */
-    range: function(range){
-        var len;
-
+    range: function(low, high){
         Family.match();
-        len = Collect.matchedElements.length;
-        if ( isNaN(range) || -1*range > len || range > len-1 ) {
-            HTML.form.parent.range.value = "";
-        } else {
-           if ( range < 0 ) {
-                Collect.matchedElements = Array.prototype.slice.call(Collect.matchedElements).slice(0, range);
-                Collect.elementIndex = 0;
-                setCurrentIndex();
-                setRuleHTML(Collect.matchedElements[0]);
-            } else if ( range > 0 ) {
-                Collect.matchedElements = Array.prototype.slice.call(Collect.matchedElements).slice(range);
-                Collect.elementIndex = 0;
-                setCurrentIndex();
-                setRuleHTML(Collect.matchedElements[0]);
-            }    
-        }
+        var len = Collect.matchedElements.length;
+        Collect.matchedElements = Array.prototype.slice.call(Collect.matchedElements).slice(low, len + high);
+        Collect.elementIndex = 0;
+        setCurrentIndex();
+        setRuleHTML(Collect.matchedElements[0]);
     }
 };
 
@@ -370,7 +357,8 @@ function resetRulesView(){
 
     // reset parent form
     HTML.form.parent.selector.textContent = "";
-    HTML.form.parent.range.value = "";
+    HTML.form.parent.low.value = "";
+    HTML.form.parent.high.value = "";
 
     // reset next form
     HTML.form.next.selector.textContent = "";
@@ -430,7 +418,8 @@ function ruleViewEvents(){
     idEvent("ruleCyclePrevious", "click", showPreviousElement);
     idEvent("ruleCycleNext", "click", showNextElement);
 
-    idEvent("parentRange", "blue", applyParentRange);
+    idEvent("parentLow", "blur", verifyAndApplyParentLow);
+    idEvent("parentHigh", "blur", verifyAndApplyParentHigh);
 }
 
 function optionsViewEvents(){
@@ -557,12 +546,40 @@ function cancelNextEvent(event){
     HTML.info.nextCheckbox.checked = false;
 }
 
-function applyParentRange(event){
-    Family.range(parseInt(HTML.form.parent.range.value, 10));
+function verifyAndApplyParentLow(event){
+    var low = parseInt(HTML.form.parent.low.value, 10),
+        high = parseInt(HTML.form.parent.high.value, 10) || 0;
+
+    if ( isNaN(low) || low <= 0 ) {
+        HTML.form.parent.low.value = "";
+        alertMessage("Low must be positive integer greater than 0");
+        return;
+    }
+
+    Family.range(low, high);
     clearClass("queryCheck");
     addClass("queryCheck", Collect.matchedElements);
     
     HTML.info.count.textContent = Collect.matchedElements.length;   
+}
+
+function verifyAndApplyParentHigh(event){
+    var low = parseInt(HTML.form.parent.low.value, 10) || 0,
+        high = parseInt(HTML.form.parent.high.value, 10);
+
+    if ( isNaN(high) || high > 0 ) {
+        HTML.form.parent.high.value = "";
+        alertMessage("High must be a negative integer");
+        return;
+    }
+    Family.range(low, high);
+    clearClass("queryCheck");
+    addClass("queryCheck", Collect.matchedElements);
+    
+    HTML.info.count.textContent = Collect.matchedElements.length;   
+}
+
+function applyParentRange(event){
 }
 
 /*
@@ -576,12 +593,6 @@ function showPreviousElement(event){
     setCurrentIndex();
     setRuleHTML(Collect.matchedElements[Collect.elementIndex]);
     markCapture();
-}
-
-function setCurrentIndex(){
-    var positive = Collect.elementIndex,
-        negative = Collect.elementIndex - Collect.matchedElements.length;
-    HTML.info.cycleIndex.textContent = (positive === 0 ) ? "" : positive + " / " + negative;
 }
 
 /*
@@ -718,31 +729,30 @@ function saveEditEvent(event){
 function saveParentEvent(event){
     event.preventDefault();
     var selector = HTML.form.parent.selector.textContent,
-        range = HTML.form.parent.range.value,
+        low = parseInt(HTML.form.parent.low.value, 10),
+        high = parseInt(HTML.form.parent.high.value, 10),
         parent = {
             selector: selector
         };
+
+    if ( !isNaN(low) ) {
+        parent.low = low;
+    }
+    if ( !isNaN(high) ) {
+        parent.high = high;
+    }
 
     clearErrors();
     if ( emptyErrorCheck(selector, HTML.form.parent.selector, "No CSS selector selected")) {
         return;
     }
 
-    var rangeInt = parseInt(range, 10);
-    // 0 for range includes everything, so its useless to save
-    if ( !isNaN(rangeInt) && rangeInt !== 0 ) {
-        parent.which = rangeInt;
-        if ( rangeInt > 0 ) {
-            HTML.info.range.textContent = "Range: (" + rangeInt + " to end)";
-        } else {
-            HTML.info.range.textContent = "Range: (start to " + rangeInt + ")";
-        }
-    }
+
+    HTML.info.range.textContent = setRangeString(low, high);
 
     Collect.parent = parent;
     HTML.info.parent.textContent = selector;
-    
-    addParentGroup(selector, parent.which);
+    addParentGroup(selector, parent.low, parent.high);
 
     Collect.group.pages[Collect.current.page].sets[Collect.current.ruleSet].parent = parent;
     saveGroup();
@@ -779,7 +789,7 @@ function saveNextEvent(event){
 
     showRuleForm();
     if ( Collect.parent.selector ) {
-        addParentGroup(Collect.parent.selector, Collect.parent.which);
+        addParentGroup(Collect.parent.selector, Collect.parent.low, Collect.parent.high);
     }
 
     refreshElements();
@@ -1018,19 +1028,14 @@ function addRule(rule, ruleSet){
 /*
 add .parentGroup to all elements matching parent selector and in range
 */
-function addParentGroup(selector, range){
+function addParentGroup(selector, low,  high){
     var elements = Collect.all(selector),
-        start = 0,
-        end = elements.length;
-    if ( range ) {
-        if ( range > 0 ) {
-            start = range;
-        } else {
-            end -= range;
-        }
-    }
-    for ( ; start<end ; start++ ){
-        elements[start].classList.add("parentGroup");
+        end = elements.length + high;
+    low = low || 0;
+    high = high || 0;
+        // add high because it is negative
+    for ( ; low<end ; low++ ){
+        elements[low].classList.add("parentGroup");
     }
 }
 
@@ -1039,24 +1044,20 @@ uses Collect.parent to limit selected elements to children of elements matching 
 if Collect.parent.which is defined, only use Collect.parent.selector elements within that range
 */
 function parentElements(selector){
-    var range = Collect.parent.which,
+    var low = Collect.parent.low || 0,
+        high = Collect.parent.high || 0,
         allElements = [];
 
     // don't restrict to Collect.parent.selector when setting next selector
     if ( Interface.activeForm === "next" ) {
         allElements = Array.prototype.slice.call(Collect.all(selector));
-    } else if ( range !== undefined ) {
+    } else if ( low !== 0 || high !== 0 ) {
         var elements = document.querySelectorAll(Collect.parent.selector),
-            start = 0,
-            end = elements.length,
+            // add high because it is negative
+            end = elements.length + high,
             currElements;
-        if ( range > 0 ) {
-            start = range;
-        } else {
-            end -= range;
-        }
-        for ( ; start<end; start++ ) {
-            currElements = elements[start].querySelectorAll(Collect.not(selector));
+        for ( ; low<end; low++ ) {
+            currElements = elements[low].querySelectorAll(Collect.not(selector));
             allElements = allElements.concat(Array.prototype.slice.call(currElements));
         }
         return allElements;
@@ -1091,7 +1092,7 @@ function showParentForm(){
     HTML.form.rule.form.style.display = "none";
     HTML.form.next.form.style.display = "none";
     HTML.form.edit.form.style.display = "none";
-    HTML.cycle.style.display = "none";
+    HTML.cycle.style.display = "block";
 }
 
 function showNextForm(){
@@ -1109,13 +1110,24 @@ function baseCancel(){
     showRuleForm();
 }
 
+function setCurrentIndex(){
+    var positive = Collect.elementIndex,
+        negative = Collect.elementIndex - Collect.matchedElements.length;
+    HTML.info.cycleIndex.textContent = (positive === 0 ) ? "" : positive + " / " + negative;
+}
+
+function setRangeString(low, high){
+    var rangeString = "Range: ";
+    rangeString += (low !== 0) ? low : "begging";
+    rangeString += " to ";
+    rangeString += (high !== 0) ? high : "end";
+    return rangeString;
+}
+
 /***********************
     UTILITY FUNCTIONS
 general helper functions
 ***********************/
-
-
-
 function isLink(element, index, array){
     return element.tagName === "A";
 }
@@ -1554,17 +1566,8 @@ function loadRuleSetObject(ruleSet){
     if ( ruleSet.parent ) {
         HTML.info.parent.textContent = ruleSet.parent.selector;
         HTML.info.parentCheckbox.checked = true;
-        addParentGroup(ruleSet.parent.selector, ruleSet.parent.which);
-
-        if ( ruleSet.parent.which ) {
-            if ( ruleSet.parent.which > 0 ) {
-                HTML.info.range.textContent = "Range: (" + ruleSet.parent.which + " to end)";
-            } else {
-                HTML.info.range.textContent = "Range: (start to " + ruleSet.parent.which + ")";
-            }
-        } else {
-            HTML.info.range.textContent = "";    
-        }
+        addParentGroup(ruleSet.parent.selector, ruleSet.parent.low, ruleSet.parent.high);
+        setRangeString();
     } else {
         HTML.info.parent.textContent = "";
         HTML.info.parentCheckbox.checked = false;
