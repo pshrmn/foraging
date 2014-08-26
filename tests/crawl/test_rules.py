@@ -1,12 +1,12 @@
 from collector.crawl.rules import Rule
 import unittest
-from lxml.etree import fromstring
+from lxml.html import document_fromstring
 
 class RuleTestCase(unittest.TestCase):
 
     def setUp(self):
         self.good_rules = {"name": "links", "selector": "a", "capture": "attr-href"}
-        self.html = fromstring('''<div>
+        self.html = document_fromstring('''<div>
             <a href="#">Testing<span> more testing</span></a>
             <a href="http://www.example.com">Second</a>
             </div>''')
