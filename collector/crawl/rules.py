@@ -111,7 +111,9 @@ class Rule(object):
     def get(self, html):
         """
         html is an lxml parsed html etree
-        returns a list of value based on self.capture
+        eles is all elements in the dom that match the xpath, however only the first match is used
+        this might change in the future (at least for specific targets like a select/options)
+        returns a value based on self.capture
         """
         eles = self.xpath(html)
         # return None if the xpath gets no matches
@@ -130,19 +132,19 @@ class Rule(object):
         """
         if self.capture.startswith('attr-'):
             attr_name = self.capture[5:]
-            def attr(eles):
+            def attr(ele):
                 """
                 called when self.capture is attr-<attr_name>
                 iterate over all matches, returns a list of attributes
                 """
-                return eles.get(attr_name)
+                return ele.get(attr_name)
             return attr
         else:
-            def text(eles):
+            def text(ele):
                 """
                 iterate over all matches, returns a list of text strings
                 """
-                return "".join(eles.itertext())
+                return ele.text_content().strip()
             return text
 
     
