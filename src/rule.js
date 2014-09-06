@@ -26,20 +26,52 @@ Group.prototype.object = function(){
     return data;
 };
 
+/***
+rearrange the group's JSON into proper format for Collector
+name: the name of the group
+urls: converted from an object to a list of urls
+pages: a tree with root node of the "default" page. Each 
+***/
 Group.prototype.uploadObject = function(){
     var data = {
         name: this.name,
-        urls: Object.keys(this.urls),
-        pages: {}
+        urls: Object.keys(this.urls)
     },
-        pageObject;
+        pages = {},
+        followSets = {},
+        currPage,
+        pageName, setName,
+        pageObject,
+        set, followPages;
 
-    for ( var key in this.pages ) {
-        pageObject = this.pages[key].uploadObject();
+    // iterate over all pages and generate their upload json
+    for ( pageName in this.pages ) {
+        currPage = this.pages[pageName];
+        pageObject = currPage.uploadObject();
         if ( pageObject ) {
-            data.pages[key] = pageObject;
+            pages[pageName] = pageObject;
+            followSets[pageName] = currPage.followedSets();
         }
     }
+
+    // iterate over followSets to build tree
+    for ( pageName in followSets ) {
+        set = followSets[pageName];
+        for ( setName in set ) {
+            followPages = set[setName];
+            for ( var i=0, len=followPages.length; i<len; i++ ) {
+                var currPageName = followPages[i];
+
+                // make sure the page actually exists before appending
+                if ( pages[currPageName] ) {
+                    pages[pageName].sets[setName].pages[currPageName] = pages[currPageName];
+                }
+            }
+        }
+    }
+
+    // once all of the following pages have been attached to their set, set data.page
+    data.page = pages.default;
 
     return data;  
 };
@@ -164,12 +196,25 @@ Page.prototype.object = function(){
     return data;
 };
 
+/***
+returns an object representing a page for upload
+name: name of the page
+index: whether or not the page is an index page (based on if there is a next)
+    probably not necessary, look to remove after tree is working
+sets: dict containing non-empty (ie, has 1+ rules) rule sets
+next: string for next selector (if index = true)
+***/
 Page.prototype.uploadObject = function(){
     var data = {
         name: this.name,
         index: this.index,
         sets: {}
     };
+
+    // only add next if it exists
+    if ( this.next){
+        data.next = this.next;
+    }
 
     var set;
     for ( var key in this.sets ) {
@@ -251,8 +296,28 @@ Page.prototype.removeNext = function(){
     this.index = false;
 };
 
+/***
+iterate over sets in the page, returning an object mapping rule set's name to a list of pages that
+follow it
+***/
+Page.prototype.followedSets = function(){
+    var following = {},
+        set, followed;
+    for ( var key in this.sets ) {
+        set = this.sets[key];
+        followed = set.followedRules();
+        if ( followed.length ) {
+            following[key] = followed;
+        }
+    }
+    return following;
+};
+
 /********************
         RULESET
+*********************
+name: name of the rule set
+parent: selector/range for selecting a rule set's parent element
 ********************/
 function RuleSet(name, parent){
     this.name = name;
@@ -281,6 +346,11 @@ RuleSet.prototype.object = function(){
     return data;
 };
 
+/***
+    name: name of rule set
+    rules: dict mapping name of rules to rules
+    pages: any pages that should be crawled based on a "follow"ed rule
+***/
 RuleSet.prototype.uploadObject = function(){
     if ( Object.keys(this.rules).length === 0 ) {
         return;
@@ -288,7 +358,8 @@ RuleSet.prototype.uploadObject = function(){
 
     var data = {
         name: this.name,
-        rules: {}
+        rules: {},
+        pages: {}
     };
 
     if ( this.parent ) {
@@ -358,6 +429,19 @@ RuleSet.prototype.remove = function(){
     if ( this.page ) {
         delete this.page.sets[this.name];
     }
+};
+
+/***
+iterate over rules in the set and returns an array containg names of rules where follow = true
+***/
+RuleSet.prototype.followedRules = function(){
+    var following = [];
+    for ( var key in this.rules ) {
+        if ( this.rules[key].follow ) {
+            following.push(key);
+        }
+    }
+    return following;
 };
 
 /********************

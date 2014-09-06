@@ -1118,7 +1118,7 @@ function setCurrentIndex(){
 
 function setRangeString(low, high){
     var rangeString = "Range: ";
-    rangeString += (low !== 0) ? low : "begging";
+    rangeString += (low !== 0) ? low : "beginning";
     rangeString += " to ";
     rangeString += (high !== 0) ? high : "end";
     return rangeString;
@@ -1567,7 +1567,7 @@ function loadRuleSetObject(ruleSet){
         HTML.info.parent.textContent = ruleSet.parent.selector;
         HTML.info.parentCheckbox.checked = true;
         addParentGroup(ruleSet.parent.selector, ruleSet.parent.low, ruleSet.parent.high);
-        setRangeString();
+        setRangeString(ruleSet.parent.low, ruleSet.parent.high);
     } else {
         HTML.info.parent.textContent = "";
         HTML.info.parentCheckbox.checked = false;

@@ -46,14 +46,69 @@ describe("Group", function(){
 
     describe("uploadObject", function(){
         it("returns a JSON object formatted for upload", function(){
-            var g = new Group("Bears"),
-                p = new Page("Super Bowl Championships", undefined, undefined, g);
+            var g = new Group("Bears");
             var expected = {
                 name: "Bears",
-                urls: [],
-                pages: {}
+                urls: []
             }
             expect(JSON.stringify(g.uploadObject())).toEqual(JSON.stringify(expected));
+        });
+
+        it("correctly builds a tree based on followed rules", function(){
+            var g = new Group("Cardinals"),
+                p = new Page("Foo"),
+                s1 = new RuleSet("Bar"),
+                s2 = new RuleSet("Baz"),
+                r1 = new Rule("Foo", "a", "attr-href", true),
+                r2 = new Rule("div", "div", "text");
+            s1.addRule(r1);
+            s2.addRule(r2)
+            g.pages.default.addSet(s1)
+            p.addSet(s2);
+            g.addPage(p);
+            var expected = {
+                name: "Cardinals",
+                urls: [],
+                page: {
+                    name: "default",
+                    index: false,
+                    sets: {
+                        "Bar": {
+                            name: "Bar",
+                            rules: {
+                                "Foo": {
+                                    name: "Foo",
+                                    selector: "a",
+                                    capture: "attr-href",
+                                    follow: true
+                                }
+                            },
+                            pages: {
+                                "Foo": {
+                                    name: "Foo",
+                                    index: false,
+                                    sets: {
+                                        "Baz": {
+                                            name: "Baz",
+                                            rules: {
+                                                "div": {
+                                                    name: "div",
+                                                    selector: "div",
+                                                    capture: "text"
+                                                }
+                                            },
+                                            pages: {}
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            var upJSON = JSON.stringify(g.uploadObject());
+            var upExp = JSON.stringify(expected);
+            expect(upJSON).toEqual(upExp);
         })
     });
 
@@ -277,14 +332,17 @@ describe("Page", function(){
                                 selector: ".score",
                                 capture: "text"
                             }
-                        }
+                        },
+                        pages: {}
                     }
                 }
             };
             p.addSet(s1);
             p.addSet(s2);
             s1.addRule(r1);
-            expect(JSON.stringify(p.uploadObject())).toEqual(JSON.stringify(expected));
+            var upJSON = JSON.stringify(p.uploadObject());
+            var upExp = JSON.stringify(expected);
+            expect(upJSON).toEqual(upExp);
         });
     });
 
