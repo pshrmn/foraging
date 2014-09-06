@@ -124,7 +124,7 @@ class Site(object):
         dom = html.document_fromstring(text)
         dom.make_links_absolute(url)
         canonical_url = canonical(dom) or url
-        return dom, url
+        return dom, canonical_url
 
     def visited(self, url):
         clean_url = os.path.join(self.folder, clean_url_filename(url))

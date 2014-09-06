@@ -1,4 +1,4 @@
-from collector.crawl.rules import Rule
+from collector.crawl.rule import Rule
 import unittest
 from lxml.html import document_fromstring
 
@@ -23,13 +23,12 @@ class RuleTestCase(unittest.TestCase):
     def test_text(self):
         self.good_rules["capture"] = "text"
         r = Rule.from_json(self.good_rules)
-        captured_text, follow = r.get(self.html)
+        captured_text = r.get(self.html)
         self.assertEqual(captured_text, "Testing more testing")
-        self.assertIsNone(follow)
 
     def test_attr(self):
         r = Rule.from_json(self.good_rules)
-        captured_attrs, follow = r.get(self.html)
+        captured_attrs = r.get(self.html)
         self.assertEqual(captured_attrs, "#")
 
 
