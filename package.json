@@ -1,9 +1,9 @@
 {
   "name": "collectJS",
-  "version": "0.18.0",
+  "version": "0.18.1",
   "repository": {
     "type": "git",
-    "url": "git://github.com/psherman/collectjs-chrome.git"
+    "url": "git://github.com/psherman/collectorjs.git"
   },
   "devDependencies": {
     "grunt": "^0.4.4",

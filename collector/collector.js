@@ -1725,7 +1725,8 @@ function saveRuleEvent(event){
     if ( emptyErrorCheck(name, HTML.form.rule.name, "Name needs to be filled in") ||
         emptyErrorCheck(selector, HTML.form.rule.selector, "No CSS selector selected") ||
         emptyErrorCheck(capture, HTML.form.rule.capture, "No attribute selected") || 
-        errorCheck((rule.name === "default"), HTML.form.rule.name, "Rule cannot be named 'default'") ) {
+        reservedWordErrorCheck(rule.name, HTML.form.rule.name, "Cannot use " + rule.name + 
+            " because it is a reserved word") ) {
         return;
     }
     else if ( !Collect.group.uniqueRuleName(name) ) {
@@ -2048,6 +2049,18 @@ function errorCheck(condition, ele, msg){
         return true;
     }
     return false;
+}
+
+function reservedWordErrorCheck(word, ele, msg){
+    var reservedWords = ["default", "url"],
+        reserved = false;
+    for ( var i=0, len=reservedWords.length; i<len; i++ ) {
+        if ( word === reservedWords[i] ) {
+            reserved = true;
+            break;
+        }
+    }
+    return errorCheck(reserved, ele, msg);
 }
 
 function emptyErrorCheck(attr, ele, msg){
@@ -2437,16 +2450,6 @@ function deleteRuleSet(){
         return;
     }
 
-    var currRule, ruleName;
-    // delete any {follow: true} generated pages
-    /*
-    for ( ruleName in ruleSet.rules ) {
-        currRule = ruleSet.rules[ruleName];
-        if ( currRule.follow ) {
-            deletePageFromGroup(ruleName, pages);
-        }
-    }
-    */
     var page = Collect.group.pages[Collect.current.page],
         ruleSet;
     page.removeSet(Collect.current.ruleSet);
