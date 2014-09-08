@@ -24,16 +24,24 @@ def canonical(dom):
     return matches[0].get("href")
 
 def make_folder(path):
+    """
+    given a path, create a folder from the path if one doesn't already exist
+    returns True if folder was created, False is folder already existed
+    """
     if not os.path.exists(path):
         os.makedirs(path)
-    return path
+        return True
+    return False
 
 def make_cache(folder):
     """
     given a folder, check if cache folder exists in it. if it doesn't, create it
     return path to folder
+    creates a new cache from the provided folder + 'cache'
     """
-    return make_folder(os.path.join(folder, 'cache'))
+    path = os.path.join(folder, 'cache')
+    make_folder(path)
+    return Cache(path)
 
 class Cache(object):
     """
@@ -87,7 +95,8 @@ class Site(object):
     def __init__(self, name, parent):
         self.name = name
         self.parent = parent
-        self.folder = make_folder(os.path.join(self.parent, self.name))
+        self.folder = os.path.join(self.parent, self.name)
+        make_folder(self.folder)
         self.filenames = {name: True for name in glob.glob(os.path.join(self.folder, "*"))}
         self.wait = False
         self.wait_until = 0

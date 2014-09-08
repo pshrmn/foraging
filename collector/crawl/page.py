@@ -2,10 +2,9 @@ import os
 from lxml.cssselect import CSSSelector
 
 from .rule import Rule
-from .cache import Cache, make_cache
+from .cache import make_cache
 
-cache_folder = make_cache(os.getcwd())
-page_cache = Cache(cache_folder)
+page_cache = make_cache(os.getcwd())
 
 class Page(object):
     def __init__(self, name, sets, index=False, next=None):
