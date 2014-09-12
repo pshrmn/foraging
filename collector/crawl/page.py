@@ -29,10 +29,11 @@ class Page(object):
         iterate over sets, returning a dict holding the captured values and a dict mapping
         page names to "follow" urls
         """
-        dom, canon = page_cache.fetch(url)
+        dom, canonical_url = page_cache.fetch(url)
         #start by adding url to page's data
+        # use the canonical url
         data = {
-            "url": url
+            "url": canonical_url
         }
         for key, rule_set in self.sets.iteritems():
             data[key] = rule_set.get(dom) 
@@ -111,11 +112,11 @@ class RuleSet(object):
                 data[rule.name] = rule_data
             else:
                 return None
-        for page in self.pages:
-            page_name = "_" + page.name
+        for page in self.pages.itervalues():
             page_url = data[page.name]
             page_data = page.get(page_url)
-            data[page_name] = page_data
+            # overwrite url with page
+            data[page.name] = page_data
         return data
 
     def __str__(self):
