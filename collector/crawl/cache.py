@@ -7,6 +7,11 @@ import urlparse
 from lxml import html
 from lxml.cssselect import CSSSelector
 import requests
+from selenium import webdriver
+
+cache_dir = os.path.abspath(__file__)
+collector_dir = os.path.join(cache_dir, os.pardir, os.pardir)
+PHANTOM_PATH = os.path.join(os.path.abspath(collector_dir), "phantomjs", "phantomjs.exe")
 
 def clean_url_filename(url):
     illegal_chars = re.compile(r'(\/|\\|:|\*|\?|"|\<|\>|\|)')
@@ -59,12 +64,12 @@ class Cache(object):
         for folder in folders:
             self.sites[folder] = Site(folder, self.folder)
 
-    def fetch(self, url):
+    def fetch(self, url, dynamic=False):
         domain = urlparse.urlparse(url).netloc.replace(".", "_")
         if domain not in self.sites:
             self.sites[domain] = Site(domain, self.folder)
         site = self.sites.get(domain)
-        return site.fetch(url)
+        return site.fetch(url, dynamic)
 
     def visited(self, url):
         """
@@ -98,14 +103,19 @@ class Site(object):
         self.folder = os.path.join(self.parent, self.name)
         make_folder(self.folder)
         self.filenames = {name: True for name in glob.glob(os.path.join(self.folder, "*"))}
+
+        self.dynamic_driver = webdriver.PhantomJS(PHANTOM_PATH,
+                service_args=['--load-images=no'])
         self.wait = False
         self.wait_until = 0
 
-    def fetch(self, url):
+    def fetch(self, url, dynamic=False):
         clean_url = os.path.join(self.folder, clean_url_filename(url))
+        new_file = False
         if clean_url in self.filenames:
             with open(os.path.join(self.folder, clean_url)) as fp:
                 text = fp.read()
+            new_file = True
             print("<cache>:\t%s" % url)
         else:
             """
@@ -117,10 +127,15 @@ class Site(object):
                 while time.time() < self.wait_until:
                     continue
                 self.wait = False
-            resp = requests.get(url)
-            if not resp.ok:
-                return None, None
-            text = resp.text
+            if dynamic:
+                self.dynamic_driver.get(url)
+                html_element = self.dynamic_driver.find_element_by_tag_name("html")
+                text = html_element.get_attribute("outerHTML")
+            else:
+                resp = requests.get(url)
+                if not resp.ok:
+                    return None, None
+                text = resp.text
             # save html file
             self.filenames[clean_url] = True
             with open(os.path.join(self.folder, clean_url), 'w') as fp:
@@ -133,6 +148,12 @@ class Site(object):
         dom = html.document_fromstring(text)
         dom.make_links_absolute(url)
         canonical_url = canonical(dom) or url
+        # also save html under canonical url name if canonical is different from provided url
+        # currently having issues with this
+        #if new_file and canonical_url != url:
+        #    clean_canon_url = os.path.join(self.folder, clean_url_filename(canonical_url))
+        #    with open(clean_canon_url, 'w') as fp:
+        #        fp.write(text.encode('utf-8'))
         return dom, canonical_url
 
     def visited(self, url):

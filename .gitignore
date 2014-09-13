@@ -5,3 +5,5 @@ log.txt
 collector/crawl/log.txt
 tests/rules
 /cache
+ghostdriver.log
+phantomjs

@@ -7,11 +7,22 @@ from .cache import make_cache
 page_cache = make_cache(os.getcwd())
 
 class Page(object):
-    def __init__(self, name, sets, index=False, next=None):
+    """
+    name is the name of the page
+    sets are the rule sets associated with the page
+    index is whether or not the page is an index (starting) page from which more pages are generated
+    next is a selector for another index page (only used when index=True)
+    dynamic is whether or not data necessary to collect is dynamically loaded (so need to
+        use selenium/phantomjs)
+    """
+    def __init__(self, name, sets, index=False, next=None, dynamic=False):
         self.name = name
         self.sets = sets
         self.next = next
         self.index = index
+        # if dynamic, will make a request to a url using selenium/phantomjs
+        # otherwise just use requests for nice and simple stuff
+        self.dynamic = dynamic
         # only set next on "default" page
         if self.name == "default" and next:
             self.next = CSSSelector(next)
@@ -22,14 +33,15 @@ class Page(object):
         sets = {rule_set["name"]: RuleSet.from_json(rule_set) for rule_set in page_json["sets"].itervalues()}
         index = page_json.get("index", False)
         next = page_json.get("next")
-        return cls(name, sets, index, next) 
+        dynamic = page_json.get("dynamic", False)
+        return cls(name, sets, index, next, dynamic)
 
     def get(self, url):
         """
         iterate over sets, returning a dict holding the captured values and a dict mapping
         page names to "follow" urls
         """
-        dom, canonical_url = page_cache.fetch(url)
+        dom, canonical_url = page_cache.fetch(url, self.dynamic)
         #start by adding url to page's data
         # use the canonical url
         data = {
@@ -112,11 +124,12 @@ class RuleSet(object):
                 data[rule.name] = rule_data
             else:
                 return None
-        for page in self.pages.itervalues():
-            page_url = data[page.name]
-            page_data = page.get(page_url)
-            # overwrite url with page
-            data[page.name] = page_data
+        if self.pages:
+            for page in self.pages.itervalues():
+                page_url = data[page.name]
+                page_data = page.get(page_url)
+                # overwrite url with page
+                data[page.name] = page_data
         return data
 
     def __str__(self):
