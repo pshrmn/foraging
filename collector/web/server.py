@@ -2,7 +2,6 @@ from flask import Flask, request, jsonify
 import json
 import os
 import argparse
-from urlparse import urlparse
 
 app = Flask(__name__)
 
