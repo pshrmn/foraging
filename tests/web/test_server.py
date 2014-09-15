@@ -74,6 +74,9 @@ class CollectTestCase(unittest.TestCase):
             "site": "www.example.com"
         }
 
+        # overwrite test_upload to prevent multiprocessing error showing up in output
+        server.test_upload = lambda x: None
+
         resp = self.app.post('/upload', headers=headers, data=json.dumps(upload))
         self.assertEqual(resp.status_code, 200)
         resp_json = json.loads(resp.data)

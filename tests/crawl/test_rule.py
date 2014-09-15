@@ -31,6 +31,9 @@ class RuleTestCase(unittest.TestCase):
         captured_attrs = r.get(self.html)
         self.assertEqual(captured_attrs, "#")
 
-
+    def test_multiple(self):
+        r = Rule("combo", "a", "text", multiple=True)
+        text = r.get(self.html)
+        self.assertEqual(text, ["Testing more testing", "Second"])
 if __name__=="__main__":
     unittest.main()

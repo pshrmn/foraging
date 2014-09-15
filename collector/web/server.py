@@ -42,7 +42,7 @@ def upload():
     except ValueError:
         return jsonify({"error": True})
 
-    multiprocessing.Process(target=test_group, args=(data["group"],)).start()
+    test_upload(data["group"])
 
     site = data["site"]
     name = data["group"]["name"]
@@ -52,8 +52,10 @@ def upload():
     path = os.path.join(folder, filename)
     with open(path, 'w') as fp:
         json.dump(data["group"], fp, indent=2)
-    print("saved uploaded group")
     return jsonify({"error": False})
+
+def test_upload(group_json):
+    multiprocessing.Process(target=test_group, args=(group_json,)).start()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Server to run with collectorjs')

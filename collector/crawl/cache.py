@@ -104,8 +104,6 @@ class Site(object):
         make_folder(self.folder)
         self.filenames = {name: True for name in glob.glob(os.path.join(self.folder, "*"))}
 
-        self.dynamic_driver = webdriver.PhantomJS(PHANTOM_PATH,
-                service_args=['--load-images=no'])
         self.wait = False
         self.wait_until = 0
 
@@ -128,6 +126,10 @@ class Site(object):
                     continue
                 self.wait = False
             if dynamic:
+                # don't create dynamic driver until it is needed
+                if not self.dynamic_driver:
+                    self.dynamic_driver = webdriver.PhantomJS(PHANTOM_PATH,
+                        service_args=['--load-images=no'])
                 self.dynamic_driver.get(url)
                 html_element = self.dynamic_driver.find_element_by_tag_name("html")
                 text = html_element.get_attribute("outerHTML")

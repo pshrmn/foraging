@@ -9,10 +9,11 @@ class Rule(object):
         eg. attr-href means that you want to get the element's href attribute
         text means that you want the text content of the element
     """
-    def __init__(self, name, selector, capture, follow=False):
+    def __init__(self, name, selector, capture, multiple=False, follow=False):
         self.name = name
         self.selector = selector
         self.capture = capture
+        self.multiple = multiple
         self.follow = follow
 
         self.xpath = CSSSelector(self.selector)
@@ -23,8 +24,9 @@ class Rule(object):
         name = rule_json["name"]
         selector = rule_json["selector"]
         capture = rule_json["capture"]
+        multiple = rule_json.get("multiple", False)
         follow = rule_json.get("follow", False)
-        return cls(name, selector, capture, follow)
+        return cls(name, selector, capture, multiple=multiple, follow=follow)
 
     def get(self, html):
         """
@@ -37,8 +39,10 @@ class Rule(object):
         # return None if the xpath gets no matches
         if len(eles) == 0:
             return None
-        value = self.value(eles[0])
-        return value
+        if self.multiple:
+            return map(self.value, eles)
+        else:
+            return self.value(eles[0])
 
     def set_capture(self):
         """
