@@ -363,7 +363,16 @@ RuleSet.prototype.uploadObject = function(){
     };
 
     if ( this.parent ) {
-        data.parent = this.parent;
+        data.parent = {
+            selector: this.parent.selector
+        };
+        // only upload low/high if their values are not 0
+        if ( this.parent.low !== 0 ) {
+            data.parent.low = this.parent.low;
+        }
+        if ( this.parent.high !== 0 ) {
+            data.parent.high = this.parent.high;
+        }
     }
 
     for ( var key in this.rules ) {

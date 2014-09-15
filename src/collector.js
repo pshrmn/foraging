@@ -1061,7 +1061,7 @@ function addParentGroup(selector, low,  high){
 
 /*
 uses Collect.parent to limit selected elements to children of elements matching Collect.parent.selector
-if Collect.parent.which is defined, only use Collect.parent.selector elements within that range
+if Collect.parent.high/low are defined, only use Collect.parent.selector elements within that range
 */
 function parentElements(selector){
     var low = Collect.parent.low || 0,
