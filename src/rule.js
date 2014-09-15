@@ -447,10 +447,11 @@ RuleSet.prototype.followedRules = function(){
 /********************
         RULE
 ********************/
-function Rule(name, selector, capture, follow){
+function Rule(name, selector, capture, multiple, follow){
     this.name = name;
     this.selector = selector;
     this.capture = capture;
+    this.multiple = multiple || false;
     this.follow = follow || false;
     this.elements = {};
     // added when a ruleSet calls addRule
@@ -463,6 +464,10 @@ Rule.prototype.object = function(){
         selector: this.selector,
         capture: this.capture
     };
+
+    if ( this.multiple ) {
+        data.multiple = this.multiple;
+    }
 
     if ( this.follow ) {
         data.follow = this.follow;
@@ -528,6 +533,7 @@ Rule.prototype.update = function(object){
     }
     this.selector = object.selector;
     this.capture = object.capture;
+    this.multiple = object.multiple || false;
     this.follow = object.follow || false;
 };
 

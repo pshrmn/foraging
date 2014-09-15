@@ -58,6 +58,10 @@
                     <label title="the attribute of an element to capture">Capture:</label>
                     <span id="ruleAttr"></span>
                 </div>
+                <div class="rule multiple">
+                    <label for="ruleMultiple" title="capture from all elements matching selector. Useful when you only need one attribute from multiple elements (so that using a parent selector would be overkill)">Multiple: </label>
+                    <input id="ruleMultiple" type="checkbox" />
+                </div>
                 <div class="rule follow">
                     <label for="ruleFollow" title="create a new page from the element's captured url (capture must be attr-href)">Follow:</label>
                     <input id="ruleFollow" name="ruleFollow" type="checkbox" disabled="true" title="Can only follow rules that get href attribute from links" />

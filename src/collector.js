@@ -126,6 +126,7 @@ var HTML = {
             name: document.getElementById("ruleName"),
             capture: document.getElementById("ruleAttr"),
             selector: document.getElementById("ruleSelector"),
+            multiple: document.getElementById("ruleMultiple"),
             follow: document.getElementById("ruleFollow"),
             followHolder: document.querySelector("#ruleItems .follow")
         },
@@ -660,6 +661,7 @@ function saveRuleEvent(event){
     var name = HTML.form.rule.name.value,
         selector = HTML.form.rule.selector.textContent,
         capture = HTML.form.rule.capture.textContent,
+        multiple = HTML.form.rule.multiple.checked,
         follow = HTML.form.rule.follow.checked,
         rule = {
             name: name,
@@ -683,6 +685,10 @@ function saveRuleEvent(event){
         return;
     }
     
+    if ( multiple ) {
+        rule.multiple = true;
+    }
+
     if ( follow ) {
         rule.follow = true;
         // page will be created when rule is added to ruleset, but add option now
@@ -1030,7 +1036,8 @@ function addRule(rule, ruleSet){
         rule.name,
         rule.selector,
         rule.capture,
-        rule.follow,
+        rule.multiple || false,
+        rule.follow || false,
         Collect.parent.selector
     );
 

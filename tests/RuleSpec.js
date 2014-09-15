@@ -59,7 +59,7 @@ describe("Group", function(){
                 p = new Page("Foo"),
                 s1 = new RuleSet("Bar"),
                 s2 = new RuleSet("Baz"),
-                r1 = new Rule("Foo", "a", "attr-href", true),
+                r1 = new Rule("Foo", "a", "attr-href", false, true),
                 r2 = new Rule("div", "div", "text");
             s1.addRule(r1);
             s2.addRule(r2)
@@ -445,7 +445,7 @@ describe("RuleSet", function(){
 
         it("creates a new page if group/page are defined", function(){
             var g = new Group("Pirates"),
-                r = new Rule("two", "a", "attr-href", true);
+                r = new Rule("two", "a", "attr-href", false, true);
             g.pages["default"].sets["default"].addRule(r);
             expect(g.pages["two"]).toBeDefined();
         });
@@ -465,7 +465,7 @@ describe("RuleSet", function(){
     describe("remove", function(){
         it("removes all rules (and thus associated follow pages)", function(){
             var g = new Group("One"),
-                r = new Rule("two", "a", "attr-href", true);
+                r = new Rule("two", "a", "attr-href", false, true);
             g.pages["default"].sets["default"].addRule(r);
             expect(g.pages["two"]).toBeDefined();
             g.pages["default"].sets["default"].removeRule("two");
@@ -484,15 +484,20 @@ describe("Rule", function(){
             expect(r1.follow).toBe(false);
         });
 
-        it("includes Rule.follow if included", function(){
+        it("includes Rule.multiple if included", function(){
             var r1 = new Rule("seasons", "a.season", "attr-href", true);
+            expect(r1.multiple).toBe(true);
+        });
+
+        it("includes Rule.follow if included", function(){
+            var r1 = new Rule("seasons", "a.season", "attr-href", false, true);
             expect(r1.follow).toBe(true);
         });
     });
 
     describe("object", function(){
         it("returns a JSON object representing a Rule", function(){
-            var r1 = new Rule("seasons", "a.season", "attr-href", true),
+            var r1 = new Rule("seasons", "a.season", "attr-href", false, true),
                 r2 = new Rule("name", "h1", "text");
                 r1Expected = {
                     name: "seasons",
@@ -512,8 +517,9 @@ describe("Rule", function(){
 
     describe("html", function(){
         it("generates a html element representing a Rule", function(){
+            // blank function since we don't care about events in this test
             var sE = usE = eE = pE = dE = function(){};
-            var r1 = new Rule("seasons", "a.season", "attr-href", true),
+            var r1 = new Rule("seasons", "a.season", "attr-href"),
                 ele = r1.html(sE, usE, eE, pE, dE);
             expect(ele.tagName).toEqual("LI");
             expect(r1.elements.nametag.textContent).toEqual(r1.name);
@@ -522,7 +528,7 @@ describe("Rule", function(){
 
     describe("update", function(){
         it("replaces Rule properties", function(){
-            var r1 = new Rule("seasons", "a.season", "attr-href", true),
+            var r1 = new Rule("seasons", "a.season", "attr-href", true, true),
                 newRule = {
                     name: "seasons",
                     selector: "a.season",
@@ -532,6 +538,7 @@ describe("Rule", function(){
             expect(r1.name).toEqual("seasons");
             expect(r1.selector).toEqual("a.season");
             expect(r1.capture).toEqual("text");
+            expect(r1.multiple).toBe(false);
             expect(r1.follow).toBe(false);
         });
 
@@ -554,7 +561,7 @@ describe("Rule", function(){
     describe("remove", function(){
         it("removes all rules (and thus associated follow pages)", function(){
             var g = new Group("One"),
-                r = new Rule("two", "a", "attr-href", true);
+                r = new Rule("two", "a", "attr-href", false, true);
             g.pages["default"].sets["default"].addRule(r);
             expect(g.pages["two"]).toBeDefined();
             r.remove();
