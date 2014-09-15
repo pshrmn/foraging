@@ -2,6 +2,9 @@ from flask import Flask, request, jsonify
 import json
 import os
 import argparse
+import multiprocessing
+
+from dynamic_check import test_group
 
 app = Flask(__name__)
 
@@ -39,6 +42,8 @@ def upload():
     except ValueError:
         return jsonify({"error": True})
 
+    multiprocessing.Process(target=test_group, args=(data["group"],)).start()
+
     site = data["site"]
     name = data["group"]["name"]
     folder = host_folder(site)
@@ -47,6 +52,7 @@ def upload():
     path = os.path.join(folder, filename)
     with open(path, 'w') as fp:
         json.dump(data["group"], fp, indent=2)
+    print("saved uploaded group")
     return jsonify({"error": False})
 
 if __name__ == "__main__":

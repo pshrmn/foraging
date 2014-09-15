@@ -49,7 +49,6 @@ def test_rule_set(rule_set, dom):
         test_page(page, page_url)
     return all(working_rules)
 
-
 def test_rule(rule, dom):
     """
     given a rule and a dom, test if the css selector for the rule matches anything in the page
@@ -61,7 +60,7 @@ def test_rule(rule, dom):
     works, works_char = (True, "+") if len(eles) > 0 else (False, "-")
     follow_url = None
     if works and rule.get("follow", False):
-        follow_url = eles[0].get_attribute("href")
+        follow_url = eles[0].get("href")
     print(rule_output.format(rule["name"], rule["selector"], works_char))
     return works, follow_url
 
