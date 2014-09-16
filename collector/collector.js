@@ -80,6 +80,10 @@ function SelectorFamily(ele, parent, holder, text, fn, options){
     // Order is from most senior element to provided ele
     var sel;
     options = options || {};
+    // if a select is given, swap ele to be the first option
+    if ( ele.tagName === "SELECT" && ele.childElementCount > 0 ) {
+        ele = ele.children[0];
+    }
     while ( ele !== null && ele.tagName !== "BODY" ) {
         // ignore element if it isn't allowed
         if ( options.ignore && !allowedElement(ele.tagName) ) {
@@ -1822,7 +1826,6 @@ function saveParentEvent(event){
         return;
     }
 
-
     HTML.info.range.textContent = setRangeString(low, high);
 
     Collect.parent = parent;
@@ -2206,9 +2209,9 @@ function setCurrentIndex(){
 
 function setRangeString(low, high){
     var rangeString = "Range: ";
-    rangeString += (low !== 0) ? low : "beginning";
+    rangeString += (low !== 0 && !isNaN(low)) ? low : "beginning";
     rangeString += " to ";
-    rangeString += (high !== 0) ? high : "end";
+    rangeString += (high !== 0 && !isNaN(high)) ? high : "end";
     return rangeString;
 }
 

@@ -754,7 +754,6 @@ function saveParentEvent(event){
         return;
     }
 
-
     HTML.info.range.textContent = setRangeString(low, high);
 
     Collect.parent = parent;
@@ -1138,9 +1137,9 @@ function setCurrentIndex(){
 
 function setRangeString(low, high){
     var rangeString = "Range: ";
-    rangeString += (low !== 0) ? low : "beginning";
+    rangeString += (low !== 0 && !isNaN(low)) ? low : "beginning";
     rangeString += " to ";
-    rangeString += (high !== 0) ? high : "end";
+    rangeString += (high !== 0 && !isNaN(high)) ? high : "end";
     return rangeString;
 }
 

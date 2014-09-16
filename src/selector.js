@@ -17,6 +17,10 @@ function SelectorFamily(ele, parent, holder, text, fn, options){
     // Order is from most senior element to provided ele
     var sel;
     options = options || {};
+    // if a select is given, swap ele to be the first option
+    if ( ele.tagName === "SELECT" && ele.childElementCount > 0 ) {
+        ele = ele.children[0];
+    }
     while ( ele !== null && ele.tagName !== "BODY" ) {
         // ignore element if it isn't allowed
         if ( options.ignore && !allowedElement(ele.tagName) ) {
