@@ -1,7 +1,7 @@
 import os
 from lxml.cssselect import CSSSelector
 
-from .rule import Rule
+from .rule import Selector
 from .cache import make_cache
 
 page_cache = make_cache(os.getcwd())
@@ -9,7 +9,7 @@ page_cache = make_cache(os.getcwd())
 class Page(object):
     """
     name is the name of the page
-    sets are the rule sets associated with the page
+    sets are the selector sets associated with the page
     index is whether or not the page is an index (starting) page from which more pages are generated
     next is a selector for another index page (only used when index=True)
     dynamic is whether or not data necessary to collect is dynamically loaded (so need to
@@ -30,7 +30,8 @@ class Page(object):
     @classmethod
     def from_json(cls, page_json):
         name = page_json["name"]
-        sets = {rule_set["name"]: RuleSet.from_json(rule_set) for rule_set in page_json["sets"].itervalues()}
+        sel_sets = page_json["sets"]
+        sets = {key: SelectorSet.from_json(ss) for key, ss in sel_sets.iteritems()}
         index = page_json.get("index", False)
         next = page_json.get("next")
         dynamic = page_json.get("dynamic", False)
@@ -73,31 +74,35 @@ class Page(object):
     def __str__(self):
         return "Page(%s, %s)" % (self.name, self.sets)
 
-class RuleSet(object):
+class SelectorSet(object):
     """
-    A RuleSet consists of a group of (related?) rules in a page
-    rules is a dict containing rules for the set
+    A SelectorSet consists of a group of (related?) selector/rule pairs in a page
+    seletors is a dict containing selectors for the set
     parent (optional) is a dict with a selector and an optional low/high range
     """
-    def __init__(self, name, rules, pages=None, parent=None):
+    def __init__(self, name, selectors, pages=None, parent=None):
         self.name = name
-        self.rules = rules
+        self.selectors = selectors
         self.pages = pages
         self.parent = parent
 
     @classmethod
-    def from_json(cls, rule_set_json):
-        name = rule_set_json["name"]
-        rules = {rule["name"]: Rule.from_json(rule) for rule in rule_set_json["rules"].itervalues()}
-        json_pages = rule_set_json.get("pages")
+    def from_json(cls, selector_set_json):
+        name = selector_set_json["name"]
+        selector_dict = selector_set_json["selectors"]
+        selectors = {key: Selector.from_json(sel) for key, sel in selector_dict.iteritems()}
+
+        json_pages = selector_set_json.get("pages")
+        pages = None
         if json_pages:
-            pages = {page["name"]: Page.from_json(page) for page in rule_set_json["pages"].itervalues()}
-        else:
-            pages = None
+            pages = {key: Page.from_json(page) for key, page in json_pages.iteritems()}
+
+        parent_json = selector_set_json.get("parent")
         parent = None
-        if rule_set_json.get("parent"):
-            parent = Parent.from_json(rule_set_json["parent"])
-        return cls(name, rules, pages=pages, parent=parent)
+        if parent_json:
+            parent = Parent.from_json(parent_json)
+
+        return cls(name, selectors, pages=pages, parent=parent)
 
     def get(self, dom):
         """
@@ -116,9 +121,9 @@ class RuleSet(object):
         {page name: url} pairs to crawl subsequent pages
         """
         data = {}
-        # iterate over self.rules to get values
-        for rule in self.rules.itervalues():
-            rule_data = rule.get(dom)
+        # iterate over self.rules to get values]
+        for selector in self.selectors.itervalues():
+            rule_data = selector.get(dom)
             # if any of the rules return None, have the whole thing fail
             if rule_data:
                 data[rule.name] = rule_data
@@ -133,7 +138,8 @@ class RuleSet(object):
         return data
 
     def __str__(self):
-        return "RuleSet(%s, %s)" % (self.rules, self.parent)
+        return "SelectorSet(%s, %s, pages=%s, parent=%s)" % (self.name, self.selectors,
+            self.pages, self.parent)
 
 class Parent(object):
     """

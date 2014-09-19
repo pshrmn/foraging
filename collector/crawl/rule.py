@@ -1,48 +1,63 @@
 from lxml.cssselect import CSSSelector
 
+class Selector(object):
+    """
+    A selector is used to select element(s) from a dom to apply rules to
+    """
+    def __init__(self, selector, rules, multiple=False):
+        self.selector = selector
+        self.rules = rules
+        self.multiple = multiple
+        self.xpath = CSSSelector(self.selector)
+
+    @classmethod
+    def from_json(cls, selector_json):
+        selector = selector_json["selector"]
+        rules = selector_json["rules"]
+        rules = {key: Rule.from_json(rule) for key, rule in rules.iteritems()}
+        multiple = selector_json.get("multiple", False)
+        return cls(selector, rules)
+
+    def get(self, html):
+        eles = self.xpath(html)
+        if len(eles) == 0:
+            return None
+
+        data = {}
+        for rule_name, rule in self.rules.iteritems():
+            # return None if the xpath gets no matches
+            if self.multiple:
+                data[rule_name] = map(rule.get, eles)
+            else:
+                data[rule_name] = rule.get(eles[0])
+        return data
+
 class Rule(object):
     """
     A rule corresponds to a column in a sql tuple
     name is the name of the column
-    selector is the css selector used to select the item(s) from an html dom
     capture is the attribute of the item(s) that you want to store
         eg. attr-href means that you want to get the element's href attribute
         text means that you want the text content of the element
     """
-    def __init__(self, name, selector, capture, multiple=False, follow=False):
+    def __init__(self, name, capture, follow=False):
         self.name = name
-        self.selector = selector
         self.capture = capture
-        self.multiple = multiple
         self.follow = follow
-
-        self.xpath = CSSSelector(self.selector)
         self.value = self.set_capture()
 
     @classmethod
     def from_json(cls, rule_json):
         name = rule_json["name"]
-        selector = rule_json["selector"]
         capture = rule_json["capture"]
-        multiple = rule_json.get("multiple", False)
         follow = rule_json.get("follow", False)
-        return cls(name, selector, capture, multiple=multiple, follow=follow)
+        return cls(name, capture, follow=follow)
 
-    def get(self, html):
+    def get(self, ele):
         """
-        html is an lxml parsed html etree
-        eles is all elements in the dom that match the xpath, however only the first match is used
-        this might change in the future (at least for specific targets like a select/options)
-        returns a value based on self.capture
+        given an element, return the desired attribute for the element
         """
-        eles = self.xpath(html)
-        # return None if the xpath gets no matches
-        if len(eles) == 0:
-            return None
-        if self.multiple:
-            return map(self.value, eles)
-        else:
-            return self.value(eles[0])
+        return self.value(ele)
 
     def set_capture(self):
         """
@@ -68,4 +83,4 @@ class Rule(object):
 
     
     def __str__(self):
-        return "Rule(%s, %s, %s, %s)" % (self.name, self.selector, self.capture, self.follow)
+        return "Rule(%s, %s, %s, %s)" % (self.name, self.capture, self.follow)

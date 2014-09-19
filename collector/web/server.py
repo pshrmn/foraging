@@ -55,6 +55,9 @@ def upload():
     return jsonify({"error": False})
 
 def test_upload(group_json):
+    """
+    use multiplrocessing so that the test is async and the upload can return sooner
+    """
     multiprocessing.Process(target=test_group, args=(group_json,)).start()
 
 if __name__ == "__main__":

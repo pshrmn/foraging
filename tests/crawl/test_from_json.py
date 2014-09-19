@@ -1,6 +1,6 @@
 from collector.crawl.group import Group
-from collector.crawl.page import Page, RuleSet, Parent
-from collector.crawl.rule import Rule
+from collector.crawl.page import Page, SelectorSet, Parent
+from collector.crawl.rule import Selector, Rule
 
 import unittest
 import os
@@ -54,11 +54,11 @@ class FromJSONTestCase(unittest.TestCase):
         other_page_next = Page.from_json(other_next_json)
         self.assertNotIsInstance(other_page_next.next, CSSSelector)        
 
-    def test_rule_set_from_json(self):
-        rule_set = self.group.page.sets["default"]
-        self.assertEqual(rule_set.name, "default")
-        self.assertEqual(len(rule_set.pages), 1)
-        self.assertIsInstance(rule_set.parent, Parent)
+    def test_selector_set_from_json(self):
+        selector_set = self.group.page.sets["default"]
+        self.assertEqual(selector_set.name, "default")
+        self.assertEqual(len(selector_set.pages), 1)
+        self.assertIsInstance(selector_set.parent, Parent)
 
         # when Parent isn't provided RuleSet.parent is None
         other_rule_set = self.group.page.sets["default"].pages["other_page"].sets["default"]
@@ -81,20 +81,35 @@ class FromJSONTestCase(unittest.TestCase):
         range_parent = Parent.from_json(parent_json)
         self.assertEqual(range_parent.high, -1)
 
+    def test_selector_from_json(self):
+        selector_json = {
+            "selector": "a",
+            "rules": {
+                "url": {
+                    "name": "url",
+                    "capture": "attr-href"
+                },
+                "headline": {
+                    "name": "headline",
+                    "capture": "text"
+                }
+            }
+        }
+        selector = Selector.from_json(selector_json)
+        self.assertEqual(selector.selector, "a")
+        self.assertEqual(len(selector.rules.keys()), 2)
+
     def test_rule_from_json(self):
         rule_json = {
             "name": "title",
-            "selector": "h1",
             "capture": "text"
         }
         rule = Rule.from_json(rule_json)
         self.assertEqual(rule.name, "title")
         self.assertEqual(rule.capture, "text")
-        self.assertEqual(rule.selector, "h1")
         
         follow_rule_json = {
             "name": "product_page",
-            "selector": ".product a",
             "capture": "attr-href",
             "follow": True
         }
