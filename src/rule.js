@@ -83,8 +83,7 @@ Group.prototype.html = function(){
 
     holder.classList.add("group");
     nametag.textContent = "Group: " + this.name;
-    holder.appendChild(nametag);
-    holder.appendChild(pages);
+    appendChildren(holder, [nametag, pages]);
 
     for ( var key in this.pages ) {
         pages.appendChild(this.pages[key].html());
@@ -132,7 +131,7 @@ Group.prototype.uniquePageName = function(name){
     return true;
 };
 
-Group.prototype.uniqueRuleSetName = function(name){
+Group.prototype.uniqueSelectorSetName = function(name){
     var page, pageName, setName;
     for ( pageName in this.pages ){
         page = this.pages[pageName];
@@ -146,15 +145,18 @@ Group.prototype.uniqueRuleSetName = function(name){
 };
 
 Group.prototype.uniqueRuleName = function(name){
-    var page, ruleSet,
-        pageName, setName, ruleName;
+    var page, selectorSet, selector,
+        pageName, setName, selectorName, ruleName;
     for ( pageName in this.pages ){
         page = this.pages[pageName];
         for ( setName in page.sets ) {
-            ruleSet = page.sets[setName];
-            for ( ruleName in ruleSet.rules ) {
-                if ( name === ruleName ) {
-                    return false;
+            selectorSet = page.sets[setName];
+            for ( selectorName in selectorSet.selectors ) {
+                selector = selectorSet.selectors[selectorName];
+                for ( ruleName in selector.rules ) {
+                    if ( name === ruleName ) {
+                        return false;
+                    }
                 }
             }
         }
@@ -170,7 +172,7 @@ function Page(name, index, next){
     this.index = index || false;
     this.next = next;
     this.sets = {
-        "default": new RuleSet("default")
+        "default": new SelectorSet("default")
     };
     this.sets["default"].page = this;
     this.elements = {};
@@ -201,7 +203,7 @@ returns an object representing a page for upload
 name: name of the page
 index: whether or not the page is an index page (based on if there is a next)
     probably not necessary, look to remove after tree is working
-sets: dict containing non-empty (ie, has 1+ rules) rule sets
+sets: dict containing non-empty (ie, has 1+ rules) selector sets
 next: string for next selector (if index = true)
 ***/
 Page.prototype.uploadObject = function(){
@@ -239,8 +241,7 @@ Page.prototype.html = function(){
 
     holder.classList.add("page");
     nametag.textContent = "Page: " + this.name;
-    holder.appendChild(nametag);
-    holder.appendChild(sets);
+    appendChildren(holder, [nametag, sets]);
 
     for ( var key in this.sets ) {
         sets.appendChild(this.sets[key].html());
@@ -257,18 +258,18 @@ Page.prototype.html = function(){
 
 Page.prototype.deleteHTML = prototypeDeleteHTML;
 
-Page.prototype.addSet = function(ruleSet){
-    var name = ruleSet.name;
+Page.prototype.addSet = function(selectorSet){
+    var name = selectorSet.name;
     // if a set with the same name already exists, overwrite it
     if ( this.sets[name]) {
         this.removeSet(name);
     }
 
-    this.sets[name] = ruleSet;
-    ruleSet.page = this;
-    // if html for page exists, also create html for RuleSet
+    this.sets[name] = selectorSet;
+    selectorSet.page = this;
+    // if html for page exists, also create html for SelectorSet
     if ( this.elements.holder ) {
-        var ele = ruleSet.html();
+        var ele = selectorSet.html();
         this.elements.sets.appendChild(ele);
     }
 };
@@ -297,7 +298,7 @@ Page.prototype.removeNext = function(){
 };
 
 /***
-iterate over sets in the page, returning an object mapping rule set's name to a list of pages that
+iterate over sets in the page, returning an object mapping selector set's name to a list of pages that
 follow it
 ***/
 Page.prototype.followedSets = function(){
@@ -314,126 +315,105 @@ Page.prototype.followedSets = function(){
 };
 
 /********************
-        RULESET
+        SelectorSet
 *********************
-name: name of the rule set
-parent: selector/range for selecting a rule set's parent element
+name: name of the selector set
+parent: selector/range for selecting a selector set's parent element
 ********************/
-function RuleSet(name, parent){
+function SelectorSet(name, parent){
     this.name = name;
     this.parent = parent;
-    this.rules = {};
+    this.selectors = {};
     this.elements = {};
     // added when a page calls addSet
     this.page;
 }
 
-RuleSet.prototype.object = function(){
+SelectorSet.prototype.object = function(){
     var data = {
         name: this.name,
-        rules: {}
+        selectors: {}
     };
 
     if ( this.parent ) {
         data.parent = this.parent;
     }
 
-    for ( var key in this.rules ) {
-        data.rules[key] = this.rules[key].object();
+    for ( var key in this.selectors ) {
+        data.selectors[key] = this.selectors[key].object();
     }
-
 
     return data;
 };
 
 /***
-    name: name of rule set
-    rules: dict mapping name of rules to rules
+    name: name of selector set
+    selectors: dict mapping name of selectors to selectors
     pages: any pages that should be crawled based on a "follow"ed rule
 ***/
-RuleSet.prototype.uploadObject = function(){
-    if ( Object.keys(this.rules).length === 0 ) {
+SelectorSet.prototype.uploadObject = function(){
+    if ( Object.keys(this.selectors).length === 0 ) {
         return;
     }
 
-    var data = {
-        name: this.name,
-        rules: {},
-        pages: {}
-    };
+    // use base object created by SelectorSet.object
+    var data = this.object();
+    data.pages = {};
 
-    if ( this.parent ) {
-        data.parent = {
-            selector: this.parent.selector
-        };
-        // only upload low/high if their values are not 0
-        if ( this.parent.low !== 0 ) {
-            data.parent.low = this.parent.low;
+    // only upload low/high if their values are not 0
+    if ( data.parent ) {
+        if ( data.parent.low === 0 ) {
+            delete data.parent.low;
         }
-        if ( this.parent.high !== 0 ) {
-            data.parent.high = this.parent.high;
+
+        if ( data.parent.high === 0 ) {
+            delete data.parent.high;
         }
     }
-
-    for ( var key in this.rules ) {
-        data.rules[key] = this.rules[key].object();
-    }
-
 
     return data;
 };
 
-RuleSet.prototype.html = function(){
+SelectorSet.prototype.html = function(){
     var holder = noSelectElement("li"),
         nametag = noSelectElement("h5"),
         ul = noSelectElement("ul");
         
-    holder.classList.add("ruleSet");
-    nametag.textContent = "Rule Set: " + this.name;
-
-    holder.appendChild(nametag);
-    holder.appendChild(ul);
+    holder.classList.add("SelectorSet");
+    nametag.textContent = "Selector Set: " + this.name;
+    appendChildren(holder, [nametag, ul]);
 
     this.elements = {
         holder: holder,
         nametag: nametag,
-        rules: ul
+        selectors: ul
     };
 
     return holder;
 };
 
-RuleSet.prototype.deleteHTML = prototypeDeleteHTML;
+SelectorSet.prototype.deleteHTML = prototypeDeleteHTML;
 
-RuleSet.prototype.addRule = function(rule, events){   
-    this.rules[rule.name] = rule;
-    rule.ruleSet = this;
-
-    // if the Rule has follow=true and the RuleSet has a Page (which in turn has a Group)
-    // add a new Page to the group with the name of the Rule
-    if ( rule.follow && this.page && this.page.group ) {
-        var page = new Page(rule.name);
-        this.page.group.addPage(page);
+SelectorSet.prototype.addSelector = function(selector){
+    this.selectors[selector.selector] = selector;
+    if ( this.elements.selectors) {
+        this.elements.selectors.appendChild(selector.html())
     }
+    selector.set = this;
+};
 
-    // if RuleSet html exists, also create html for rule
-    if ( this.elements.rules ) {
-        var ele = rule.html.apply(rule, events);
-        this.elements.rules.appendChild(ele);
+SelectorSet.prototype.removeSelector = function(name){
+    var selector = this.selectors[name];
+    if ( selector ) {
+        selector.remove();
+        delete this.selectors[name];
     }
 };
 
-RuleSet.prototype.removeRule = function(name){
-    var rule = this.rules[name];
-    if ( rule ) {
-        rule.remove();
-    }
-};
-
-RuleSet.prototype.remove = function(){
+SelectorSet.prototype.remove = function(){
     this.deleteHTML();
-    for ( var key in this.rules ) {
-        this.removeRule(key);
+    for ( var key in this.selectors ) {
+        this.removeSelector(key);
     }
     if ( this.page ) {
         delete this.page.sets[this.name];
@@ -443,34 +423,134 @@ RuleSet.prototype.remove = function(){
 /***
 iterate over rules in the set and returns an array containg names of rules where follow = true
 ***/
-RuleSet.prototype.followedRules = function(){
-    var following = [];
-    for ( var key in this.rules ) {
-        if ( this.rules[key].follow ) {
-            following.push(key);
+SelectorSet.prototype.followedRules = function(){
+    var following = [],
+        selector;
+    for ( var key in this.selectors ) {
+        selector = this.selectors[key];
+        for ( var ruleName in selector.rules ) {
+            following.push(ruleName);
         }
     }
     return following;
 };
 
 /********************
+        SELECTOR
+********************/
+function Selector(selector, rules){
+    this.selector = selector;
+    this.rules = rules || {};
+    this.elements = {};
+}
+
+Selector.prototype.object = function(){
+    var data = {
+        selector: this.selector,
+        rules: {}
+    };
+
+    for ( var key in this.rules ) {
+        data.rules[key] = this.rules[key].object();
+    }
+
+    return data;
+}
+
+/*
+only include the selector if it has rules
+*/
+Selector.prototype.uploadObject = function(){
+    if ( Object.keys(this.rules).length === 0 ) {
+        return;
+    }
+
+    return this.object();
+}
+
+Selector.prototype.addRule = function(rule, events){
+    this.rules[rule.name] = rule;
+    rule.selector = this;
+
+    // if the Rule has follow=true and the SelectorSet has a Page (which in turn has a Group)
+    // add a new Page to the group with the name of the Rule
+    if ( rule.follow && this.set && this.set.page && this.set.page.group ) {
+        var page = new Page(rule.name);
+        this.set.page.group.addPage(page);
+    }
+
+    // if Selector html exists, also create html for rule
+    if ( this.elements.rules ) {
+        var ele = rule.html.apply(rule, events);
+        this.elements.rules.appendChild(ele);
+    }
+};
+
+Selector.prototype.removeRule = function(name){
+    delete this.rules[name];
+};
+
+Selector.prototype.updateSelector = function(newSelector){
+    var oldSelector = this.selector;
+    this.selector = newSelector
+    if ( this.elements.nametag ) {
+        this.elements.nametag.textContent = newSelector;
+    }
+
+    if ( this.set ) {
+        this.set.selectors[newSelector] = this;
+        delete this.set.selectors[oldSelector];
+    }
+};
+
+Selector.prototype.html = function(){
+    var holder = noSelectElement("li"),
+        nametag = noSelectElement("span"),
+        rules = noSelectElement("ul");
+
+    holder.classList.add("savedSelector");
+    nametag.textContent = this.selector;
+
+    appendChildren(holder, [nametag, rules]);
+
+    this.elements = {
+        holder: holder,
+        nametag: nametag,
+        rules: rules
+    };
+
+    return holder;
+};
+
+Selector.prototype.deleteHTML = prototypeDeleteHTML;
+
+Selector.prototype.remove = function(){
+    this.deleteHTML();
+    for ( var key in this.rules ) {
+        this.removeRule(key);
+    }
+
+    if ( this.set ) {
+        delete this.set.selectors[this.name];
+    }
+};
+
+/********************
         RULE
 ********************/
-function Rule(name, selector, capture, multiple, follow){
+function Rule(name, capture, multiple, follow){
     this.name = name;
-    this.selector = selector;
     this.capture = capture;
     this.multiple = multiple || false;
     this.follow = follow || false;
     this.elements = {};
-    // added when a ruleSet calls addRule
-    this.ruleSet;
+    // added when a SelectorSet calls addRule
+    this.selector;
 }
 
 Rule.prototype.object = function(){
     var data = {
         name: this.name,
-        selector: this.selector,
         capture: this.capture
     };
 
@@ -502,10 +582,7 @@ Rule.prototype.html = function(selectorViewEvent, unselectorViewEvent, editEvent
     deltog.innerHTML = "&times;";
     deltog.classList.add("deltog");
 
-    holder.appendChild(nametag);
-    holder.appendChild(edit);
-    holder.appendChild(preview);
-    holder.appendChild(deltog);
+    appendChildren(holder, [nametag, edit, preview, deltog]);
 
     holder.addEventListener("mouseenter", selectorViewEvent.bind(this), false);
     holder.addEventListener("mouseleave", unselectorViewEvent.bind(this), false);
@@ -535,25 +612,31 @@ Rule.prototype.update = function(object){
         if ( this.elements.holder ) {
             this.elements.nametag.textContent = newName;
         }
-        if ( this.ruleSet ) {
-            this.ruleSet.rules[newName] = this;
-            delete this.ruleSet.rules[oldName];
+        if ( this.selector ) {
+            this.selector.rules[newName] = this;
+            delete this.selector.rules[oldName];
         }
     }
-    this.selector = object.selector;
     this.capture = object.capture;
     this.multiple = object.multiple || false;
     this.follow = object.follow || false;
 };
 
+/***
+delete rule's html
+is rule.follow, remove the page associated with the rule
+remove rule from parent selector
+***/
 Rule.prototype.remove = function(){
     this.deleteHTML();
-    if ( this.follow && this.ruleSet && this.ruleSet.page && this.ruleSet.page.group ) {
-        // find associated page and remove that
-        this.ruleSet.page.group.removePage(this.name);
+    // remove associated page if rule.follow = true
+    if ( this.follow && this.selector && this.selector.set && this.selector.set.page &&
+        this.selector.set.page.group) {
+        this.selector.set.page.group.removePage(this.name);
     }
-    if ( this.ruleSet ) {
-        delete this.ruleSet.rules[this.name];
+
+    if ( this.selector ) {
+        delete this.selector.rules[this.name];
     }
 };
 
@@ -562,5 +645,12 @@ function prototypeDeleteHTML(){
     var holder = this.elements.holder;
     if ( holder ) {
         holder.parentElement.removeChild(holder);
+    }
+}
+
+// append all of the elements in children to the parent element
+function appendChildren(parent, children){
+    for ( var i=0, len=children.length; i<len; i++ ) {
+        parent.appendChild(children[i]);
     }
 }
