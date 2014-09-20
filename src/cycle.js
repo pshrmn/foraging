@@ -15,6 +15,7 @@ Cycle.prototype.reset = function(){
     this.elements = [];
     this.index = 0;
     this.html.preview.textContent = "";
+    this.html.index.textContent = "";
 };
 
 Cycle.prototype.html = function(){

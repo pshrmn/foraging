@@ -336,6 +336,7 @@ function resetInterface(){
 function resetSelectorView(){
     Family.remove();
     Interface.activeSelector = "selector";
+    Interface.selectorCycle.reset();
     HTML.selector.radio.selector.checked = true;
     HTML.selector.parent.holder.style.display = "none";
     HTML.selector.parent.low.value = "";

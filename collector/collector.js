@@ -1182,6 +1182,7 @@ Cycle.prototype.reset = function(){
     this.elements = [];
     this.index = 0;
     this.html.preview.textContent = "";
+    this.html.index.textContent = "";
 };
 
 Cycle.prototype.html = function(){
@@ -1263,8 +1264,8 @@ Cycle.prototype.preview = function(){
         }
     } else {
         // get rid of empty class string
-        if (html.indexOf("class=\"\"") !== -1 ) {
-            html = html.replace("class=\"\"", "");
+        if (html.indexOf(" class=\"\"") !== -1 ) {
+            html = html.replace(" class=\"\"", "");
         }
     }
 
@@ -1667,6 +1668,7 @@ function resetInterface(){
 function resetSelectorView(){
     Family.remove();
     Interface.activeSelector = "selector";
+    Interface.selectorCycle.reset();
     HTML.selector.radio.selector.checked = true;
     HTML.selector.parent.holder.style.display = "none";
     HTML.selector.parent.low.value = "";
