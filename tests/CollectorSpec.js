@@ -155,63 +155,6 @@ describe("storage helpers", function(){
     });
 });
 
-describe("html functions", function(){    
-
-    describe("cleanElement", function(){
-        var ele;
-        beforeEach(function(){
-            ele = document.createElement("div");
-        });
-        it("removes query string from src", function(){
-            ele.setAttribute("src", "http://www.example.com/?remove=this")
-            ele = cleanElement(ele);
-            expect(ele.getAttribute("src")).toEqual("http://www.example.com/");
-        });
-        it("removes unwanted classes", function(){
-            ele.classList.add("queryCheck");
-            ele.classList.add("keeper");
-            ele.classList.add("collectHighlight");
-            ele = cleanElement(ele);
-            expect(ele.className).toEqual("keeper");
-        });
-        it("replaces innerHTML with textContent", function(){
-            ele.innerHTML = "<i>italic content</i>";
-            ele = cleanElement(ele);
-            expect(ele.innerHTML).toEqual("italic content");
-        })
-        it("concatenates long innerHTML", function(){
-            ele.innerHTML = "01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789";
-            ele = cleanElement(ele);
-            expect(ele.innerHTML).toEqual("0123456789012345678901234...5678901234567890123456789")
-        });
-        it("strips whitespace from textContent", function(){
-            ele.innerHTML = "this           shouldn't be so\nspread out";
-            ele = cleanElement(ele);
-            expect(ele.innerHTML).toEqual("this shouldn't be so spread out");
-        })
-    });
-
-    describe("attributeText", function(){
-        it("returns proper string representation", function(){
-            var ele = document.createElement("div"),
-                attrText = "class=\"foo bar\"";
-            ele.setAttribute("class", "foo bar");
-            expect(attributeText(ele.attributes[0])).toEqual(attrText);
-        });
-    });
-
-    describe("captureAttribute", function(){
-        it("returns proper string representation", function(){
-            var  html = '<span class="noSelect capture" title="click to capture text property" ' + 
-                'data-capture="text">this is a text</span>';
-            expect(captureAttribute("this is a text", "text").outerHTML).toEqual(html);
-        });
-        it("ignores empty attributes", function(){
-            expect(captureAttribute("class=\"\"")).toBeUndefined();
-        });
-    });
-});
-
 /*
 describe("", function(){
     it("", function(){

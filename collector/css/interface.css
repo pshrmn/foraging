@@ -152,16 +152,6 @@ body {
       .collectjs .rules .ruleGroup h2 {
         text-decoration: underline;
         margin: 10px 0; }
-  .collectjs .ruleHTMLHolder .capture {
-    background: #ddd;
-    padding: 2px;
-    cursor: pointer; }
-  .collectjs .ruleHTMLHolder .selected {
-    background: #bddbce; }
-  .collectjs .ruleHTMLHolder .cycle {
-    margin: 0 5px;
-    padding: 2px 3px;
-    cursor: pointer; }
   .collectjs .items {
     font-size: 16px;
     color: black; }
@@ -170,6 +160,12 @@ body {
       max-width: 75%; }
       .collectjs .items .modifiers > div {
         padding: 10px 0; }
+      .collectjs .items .modifiers .capture {
+        background: #ddd;
+        padding: 2px;
+        cursor: pointer; }
+      .collectjs .items .modifiers .selected {
+        background: #bddbce; }
   .collectjs .selectorGroup {
     display: inline-block;
     white-space: nowrap;

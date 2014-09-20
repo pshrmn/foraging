@@ -76,6 +76,7 @@
             </div>
             <p>
                 <button id="saveSelector">Save</button>
+                <button id="clearSelector">Clear</button>
             </p>
         </div>
         <div class="column">
@@ -91,6 +92,10 @@
                     <label for="ruleName" title="the name of a rule">Name:</label>
                     <input id="ruleName" name="ruleName" type="text" />
                 </div>
+                <div class="rule">
+                    Selector: <span id="ruleSelector"></span>
+                </div>
+
                 <div class="rule">
                     <label title="the attribute of an element to capture">Capture:</label>
                     <span id="ruleAttr"></span>
@@ -110,8 +115,7 @@
                     <input id="editName" name="editName" type="text" />
                 </div>
                 <div class="rule">
-                    <label title="the selector to get the rule in the DOM">Selector:</label>
-                    <span id="editSelector"></span>
+                    Selector: <span id="editSelector"></span>
                 </div>
                 <div class="rule">
                     <label title="the attribute of an element to capture">Capture:</label>
@@ -127,7 +131,7 @@
                 </div>
             </form>
             <div class="modifiers column">
-                <div class="ruleCycleHolder"></div>
+                <div id="ruleCycleHolder"></div>
             </div>
         </div>
     </div>

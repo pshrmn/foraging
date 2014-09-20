@@ -8,7 +8,7 @@ function Group(name, urls){
         "default": new Page("default")
     };
     this.pages["default"].group = this;
-    this.elements = {};
+    this.htmlElements = {};
 }
 
 Group.prototype.object = function(){
@@ -89,7 +89,7 @@ Group.prototype.html = function(){
         pages.appendChild(this.pages[key].html());
     }
 
-    this.elements = {
+    this.htmlElements = {
         holder: holder,
         nametag: nametag,
         pages: pages
@@ -108,9 +108,9 @@ Group.prototype.addPage = function(page){
     this.pages[name] = page;
     page.group = this;
     // if html for group exists, also generate html for page
-    if ( this.elements.holder) {
+    if ( this.htmlElements.holder) {
         var ele = page.html();
-        this.elements.pages.appendChild(ele);
+        this.htmlElements.pages.appendChild(ele);
     }
 };
 
@@ -175,7 +175,7 @@ function Page(name, index, next){
         "default": new SelectorSet("default")
     };
     this.sets["default"].page = this;
-    this.elements = {};
+    this.htmlElements = {};
     // added when a group calls addPage
     this.group;
 }
@@ -247,7 +247,7 @@ Page.prototype.html = function(){
         sets.appendChild(this.sets[key].html());
     }
 
-    this.elements = {
+    this.htmlElements = {
         holder: holder,
         nametag: nametag,
         sets: sets
@@ -268,9 +268,9 @@ Page.prototype.addSet = function(selectorSet){
     this.sets[name] = selectorSet;
     selectorSet.page = this;
     // if html for page exists, also create html for SelectorSet
-    if ( this.elements.holder ) {
+    if ( this.htmlElements.holder ) {
         var ele = selectorSet.html();
-        this.elements.sets.appendChild(ele);
+        this.htmlElements.sets.appendChild(ele);
     }
 };
 
@@ -324,7 +324,7 @@ function SelectorSet(name, parent){
     this.name = name;
     this.parent = parent;
     this.selectors = {};
-    this.elements = {};
+    this.htmlElements = {};
     // added when a page calls addSet
     this.page;
 }
@@ -358,6 +358,11 @@ SelectorSet.prototype.uploadObject = function(){
 
     // use base object created by SelectorSet.object
     var data = this.object();
+
+    for ( var key in this.selectors ) {
+        data.selectors[key] = this.selectors[key].uploadObject();
+    }
+
     data.pages = {};
 
     // only upload low/high if their values are not 0
@@ -383,7 +388,7 @@ SelectorSet.prototype.html = function(){
     nametag.textContent = "Selector Set: " + this.name;
     appendChildren(holder, [nametag, ul]);
 
-    this.elements = {
+    this.htmlElements = {
         holder: holder,
         nametag: nametag,
         selectors: ul
@@ -394,10 +399,11 @@ SelectorSet.prototype.html = function(){
 
 SelectorSet.prototype.deleteHTML = prototypeDeleteHTML;
 
-SelectorSet.prototype.addSelector = function(selector){
+SelectorSet.prototype.addSelector = function(selector, events){
     this.selectors[selector.selector] = selector;
-    if ( this.elements.selectors) {
-        this.elements.selectors.appendChild(selector.html());
+    if ( this.htmlElements.selectors) {
+        var ele = selector.html.apply(selector, events);
+        this.htmlElements.selectors.appendChild(ele);
     }
     selector.set = this;
 };
@@ -441,7 +447,7 @@ SelectorSet.prototype.followedRules = function(){
 function Selector(selector, rules){
     this.selector = selector;
     this.rules = rules || {};
-    this.elements = {};
+    this.htmlElements = {};
 }
 
 Selector.prototype.object = function(){
@@ -480,9 +486,9 @@ Selector.prototype.addRule = function(rule, events){
     }
 
     // if Selector html exists, also create html for rule
-    if ( this.elements.rules ) {
+    if ( this.htmlElements.rules ) {
         var ele = rule.html.apply(rule, events);
-        this.elements.rules.appendChild(ele);
+        this.htmlElements.rules.appendChild(ele);
     }
 };
 
@@ -493,8 +499,8 @@ Selector.prototype.removeRule = function(name){
 Selector.prototype.updateSelector = function(newSelector){
     var oldSelector = this.selector;
     this.selector = newSelector;
-    if ( this.elements.nametag ) {
-        this.elements.nametag.textContent = newSelector;
+    if ( this.htmlElements.nametag ) {
+        this.htmlElements.nametag.textContent = newSelector;
     }
 
     if ( this.set ) {
@@ -503,17 +509,25 @@ Selector.prototype.updateSelector = function(newSelector){
     }
 };
 
-Selector.prototype.html = function(){
+Selector.prototype.html = function(newRuleEvent, deleteEvent){
     var holder = noSelectElement("li"),
         nametag = noSelectElement("span"),
+        newRule = noSelectElement("button"),
+        remove = noSelectElement("button"),
         rules = noSelectElement("ul");
 
-    holder.classList.add("savedSelector");
+    holder.classList.add("selector");
     nametag.textContent = this.selector;
 
-    appendChildren(holder, [nametag, rules]);
+    newRule.textContent = "Add Rule";
+    remove.textContent = "×";
 
-    this.elements = {
+    newRule.addEventListener("click", newRuleEvent.bind(this), false);
+    remove.addEventListener("click", deleteEvent.bind(this), false);
+
+    appendChildren(holder, [nametag, newRule, remove, rules]);
+
+    this.htmlElements = {
         holder: holder,
         nametag: nametag,
         rules: rules
@@ -543,7 +557,7 @@ function Rule(name, capture, multiple, follow){
     this.capture = capture;
     this.multiple = multiple || false;
     this.follow = follow || false;
-    this.elements = {};
+    this.htmlElements = {};
     // added when a SelectorSet calls addRule
     this.selector;
 }
@@ -590,7 +604,7 @@ Rule.prototype.html = function(selectorViewEvent, unselectorViewEvent, editEvent
     preview.addEventListener("click", previewEvent.bind(this), false);
     deltog.addEventListener("click", deleteEvent.bind(this), false);
     
-    this.elements = {
+    this.htmlElements = {
         holder: holder,
         nametag: nametag,
         edit: edit,
@@ -609,8 +623,8 @@ Rule.prototype.update = function(object){
     if ( oldName !== newName ) {
         this.name = newName;
         // update nametag if html has been generated
-        if ( this.elements.holder ) {
-            this.elements.nametag.textContent = newName;
+        if ( this.htmlElements.holder ) {
+            this.htmlElements.nametag.textContent = newName;
         }
         if ( this.selector ) {
             this.selector.rules[newName] = this;
@@ -642,7 +656,7 @@ Rule.prototype.remove = function(){
 
 // shared delete function
 function prototypeDeleteHTML(){
-    var holder = this.elements.holder;
+    var holder = this.htmlElements.holder;
     if ( holder ) {
         holder.parentElement.removeChild(holder);
     }

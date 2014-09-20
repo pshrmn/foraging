@@ -43,7 +43,8 @@ var Collect = {
     current: {
         group: undefined,
         page: undefined,
-        set: undefined
+        set: undefined,
+        selector: undefined
     },
     // parent.selector is set when Collect.current.set index=true
     parent: {},
@@ -148,7 +149,8 @@ var HTML = {
             name: document.getElementById("ruleName"),
             capture: document.getElementById("ruleAttr"),
             follow: document.getElementById("ruleFollow"),
-            followHolder: document.querySelector("#ruleItems .follow")
+            followHolder: document.querySelector("#ruleItems .follow"),
+            selector: document.getElementById("ruleSelector")
         },
         edit: {
             form: document.getElementById("editForm"),
@@ -164,6 +166,8 @@ var HTML = {
         group: {
             select: document.getElementById("groupSelect"),
             holder: document.getElementById("groupHolder"),
+            index: document.getElementById("indexMarker"),
+            indexToggle: document.getElementById("indexToggle")
         },
         page: {
             select: document.getElementById("pageSelect"),
@@ -183,8 +187,6 @@ var HTML = {
     },
     info: {
         alert: document.getElementById("collectAlert"),
-        index: document.getElementById("indexMarker"),
-        indexToggle: document.getElementById("indexToggle"),
     },
     interface: document.querySelector(".collectjs"),
     // elements in the preview view
@@ -217,13 +219,10 @@ var Family = {
             HTML.rule.edit.name.value = Interface.editing.name;
         }
         
-        //redo
-        var selectorElement = HTML.selector.selector;
-
         var sf = new SelectorFamily(this,
             Collect.parent.selector,
             HTML.selector.family,
-            selectorElement,
+            HTML.selector.selector,
             Family.test.bind(Family),
             Collect.options
         );
@@ -238,7 +237,7 @@ var Family = {
         }
         var sf = new SelectorFamily(eles[0],
             Collect.parent.selector,
-            HTML.family,
+            HTML.selector.family,
             HTML.selector.selector,
             Family.test.bind(Family),
             Collect.options
@@ -260,7 +259,7 @@ var Family = {
         if ( element ) {
             var sf = new SelectorFamily(element,
                 Collect.parent.selector,
-                HTML.family,
+                HTML.selector.family,
                 HTML.selector.selector,
                 Family.test.bind(Family),
                 Collect.options
@@ -324,19 +323,25 @@ var Family = {
 
 Interface.setup();
 
-
 function resetInterface(){
     clearClass("queryCheck");
     clearClass("collectHighlight");
     clearClass("savedPreview");
+    resetSelectorView();
     resetRulesView();
     resetPreviewView();
 }
 
 function resetSelectorView(){
     Family.remove();
+
+    clearClass("queryCheck");
+    clearClass("collectHighlight");
+    clearClass("savedPreview");
+
     Interface.activeSelector = "selector";
     Interface.selectorCycle.reset();
+
     HTML.selector.radio.selector.checked = true;
     HTML.selector.parent.holder.style.display = "none";
     HTML.selector.parent.low.value = "";
@@ -408,6 +413,7 @@ function setupRulesTab() {
 
 function selectorViewEvents(){
     idEvent("saveSelector", "click", saveSelectorEvent);
+    idEvent("clearSelector", "click", clearSelectorEvent);
     idEvent("selectorRadio", "change", updateRadioEvent);
     idEvent("parentRadio", "change", updateRadioEvent);
     idEvent("nextRadio", "change", updateRadioEvent);
@@ -534,8 +540,9 @@ function cancelEditEvent(event){
 function verifyAndApplyParentLow(event){
     var low = parseInt(HTML.selector.parent.low.value, 10),
         high = parseInt(HTML.selector.parent.high.value, 10) || 0;
-
-    if ( isNaN(low) || low <= 0 ) {
+    if ( HTML.selector.parent.low.value === "" ) {
+        low = 0;
+    } else if ( isNaN(low) || low <= 0 ) {
         HTML.selector.parent.low.value = "";
         alertMessage("Low must be positive integer greater than 0");
         return;
@@ -552,7 +559,9 @@ function verifyAndApplyParentHigh(event){
     var low = parseInt(HTML.selector.parent.low.value, 10) || 0,
         high = parseInt(HTML.selector.parent.high.value, 10);
 
-    if ( isNaN(high) || high > 0 ) {
+    if ( HTML.selector.parent.high.value === "" ) {
+        high = 0;
+    } else if ( isNaN(high) || high > 0 ) {
         HTML.selector.parent.high.value = "";
         alertMessage("High must be a negative integer");
         return;
@@ -636,7 +645,7 @@ function saveSelector(selector){
         group = Collect.current.group,
         page = Collect.current.page,
         set = Collect.current.set;
-    Collect.group.pages[page].sets[set].addSelector(sel);
+    Collect.group.pages[page].sets[set].addSelector(sel, [newRuleEvent, removeSelectorEvent]);
     saveGroup();
 }
 
@@ -663,7 +672,6 @@ function saveParent(selector){
     // attach the parent to the current set and save
     Collect.group.pages[Collect.current.page].sets[Collect.current.set].parent = parent;
     saveGroup();
-    //test
     refreshElements();
 }
 
@@ -695,14 +703,36 @@ function saveNext(selector){
     refreshElements();
 }
 
+function clearSelectorEvent(event){
+    event.preventDefault();
+    resetSelectorView();
+}
+
 function updateRadioEvent(event){
     Interface.activeSelector = this.value;
     HTML.selector.parent.holder.style.display = (Interface.activeSelector === "parent") ? "block": "none";
 }
 
+function removeSelectorEvent(event){
+    event.preventDefault();
+    this.remove();
+}
+
 /******************
     RULE EVENTS
 ******************/
+function newRuleEvent(event){
+    event.preventDefault();
+    Collect.current.selector = this.selector;
+    HTML.rule.rule.selector.textContent  = this.selector;
+
+    // generate selector family from selector
+    var sf = Family.fromSelector(this.selector);
+    Family.match();
+    showTab(HTML.tabs.rule);
+    Interface.ruleCycle.setElements(Collect.matchedElements);
+}
+
 function saveRuleEvent(event){
     event.preventDefault();
     var name = HTML.rule.rule.name.value,
@@ -735,7 +765,7 @@ function saveRuleEvent(event){
         HTML.perm.page.select.appendChild(newOption(rule.name));
     }
     var curr = Collect.current;
-    var selector = Collect.group.pages[curr.page].sets[curr.set].selector[curr.selector];
+    var selector = Collect.group.pages[curr.page].sets[curr.set].selectors[curr.selector];
     addRule(rule, selector);
     saveGroup();
     resetInterface();
@@ -764,9 +794,8 @@ function saveEditEvent(event){
         rule.follow = true;
     }
     var oldName = Interface.editing.name,
-        set = Interface.editing.set;
+        set = Interface.editing.selector.set;
     Interface.editing.update(rule);
-    Collect.group.pages[set.page.name].sets[set.name] = set;
     saveGroup();
 
     deleteEditing();
@@ -817,7 +846,7 @@ function toggleURLEvent(event){
 function selectorViewRule(event){
     clearClass("queryCheck");
     clearClass("collectHighlight");
-    var elements = parentElements(this.selector);
+    var elements = parentElements(this.selector.selector);
     addClass("savedPreview", elements);
 }
 
@@ -829,11 +858,11 @@ function editSavedRule(event){
     deleteEditing();
 
     Interface.editing = this;
-    Family.edit(this.selector);
+    Family.edit(this.selector.selector);
 
     // setup the form
     HTML.rule.edit.name.value = this.name;
-    HTML.rule.edit.selector.textContent = this.selector;
+    HTML.rule.edit.selector.textContent = this.selector.selector;
     HTML.rule.edit.capture.textContent = this.capture;
     if ( this.follow ) {
         HTML.rule.edit.follow.checked = this.follow;
@@ -847,10 +876,10 @@ function editSavedRule(event){
 
 function previewSavedRule(event){
     HTML.preview.name.textContent = this.name;
-    HTML.preview.selector.textContent = this.selector;
+    HTML.preview.selector.textContent = this.selector.selector;
     HTML.preview.capture.textContent = this.capture;
     //HTML.preview.contents;
-    var elements = parentElements(this.selector);
+    var elements = parentElements(this.selector.selector);
     generatePreviewElements(this.capture, elements);
     showTab(HTML.tabs.preview);
 }
@@ -1110,7 +1139,6 @@ function uploadGroup(){
         group: Collect.group.uploadObject(),
         site: window.location.host
     };
-
     chrome.runtime.sendMessage({type: 'upload', data: data});
 }
 
@@ -1411,7 +1439,7 @@ function loadGroupObject(group){
     HTML.perm.group.select.querySelector("option[value=" + group.name + "]").selected = true;
 
     var url = window.location.href;
-    HTML.info.indexToggle.checked = group.urls[url] !== undefined;
+    HTML.perm.group.indexToggle.checked = group.urls[url] !== undefined;
 
     // clear out current options and populate with current group's pages
     HTML.perm.page.select.innerHTML = "";
@@ -1441,7 +1469,7 @@ function loadGroupObject(group){
             for ( selectorName in set.selectors ) {
                 selector = set.selectors[selectorName];
                 selectorObject = new Selector(selector.selector);
-                setObject.addSelector(selectorObject);
+                setObject.addSelector(selectorObject, [newRuleEvent, removeSelectorEvent]);
                 for ( ruleName in selector.rules ) {
                     rule = selector.rules[ruleName];
                     addRule(rule, selectorObject);
@@ -1455,7 +1483,7 @@ function loadGroupObject(group){
 function loadPageObject(page){
     Collect.current.page = page.name;
     if ( page.name === "default" ) {
-        HTML.info.index.style.display = "inline-block";
+        HTML.perm.group.index.style.display = "inline-block";
         HTML.perm.next.holder.style.display = "inline-block";
         // handle whether or not next has already been set
         if ( page.next ) {
@@ -1466,7 +1494,7 @@ function loadPageObject(page){
             HTML.perm.next.selector.textContent = "";
         }
     } else {
-        HTML.info.index.style.display = "none";
+        HTML.perm.group.index.style.display = "none";
         HTML.perm.next.holder.style.display = "none";
     }
 

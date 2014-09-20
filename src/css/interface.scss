@@ -245,24 +245,6 @@ body{
         }
     }
 
-    .ruleHTMLHolder{    
-        .capture{
-            background: #ddd;
-            padding: 2px;
-            cursor: pointer; 
-        }
-
-        .selected{
-            background: $light-green;
-        }
-
-        .cycle {
-            margin: 0 5px;
-            padding: 2px 3px;
-            cursor: pointer;
-        }
-    }
-
     .items{
         font-size: 16px;
         color: $black;
@@ -273,6 +255,17 @@ body{
             > div{
                 padding: 10px 0;
             }
+
+            .capture{
+                background: #ddd;
+                padding: 2px;
+                cursor: pointer; 
+            }
+
+            .selected{
+                background: $light-green;
+            }
+
         }
 
     }

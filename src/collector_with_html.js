@@ -5,7 +5,7 @@ var marginBottom;
 (function addInterface(){
     var div = noSelectElement("div");
     div.classList.add("collectjs");
-    div.innerHTML = "<div class=\"tabHolder\"><div class=\"tabs\"><div class=\"tab active\" id=\"selectorTab\" data-for=\"selectorView\">Selector</div><div class=\"tab\" id=\"ruleTab\" data-for=\"ruleView\">Rule</div><div class=\"tab\" id=\"groupsTab\" data-for=\"groupsView\">Current Group</div><div class=\"tab\" id=\"previewTab\" data-for=\"previewView\">Preview</div><div class=\"tab\" id=\"optionsTab\" data-for=\"optionsView\">Options</div><div class=\"tab\" id=\"refreshCollect\">&#8635;</div><div class=\"tab\" id=\"closeCollect\">&times;</div></div></div><div class=\"permanent\"><div class=\"currentInfo\"><div>Group: <select id=\"groupSelect\"></select><button id=\"createGroup\" title=\"create a new group\">+</button><button id=\"deleteGroup\" title=\"delete current group\">&times;</button><div id=\"indexMarker\" class=\"info\">Initial URL<input type=\"checkbox\" id=\"indexToggle\" /></div><div id=\"nextHolder\" class=\"info\">Next:<span id=\"nextSelectorView\"></span><button id=\"removeNext\">&times;</button></div></div><div>Page: <select id=\"pageSelect\"></select><button id=\"deletePage\" title=\"delete current page\">&times;</button></div><div>Selector Set: <select id=\"selectorSetSelect\"></select><button id=\"createSelectorSet\" title=\"create a new selector set\">+</button><button id=\"deleteSelectorSet\" title=\"delete current selector set\">&times;</button><div id=\"currentParent\" class=\"info\">Parent<span id=\"parentSelectorView\"></span><span id=\"parentRangeView\"></span><button id=\"removeParent\">&times;</button></div></div><button id=\"uploadRules\">Upload Group</button></div><div id=\"collectAlert\"></div></div><div class=\"views\"><div class=\"view\" id=\"emptyView\"></div><div class=\"view active\" id=\"selectorView\"><div class=\"column\"><!--displays what the current selector is--><p>Selector: <span id=\"currentSelector\"></span></p><p>Count: <span id=\"currentCount\"></span></p><div><label>Selector <input type=\"radio\" id=\"selectorRadio\" name=\"selector\" value=\"selector\" checked/></label><label>Parent <input type=\"radio\" id=\"parentRadio\" name=\"selector\" value=\"parent\" /></label><label>Next <input type=\"radio\" id=\"nextRadio\" name=\"selector\" value=\"next\" /></label></div><div id=\"parentRange\"><label>Low: <input id=\"parentLow\" name=\"parentLow\" type=\"text\" /></label><label for=\"parentHigh\">High: <input id=\"parentHigh\" name=\"parentHigh\" type=\"text\" /></label></div><p><button id=\"saveSelector\">Save</button></p></div><div class=\"column\"><!--holds the interactive element for choosing a selector--><div id=\"selectorHolder\"></div><div id=\"selectorCycleHolder\"></div></div></div><div class=\"view\" id=\"ruleView\"><div id=\"ruleItems\" class=\"items\"><form id=\"ruleForm\" class=\"column\"><div class=\"rule\"><label for=\"ruleName\" title=\"the name of a rule\">Name:</label><input id=\"ruleName\" name=\"ruleName\" type=\"text\" /></div><div class=\"rule\"><label title=\"the attribute of an element to capture\">Capture:</label><span id=\"ruleAttr\"></span></div><div class=\"rule follow\"><label for=\"ruleFollow\" title=\"create a new page from the element's captured url (capture must be attr-href)\">Follow:</label><input id=\"ruleFollow\" name=\"ruleFollow\" type=\"checkbox\" disabled=\"true\" title=\"Can only follow rules that get href attribute from links\" /></div><div><button id=\"saveRule\">Save Rule</button><button id=\"cancelRule\">Cancel</button></div></form><form id=\"editForm\" class=\"column\"><div class=\"rule\"><label for=\"ruleName\" title=\"the name of a rule\">Name:</label><input id=\"editName\" name=\"editName\" type=\"text\" /></div><div class=\"rule\"><label title=\"the selector to get the rule in the DOM\">Selector:</label><span id=\"editSelector\"></span></div><div class=\"rule\"><label title=\"the attribute of an element to capture\">Capture:</label><span id=\"editAttr\"></span></div><div class=\"rule editFollow\"><label for=\"editFollow\" title=\"create a new page from the element's captured url (capture must be attr-href)\">Follow:</label><input id=\"editFollow\" name=\"editFollow\" type=\"checkbox\" disabled=\"true\" title=\"Can only follow rules that get href attribute from links\" /></div><div><button id=\"saveEdit\">Save Edited Rule</button><button id=\"cancelEdit\">Cancel</button></div></form><div class=\"modifiers column\"><div class=\"ruleCycleHolder\"></div></div></div></div><div class=\"view\" id=\"groupsView\"><div id=\"groupHolder\" class=\"rules\"></div></div><div class=\"view\" id=\"previewView\"><p>Name: <span id=\"previewName\" class=\"name\"></span>Selector: <span id=\"previewSelector\" class=\"name\"></span>Capture: <span id=\"previewCapture\" class=\"name\"></span><button id=\"previewClear\">Clear</button></p><div id=\"previewContents\"></div></div><div class=\"view\" id=\"optionsView\"><p><label for=\"ignore\">Ignore helper elements (eg tbody)</label><input type=\"checkbox\" id=\"ignore\" /></p></div></div>";
+    div.innerHTML = "<div class=\"tabHolder\"><div class=\"tabs\"><div class=\"tab active\" id=\"selectorTab\" data-for=\"selectorView\">Selector</div><div class=\"tab\" id=\"ruleTab\" data-for=\"ruleView\">Rule</div><div class=\"tab\" id=\"groupsTab\" data-for=\"groupsView\">Current Group</div><div class=\"tab\" id=\"previewTab\" data-for=\"previewView\">Preview</div><div class=\"tab\" id=\"optionsTab\" data-for=\"optionsView\">Options</div><div class=\"tab\" id=\"refreshCollect\">&#8635;</div><div class=\"tab\" id=\"closeCollect\">&times;</div></div></div><div class=\"permanent\"><div class=\"currentInfo\"><div>Group: <select id=\"groupSelect\"></select><button id=\"createGroup\" title=\"create a new group\">+</button><button id=\"deleteGroup\" title=\"delete current group\">&times;</button><div id=\"indexMarker\" class=\"info\">Initial URL<input type=\"checkbox\" id=\"indexToggle\" /></div><div id=\"nextHolder\" class=\"info\">Next:<span id=\"nextSelectorView\"></span><button id=\"removeNext\">&times;</button></div></div><div>Page: <select id=\"pageSelect\"></select><button id=\"deletePage\" title=\"delete current page\">&times;</button></div><div>Selector Set: <select id=\"selectorSetSelect\"></select><button id=\"createSelectorSet\" title=\"create a new selector set\">+</button><button id=\"deleteSelectorSet\" title=\"delete current selector set\">&times;</button><div id=\"currentParent\" class=\"info\">Parent<span id=\"parentSelectorView\"></span><span id=\"parentRangeView\"></span><button id=\"removeParent\">&times;</button></div></div><button id=\"uploadRules\">Upload Group</button></div><div id=\"collectAlert\"></div></div><div class=\"views\"><div class=\"view\" id=\"emptyView\"></div><div class=\"view active\" id=\"selectorView\"><div class=\"column\"><!--displays what the current selector is--><p>Selector: <span id=\"currentSelector\"></span></p><p>Count: <span id=\"currentCount\"></span></p><div><label>Selector <input type=\"radio\" id=\"selectorRadio\" name=\"selector\" value=\"selector\" checked/></label><label>Parent <input type=\"radio\" id=\"parentRadio\" name=\"selector\" value=\"parent\" /></label><label>Next <input type=\"radio\" id=\"nextRadio\" name=\"selector\" value=\"next\" /></label></div><div id=\"parentRange\"><label>Low: <input id=\"parentLow\" name=\"parentLow\" type=\"text\" /></label><label for=\"parentHigh\">High: <input id=\"parentHigh\" name=\"parentHigh\" type=\"text\" /></label></div><p><button id=\"saveSelector\">Save</button><button id=\"clearSelector\">Clear</button></p></div><div class=\"column\"><!--holds the interactive element for choosing a selector--><div id=\"selectorHolder\"></div><div id=\"selectorCycleHolder\"></div></div></div><div class=\"view\" id=\"ruleView\"><div id=\"ruleItems\" class=\"items\"><form id=\"ruleForm\" class=\"column\"><div class=\"rule\"><label for=\"ruleName\" title=\"the name of a rule\">Name:</label><input id=\"ruleName\" name=\"ruleName\" type=\"text\" /></div><div class=\"rule\">Selector: <span id=\"ruleSelector\"></span></div><div class=\"rule\"><label title=\"the attribute of an element to capture\">Capture:</label><span id=\"ruleAttr\"></span></div><div class=\"rule follow\"><label for=\"ruleFollow\" title=\"create a new page from the element's captured url (capture must be attr-href)\">Follow:</label><input id=\"ruleFollow\" name=\"ruleFollow\" type=\"checkbox\" disabled=\"true\" title=\"Can only follow rules that get href attribute from links\" /></div><div><button id=\"saveRule\">Save Rule</button><button id=\"cancelRule\">Cancel</button></div></form><form id=\"editForm\" class=\"column\"><div class=\"rule\"><label for=\"ruleName\" title=\"the name of a rule\">Name:</label><input id=\"editName\" name=\"editName\" type=\"text\" /></div><div class=\"rule\">Selector: <span id=\"editSelector\"></span></div><div class=\"rule\"><label title=\"the attribute of an element to capture\">Capture:</label><span id=\"editAttr\"></span></div><div class=\"rule editFollow\"><label for=\"editFollow\" title=\"create a new page from the element's captured url (capture must be attr-href)\">Follow:</label><input id=\"editFollow\" name=\"editFollow\" type=\"checkbox\" disabled=\"true\" title=\"Can only follow rules that get href attribute from links\" /></div><div><button id=\"saveEdit\">Save Edited Rule</button><button id=\"cancelEdit\">Cancel</button></div></form><div class=\"modifiers column\"><div id=\"ruleCycleHolder\"></div></div></div></div><div class=\"view\" id=\"groupsView\"><div id=\"groupHolder\" class=\"rules\"></div></div><div class=\"view\" id=\"previewView\"><p>Name: <span id=\"previewName\" class=\"name\"></span>Selector: <span id=\"previewSelector\" class=\"name\"></span>Capture: <span id=\"previewCapture\" class=\"name\"></span><button id=\"previewClear\">Clear</button></p><div id=\"previewContents\"></div></div><div class=\"view\" id=\"optionsView\"><p><label for=\"ignore\">Ignore helper elements (eg tbody)</label><input type=\"checkbox\" id=\"ignore\" /></p></div></div>";
     document.body.appendChild(div);
     addNoSelect(div.querySelectorAll("*"));
 
@@ -43,7 +43,8 @@ var Collect = {
     current: {
         group: undefined,
         page: undefined,
-        set: undefined
+        set: undefined,
+        selector: undefined
     },
     // parent.selector is set when Collect.current.set index=true
     parent: {},
@@ -148,7 +149,8 @@ var HTML = {
             name: document.getElementById("ruleName"),
             capture: document.getElementById("ruleAttr"),
             follow: document.getElementById("ruleFollow"),
-            followHolder: document.querySelector("#ruleItems .follow")
+            followHolder: document.querySelector("#ruleItems .follow"),
+            selector: document.getElementById("ruleSelector")
         },
         edit: {
             form: document.getElementById("editForm"),
@@ -164,6 +166,8 @@ var HTML = {
         group: {
             select: document.getElementById("groupSelect"),
             holder: document.getElementById("groupHolder"),
+            index: document.getElementById("indexMarker"),
+            indexToggle: document.getElementById("indexToggle")
         },
         page: {
             select: document.getElementById("pageSelect"),
@@ -183,8 +187,6 @@ var HTML = {
     },
     info: {
         alert: document.getElementById("collectAlert"),
-        index: document.getElementById("indexMarker"),
-        indexToggle: document.getElementById("indexToggle"),
     },
     interface: document.querySelector(".collectjs"),
     // elements in the preview view
@@ -217,13 +219,10 @@ var Family = {
             HTML.rule.edit.name.value = Interface.editing.name;
         }
         
-        //redo
-        var selectorElement = HTML.selector.selector;
-
         var sf = new SelectorFamily(this,
             Collect.parent.selector,
             HTML.selector.family,
-            selectorElement,
+            HTML.selector.selector,
             Family.test.bind(Family),
             Collect.options
         );
@@ -238,7 +237,7 @@ var Family = {
         }
         var sf = new SelectorFamily(eles[0],
             Collect.parent.selector,
-            HTML.family,
+            HTML.selector.family,
             HTML.selector.selector,
             Family.test.bind(Family),
             Collect.options
@@ -260,7 +259,7 @@ var Family = {
         if ( element ) {
             var sf = new SelectorFamily(element,
                 Collect.parent.selector,
-                HTML.family,
+                HTML.selector.family,
                 HTML.selector.selector,
                 Family.test.bind(Family),
                 Collect.options
@@ -324,19 +323,25 @@ var Family = {
 
 Interface.setup();
 
-
 function resetInterface(){
     clearClass("queryCheck");
     clearClass("collectHighlight");
     clearClass("savedPreview");
+    resetSelectorView();
     resetRulesView();
     resetPreviewView();
 }
 
 function resetSelectorView(){
     Family.remove();
+
+    clearClass("queryCheck");
+    clearClass("collectHighlight");
+    clearClass("savedPreview");
+
     Interface.activeSelector = "selector";
     Interface.selectorCycle.reset();
+
     HTML.selector.radio.selector.checked = true;
     HTML.selector.parent.holder.style.display = "none";
     HTML.selector.parent.low.value = "";
@@ -408,6 +413,7 @@ function setupRulesTab() {
 
 function selectorViewEvents(){
     idEvent("saveSelector", "click", saveSelectorEvent);
+    idEvent("clearSelector", "click", clearSelectorEvent);
     idEvent("selectorRadio", "change", updateRadioEvent);
     idEvent("parentRadio", "change", updateRadioEvent);
     idEvent("nextRadio", "change", updateRadioEvent);
@@ -534,8 +540,9 @@ function cancelEditEvent(event){
 function verifyAndApplyParentLow(event){
     var low = parseInt(HTML.selector.parent.low.value, 10),
         high = parseInt(HTML.selector.parent.high.value, 10) || 0;
-
-    if ( isNaN(low) || low <= 0 ) {
+    if ( HTML.selector.parent.low.value === "" ) {
+        low = 0;
+    } else if ( isNaN(low) || low <= 0 ) {
         HTML.selector.parent.low.value = "";
         alertMessage("Low must be positive integer greater than 0");
         return;
@@ -552,7 +559,9 @@ function verifyAndApplyParentHigh(event){
     var low = parseInt(HTML.selector.parent.low.value, 10) || 0,
         high = parseInt(HTML.selector.parent.high.value, 10);
 
-    if ( isNaN(high) || high > 0 ) {
+    if ( HTML.selector.parent.high.value === "" ) {
+        high = 0;
+    } else if ( isNaN(high) || high > 0 ) {
         HTML.selector.parent.high.value = "";
         alertMessage("High must be a negative integer");
         return;
@@ -636,7 +645,7 @@ function saveSelector(selector){
         group = Collect.current.group,
         page = Collect.current.page,
         set = Collect.current.set;
-    Collect.group.pages[page].sets[set].addSelector(sel);
+    Collect.group.pages[page].sets[set].addSelector(sel, [newRuleEvent, removeSelectorEvent]);
     saveGroup();
 }
 
@@ -663,7 +672,6 @@ function saveParent(selector){
     // attach the parent to the current set and save
     Collect.group.pages[Collect.current.page].sets[Collect.current.set].parent = parent;
     saveGroup();
-    //test
     refreshElements();
 }
 
@@ -695,14 +703,36 @@ function saveNext(selector){
     refreshElements();
 }
 
+function clearSelectorEvent(event){
+    event.preventDefault();
+    resetSelectorView();
+}
+
 function updateRadioEvent(event){
     Interface.activeSelector = this.value;
     HTML.selector.parent.holder.style.display = (Interface.activeSelector === "parent") ? "block": "none";
 }
 
+function removeSelectorEvent(event){
+    event.preventDefault();
+    this.remove();
+}
+
 /******************
     RULE EVENTS
 ******************/
+function newRuleEvent(event){
+    event.preventDefault();
+    Collect.current.selector = this.selector;
+    HTML.rule.rule.selector.textContent  = this.selector;
+
+    // generate selector family from selector
+    var sf = Family.fromSelector(this.selector);
+    Family.match();
+    showTab(HTML.tabs.rule);
+    Interface.ruleCycle.setElements(Collect.matchedElements);
+}
+
 function saveRuleEvent(event){
     event.preventDefault();
     var name = HTML.rule.rule.name.value,
@@ -735,7 +765,7 @@ function saveRuleEvent(event){
         HTML.perm.page.select.appendChild(newOption(rule.name));
     }
     var curr = Collect.current;
-    var selector = Collect.group.pages[curr.page].sets[curr.set].selector[curr.selector];
+    var selector = Collect.group.pages[curr.page].sets[curr.set].selectors[curr.selector];
     addRule(rule, selector);
     saveGroup();
     resetInterface();
@@ -764,9 +794,8 @@ function saveEditEvent(event){
         rule.follow = true;
     }
     var oldName = Interface.editing.name,
-        set = Interface.editing.set;
+        set = Interface.editing.selector.set;
     Interface.editing.update(rule);
-    Collect.group.pages[set.page.name].sets[set.name] = set;
     saveGroup();
 
     deleteEditing();
@@ -817,7 +846,7 @@ function toggleURLEvent(event){
 function selectorViewRule(event){
     clearClass("queryCheck");
     clearClass("collectHighlight");
-    var elements = parentElements(this.selector);
+    var elements = parentElements(this.selector.selector);
     addClass("savedPreview", elements);
 }
 
@@ -829,11 +858,11 @@ function editSavedRule(event){
     deleteEditing();
 
     Interface.editing = this;
-    Family.edit(this.selector);
+    Family.edit(this.selector.selector);
 
     // setup the form
     HTML.rule.edit.name.value = this.name;
-    HTML.rule.edit.selector.textContent = this.selector;
+    HTML.rule.edit.selector.textContent = this.selector.selector;
     HTML.rule.edit.capture.textContent = this.capture;
     if ( this.follow ) {
         HTML.rule.edit.follow.checked = this.follow;
@@ -847,10 +876,10 @@ function editSavedRule(event){
 
 function previewSavedRule(event){
     HTML.preview.name.textContent = this.name;
-    HTML.preview.selector.textContent = this.selector;
+    HTML.preview.selector.textContent = this.selector.selector;
     HTML.preview.capture.textContent = this.capture;
     //HTML.preview.contents;
-    var elements = parentElements(this.selector);
+    var elements = parentElements(this.selector.selector);
     generatePreviewElements(this.capture, elements);
     showTab(HTML.tabs.preview);
 }
@@ -1110,7 +1139,6 @@ function uploadGroup(){
         group: Collect.group.uploadObject(),
         site: window.location.host
     };
-
     chrome.runtime.sendMessage({type: 'upload', data: data});
 }
 
@@ -1411,7 +1439,7 @@ function loadGroupObject(group){
     HTML.perm.group.select.querySelector("option[value=" + group.name + "]").selected = true;
 
     var url = window.location.href;
-    HTML.info.indexToggle.checked = group.urls[url] !== undefined;
+    HTML.perm.group.indexToggle.checked = group.urls[url] !== undefined;
 
     // clear out current options and populate with current group's pages
     HTML.perm.page.select.innerHTML = "";
@@ -1441,7 +1469,7 @@ function loadGroupObject(group){
             for ( selectorName in set.selectors ) {
                 selector = set.selectors[selectorName];
                 selectorObject = new Selector(selector.selector);
-                setObject.addSelector(selectorObject);
+                setObject.addSelector(selectorObject, [newRuleEvent, removeSelectorEvent]);
                 for ( ruleName in selector.rules ) {
                     rule = selector.rules[ruleName];
                     addRule(rule, selectorObject);
@@ -1455,7 +1483,7 @@ function loadGroupObject(group){
 function loadPageObject(page){
     Collect.current.page = page.name;
     if ( page.name === "default" ) {
-        HTML.info.index.style.display = "inline-block";
+        HTML.perm.group.index.style.display = "inline-block";
         HTML.perm.next.holder.style.display = "inline-block";
         // handle whether or not next has already been set
         if ( page.next ) {
@@ -1466,7 +1494,7 @@ function loadPageObject(page){
             HTML.perm.next.selector.textContent = "";
         }
     } else {
-        HTML.info.index.style.display = "none";
+        HTML.perm.group.index.style.display = "none";
         HTML.perm.next.holder.style.display = "none";
     }
 

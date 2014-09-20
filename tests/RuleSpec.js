@@ -132,8 +132,8 @@ describe("Group", function(){
             var g = new Group("Colts");
             var ele = g.html();
             expect(ele.tagName).toEqual("DIV");
-            expect(g.elements.pages.tagName).toEqual("UL");
-            expect(g.elements.nametag.textContent).toEqual("Group: Colts");
+            expect(g.htmlElements.pages.tagName).toEqual("UL");
+            expect(g.htmlElements.nametag.textContent).toEqual("Group: Colts");
         });
     });
 
@@ -153,8 +153,8 @@ describe("Group", function(){
                 p = new Page("wins");
             g.html();
             g.addPage(p);
-            expect(g.elements.holder).toBeDefined();
-            expect(p.elements.holder).toBeDefined();
+            expect(g.htmlElements.holder).toBeDefined();
+            expect(p.htmlElements.holder).toBeDefined();
         })
     });
 
@@ -373,8 +373,8 @@ describe("Page", function(){
             var p = new Page("Thunder"),
                 ele = p.html();
             expect(ele.tagName).toEqual("LI");
-            expect(p.elements.sets.tagName).toEqual("UL");
-            expect(p.elements.nametag.textContent).toEqual("Page: Thunder");
+            expect(p.htmlElements.sets.tagName).toEqual("UL");
+            expect(p.htmlElements.nametag.textContent).toEqual("Page: Thunder");
         });
     });
 
@@ -449,8 +449,8 @@ describe("SelectorSet", function(){
             var s1 = new SelectorSet("Cardinals"),
                 ele = s1.html();
             expect(ele.tagName).toEqual("LI");
-            expect(s1.elements.selectors.tagName).toEqual("UL");
-            expect(s1.elements.nametag.textContent).toEqual("Selector Set: Cardinals");
+            expect(s1.htmlElements.selectors.tagName).toEqual("UL");
+            expect(s1.htmlElements.nametag.textContent).toEqual("Selector Set: Cardinals");
         });
     });
 
@@ -598,10 +598,11 @@ describe("Selector", function(){
 
     describe("html", function(){
         it("generates an html element representing a selector", function(){
-            var sel = new Selector(".foo");
-            var holder = sel.html();
+            var sel = new Selector(".foo"),
+                fakeEvent = function(){},
+                holder = sel.html(fakeEvent, fakeEvent);
             expect(holder.tagName).toEqual("LI");
-            expect(sel.elements.nametag.textContent).toEqual(".foo");
+            expect(sel.htmlElements.nametag.textContent).toEqual(".foo");
         });
     });
 });
@@ -647,11 +648,11 @@ describe("Rule", function(){
     describe("html", function(){
         it("generates a html element representing a Rule", function(){
             // blank function since we don't care about events in this test
-            var sE = usE = eE = pE = dE = function(){};
-            var r1 = new Rule("seasons", "attr-href"),
-                ele = r1.html(sE, usE, eE, pE, dE);
+            var fakeEvent = function(){},
+                r1 = new Rule("seasons", "attr-href"),
+                ele = r1.html(fakeEvent, fakeEvent, fakeEvent, fakeEvent, fakeEvent);
             expect(ele.tagName).toEqual("LI");
-            expect(r1.elements.nametag.textContent).toEqual(r1.name);
+            expect(r1.htmlElements.nametag.textContent).toEqual(r1.name);
         });
     });
 

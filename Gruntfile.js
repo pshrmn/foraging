@@ -49,7 +49,7 @@ module.exports = function(grunt){
                 src: 'src/collector_with_html.js',
                 options: {
                     specs: 'tests/CollectorSpec.js',
-                    helpers: ['src/utility.js', 'tests/CollectorHelper.js']
+                    helpers: ['src/utility.js', 'src/Cycle.js', 'tests/CollectorHelper.js']
                 }
             },
             utility: {

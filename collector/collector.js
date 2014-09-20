@@ -524,7 +524,7 @@ function Group(name, urls){
         "default": new Page("default")
     };
     this.pages["default"].group = this;
-    this.elements = {};
+    this.htmlElements = {};
 }
 
 Group.prototype.object = function(){
@@ -605,7 +605,7 @@ Group.prototype.html = function(){
         pages.appendChild(this.pages[key].html());
     }
 
-    this.elements = {
+    this.htmlElements = {
         holder: holder,
         nametag: nametag,
         pages: pages
@@ -624,9 +624,9 @@ Group.prototype.addPage = function(page){
     this.pages[name] = page;
     page.group = this;
     // if html for group exists, also generate html for page
-    if ( this.elements.holder) {
+    if ( this.htmlElements.holder) {
         var ele = page.html();
-        this.elements.pages.appendChild(ele);
+        this.htmlElements.pages.appendChild(ele);
     }
 };
 
@@ -691,7 +691,7 @@ function Page(name, index, next){
         "default": new SelectorSet("default")
     };
     this.sets["default"].page = this;
-    this.elements = {};
+    this.htmlElements = {};
     // added when a group calls addPage
     this.group;
 }
@@ -763,7 +763,7 @@ Page.prototype.html = function(){
         sets.appendChild(this.sets[key].html());
     }
 
-    this.elements = {
+    this.htmlElements = {
         holder: holder,
         nametag: nametag,
         sets: sets
@@ -784,9 +784,9 @@ Page.prototype.addSet = function(selectorSet){
     this.sets[name] = selectorSet;
     selectorSet.page = this;
     // if html for page exists, also create html for SelectorSet
-    if ( this.elements.holder ) {
+    if ( this.htmlElements.holder ) {
         var ele = selectorSet.html();
-        this.elements.sets.appendChild(ele);
+        this.htmlElements.sets.appendChild(ele);
     }
 };
 
@@ -840,7 +840,7 @@ function SelectorSet(name, parent){
     this.name = name;
     this.parent = parent;
     this.selectors = {};
-    this.elements = {};
+    this.htmlElements = {};
     // added when a page calls addSet
     this.page;
 }
@@ -874,6 +874,11 @@ SelectorSet.prototype.uploadObject = function(){
 
     // use base object created by SelectorSet.object
     var data = this.object();
+
+    for ( var key in this.selectors ) {
+        data.selectors[key] = this.selectors[key].uploadObject();
+    }
+
     data.pages = {};
 
     // only upload low/high if their values are not 0
@@ -899,7 +904,7 @@ SelectorSet.prototype.html = function(){
     nametag.textContent = "Selector Set: " + this.name;
     appendChildren(holder, [nametag, ul]);
 
-    this.elements = {
+    this.htmlElements = {
         holder: holder,
         nametag: nametag,
         selectors: ul
@@ -910,10 +915,11 @@ SelectorSet.prototype.html = function(){
 
 SelectorSet.prototype.deleteHTML = prototypeDeleteHTML;
 
-SelectorSet.prototype.addSelector = function(selector){
+SelectorSet.prototype.addSelector = function(selector, events){
     this.selectors[selector.selector] = selector;
-    if ( this.elements.selectors) {
-        this.elements.selectors.appendChild(selector.html());
+    if ( this.htmlElements.selectors) {
+        var ele = selector.html.apply(selector, events);
+        this.htmlElements.selectors.appendChild(ele);
     }
     selector.set = this;
 };
@@ -957,7 +963,7 @@ SelectorSet.prototype.followedRules = function(){
 function Selector(selector, rules){
     this.selector = selector;
     this.rules = rules || {};
-    this.elements = {};
+    this.htmlElements = {};
 }
 
 Selector.prototype.object = function(){
@@ -996,9 +1002,9 @@ Selector.prototype.addRule = function(rule, events){
     }
 
     // if Selector html exists, also create html for rule
-    if ( this.elements.rules ) {
+    if ( this.htmlElements.rules ) {
         var ele = rule.html.apply(rule, events);
-        this.elements.rules.appendChild(ele);
+        this.htmlElements.rules.appendChild(ele);
     }
 };
 
@@ -1009,8 +1015,8 @@ Selector.prototype.removeRule = function(name){
 Selector.prototype.updateSelector = function(newSelector){
     var oldSelector = this.selector;
     this.selector = newSelector;
-    if ( this.elements.nametag ) {
-        this.elements.nametag.textContent = newSelector;
+    if ( this.htmlElements.nametag ) {
+        this.htmlElements.nametag.textContent = newSelector;
     }
 
     if ( this.set ) {
@@ -1019,17 +1025,25 @@ Selector.prototype.updateSelector = function(newSelector){
     }
 };
 
-Selector.prototype.html = function(){
+Selector.prototype.html = function(newRuleEvent, deleteEvent){
     var holder = noSelectElement("li"),
         nametag = noSelectElement("span"),
+        newRule = noSelectElement("button"),
+        remove = noSelectElement("button"),
         rules = noSelectElement("ul");
 
-    holder.classList.add("savedSelector");
+    holder.classList.add("selector");
     nametag.textContent = this.selector;
 
-    appendChildren(holder, [nametag, rules]);
+    newRule.textContent = "Add Rule";
+    remove.textContent = "×";
 
-    this.elements = {
+    newRule.addEventListener("click", newRuleEvent.bind(this), false);
+    remove.addEventListener("click", deleteEvent.bind(this), false);
+
+    appendChildren(holder, [nametag, newRule, remove, rules]);
+
+    this.htmlElements = {
         holder: holder,
         nametag: nametag,
         rules: rules
@@ -1059,7 +1073,7 @@ function Rule(name, capture, multiple, follow){
     this.capture = capture;
     this.multiple = multiple || false;
     this.follow = follow || false;
-    this.elements = {};
+    this.htmlElements = {};
     // added when a SelectorSet calls addRule
     this.selector;
 }
@@ -1106,7 +1120,7 @@ Rule.prototype.html = function(selectorViewEvent, unselectorViewEvent, editEvent
     preview.addEventListener("click", previewEvent.bind(this), false);
     deltog.addEventListener("click", deleteEvent.bind(this), false);
     
-    this.elements = {
+    this.htmlElements = {
         holder: holder,
         nametag: nametag,
         edit: edit,
@@ -1125,8 +1139,8 @@ Rule.prototype.update = function(object){
     if ( oldName !== newName ) {
         this.name = newName;
         // update nametag if html has been generated
-        if ( this.elements.holder ) {
-            this.elements.nametag.textContent = newName;
+        if ( this.htmlElements.holder ) {
+            this.htmlElements.nametag.textContent = newName;
         }
         if ( this.selector ) {
             this.selector.rules[newName] = this;
@@ -1158,178 +1172,182 @@ Rule.prototype.remove = function(){
 
 // shared delete function
 function prototypeDeleteHTML(){
-    var holder = this.elements.holder;
+    var holder = this.htmlElements.holder;
     if ( holder ) {
         holder.parentElement.removeChild(holder);
     }
 }
 
 // Source: src/cycle.js
-function Cycle(holder, interactive){
-    this.index = 0;
-    this.elements = [];
-    this.interactive = interactive || false;
-    this.holder = holder;
-    this.html();
-}
+var Cycle = (function(){
+    function Cycle(holder, interactive){
+        this.index = 0;
+        this.elements = [];
+        this.interactive = interactive || false;
+        this.holder = holder;
+        this.generateHTML();
+    }
 
-Cycle.prototype.setElements = function(elements){
-    this.elements = elements;
-    this.preview();
-};
-
-Cycle.prototype.reset = function(){
-    this.elements = [];
-    this.index = 0;
-    this.html.preview.textContent = "";
-    this.html.index.textContent = "";
-};
-
-Cycle.prototype.html = function(){
-    var previousButton = noSelectElement("button"),
-        index = noSelectElement("span"),
-        nextButton = noSelectElement("button"),
-        preview = noSelectElement("span");
-
-    previousButton.textContent = "<<";
-    nextButton.textContent = ">>";
-
-    previousButton.addEventListener("click", this.previous.bind(this), false);
-    nextButton.addEventListener("click", this.next.bind(this), false);
-
-    this.html = {
-        previous: previousButton,
-        index: index,
-        next: nextButton,
-        preview: preview
+    Cycle.prototype.setElements = function(elements){
+        this.elements = elements;
+        this.preview();
     };
 
-    appendChildren(this.holder, [previousButton, index, nextButton, preview]);
-};
+    Cycle.prototype.reset = function(){
+        this.elements = [];
+        this.index = 0;
+        this.htmlElements.preview.textContent = "";
+        this.htmlElements.index.textContent = "";
+    };
 
-Cycle.prototype.previous = function(event){
-    event.preventDefault();
-    this.index = ( this.index === 0 ) ? this.elements.length-1 : this.index - 1;
-    this.preview();
-    markCapture();
-};
+    Cycle.prototype.generateHTML = function(){
+        var previousButton = noSelectElement("button"),
+            index = noSelectElement("span"),
+            nextButton = noSelectElement("button"),
+            preview = noSelectElement("span");
 
-Cycle.prototype.next = function(event){
-    event.preventDefault();
-    this.index = ( this.index === this.elements.length - 1) ? 0 : this.index + 1;
-    this.preview();
-    markCapture();
-};
+        previousButton.textContent = "<<";
+        nextButton.textContent = ">>";
 
-Cycle.prototype.preview = function(){
-    var element = this.elements[this.index],
-        negative = this.index - this.elements.length;
-    this.html.index.textContent = (this.idex === 0) ? "" : this.index + " / " + negative;
-    this.html.preview.innerHTML = "";
+        previousButton.addEventListener("click", this.previous.bind(this), false);
+        nextButton.addEventListener("click", this.next.bind(this), false);
 
-    var clone = cleanElement(element.cloneNode(true)),
-        html = clone.outerHTML,
-        attrs = clone.attributes,
-        curr, text, splitHTML, firstHalf, secondHalf, captureEle;
-    if ( this.interactive ) {
-        for ( var i=0, len =attrs.length; i<len; i++ ) {
-            curr = attrs[i];
-            text = attributeText(curr);
+        this.htmlElements = {
+            previous: previousButton,
+            index: index,
+            next: nextButton,
+            preview: preview
+        };
 
-            splitHTML = html.split(text);
-            firstHalf = splitHTML[0];
-            secondHalf = splitHTML[1];
+        appendChildren(this.holder, [previousButton, index, nextButton, preview]);
+    };
 
-            this.html.preview.appendChild(document.createTextNode(firstHalf));
-            captureEle = captureAttribute(text, 'attr-'+curr.name);
-            if ( captureEle) {
-                this.html.preview.appendChild(captureEle);
+    Cycle.prototype.previous = function(event){
+        event.preventDefault();
+        this.index = ( this.index === 0 ) ? this.elements.length-1 : this.index - 1;
+        this.preview();
+        markCapture();
+    };
+
+    Cycle.prototype.next = function(event){
+        event.preventDefault();
+        this.index = ( this.index === this.elements.length - 1) ? 0 : this.index + 1;
+        this.preview();
+        markCapture();
+    };
+
+    Cycle.prototype.preview = function(){
+        var element = this.elements[this.index],
+            negative = this.index - this.elements.length;
+        this.htmlElements.index.textContent = (this.idex === 0) ? "" : this.index + " / " + negative;
+        this.htmlElements.preview.innerHTML = "";
+
+        var clone = cleanElement(element.cloneNode(true)),
+            html = clone.outerHTML,
+            attrs = clone.attributes,
+            curr, text, splitHTML, firstHalf, secondHalf, captureEle;
+        if ( this.interactive ) {
+            for ( var i=0, len =attrs.length; i<len; i++ ) {
+                curr = attrs[i];
+                text = attributeText(curr);
+
+                splitHTML = html.split(text);
+                firstHalf = splitHTML[0];
+                secondHalf = splitHTML[1];
+
+                this.htmlElements.preview.appendChild(document.createTextNode(firstHalf));
+                captureEle = captureAttribute(text, 'attr-'+curr.name);
+                if ( captureEle) {
+                    this.htmlElements.preview.appendChild(captureEle);
+                }
+                html = secondHalf;
             }
-            html = secondHalf;
-        }
 
-        if ( clone.textContent !== "" ) {
-            text = clone.textContent;
-            splitHTML = html.split(text);
-            firstHalf = splitHTML[0];
-            secondHalf = splitHTML[1];
+            if ( clone.textContent !== "" ) {
+                text = clone.textContent;
+                splitHTML = html.split(text);
+                firstHalf = splitHTML[0];
+                secondHalf = splitHTML[1];
 
-            this.html.preview.appendChild(document.createTextNode(firstHalf));
-            captureEle = captureAttribute(text, 'text');
-            if ( captureEle) {
-                this.html.preview.appendChild(captureEle);
+                this.htmlElements.preview.appendChild(document.createTextNode(firstHalf));
+                captureEle = captureAttribute(text, 'text');
+                if ( captureEle) {
+                    this.htmlElements.preview.appendChild(captureEle);
+                }
+
+                html = secondHalf;
             }
-
-            html = secondHalf;
+        } else {
+            // get rid of empty class string
+            if (html.indexOf(" class=\"\"") !== -1 ) {
+                html = html.replace(" class=\"\"", "");
+            }
         }
-    } else {
-        // get rid of empty class string
-        if (html.indexOf(" class=\"\"") !== -1 ) {
-            html = html.replace(" class=\"\"", "");
+
+        // append remaining text
+        this.htmlElements.preview.appendChild(document.createTextNode(html));
+    };
+
+    /*
+    takes an element and remove collectjs related classes and shorten text, then returns outerHTML
+    */
+    function cleanElement(ele){
+        ele.classList.remove('queryCheck');
+        ele.classList.remove('collectHighlight');
+        if ( ele.hasAttribute('src') ) {
+            var value = ele.getAttribute('src'),
+                query = value.indexOf('?');
+            if ( query !== -1 ) {
+                value = value.slice(0, query);
+            }
+            ele.setAttribute('src', value);
+        }
+        if ( ele.textContent !== "" ) {
+            var innerText = ele.textContent.replace(/(\s{2,}|[\n\t]+)/g, ' ');
+            if ( innerText.length > 100 ){
+                innerText = innerText.slice(0, 25) + "..." + innerText.slice(-25);
+            }
+            ele.innerHTML = innerText;
+        }
+        return ele;
+    }
+
+    function attributeText(attr) {
+        // encode ampersand
+        attr.value = attr.value.replace("&", "&amp;");
+        return attr.name + "=\"" + attr.value + "\"";
+    }
+
+    //wrap an attribute or the text of an html string 
+    //(used in #selector_text div)
+    function captureAttribute(text, type){
+        // don't include empty properties
+        if ( text.indexOf('=""') !== -1 ) {
+            return;
+        }
+        var span = noSelectElement("span");
+        span.classList.add("capture");
+        span.setAttribute("title", "click to capture " + type + " property");
+        span.dataset.capture = type;
+        span.textContent = text;
+        span.addEventListener("click", capturePreview, false);
+        return span;
+    }
+
+    /*
+    if #ruleAttr is set, add .selected class to the matching #ruleHTML .capture span
+    */
+    function markCapture(){
+        var capture = HTML.rule.rule.capture.textContent,
+            selector;
+        if ( capture !== "") {
+            selector = ".capture[data-capture='" + capture + "']";
+            document.querySelector(selector).classList.add("selected");
         }
     }
 
-    // append remaining text
-    this.html.preview.appendChild(document.createTextNode(html));
-};
-
-/*
-takes an element and remove collectjs related classes and shorten text, then returns outerHTML
-*/
-function cleanElement(ele){
-    ele.classList.remove('queryCheck');
-    ele.classList.remove('collectHighlight');
-    if ( ele.hasAttribute('src') ) {
-        var value = ele.getAttribute('src'),
-            query = value.indexOf('?');
-        if ( query !== -1 ) {
-            value = value.slice(0, query);
-        }
-        ele.setAttribute('src', value);
-    }
-    if ( ele.textContent !== "" ) {
-        var innerText = ele.textContent.replace(/(\s{2,}|[\n\t]+)/g, ' ');
-        if ( innerText.length > 100 ){
-            innerText = innerText.slice(0, 25) + "..." + innerText.slice(-25);
-        }
-        ele.innerHTML = innerText;
-    }
-    return ele;
-}
-
-function attributeText(attr) {
-    // encode ampersand
-    attr.value = attr.value.replace("&", "&amp;");
-    return attr.name + "=\"" + attr.value + "\"";
-}
-
-//wrap an attribute or the text of an html string 
-//(used in #selector_text div)
-function captureAttribute(text, type){
-    // don't include empty properties
-    if ( text.indexOf('=""') !== -1 ) {
-        return;
-    }
-    var span = noSelectElement("span");
-    span.classList.add("capture");
-    span.setAttribute("title", "click to capture " + type + " property");
-    span.dataset.capture = type;
-    span.textContent = text;
-    span.addEventListener("click", capturePreview, false);
-    return span;
-}
-
-/*
-if #ruleAttr is set, add .selected class to the matching #ruleHTML .capture span
-*/
-function markCapture(){
-    var capture = HTML.rule.rule.capture.textContent,
-        selector;
-    if ( capture !== "") {
-        selector = ".capture[data-capture='" + capture + "']";
-        document.querySelector(selector).classList.add("selected");
-    }
-}
+    return Cycle;
+})();
 
 // Source: src/collector_with_html.js
 var marginBottom;
@@ -1337,7 +1355,7 @@ var marginBottom;
 (function addInterface(){
     var div = noSelectElement("div");
     div.classList.add("collectjs");
-    div.innerHTML = "<div class=\"tabHolder\"><div class=\"tabs\"><div class=\"tab active\" id=\"selectorTab\" data-for=\"selectorView\">Selector</div><div class=\"tab\" id=\"ruleTab\" data-for=\"ruleView\">Rule</div><div class=\"tab\" id=\"groupsTab\" data-for=\"groupsView\">Current Group</div><div class=\"tab\" id=\"previewTab\" data-for=\"previewView\">Preview</div><div class=\"tab\" id=\"optionsTab\" data-for=\"optionsView\">Options</div><div class=\"tab\" id=\"refreshCollect\">&#8635;</div><div class=\"tab\" id=\"closeCollect\">&times;</div></div></div><div class=\"permanent\"><div class=\"currentInfo\"><div>Group: <select id=\"groupSelect\"></select><button id=\"createGroup\" title=\"create a new group\">+</button><button id=\"deleteGroup\" title=\"delete current group\">&times;</button><div id=\"indexMarker\" class=\"info\">Initial URL<input type=\"checkbox\" id=\"indexToggle\" /></div><div id=\"nextHolder\" class=\"info\">Next:<span id=\"nextSelectorView\"></span><button id=\"removeNext\">&times;</button></div></div><div>Page: <select id=\"pageSelect\"></select><button id=\"deletePage\" title=\"delete current page\">&times;</button></div><div>Selector Set: <select id=\"selectorSetSelect\"></select><button id=\"createSelectorSet\" title=\"create a new selector set\">+</button><button id=\"deleteSelectorSet\" title=\"delete current selector set\">&times;</button><div id=\"currentParent\" class=\"info\">Parent<span id=\"parentSelectorView\"></span><span id=\"parentRangeView\"></span><button id=\"removeParent\">&times;</button></div></div><button id=\"uploadRules\">Upload Group</button></div><div id=\"collectAlert\"></div></div><div class=\"views\"><div class=\"view\" id=\"emptyView\"></div><div class=\"view active\" id=\"selectorView\"><div class=\"column\"><!--displays what the current selector is--><p>Selector: <span id=\"currentSelector\"></span></p><p>Count: <span id=\"currentCount\"></span></p><div><label>Selector <input type=\"radio\" id=\"selectorRadio\" name=\"selector\" value=\"selector\" checked/></label><label>Parent <input type=\"radio\" id=\"parentRadio\" name=\"selector\" value=\"parent\" /></label><label>Next <input type=\"radio\" id=\"nextRadio\" name=\"selector\" value=\"next\" /></label></div><div id=\"parentRange\"><label>Low: <input id=\"parentLow\" name=\"parentLow\" type=\"text\" /></label><label for=\"parentHigh\">High: <input id=\"parentHigh\" name=\"parentHigh\" type=\"text\" /></label></div><p><button id=\"saveSelector\">Save</button></p></div><div class=\"column\"><!--holds the interactive element for choosing a selector--><div id=\"selectorHolder\"></div><div id=\"selectorCycleHolder\"></div></div></div><div class=\"view\" id=\"ruleView\"><div id=\"ruleItems\" class=\"items\"><form id=\"ruleForm\" class=\"column\"><div class=\"rule\"><label for=\"ruleName\" title=\"the name of a rule\">Name:</label><input id=\"ruleName\" name=\"ruleName\" type=\"text\" /></div><div class=\"rule\"><label title=\"the attribute of an element to capture\">Capture:</label><span id=\"ruleAttr\"></span></div><div class=\"rule follow\"><label for=\"ruleFollow\" title=\"create a new page from the element's captured url (capture must be attr-href)\">Follow:</label><input id=\"ruleFollow\" name=\"ruleFollow\" type=\"checkbox\" disabled=\"true\" title=\"Can only follow rules that get href attribute from links\" /></div><div><button id=\"saveRule\">Save Rule</button><button id=\"cancelRule\">Cancel</button></div></form><form id=\"editForm\" class=\"column\"><div class=\"rule\"><label for=\"ruleName\" title=\"the name of a rule\">Name:</label><input id=\"editName\" name=\"editName\" type=\"text\" /></div><div class=\"rule\"><label title=\"the selector to get the rule in the DOM\">Selector:</label><span id=\"editSelector\"></span></div><div class=\"rule\"><label title=\"the attribute of an element to capture\">Capture:</label><span id=\"editAttr\"></span></div><div class=\"rule editFollow\"><label for=\"editFollow\" title=\"create a new page from the element's captured url (capture must be attr-href)\">Follow:</label><input id=\"editFollow\" name=\"editFollow\" type=\"checkbox\" disabled=\"true\" title=\"Can only follow rules that get href attribute from links\" /></div><div><button id=\"saveEdit\">Save Edited Rule</button><button id=\"cancelEdit\">Cancel</button></div></form><div class=\"modifiers column\"><div class=\"ruleCycleHolder\"></div></div></div></div><div class=\"view\" id=\"groupsView\"><div id=\"groupHolder\" class=\"rules\"></div></div><div class=\"view\" id=\"previewView\"><p>Name: <span id=\"previewName\" class=\"name\"></span>Selector: <span id=\"previewSelector\" class=\"name\"></span>Capture: <span id=\"previewCapture\" class=\"name\"></span><button id=\"previewClear\">Clear</button></p><div id=\"previewContents\"></div></div><div class=\"view\" id=\"optionsView\"><p><label for=\"ignore\">Ignore helper elements (eg tbody)</label><input type=\"checkbox\" id=\"ignore\" /></p></div></div>";
+    div.innerHTML = "<div class=\"tabHolder\"><div class=\"tabs\"><div class=\"tab active\" id=\"selectorTab\" data-for=\"selectorView\">Selector</div><div class=\"tab\" id=\"ruleTab\" data-for=\"ruleView\">Rule</div><div class=\"tab\" id=\"groupsTab\" data-for=\"groupsView\">Current Group</div><div class=\"tab\" id=\"previewTab\" data-for=\"previewView\">Preview</div><div class=\"tab\" id=\"optionsTab\" data-for=\"optionsView\">Options</div><div class=\"tab\" id=\"refreshCollect\">&#8635;</div><div class=\"tab\" id=\"closeCollect\">&times;</div></div></div><div class=\"permanent\"><div class=\"currentInfo\"><div>Group: <select id=\"groupSelect\"></select><button id=\"createGroup\" title=\"create a new group\">+</button><button id=\"deleteGroup\" title=\"delete current group\">&times;</button><div id=\"indexMarker\" class=\"info\">Initial URL<input type=\"checkbox\" id=\"indexToggle\" /></div><div id=\"nextHolder\" class=\"info\">Next:<span id=\"nextSelectorView\"></span><button id=\"removeNext\">&times;</button></div></div><div>Page: <select id=\"pageSelect\"></select><button id=\"deletePage\" title=\"delete current page\">&times;</button></div><div>Selector Set: <select id=\"selectorSetSelect\"></select><button id=\"createSelectorSet\" title=\"create a new selector set\">+</button><button id=\"deleteSelectorSet\" title=\"delete current selector set\">&times;</button><div id=\"currentParent\" class=\"info\">Parent<span id=\"parentSelectorView\"></span><span id=\"parentRangeView\"></span><button id=\"removeParent\">&times;</button></div></div><button id=\"uploadRules\">Upload Group</button></div><div id=\"collectAlert\"></div></div><div class=\"views\"><div class=\"view\" id=\"emptyView\"></div><div class=\"view active\" id=\"selectorView\"><div class=\"column\"><!--displays what the current selector is--><p>Selector: <span id=\"currentSelector\"></span></p><p>Count: <span id=\"currentCount\"></span></p><div><label>Selector <input type=\"radio\" id=\"selectorRadio\" name=\"selector\" value=\"selector\" checked/></label><label>Parent <input type=\"radio\" id=\"parentRadio\" name=\"selector\" value=\"parent\" /></label><label>Next <input type=\"radio\" id=\"nextRadio\" name=\"selector\" value=\"next\" /></label></div><div id=\"parentRange\"><label>Low: <input id=\"parentLow\" name=\"parentLow\" type=\"text\" /></label><label for=\"parentHigh\">High: <input id=\"parentHigh\" name=\"parentHigh\" type=\"text\" /></label></div><p><button id=\"saveSelector\">Save</button><button id=\"clearSelector\">Clear</button></p></div><div class=\"column\"><!--holds the interactive element for choosing a selector--><div id=\"selectorHolder\"></div><div id=\"selectorCycleHolder\"></div></div></div><div class=\"view\" id=\"ruleView\"><div id=\"ruleItems\" class=\"items\"><form id=\"ruleForm\" class=\"column\"><div class=\"rule\"><label for=\"ruleName\" title=\"the name of a rule\">Name:</label><input id=\"ruleName\" name=\"ruleName\" type=\"text\" /></div><div class=\"rule\">Selector: <span id=\"ruleSelector\"></span></div><div class=\"rule\"><label title=\"the attribute of an element to capture\">Capture:</label><span id=\"ruleAttr\"></span></div><div class=\"rule follow\"><label for=\"ruleFollow\" title=\"create a new page from the element's captured url (capture must be attr-href)\">Follow:</label><input id=\"ruleFollow\" name=\"ruleFollow\" type=\"checkbox\" disabled=\"true\" title=\"Can only follow rules that get href attribute from links\" /></div><div><button id=\"saveRule\">Save Rule</button><button id=\"cancelRule\">Cancel</button></div></form><form id=\"editForm\" class=\"column\"><div class=\"rule\"><label for=\"ruleName\" title=\"the name of a rule\">Name:</label><input id=\"editName\" name=\"editName\" type=\"text\" /></div><div class=\"rule\">Selector: <span id=\"editSelector\"></span></div><div class=\"rule\"><label title=\"the attribute of an element to capture\">Capture:</label><span id=\"editAttr\"></span></div><div class=\"rule editFollow\"><label for=\"editFollow\" title=\"create a new page from the element's captured url (capture must be attr-href)\">Follow:</label><input id=\"editFollow\" name=\"editFollow\" type=\"checkbox\" disabled=\"true\" title=\"Can only follow rules that get href attribute from links\" /></div><div><button id=\"saveEdit\">Save Edited Rule</button><button id=\"cancelEdit\">Cancel</button></div></form><div class=\"modifiers column\"><div id=\"ruleCycleHolder\"></div></div></div></div><div class=\"view\" id=\"groupsView\"><div id=\"groupHolder\" class=\"rules\"></div></div><div class=\"view\" id=\"previewView\"><p>Name: <span id=\"previewName\" class=\"name\"></span>Selector: <span id=\"previewSelector\" class=\"name\"></span>Capture: <span id=\"previewCapture\" class=\"name\"></span><button id=\"previewClear\">Clear</button></p><div id=\"previewContents\"></div></div><div class=\"view\" id=\"optionsView\"><p><label for=\"ignore\">Ignore helper elements (eg tbody)</label><input type=\"checkbox\" id=\"ignore\" /></p></div></div>";
     document.body.appendChild(div);
     addNoSelect(div.querySelectorAll("*"));
 
@@ -1375,7 +1393,8 @@ var Collect = {
     current: {
         group: undefined,
         page: undefined,
-        set: undefined
+        set: undefined,
+        selector: undefined
     },
     // parent.selector is set when Collect.current.set index=true
     parent: {},
@@ -1480,7 +1499,8 @@ var HTML = {
             name: document.getElementById("ruleName"),
             capture: document.getElementById("ruleAttr"),
             follow: document.getElementById("ruleFollow"),
-            followHolder: document.querySelector("#ruleItems .follow")
+            followHolder: document.querySelector("#ruleItems .follow"),
+            selector: document.getElementById("ruleSelector")
         },
         edit: {
             form: document.getElementById("editForm"),
@@ -1496,6 +1516,8 @@ var HTML = {
         group: {
             select: document.getElementById("groupSelect"),
             holder: document.getElementById("groupHolder"),
+            index: document.getElementById("indexMarker"),
+            indexToggle: document.getElementById("indexToggle")
         },
         page: {
             select: document.getElementById("pageSelect"),
@@ -1515,8 +1537,6 @@ var HTML = {
     },
     info: {
         alert: document.getElementById("collectAlert"),
-        index: document.getElementById("indexMarker"),
-        indexToggle: document.getElementById("indexToggle"),
     },
     interface: document.querySelector(".collectjs"),
     // elements in the preview view
@@ -1549,13 +1569,10 @@ var Family = {
             HTML.rule.edit.name.value = Interface.editing.name;
         }
         
-        //redo
-        var selectorElement = HTML.selector.selector;
-
         var sf = new SelectorFamily(this,
             Collect.parent.selector,
             HTML.selector.family,
-            selectorElement,
+            HTML.selector.selector,
             Family.test.bind(Family),
             Collect.options
         );
@@ -1570,7 +1587,7 @@ var Family = {
         }
         var sf = new SelectorFamily(eles[0],
             Collect.parent.selector,
-            HTML.family,
+            HTML.selector.family,
             HTML.selector.selector,
             Family.test.bind(Family),
             Collect.options
@@ -1592,7 +1609,7 @@ var Family = {
         if ( element ) {
             var sf = new SelectorFamily(element,
                 Collect.parent.selector,
-                HTML.family,
+                HTML.selector.family,
                 HTML.selector.selector,
                 Family.test.bind(Family),
                 Collect.options
@@ -1656,19 +1673,25 @@ var Family = {
 
 Interface.setup();
 
-
 function resetInterface(){
     clearClass("queryCheck");
     clearClass("collectHighlight");
     clearClass("savedPreview");
+    resetSelectorView();
     resetRulesView();
     resetPreviewView();
 }
 
 function resetSelectorView(){
     Family.remove();
+
+    clearClass("queryCheck");
+    clearClass("collectHighlight");
+    clearClass("savedPreview");
+
     Interface.activeSelector = "selector";
     Interface.selectorCycle.reset();
+
     HTML.selector.radio.selector.checked = true;
     HTML.selector.parent.holder.style.display = "none";
     HTML.selector.parent.low.value = "";
@@ -1740,6 +1763,7 @@ function setupRulesTab() {
 
 function selectorViewEvents(){
     idEvent("saveSelector", "click", saveSelectorEvent);
+    idEvent("clearSelector", "click", clearSelectorEvent);
     idEvent("selectorRadio", "change", updateRadioEvent);
     idEvent("parentRadio", "change", updateRadioEvent);
     idEvent("nextRadio", "change", updateRadioEvent);
@@ -1866,8 +1890,9 @@ function cancelEditEvent(event){
 function verifyAndApplyParentLow(event){
     var low = parseInt(HTML.selector.parent.low.value, 10),
         high = parseInt(HTML.selector.parent.high.value, 10) || 0;
-
-    if ( isNaN(low) || low <= 0 ) {
+    if ( HTML.selector.parent.low.value === "" ) {
+        low = 0;
+    } else if ( isNaN(low) || low <= 0 ) {
         HTML.selector.parent.low.value = "";
         alertMessage("Low must be positive integer greater than 0");
         return;
@@ -1884,7 +1909,9 @@ function verifyAndApplyParentHigh(event){
     var low = parseInt(HTML.selector.parent.low.value, 10) || 0,
         high = parseInt(HTML.selector.parent.high.value, 10);
 
-    if ( isNaN(high) || high > 0 ) {
+    if ( HTML.selector.parent.high.value === "" ) {
+        high = 0;
+    } else if ( isNaN(high) || high > 0 ) {
         HTML.selector.parent.high.value = "";
         alertMessage("High must be a negative integer");
         return;
@@ -1968,7 +1995,7 @@ function saveSelector(selector){
         group = Collect.current.group,
         page = Collect.current.page,
         set = Collect.current.set;
-    Collect.group.pages[page].sets[set].addSelector(sel);
+    Collect.group.pages[page].sets[set].addSelector(sel, [newRuleEvent, removeSelectorEvent]);
     saveGroup();
 }
 
@@ -1995,7 +2022,6 @@ function saveParent(selector){
     // attach the parent to the current set and save
     Collect.group.pages[Collect.current.page].sets[Collect.current.set].parent = parent;
     saveGroup();
-    //test
     refreshElements();
 }
 
@@ -2027,14 +2053,36 @@ function saveNext(selector){
     refreshElements();
 }
 
+function clearSelectorEvent(event){
+    event.preventDefault();
+    resetSelectorView();
+}
+
 function updateRadioEvent(event){
     Interface.activeSelector = this.value;
     HTML.selector.parent.holder.style.display = (Interface.activeSelector === "parent") ? "block": "none";
 }
 
+function removeSelectorEvent(event){
+    event.preventDefault();
+    this.remove();
+}
+
 /******************
     RULE EVENTS
 ******************/
+function newRuleEvent(event){
+    event.preventDefault();
+    Collect.current.selector = this.selector;
+    HTML.rule.rule.selector.textContent  = this.selector;
+
+    // generate selector family from selector
+    var sf = Family.fromSelector(this.selector);
+    Family.match();
+    showTab(HTML.tabs.rule);
+    Interface.ruleCycle.setElements(Collect.matchedElements);
+}
+
 function saveRuleEvent(event){
     event.preventDefault();
     var name = HTML.rule.rule.name.value,
@@ -2067,7 +2115,7 @@ function saveRuleEvent(event){
         HTML.perm.page.select.appendChild(newOption(rule.name));
     }
     var curr = Collect.current;
-    var selector = Collect.group.pages[curr.page].sets[curr.set].selector[curr.selector];
+    var selector = Collect.group.pages[curr.page].sets[curr.set].selectors[curr.selector];
     addRule(rule, selector);
     saveGroup();
     resetInterface();
@@ -2096,9 +2144,8 @@ function saveEditEvent(event){
         rule.follow = true;
     }
     var oldName = Interface.editing.name,
-        set = Interface.editing.set;
+        set = Interface.editing.selector.set;
     Interface.editing.update(rule);
-    Collect.group.pages[set.page.name].sets[set.name] = set;
     saveGroup();
 
     deleteEditing();
@@ -2149,7 +2196,7 @@ function toggleURLEvent(event){
 function selectorViewRule(event){
     clearClass("queryCheck");
     clearClass("collectHighlight");
-    var elements = parentElements(this.selector);
+    var elements = parentElements(this.selector.selector);
     addClass("savedPreview", elements);
 }
 
@@ -2161,11 +2208,11 @@ function editSavedRule(event){
     deleteEditing();
 
     Interface.editing = this;
-    Family.edit(this.selector);
+    Family.edit(this.selector.selector);
 
     // setup the form
     HTML.rule.edit.name.value = this.name;
-    HTML.rule.edit.selector.textContent = this.selector;
+    HTML.rule.edit.selector.textContent = this.selector.selector;
     HTML.rule.edit.capture.textContent = this.capture;
     if ( this.follow ) {
         HTML.rule.edit.follow.checked = this.follow;
@@ -2179,10 +2226,10 @@ function editSavedRule(event){
 
 function previewSavedRule(event){
     HTML.preview.name.textContent = this.name;
-    HTML.preview.selector.textContent = this.selector;
+    HTML.preview.selector.textContent = this.selector.selector;
     HTML.preview.capture.textContent = this.capture;
     //HTML.preview.contents;
-    var elements = parentElements(this.selector);
+    var elements = parentElements(this.selector.selector);
     generatePreviewElements(this.capture, elements);
     showTab(HTML.tabs.preview);
 }
@@ -2442,7 +2489,7 @@ function uploadGroup(){
         group: Collect.group.uploadObject(),
         site: window.location.host
     };
-
+    console.log(data);
     chrome.runtime.sendMessage({type: 'upload', data: data});
 }
 
@@ -2743,7 +2790,7 @@ function loadGroupObject(group){
     HTML.perm.group.select.querySelector("option[value=" + group.name + "]").selected = true;
 
     var url = window.location.href;
-    HTML.info.indexToggle.checked = group.urls[url] !== undefined;
+    HTML.perm.group.indexToggle.checked = group.urls[url] !== undefined;
 
     // clear out current options and populate with current group's pages
     HTML.perm.page.select.innerHTML = "";
@@ -2773,7 +2820,7 @@ function loadGroupObject(group){
             for ( selectorName in set.selectors ) {
                 selector = set.selectors[selectorName];
                 selectorObject = new Selector(selector.selector);
-                setObject.addSelector(selectorObject);
+                setObject.addSelector(selectorObject, [newRuleEvent, removeSelectorEvent]);
                 for ( ruleName in selector.rules ) {
                     rule = selector.rules[ruleName];
                     addRule(rule, selectorObject);
@@ -2787,7 +2834,7 @@ function loadGroupObject(group){
 function loadPageObject(page){
     Collect.current.page = page.name;
     if ( page.name === "default" ) {
-        HTML.info.index.style.display = "inline-block";
+        HTML.perm.group.index.style.display = "inline-block";
         HTML.perm.next.holder.style.display = "inline-block";
         // handle whether or not next has already been set
         if ( page.next ) {
@@ -2798,7 +2845,7 @@ function loadPageObject(page){
             HTML.perm.next.selector.textContent = "";
         }
     } else {
-        HTML.info.index.style.display = "none";
+        HTML.perm.group.index.style.display = "none";
         HTML.perm.next.holder.style.display = "none";
     }
 
