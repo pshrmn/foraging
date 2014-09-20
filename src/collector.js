@@ -144,19 +144,18 @@ var HTML = {
     },
     // elements in the rule view
     rule: {
+        selector: document.getElementById("ruleSelector"),
         rule: {
             form: document.getElementById("ruleForm"),
             name: document.getElementById("ruleName"),
             capture: document.getElementById("ruleAttr"),
             follow: document.getElementById("ruleFollow"),
-            followHolder: document.querySelector("#ruleItems .follow"),
-            selector: document.getElementById("ruleSelector")
+            followHolder: document.querySelector("#ruleItems .follow")
         },
         edit: {
             form: document.getElementById("editForm"),
             name: document.getElementById("editName"),
             capture: document.getElementById("editAttr"),
-            selector: document.getElementById("editSelector"),
             follow: document.getElementById("editFollow"),
             followHolder: document.querySelector("#ruleItems .editFollow")  
         }
@@ -350,6 +349,11 @@ function resetSelectorView(){
 }
 
 function resetRulesView(){
+    Family.remove();
+
+    Interface.ruleCycle.reset();
+    HTML.rule.selector.textContent = "";
+
     // reset rule form
     HTML.rule.rule.name.value = "";
     HTML.rule.rule.capture.textContent = "";
@@ -360,7 +364,6 @@ function resetRulesView(){
     // reset edit form
     HTML.rule.edit.name.value = "";
     HTML.rule.edit.capture.textContent = "";
-    HTML.rule.edit.selector.textContent = "";
     HTML.rule.edit.follow.checked = false;
     HTML.rule.edit.follow.disabled = true;
     HTML.rule.edit.followHolder.style.display = "none";
@@ -724,7 +727,7 @@ function removeSelectorEvent(event){
 function newRuleEvent(event){
     event.preventDefault();
     Collect.current.selector = this.selector;
-    HTML.rule.rule.selector.textContent  = this.selector;
+    HTML.rule.selector.textContent  = this.selector;
 
     // generate selector family from selector
     var sf = Family.fromSelector(this.selector);
@@ -774,18 +777,15 @@ function saveRuleEvent(event){
 function saveEditEvent(event){
     event.preventDefault();
     var name = HTML.rule.edit.name.value,
-        selector = HTML.rule.edit.selector.textContent,
         capture = HTML.rule.edit.capture.textContent,
         follow = HTML.rule.edit.follow.checked,
         rule = {
             name: name,
-            capture: capture,
-            selector: selector
+            capture: capture
         };
 
     clearErrors();
     if ( emptyErrorCheck(name, HTML.rule.edit.name, "Name needs to be filled in") ||
-        emptyErrorCheck(selector, HTML.rule.edit.selector, "No CSS selector selected") ||
         emptyErrorCheck(capture, HTML.rule.edit.capture, "No attribute selected") ) {
         return;
     }
@@ -862,7 +862,7 @@ function editSavedRule(event){
 
     // setup the form
     HTML.rule.edit.name.value = this.name;
-    HTML.rule.edit.selector.textContent = this.selector.selector;
+    HTML.rule.selector.textContent = this.selector.selector;
     HTML.rule.edit.capture.textContent = this.capture;
     if ( this.follow ) {
         HTML.rule.edit.follow.checked = this.follow;

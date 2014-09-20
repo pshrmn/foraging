@@ -86,7 +86,16 @@ body {
       padding: 5px; }
       .collectjs .views .view .column {
         display: inline-block;
-        vertical-align: top; }
+        vertical-align: top;
+        padding: 0 15px; }
+      .collectjs .views .view .form.column {
+        width: 25%;
+        min-width: 300px;
+        padding-right: 50px;
+        border-right: 1px solid #444444; }
+      .collectjs .views .view .form label {
+        display: inline-block;
+        width: 75px; }
     .collectjs .views .view.active {
       display: block; }
   .collectjs input {
@@ -102,9 +111,6 @@ body {
     min-height: 20px;
     padding: 2px;
     font-family: sans-serif; }
-  .collectjs input[type=text]:disabled {
-    background: #efefef;
-    border-color: #cccccc; }
   .collectjs label {
     font-size: 1em;
     cursor: pointer;
@@ -206,7 +212,11 @@ body {
 /* views */
 /* selectorView */
 #selectorView {
-  font-size: 0.75em; }
+  font-size: 14px; }
+  #selectorView input[type=text] {
+    width: 50px; }
+  #selectorView p {
+    margin: 3px 0; }
 
 #parentRange {
   display: none; }
@@ -227,33 +237,29 @@ body {
     background: #efefef; }
 
 /* rulesView */
-#ruleForm, #parentForm, #nextForm, #editForm {
-  width: 25%;
-  min-width: 250px;
-  border-right: 1px dashed #444444; }
-  #ruleForm input.error, #parentForm input.error, #nextForm input.error, #editForm input.error {
-    border-color: #c91900;
-    border-style: solid; }
-  #ruleForm span.error, #parentForm span.error, #nextForm span.error, #editForm span.error {
-    border-bottom: 1px solid #c91900; }
-  #ruleForm input[type=text], #parentForm input[type=text], #nextForm input[type=text], #editForm input[type=text] {
-    width: 150px;
-    border-width: 0 0 1px; }
-  #ruleForm .rule, #parentForm .rule, #nextForm .rule, #editForm .rule {
-    height: 20px;
-    font-size: 1em;
-    margin-bottom: 5px;
-    border: 0;
-    overflow: visible; }
-    #ruleForm .rule span, #parentForm .rule span, #nextForm .rule span, #editForm .rule span {
-      min-width: 50px; }
-    #ruleForm .rule label, #parentForm .rule label, #nextForm .rule label, #editForm .rule label {
-      width: 75px; }
-    #ruleForm .rule label, #parentForm .rule label, #nextForm .rule label, #editForm .rule label, #ruleForm .rule input, #parentForm .rule input, #nextForm .rule input, #editForm .rule input {
-      margin: 0;
-      display: inline-block; }
-  #ruleForm .rule.follow, #parentForm .rule.follow, #nextForm .rule.follow, #editForm .rule.follow {
-    display: none; }
+#ruleForm input.error, #parentForm input.error, #nextForm input.error, #editForm input.error {
+  border-color: #c91900;
+  border-style: solid; }
+#ruleForm span.error, #parentForm span.error, #nextForm span.error, #editForm span.error {
+  border-bottom: 1px solid #c91900; }
+#ruleForm input[type=text], #parentForm input[type=text], #nextForm input[type=text], #editForm input[type=text] {
+  width: 150px;
+  border-width: 0 0 1px; }
+#ruleForm .rule, #parentForm .rule, #nextForm .rule, #editForm .rule {
+  height: 20px;
+  font-size: 1em;
+  margin-bottom: 5px;
+  border: 0;
+  overflow: visible; }
+  #ruleForm .rule span, #parentForm .rule span, #nextForm .rule span, #editForm .rule span {
+    min-width: 50px; }
+  #ruleForm .rule label, #parentForm .rule label, #nextForm .rule label, #editForm .rule label {
+    width: 75px; }
+  #ruleForm .rule label, #parentForm .rule label, #nextForm .rule label, #editForm .rule label, #ruleForm .rule input, #parentForm .rule input, #nextForm .rule input, #editForm .rule input {
+    margin: 0;
+    display: inline-block; }
+#ruleForm .rule.follow, #parentForm .rule.follow, #nextForm .rule.follow, #editForm .rule.follow {
+  display: none; }
 
 #parentForm, #nextForm, #editForm {
   display: none; }

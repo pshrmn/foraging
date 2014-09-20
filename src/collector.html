@@ -2,7 +2,7 @@
     <div class="tabs">
         <div class="tab active" id="selectorTab" data-for="selectorView">Selector</div>
         <div class="tab" id="ruleTab" data-for="ruleView">Rule</div>
-        <div class="tab" id="groupsTab" data-for="groupsView">Current Group</div>
+        <div class="tab" id="groupsTab" data-for="groupsView">Group</div>
         <div class="tab" id="previewTab" data-for="previewView">Preview</div>
         <div class="tab" id="optionsTab" data-for="optionsView">Options</div>
         <div class="tab" id="refreshCollect">&#8635;</div>
@@ -47,7 +47,7 @@
 <div class="views">
     <div class="view" id="emptyView"></div>
     <div class="view active" id="selectorView">
-        <div class="column">
+        <div class="column form">
             <!--displays what the current selector is-->
             <p>
                 Selector: <span id="currentSelector"></span>
@@ -56,15 +56,19 @@
                 Count: <span id="currentCount"></span>
             </p>
             <div>
-                <label>
-                    Selector <input type="radio" id="selectorRadio" name="selector" value="selector" checked/>
-                </label>
-                <label>
-                    Parent <input type="radio" id="parentRadio" name="selector" value="parent" />
-                </label>
-                <label>
-                    Next <input type="radio" id="nextRadio" name="selector" value="next" />
-                </label>
+                <h3>Type:</h3>
+                <p>
+                    <label for="selectorRadio">Selector</label>
+                    <input type="radio" id="selectorRadio" name="selector" value="selector" checked/>
+                </p>
+                <p>
+                    <label for="parentRadio">Parent</label>
+                    <input type="radio" id="parentRadio" name="selector" value="parent" />
+                </p>
+                <p>
+                    <label for="nextRadio">Next</label>
+                    <input type="radio" id="nextRadio" name="selector" value="next" />
+                </p>
             </div>
             <div id="parentRange">
                 <label>
@@ -87,15 +91,14 @@
     </div>
     <div class="view" id="ruleView">
         <div id="ruleItems" class="items">
-            <form id="ruleForm" class="column">
+            <form id="ruleForm" class="column form">
+                <h3>
+                    Selector: <span id="ruleSelector"></span>
+                </h3>
                 <div class="rule">
                     <label for="ruleName" title="the name of a rule">Name:</label>
                     <input id="ruleName" name="ruleName" type="text" />
                 </div>
-                <div class="rule">
-                    Selector: <span id="ruleSelector"></span>
-                </div>
-
                 <div class="rule">
                     <label title="the attribute of an element to capture">Capture:</label>
                     <span id="ruleAttr"></span>
@@ -109,13 +112,13 @@
                     <button id="cancelRule">Cancel</button>
                 </div>
             </form>
-            <form id="editForm" class="column">
+            <form id="editForm" class="column form">
+                <h3>
+                    Selector: <span id="editSelector"></span>
+                </h3>
                 <div class="rule">
                     <label for="ruleName" title="the name of a rule">Name:</label>
                     <input id="editName" name="editName" type="text" />
-                </div>
-                <div class="rule">
-                    Selector: <span id="editSelector"></span>
                 </div>
                 <div class="rule">
                     <label title="the attribute of an element to capture">Capture:</label>

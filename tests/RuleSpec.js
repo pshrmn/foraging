@@ -61,7 +61,7 @@ describe("Group", function(){
             var s2 = new SelectorSet("Baz");
             var sel1 = new Selector("A");
             var sel2 = new Selector("div");
-            var r1 = new Rule("Foo", "attr-href", false, true);
+            var r1 = new Rule("Foo", "attr-href", true);
             var r2 = new Rule("div", "text");
 
             s1.addSelector(sel1);
@@ -616,20 +616,15 @@ describe("Rule", function(){
             expect(r1.follow).toBe(false);
         });
 
-        it("includes Rule.multiple if included", function(){
-            var r1 = new Rule("seasons", "attr-href", true);
-            expect(r1.multiple).toBe(true);
-        });
-
         it("includes Rule.follow if included", function(){
-            var r1 = new Rule("seasons", "attr-href", false, true);
+            var r1 = new Rule("seasons", "attr-href", true);
             expect(r1.follow).toBe(true);
         });
     });
 
     describe("object", function(){
         it("returns a JSON object representing a Rule", function(){
-            var r1 = new Rule("seasons", "attr-href", false, true),
+            var r1 = new Rule("seasons", "attr-href", true),
                 r2 = new Rule("name", "text");
                 r1Expected = {
                     name: "seasons",
@@ -658,7 +653,7 @@ describe("Rule", function(){
 
     describe("update", function(){
         it("replaces Rule properties", function(){
-            var r1 = new Rule("seasons", "attr-href", true, true),
+            var r1 = new Rule("seasons", "attr-href", true),
                 newRule = {
                     name: "seasons",
                     capture: "text"
@@ -666,7 +661,6 @@ describe("Rule", function(){
             r1.update(newRule);
             expect(r1.name).toEqual("seasons");
             expect(r1.capture).toEqual("text");
-            expect(r1.multiple).toBe(false);
             expect(r1.follow).toBe(false);
         });
 
@@ -689,7 +683,7 @@ describe("Rule", function(){
         it("removes all rules (and thus associated follow pages)", function(){
             var g = new Group("One"),
                 s = new Selector("a"),
-                r = new Rule("two", "attr-href", false, true);
+                r = new Rule("two", "attr-href", true);
             g.pages["default"].sets["default"].addSelector(s);
             s.addRule(r);
             expect(g.pages["two"]).toBeDefined();

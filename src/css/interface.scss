@@ -138,6 +138,19 @@ body{
             .column{
                 display: inline-block;
                 vertical-align: top;
+                padding: 0 15px;
+            }
+
+            .form.column{
+                width: 25%;
+                min-width: 300px;
+                padding-right: 50px;
+                border-right: 1px solid $dark-gray;
+            }
+
+            .form label{
+                display: inline-block;
+                width: 75px;
             }
         }
 
@@ -161,11 +174,6 @@ body{
         min-height: 20px;
         padding: 2px;
         font-family: sans-serif;
-    }
-
-    input[type=text]:disabled{
-        background: $light-gray;
-        border-color: $gray;
     }
 
     label{
@@ -331,7 +339,15 @@ body{
 /* views */
 /* selectorView */
 #selectorView{
-    font-size: 0.75em;
+    font-size: 14px;
+
+    input[type=text]{
+        width: 50px;
+    }
+
+    p{
+        margin: 3px 0;
+    }
 }
 
 #parentRange{
@@ -362,10 +378,6 @@ body{
 
 /* rulesView */
 #ruleForm{
-    width: 25%;
-    min-width: 250px;
-    border-right: 1px dashed $dark-gray;
-
     input.error{
         border-color: $red;
         border-style: solid;

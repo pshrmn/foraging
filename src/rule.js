@@ -552,10 +552,9 @@ Selector.prototype.remove = function(){
 /********************
         RULE
 ********************/
-function Rule(name, capture, multiple, follow){
+function Rule(name, capture, follow){
     this.name = name;
     this.capture = capture;
-    this.multiple = multiple || false;
     this.follow = follow || false;
     this.htmlElements = {};
     // added when a SelectorSet calls addRule
@@ -567,10 +566,6 @@ Rule.prototype.object = function(){
         name: this.name,
         capture: this.capture
     };
-
-    if ( this.multiple ) {
-        data.multiple = this.multiple;
-    }
 
     if ( this.follow ) {
         data.follow = this.follow;
@@ -632,7 +627,6 @@ Rule.prototype.update = function(object){
         }
     }
     this.capture = object.capture;
-    this.multiple = object.multiple || false;
     this.follow = object.follow || false;
 };
 
