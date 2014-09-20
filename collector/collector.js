@@ -60,6 +60,16 @@ function newOption(name){
     return option;
 }
 
+// append all of the elements in children to the parent element
+function appendChildren(parent, children){
+    if ( parent === null ) {
+        return;
+    }
+    for ( var i=0, len=children.length; i<len; i++ ) {
+        parent.appendChild(children[i]);
+    }
+}
+
 // Source: src/selector.js
 /********************
     SELECTORFAMILY
@@ -91,7 +101,7 @@ function SelectorFamily(ele, parent, holder, text, fn, options){
             continue;
         }
 
-        sel = new Selector(ele, this);
+        sel = new EleSelector(ele, this);
         if ( this.parent && sel.matches(this.parent)) {
             break;
         }
@@ -282,7 +292,7 @@ NthFragment.prototype = {
 /********************
     SELECTOR
 ********************/
-function Selector(ele, family){
+function EleSelector(ele, family){
     this.family = family;
     this.tag = new Fragment(ele.tagName.toLowerCase(), this);
     this.id = ele.hasAttribute('id') ? new Fragment('#' + ele.getAttribute('id'), this) : undefined;
@@ -336,7 +346,7 @@ function cleanSelector(event){
     this.family.update();
 }
 
-Selector.prototype = {
+EleSelector.prototype = {
     addNthofType: function(){
         if ( this.nthoftype ) {
             return;
@@ -885,7 +895,7 @@ SelectorSet.prototype.html = function(){
         nametag = noSelectElement("h5"),
         ul = noSelectElement("ul");
         
-    holder.classList.add("SelectorSet");
+    holder.classList.add("set");
     nametag.textContent = "Selector Set: " + this.name;
     appendChildren(holder, [nametag, ul]);
 
@@ -903,7 +913,7 @@ SelectorSet.prototype.deleteHTML = prototypeDeleteHTML;
 SelectorSet.prototype.addSelector = function(selector){
     this.selectors[selector.selector] = selector;
     if ( this.elements.selectors) {
-        this.elements.selectors.appendChild(selector.html())
+        this.elements.selectors.appendChild(selector.html());
     }
     selector.set = this;
 };
@@ -961,7 +971,7 @@ Selector.prototype.object = function(){
     }
 
     return data;
-}
+};
 
 /*
 only include the selector if it has rules
@@ -972,7 +982,7 @@ Selector.prototype.uploadObject = function(){
     }
 
     return this.object();
-}
+};
 
 Selector.prototype.addRule = function(rule, events){
     this.rules[rule.name] = rule;
@@ -998,7 +1008,7 @@ Selector.prototype.removeRule = function(name){
 
 Selector.prototype.updateSelector = function(newSelector){
     var oldSelector = this.selector;
-    this.selector = newSelector
+    this.selector = newSelector;
     if ( this.elements.nametag ) {
         this.elements.nametag.textContent = newSelector;
     }
@@ -1154,10 +1164,169 @@ function prototypeDeleteHTML(){
     }
 }
 
-// append all of the elements in children to the parent element
-function appendChildren(parent, children){
-    for ( var i=0, len=children.length; i<len; i++ ) {
-        parent.appendChild(children[i]);
+// Source: src/cycle.js
+function Cycle(holder, interactive){
+    this.index = 0;
+    this.elements = [];
+    this.interactive = interactive || false;
+    this.holder = holder;
+    this.html();
+}
+
+Cycle.prototype.setElements = function(elements){
+    this.elements = elements;
+    this.preview();
+};
+
+Cycle.prototype.reset = function(){
+    this.elements = [];
+    this.index = 0;
+    this.html.preview.textContent = "";
+};
+
+Cycle.prototype.html = function(){
+    var previousButton = noSelectElement("button"),
+        index = noSelectElement("span"),
+        nextButton = noSelectElement("button"),
+        preview = noSelectElement("span");
+
+    previousButton.textContent = "<<";
+    nextButton.textContent = ">>";
+
+    previousButton.addEventListener("click", this.previous.bind(this), false);
+    nextButton.addEventListener("click", this.next.bind(this), false);
+
+    this.html = {
+        previous: previousButton,
+        index: index,
+        next: nextButton,
+        preview: preview
+    };
+
+    appendChildren(this.holder, [previousButton, index, nextButton, preview]);
+};
+
+Cycle.prototype.previous = function(event){
+    event.preventDefault();
+    this.index = ( this.index === 0 ) ? this.elements.length-1 : this.index - 1;
+    this.preview();
+    markCapture();
+};
+
+Cycle.prototype.next = function(event){
+    event.preventDefault();
+    this.index = ( this.index === this.elements.length - 1) ? 0 : this.index + 1;
+    this.preview();
+    markCapture();
+};
+
+Cycle.prototype.preview = function(){
+    var element = this.elements[this.index],
+        negative = this.index - this.elements.length;
+    this.html.index.textContent = (this.idex === 0) ? "" : this.index + " / " + negative;
+    this.html.preview.innerHTML = "";
+
+    var clone = cleanElement(element.cloneNode(true)),
+        html = clone.outerHTML,
+        attrs = clone.attributes,
+        curr, text, splitHTML, firstHalf, secondHalf, captureEle;
+    if ( this.interactive ) {
+        for ( var i=0, len =attrs.length; i<len; i++ ) {
+            curr = attrs[i];
+            text = attributeText(curr);
+
+            splitHTML = html.split(text);
+            firstHalf = splitHTML[0];
+            secondHalf = splitHTML[1];
+
+            this.html.preview.appendChild(document.createTextNode(firstHalf));
+            captureEle = captureAttribute(text, 'attr-'+curr.name);
+            if ( captureEle) {
+                this.html.preview.appendChild(captureEle);
+            }
+            html = secondHalf;
+        }
+
+        if ( clone.textContent !== "" ) {
+            text = clone.textContent;
+            splitHTML = html.split(text);
+            firstHalf = splitHTML[0];
+            secondHalf = splitHTML[1];
+
+            this.html.preview.appendChild(document.createTextNode(firstHalf));
+            captureEle = captureAttribute(text, 'text');
+            if ( captureEle) {
+                this.html.preview.appendChild(captureEle);
+            }
+
+            html = secondHalf;
+        }
+    } else {
+        // get rid of empty class string
+        if (html.indexOf("class=\"\"") !== -1 ) {
+            html = html.replace("class=\"\"", "");
+        }
+    }
+
+    // append remaining text
+    this.html.preview.appendChild(document.createTextNode(html));
+};
+
+/*
+takes an element and remove collectjs related classes and shorten text, then returns outerHTML
+*/
+function cleanElement(ele){
+    ele.classList.remove('queryCheck');
+    ele.classList.remove('collectHighlight');
+    if ( ele.hasAttribute('src') ) {
+        var value = ele.getAttribute('src'),
+            query = value.indexOf('?');
+        if ( query !== -1 ) {
+            value = value.slice(0, query);
+        }
+        ele.setAttribute('src', value);
+    }
+    if ( ele.textContent !== "" ) {
+        var innerText = ele.textContent.replace(/(\s{2,}|[\n\t]+)/g, ' ');
+        if ( innerText.length > 100 ){
+            innerText = innerText.slice(0, 25) + "..." + innerText.slice(-25);
+        }
+        ele.innerHTML = innerText;
+    }
+    return ele;
+}
+
+function attributeText(attr) {
+    // encode ampersand
+    attr.value = attr.value.replace("&", "&amp;");
+    return attr.name + "=\"" + attr.value + "\"";
+}
+
+//wrap an attribute or the text of an html string 
+//(used in #selector_text div)
+function captureAttribute(text, type){
+    // don't include empty properties
+    if ( text.indexOf('=""') !== -1 ) {
+        return;
+    }
+    var span = noSelectElement("span");
+    span.classList.add("capture");
+    span.setAttribute("title", "click to capture " + type + " property");
+    span.dataset.capture = type;
+    span.textContent = text;
+    span.addEventListener("click", capturePreview, false);
+    return span;
+}
+
+/*
+if #ruleAttr is set, add .selected class to the matching #ruleHTML .capture span
+*/
+function markCapture(){
+    var capture = HTML.rule.rule.capture.textContent,
+        selector;
+    if ( capture !== "") {
+        selector = ".capture[data-capture='" + capture + "']";
+        document.querySelector(selector).classList.add("selected");
     }
 }
 
@@ -1167,7 +1336,7 @@ var marginBottom;
 (function addInterface(){
     var div = noSelectElement("div");
     div.classList.add("collectjs");
-    div.innerHTML = "<div class=\"tabHolder\"><div class=\"tabs\"><div class=\"tab active\" id=\"ruleTab\"data-for=\"ruleView\">Rule</div><div class=\"tab\" id=\"groupsTab\" data-for=\"groupsView\">Current Group</div><div class=\"tab\" id=\"previewTab\" data-for=\"previewView\">Preview</div><div class=\"tab\" id=\"optionsTab\" data-for=\"optionsView\">Options</div><div class=\"tab\" id=\"refreshCollect\">&#8635;</div><div class=\"tab\" id=\"closeCollect\">&times;</div></div></div><div class=\"permanent\"><div class=\"currentInfo\"><div>Group: <select id=\"groupSelect\"></select><button id=\"createGroup\" title=\"create a new group\">+</button><button id=\"deleteGroup\" title=\"delete current group\">&times;</button><div id=\"indexMarker\" class=\"info\">Initial URL<input type=\"checkbox\" id=\"indexToggle\" /></div><div id=\"defaultNext\" class=\"info\">Next <input type=\"checkbox\" id=\"pageNext\" name=\"next\" /><span id=\"nextSelectorView\"></span></div></div><div>Page: <select id=\"pageSelect\"></select><button id=\"deletePage\" title=\"delete current page\">&times;</button></div><div>Rule Set: <select id=\"ruleSetSelect\"></select><button id=\"createRuleSet\" title=\"create a new rule set\">+</button><button id=\"deleteRuleSet\" title=\"delete current rule set\">&times;</button><div id=\"currentParent\" class=\"info\">Parent <input type=\"checkbox\" id=\"ruleSetParent\" name=\"parent\" /><span id=\"parentSelectorView\"></span><span id=\"parentRangeView\"></span></div></div><button id=\"uploadRules\">Upload Group</button></div><div id=\"collectAlert\"></div></div><div class=\"views\"><div class=\"view\" id=\"emptyView\"></div><div class=\"view active\" id=\"ruleView\"><div id=\"ruleItems\" class=\"items\"><form id=\"ruleForm\" class=\"column\"><div class=\"rule\"><label for=\"ruleName\" title=\"the name of a rule\">Name:</label><input id=\"ruleName\" name=\"ruleName\" type=\"text\" /></div><div class=\"rule\"><label title=\"the selector to get the rule in the DOM\">Selector:</label><span id=\"ruleSelector\"></span></div><div class=\"rule\"><label title=\"the attribute of an element to capture\">Capture:</label><span id=\"ruleAttr\"></span></div><div class=\"rule multiple\"><label for=\"ruleMultiple\" title=\"capture from all elements matching selector. Useful when you only need one attribute from multiple elements (so that using a parent selector would be overkill)\">Multiple: </label><input id=\"ruleMultiple\" type=\"checkbox\" /></div><div class=\"rule follow\"><label for=\"ruleFollow\" title=\"create a new page from the element's captured url (capture must be attr-href)\">Follow:</label><input id=\"ruleFollow\" name=\"ruleFollow\" type=\"checkbox\" disabled=\"true\" title=\"Can only follow rules that get href attribute from links\" /></div><div><button id=\"saveRule\">Save Rule</button><button id=\"cancelRule\">Cancel</button></div></form><form id=\"editForm\" class=\"column\"><div class=\"rule\"><label for=\"ruleName\" title=\"the name of a rule\">Name:</label><input id=\"editName\" name=\"editName\" type=\"text\" /></div><div class=\"rule\"><label title=\"the selector to get the rule in the DOM\">Selector:</label><span id=\"editSelector\"></span></div><div class=\"rule\"><label title=\"the attribute of an element to capture\">Capture:</label><span id=\"editAttr\"></span></div><div class=\"rule editFollow\"><label for=\"editFollow\" title=\"create a new page from the element's captured url (capture must be attr-href)\">Follow:</label><input id=\"editFollow\" name=\"editFollow\" type=\"checkbox\" disabled=\"true\" title=\"Can only follow rules that get href attribute from links\" /></div><div><button id=\"saveEdit\">Save Edited Rule</button><button id=\"cancelEdit\">Cancel</button></div></form><form id=\"parentForm\" class=\"column\"><div class=\"rule\"><label>Selector:</label><span id=\"parentSelector\"></span></div><p>Range:</p><div class=\"rule\"><label for=\"parentLow\">Low:</label><input id=\"parentLow\" name=\"parentLow\" type=\"text\" /></div><div class=\"rule\"><label for=\"parentHigh\">High:</label><input id=\"parentHigh\" name=\"parentHigh\" type=\"text\" /></div><div><button id=\"saveParent\">Set Parent</button><button id=\"cancelParent\">Cancel</button></div></form><form id=\"nextForm\" class=\"column\"><div class=\"rule\"><label>Selector:</label><span id=\"nextSelector\"></span></div><button id=\"saveNext\">Save Next Rule</button><button id=\"cancelNext\">Cancel</button></form><div class=\"modifiers column\"><div id=\"selectorHolder\"></div><div class=\"ruleHTMLHolder\">Count: <span id=\"currentCount\"></span><div id=\"ruleCycle\"><button id=\"ruleCyclePrevious\" class=\"cycle\" title=\"previous element matching selector\">&lt;&lt;</button><span id=\"currentElementIndex\"></span><button id=\"ruleCycleNext\" class=\"cycle\" title=\"next element matching selector\">&gt;&gt;</button><span id=\"ruleHTML\"></span></div></div></div></div></div><div class=\"view\" id=\"groupsView\"><div id=\"groupHolder\" class=\"rules\"></div></div><div class=\"view\" id=\"previewView\"><p>Name: <span id=\"previewName\" class=\"name\"></span>Selector: <span id=\"previewSelector\" class=\"name\"></span>Capture: <span id=\"previewCapture\" class=\"name\"></span><button id=\"previewClear\">Clear</button></p><div id=\"previewContents\"></div></div><div class=\"view\" id=\"optionsView\"><p><label for=\"ignore\">Ignore helper elements (eg tbody)</label><input type=\"checkbox\" id=\"ignore\" /></p></div></div>";
+    div.innerHTML = "<div class=\"tabHolder\"><div class=\"tabs\"><div class=\"tab active\" id=\"selectorTab\" data-for=\"selectorView\">Selector</div><div class=\"tab\" id=\"ruleTab\" data-for=\"ruleView\">Rule</div><div class=\"tab\" id=\"groupsTab\" data-for=\"groupsView\">Current Group</div><div class=\"tab\" id=\"previewTab\" data-for=\"previewView\">Preview</div><div class=\"tab\" id=\"optionsTab\" data-for=\"optionsView\">Options</div><div class=\"tab\" id=\"refreshCollect\">&#8635;</div><div class=\"tab\" id=\"closeCollect\">&times;</div></div></div><div class=\"permanent\"><div class=\"currentInfo\"><div>Group: <select id=\"groupSelect\"></select><button id=\"createGroup\" title=\"create a new group\">+</button><button id=\"deleteGroup\" title=\"delete current group\">&times;</button><div id=\"indexMarker\" class=\"info\">Initial URL<input type=\"checkbox\" id=\"indexToggle\" /></div><div id=\"nextHolder\" class=\"info\">Next:<span id=\"nextSelectorView\"></span><button id=\"removeNext\">&times;</button></div></div><div>Page: <select id=\"pageSelect\"></select><button id=\"deletePage\" title=\"delete current page\">&times;</button></div><div>Selector Set: <select id=\"selectorSetSelect\"></select><button id=\"createSelectorSet\" title=\"create a new selector set\">+</button><button id=\"deleteSelectorSet\" title=\"delete current selector set\">&times;</button><div id=\"currentParent\" class=\"info\">Parent<span id=\"parentSelectorView\"></span><span id=\"parentRangeView\"></span><button id=\"removeParent\">&times;</button></div></div><button id=\"uploadRules\">Upload Group</button></div><div id=\"collectAlert\"></div></div><div class=\"views\"><div class=\"view\" id=\"emptyView\"></div><div class=\"view active\" id=\"selectorView\"><div class=\"column\"><!--displays what the current selector is--><p>Selector: <span id=\"currentSelector\"></span></p><p>Count: <span id=\"currentCount\"></span></p><div><label>Selector <input type=\"radio\" id=\"selectorRadio\" name=\"selector\" value=\"selector\" checked/></label><label>Parent <input type=\"radio\" id=\"parentRadio\" name=\"selector\" value=\"parent\" /></label><label>Next <input type=\"radio\" id=\"nextRadio\" name=\"selector\" value=\"next\" /></label></div><div id=\"parentRange\"><label>Low: <input id=\"parentLow\" name=\"parentLow\" type=\"text\" /></label><label for=\"parentHigh\">High: <input id=\"parentHigh\" name=\"parentHigh\" type=\"text\" /></label></div><p><button id=\"saveSelector\">Save</button></p></div><div class=\"column\"><!--holds the interactive element for choosing a selector--><div id=\"selectorHolder\"></div><div id=\"selectorCycleHolder\"></div></div></div><div class=\"view\" id=\"ruleView\"><div id=\"ruleItems\" class=\"items\"><form id=\"ruleForm\" class=\"column\"><div class=\"rule\"><label for=\"ruleName\" title=\"the name of a rule\">Name:</label><input id=\"ruleName\" name=\"ruleName\" type=\"text\" /></div><div class=\"rule\"><label title=\"the attribute of an element to capture\">Capture:</label><span id=\"ruleAttr\"></span></div><div class=\"rule follow\"><label for=\"ruleFollow\" title=\"create a new page from the element's captured url (capture must be attr-href)\">Follow:</label><input id=\"ruleFollow\" name=\"ruleFollow\" type=\"checkbox\" disabled=\"true\" title=\"Can only follow rules that get href attribute from links\" /></div><div><button id=\"saveRule\">Save Rule</button><button id=\"cancelRule\">Cancel</button></div></form><form id=\"editForm\" class=\"column\"><div class=\"rule\"><label for=\"ruleName\" title=\"the name of a rule\">Name:</label><input id=\"editName\" name=\"editName\" type=\"text\" /></div><div class=\"rule\"><label title=\"the selector to get the rule in the DOM\">Selector:</label><span id=\"editSelector\"></span></div><div class=\"rule\"><label title=\"the attribute of an element to capture\">Capture:</label><span id=\"editAttr\"></span></div><div class=\"rule editFollow\"><label for=\"editFollow\" title=\"create a new page from the element's captured url (capture must be attr-href)\">Follow:</label><input id=\"editFollow\" name=\"editFollow\" type=\"checkbox\" disabled=\"true\" title=\"Can only follow rules that get href attribute from links\" /></div><div><button id=\"saveEdit\">Save Edited Rule</button><button id=\"cancelEdit\">Cancel</button></div></form><div class=\"modifiers column\"><div class=\"ruleCycleHolder\"></div></div></div></div><div class=\"view\" id=\"groupsView\"><div id=\"groupHolder\" class=\"rules\"></div></div><div class=\"view\" id=\"previewView\"><p>Name: <span id=\"previewName\" class=\"name\"></span>Selector: <span id=\"previewSelector\" class=\"name\"></span>Capture: <span id=\"previewCapture\" class=\"name\"></span><button id=\"previewClear\">Clear</button></p><div id=\"previewContents\"></div></div><div class=\"view\" id=\"optionsView\"><p><label for=\"ignore\">Ignore helper elements (eg tbody)</label><input type=\"checkbox\" id=\"ignore\" /></p></div></div>";
     document.body.appendChild(div);
     addNoSelect(div.querySelectorAll("*"));
 
@@ -1205,9 +1374,9 @@ var Collect = {
     current: {
         group: undefined,
         page: undefined,
-        ruleSet: undefined
+        set: undefined
     },
-    // parent.selector is set when Collect.current.ruleSet index=true
+    // parent.selector is set when Collect.current.set index=true
     parent: {},
     // currently loaded Group
     group: undefined
@@ -1218,6 +1387,7 @@ Object that controls the functionality of the interface
 */
 var Interface = {
     activeForm: "rule",
+    activeSelector: "selector",
     tabs: {
         tab: document.querySelector(".tab.active"),
         view: document.querySelector(".view.active")
@@ -1226,6 +1396,9 @@ var Interface = {
         loadOptions();
         setupHostname();
         this.events();
+
+        setupSelectorTab();
+        setupRulesTab();
     },
     /*
     adds events listeners based on whether or not Collect.parent.elector is set
@@ -1267,28 +1440,44 @@ var Interface = {
         tabEvents();
 
         //views
+        selectorViewEvents();
         ruleViewEvents();
         optionsViewEvents();
         previewViewEvents();
         permanentBarEvents();
     },
     update: function(){
-        HTML.groups.group.querySelector("option[value=" + Collect.current.group + "]").selected = true;
-        HTML.groups.page.querySelector("option[value=" + Collect.current.page + "]").selected = true;
-        HTML.groups.ruleSet.querySelector("option[value=" + Collect.current.ruleSet + "]").selected = true;
+        HTML.perm.group.select.querySelector("option[value=" + Collect.current.group + "]").selected = true;
+        HTML.perm.page.select.querySelector("option[value=" + Collect.current.page + "]").selected = true;
+        HTML.perm.set.select.querySelector("option[value=" + Collect.current.set + "]").selected = true;
     }
 };
 
 // save commonly referenced to elements
 var HTML = {
-    family: document.getElementById("selectorHolder"),
-    form: {
+    // elements in the selector view
+    selector: {
+        family: document.getElementById("selectorHolder"),
+        selector: document.getElementById("currentSelector"),
+        count: document.getElementById("currentCount"),
+        save: document.getElementById("saveSelector"),
+        parent: {
+            holder: document.getElementById("parentRange"),
+            low: document.getElementById("parentLow"),
+            high: document.getElementById("parentHigh")
+        },
+        radio: {
+            selector: document.getElementById("selectorRadio"),
+            parent: document.getElementById("parentRadio"),
+            next: document.getElementById("nextRadio")
+        }
+    },
+    // elements in the rule view
+    rule: {
         rule: {
             form: document.getElementById("ruleForm"),
             name: document.getElementById("ruleName"),
             capture: document.getElementById("ruleAttr"),
-            selector: document.getElementById("ruleSelector"),
-            multiple: document.getElementById("ruleMultiple"),
             follow: document.getElementById("ruleFollow"),
             followHolder: document.querySelector("#ruleItems .follow")
         },
@@ -1299,38 +1488,37 @@ var HTML = {
             selector: document.getElementById("editSelector"),
             follow: document.getElementById("editFollow"),
             followHolder: document.querySelector("#ruleItems .editFollow")  
-        },
-        parent: {
-            form: document.getElementById("parentForm"),
-            selector: document.getElementById("parentSelector"),
-            low: document.getElementById("parentLow"),
-            high: document.getElementById("parentHigh")
-        },
-        next: {
-            form: document.getElementById("nextForm"),
-            selector: document.getElementById("nextSelector")
         }
     },
-    groups: {
-        group: document.getElementById("groupSelect"),
-        page: document.getElementById("pageSelect"),
-        ruleSet: document.getElementById("ruleSetSelect"),
-        groupHolder: document.getElementById("groupHolder")
+    // elements in the the permament bar
+    perm: {
+        group: {
+            select: document.getElementById("groupSelect"),
+            holder: document.getElementById("groupHolder"),
+        },
+        page: {
+            select: document.getElementById("pageSelect"),
+        },
+        set: {
+            select: document.getElementById("selectorSetSelect")
+        },
+        parent: {
+            holder: document.getElementById("currentParent"),
+            selector: document.getElementById("parentSelectorView"),
+            range: document.getElementById("parentRangeView")
+        },
+        next: {
+            holder: document.getElementById("nextHolder"),
+            selector: document.getElementById("nextSelectorView")
+        }
     },
     info: {
         alert: document.getElementById("collectAlert"),
-        count: document.getElementById("currentCount"),
-        cycleIndex: document.getElementById("currentElementIndex"),
         index: document.getElementById("indexMarker"),
         indexToggle: document.getElementById("indexToggle"),
-        parent: document.getElementById("parentSelectorView"),
-        parentCheckbox: document.getElementById("ruleSetParent"),
-        nextHolder: document.getElementById("defaultNext"),
-        next: document.getElementById("nextSelectorView"),
-        nextCheckbox: document.getElementById("pageNext"),
-        range: document.getElementById("parentRangeView")
     },
     interface: document.querySelector(".collectjs"),
+    // elements in the preview view
     preview: {
         name: document.getElementById("previewName"),
         selector: document.getElementById("previewSelector"),
@@ -1338,9 +1526,8 @@ var HTML = {
         contents: document.getElementById("previewContents"),
         clear: document.getElementById("previewClear")
     },
-    cycle: document.getElementById("ruleCycle"),
-    ruleHTML: document.getElementById("ruleHTML"),
     tabs: {
+        selector: document.getElementById("selectorTab"),
         rule: document.getElementById("ruleTab"),
         groups: document.getElementById("groupsTab"),
         preview: document.getElementById("previewTab"),
@@ -1358,37 +1545,22 @@ var Family = {
         resetInterface(); 
         if ( Interface.editing ) {
             // preserve name when switching selector while editing
-            HTML.form.edit.name.value = Interface.editing.name;
+            HTML.rule.edit.name.value = Interface.editing.name;
         }
         
-        var selectorElement;
-        switch ( Interface.activeForm ){
-        case "rule":
-            selectorElement = HTML.form.rule.selector;
-            break;
-        case "parent":
-            selectorElement = HTML.form.parent.selector;
-            break;
-        case "next":
-            selectorElement = HTML.form.next.selector;
-            break;
-        case "edit":
-            selectorElement = HTML.form.edit.selector;
-            break;
-        default:
-            selectorElement = HTML.form.rule.selector;
-        }
+        //redo
+        var selectorElement = HTML.selector.selector;
 
         var sf = new SelectorFamily(this,
             Collect.parent.selector,
-            HTML.family,
+            HTML.selector.family,
             selectorElement,
             Family.test.bind(Family),
             Collect.options
         );
         Family.family = sf;
         sf.update();
-        showTab(HTML.tabs.rule);
+        showTab(HTML.tabs.selector);
     },
     edit: function(selector){
         var eles = parentElements(selector);
@@ -1398,13 +1570,13 @@ var Family = {
         var sf = new SelectorFamily(eles[0],
             Collect.parent.selector,
             HTML.family,
-            HTML.form.rule.selector,
+            HTML.selector.selector,
             Family.test.bind(Family),
             Collect.options
         );
         Family.family = sf;
         sf.update();
-        showTab(HTML.tabs.rule);  
+        showTab(HTML.tabs.selector);  
     },
     remove: function(){
         if ( this.family ) {
@@ -1420,7 +1592,7 @@ var Family = {
             var sf = new SelectorFamily(element,
                 Collect.parent.selector,
                 HTML.family,
-                HTML.form.rule.selector,
+                HTML.selector.selector,
                 Family.test.bind(Family),
                 Collect.options
             );
@@ -1446,12 +1618,10 @@ var Family = {
         return parentElements(selector);
     },
     /*
-    sets Collect.matchedElements to elements matching the current selector and resets elementIndex
+    sets Collect.matchedElements to elements matching the current selector
     */
     match: function(){
         Collect.matchedElements = this.elements();
-        Collect.elementIndex = 0;
-        setCurrentIndex();
     },
     /*
     add queryCheck class to all elements matching selector
@@ -1467,12 +1637,9 @@ var Family = {
             elements[i].classList.add("queryCheck");
         }
         count = elements.length ? elements.length : "";
-        HTML.info.count.textContent = count;
+        HTML.selector.count.textContent = count;
         this.match();
-        var ele = Collect.matchedElements[0];
-        if ( ele ) {
-            setRuleHTML(ele);
-        }
+        Interface.selectorCycle.setElements(Collect.matchedElements);
     },
     /*
     only select elements that fall between low/elements.length + high (because high is negative)
@@ -1482,9 +1649,7 @@ var Family = {
         Family.match();
         var len = Collect.matchedElements.length;
         Collect.matchedElements = Array.prototype.slice.call(Collect.matchedElements).slice(low, len + high);
-        Collect.elementIndex = 0;
-        setCurrentIndex();
-        setRuleHTML(Collect.matchedElements[0]);
+        Interface.selectorCycle.setElements(Collect.matchedElements);
     }
 };
 
@@ -1499,35 +1664,31 @@ function resetInterface(){
     resetPreviewView();
 }
 
-function resetRulesView(){
+function resetSelectorView(){
     Family.remove();
-    
+    Interface.activeSelector = "selector";
+    HTML.selector.radio.selector.checked = true;
+    HTML.selector.parent.holder.style.display = "none";
+    HTML.selector.parent.low.value = "";
+    HTML.selector.parent.high.value = "";
+    HTML.selector.count.textContent = "";
+}
+
+function resetRulesView(){
     // reset rule form
-    HTML.form.rule.name.value = "";
-    HTML.form.rule.capture.textContent = "";
-    HTML.form.rule.selector.textContent = "";
-    HTML.form.rule.follow.checked = false;
-    HTML.form.rule.follow.disabled = true;
-    HTML.form.rule.followHolder.style.display = "none";
+    HTML.rule.rule.name.value = "";
+    HTML.rule.rule.capture.textContent = "";
+    HTML.rule.rule.follow.checked = false;
+    HTML.rule.rule.follow.disabled = true;
+    HTML.rule.rule.followHolder.style.display = "none";
 
     // reset edit form
-    HTML.form.edit.name.value = "";
-    HTML.form.edit.capture.textContent = "";
-    HTML.form.edit.selector.textContent = "";
-    HTML.form.edit.follow.checked = false;
-    HTML.form.edit.follow.disabled = true;
-    HTML.form.edit.followHolder.style.display = "none";
-
-    // reset parent form
-    HTML.form.parent.selector.textContent = "";
-    HTML.form.parent.low.value = "";
-    HTML.form.parent.high.value = "";
-
-    // reset next form
-    HTML.form.next.selector.textContent = "";
-
-    HTML.info.count.textContent = "";
-    HTML.ruleHTML.innerHTML = "";
+    HTML.rule.edit.name.value = "";
+    HTML.rule.edit.capture.textContent = "";
+    HTML.rule.edit.selector.textContent = "";
+    HTML.rule.edit.follow.checked = false;
+    HTML.rule.edit.follow.disabled = true;
+    HTML.rule.edit.followHolder.style.display = "none";
 }
 
 function resetPreviewView(){
@@ -1567,19 +1728,27 @@ function tabEvents(){
     }
 }
 
+function setupSelectorTab(){
+    Interface.selectorCycle = new Cycle(document.getElementById("selectorCycleHolder"));
+}
+
+function setupRulesTab() {
+    Interface.ruleCycle = new Cycle(document.getElementById("ruleCycleHolder"), true);   
+}
+
+function selectorViewEvents(){
+    idEvent("saveSelector", "click", saveSelectorEvent);
+    idEvent("selectorRadio", "change", updateRadioEvent);
+    idEvent("parentRadio", "change", updateRadioEvent);
+    idEvent("nextRadio", "change", updateRadioEvent);
+}
+
 function ruleViewEvents(){
     idEvent("saveRule", "click", saveRuleEvent);
     idEvent("saveEdit", "click", saveEditEvent);
-    idEvent("saveParent", "click", saveParentEvent);
-    idEvent("saveNext", "click", saveNextEvent);
 
     idEvent("cancelRule", "click", cancelRuleEvent);
     idEvent("cancelEdit", "click", cancelEditEvent);
-    idEvent("cancelParent", "click", cancelParentEvent);
-    idEvent("cancelNext", "click", cancelNextEvent);
-
-    idEvent("ruleCyclePrevious", "click", showPreviousElement);
-    idEvent("ruleCycleNext", "click", showNextElement);
 
     idEvent("parentLow", "blur", verifyAndApplyParentLow);
     idEvent("parentHigh", "blur", verifyAndApplyParentHigh);
@@ -1636,26 +1805,23 @@ function permanentBarEvents(){
     // attr-href and follow=true
 
     // rule set events
-    idEvent("createRuleSet", "click", function newRuleSetEvent(event){
+    idEvent("createSelectorSet", "click", function newSelectorSetEvent(event){
         event.preventDefault();
-        createRuleSet();
+        createSelectorSet();
     });
 
-    idEvent("ruleSetSelect", "change", function loadRuleSetEvent(event){
+    idEvent("selectorSetSelect", "change", function loadSetEvent(event){
         event.preventDefault();
-        loadRuleSet(this);
+        loadSet(this);
     });
 
-    idEvent("deleteRuleSet", "click", function deleteRuleSetEvent(event){
+    idEvent("deleteSelectorSet", "click", function deleteSelectorSetEvent(event){
         event.preventDefault();
-        deleteRuleSet();
+        deleteSelectorSet();
     });
 
-    // parent events
-    idEvent("ruleSetParent", "change", toggleParentEvent);
-
-    // next events
-    idEvent("pageNext", "change", toggleNextEvent);
+    idEvent("removeParent", "click", deleteParentEvent);
+    idEvent("removeNext", "click", deleteNextEvent);
 
     // upload events
     idEvent("uploadRules", "click", function uploadEvent(event){
@@ -1695,26 +1861,12 @@ function cancelEditEvent(event){
     baseCancel();   
 }
 
-function cancelParentEvent(event){
-    event.stopPropagation();
-    event.preventDefault();
-    baseCancel();
-    HTML.info.parentCheckbox.checked = false;
-}
-
-function cancelNextEvent(event){
-    event.stopPropagation();
-    event.preventDefault();
-    baseCancel();    
-    HTML.info.nextCheckbox.checked = false;
-}
-
 function verifyAndApplyParentLow(event){
-    var low = parseInt(HTML.form.parent.low.value, 10),
-        high = parseInt(HTML.form.parent.high.value, 10) || 0;
+    var low = parseInt(HTML.selector.parent.low.value, 10),
+        high = parseInt(HTML.selector.parent.high.value, 10) || 0;
 
     if ( isNaN(low) || low <= 0 ) {
-        HTML.form.parent.low.value = "";
+        HTML.selector.parent.low.value = "";
         alertMessage("Low must be positive integer greater than 0");
         return;
     }
@@ -1723,15 +1875,15 @@ function verifyAndApplyParentLow(event){
     clearClass("queryCheck");
     addClass("queryCheck", Collect.matchedElements);
     
-    HTML.info.count.textContent = Collect.matchedElements.length;   
+    HTML.selector.count.textContent = Collect.matchedElements.length;   
 }
 
 function verifyAndApplyParentHigh(event){
-    var low = parseInt(HTML.form.parent.low.value, 10) || 0,
-        high = parseInt(HTML.form.parent.high.value, 10);
+    var low = parseInt(HTML.selector.parent.low.value, 10) || 0,
+        high = parseInt(HTML.selector.parent.high.value, 10);
 
     if ( isNaN(high) || high > 0 ) {
-        HTML.form.parent.high.value = "";
+        HTML.selector.parent.high.value = "";
         alertMessage("High must be a negative integer");
         return;
     }
@@ -1739,36 +1891,7 @@ function verifyAndApplyParentHigh(event){
     clearClass("queryCheck");
     addClass("queryCheck", Collect.matchedElements);
     
-    HTML.info.count.textContent = Collect.matchedElements.length;   
-}
-
-function applyParentRange(event){
-}
-
-/*
-cycle to the previous element (based on Collect.elementIndex and Collect.matchedElements) to represent an
-element in #ruleHTML
-*/
-function showPreviousElement(event){
-    var index = Collect.elementIndex,
-        len = Collect.matchedElements.length;
-    Collect.elementIndex = (index=== 0) ? len-1 : index-1;
-    setCurrentIndex();
-    setRuleHTML(Collect.matchedElements[Collect.elementIndex]);
-    markCapture();
-}
-
-/*
-cycle to the next element (`d on Collect.elementIndex and Collect.matchedElements) to represent an
-element in #ruleHTML
-*/
-function showNextElement(event){
-    var index = Collect.elementIndex,
-        len = Collect.matchedElements.length;
-    Collect.elementIndex = (index=== len-1) ? 0 : index+1;
-    setCurrentIndex();
-    setRuleHTML(Collect.matchedElements[Collect.elementIndex]);
-    markCapture();
+    HTML.selector.count.textContent = Collect.matchedElements.length;   
 }
 
 /*
@@ -1779,13 +1902,13 @@ toggle .selected class
 function capturePreview(event){
     var capture, follow, followHolder;
     if ( Interface.activeForm === "rule" ) {
-        capture = HTML.form.rule.capture;
-        follow = HTML.form.rule.follow;
-        followHolder = HTML.form.rule.followHolder;
+        capture = HTML.rule.rule.capture;
+        follow = HTML.rule.rule.follow;
+        followHolder = HTML.rule.rule.followHolder;
     } else if ( Interface.activeForm === "edit" ) {
-        capture = HTML.form.edit.capture;
-        follow = HTML.form.edit.follow;
-        followHolder = HTML.form.edit.followHolder;
+        capture = HTML.rule.edit.capture;
+        follow = HTML.rule.edit.follow;
+        followHolder = HTML.rule.edit.followHolder;
     }
 
     if ( !this.classList.contains("selected") ){
@@ -1813,97 +1936,46 @@ function capturePreview(event){
         this.classList.remove("selected");
     }   
 }
-
-
 /******************
-    RULE EVENTS
+    SELECTOR EVENTS
 ******************/
-function saveRuleEvent(event){
+function saveSelectorEvent(event){
     event.preventDefault();
-    var name = HTML.form.rule.name.value,
-        selector = HTML.form.rule.selector.textContent,
-        capture = HTML.form.rule.capture.textContent,
-        multiple = HTML.form.rule.multiple.checked,
-        follow = HTML.form.rule.follow.checked,
-        rule = {
-            name: name,
-            capture: capture,
-            selector: selector
-        };
-
-    // error checking
     clearErrors();
-    if ( emptyErrorCheck(name, HTML.form.rule.name, "Name needs to be filled in") ||
-        emptyErrorCheck(selector, HTML.form.rule.selector, "No CSS selector selected") ||
-        emptyErrorCheck(capture, HTML.form.rule.capture, "No attribute selected") || 
-        reservedWordErrorCheck(rule.name, HTML.form.rule.name, "Cannot use " + rule.name + 
-            " because it is a reserved word") ) {
+    var selector = HTML.selector.selector.textContent;
+    if ( emptyErrorCheck(selector, HTML.selector.selector, "No CSS selector selected") ) {
         return;
-    }
-    else if ( !Collect.group.uniqueRuleName(name) ) {
-        // some markup to signify you need to change the rule's name
-        alertMessage("Rule name is not unique");
-        HTML.form.rule.name.classList.add("error");
-        return;
-    }
-    
-    if ( multiple ) {
-        rule.multiple = true;
     }
 
-    if ( follow ) {
-        rule.follow = true;
-        // page will be created when rule is added to ruleset, but add option now
-        HTML.groups.page.appendChild(newOption(rule.name));
+    switch(Interface.activeSelector){
+    case "selector":
+        saveSelector(selector);
+        break;
+    case "parent":
+        saveParent(selector);
+        break;
+    case "next":
+        saveNext(selector);
+        break;
     }
-    
-    addRule(rule, Collect.group.pages[Collect.current.page].sets[Collect.current.ruleSet]);
-    saveGroup();
-    resetInterface();
+    resetSelectorView();
 }
 
-function saveEditEvent(event){
-    event.preventDefault();
-    var name = HTML.form.edit.name.value,
-        selector = HTML.form.edit.selector.textContent,
-        capture = HTML.form.edit.capture.textContent,
-        follow = HTML.form.edit.follow.checked,
-        rule = {
-            name: name,
-            capture: capture,
-            selector: selector
-        };
-
-    clearErrors();
-    if ( emptyErrorCheck(name, HTML.form.edit.name, "Name needs to be filled in") ||
-        emptyErrorCheck(selector, HTML.form.edit.selector, "No CSS selector selected") ||
-        emptyErrorCheck(capture, HTML.form.edit.capture, "No attribute selected") ) {
-        return;
-    }
-
-    if ( follow ) {
-        rule.follow = true;
-    }
-    var oldName = Interface.editing.name,
-        ruleSet = Interface.editing.ruleSet;
-    Interface.editing.update(rule);
-    Collect.group.pages[ruleSet.page.name].sets[ruleSet.name] = ruleSet;
+function saveSelector(selector){
+    var sel = new Selector(selector),
+        group = Collect.current.group,
+        page = Collect.current.page,
+        set = Collect.current.set;
+    Collect.group.pages[page].sets[set].addSelector(sel);
     saveGroup();
-
-    deleteEditing();
-    showRuleForm();
-    resetInterface();
 }
 
-function saveParentEvent(event){
-    event.preventDefault();
-    var selector = HTML.form.parent.selector.textContent,
-        low = parseInt(HTML.form.parent.low.value, 10),
-        high = parseInt(HTML.form.parent.high.value, 10),
+function saveParent(selector){
+    var low = parseInt(HTML.selector.parent.low.value, 10),
+        high = parseInt(HTML.selector.parent.high.value, 10),
         parent = {
             selector: selector
         };
-
     if ( !isNaN(low) ) {
         parent.low = low;
     }
@@ -1911,43 +1983,33 @@ function saveParentEvent(event){
         parent.high = high;
     }
 
-    clearErrors();
-    if ( emptyErrorCheck(selector, HTML.form.parent.selector, "No CSS selector selected")) {
-        return;
-    }
-
-    HTML.info.range.textContent = setRangeString(low, high);
 
     Collect.parent = parent;
-    HTML.info.parent.textContent = selector;
+    HTML.perm.parent.holder.style.display = "inline-block";
+    HTML.perm.parent.selector.textContent = selector;
+    HTML.perm.parent.range.textContent = setRangeString(low, high);
     addParentGroup(selector, parent.low, parent.high);
 
-    Collect.group.pages[Collect.current.page].sets[Collect.current.ruleSet].parent = parent;
+    // attach the parent to the current set and save
+    Collect.group.pages[Collect.current.page].sets[Collect.current.set].parent = parent;
     saveGroup();
-
-    showRuleForm();
+    //test
     refreshElements();
 }
 
-function saveNextEvent(event){
-    event.preventDefault();
-    var selector = HTML.form.next.selector.textContent,
-        match = document.querySelector(selector),
+function saveNext(selector){
+    var match = document.querySelector(selector),
         page = Collect.group.pages[Collect.current.page];
-
-    clearErrors();
 
     if ( page.name !== "default" ) {
         alertMessage("Cannot add next selector to '" + page.name + "' page, only to default");
         return;
     }
-
-    if ( emptyErrorCheck(selector, HTML.form.next.selector, "No CSS selector selected") || 
-        errorCheck(!match.hasAttribute("href"), HTML.form.next.selector, "selector must select element with href attribute") ) {
+    if ( errorCheck(!match.hasAttribute("href"), HTML.selector.selector, "selector must select element with href attribute") ) {
         return;
     }
 
-    HTML.info.next.textContent = selector;
+    HTML.perm.next.selector.textContent = selector;
 
     page.index = true;
     page.next = selector;
@@ -1963,54 +2025,108 @@ function saveNextEvent(event){
     refreshElements();
 }
 
-function toggleParentEvent(event){
-    deleteEditing();
-    // can only be setting parent or next at once, so if setting next, return
-    if ( Interface.activeForm === "next" ) {
-        // revert checked
-        this.checked = !this.checked;
-        alertMessage("cannot set parent while setting next selector");
-        return;
-    }
-    if ( this.checked ) {
-        // if parent selector doesn't exist, switch to parent form
-        showParentForm();
-        showTab(HTML.tabs.rule);
-    } else {
-        // if parent selector exists, remove it from current ruleSet
-        Collect.parent = {};
-        HTML.info.parent.textContent = "";
-        HTML.info.range.textContent = "";
-        Collect.group.pages[Collect.current.page].sets[Collect.current.ruleSet].parent = undefined;
-        saveGroup();
-        clearClass("parentGroup");
-        showRuleForm();
-        Interface.turnOn();
-    }
+function updateRadioEvent(event){
+    Interface.activeSelector = this.value;
+    HTML.selector.parent.holder.style.display = (Interface.activeSelector === "parent") ? "block": "none";
 }
 
-function toggleNextEvent(event){
-    deleteEditing();
-    // can only be setting parent or next at once, so if setting parent, return
-    if ( Interface.activeForm === "parent" ) {
-        // revert checked
-        this.checked = !this.checked;
-        alertMessage("cannot set next while setting parent selector");
+/******************
+    RULE EVENTS
+******************/
+function saveRuleEvent(event){
+    event.preventDefault();
+    var name = HTML.rule.rule.name.value,
+        capture = HTML.rule.rule.capture.textContent,
+        follow = HTML.rule.rule.follow.checked,
+        rule = {
+            name: name,
+            capture: capture,
+            selector: selector
+        };
+
+    // error checking
+    clearErrors();
+    if ( emptyErrorCheck(name, HTML.rule.rule.name, "Name needs to be filled in") ||
+        emptyErrorCheck(capture, HTML.rule.rule.capture, "No attribute selected") || 
+        reservedWordErrorCheck(rule.name, HTML.rule.rule.name, "Cannot use " + rule.name + 
+            " because it is a reserved word") ) {
         return;
     }
-    if ( this.checked ) {
-        showNextForm();
-        showTab(HTML.tabs.rule);
-        // remove parent selector limitation 
-        clearClass("parentGroup");
-    } else {
-        delete Collect.next;
-        HTML.info.next.textContent = "";
-        Collect.group.pages[Collect.current.page].removeNext();
-        saveGroup();
-        showRuleForm();
-        Interface.turnOn();
+    else if ( !Collect.group.uniqueRuleName(name) ) {
+        // some markup to signify you need to change the rule's name
+        alertMessage("Rule name is not unique");
+        HTML.rule.rule.name.classList.add("error");
+        return;
     }
+
+    if ( follow ) {
+        rule.follow = true;
+        // page will be created when rule is added to set, but add option now
+        HTML.perm.page.select.appendChild(newOption(rule.name));
+    }
+    var curr = Collect.current;
+    var selector = Collect.group.pages[curr.page].sets[curr.set].selector[curr.selector];
+    addRule(rule, selector);
+    saveGroup();
+    resetInterface();
+}
+
+function saveEditEvent(event){
+    event.preventDefault();
+    var name = HTML.rule.edit.name.value,
+        selector = HTML.rule.edit.selector.textContent,
+        capture = HTML.rule.edit.capture.textContent,
+        follow = HTML.rule.edit.follow.checked,
+        rule = {
+            name: name,
+            capture: capture,
+            selector: selector
+        };
+
+    clearErrors();
+    if ( emptyErrorCheck(name, HTML.rule.edit.name, "Name needs to be filled in") ||
+        emptyErrorCheck(selector, HTML.rule.edit.selector, "No CSS selector selected") ||
+        emptyErrorCheck(capture, HTML.rule.edit.capture, "No attribute selected") ) {
+        return;
+    }
+
+    if ( follow ) {
+        rule.follow = true;
+    }
+    var oldName = Interface.editing.name,
+        set = Interface.editing.set;
+    Interface.editing.update(rule);
+    Collect.group.pages[set.page.name].sets[set.name] = set;
+    saveGroup();
+
+    deleteEditing();
+    showRuleForm();
+    resetInterface();
+}
+
+function deleteParentEvent(event){
+    event.preventDefault();
+    deleteEditing();
+    Collect.parent = {};
+    HTML.perm.parent.holder.style.display = "none";
+    HTML.perm.parent.selector.textContent = "";
+    HTML.perm.parent.range.textContent = "";
+    Collect.group.pages[Collect.current.page].sets[Collect.current.set].parent = undefined;
+    saveGroup();
+    clearClass("parentGroup");
+    showRuleForm();
+    Interface.turnOn();
+}
+
+function deleteNextEvent(event){
+    event.preventDefault();
+    deleteEditing();
+    delete Collect.next;
+    HTML.perm.next.holder.style.display = "none";
+    HTML.perm.next.selector.textContent = "";
+    Collect.group.pages[Collect.current.page].removeNext();
+    saveGroup();
+    Interface.turnOn();
 }
 
 function toggleURLEvent(event){
@@ -2046,13 +2162,13 @@ function editSavedRule(event){
     Family.edit(this.selector);
 
     // setup the form
-    HTML.form.edit.name.value = this.name;
-    HTML.form.edit.selector.textContent = this.selector;
-    HTML.form.edit.capture.textContent = this.capture;
+    HTML.rule.edit.name.value = this.name;
+    HTML.rule.edit.selector.textContent = this.selector;
+    HTML.rule.edit.capture.textContent = this.capture;
     if ( this.follow ) {
-        HTML.form.edit.follow.checked = this.follow;
-        HTML.form.edit.follow.disabled = false;
-        HTML.form.edit.followHolder.style.display = "block";
+        HTML.rule.edit.follow.checked = this.follow;
+        HTML.rule.edit.follow.disabled = false;
+        HTML.rule.edit.followHolder.style.display = "block";
     }
 
     showTab(HTML.tabs.rule);
@@ -2071,9 +2187,9 @@ function previewSavedRule(event){
 
 function deleteRuleEvent(event){
     clearClass("savedPreview");
-    // also need to remove rule from RuleSet
+    // also need to remove rule from set
     if ( this.follow ) {
-        var pageOption = HTML.groups.page.querySelector("option[value=" + this.name + "]");
+        var pageOption = HTML.perm.page.select.querySelector("option[value=" + this.name + "]");
         pageOption.parentElement.removeChild(pageOption);
     }
     this.remove();
@@ -2098,18 +2214,6 @@ function showTab(tab){
     Interface.tabs.view = view;
     Interface.tabs.tab.classList.add("active");
     Interface.tabs.view.classList.add("active");
-}
-
-/*
-if #ruleAttr is set, add .selected class to the matching #ruleHTML .capture span
-*/
-function markCapture(){
-    var capture = HTML.form.rule.capture.textContent,
-        selector;
-    if ( capture !== "") {
-        selector = ".capture[data-capture='" + capture + "']";
-        document.querySelector(selector).classList.add("selected");
-    }
 }
 
 //generate paragraphs html for the captured attribute on all of the elements and attach them to #rulePreview
@@ -2192,17 +2296,15 @@ function clearErrors(){
 /*
 add's a rule element to it's respective location in #ruleGroup
 */
-function addRule(rule, ruleSet){
+function addRule(rule, selector){
     var ruleObject = new Rule(
         rule.name,
-        rule.selector,
         rule.capture,
-        rule.multiple || false,
         rule.follow || false,
         Collect.parent.selector
     );
 
-    ruleSet.addRule(ruleObject,
+    selector.addRule(ruleObject,
         [selectorViewRule, unselectorViewRule, editSavedRule, previewSavedRule, deleteRuleEvent]);
 }
 
@@ -2210,10 +2312,10 @@ function addRule(rule, ruleSet){
 add .parentGroup to all elements matching parent selector and in range
 */
 function addParentGroup(selector, low,  high){
-    var elements = Collect.all(selector),
-        end = elements.length + high;
     low = low || 0;
     high = high || 0;
+    var elements = Collect.all(selector),
+        end = elements.length + high;
         // add high because it is negative
     for ( ; low<end ; low++ ){
         elements[low].classList.add("parentGroup");
@@ -2230,9 +2332,7 @@ function parentElements(selector){
         allElements = [];
 
     // don't restrict to Collect.parent.selector when setting next selector
-    if ( Interface.activeForm === "next" ) {
-        allElements = Array.prototype.slice.call(Collect.all(selector));
-    } else if ( low !== 0 || high !== 0 ) {
+    if ( low !== 0 || high !== 0 ) {
         var elements = document.querySelectorAll(Collect.parent.selector),
             // add high because it is negative
             end = elements.length + high,
@@ -2251,50 +2351,20 @@ function parentElements(selector){
 
 function showRuleForm(){
     Interface.activeForm = "rule";
-    HTML.form.rule.form.style.display = "inline-block";
-    HTML.form.parent.form.style.display = "none";
-    HTML.form.next.form.style.display = "none";
-    HTML.form.edit.form.style.display = "none";
-    HTML.cycle.style.display = "block";
+    HTML.rule.rule.form.style.display = "inline-block";
+    HTML.rule.edit.form.style.display = "none";
 }
 
 function showEditForm(){
     Interface.activeForm = "edit";
-    HTML.form.edit.form.style.display = "inline-block";
-    HTML.form.rule.form.style.display = "none";
-    HTML.form.parent.form.style.display = "none";
-    HTML.form.next.form.style.display = "none";
-    HTML.cycle.style.display = "block";   
-}
-
-function showParentForm(){
-    Interface.activeForm = "parent";
-    HTML.form.parent.form.style.display = "inline-block";
-    HTML.form.rule.form.style.display = "none";
-    HTML.form.next.form.style.display = "none";
-    HTML.form.edit.form.style.display = "none";
-    HTML.cycle.style.display = "block";
-}
-
-function showNextForm(){
-    Interface.activeForm = "next";
-    HTML.form.next.form.style.display = "inline-block";
-    HTML.form.parent.form.style.display = "none";
-    HTML.form.rule.form.style.display = "none";
-    HTML.form.edit.form.style.display = "none";
-    HTML.cycle.style.display = "none";
+    HTML.rule.edit.form.style.display = "inline-block";
+    HTML.rule.rule.form.style.display = "none";
 }
 
 function baseCancel(){
     deleteEditing();
     resetInterface();
     showRuleForm();
-}
-
-function setCurrentIndex(){
-    var positive = Collect.elementIndex,
-        negative = Collect.elementIndex - Collect.matchedElements.length;
-    HTML.info.cycleIndex.textContent = (positive === 0 ) ? "" : positive + " / " + negative;
 }
 
 function setRangeString(low, high){
@@ -2355,10 +2425,10 @@ function setupHostname(){
             };
             chrome.storage.local.set({'sites': storage.sites});
 
-            HTML.groups.group.appendChild(newOption("default"));
+            HTML.perm.group.select.appendChild(newOption("default"));
 
         } else {
-            options(Object.keys(site.groups), HTML.groups.group);
+            options(Object.keys(site.groups), HTML.perm.group.select);
             group = site.groups['default'];
         }
         loadGroupObject(group);
@@ -2400,7 +2470,7 @@ function createGroup(){
             return;
         }
 
-        HTML.groups.group.appendChild(newOption(name));
+        HTML.perm.group.select.appendChild(newOption(name));
         group = newGroup(name);
         storage.sites[host].groups[name] = group;
 
@@ -2454,7 +2524,7 @@ function deleteGroup(){
     chrome.storage.local.get("sites", function deleteGroupChrome(storage){
         var host = window.location.hostname,
             site = storage.sites[host],
-            currOption = HTML.groups.group.querySelector("option:checked");
+            currOption = HTML.perm.group.select.querySelector("option:checked");
         // just delete all of the rules for "default" option
         if ( defaultGroup ) {
             site.groups["default"] = newGroup("default");
@@ -2502,9 +2572,9 @@ function deletePage(){
         Collect.group.addPage(page);
     } else {
         Collect.group.removePage(Collect.current.page);
-        var currOption = HTML.groups.page.querySelector("option:checked");
+        var currOption = HTML.perm.page.select.querySelector("option:checked");
         currOption.parentElement.removeChild(currOption);
-        HTML.groups.page.querySelector("option[value=default]").selected = true;
+        HTML.perm.page.select.querySelector("option[value=default]").selected = true;
         page = Collect.group.pages["default"];
     }
     saveGroup();
@@ -2515,48 +2585,47 @@ function deletePage(){
 }
 
 /***********************
-    RULE SET STORAGE
+    SELECTOR SET STORAGE
 ***********************/
 
-function loadRuleSet(ele){
+function loadSet(ele){
     var option = ele.querySelector("option:checked"),
         name = option.value;
-    Collect.current.ruleSet = name;
+    Collect.current.set = name;
 
     deleteEditing();
     resetInterface();
-    loadRuleSetObject(Collect.group.pages[Collect.current.page].sets[name]);
+    loadSetObject(Collect.group.pages[Collect.current.page].sets[name]);
 }
 
-function createRuleSet(){
-    var name = prompt("Group Name");
+function createSelectorSet(){
+    var name = prompt("Selector Set Name");
     if ( name === null ) {
         return;
     }
     else if ( name === "" ) {
-        alertMessage("rule set name cannot be blank");
+        alertMessage("selector set name cannot be blank");
         return;
     }
     
-    if ( !Collect.group.uniqueRuleSetName(name) ) {
-        alertMessage("a rule set named \"" + name + "\" already exists");
+    if ( !Collect.group.uniqueSelectorSetName(name) ) {
+        alertMessage("a selector set named \"" + name + "\" already exists");
         return;
     }
-    
-    HTML.groups.ruleSet.appendChild(newOption(name));
+    HTML.perm.set.select.appendChild(newOption(name));
     var page = Collect.group.pages[Collect.current.page],
-        ruleSet = new RuleSet(name);
-    page.addSet(ruleSet);
+        set = new SelectorSet(name);
+    page.addSet(set);
     saveGroup();
 
     deleteEditing();
-    loadRuleSetObject(ruleSet);
+    loadSetObject(set);
 }
 
-function deleteRuleSet(){
-    var defaultRuleSet = (Collect.current.ruleSet === "default"),
+function deleteSelectorSet(){
+    var defaultSet = (Collect.current.set === "default"),
         confirmed;
-    if ( defaultRuleSet ) {
+    if ( defaultSet ) {
         confirmed = confirm("Cannot delete \"default\" rule set. Do you want to clear out all of its rules instead?");
     } else {
         confirmed = confirm("Are you sure you want to delete this rule set and all of its related rules?");    
@@ -2566,24 +2635,24 @@ function deleteRuleSet(){
     }
 
     var page = Collect.group.pages[Collect.current.page],
-        ruleSet;
-    page.removeSet(Collect.current.ruleSet);
+        set;
+    page.removeSet(Collect.current.set);
 
-    // handle setting new current RuleSet
-    if ( defaultRuleSet ) {
-        ruleSet = new RuleSet("default");
-        page.addSet(ruleSet);
+    // handle setting new current SelectorSet
+    if ( defaultSet ) {
+        set = new SelectorSet("default");
+        page.addSet(set);
     } else {
-        var currOption = HTML.groups.ruleSet.querySelector("option:checked");
+        var currOption = HTML.perm.set.select.querySelector("option:checked");
         currOption.parentElement.removeChild(currOption);
-        Collect.current.ruleSet = "default";
-        ruleSet = page.sets["default"];
-        HTML.groups.ruleSet.querySelector("option[value=default]").selected = true;
+        Collect.current.set = "default";
+        set = page.sets["default"];
+        HTML.perm.set.select.querySelector("option[value=default]").selected = true;
     }
 
     saveGroup();
     deleteEditing();    
-    loadRuleSetObject(ruleSet);
+    loadSetObject(set);
 }
 
 /***********************
@@ -2629,15 +2698,15 @@ function newPage(name, index){
     return {
         name: name,
         index: index,
-        sets: {"default": newRuleSet("default")}
+        sets: {"default": newSet("default")}
     };
 }
 
-// creates an empty ruleSet object
-function newRuleSet(name){
+// creates an empty selectorSet object
+function newSet(name){
     return {
         name: name,
-        rules: {}
+        selectors: {}
     };
 }
 
@@ -2664,41 +2733,49 @@ function legalFilename(name){
 }
 
 /*
-given JSON representing a group, create that Group's object and all associated Page/RuleSet/Rule objects
+given JSON representing a group, create that Group's object and all associated 
+Page/SelectorSet/Selector/Rule objects
 also setup relevant HTML data associated with the Group
 */
 function loadGroupObject(group){
-    HTML.groups.group.querySelector("option[value=" + group.name + "]").selected = true;
+    HTML.perm.group.select.querySelector("option[value=" + group.name + "]").selected = true;
 
     var url = window.location.href;
     HTML.info.indexToggle.checked = group.urls[url] !== undefined;
 
     // clear out current options and populate with current group's pages
-    HTML.groups.page.innerHTML = "";
-    options(Object.keys(group.pages), HTML.groups.page);
+    HTML.perm.page.select.innerHTML = "";
+    options(Object.keys(group.pages), HTML.perm.page.select);
     var groupObject,
         page, pageObject, pageName,
-        ruleSet, ruleSetObject, ruleSetName,
+        set, setObject, setName,
+        selector, selectorObject, selectorName,
         rule, ruleObject, ruleName;
 
     groupObject = new Group(group.name, group.urls);
     // clear out previous group
-    HTML.groups.groupHolder.innerHTML = "";
-    HTML.groups.groupHolder.appendChild(groupObject.html());
+    HTML.perm.group.holder.innerHTML = "";
+    HTML.perm.group.holder.appendChild(groupObject.html());
     Collect.group = groupObject;
     Collect.current.group = group.name;
     
+    // create all pages and child objects for the group
     for ( pageName in group.pages ) {
         page = group.pages[pageName];
         pageObject = new Page(page.name, page.index, page.next);
         groupObject.addPage(pageObject);
-        for ( ruleSetName in page.sets ) {
-            ruleSet = page.sets[ruleSetName];
-            ruleSetObject = new RuleSet(ruleSet.name, ruleSet.parent);
-            pageObject.addSet(ruleSetObject);
-            for ( ruleName in ruleSet.rules ) {
-                rule = ruleSet.rules[ruleName];
-                addRule(rule, ruleSetObject);
+        for ( setName in page.sets ) {
+            set = page.sets[setName];
+            setObject = new SelectorSet(set.name, set.parent);
+            pageObject.addSet(setObject);
+            for ( selectorName in set.selectors ) {
+                selector = set.selectors[selectorName];
+                selectorObject = new Selector(selector.selector);
+                setObject.addSelector(selectorObject);
+                for ( ruleName in selector.rules ) {
+                    rule = selector.rules[ruleName];
+                    addRule(rule, selectorObject);
+                }
             }
         }
     }
@@ -2709,40 +2786,38 @@ function loadPageObject(page){
     Collect.current.page = page.name;
     if ( page.name === "default" ) {
         HTML.info.index.style.display = "inline-block";
-        HTML.info.nextHolder.style.display = "inline-block";
+        HTML.perm.next.holder.style.display = "inline-block";
         // handle whether or not next has already been set
         if ( page.next ) {
             Collect.next = page.next;
-            HTML.info.nextCheckbox.checked = true;
-            HTML.info.next.textContent = page.next;
+            HTML.perm.next.selector.textContent = page.next;
         } else {
             delete Collect.next;
-            HTML.info.nextCheckbox.checked = false;
-            HTML.info.next.textContent = "";
+            HTML.perm.next.selector.textContent = "";
         }
     } else {
         HTML.info.index.style.display = "none";
-        HTML.info.nextHolder.style.display = "none";
+        HTML.perm.next.holder.style.display = "none";
     }
 
-    options(Object.keys(page.sets), HTML.groups.ruleSet);
+    options(Object.keys(page.sets), HTML.perm.set.select);
 
-    loadRuleSetObject(page.sets["default"]);
+    loadSetObject(page.sets["default"]);
 }
 
-function loadRuleSetObject(ruleSet){
-    Collect.parent = ruleSet.parent || {};
-    Collect.current.ruleSet = ruleSet.name;
+function loadSetObject(set){
+    Collect.parent = set.parent || {};
+    Collect.current.set = set.name;
 
-    if ( ruleSet.parent ) {
-        HTML.info.parent.textContent = ruleSet.parent.selector;
-        HTML.info.parentCheckbox.checked = true;
-        addParentGroup(ruleSet.parent.selector, ruleSet.parent.low, ruleSet.parent.high);
-        setRangeString(ruleSet.parent.low, ruleSet.parent.high);
+    if ( set.parent ) {
+        HTML.perm.parent.holder.style.display = "inline-block";
+        HTML.perm.parent.selector.textContent = set.parent.selector;
+        addParentGroup(set.parent.selector, set.parent.low, set.parent.high);
+        setRangeString(set.parent.low, set.parent.high);
     } else {
-        HTML.info.parent.textContent = "";
-        HTML.info.parentCheckbox.checked = false;
-        HTML.info.range.textContent = "";
+        HTML.perm.parent.holder.style.display = "none";
+        HTML.perm.parent.selector.textContent = "";
+        HTML.perm.parent.range.textContent = "";
         clearClass("parentGroup");
     }
 
@@ -2752,147 +2827,6 @@ function loadRuleSetObject(ruleSet){
     Interface.update();
 }
 
-/*
-Find all of the {follow: true} rules in a page that is going to be deleted, and make a recursive
-call to delete those pages as well.
-*/
-function deletePageFromGroup(name, pages){
-    var page = pages[name],
-        followedRules;
-    // can't delete default page
-    if ( name === "default" || !page ) {
-        return;
-    }
-
-    followedRules = followRulesInPage(page);
-    for ( var i=0, len=followedRules.length; i<len; i++ ) {
-        pages = deletePageFromGroup(followedRules[i], pages);
-    }
-    delete pages[name];
-
-    // remove select
-    var option = HTML.groups.page.querySelector("option[value=" + name + "]");
-    if ( option ) {
-        option.parentElement.removeChild(option);
-    }
-
-    return pages;
-}
-
-// iterate over ruleSets in a page and generate an array of rules that have follow=true
-function followRulesInPage(page){
-    var rules = [],
-        setName, ruleName, ruleSet;
-    for ( setName in page.sets ) {
-        ruleSet = page.sets[setName];
-        for ( ruleName in ruleSet.rules ) {
-            if ( ruleSet.rules[ruleName].follow ) {
-                rules.push(ruleName);
-            }
-        }
-    }
-    return rules;
-}
-
 function deleteEditing(){
     delete Interface.editing;
-}
-
-/***********************
-    HTML FUNCTIONS
-***********************/
-
-/*
-given an element, generate the html to represent an element and its "captureable" attributes and
-create the event listeners for it to work
-*/
-function setRuleHTML(element){
-    if ( element === undefined ) {
-        return;
-    }
-    HTML.ruleHTML.innerHTML = "";
-    var clone = cleanElement(element.cloneNode(true)),
-        html = clone.outerHTML,
-        attrs = clone.attributes,
-        curr, text, splitHTML, firstHalf, secondHalf, captureEle;
-    
-    for ( var i=0, len =attrs.length; i<len; i++ ) {
-        curr = attrs[i];
-        text = attributeText(curr);
-
-        splitHTML = html.split(text);
-        firstHalf = splitHTML[0];
-        secondHalf = splitHTML[1];
-
-        HTML.ruleHTML.appendChild(document.createTextNode(firstHalf));
-        captureEle = captureAttribute(text, 'attr-'+curr.name);
-        if ( captureEle) {
-            HTML.ruleHTML.appendChild(captureEle);
-        }
-        html = secondHalf;
-    }
-
-    if ( clone.textContent !== "" ) {
-        text = clone.textContent;
-        splitHTML = html.split(text);
-        firstHalf = splitHTML[0];
-        secondHalf = splitHTML[1];
-
-        HTML.ruleHTML.appendChild(document.createTextNode(firstHalf));
-        captureEle = captureAttribute(text, 'text');
-        if ( captureEle) {
-            HTML.ruleHTML.appendChild(captureEle);
-        }
-
-        html = secondHalf;
-    }
-
-    // append remaining text
-    HTML.ruleHTML.appendChild(document.createTextNode(html));
-}
-
-/*
-takes an element and remove collectjs related classes and shorten text, then returns outerHTML
-*/
-function cleanElement(ele){
-    ele.classList.remove('queryCheck');
-    ele.classList.remove('collectHighlight');
-    if ( ele.hasAttribute('src') ) {
-        var value = ele.getAttribute('src'),
-            query = value.indexOf('?');
-        if ( query !== -1 ) {
-            value = value.slice(0, query);
-        }
-        ele.setAttribute('src', value);
-    }
-    if ( ele.textContent !== "" ) {
-        var innerText = ele.textContent.replace(/(\s{2,}|[\n\t]+)/g, ' ');
-        if ( innerText.length > 100 ){
-            innerText = innerText.slice(0, 25) + "..." + innerText.slice(-25);
-        }
-        ele.innerHTML = innerText;
-    }
-    return ele;
-}
-
-function attributeText(attr) {
-    // encode ampersand
-    attr.value = attr.value.replace("&", "&amp;");
-    return attr.name + "=\"" + attr.value + "\"";
-}
-
-//wrap an attribute or the text of an html string 
-//(used in #selector_text div)
-function captureAttribute(text, type){
-    // don't include empty properties
-    if ( text.indexOf('=""') !== -1 ) {
-        return;
-    }
-    var span = noSelectElement("span");
-    span.classList.add("capture");
-    span.setAttribute("title", "click to capture " + type + " property");
-    span.dataset.capture = type;
-    span.textContent = text;
-    span.addEventListener("click", capturePreview, false);
-    return span;
 }

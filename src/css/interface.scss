@@ -127,7 +127,7 @@ body{
 
     .views{
         box-sizing: border-box;        
-        min-height: 250px;
+        min-height: 150px;
         padding: 15px;;
 
 
@@ -137,6 +137,7 @@ body{
 
             .column{
                 display: inline-block;
+                vertical-align: top;
             }
         }
 
@@ -176,7 +177,7 @@ body{
     .rules{
         font-size: 16px;
 
-        .group, .page, .ruleSet{
+        .group, .page, .set, .selector{
             padding: 5px 2px;
             border-radius: 5px;
             border-width: 1px;
@@ -193,12 +194,17 @@ body{
             background: $white;
         }
 
-        .ruleSet{
+        .set{
             margin: 2px 0;
             background: $light-gray;
         }
 
-        .group ul, .page ul, .ruleSet ul{
+        .selector{
+            margin: 2px 0;
+            background: $white;
+        }
+
+        .group ul, .page ul, .set ul{
             list-style: none;
         }
 
@@ -260,13 +266,7 @@ body{
     .items{
         font-size: 16px;
         color: $black;
-
-        .column{
-            display: inline-block;
-        }
-
         .modifiers{
-            vertical-align: top;
             padding-left: 15px;
             max-width: 75%;
 
@@ -330,7 +330,21 @@ body{
     line-height: 2;
 }
 
+/* permanent bar */
+#currentParent{
+    display: none;
+}
+
 /* views */
+/* selectorView */
+#selectorView{
+    font-size: 0.75em;
+}
+
+#parentRange{
+    display: none;
+}
+
 /* previewView */
 #previewView{
     .name{

@@ -117,13 +117,13 @@ describe("storage helpers", function(){
         });
     });
 
-    describe("newRuleSet", function(){
-        it("returns a rule set with provided name", function(){
-            var ruleSet = newRuleSet("Barack");
-            expect(ruleSet.name).toEqual("Barack");
+    describe("newSet", function(){
+        it("returns a set with provided name", function(){
+            var set = newSet("Barack");
+            expect(set.name).toEqual("Barack");
         });
     });
-    
+
     describe("legalFilename", function(){
         it("returns true for legal filenames", function(){
             var goodNames = ["test", "good.jpg", "this is legal !"];

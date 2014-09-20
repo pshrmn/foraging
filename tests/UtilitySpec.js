@@ -112,4 +112,17 @@ describe("utility functions", function(){
             expect(option.value).toEqual("foobar");
         });
     });
+
+    describe("appendChildren", function(){
+        it("appends all of the elements in the array to the parent", function(){
+            var holder = document.createElement("div"),
+                children = [];
+            for ( var i=0; i<10; i++ ) {
+                children.push(document.createElement("span"));
+            }
+            expect(holder.childElementCount).toEqual(0);
+            appendChildren(holder, children);
+            expect(holder.childElementCount).toEqual(10);
+        });
+    });
 });

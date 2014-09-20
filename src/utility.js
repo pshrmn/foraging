@@ -57,3 +57,13 @@ function newOption(name){
     option.textContent = name;
     return option;
 }
+
+// append all of the elements in children to the parent element
+function appendChildren(parent, children){
+    if ( parent === null ) {
+        return;
+    }
+    for ( var i=0, len=children.length; i<len; i++ ) {
+        parent.appendChild(children[i]);
+    }
+}

@@ -379,7 +379,7 @@ SelectorSet.prototype.html = function(){
         nametag = noSelectElement("h5"),
         ul = noSelectElement("ul");
         
-    holder.classList.add("SelectorSet");
+    holder.classList.add("set");
     nametag.textContent = "Selector Set: " + this.name;
     appendChildren(holder, [nametag, ul]);
 
@@ -397,7 +397,7 @@ SelectorSet.prototype.deleteHTML = prototypeDeleteHTML;
 SelectorSet.prototype.addSelector = function(selector){
     this.selectors[selector.selector] = selector;
     if ( this.elements.selectors) {
-        this.elements.selectors.appendChild(selector.html())
+        this.elements.selectors.appendChild(selector.html());
     }
     selector.set = this;
 };
@@ -455,7 +455,7 @@ Selector.prototype.object = function(){
     }
 
     return data;
-}
+};
 
 /*
 only include the selector if it has rules
@@ -466,7 +466,7 @@ Selector.prototype.uploadObject = function(){
     }
 
     return this.object();
-}
+};
 
 Selector.prototype.addRule = function(rule, events){
     this.rules[rule.name] = rule;
@@ -492,7 +492,7 @@ Selector.prototype.removeRule = function(name){
 
 Selector.prototype.updateSelector = function(newSelector){
     var oldSelector = this.selector;
-    this.selector = newSelector
+    this.selector = newSelector;
     if ( this.elements.nametag ) {
         this.elements.nametag.textContent = newSelector;
     }
@@ -645,12 +645,5 @@ function prototypeDeleteHTML(){
     var holder = this.elements.holder;
     if ( holder ) {
         holder.parentElement.removeChild(holder);
-    }
-}
-
-// append all of the elements in children to the parent element
-function appendChildren(parent, children){
-    for ( var i=0, len=children.length; i<len; i++ ) {
-        parent.appendChild(children[i]);
     }
 }

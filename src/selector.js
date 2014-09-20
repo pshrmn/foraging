@@ -28,7 +28,7 @@ function SelectorFamily(ele, parent, holder, text, fn, options){
             continue;
         }
 
-        sel = new Selector(ele, this);
+        sel = new EleSelector(ele, this);
         if ( this.parent && sel.matches(this.parent)) {
             break;
         }
@@ -219,7 +219,7 @@ NthFragment.prototype = {
 /********************
     SELECTOR
 ********************/
-function Selector(ele, family){
+function EleSelector(ele, family){
     this.family = family;
     this.tag = new Fragment(ele.tagName.toLowerCase(), this);
     this.id = ele.hasAttribute('id') ? new Fragment('#' + ele.getAttribute('id'), this) : undefined;
@@ -273,7 +273,7 @@ function cleanSelector(event){
     this.family.update();
 }
 
-Selector.prototype = {
+EleSelector.prototype = {
     addNthofType: function(){
         if ( this.nthoftype ) {
             return;

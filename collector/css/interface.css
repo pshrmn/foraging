@@ -79,13 +79,14 @@ body {
       border-bottom: 1px solid #444444; }
   .collectjs .views {
     box-sizing: border-box;
-    min-height: 250px;
+    min-height: 150px;
     padding: 15px; }
     .collectjs .views .view {
       display: none;
       padding: 5px; }
       .collectjs .views .view .column {
-        display: inline-block; }
+        display: inline-block;
+        vertical-align: top; }
     .collectjs .views .view.active {
       display: block; }
   .collectjs input {
@@ -110,7 +111,7 @@ body {
     font-weight: normal; }
   .collectjs .rules {
     font-size: 16px; }
-    .collectjs .rules .group, .collectjs .rules .page, .collectjs .rules .ruleSet {
+    .collectjs .rules .group, .collectjs .rules .page, .collectjs .rules .set, .collectjs .rules .selector {
       padding: 5px 2px;
       border-radius: 5px;
       border-width: 1px;
@@ -121,10 +122,13 @@ body {
     .collectjs .rules .page {
       margin: 3px 0;
       background: white; }
-    .collectjs .rules .ruleSet {
+    .collectjs .rules .set {
       margin: 2px 0;
       background: #efefef; }
-    .collectjs .rules .group ul, .collectjs .rules .page ul, .collectjs .rules .ruleSet ul {
+    .collectjs .rules .selector {
+      margin: 2px 0;
+      background: white; }
+    .collectjs .rules .group ul, .collectjs .rules .page ul, .collectjs .rules .set ul {
       list-style: none; }
     .collectjs .rules .savedRule {
       margin-right: 10px;
@@ -161,10 +165,7 @@ body {
   .collectjs .items {
     font-size: 16px;
     color: black; }
-    .collectjs .items .column {
-      display: inline-block; }
     .collectjs .items .modifiers {
-      vertical-align: top;
       padding-left: 15px;
       max-width: 75%; }
       .collectjs .items .modifiers > div {
@@ -202,7 +203,18 @@ body {
 #ruleHTML {
   line-height: 2; }
 
+/* permanent bar */
+#currentParent {
+  display: none; }
+
 /* views */
+/* selectorView */
+#selectorView {
+  font-size: 0.75em; }
+
+#parentRange {
+  display: none; }
+
 /* previewView */
 #previewView .name {
   margin-right: 15px; }

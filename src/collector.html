@@ -1,6 +1,7 @@
 <div class="tabHolder">
     <div class="tabs">
-        <div class="tab active" id="ruleTab"data-for="ruleView">Rule</div>
+        <div class="tab active" id="selectorTab" data-for="selectorView">Selector</div>
+        <div class="tab" id="ruleTab" data-for="ruleView">Rule</div>
         <div class="tab" id="groupsTab" data-for="groupsView">Current Group</div>
         <div class="tab" id="previewTab" data-for="previewView">Preview</div>
         <div class="tab" id="optionsTab" data-for="optionsView">Options</div>
@@ -18,9 +19,10 @@
                 Initial URL
                 <input type="checkbox" id="indexToggle" />
             </div>
-            <div id="defaultNext" class="info">
-                Next <input type="checkbox" id="pageNext" name="next" />
+            <div id="nextHolder" class="info">
+                Next:
                 <span id="nextSelectorView"></span>
+                <button id="removeNext">&times;</button>
             </div>
         </div>
         <div>
@@ -28,13 +30,14 @@
             <button id="deletePage" title="delete current page">&times;</button>
         </div>
         <div>
-            Rule Set: <select id="ruleSetSelect"></select>
-            <button id="createRuleSet" title="create a new rule set">+</button>
-            <button id="deleteRuleSet" title="delete current rule set">&times;</button>
+            Selector Set: <select id="selectorSetSelect"></select>
+            <button id="createSelectorSet" title="create a new selector set">+</button>
+            <button id="deleteSelectorSet" title="delete current selector set">&times;</button>
             <div id="currentParent" class="info">
-                Parent <input type="checkbox" id="ruleSetParent" name="parent" />
+                Parent
                 <span id="parentSelectorView"></span>
                 <span id="parentRangeView"></span>
+                <button id="removeParent">&times;</button>
             </div>
         </div>
         <button id="uploadRules">Upload Group</button>
@@ -43,7 +46,45 @@
 </div>
 <div class="views">
     <div class="view" id="emptyView"></div>
-    <div class="view active" id="ruleView">
+    <div class="view active" id="selectorView">
+        <div class="column">
+            <!--displays what the current selector is-->
+            <p>
+                Selector: <span id="currentSelector"></span>
+            </p>
+            <p>
+                Count: <span id="currentCount"></span>
+            </p>
+            <div>
+                <label>
+                    Selector <input type="radio" id="selectorRadio" name="selector" value="selector" checked/>
+                </label>
+                <label>
+                    Parent <input type="radio" id="parentRadio" name="selector" value="parent" />
+                </label>
+                <label>
+                    Next <input type="radio" id="nextRadio" name="selector" value="next" />
+                </label>
+            </div>
+            <div id="parentRange">
+                <label>
+                    Low: <input id="parentLow" name="parentLow" type="text" />
+                </label>
+                <label for="parentHigh">
+                    High: <input id="parentHigh" name="parentHigh" type="text" />
+                </label>
+            </div>
+            <p>
+                <button id="saveSelector">Save</button>
+            </p>
+        </div>
+        <div class="column">
+            <!--holds the interactive element for choosing a selector-->
+            <div id="selectorHolder"></div>
+            <div id="selectorCycleHolder"></div>
+        </div>
+    </div>
+    <div class="view" id="ruleView">
         <div id="ruleItems" class="items">
             <form id="ruleForm" class="column">
                 <div class="rule">
@@ -51,16 +92,8 @@
                     <input id="ruleName" name="ruleName" type="text" />
                 </div>
                 <div class="rule">
-                    <label title="the selector to get the rule in the DOM">Selector:</label>
-                    <span id="ruleSelector"></span>
-                </div>
-                <div class="rule">
                     <label title="the attribute of an element to capture">Capture:</label>
                     <span id="ruleAttr"></span>
-                </div>
-                <div class="rule multiple">
-                    <label for="ruleMultiple" title="capture from all elements matching selector. Useful when you only need one attribute from multiple elements (so that using a parent selector would be overkill)">Multiple: </label>
-                    <input id="ruleMultiple" type="checkbox" />
                 </div>
                 <div class="rule follow">
                     <label for="ruleFollow" title="create a new page from the element's captured url (capture must be attr-href)">Follow:</label>
@@ -93,44 +126,8 @@
                     <button id="cancelEdit">Cancel</button>
                 </div>
             </form>
-            <form id="parentForm" class="column">
-                <div class="rule">
-                    <label>Selector:</label>
-                    <span id="parentSelector"></span>
-                </div>
-                <p>Range:</p>
-                <div class="rule">
-                    <label for="parentLow">Low:</label>
-                    <input id="parentLow" name="parentLow" type="text" />
-                </div>
-                <div class="rule">
-                    <label for="parentHigh">High:</label>
-                    <input id="parentHigh" name="parentHigh" type="text" />
-                </div>
-                <div>
-                    <button id="saveParent">Set Parent</button>
-                    <button id="cancelParent">Cancel</button>
-                </div>
-            </form>
-            <form id="nextForm" class="column">
-                <div class="rule">
-                    <label>Selector:</label>
-                    <span id="nextSelector"></span>
-                </div>
-                <button id="saveNext">Save Next Rule</button>
-                <button id="cancelNext">Cancel</button>
-            </form>
             <div class="modifiers column">
-                <div id="selectorHolder"></div>
-                <div class="ruleHTMLHolder">
-                    Count: <span id="currentCount"></span>
-                    <div id="ruleCycle">
-                        <button id="ruleCyclePrevious" class="cycle" title="previous element matching selector">&lt;&lt;</button>
-                        <span id="currentElementIndex"></span>
-                        <button id="ruleCycleNext" class="cycle" title="next element matching selector">&gt;&gt;</button>
-                        <span id="ruleHTML"></span>
-                    </div>
-                </div>
+                <div class="ruleCycleHolder"></div>
             </div>
         </div>
     </div>
