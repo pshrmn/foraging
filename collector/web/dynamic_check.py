@@ -24,45 +24,47 @@ def test_page(page, url):
     print("Page:\t{}".format(page["name"]))
     resp = requests.get(url)
     dom = html.document_fromstring(resp.text)
-    working_rule_sets = []
-    for rule_set in page.get("sets").itervalues():
-        works = test_rule_set(rule_set, dom)
-        working_rule_sets.append(works)
-    if not all(working_rule_sets):
+    working_selector_sets = []
+    for selector_set in page.get("sets").itervalues():
+        works = test_selector_set(selector_set, dom)
+        working_selector_sets.append(works)
+    if not all(working_selector_sets):
         print("Page:\t{} may need to be loaded dynamically".format(page["name"]))
 
-def test_rule_set(rule_set, dom):
+def test_selector_set(selector_set, dom):
     """
-    iterate over rules in a rule set to test if their css selector matches anything in the page
-    then iterate over any child pages of the rule set
+    iterate over selectors in a selector set to test if they match anything in the page
+    then iterate over any child pages of the set
     """
-    print("  Rule Set: {}".format(rule_set["name"]))
-    working_rules = []
+    print("  Rule Set: {}".format(selector_set["name"]))
+    working_selectors = []
     matched_pages = {}
-    for rule in rule_set["rules"].itervalues():
-        works, follow = test_rule(rule, dom)
-        working_rules.append(works)
+    for selector in selector_set["selectors"].itervalues():
+        works, follow = test_selector(selector, dom)
+        working_selectors.append(works)
         if works and follow:
             matched_pages[rule["name"]] = follow
     for name, page_url in matched_pages.iteritems():
-        page = rule_set["pages"][name]
+        page = selector_set["pages"][name]
         test_page(page, page_url)
-    return all(working_rules)
+    return all(working_selectors)
 
-def test_rule(rule, dom):
-    """
-    given a rule and a dom, test if the css selector for the rule matches anything in the page
-    print a line and return a boolean indicating if there is a match
-    """
-    rule_output = "    {} ({}): {}"
-    css = CSSSelector(rule["selector"])
+def test_selector(selector, dom):
+    selector_output = "    {}: {}"
+    css = CSSSelector(selector["selector"])
     eles = css(dom)
     works, works_char = (True, "+") if len(eles) > 0 else (False, "-")
     follow_url = None
-    if works and rule.get("follow", False):
-        follow_url = eles[0].get("href")
-    print(rule_output.format(rule["name"], rule["selector"], works_char))
+    if works:
+        follow_url = has_follow(selector, eles[0])
+    print(selector_output.format(selector["selector"], works_char))
     return works, follow_url
+
+def has_follow(selector, ele):
+    for rule in selector["rules"].itervalues():
+        if rule.get("follow", False):
+            return ele.get("href")
+    return None
 
 def load_json(filename):
     with open(filename, "r") as fp:
