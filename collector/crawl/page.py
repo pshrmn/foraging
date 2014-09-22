@@ -48,8 +48,10 @@ class Page(object):
         data = {
             "url": canonical_url
         }
-        for key, rule_set in self.sets.iteritems():
-            data[key] = rule_set.get(dom) 
+        for key, selector_set in self.sets.iteritems():
+            set_data = selector_set.get(dom)
+            if set_data is not None:
+                data[key] = set_data
         return data
 
     def next_page(self, url):
@@ -111,7 +113,8 @@ class SelectorSet(object):
         otherwise, return a dict
         """
         if self.parent:
-            return map(self.apply, self.parent.get(dom))
+            parent_data = map(self.apply, self.parent.get(dom))
+            return [d for d in parent_data if d is not None]
         else:    
             return self.apply(dom)
 
