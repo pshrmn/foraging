@@ -34,7 +34,7 @@
             <button id="createSelectorSet" title="create a new selector set">+</button>
             <button id="deleteSelectorSet" title="delete current selector set">&times;</button>
             <div id="currentParent" class="info">
-                Parent
+                Parent:
                 <span id="parentSelectorView"></span>
                 <span id="parentRangeView"></span>
                 <button id="removeParent">&times;</button>
@@ -91,10 +91,10 @@
     </div>
     <div class="view" id="ruleView">
         <div id="ruleItems" class="items">
+            <h3>
+                Selector: <span id="ruleSelector"></span>
+            </h3>
             <form id="ruleForm" class="column form">
-                <h3>
-                    Selector: <span id="ruleSelector"></span>
-                </h3>
                 <div class="rule">
                     <label for="ruleName" title="the name of a rule">Name:</label>
                     <input id="ruleName" name="ruleName" type="text" />
@@ -113,9 +113,6 @@
                 </div>
             </form>
             <form id="editForm" class="column form">
-                <h3>
-                    Selector: <span id="editSelector"></span>
-                </h3>
                 <div class="rule">
                     <label for="ruleName" title="the name of a rule">Name:</label>
                     <input id="editName" name="editName" type="text" />

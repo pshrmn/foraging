@@ -185,7 +185,7 @@ body{
     .rules{
         font-size: 16px;
 
-        .group, .page, .set, .selector{
+        .group, .page, .set, .selector, .rule{
             padding: 5px 2px;
             border-radius: 5px;
             border-width: 1px;
@@ -216,11 +216,10 @@ body{
             list-style: none;
         }
 
-        .savedRule{
+        .rule{
             margin-right: 10px;
             padding: 5px;
-            border: 1px solid $dark-gray;
-            background: $white;
+            background: $light-gray;
             display: inline-block;
         }
 

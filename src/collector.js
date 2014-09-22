@@ -252,14 +252,15 @@ var Family = {
         }
     },
     // create a SelectorFamily given a css selector string
-    fromSelector: function(selector){
+    fromSelector: function(selector, text){
         var prefix = Collect.parent.selector ? Collect.parent.selector: "body",
             element = Collect.one(selector, prefix);
+        text = text || HTML.selector.seletcor;
         if ( element ) {
             var sf = new SelectorFamily(element,
                 Collect.parent.selector,
                 HTML.selector.family,
-                HTML.selector.selector,
+                text,
                 Family.test.bind(Family),
                 Collect.options
             );
@@ -296,6 +297,7 @@ var Family = {
     set the preview
     */
     test: function(){
+        //test
         clearClass("queryCheck");
         clearClass("collectHighlight");
         var elements = this.elements(),
@@ -583,14 +585,17 @@ toggle .selected class
 */
 function capturePreview(event){
     var capture, follow, followHolder;
-    if ( Interface.activeForm === "rule" ) {
+    switch(Interface.activeForm){
+    case "rule":
         capture = HTML.rule.rule.capture;
         follow = HTML.rule.rule.follow;
         followHolder = HTML.rule.rule.followHolder;
-    } else if ( Interface.activeForm === "edit" ) {
+        break;
+    case "edit":
         capture = HTML.rule.edit.capture;
         follow = HTML.rule.edit.follow;
         followHolder = HTML.rule.edit.followHolder;
+        break;
     }
 
     if ( !this.classList.contains("selected") ){
@@ -612,7 +617,7 @@ function capturePreview(event){
             follow.setAttribute("title", "Can only follow rules that get href attribute from links");
         }
     } else {
-        capture.textContent ="";
+        capture.textContent = "";
         follow.disabled = true;
         followHolder.style.display = "none";
         this.classList.remove("selected");
@@ -727,13 +732,9 @@ function removeSelectorEvent(event){
 function newRuleEvent(event){
     event.preventDefault();
     Collect.current.selector = this.selector;
-    HTML.rule.selector.textContent  = this.selector;
 
-    // generate selector family from selector
-    var sf = Family.fromSelector(this.selector);
-    Family.match();
+    setupRuleForm(this.selector);
     showTab(HTML.tabs.rule);
-    Interface.ruleCycle.setElements(Collect.matchedElements);
 }
 
 function saveRuleEvent(event){
@@ -856,22 +857,28 @@ function unselectorViewRule(event){
 
 function editSavedRule(event){
     deleteEditing();
-
     Interface.editing = this;
-    Family.edit(this.selector.selector);
+
 
     // setup the form
     HTML.rule.edit.name.value = this.name;
     HTML.rule.selector.textContent = this.selector.selector;
     HTML.rule.edit.capture.textContent = this.capture;
-    if ( this.follow ) {
+    if ( this.follow || this.capture === "attr-href" ) {
         HTML.rule.edit.follow.checked = this.follow;
         HTML.rule.edit.follow.disabled = false;
         HTML.rule.edit.followHolder.style.display = "block";
+    } else {
+        HTML.rule.edit.follow.checked = false;
+        HTML.rule.edit.follow.disabled = true;
+        HTML.rule.edit.followHolder.style.display = "none";
     }
 
-    showTab(HTML.tabs.rule);
+    // show edit form after setting values, but before calling setupRuleForm
+    // because Interface.activeForm needs to equal "edit"
     showEditForm();
+    setupRuleForm(this.selector.selector);
+    showTab(HTML.tabs.rule);
 }
 
 function previewSavedRule(event){
@@ -1046,6 +1053,15 @@ function parentElements(selector){
         allElements = Array.prototype.slice.call(Collect.all(selector, prefix));
     }
     return allElements;
+}
+
+function setupRuleForm(selector){
+    HTML.rule.selector.textContent = selector;
+    var elements = parentElements(selector);
+    Interface.ruleCycle.setElements(elements);
+    addClass("queryCheck", elements);
+    // set global for allLinks (fix?)
+    Collect.matchedElements = elements;
 }
 
 function showRuleForm(){

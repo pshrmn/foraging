@@ -511,6 +511,7 @@ Selector.prototype.updateSelector = function(newSelector){
 
 Selector.prototype.html = function(newRuleEvent, deleteEvent){
     var holder = noSelectElement("li"),
+        identifier = document.createTextNode("Selector: "),
         nametag = noSelectElement("span"),
         newRule = noSelectElement("button"),
         remove = noSelectElement("button"),
@@ -525,7 +526,7 @@ Selector.prototype.html = function(newRuleEvent, deleteEvent){
     newRule.addEventListener("click", newRuleEvent.bind(this), false);
     remove.addEventListener("click", deleteEvent.bind(this), false);
 
-    appendChildren(holder, [nametag, newRule, remove, rules]);
+    appendChildren(holder, [identifier, nametag, newRule, remove, rules]);
 
     this.htmlElements = {
         holder: holder,
@@ -581,7 +582,7 @@ Rule.prototype.html = function(selectorViewEvent, unselectorViewEvent, editEvent
         preview = noSelectElement("span"),
         deltog = noSelectElement("span");
 
-    holder.classList.add("savedRule");
+    holder.classList.add("rule");
     nametag.textContent = this.name;
     nametag.classList.add("savedRuleName");
     edit.classList.add("editRule");

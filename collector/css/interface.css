@@ -117,7 +117,7 @@ body {
     font-weight: normal; }
   .collectjs .rules {
     font-size: 16px; }
-    .collectjs .rules .group, .collectjs .rules .page, .collectjs .rules .set, .collectjs .rules .selector {
+    .collectjs .rules .group, .collectjs .rules .page, .collectjs .rules .set, .collectjs .rules .selector, .collectjs .rules .rule {
       padding: 5px 2px;
       border-radius: 5px;
       border-width: 1px;
@@ -136,11 +136,10 @@ body {
       background: white; }
     .collectjs .rules .group ul, .collectjs .rules .page ul, .collectjs .rules .set ul {
       list-style: none; }
-    .collectjs .rules .savedRule {
+    .collectjs .rules .rule {
       margin-right: 10px;
       padding: 5px;
-      border: 1px solid #444444;
-      background: white;
+      background: #efefef;
       display: inline-block; }
     .collectjs .rules .savedRuleName {
       cursor: pointer;
