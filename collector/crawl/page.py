@@ -117,16 +117,17 @@ class SelectorSet(object):
 
     def apply(self, dom):
         """
-        iterate over rules given a dom, returning dict of {rule name:value} pairs and a dict of
+        given a dom, iterate over selector returning dict of {rule name:value} pairs and a dict of
         {page name: url} pairs to crawl subsequent pages
         """
         data = {}
-        # iterate over self.rules to get values]
+        # iterate over self.selector to get values
         for selector in self.selectors.itervalues():
             rule_data = selector.get(dom)
             # if any of the rules return None, have the whole thing fail
             if rule_data:
-                data[rule.name] = rule_data
+                for name, value in rule_data.iteritems():
+                    data[name] = value
             else:
                 return None
         if self.pages:
