@@ -100,6 +100,14 @@ Group.prototype.html = function(){
 
 Group.prototype.deleteHTML = prototypeDeleteHTML;
 
+Group.prototype.toggleURL = function(url){
+    if ( this.urls[url] ) {
+        delete this.urls[url];
+    } else {
+        this.urls[url] = true;
+    }
+};
+
 Group.prototype.addPage = function(page){
     var name = page.name;
     if ( this.pages[name] ) {
@@ -398,6 +406,14 @@ SelectorSet.prototype.html = function(){
 };
 
 SelectorSet.prototype.deleteHTML = prototypeDeleteHTML;
+
+SelectorSet.prototype.addParent = function(parent){
+    this.parent = parent;
+};
+
+SelectorSet.prototype.removeParent = function(){
+    this.parent = undefined;
+};
 
 SelectorSet.prototype.addSelector = function(selector, events){
     this.selectors[selector.selector] = selector;

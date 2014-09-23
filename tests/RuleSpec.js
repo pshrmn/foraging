@@ -137,6 +137,25 @@ describe("Group", function(){
         });
     });
 
+    describe("toggleURL", function(){
+        it("adds a url to this.urls if it doesn't already exist", function(){
+            var g = new Group("Cowboys"),
+                testURL = "http://www.example.com";
+            expect(g.urls[testURL]).toBeUndefined();
+            g.toggleURL(testURL);
+            expect(g.urls[testURL]).toBe(true);
+        });
+
+        it("it removes a url from this.urls if it already exists", function(){
+            var g = new Group("Eagles"),
+                testURL = "http://www.example.com";
+            g.toggleURL(testURL);
+            expect(g.urls[testURL]).toBe(true); 
+            g.toggleURL(testURL);
+            expect(g.urls[testURL]).toBeUndefined();
+        });
+    });
+
     describe("addPage", function(){
         it("adds a page to group.pages", function(){
             var g = new Group("Titans"),

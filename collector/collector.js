@@ -616,6 +616,14 @@ Group.prototype.html = function(){
 
 Group.prototype.deleteHTML = prototypeDeleteHTML;
 
+Group.prototype.toggleURL = function(url){
+    if ( this.urls[url] ) {
+        delete this.urls[url];
+    } else {
+        this.urls[url] = true;
+    }
+};
+
 Group.prototype.addPage = function(page){
     var name = page.name;
     if ( this.pages[name] ) {
@@ -914,6 +922,14 @@ SelectorSet.prototype.html = function(){
 };
 
 SelectorSet.prototype.deleteHTML = prototypeDeleteHTML;
+
+SelectorSet.prototype.addParent = function(parent){
+    this.parent = parent;
+};
+
+SelectorSet.prototype.removeParent = function(){
+    this.parent = undefined;
+};
 
 SelectorSet.prototype.addSelector = function(selector, events){
     this.selectors[selector.selector] = selector;
@@ -1477,9 +1493,9 @@ var Interface = {
         permanentBarEvents();
     },
     update: function(){
-        HTML.perm.group.select.querySelector("option[value=" + Collect.current.group + "]").selected = true;
-        HTML.perm.page.select.querySelector("option[value=" + Collect.current.page + "]").selected = true;
-        HTML.perm.set.select.querySelector("option[value=" + Collect.current.set + "]").selected = true;
+        HTML.perm.group.select.querySelector("option[value=" + Collect.current.group.name + "]").selected = true;
+        HTML.perm.page.select.querySelector("option[value=" + Collect.current.page.name + "]").selected = true;
+        HTML.perm.set.select.querySelector("option[value=" + Collect.current.set.name + "]").selected = true;
     }
 };
 
@@ -2011,14 +2027,12 @@ function saveSelectorEvent(event){
 }
 
 function saveSelector(selector){
-    var sel = new Selector(selector),
-        group = Collect.current.group,
-        page = Collect.current.page,
-        set = Collect.current.set;
+    var sel = new Selector(selector);
+    // if editing just update the selector, otherwise add it to the current set
     if ( Interface.editing.selector ) {
         Interface.editing.selector.updateSelector(selector);
     } else {
-        Collect.group.pages[page].sets[set].addSelector(sel, [newRuleEvent, editSelectorEvent, removeSelectorEvent]);
+        Collect.current.set.addSelector(sel, [newRuleEvent, editSelectorEvent, removeSelectorEvent]);
     }
 
     saveGroup();
@@ -2045,17 +2059,17 @@ function saveParent(selector){
     addParentGroup(selector, parent.low, parent.high);
 
     // attach the parent to the current set and save
-    Collect.group.pages[Collect.current.page].sets[Collect.current.set].parent = parent;
+    Collect.current.set.addParent(parent);
     saveGroup();
     refreshElements();
 }
 
 function saveNext(selector){
     var match = document.querySelector(selector),
-        page = Collect.group.pages[Collect.current.page];
+        name = Collect.current.page.name;
 
-    if ( page.name !== "default" ) {
-        alertMessage("Cannot add next selector to '" + page.name + "' page, only to default");
+    if ( name !== "default" ) {
+        alertMessage("Cannot add next selector to '" + name + "' page, only to default");
         return;
     }
     if ( errorCheck(!match.hasAttribute("href"), HTML.selector.selector, "selector must select element with href attribute") ) {
@@ -2064,10 +2078,8 @@ function saveNext(selector){
 
     HTML.perm.next.selector.textContent = selector;
 
-    page.index = true;
-    page.next = selector;
-
-    Collect.group.pages[Collect.current.page] = page;
+    Collect.current.page.index = true;
+    Collect.current.page.next = selector;
     saveGroup();
 
     showRuleForm();
@@ -2099,7 +2111,7 @@ function removeSelectorEvent(event){
 ******************/
 function newRuleEvent(event){
     event.preventDefault();
-    Collect.current.selector = this.selector;
+    Collect.current.selector = this;
 
     setupRuleForm(this.selector);
     showTab(HTML.tabs.rule);
@@ -2136,7 +2148,7 @@ function saveRuleEvent(event){
             " because it is a reserved word") ) {
         return;
     }
-    else if ( !Collect.group.uniqueRuleName(name) ) {
+    else if ( !Collect.current.group.uniqueRuleName(name) ) {
         // some markup to signify you need to change the rule's name
         alertMessage("Rule name is not unique");
         HTML.rule.rule.name.classList.add("error");
@@ -2148,8 +2160,7 @@ function saveRuleEvent(event){
         // page will be created when rule is added to set, but add option now
         HTML.perm.page.select.appendChild(newOption(rule.name));
     }
-    var curr = Collect.current;
-    var selector = Collect.group.pages[curr.page].sets[curr.set].selectors[curr.selector];
+    var selector = Collect.current.selector;
     addRule(rule, selector);
     saveGroup();
     resetInterface();
@@ -2190,7 +2201,7 @@ function deleteParentEvent(event){
     HTML.perm.parent.holder.style.display = "none";
     HTML.perm.parent.selector.textContent = "";
     HTML.perm.parent.range.textContent = "";
-    Collect.group.pages[Collect.current.page].sets[Collect.current.set].parent = undefined;
+    Collect.current.set.removeParent();
     saveGroup();
     clearClass("parentGroup");
     showRuleForm();
@@ -2202,20 +2213,13 @@ function deleteNextEvent(event){
     delete Collect.next;
     HTML.perm.next.holder.style.display = "none";
     HTML.perm.next.selector.textContent = "";
-    Collect.group.pages[Collect.current.page].removeNext();
+    Collect.current.page.removeNext();
     saveGroup();
     Interface.turnOn();
 }
 
 function toggleURLEvent(event){
-    var group = Collect.group,
-        url = window.location.href;
-    if ( group.urls[url] ) {
-        delete group.urls[url];
-    } else {
-        group.urls[url] = true;
-    }
-
+    Collect.current.group.toggleURL(window.location.href);
     saveGroup();
 }
 
@@ -2376,7 +2380,8 @@ function clearErrors(){
 }
 
 /*
-add's a rule element to it's respective location in #ruleGroup
+rule is a JSON object representing a rule
+selector a a Selector object to attach the rule to
 */
 function addRule(rule, selector){
     var ruleObject = new Rule(
@@ -2526,7 +2531,7 @@ function setupHostname(){
 
 function uploadGroup(){
     var data = {
-        group: Collect.group.uploadObject(),
+        group: Collect.current.group.uploadObject(),
         site: window.location.host
     };
     chrome.runtime.sendMessage({type: 'upload', data: data});
@@ -2586,7 +2591,7 @@ function saveGroup(){
     chrome.storage.local.get('sites', function saveGroupChrome(storage){
         var host = window.location.hostname,
             site = storage.sites[host],
-            group = Collect.group.object();
+            group = Collect.current.group.object();
         storage.sites[host].groups[group.name] = group;
         chrome.storage.local.set({"sites": storage.sites});
     });
@@ -2597,7 +2602,7 @@ deletes the group currently selected, and removes its associated option from #al
 if the current group is "default", delete the rules for the group but don't delete the group
 */
 function deleteGroup(){
-    var defaultGroup = (Collect.current.group === "default"),
+    var defaultGroup = (Collect.current.group.name === "default"),
         confirmed;
     if ( defaultGroup ) {
         confirmed = confirm("Cannot delete \"default\" group. Do you want to clear out all of its pages instead?");
@@ -2615,7 +2620,7 @@ function deleteGroup(){
         if ( defaultGroup ) {
             site.groups["default"] = newGroup("default");
         } else {
-            delete site.groups[Collect.current.group];
+            delete site.groups[Collect.current.group.name];
             currOption.parentElement.removeChild(currOption);
         }
         storage.sites[host] = site;
@@ -2631,17 +2636,14 @@ function deleteGroup(){
 
 function loadPage(ele){
     var option = ele.querySelector('option:checked'),
-        name = option.value,
-        page = Collect.group.pages[name];
-    Collect.current.page = name;
+        name = option.value;
     resetInterface();
-    //test2
     baseCancel();
-    loadPageObject(page);
+    loadPageObject(Collect.current.group.pages[name]);
 }
 
 function deletePage(){
-    var defaultPage = (Collect.current.page === "default"),
+    var defaultPage = (Collect.current.page.name === "default"),
         confirmed;
     if ( defaultPage ) {
         confirmed = confirm("Cannot delete \"default\" page. Do you want to clear out all of its rule sets instead?");
@@ -2656,13 +2658,13 @@ function deletePage(){
     // just delete all of the rules for "default" option
     if ( defaultPage ) {
         page = new Page("default");
-        Collect.group.addPage(page);
+        Collect.current.group.addPage(page);
     } else {
-        Collect.group.removePage(Collect.current.page);
+        Collect.current.group.removePage(Collect.current.page.name);
         var currOption = HTML.perm.page.select.querySelector("option:checked");
         currOption.parentElement.removeChild(currOption);
         HTML.perm.page.select.querySelector("option[value=default]").selected = true;
-        page = Collect.group.pages["default"];
+        page = Collect.current.group.pages["default"];
     }
     saveGroup();
     baseCancel();
@@ -2676,10 +2678,8 @@ function deletePage(){
 function loadSet(ele){
     var option = ele.querySelector("option:checked"),
         name = option.value;
-    Collect.current.set = name;
-
     baseCancel();
-    loadSetObject(Collect.group.pages[Collect.current.page].sets[name]);
+    loadSetObject(Collect.current.page.sets[name]);
 }
 
 function createSelectorSet(){
@@ -2692,14 +2692,13 @@ function createSelectorSet(){
         return;
     }
     
-    if ( !Collect.group.uniqueSelectorSetName(name) ) {
+    if ( !Collect.current.group.uniqueSelectorSetName(name) ) {
         alertMessage("a selector set named \"" + name + "\" already exists");
         return;
     }
     HTML.perm.set.select.appendChild(newOption(name));
-    var page = Collect.group.pages[Collect.current.page],
-        set = new SelectorSet(name);
-    page.addSet(set);
+    var set = new SelectorSet(name);
+    Collect.current.page.addSet(set);
     saveGroup();
 
     baseCancel();
@@ -2707,7 +2706,7 @@ function createSelectorSet(){
 }
 
 function deleteSelectorSet(){
-    var defaultSet = (Collect.current.set === "default"),
+    var defaultSet = (Collect.current.set.name === "default"),
         confirmed;
     if ( defaultSet ) {
         confirmed = confirm("Cannot delete \"default\" rule set. Do you want to clear out all of its rules instead?");
@@ -2718,19 +2717,17 @@ function deleteSelectorSet(){
         return;
     }
 
-    var page = Collect.group.pages[Collect.current.page],
-        set;
-    page.removeSet(Collect.current.set);
-
+    Collect.current.page.removeSet(Collect.current.set.name);
+    var set;
     // handle setting new current SelectorSet
     if ( defaultSet ) {
         set = new SelectorSet("default");
-        page.addSet(set);
+        Collect.current.page.addSet(set);
     } else {
         var currOption = HTML.perm.set.select.querySelector("option:checked");
         currOption.parentElement.removeChild(currOption);
-        Collect.current.set = "default";
-        set = page.sets["default"];
+        //test
+        set = Collect.current.page.sets["default"];
         HTML.perm.set.select.querySelector("option[value=default]").selected = true;
     }
 
@@ -2840,9 +2837,8 @@ function loadGroupObject(group){
     // clear out previous group
     HTML.perm.group.holder.innerHTML = "";
     HTML.perm.group.holder.appendChild(groupObject.html());
-    Collect.group = groupObject;
-    Collect.current.group = group.name;
-    
+
+    Collect.current.group = groupObject;    
     // create all pages and child objects for the group
     for ( pageName in group.pages ) {
         page = group.pages[pageName];
@@ -2863,11 +2859,11 @@ function loadGroupObject(group){
             }
         }
     }
-    loadPageObject(Collect.group.pages["default"]);
+    loadPageObject(Collect.current.group.pages["default"]);
 }
 
 function loadPageObject(page){
-    Collect.current.page = page.name;
+    Collect.current.page = page;
     if ( page.name === "default" ) {
         HTML.perm.group.index.style.display = "inline-block";
         HTML.perm.next.holder.style.display = "inline-block";
@@ -2891,7 +2887,7 @@ function loadPageObject(page){
 
 function loadSetObject(set){
     Collect.parent = set.parent || {};
-    Collect.current.set = set.name;
+    Collect.current.set = set;
 
     if ( set.parent ) {
         HTML.perm.parent.holder.style.display = "inline-block";
