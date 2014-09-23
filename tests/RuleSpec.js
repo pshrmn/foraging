@@ -1,29 +1,29 @@
-describe("Group", function(){
+describe("Schema", function(){
     describe("constructor", function(){
         it("sets name and urls", function(){
             var urls = {"http://www.example.com/packers": true,
                 "http://www.example.com/football": true};
-            var g = new Group("Packers", urls);
+            var g = new Schema("Packers", urls);
             expect(g.name).toEqual("Packers");
             expect(JSON.stringify(g.urls)).toEqual(JSON.stringify(urls));
         });
 
         it("sets urls to an empty object when not provided", function(){
-            var g = new Group("Vikings");
+            var g = new Schema("Vikings");
             expect(JSON.stringify(g.urls)).toEqual("{}");
         });
 
         it("creates a default page", function(){
-            var g = new Group("Broncos");
+            var g = new Schema("Broncos");
             expect(g.pages["default"]).toBeDefined();
         });
     });
 
     describe("object", function(){
-        it("returns a JSON object representing the group", function(){
+        it("returns a JSON object representing the schema", function(){
             var urls = {"http://www.example.com/lions": true,
                 "http://www.example.com/football": true};
-            var groupJSON = {
+            var schemaJSON = {
                 name: "Lions",
                 urls: urls,
                 pages: {
@@ -39,14 +39,14 @@ describe("Group", function(){
                     }
                 }
             }
-            var g = new Group("Lions", urls);
-            expect(JSON.stringify(g.object())).toEqual(JSON.stringify(groupJSON));
+            var g = new Schema("Lions", urls);
+            expect(JSON.stringify(g.object())).toEqual(JSON.stringify(schemaJSON));
         });
     });
 
     describe("uploadObject", function(){
         it("returns a JSON object formatted for upload", function(){
-            var g = new Group("Bears");
+            var g = new Schema("Bears");
             var expected = {
                 name: "Bears",
                 urls: []
@@ -55,7 +55,7 @@ describe("Group", function(){
         });
 
         it("correctly builds a tree based on followed rules", function(){
-            var g = new Group("Cardinals");
+            var g = new Schema("Cardinals");
             var p = new Page("Foo");
             var s1 = new SelectorSet("Bar");
             var s2 = new SelectorSet("Baz");
@@ -128,18 +128,18 @@ describe("Group", function(){
     });
 
     describe("html", function(){
-        it("builds and returns html elements representing the group", function(){
-            var g = new Group("Colts");
+        it("builds and returns html elements representing the schema", function(){
+            var g = new Schema("Colts");
             var ele = g.html();
             expect(ele.tagName).toEqual("DIV");
             expect(g.htmlElements.pages.tagName).toEqual("UL");
-            expect(g.htmlElements.nametag.textContent).toEqual("Group: Colts");
+            expect(g.htmlElements.nametag.textContent).toEqual("Schema: Colts");
         });
     });
 
     describe("toggleURL", function(){
         it("adds a url to this.urls if it doesn't already exist", function(){
-            var g = new Group("Cowboys"),
+            var g = new Schema("Cowboys"),
                 testURL = "http://www.example.com";
             expect(g.urls[testURL]).toBeUndefined();
             g.toggleURL(testURL);
@@ -147,7 +147,7 @@ describe("Group", function(){
         });
 
         it("it removes a url from this.urls if it already exists", function(){
-            var g = new Group("Eagles"),
+            var g = new Schema("Eagles"),
                 testURL = "http://www.example.com";
             g.toggleURL(testURL);
             expect(g.urls[testURL]).toBe(true); 
@@ -157,18 +157,18 @@ describe("Group", function(){
     });
 
     describe("addPage", function(){
-        it("adds a page to group.pages", function(){
-            var g = new Group("Titans"),
+        it("adds a page to schema.pages", function(){
+            var g = new Schema("Titans"),
                 p = new Page("locations");
             expect(g.pages["locations"]).toBeUndefined();
-            expect(p.group).toBeUndefined();
+            expect(p.schema).toBeUndefined();
             g.addPage(p);
             expect(g.pages["locations"]).toBeDefined();
-            expect(p.group).toBeDefined();
+            expect(p.schema).toBeDefined();
         });
 
-        it("generates html if group html has been generated", function(){
-            var g = new Group("Jaguars"),
+        it("generates html if schema html has been generated", function(){
+            var g = new Schema("Jaguars"),
                 p = new Page("wins");
             g.html();
             g.addPage(p);
@@ -178,8 +178,8 @@ describe("Group", function(){
     });
 
     describe("removePage", function(){
-        it("removes page from group.pages", function(){
-            var g = new Group("Texans"),
+        it("removes page from schema.pages", function(){
+            var g = new Schema("Texans"),
                 p = new Page("quarterbacks");
             g.addPage(p);
             expect(g.pages["quarterbacks"]).toBeDefined();
@@ -190,13 +190,13 @@ describe("Group", function(){
 
     describe("uniquePageName", function(){
         it("returns true if name does not already exist", function(){
-            var g = new Group("Browns");
+            var g = new Schema("Browns");
             expect(g.uniquePageName("playoff wins")).toBe(true);
         });
 
         it("returns false if name already exists", function(){
-            var g = new Group("Bengals");
-            var p = new Group("arrested players");
+            var g = new Schema("Bengals");
+            var p = new Schema("arrested players");
             g.addPage(p);
             expect(g.uniquePageName("arrested players")).toBe(false);
         });
@@ -204,7 +204,7 @@ describe("Group", function(){
 
     describe("uniqueSelectorSetName", function(){
         it("returns true if a SelectorSet with the name does not exist", function(){
-            var g = new Group("Steelers");
+            var g = new Schema("Steelers");
             var p1 = new Page("Offense");
             var p2 = new Page("Defense");
             var r1 = new SelectorSet("Quarterbacks");
@@ -217,7 +217,7 @@ describe("Group", function(){
         });
 
         it("returns false if a SelectorSet with the name already exists", function(){
-            var g = new Group("Ravens");
+            var g = new Schema("Ravens");
             var p1 = new Page("Offense");
             var p2 = new Page("Defense");
             var r1 = new SelectorSet("Quarterbacks");
@@ -231,29 +231,29 @@ describe("Group", function(){
     });
 
     describe("uniqueRuleName", function(){
-        var group;
+        var schema;
         beforeEach(function(){
-            group = new Group("Bills");
+            schema = new Schema("Bills");
             var p1 = new Page("Offense");
             var p2 = new Page("Defense");
             var r1 = new SelectorSet("Quarterbacks");
             var r2 = new SelectorSet("Linebackers");
             var sel1 = new Selector("Names", "");
             var rule = new Rule("Geno", "");
-            group.addPage(p1);
-            group.addPage(p2);
+            schema.addPage(p1);
+            schema.addPage(p2);
             p1.addSet(r1);
             p2.addSet(r2);
             r1.addSelector(sel1)
             sel1.addRule(rule);
         });
 
-        it("returns true if a Rule's name is unique across a group", function(){
-            expect(group.uniqueRuleName("Doug")).toBe(true);
+        it("returns true if a Rule's name is unique across a schema", function(){
+            expect(schema.uniqueRuleName("Doug")).toBe(true);
         });
 
-        it("returns false if a Rule's name already exists in a group", function(){
-            expect(group.uniqueRuleName("Geno")).toBe(false);
+        it("returns false if a Rule's name already exists in a schema", function(){
+            expect(schema.uniqueRuleName("Geno")).toBe(false);
         });
     });
 });
@@ -485,8 +485,8 @@ describe("SelectorSet", function(){
         });
         /*
         // this should be moved to selector tests once those are created
-        it("creates a new page if group/page are defined", function(){
-            var g = new Group("Pirates"),
+        it("creates a new page if schema/page are defined", function(){
+            var g = new Schema("Pirates"),
                 r = new Rule("two", "a", "attr-href", false, true);
             g.pages["default"].sets["default"].addRule(r);
             expect(g.pages["two"]).toBeDefined();
@@ -515,7 +515,7 @@ describe("SelectorSet", function(){
             expect(Object.keys(set.selectors).length).toEqual(0);
             /*
             // reuse for selector.remove test
-            var g = new Group("One"),
+            var g = new Schema("One"),
                 r = new Rule("two", "a", "attr-href", false, true);
             g.pages["default"].sets["default"].addRule(r);
             expect(g.pages["two"]).toBeDefined();
@@ -700,7 +700,7 @@ describe("Rule", function(){
 
     describe("remove", function(){
         it("removes all rules (and thus associated follow pages)", function(){
-            var g = new Group("One"),
+            var g = new Schema("One"),
                 s = new Selector("a"),
                 r = new Rule("two", "attr-href", true);
             g.pages["default"].sets["default"].addSelector(s);

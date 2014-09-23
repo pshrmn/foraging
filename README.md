@@ -21,7 +21,7 @@ A page is a webpage and contains selector sets to capture elements in the page
         sets: {<selectorSet>...}
     }
 
-A selector set is a group of selectors within a page
+A selector set is a group of selectors within a page, optionally linked together by a parent selector
 
     selectorSet = {
         name: <string>,
@@ -47,7 +47,8 @@ A parent is a selector for how to match an object within the DOM. This is useful
 
     parent = {
         selector: <string>,
-        range: <int> (optional)
+        low: <int> (optional),
+        high: <int> (optional)
     }
 
 And a site can have multiple, independent groups, each of which is uploaded individually to the server

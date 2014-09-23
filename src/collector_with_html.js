@@ -41,15 +41,15 @@ var Collect = {
     allElements: [],
     indexPage: false,
     current: {
-        group: undefined,
+        schema: undefined,
         page: undefined,
         set: undefined,
         selector: undefined
     },
     // parent.selector is set when Collect.current.set index=true
     parent: {},
-    // currently loaded Group
-    group: undefined
+    // currently loaded Schema
+    schema: undefined
 };
 
 /*
@@ -120,7 +120,7 @@ var Interface = {
         permanentBarEvents();
     },
     update: function(){
-        HTML.perm.group.select.querySelector("option[value=" + Collect.current.group.name + "]").selected = true;
+        HTML.perm.schema.select.querySelector("option[value=" + Collect.current.schema.name + "]").selected = true;
         HTML.perm.page.select.querySelector("option[value=" + Collect.current.page.name + "]").selected = true;
         HTML.perm.set.select.querySelector("option[value=" + Collect.current.set.name + "]").selected = true;
     }
@@ -165,9 +165,9 @@ var HTML = {
     },
     // elements in the the permament bar
     perm: {
-        group: {
-            select: document.getElementById("groupSelect"),
-            holder: document.getElementById("groupHolder"),
+        schema: {
+            select: document.getElementById("schemaSelect"),
+            holder: document.getElementById("schemaHolder"),
             index: document.getElementById("indexMarker"),
             indexToggle: document.getElementById("indexToggle")
         },
@@ -202,7 +202,7 @@ var HTML = {
     tabs: {
         selector: document.getElementById("selectorTab"),
         rule: document.getElementById("ruleTab"),
-        groups: document.getElementById("groupsTab"),
+        schemas: document.getElementById("schemasTab"),
         preview: document.getElementById("previewTab"),
         options: document.getElementById("optionsTab")
     }
@@ -395,7 +395,7 @@ function tabEvents(){
         Interface.turnOff();
         clearClass('queryCheck');
         clearClass('collectHighlight');
-        clearClass('parentGroup');
+        clearClass('parentSchema');
         clearClass("savedPreview");
         HTML.interface.parentElement.removeChild(HTML.interface);
         document.body.style.marginBottom = marginBottom + "px";
@@ -459,20 +459,20 @@ function previewViewEvents(){
 }
 
 function permanentBarEvents(){
-    // group events
-    idEvent("groupSelect", "change", function loadGroupEvent(event){
+    // schema events
+    idEvent("schemaSelect", "change", function loadSchemaEvent(event){
         event.preventDefault();
-        loadGroup(this);
+        loadSchema(this);
     });
 
-    idEvent("createGroup", "click", function newGroupEvent(event){
+    idEvent("createSchema", "click", function newSchemaEvent(event){
         event.preventDefault();
-        createGroup();
+        createSchema();
     });
 
-    idEvent("deleteGroup", "click", function deleteGroupEvent(event){
+    idEvent("deleteSchema", "click", function deleteSchemaEvent(event){
         event.preventDefault();
-        deleteGroup();
+        deleteSchema();
     });
 
     // page events
@@ -511,7 +511,7 @@ function permanentBarEvents(){
     // upload events
     idEvent("uploadRules", "click", function uploadEvent(event){
         event.preventDefault();
-        uploadGroup();
+        uploadSchema();
     });
 
     // index events
@@ -662,7 +662,7 @@ function saveSelector(selector){
         Collect.current.set.addSelector(sel, [newRuleEvent, editSelectorEvent, removeSelectorEvent]);
     }
 
-    saveGroup();
+    saveSchema();
 }
 
 function saveParent(selector){
@@ -683,11 +683,11 @@ function saveParent(selector){
     HTML.perm.parent.holder.style.display = "inline-block";
     HTML.perm.parent.selector.textContent = selector;
     HTML.perm.parent.range.textContent = setRangeString(low, high);
-    addParentGroup(selector, parent.low, parent.high);
+    addParentSchema(selector, parent.low, parent.high);
 
     // attach the parent to the current set and save
     Collect.current.set.addParent(parent);
-    saveGroup();
+    saveSchema();
     refreshElements();
 }
 
@@ -707,11 +707,11 @@ function saveNext(selector){
 
     Collect.current.page.index = true;
     Collect.current.page.next = selector;
-    saveGroup();
+    saveSchema();
 
     showRuleForm();
     if ( Collect.parent.selector ) {
-        addParentGroup(Collect.parent.selector, Collect.parent.low, Collect.parent.high);
+        addParentSchema(Collect.parent.selector, Collect.parent.low, Collect.parent.high);
     }
 
     refreshElements();
@@ -730,7 +730,7 @@ function updateRadioEvent(event){
 function removeSelectorEvent(event){
     event.preventDefault();
     this.remove();
-    saveGroup();
+    saveSchema();
 }
 
 /******************
@@ -775,7 +775,7 @@ function saveRuleEvent(event){
             " because it is a reserved word") ) {
         return;
     }
-    else if ( !Collect.current.group.uniqueRuleName(name) ) {
+    else if ( !Collect.current.schema.uniqueRuleName(name) ) {
         // some markup to signify you need to change the rule's name
         alertMessage("Rule name is not unique");
         HTML.rule.rule.name.classList.add("error");
@@ -789,7 +789,7 @@ function saveRuleEvent(event){
     }
     var selector = Collect.current.selector;
     addRule(rule, selector);
-    saveGroup();
+    saveSchema();
     resetInterface();
 }
 
@@ -815,7 +815,7 @@ function saveEditEvent(event){
     var oldName = Interface.editing.rule.name,
         set = Interface.editing.rule.selector.set;
     Interface.editing.rule.update(rule);
-    saveGroup();
+    saveSchema();
 
     delete Interface.editing.rule;
     showRuleForm();
@@ -829,8 +829,8 @@ function deleteParentEvent(event){
     HTML.perm.parent.selector.textContent = "";
     HTML.perm.parent.range.textContent = "";
     Collect.current.set.removeParent();
-    saveGroup();
-    clearClass("parentGroup");
+    saveSchema();
+    clearClass("parentSchema");
     showRuleForm();
     Interface.turnOn();
 }
@@ -841,13 +841,13 @@ function deleteNextEvent(event){
     HTML.perm.next.holder.style.display = "none";
     HTML.perm.next.selector.textContent = "";
     Collect.current.page.removeNext();
-    saveGroup();
+    saveSchema();
     Interface.turnOn();
 }
 
 function toggleURLEvent(event){
-    Collect.current.group.toggleURL(window.location.href);
-    saveGroup();
+    Collect.current.schema.toggleURL(window.location.href);
+    saveSchema();
 }
 
 /************************
@@ -906,7 +906,7 @@ function deleteRuleEvent(event){
         pageOption.parentElement.removeChild(pageOption);
     }
     this.remove();
-    saveGroup();
+    saveSchema();
 }
 
 /***********************
@@ -1023,16 +1023,16 @@ function addRule(rule, selector){
 }
 
 /*
-add .parentGroup to all elements matching parent selector and in range
+add .parentSchema to all elements matching parent selector and in range
 */
-function addParentGroup(selector, low,  high){
+function addParentSchema(selector, low,  high){
     low = low || 0;
     high = high || 0;
     var elements = Collect.all(selector),
         end = elements.length + high;
         // add high because it is negative
     for ( ; low<end ; low++ ){
-        elements[low].classList.add("parentGroup");
+        elements[low].classList.add("parentSchema");
     }
 }
 
@@ -1119,7 +1119,7 @@ creates an object representing a site and saves it to chrome.storage.local
 the object is:
     host:
         site: <hostname>
-        groups:
+        schemas:
             <name>:
                 name: <name>,
                 pages: {},
@@ -1133,127 +1133,127 @@ function setupHostname(){
     chrome.storage.local.get("sites", function setupHostnameChrome(storage){
         var host = window.location.hostname,
             site = storage.sites[host],
-            group,
+            schema,
             key;
         // default setup if page hasn't been visited before
         if ( !site ) {
-            group = newGroup("default");
+            schema = newSchema("default");
             storage.sites[host] = {
                 site: host,
-                groups: {
-                    "default": group
+                schemas: {
+                    "default": schema
                 }
             };
             chrome.storage.local.set({'sites': storage.sites});
 
-            HTML.perm.group.select.appendChild(newOption("default"));
+            HTML.perm.schema.select.appendChild(newOption("default"));
 
         } else {
-            options(Object.keys(site.groups), HTML.perm.group.select);
-            group = site.groups['default'];
+            options(Object.keys(site.schemas), HTML.perm.schema.select);
+            schema = site.schemas['default'];
         }
-        loadGroupObject(group);
+        loadSchemaObject(schema);
     });
 }
 
-function uploadGroup(){
+function uploadSchema(){
     var data = {
-        group: Collect.current.group.uploadObject(),
+        schema: Collect.current.schema.uploadObject(),
         site: window.location.host
     };
     chrome.runtime.sendMessage({type: 'upload', data: data});
 }
 
 /***********************
-    GROUP STORAGE
+    SCHEMA STORAGE
 ***********************/
 
-function createGroup(){
-    var name = prompt("Group Name");
+function createSchema(){
+    var name = prompt("Schema Name");
     // null when cancelling prompt
     if ( name === null ) {
         return;
     }
     // make sure name isn't empty string or string that can't be used in a filename
     else if ( name === "" || !legalFilename(name)) {
-        alertMessage("\'" + name + "\' is not a valid group name");
+        alertMessage("\'" + name + "\' is not a valid schema name");
         return;
     }
     
     chrome.storage.local.get("sites", function(storage){
         var host = window.location.hostname,
             site = storage.sites[host],
-            group;
+            schema;
 
-        if ( !uniqueGroupName(name, site.groups)){
-            alertMessage("a group named \"" + name + "\" already exists");
+        if ( !uniqueSchemaName(name, site.schemas)){
+            alertMessage("a schema named \"" + name + "\" already exists");
             return;
         }
 
-        HTML.perm.group.select.appendChild(newOption(name));
-        group = newGroup(name);
-        storage.sites[host].groups[name] = group;
+        HTML.perm.schema.select.appendChild(newOption(name));
+        schema = newSchema(name);
+        storage.sites[host].schemas[name] = schema;
 
         chrome.storage.local.set({'sites': storage.sites});
-        loadGroupObject(group);
+        loadSchemaObject(schema);
     });
 }
 
-function loadGroup(ele){
+function loadSchema(ele){
     var option = ele.querySelector('option:checked'),
         name = option.value;
-    chrome.storage.local.get('sites', function loadGroupsChrome(storage){
+    chrome.storage.local.get('sites', function loadSchemasChrome(storage){
         var host = window.location.hostname,
             site = storage.sites[host],
-            group = site.groups[name];
+            schema = site.schemas[name];
         baseCancel();
-        loadGroupObject(group);
+        loadSchemaObject(schema);
     });
 }
 
 /*
-saving function for all things group related
+saving function for all things schema related
 */
-function saveGroup(){
-    chrome.storage.local.get('sites', function saveGroupChrome(storage){
+function saveSchema(){
+    chrome.storage.local.get('sites', function saveSchemaChrome(storage){
         var host = window.location.hostname,
             site = storage.sites[host],
-            group = Collect.current.group.object();
-        storage.sites[host].groups[group.name] = group;
+            schema = Collect.current.schema.object();
+        storage.sites[host].schemas[schema.name] = schema;
         chrome.storage.local.set({"sites": storage.sites});
     });
 }
 
 /*
-deletes the group currently selected, and removes its associated option from #allGroups
-if the current group is "default", delete the rules for the group but don't delete the group
+deletes the schema currently selected, and removes its associated option from #allSchemas
+if the current schema is "default", delete the rules for the schema but don't delete the schema
 */
-function deleteGroup(){
-    var defaultGroup = (Collect.current.group.name === "default"),
+function deleteSchema(){
+    var defaultSchema = (Collect.current.schema.name === "default"),
         confirmed;
-    if ( defaultGroup ) {
-        confirmed = confirm("Cannot delete \"default\" group. Do you want to clear out all of its pages instead?");
+    if ( defaultSchema ) {
+        confirmed = confirm("Cannot delete \"default\" schema. Do you want to clear out all of its pages instead?");
     } else {
-        confirmed = confirm("Are you sure you want to delete this group and all of its related pages?");    
+        confirmed = confirm("Are you sure you want to delete this schema and all of its related pages?");    
     }
     if ( !confirmed ) {
         return;
     }
-    chrome.storage.local.get("sites", function deleteGroupChrome(storage){
+    chrome.storage.local.get("sites", function deleteSchemaChrome(storage){
         var host = window.location.hostname,
             site = storage.sites[host],
-            currOption = HTML.perm.group.select.querySelector("option:checked");
+            currOption = HTML.perm.schema.select.querySelector("option:checked");
         // just delete all of the rules for "default" option
-        if ( defaultGroup ) {
-            site.groups["default"] = newGroup("default");
+        if ( defaultSchema ) {
+            site.schemas["default"] = newSchema("default");
         } else {
-            delete site.groups[Collect.current.group.name];
+            delete site.schemas[Collect.current.schema.name];
             currOption.parentElement.removeChild(currOption);
         }
         storage.sites[host] = site;
         chrome.storage.local.set({'sites': storage.sites});
         baseCancel();
-        loadGroupObject(site.groups["default"]);
+        loadSchemaObject(site.schemas["default"]);
     });
 }
 
@@ -1266,7 +1266,7 @@ function loadPage(ele){
         name = option.value;
     resetInterface();
     baseCancel();
-    loadPageObject(Collect.current.group.pages[name]);
+    loadPageObject(Collect.current.schema.pages[name]);
 }
 
 function deletePage(){
@@ -1285,15 +1285,15 @@ function deletePage(){
     // just delete all of the rules for "default" option
     if ( defaultPage ) {
         page = new Page("default");
-        Collect.current.group.addPage(page);
+        Collect.current.schema.addPage(page);
     } else {
-        Collect.current.group.removePage(Collect.current.page.name);
+        Collect.current.schema.removePage(Collect.current.page.name);
         var currOption = HTML.perm.page.select.querySelector("option:checked");
         currOption.parentElement.removeChild(currOption);
         HTML.perm.page.select.querySelector("option[value=default]").selected = true;
-        page = Collect.current.group.pages["default"];
+        page = Collect.current.schema.pages["default"];
     }
-    saveGroup();
+    saveSchema();
     baseCancel();
     loadPageObject(page);
 }
@@ -1319,14 +1319,14 @@ function createSelectorSet(){
         return;
     }
     
-    if ( !Collect.current.group.uniqueSelectorSetName(name) ) {
+    if ( !Collect.current.schema.uniqueSelectorSetName(name) ) {
         alertMessage("a selector set named \"" + name + "\" already exists");
         return;
     }
     HTML.perm.set.select.appendChild(newOption(name));
     var set = new SelectorSet(name);
     Collect.current.page.addSet(set);
-    saveGroup();
+    saveSchema();
 
     baseCancel();
     loadSetObject(set);
@@ -1358,7 +1358,7 @@ function deleteSelectorSet(){
         HTML.perm.set.select.querySelector("option[value=default]").selected = true;
     }
 
-    saveGroup();
+    saveSchema();
     baseCancel();
     loadSetObject(set);
 }
@@ -1391,8 +1391,8 @@ function setOptions(options){
     STORAGE HELPERS
 ***********************/
 
-// creates an empty group object
-function newGroup(name){
+// creates an empty schema object
+function newSchema(name){
     return {
         name: name,
         pages: {"default": newPage("default", false)},
@@ -1418,8 +1418,8 @@ function newSet(name){
     };
 }
 
-function uniqueGroupName(name, groups){
-    for ( var key in groups ) {
+function uniqueSchemaName(name, schemas){
+    for ( var key in schemas ) {
         if ( name === key ) {
             return false;
         }
@@ -1428,7 +1428,7 @@ function uniqueGroupName(name, groups){
 }
 
 /*
-a group's name will be the name of the file when it is uploaded, so make sure that any characters in the name will be legal to use
+a schema's name will be the name of the file when it is uploaded, so make sure that any characters in the name will be legal to use
 rejects if name contains characters not allowed in filename: <, >, :, ", \, /, |, ?, *
 */
 function legalFilename(name){
@@ -1441,36 +1441,36 @@ function legalFilename(name){
 }
 
 /*
-given JSON representing a group, create that Group's object and all associated 
+given JSON representing a schema, create that Schema's object and all associated 
 Page/SelectorSet/Selector/Rule objects
-also setup relevant HTML data associated with the Group
+also setup relevant HTML data associated with the Schema
 */
-function loadGroupObject(group){
-    HTML.perm.group.select.querySelector("option[value=" + group.name + "]").selected = true;
+function loadSchemaObject(schema){
+    HTML.perm.schema.select.querySelector("option[value=" + schema.name + "]").selected = true;
 
     var url = window.location.href;
-    HTML.perm.group.indexToggle.checked = group.urls[url] !== undefined;
+    HTML.perm.schema.indexToggle.checked = schema.urls[url] !== undefined;
 
-    // clear out current options and populate with current group's pages
+    // clear out current options and populate with current schema's pages
     HTML.perm.page.select.innerHTML = "";
-    options(Object.keys(group.pages), HTML.perm.page.select);
-    var groupObject,
+    options(Object.keys(schema.pages), HTML.perm.page.select);
+    var schemaObject,
         page, pageObject, pageName,
         set, setObject, setName,
         selector, selectorObject, selectorName,
         rule, ruleObject, ruleName;
 
-    groupObject = new Group(group.name, group.urls);
-    // clear out previous group
-    HTML.perm.group.holder.innerHTML = "";
-    HTML.perm.group.holder.appendChild(groupObject.html());
+    schemaObject = new Schema(schema.name, schema.urls);
+    // clear out previous schema
+    HTML.perm.schema.holder.innerHTML = "";
+    HTML.perm.schema.holder.appendChild(schemaObject.html());
 
-    Collect.current.group = groupObject;    
-    // create all pages and child objects for the group
-    for ( pageName in group.pages ) {
-        page = group.pages[pageName];
+    Collect.current.schema = schemaObject;    
+    // create all pages and child objects for the schema
+    for ( pageName in schema.pages ) {
+        page = schema.pages[pageName];
         pageObject = new Page(page.name, page.index, page.next);
-        groupObject.addPage(pageObject);
+        schemaObject.addPage(pageObject);
         for ( setName in page.sets ) {
             set = page.sets[setName];
             setObject = new SelectorSet(set.name, set.parent);
@@ -1486,13 +1486,13 @@ function loadGroupObject(group){
             }
         }
     }
-    loadPageObject(Collect.current.group.pages["default"]);
+    loadPageObject(Collect.current.schema.pages["default"]);
 }
 
 function loadPageObject(page){
     Collect.current.page = page;
     if ( page.name === "default" ) {
-        HTML.perm.group.index.style.display = "inline-block";
+        HTML.perm.schema.index.style.display = "inline-block";
         HTML.perm.next.holder.style.display = "inline-block";
         // handle whether or not next has already been set
         if ( page.next ) {
@@ -1503,7 +1503,7 @@ function loadPageObject(page){
             HTML.perm.next.selector.textContent = "";
         }
     } else {
-        HTML.perm.group.index.style.display = "none";
+        HTML.perm.schema.index.style.display = "none";
         HTML.perm.next.holder.style.display = "none";
     }
 
@@ -1519,16 +1519,16 @@ function loadSetObject(set){
     if ( set.parent ) {
         HTML.perm.parent.holder.style.display = "inline-block";
         HTML.perm.parent.selector.textContent = set.parent.selector;
-        addParentGroup(set.parent.selector, set.parent.low, set.parent.high);
+        addParentSchema(set.parent.selector, set.parent.low, set.parent.high);
         setRangeString(set.parent.low, set.parent.high);
     } else {
         HTML.perm.parent.holder.style.display = "none";
         HTML.perm.parent.selector.textContent = "";
         HTML.perm.parent.range.textContent = "";
-        clearClass("parentGroup");
+        clearClass("parentSchema");
     }
 
-    // don't call these in loadGroupObject or loadPageObject because we want to know if there is a
+    // don't call these in loadSchemaObject or loadPageObject because we want to know if there is a
     // parent selector
     Interface.turnOn();
     Interface.update();

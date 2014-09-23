@@ -1,17 +1,17 @@
 /********************
-        GROUP
+        SCHEMA
 ********************/
-function Group(name, urls){
+function Schema(name, urls){
     this.name = name;
     this.urls = urls || {};
     this.pages = {
         "default": new Page("default")
     };
-    this.pages["default"].group = this;
+    this.pages["default"].schema = this;
     this.htmlElements = {};
 }
 
-Group.prototype.object = function(){
+Schema.prototype.object = function(){
     var data = {
         name: this.name,
         urls: this.urls,
@@ -27,12 +27,12 @@ Group.prototype.object = function(){
 };
 
 /***
-rearrange the group's JSON into proper format for Collector
-name: the name of the group
+rearrange the schema's JSON into proper format for Collector
+name: the name of the schema
 urls: converted from an object to a list of urls
 pages: a tree with root node of the "default" page. Each 
 ***/
-Group.prototype.uploadObject = function(){
+Schema.prototype.uploadObject = function(){
     var data = {
         name: this.name,
         urls: Object.keys(this.urls)
@@ -76,13 +76,13 @@ Group.prototype.uploadObject = function(){
     return data;  
 };
 
-Group.prototype.html = function(){
+Schema.prototype.html = function(){
     var holder = noSelectElement("div"),
         nametag = noSelectElement("h3"),
         pages = noSelectElement("ul");
 
-    holder.classList.add("group");
-    nametag.textContent = "Group: " + this.name;
+    holder.classList.add("schema");
+    nametag.textContent = "Schema: " + this.name;
     appendChildren(holder, [nametag, pages]);
 
     for ( var key in this.pages ) {
@@ -98,9 +98,9 @@ Group.prototype.html = function(){
     return holder;
 };
 
-Group.prototype.deleteHTML = prototypeDeleteHTML;
+Schema.prototype.deleteHTML = prototypeDeleteHTML;
 
-Group.prototype.toggleURL = function(url){
+Schema.prototype.toggleURL = function(url){
     if ( this.urls[url] ) {
         delete this.urls[url];
     } else {
@@ -108,21 +108,21 @@ Group.prototype.toggleURL = function(url){
     }
 };
 
-Group.prototype.addPage = function(page){
+Schema.prototype.addPage = function(page){
     var name = page.name;
     if ( this.pages[name] ) {
         this.removePage(name);
     }
     this.pages[name] = page;
-    page.group = this;
-    // if html for group exists, also generate html for page
+    page.schema = this;
+    // if html for schema exists, also generate html for page
     if ( this.htmlElements.holder) {
         var ele = page.html();
         this.htmlElements.pages.appendChild(ele);
     }
 };
 
-Group.prototype.removePage = function(name){
+Schema.prototype.removePage = function(name){
     var page = this.pages[name];
     if ( page ) {
         this.pages[name].deleteHTML();
@@ -130,7 +130,7 @@ Group.prototype.removePage = function(name){
     }
 };
 
-Group.prototype.uniquePageName = function(name){
+Schema.prototype.uniquePageName = function(name){
     for ( var key in this.pages ) {
         if ( name === key ) {
             return false;
@@ -139,7 +139,7 @@ Group.prototype.uniquePageName = function(name){
     return true;
 };
 
-Group.prototype.uniqueSelectorSetName = function(name){
+Schema.prototype.uniqueSelectorSetName = function(name){
     var page, pageName, setName;
     for ( pageName in this.pages ){
         page = this.pages[pageName];
@@ -152,7 +152,7 @@ Group.prototype.uniqueSelectorSetName = function(name){
     return true;
 };
 
-Group.prototype.uniqueRuleName = function(name){
+Schema.prototype.uniqueRuleName = function(name){
     var page, selectorSet, selector,
         pageName, setName, selectorName, ruleName;
     for ( pageName in this.pages ){
@@ -184,8 +184,8 @@ function Page(name, index, next){
     };
     this.sets["default"].page = this;
     this.htmlElements = {};
-    // added when a group calls addPage
-    this.group;
+    // added when a schema calls addPage
+    this.schema;
 }
 
 Page.prototype.object = function(){
@@ -295,8 +295,8 @@ Page.prototype.remove = function(){
     for ( var key in this.sets ) {
         this.removeSet(key);
     }
-    if ( this.group ) {
-        delete this.group.pages[this.name];
+    if ( this.schema ) {
+        delete this.schema.pages[this.name];
     }
 };
 
@@ -494,11 +494,11 @@ Selector.prototype.addRule = function(rule, events){
     this.rules[rule.name] = rule;
     rule.selector = this;
 
-    // if the Rule has follow=true and the SelectorSet has a Page (which in turn has a Group)
-    // add a new Page to the group with the name of the Rule
-    if ( rule.follow && this.set && this.set.page && this.set.page.group ) {
+    // if the Rule has follow=true and the SelectorSet has a Page (which in turn has a Schema)
+    // add a new Page to the schema with the name of the Rule
+    if ( rule.follow && this.set && this.set.page && this.set.page.schema ) {
         var page = new Page(rule.name);
-        this.set.page.group.addPage(page);
+        this.set.page.schema.addPage(page);
     }
 
     // if Selector html exists, also create html for rule
@@ -662,8 +662,8 @@ Rule.prototype.remove = function(){
     this.deleteHTML();
     // remove associated page if rule.follow = true
     if ( this.follow && this.selector && this.selector.set && this.selector.set.page &&
-        this.selector.set.page.group) {
-        this.selector.set.page.group.removePage(this.name);
+        this.selector.set.page.schema) {
+        this.selector.set.page.schema.removePage(this.name);
     }
 
     if ( this.selector ) {
