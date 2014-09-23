@@ -4,9 +4,9 @@ A Chrome extension that allows you to get information necessary to crawl a page.
 
 #####Rules Format
 
-A group refers to a set of data to be captured
+A schema refers to a set of data to be captured
     
-    group = {
+    schema = {
         name: <string>
         urls: [<string>...],
         pages: {<page>...}
@@ -21,7 +21,7 @@ A page is a webpage and contains selector sets to capture elements in the page
         sets: {<selectorSet>...}
     }
 
-A selector set is a group of selectors within a page, optionally linked together by a parent selector
+A selector set is a schema of selectors within a page, optionally linked together by a parent selector
 
     selectorSet = {
         name: <string>,
@@ -51,23 +51,23 @@ A parent is a selector for how to match an object within the DOM. This is useful
         high: <int> (optional)
     }
 
-And a site can have multiple, independent groups, each of which is uploaded individually to the server
+And a site can have multiple, independent schemas, each of which is uploaded individually to the server
 
     site = {
-        groups: {
-            group1: {...},
-            group2: {...}
+        schemas: {
+            schema1: {...},
+            schema2: {...}
         }
 
-Naming of groups, pages, and ruleSets is up to the user, but there a few reserverd words.
+Naming of schemas, pages, and ruleSets is up to the user, but there a few reserverd words.
 
-* default (group) - initial group when visiting a new site
-* default (page) - first page to be crawled in a group
+* default (schema) - initial schema when visiting a new site
+* default (page) - first page to be crawled in a schema
 * default (ruleSet) - initial ruleSet for a page
 * default (rule) - because a page's name is based on an associated rule, cannot have a rule named default
 * next (ruleSet) - a next ruleSet can be added to a "default" page and contains one rule: a link with a capture of attr-href in order to generate more URLs for the default page to be applied to
 
-When a domain is visited (and collectjs is opened) for the first time, a "default" group with a "default" page is generated. This can be used, although creating a new group with a more relevant name is encouraged.
+When a domain is visited (and collectjs is opened) for the first time, a "default" schema with a "default" page is generated. This can be used, although creating a new schema with a more relevant name is encouraged.
 
 #####How to Use
 To pack extension and use:

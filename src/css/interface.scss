@@ -185,7 +185,7 @@ body{
     .rules{
         font-size: 16px;
 
-        .group, .page, .set, .selector, .rule{
+        .schema, .page, .set, .selector, .rule{
             padding: 5px 2px;
             border-radius: 5px;
             border-width: 1px;
@@ -193,7 +193,7 @@ body{
             border-color: $gray;
         }
 
-        .group{
+        .schema{
             background: $light-gray;
         }
 
@@ -212,7 +212,7 @@ body{
             background: $white;
         }
 
-        .group ul, .page ul, .set ul{
+        .schema ul, .page ul, .set ul{
             list-style: none;
         }
 
@@ -241,15 +241,6 @@ body{
         .deltog:hover, .editRule:hover, .previewRule:hover{
             color: $red;
         }
-
-        .ruleGroup{
-            margin-bottom: 15px;
-
-            h2{
-                text-decoration: underline;
-                margin: 10px 0;
-            }
-        }
     }
 
     .items{
@@ -277,7 +268,7 @@ body{
 
     }
 
-    .selectorGroup{
+    .selectorSchema{
         display: inline-block;
         white-space: nowrap;
         padding: 2px 0 0 2px;
@@ -310,7 +301,7 @@ body{
 
     }
 
-    .selectorGroup:hover{
+    .selectorSchema:hover{
         .deltog, .onlychild, .nthtype{
             color: #777;
         }

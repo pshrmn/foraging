@@ -2,7 +2,7 @@
     <div class="tabs">
         <div class="tab active" id="selectorTab" data-for="selectorView">Selector</div>
         <div class="tab" id="ruleTab" data-for="ruleView">Rule</div>
-        <div class="tab" id="groupsTab" data-for="groupsView">Group</div>
+        <div class="tab" id="schemasTab" data-for="schemasView">Schema</div>
         <div class="tab" id="previewTab" data-for="previewView">Preview</div>
         <div class="tab" id="optionsTab" data-for="optionsView">Options</div>
         <div class="tab" id="refreshCollect">&#8635;</div>
@@ -12,9 +12,9 @@
 <div class="permanent">
     <div class="currentInfo">
         <div>
-            Group: <select id="groupSelect"></select>
-            <button id="createGroup" title="create a new group">+</button>
-            <button id="deleteGroup" title="delete current group">&times;</button>
+            Schema: <select id="schemaSelect"></select>
+            <button id="createSchema" title="create a new schema">+</button>
+            <button id="deleteSchema" title="delete current schema">&times;</button>
             <div id="indexMarker" class="info">
                 Initial URL
                 <input type="checkbox" id="indexToggle" />
@@ -40,7 +40,7 @@
                 <button id="removeParent">&times;</button>
             </div>
         </div>
-        <button id="uploadRules">Upload Group</button>
+        <button id="uploadRules">Upload Schema</button>
     </div>
     <div id="collectAlert"></div>
 </div>
@@ -135,8 +135,8 @@
             </div>
         </div>
     </div>
-    <div class="view" id="groupsView">
-        <div id="groupHolder" class="rules"></div>
+    <div class="view" id="schemasView">
+        <div id="schemaHolder" class="rules"></div>
     </div>
     <div class="view" id="previewView">
         <p>

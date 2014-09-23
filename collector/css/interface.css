@@ -117,13 +117,13 @@ body {
     font-weight: normal; }
   .collectjs .rules {
     font-size: 16px; }
-    .collectjs .rules .group, .collectjs .rules .page, .collectjs .rules .set, .collectjs .rules .selector, .collectjs .rules .rule {
+    .collectjs .rules .schema, .collectjs .rules .page, .collectjs .rules .set, .collectjs .rules .selector, .collectjs .rules .rule {
       padding: 5px 2px;
       border-radius: 5px;
       border-width: 1px;
       border-style: solid;
       border-color: #cccccc; }
-    .collectjs .rules .group {
+    .collectjs .rules .schema {
       background: #efefef; }
     .collectjs .rules .page {
       margin: 3px 0;
@@ -134,7 +134,7 @@ body {
     .collectjs .rules .selector {
       margin: 2px 0;
       background: white; }
-    .collectjs .rules .group ul, .collectjs .rules .page ul, .collectjs .rules .set ul {
+    .collectjs .rules .schema ul, .collectjs .rules .page ul, .collectjs .rules .set ul {
       list-style: none; }
     .collectjs .rules .rule {
       margin-right: 10px;
@@ -152,11 +152,6 @@ body {
       padding: 0 3px; }
     .collectjs .rules .deltog:hover, .collectjs .rules .editRule:hover, .collectjs .rules .previewRule:hover {
       color: #c91900; }
-    .collectjs .rules .ruleGroup {
-      margin-bottom: 15px; }
-      .collectjs .rules .ruleGroup h2 {
-        text-decoration: underline;
-        margin: 10px 0; }
   .collectjs .items {
     font-size: 16px;
     color: black; }
@@ -171,27 +166,27 @@ body {
         cursor: pointer; }
       .collectjs .items .modifiers .selected {
         background: #bddbce; }
-  .collectjs .selectorGroup {
+  .collectjs .selectorSchema {
     display: inline-block;
     white-space: nowrap;
     padding: 2px 0 0 2px;
     position: relative;
     cursor: pointer; }
-    .collectjs .selectorGroup * {
+    .collectjs .selectorSchema * {
       font-size: 16px; }
-    .collectjs .selectorGroup .toggleable {
+    .collectjs .selectorSchema .toggleable {
       color: #444444;
       border-bottom: 1px solid #777; }
-      .collectjs .selectorGroup .toggleable .childtoggle {
+      .collectjs .selectorSchema .toggleable .childtoggle {
         border-width: 0 0 1px;
         width: 50px; }
-    .collectjs .selectorGroup .toggleable.off {
+    .collectjs .selectorSchema .toggleable.off {
       color: #ccc; }
-    .collectjs .selectorGroup .deltog, .collectjs .selectorGroup .nthtype, .collectjs .selectorGroup .onlychild {
+    .collectjs .selectorSchema .deltog, .collectjs .selectorSchema .nthtype, .collectjs .selectorSchema .onlychild {
       font-weight: bold;
       padding: 0 3px 0 2px;
       color: white; }
-  .collectjs .selectorGroup:hover .deltog, .collectjs .selectorGroup:hover .onlychild, .collectjs .selectorGroup:hover .nthtype {
+  .collectjs .selectorSchema:hover .deltog, .collectjs .selectorSchema:hover .onlychild, .collectjs .selectorSchema:hover .nthtype {
     color: #777; }
 
 /* tab buttons */

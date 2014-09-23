@@ -6,7 +6,7 @@ ele is the child element you want to build a selector from
 parent is the selector for the most senior element you want to build a selector up to
     or "body" if parent is undefined or an empty string
 text is an element whose textContent will be set based on SelectorFamily.toString in update
-fn is a function to be called when SelectorFamily.update is called
+fn is a callback for when SelectorFamily.update is called
 options are optional
 */
 function SelectorFamily(ele, parent, holder, text, fn, options){
@@ -224,7 +224,7 @@ function EleSelector(ele, family){
     this.tag = new Fragment(ele.tagName.toLowerCase(), this);
     this.id = ele.hasAttribute('id') ? new Fragment('#' + ele.getAttribute('id'), this) : undefined;
     this.classes = [];
-    this.ele = noSelectEle("div", ["selectorGroup"]);
+    this.ele = noSelectEle("div", ["selectorSchema"]);
     this.ele.appendChild(this.tag.ele);
     if ( this.id ) {
         this.ele.appendChild(this.id.ele);
@@ -248,7 +248,7 @@ function EleSelector(ele, family){
 
     deltog = selectorSpan("x", ["deltog", "noSelect"]);
     this.ele.appendChild(deltog);
-    deltog.addEventListener('click', removeSelectorGroup.bind(this), false);
+    deltog.addEventListener('click', removeSelectorSchema.bind(this), false);
 
     this.ele.addEventListener("click", cleanSelector.bind(this), false);
 }
@@ -408,7 +408,7 @@ function createNthofType(event){
     this.addNthofType();
 }
 
-function removeSelectorGroup(event){
+function removeSelectorSchema(event){
     // get rid of the html element
     this.ele.parentElement.removeChild(this.ele);
     this.family.removeSelector(this.index);

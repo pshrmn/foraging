@@ -202,9 +202,8 @@ var HTML = {
     tabs: {
         selector: document.getElementById("selectorTab"),
         rule: document.getElementById("ruleTab"),
-        schemas: document.getElementById("schemasTab"),
-        preview: document.getElementById("previewTab"),
-        options: document.getElementById("optionsTab")
+        schema: document.getElementById("schemasTab"),
+        preview: document.getElementById("previewTab")
     }
 };
 
@@ -682,7 +681,7 @@ function saveParent(selector){
     Collect.parent = parent;
     HTML.perm.parent.holder.style.display = "inline-block";
     HTML.perm.parent.selector.textContent = selector;
-    HTML.perm.parent.range.textContent = setRangeString(low, high);
+    HTML.perm.parent.range.textContent = createRangeString(low, high);
     addParentSchema(selector, parent.low, parent.high);
 
     // attach the parent to the current set and save
@@ -791,6 +790,7 @@ function saveRuleEvent(event){
     addRule(rule, selector);
     saveSchema();
     resetInterface();
+    showTab(HTML.tabs.schema);
 }
 
 function saveEditEvent(event){
@@ -820,6 +820,7 @@ function saveEditEvent(event){
     delete Interface.editing.rule;
     showRuleForm();
     resetInterface();
+    showTab(HTML.tabs.schema);
 }
 
 function deleteParentEvent(event){
@@ -1090,9 +1091,9 @@ function baseCancel(){
     showRuleForm();
 }
 
-function setRangeString(low, high){
+function createRangeString(low, high){
     var rangeString = "Range: ";
-    rangeString += (low !== 0 && !isNaN(low)) ? low : "beginning";
+    rangeString += (low !== 0 && !isNaN(low)) ? low : "start";
     rangeString += " to ";
     rangeString += (high !== 0 && !isNaN(high)) ? high : "end";
     return rangeString;
@@ -1353,7 +1354,6 @@ function deleteSelectorSet(){
     } else {
         var currOption = HTML.perm.set.select.querySelector("option:checked");
         currOption.parentElement.removeChild(currOption);
-        //test
         set = Collect.current.page.sets["default"];
         HTML.perm.set.select.querySelector("option[value=default]").selected = true;
     }
@@ -1520,7 +1520,7 @@ function loadSetObject(set){
         HTML.perm.parent.holder.style.display = "inline-block";
         HTML.perm.parent.selector.textContent = set.parent.selector;
         addParentSchema(set.parent.selector, set.parent.low, set.parent.high);
-        setRangeString(set.parent.low, set.parent.high);
+        HTML.perm.parent.range.textContent = createRangeString(set.parent.low, set.parent.high);
     } else {
         HTML.perm.parent.holder.style.display = "none";
         HTML.perm.parent.selector.textContent = "";
