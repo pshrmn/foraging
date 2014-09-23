@@ -509,11 +509,12 @@ Selector.prototype.updateSelector = function(newSelector){
     }
 };
 
-Selector.prototype.html = function(newRuleEvent, deleteEvent){
+Selector.prototype.html = function(newRuleEvent, editEvent, deleteEvent){
     var holder = noSelectElement("li"),
         identifier = document.createTextNode("Selector: "),
         nametag = noSelectElement("span"),
         newRule = noSelectElement("button"),
+        editSelector = noSelectElement("button"),
         remove = noSelectElement("button"),
         rules = noSelectElement("ul");
 
@@ -521,16 +522,21 @@ Selector.prototype.html = function(newRuleEvent, deleteEvent){
     nametag.textContent = this.selector;
 
     newRule.textContent = "Add Rule";
+    editSelector.textContent = "Edit Selector";
     remove.textContent = "×";
 
     newRule.addEventListener("click", newRuleEvent.bind(this), false);
+    editSelector.addEventListener("click", editEvent.bind(this), false);
     remove.addEventListener("click", deleteEvent.bind(this), false);
 
-    appendChildren(holder, [identifier, nametag, newRule, remove, rules]);
+    appendChildren(holder, [identifier, nametag, newRule, editSelector, remove, rules]);
 
     this.htmlElements = {
         holder: holder,
         nametag: nametag,
+        newRule: newRule,
+        editSelector: editSelector,
+        remove: remove,
         rules: rules
     };
 
@@ -546,7 +552,7 @@ Selector.prototype.remove = function(){
     }
 
     if ( this.set ) {
-        delete this.set.selectors[this.name];
+        delete this.set.selectors[this.selector];
     }
 };
 

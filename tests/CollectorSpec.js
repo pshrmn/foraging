@@ -144,15 +144,6 @@ describe("storage helpers", function(){
         });
     });
 
-    describe("deleteEditing", function(){
-        it("doesn't need to do anything if not currently editing", function(){
-            // make sure it doesn't exist
-            delete Interface.editing;
-            expect(Interface.editing).toBeUndefined();
-            deleteEditing();
-            expect(Interface.editing).toBeUndefined();
-        });
-    });
 });
 
 /*

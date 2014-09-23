@@ -58,6 +58,9 @@ Object that controls the functionality of the interface
 var Interface = {
     activeForm: "rule",
     activeSelector: "selector",
+    editing: {
+
+    },
     tabs: {
         tab: document.querySelector(".tab.active"),
         view: document.querySelector(".view.active")
@@ -213,9 +216,9 @@ var Family = {
         event.preventDefault();
 
         resetInterface(); 
-        if ( Interface.editing ) {
+        if ( Interface.editing.rule ) {
             // preserve name when switching selector while editing
-            HTML.rule.edit.name.value = Interface.editing.name;
+            HTML.rule.edit.name.value = Interface.editing.rule.name;
         }
         
         var sf = new SelectorFamily(this,
@@ -255,7 +258,7 @@ var Family = {
     fromSelector: function(selector, text){
         var prefix = Collect.parent.selector ? Collect.parent.selector: "body",
             element = Collect.one(selector, prefix);
-        text = text || HTML.selector.seletcor;
+        text = text || HTML.selector.selector;
         if ( element ) {
             var sf = new SelectorFamily(element,
                 Collect.parent.selector,
@@ -297,7 +300,6 @@ var Family = {
     set the preview
     */
     test: function(){
-        //test
         clearClass("queryCheck");
         clearClass("collectHighlight");
         var elements = this.elements(),
@@ -344,6 +346,8 @@ function resetSelectorView(){
     Interface.selectorCycle.reset();
 
     HTML.selector.radio.selector.checked = true;
+    HTML.selector.radio.parent.disabled = false;
+    HTML.selector.radio.next.disabled = false;
     HTML.selector.parent.holder.style.display = "none";
     HTML.selector.parent.low.value = "";
     HTML.selector.parent.high.value = "";
@@ -634,6 +638,7 @@ function saveSelectorEvent(event){
         return;
     }
 
+
     switch(Interface.activeSelector){
     case "selector":
         saveSelector(selector);
@@ -645,7 +650,7 @@ function saveSelectorEvent(event){
         saveNext(selector);
         break;
     }
-    resetSelectorView();
+    baseCancel();
 }
 
 function saveSelector(selector){
@@ -653,7 +658,12 @@ function saveSelector(selector){
         group = Collect.current.group,
         page = Collect.current.page,
         set = Collect.current.set;
-    Collect.group.pages[page].sets[set].addSelector(sel, [newRuleEvent, removeSelectorEvent]);
+    if ( Interface.editing.selector ) {
+        Interface.editing.selector.updateSelector(selector);
+    } else {
+        Collect.group.pages[page].sets[set].addSelector(sel, [newRuleEvent, editSelectorEvent, removeSelectorEvent]);
+    }
+
     saveGroup();
 }
 
@@ -724,6 +734,7 @@ function updateRadioEvent(event){
 function removeSelectorEvent(event){
     event.preventDefault();
     this.remove();
+    saveGroup();
 }
 
 /******************
@@ -735,6 +746,18 @@ function newRuleEvent(event){
 
     setupRuleForm(this.selector);
     showTab(HTML.tabs.rule);
+}
+
+function editSelectorEvent(event){
+    event.preventDefault();
+    Interface.editing.selector = this;
+    Family.fromSelector(this.selector);
+    Family.match();
+
+    HTML.selector.radio.parent.disabled = true;
+    HTML.selector.radio.next.disabled = true;
+
+    showTab(HTML.tabs.selector);
 }
 
 function saveRuleEvent(event){
@@ -794,19 +817,18 @@ function saveEditEvent(event){
     if ( follow ) {
         rule.follow = true;
     }
-    var oldName = Interface.editing.name,
-        set = Interface.editing.selector.set;
-    Interface.editing.update(rule);
+    var oldName = Interface.editing.rule.name,
+        set = Interface.editing.rule.selector.set;
+    Interface.editing.rule.update(rule);
     saveGroup();
 
-    deleteEditing();
+    delete Interface.editing.rule;
     showRuleForm();
     resetInterface();
 }
 
 function deleteParentEvent(event){
     event.preventDefault();
-    deleteEditing();
     Collect.parent = {};
     HTML.perm.parent.holder.style.display = "none";
     HTML.perm.parent.selector.textContent = "";
@@ -820,7 +842,6 @@ function deleteParentEvent(event){
 
 function deleteNextEvent(event){
     event.preventDefault();
-    deleteEditing();
     delete Collect.next;
     HTML.perm.next.holder.style.display = "none";
     HTML.perm.next.selector.textContent = "";
@@ -856,9 +877,7 @@ function unselectorViewRule(event){
 }
 
 function editSavedRule(event){
-    deleteEditing();
-    Interface.editing = this;
-
+    Interface.editing.rule = this;
 
     // setup the form
     HTML.rule.edit.name.value = this.name;
@@ -1077,7 +1096,7 @@ function showEditForm(){
 }
 
 function baseCancel(){
-    deleteEditing();
+    Interface.editing = {};
     resetInterface();
     showRuleForm();
 }
@@ -1122,8 +1141,6 @@ urls is saved as an object for easier lookup, but converted to an array of the k
 If the site object exists for a host, load the saved rules
 */
 function setupHostname(){
-    // never should be editing before this is loaded
-    deleteEditing();
     chrome.storage.local.get("sites", function setupHostnameChrome(storage){
         var host = window.location.hostname,
             site = storage.sites[host],
@@ -1189,7 +1206,6 @@ function createGroup(){
         storage.sites[host].groups[name] = group;
 
         chrome.storage.local.set({'sites': storage.sites});
-        deleteEditing();
         loadGroupObject(group);
     });
 }
@@ -1201,8 +1217,7 @@ function loadGroup(ele){
         var host = window.location.hostname,
             site = storage.sites[host],
             group = site.groups[name];
-        resetInterface();
-        deleteEditing();
+        baseCancel();
         loadGroupObject(group);
     });
 }
@@ -1248,7 +1263,7 @@ function deleteGroup(){
         }
         storage.sites[host] = site;
         chrome.storage.local.set({'sites': storage.sites});
-        deleteEditing();
+        baseCancel();
         loadGroupObject(site.groups["default"]);
     });
 }
@@ -1263,7 +1278,8 @@ function loadPage(ele){
         page = Collect.group.pages[name];
     Collect.current.page = name;
     resetInterface();
-    deleteEditing();
+    //test2
+    baseCancel();
     loadPageObject(page);
 }
 
@@ -1292,9 +1308,7 @@ function deletePage(){
         page = Collect.group.pages["default"];
     }
     saveGroup();
-
-    resetInterface();
-    deleteEditing();
+    baseCancel();
     loadPageObject(page);
 }
 
@@ -1307,8 +1321,7 @@ function loadSet(ele){
         name = option.value;
     Collect.current.set = name;
 
-    deleteEditing();
-    resetInterface();
+    baseCancel();
     loadSetObject(Collect.group.pages[Collect.current.page].sets[name]);
 }
 
@@ -1332,7 +1345,7 @@ function createSelectorSet(){
     page.addSet(set);
     saveGroup();
 
-    deleteEditing();
+    baseCancel();
     loadSetObject(set);
 }
 
@@ -1365,7 +1378,7 @@ function deleteSelectorSet(){
     }
 
     saveGroup();
-    deleteEditing();    
+    baseCancel();
     loadSetObject(set);
 }
 
@@ -1485,7 +1498,7 @@ function loadGroupObject(group){
             for ( selectorName in set.selectors ) {
                 selector = set.selectors[selectorName];
                 selectorObject = new Selector(selector.selector);
-                setObject.addSelector(selectorObject, [newRuleEvent, removeSelectorEvent]);
+                setObject.addSelector(selectorObject, [newRuleEvent, editSelectorEvent, removeSelectorEvent]);
                 for ( ruleName in selector.rules ) {
                     rule = selector.rules[ruleName];
                     addRule(rule, selectorObject);
@@ -1539,8 +1552,4 @@ function loadSetObject(set){
     // parent selector
     Interface.turnOn();
     Interface.update();
-}
-
-function deleteEditing(){
-    delete Interface.editing;
 }

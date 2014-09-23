@@ -600,7 +600,7 @@ describe("Selector", function(){
         it("generates an html element representing a selector", function(){
             var sel = new Selector(".foo"),
                 fakeEvent = function(){},
-                holder = sel.html(fakeEvent, fakeEvent);
+                holder = sel.html(fakeEvent, fakeEvent, fakeEvent);
             expect(holder.tagName).toEqual("LI");
             expect(sel.htmlElements.nametag.textContent).toEqual(".foo");
         });
