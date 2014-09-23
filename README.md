@@ -16,46 +16,74 @@ to specify which folder to save rules to, use
 A group along with the hostname of the site for the rules is uploaded by collectJS extension
 
     {
-        group: <group>,
+        group: <Group>,
         site: <string>
     }
 
-A group contains a set of related rules across multiple pages
-
-    group: {
-        name: <string>,
-        pages: {
-            name: <page>,
-            ...    
-        },
-        urls: [<string>, ...]
+A Group refers to a set of data to be captured
+    
+    Group = {
+        name: <string>
+        urls: [<string>...],
+        pages: {<Page>...}
     }
 
-A page is a single web page, but can contain multiple rule sets. When index=true, there should generally only be one rule set, which has a parent selector and is used to generate an array of data, rather than a singular data point.
+A Page is a webpage and contains selector sets to capture elements in a webpage
 
-    page: {
-        // order of operations within a page does not matter
+    Page = {
         name: <string>,
-        sets: {
-            <name>: {...},
-            ...
-        },
-        index: <bool>,
-        next: <string> (optional)
+        index: <boolean>,
+        next: <string> (optional),
+        sets: {<SelectorSet>...}
     }
 
-A rule set contains related rules within a page. If there are multiple "groups" in the page that you want to get data for, use a parent selector to identify each group. For example, if you wanted to get different columns (td elements) from a table, the parent selector should specify how to select the rows (tr elements)
+A selector set is a group of selectors within a page, optionally linked together by a parent selector
 
-    rule_set: {
+    SelectorSet = {
         name: <string>,
-        rules: {},
-        parent: <parent> (optional)
+        selectors: {<selector>...},
+        parent: <Parent> (optional)
     }
 
-    parent: {
+A Selector is a css selector and associated rules
+
+    Selector = {
         selector: <string>,
-        which: <int> (optional)
+        rules: {<Rule>...}
     }
+
+A rule is a name and a captured value (either text or an attribute)
+
+    Rule = {
+        name: <string>,
+        capture: <string>
+    }
+
+A parent is a selector for how to match an object within the DOM. This is useful if there are multiple sets within a page
+
+    Parent = {
+        selector: <string>,
+        low: <int> (optional),
+        high: <int> (optional)
+    }
+
 
 ####Collector.crawl
 module used to crawl a website
+
+Create a Group from a (properly formatted) json file
+
+    import json
+    from collector.crawl.group import Group
+
+    with open("schema.json") as fp:
+        data = json.load(fp)
+    g = Group.from_json(data)
+
+Get data by crawling urls in Group.urls (and any subsequent urls from successive Pages)
+
+    crawled_data = g.crawl_urls()
+
+Or set a specific page to get data from
+
+    spec_url_data = g.get(url)
