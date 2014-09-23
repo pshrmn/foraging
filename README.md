@@ -13,16 +13,16 @@ to specify which folder to save rules to, use
 
 #####Rules Format
 
-A group along with the hostname of the site for the rules is uploaded by collectJS extension
+A schema along with the hostname of the site for the rules is uploaded by collectJS extension
 
     {
-        group: <Group>,
+        schema: <Schema>,
         site: <string>
     }
 
-A Group refers to a set of data to be captured
+A Schema is a set of data to be captured from various rules
     
-    Group = {
+    Schema = {
         name: <string>
         urls: [<string>...],
         pages: {<Page>...}
@@ -71,19 +71,19 @@ A parent is a selector for how to match an object within the DOM. This is useful
 ####Collector.crawl
 module used to crawl a website
 
-Create a Group from a (properly formatted) json file
+Create a Schema from a (properly formatted) json file
 
     import json
-    from collector.crawl.group import Group
+    from collector.crawl.schema import Schema
 
     with open("schema.json") as fp:
         data = json.load(fp)
-    g = Group.from_json(data)
+    s = Schema.from_json(data)
 
-Get data by crawling urls in Group.urls (and any subsequent urls from successive Pages)
+Get data by crawling urls in Schema.urls (and any subsequent urls from successive Pages)
 
-    crawled_data = g.crawl_urls()
+    crawled_data = s.crawl_urls()
 
 Or set a specific page to get data from
 
-    spec_url_data = g.get(url)
+    spec_url_data = s.get(url)

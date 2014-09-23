@@ -1,4 +1,4 @@
-from collector.crawl.group import Group
+from collector.crawl.schema import Schema
 from collector.crawl.page import Page, SelectorSet, Parent
 from collector.crawl.rule import Selector, Rule
 
@@ -11,7 +11,7 @@ from lxml.cssselect import CSSSelector
 parent_directory = os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir)
 DIRECTORY = os.path.abspath(parent_directory)
 
-def open_group(filename):
+def open_schema(filename):
     with open(filename) as fp:
         rules = json.load(fp)
     return rules
@@ -19,16 +19,16 @@ def open_group(filename):
 class FromJSONTestCase(unittest.TestCase):
     def setUp(self):
         filename = os.path.join(DIRECTORY, 'rules', 'test_site_com', 'product.json')
-        rules = open_group(filename)
-        self.group = Group.from_json(rules)
+        rules = open_schema(filename)
+        self.schema = Schema.from_json(rules)
 
-    def test_group_from_json(self):
-        self.assertEqual(self.group.name, "product")
-        self.assertIsInstance(self.group.urls, Queue.Queue)
+    def test_schema_from_json(self):
+        self.assertEqual(self.schema.name, "product")
+        self.assertIsInstance(self.schema.urls, Queue.Queue)
 
     def test_page_from_json(self):
         # do tests on default page
-        page = self.group.page
+        page = self.schema.page
         self.assertEqual(page.name, "default")
         self.assertFalse(page.index)
         self.assertIsNone(page.next)
@@ -55,13 +55,13 @@ class FromJSONTestCase(unittest.TestCase):
         self.assertNotIsInstance(other_page_next.next, CSSSelector)        
 
     def test_selector_set_from_json(self):
-        selector_set = self.group.page.sets["default"]
+        selector_set = self.schema.page.sets["default"]
         self.assertEqual(selector_set.name, "default")
         self.assertEqual(len(selector_set.pages), 1)
         self.assertIsInstance(selector_set.parent, Parent)
 
         # when Parent isn't provided RuleSet.parent is None
-        other_rule_set = self.group.page.sets["default"].pages["other_page"].sets["default"]
+        other_rule_set = self.schema.page.sets["default"].pages["other_page"].sets["default"]
         self.assertNotIsInstance(other_rule_set.parent, Parent)
 
     def test_parent_from_json(self):
