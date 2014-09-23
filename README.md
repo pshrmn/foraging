@@ -4,62 +4,50 @@ A Chrome extension that allows you to get information necessary to crawl a page.
 
 #####Rules Format
 
-A rule set is a group of rules on a page. A rule consists of a name (semi-equivalent to a row in a tuple of a relational database), a selector to access the element in the page, what part of the element o capture (an attribute or text).
-
-    ruleSet = {
-        name: <string>,
-        rules: {
-            name: {
-                name: <string>,
-                selector: <string>,
-                capture: <string>,
-                range: <int> (optional)
-            },
-            ...
-        },
-        parent: parent (optional)
+A group refers to a set of data to be captured
+    
+    group = {
+        name: <string>
+        urls: [<string>...],
+        pages: {<page>...}
     }
 
+A page is a webpage and contains selector sets to capture elements in the page
+
+    page = {
+        name: <string>,
+        index: <boolean>,
+        next: <string> (optional),
+        sets: {<selectorSet>...}
+    }
+
+A selector set is a group of selectors within a page
+
+    selectorSet = {
+        name: <string>,
+        selectors: {<selector>...},
+        parent: <parent> (optional)
+    }
+
+A selector is a css selector and associated rules
+
+    selector = {
+        selector: <string>,
+        rules: {<rule>...}
+    }
+
+A rule is a name and a captured value (either text or an attribute)
+
+    rule = {
+        name: <string>,
+        capture: <string>
+    }
 
 A parent is a selector for how to match an object within the DOM. This is useful if there are multiple sets within a page
 
     parent = {
         selector: <string>,
         range: <int> (optional)
-    }
-
-Next is a selector that captures an element with an href attribute and can be used to generate more urls to apply the default page to.
-Can only be used on the "default" page (and for the time being can only be applied to one element)
-
-    next = {
-        selector: <string>
-    }
-
-A page can have multiple sets in it, in case parts of it require a parent selector while others do not
-
-    page = {
-        name: <string>,
-        sets: {
-            name: {
-                name: <string>
-                rules: {...},
-                parent: parent
-            },
-            name: {
-                name: <string>,
-                rules: {...}
-            }
-        }
-    }
-
-A group is made up of an object of pages, one of which must be a "default" page. urls is an object containing urls for the default page to crawl as keys (the object is converted to an array before uploading)
-
-A group is an array made up of one or more pages whose data are all related. The URL to get the second page is determined by a rule in the page1 page that has the name page2
-
-    group = {
-        name: <string>
-        pages: {default: page, <page2: page, ...>},
-        urls: {}
     }
 
 And a site can have multiple, independent groups, each of which is uploaded individually to the server
