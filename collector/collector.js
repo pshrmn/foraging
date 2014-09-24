@@ -523,7 +523,8 @@ function Schema(name, urls){
     this.pages = {
         "default": new Page("default")
     };
-    this.pages["default"].schema = this;
+    this.pageOptions;
+    this.pages["default"].parentSchema = this;
     this.htmlElements = {};
 }
 
@@ -605,11 +606,9 @@ Schema.prototype.html = function(){
         pages.appendChild(this.pages[key].html());
     }
 
-    this.htmlElements = {
-        holder: holder,
-        nametag: nametag,
-        pages: pages
-    };
+    this.htmlElements.holder = holder;
+    this.htmlElements.nametag = nametag;
+    this.htmlElements.pages = pages;
 
     return holder;
 };
@@ -630,7 +629,7 @@ Schema.prototype.addPage = function(page){
         this.removePage(name);
     }
     this.pages[name] = page;
-    page.schema = this;
+    page.parentSchema = this;
     // if html for schema exists, also generate html for page
     if ( this.htmlElements.holder) {
         var ele = page.html();
@@ -641,7 +640,7 @@ Schema.prototype.addPage = function(page){
 Schema.prototype.removePage = function(name){
     var page = this.pages[name];
     if ( page ) {
-        this.pages[name].deleteHTML();
+        page.remove();
         delete this.pages[name];
     }
 };
@@ -698,10 +697,10 @@ function Page(name, index, next){
     this.sets = {
         "default": new SelectorSet("default")
     };
-    this.sets["default"].page = this;
+    this.sets["default"].parentPage = this;
     this.htmlElements = {};
     // added when a schema calls addPage
-    this.schema;
+    this.parentSchema;
 }
 
 Page.prototype.object = function(){
@@ -771,13 +770,24 @@ Page.prototype.html = function(){
         sets.appendChild(this.sets[key].html());
     }
 
-    this.htmlElements = {
-        holder: holder,
-        nametag: nametag,
-        sets: sets
-    };
+    this.htmlElements.holder = holder;
+    this.htmlElements.nametag = nametag;
+    this.htmlElements.sets = sets;
 
     return holder;
+};
+
+Page.prototype.addOption = function(select){
+    if ( !select ) {
+        return;
+    }
+    var option = noSelectElement("option");
+
+    option.setAttribute("value", this.name);
+    option.textContent = this.name;
+
+    select.appendChild(option);
+    this.htmlElements.option = option;
 };
 
 Page.prototype.deleteHTML = prototypeDeleteHTML;
@@ -790,7 +800,7 @@ Page.prototype.addSet = function(selectorSet){
     }
 
     this.sets[name] = selectorSet;
-    selectorSet.page = this;
+    selectorSet.parentPage = this;
     // if html for page exists, also create html for SelectorSet
     if ( this.htmlElements.holder ) {
         var ele = selectorSet.html();
@@ -811,8 +821,8 @@ Page.prototype.remove = function(){
     for ( var key in this.sets ) {
         this.removeSet(key);
     }
-    if ( this.schema ) {
-        delete this.schema.pages[this.name];
+    if ( this.parentSchema ) {
+        delete this.parentSchema.pages[this.name];
     }
 };
 
@@ -838,6 +848,18 @@ Page.prototype.followedSets = function(){
     return following;
 };
 
+Page.prototype.updateName = function(name){
+    if ( name === this.name ) {
+        return;
+    }
+    var oldName = this.name;
+    this.name = name;
+    if ( this.parentSchema ) {
+        this.parentSchema.pages[name] = this;
+        delete this.parentSchema.pages[oldName];
+    }
+};
+
 /********************
         SelectorSet
 *********************
@@ -850,7 +872,7 @@ function SelectorSet(name, parent){
     this.selectors = {};
     this.htmlElements = {};
     // added when a page calls addSet
-    this.page;
+    this.parentPage;
 }
 
 SelectorSet.prototype.object = function(){
@@ -912,13 +934,24 @@ SelectorSet.prototype.html = function(){
     nametag.textContent = "Selector Set: " + this.name;
     appendChildren(holder, [nametag, ul]);
 
-    this.htmlElements = {
-        holder: holder,
-        nametag: nametag,
-        selectors: ul
-    };
+    this.htmlElements.holder = holder;
+    this.htmlElements.nametag = nametag;
+    this.htmlElements.selectors = ul;
 
     return holder;
+};
+
+SelectorSet.prototype.addOption = function(select){
+    if ( !select ) {
+        return;
+    }
+    var option = noSelectElement("option");
+
+    option.setAttribute("value", this.name);
+    option.textContent = this.name;
+
+    select.appendChild(option);
+    this.htmlElements.option = option;
 };
 
 SelectorSet.prototype.deleteHTML = prototypeDeleteHTML;
@@ -937,7 +970,7 @@ SelectorSet.prototype.addSelector = function(selector, events){
         var ele = selector.html.apply(selector, events);
         this.htmlElements.selectors.appendChild(ele);
     }
-    selector.set = this;
+    selector.parentSet = this;
 };
 
 SelectorSet.prototype.removeSelector = function(name){
@@ -953,8 +986,8 @@ SelectorSet.prototype.remove = function(){
     for ( var key in this.selectors ) {
         this.removeSelector(key);
     }
-    if ( this.page ) {
-        delete this.page.sets[this.name];
+    if ( this.parentPage ) {
+        delete this.parentPage.sets[this.name];
     }
 };
 
@@ -1006,15 +1039,16 @@ Selector.prototype.uploadObject = function(){
     return this.object();
 };
 
-Selector.prototype.addRule = function(rule, events){
+Selector.prototype.addRule = function(rule, events, select){
     this.rules[rule.name] = rule;
-    rule.selector = this;
+    rule.parentSelector = this;
 
     // if the Rule has follow=true and the SelectorSet has a Page (which in turn has a Schema)
     // add a new Page to the schema with the name of the Rule
-    if ( rule.follow && this.set && this.set.page && this.set.page.schema ) {
+    if ( rule.follow && this.parentSet && this.parentSet.parentPage && this.parentSet.parentPage.parentSchema ) {
         var page = new Page(rule.name);
-        this.set.page.schema.addPage(page);
+        page.addOption(select);
+        this.parentSet.parentPage.parentSchema.addPage(page);
     }
 
     // if Selector html exists, also create html for rule
@@ -1035,9 +1069,9 @@ Selector.prototype.updateSelector = function(newSelector){
         this.htmlElements.nametag.textContent = newSelector;
     }
 
-    if ( this.set ) {
-        this.set.selectors[newSelector] = this;
-        delete this.set.selectors[oldSelector];
+    if ( this.parentSet ) {
+        this.parentSet.selectors[newSelector] = this;
+        delete this.parentSet.selectors[oldSelector];
     }
 };
 
@@ -1045,23 +1079,23 @@ Selector.prototype.html = function(newRuleEvent, editEvent, deleteEvent){
     var holder = noSelectElement("li"),
         identifier = document.createTextNode("Selector: "),
         nametag = noSelectElement("span"),
-        newRule = noSelectElement("button"),
         editSelector = noSelectElement("button"),
+        newRule = noSelectElement("button"),
         remove = noSelectElement("button"),
         rules = noSelectElement("ul");
 
     holder.classList.add("selector");
     nametag.textContent = this.selector;
 
-    newRule.textContent = "Add Rule";
-    editSelector.textContent = "Edit Selector";
+    newRule.textContent = "add rule";
+    editSelector.textContent = "edit";
     remove.textContent = "×";
 
     newRule.addEventListener("click", newRuleEvent.bind(this), false);
     editSelector.addEventListener("click", editEvent.bind(this), false);
     remove.addEventListener("click", deleteEvent.bind(this), false);
 
-    appendChildren(holder, [identifier, nametag, newRule, editSelector, remove, rules]);
+    appendChildren(holder, [identifier, nametag, editSelector, newRule, remove, rules]);
 
     this.htmlElements = {
         holder: holder,
@@ -1083,8 +1117,8 @@ Selector.prototype.remove = function(){
         this.removeRule(key);
     }
 
-    if ( this.set ) {
-        delete this.set.selectors[this.selector];
+    if ( this.parentSet ) {
+        delete this.parentSet.selectors[this.selector];
     }
 };
 
@@ -1097,7 +1131,7 @@ function Rule(name, capture, follow){
     this.follow = follow || false;
     this.htmlElements = {};
     // added when a SelectorSet calls addRule
-    this.selector;
+    this.parentSelector;
 }
 
 Rule.prototype.object = function(){
@@ -1113,36 +1147,34 @@ Rule.prototype.object = function(){
     return data;
 };
 
-Rule.prototype.html = function(selectorViewEvent, unselectorViewEvent, editEvent, previewEvent, deleteEvent){
+Rule.prototype.html = function(selectorViewEvent, unselectorViewEvent, editEvent, deleteEvent){
     var holder = noSelectElement("li"),
         nametag = noSelectElement("span"),
-        edit = noSelectElement("span"),
-        preview = noSelectElement("span"),
-        deltog = noSelectElement("span");
+        capturetag = noSelectElement("span"),
+        edit = noSelectElement("button"),
+        deltog = noSelectElement("button");
 
     holder.classList.add("rule");
     nametag.textContent = this.name;
     nametag.classList.add("savedRuleName");
+    capturetag.textContent = "(" + this.capture + ")";
     edit.classList.add("editRule");
     edit.textContent = "edit";
-    preview.classList.add("previewRule");
-    preview.textContent = "preview";
     deltog.innerHTML = "&times;";
     deltog.classList.add("deltog");
 
-    appendChildren(holder, [nametag, edit, preview, deltog]);
+    appendChildren(holder, [nametag, capturetag, edit, deltog]);
 
     holder.addEventListener("mouseenter", selectorViewEvent.bind(this), false);
     holder.addEventListener("mouseleave", unselectorViewEvent.bind(this), false);
     edit.addEventListener("click", editEvent.bind(this), false);
-    preview.addEventListener("click", previewEvent.bind(this), false);
     deltog.addEventListener("click", deleteEvent.bind(this), false);
     
     this.htmlElements = {
         holder: holder,
         nametag: nametag,
+        capturetag: capturetag,
         edit: edit,
-        preview: preview,
         deltog: deltog
     };
 
@@ -1151,22 +1183,46 @@ Rule.prototype.html = function(selectorViewEvent, unselectorViewEvent, editEvent
 
 Rule.prototype.deleteHTML = prototypeDeleteHTML;
 
-Rule.prototype.update = function(object){
+Rule.prototype.update = function(object, select){
     var oldName = this.name,
         newName = object.name;
     if ( oldName !== newName ) {
         this.name = newName;
         // update nametag if html has been generated
-        if ( this.htmlElements.holder ) {
+        if ( this.htmlElements.nametag ) {
             this.htmlElements.nametag.textContent = newName;
         }
-        if ( this.selector ) {
-            this.selector.rules[newName] = this;
-            delete this.selector.rules[oldName];
+        if ( this.parentSelector ) {
+            this.parentSelector.rules[newName] = this;
+            delete this.parentSelector.rules[oldName];
         }
     }
+    var oldCapture = this.capture,
+        newCapture = object.capture;
     this.capture = object.capture;
-    this.follow = object.follow || false;
+    if ( oldCapture !== newCapture && this.htmlElements.capturetag ) {
+        this.htmlElements.capturetag.textContent = "(" + newCapture + ")";
+    }
+
+    var oldFollow = this.follow,
+        newFollow = object.follow || false;
+    if ( this.hasSchema() ) {
+        var schema = this.getSchema();
+        if ( oldFollow && !newFollow ) {
+            schema.removePage(this.name);
+        } else if ( newFollow && !oldFollow ) {
+            // create the follow page
+            var page = new Page(this.name);
+            schema.addpage(page);
+            if ( select ) {
+                page.addOption(select);
+            }
+        } else if ( oldFollow && newFollow && oldName !== newName) {
+            // update the name of the follow page
+            schema.pages[oldName].updateName(newName);
+        }
+    }
+    this.follow = newFollow;
 };
 
 /***
@@ -1177,19 +1233,45 @@ remove rule from parent selector
 Rule.prototype.remove = function(){
     this.deleteHTML();
     // remove associated page if rule.follow = true
-    if ( this.follow && this.selector && this.selector.set && this.selector.set.page &&
-        this.selector.set.page.schema) {
-        this.selector.set.page.schema.removePage(this.name);
+    if ( this.follow && this.hasSchema() ) {
+        this.getSchema().removePage(this.name);
     }
 
-    if ( this.selector ) {
-        delete this.selector.rules[this.name];
+    if ( this.parentSelector ) {
+        delete this.parentSelector.rules[this.name];
+    }
+};
+
+// some convenience functions
+Rule.prototype.hasSelector = function(){
+    return this.parentSelector !== undefined;
+};
+
+Rule.prototype.hasSet = function(){
+    return this.hasSelector() && this.parentSelector.parentSet !== undefined;
+};
+
+Rule.prototype.hasPage = function(){
+    return this.hasSet() && this.parentSelector.parentSet.parentPage !== undefined;
+};
+
+Rule.prototype.hasSchema = function(){
+    return this.hasPage() && this.parentSelector.parentSet.parentPage.parentSchema !== undefined;
+};
+
+Rule.prototype.getSchema = function(){
+    if ( this.hasSchema() ) {
+        return this.parentSelector.parentSet.parentPage.parentSchema;
     }
 };
 
 // shared delete function
 function prototypeDeleteHTML(){
-    var holder = this.htmlElements.holder;
+    var holder = this.htmlElements.holder,
+        option = this.htmlElements.option;
+    if ( option && option.parentElement ) {
+        option.parentElement.removeChild(option);
+    }
     if ( holder ) {
         holder.parentElement.removeChild(holder);
     }
@@ -1566,9 +1648,6 @@ var HTML = {
     interface: document.querySelector(".collectjs"),
     // elements in the preview view
     preview: {
-        name: document.getElementById("previewName"),
-        selector: document.getElementById("previewSelector"),
-        capture: document.getElementById("previewCapture"),
         contents: document.getElementById("previewContents"),
         clear: document.getElementById("previewClear")
     },
@@ -1748,9 +1827,6 @@ function resetRulesView(){
 }
 
 function resetPreviewView(){
-    HTML.preview.name.textContent = "";
-    HTML.preview.selector.textContent = "";
-    HTML.preview.capture.textContent = "";
     HTML.preview.contents.innerHTML = "";
 }
 
@@ -1910,12 +1986,14 @@ function cancelRuleEvent(event){
     event.stopPropagation();
     event.preventDefault();
     baseCancel();
+    showTab(HTML.tabs.schema);
 }
 
 function cancelEditEvent(event){
     event.stopPropagation();
     event.preventDefault();
-    baseCancel();   
+    baseCancel();
+    showTab(HTML.tabs.schema);
 }
 
 function verifyAndApplyParentLow(event){
@@ -2156,8 +2234,6 @@ function saveRuleEvent(event){
 
     if ( follow ) {
         rule.follow = true;
-        // page will be created when rule is added to set, but add option now
-        HTML.perm.page.select.appendChild(newOption(rule.name));
     }
     var selector = Collect.current.selector;
     addRule(rule, selector);
@@ -2182,12 +2258,17 @@ function saveEditEvent(event){
         return;
     }
 
+    var select;
     if ( follow ) {
         rule.follow = true;
+        select = HTML.perm.page.select;
     }
     var oldName = Interface.editing.rule.name,
         set = Interface.editing.rule.selector.set;
-    Interface.editing.rule.update(rule);
+
+    // include select for follow page
+    Interface.editing.rule.update(rule, select);
+
     saveSchema();
 
     delete Interface.editing.rule;
@@ -2230,7 +2311,7 @@ function toggleURLEvent(event){
 function selectorViewRule(event){
     clearClass("queryCheck");
     clearClass("collectHighlight");
-    var elements = parentElements(this.selector.selector);
+    var elements = parentElements(this.parentSelector.selector);
     addClass("savedPreview", elements);
 }
 
@@ -2243,7 +2324,7 @@ function editSavedRule(event){
 
     // setup the form
     HTML.rule.edit.name.value = this.name;
-    HTML.rule.selector.textContent = this.selector.selector;
+    HTML.rule.selector.textContent = this.parentSelector.selector;
     HTML.rule.edit.capture.textContent = this.capture;
     if ( this.follow || this.capture === "attr-href" ) {
         HTML.rule.edit.follow.checked = this.follow;
@@ -2258,19 +2339,18 @@ function editSavedRule(event){
     // show edit form after setting values, but before calling setupRuleForm
     // because Interface.activeForm needs to equal "edit"
     showEditForm();
-    setupRuleForm(this.selector.selector);
+    setupRuleForm(this.parentSelector.selector);
     showTab(HTML.tabs.rule);
 }
 
+/*
 function previewSavedRule(event){
-    HTML.preview.name.textContent = this.name;
-    HTML.preview.selector.textContent = this.selector.selector;
-    HTML.preview.capture.textContent = this.capture;
     //HTML.preview.contents;
-    var elements = parentElements(this.selector.selector);
+    var elements = parentElements(this.parentSelector.selector);
     generatePreviewElements(this.capture, elements);
     showTab(HTML.tabs.preview);
 }
+*/
 
 function deleteRuleEvent(event){
     clearClass("savedPreview");
@@ -2393,7 +2473,15 @@ function addRule(rule, selector){
     );
 
     selector.addRule(ruleObject,
-        [selectorViewRule, unselectorViewRule, editSavedRule, previewSavedRule, deleteRuleEvent]);
+        [selectorViewRule, unselectorViewRule, editSavedRule, deleteRuleEvent],
+        HTML.perm.page.select);
+
+    // if rule follow=true, add an option for it
+    /*
+    if ( rule.follow ) {
+        Collect.current.group.pages[rule.name].addOption(HTML.perm.page.select);
+    }
+    */
 }
 
 /*
@@ -2519,9 +2607,6 @@ function setupHostname(){
                 }
             };
             chrome.storage.local.set({'sites': storage.sites});
-
-            HTML.perm.schema.select.appendChild(newOption("default"));
-
         } else {
             options(Object.keys(site.schemas), HTML.perm.schema.select);
             schema = site.schemas['default'];
@@ -2564,7 +2649,6 @@ function createSchema(){
             return;
         }
 
-        HTML.perm.schema.select.appendChild(newOption(name));
         schema = newSchema(name);
         storage.sites[host].schemas[name] = schema;
 
@@ -2659,13 +2743,12 @@ function deletePage(){
     // just delete all of the rules for "default" option
     if ( defaultPage ) {
         page = new Page("default");
+        page.addOption(HTML.perm.page.select);
         Collect.current.schema.addPage(page);
     } else {
         Collect.current.schema.removePage(Collect.current.page.name);
-        var currOption = HTML.perm.page.select.querySelector("option:checked");
-        currOption.parentElement.removeChild(currOption);
-        HTML.perm.page.select.querySelector("option[value=default]").selected = true;
         page = Collect.current.schema.pages["default"];
+        page.htmlElements.option.selected = true;
     }
     saveSchema();
     baseCancel();
@@ -2697,8 +2780,8 @@ function createSelectorSet(){
         alertMessage("a selector set named \"" + name + "\" already exists");
         return;
     }
-    HTML.perm.set.select.appendChild(newOption(name));
     var set = new SelectorSet(name);
+    set.addOption(HTML.perm.set.select);
     Collect.current.page.addSet(set);
     saveSchema();
 
@@ -2718,17 +2801,18 @@ function deleteSelectorSet(){
         return;
     }
 
-    Collect.current.page.removeSet(Collect.current.set.name);
     var set;
     // handle setting new current SelectorSet
     if ( defaultSet ) {
+        Collect.current.page.removeSet("default");
         set = new SelectorSet("default");
+        set.addOption(HTML.perm.set.select);
         Collect.current.page.addSet(set);
     } else {
-        var currOption = HTML.perm.set.select.querySelector("option:checked");
-        currOption.parentElement.removeChild(currOption);
+        Collect.current.set.remove();
+        Collect.current.set = undefined;
         set = Collect.current.page.sets["default"];
-        HTML.perm.set.select.querySelector("option[value=default]").selected = true;
+        set.htmlElements.option.selected = true;
     }
 
     saveSchema();
@@ -2766,6 +2850,7 @@ function setOptions(options){
 
 // creates an empty schema object
 function newSchema(name){
+    HTML.perm.schema.select.appendChild(newOption(name));
     return {
         name: name,
         pages: {"default": newPage("default", false)},
@@ -2824,9 +2909,8 @@ function loadSchemaObject(schema){
     var url = window.location.href;
     HTML.perm.schema.indexToggle.checked = schema.urls[url] !== undefined;
 
-    // clear out current options and populate with current schema's pages
+    // clear out current page options
     HTML.perm.page.select.innerHTML = "";
-    options(Object.keys(schema.pages), HTML.perm.page.select);
     var schemaObject,
         page, pageObject, pageName,
         set, setObject, setName,
@@ -2842,11 +2926,17 @@ function loadSchemaObject(schema){
     // create all pages and child objects for the schema
     for ( pageName in schema.pages ) {
         page = schema.pages[pageName];
+
         pageObject = new Page(page.name, page.index, page.next);
+        pageObject.addOption(HTML.perm.page.select);
+
         schemaObject.addPage(pageObject);
         for ( setName in page.sets ) {
             set = page.sets[setName];
+
             setObject = new SelectorSet(set.name, set.parent);
+            setObject.addOption(HTML.perm.set.select);
+
             pageObject.addSet(setObject);
             for ( selectorName in set.selectors ) {
                 selector = set.selectors[selectorName];

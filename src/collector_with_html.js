@@ -193,9 +193,6 @@ var HTML = {
     interface: document.querySelector(".collectjs"),
     // elements in the preview view
     preview: {
-        name: document.getElementById("previewName"),
-        selector: document.getElementById("previewSelector"),
-        capture: document.getElementById("previewCapture"),
         contents: document.getElementById("previewContents"),
         clear: document.getElementById("previewClear")
     },
@@ -375,9 +372,6 @@ function resetRulesView(){
 }
 
 function resetPreviewView(){
-    HTML.preview.name.textContent = "";
-    HTML.preview.selector.textContent = "";
-    HTML.preview.capture.textContent = "";
     HTML.preview.contents.innerHTML = "";
 }
 
@@ -537,12 +531,14 @@ function cancelRuleEvent(event){
     event.stopPropagation();
     event.preventDefault();
     baseCancel();
+    showTab(HTML.tabs.schema);
 }
 
 function cancelEditEvent(event){
     event.stopPropagation();
     event.preventDefault();
-    baseCancel();   
+    baseCancel();
+    showTab(HTML.tabs.schema);
 }
 
 function verifyAndApplyParentLow(event){
@@ -783,8 +779,6 @@ function saveRuleEvent(event){
 
     if ( follow ) {
         rule.follow = true;
-        // page will be created when rule is added to set, but add option now
-        HTML.perm.page.select.appendChild(newOption(rule.name));
     }
     var selector = Collect.current.selector;
     addRule(rule, selector);
@@ -809,12 +803,17 @@ function saveEditEvent(event){
         return;
     }
 
+    var select;
     if ( follow ) {
         rule.follow = true;
+        select = HTML.perm.page.select;
     }
     var oldName = Interface.editing.rule.name,
         set = Interface.editing.rule.selector.set;
-    Interface.editing.rule.update(rule);
+
+    // include select for follow page
+    Interface.editing.rule.update(rule, select);
+
     saveSchema();
 
     delete Interface.editing.rule;
@@ -857,7 +856,7 @@ function toggleURLEvent(event){
 function selectorViewRule(event){
     clearClass("queryCheck");
     clearClass("collectHighlight");
-    var elements = parentElements(this.selector.selector);
+    var elements = parentElements(this.parentSelector.selector);
     addClass("savedPreview", elements);
 }
 
@@ -870,7 +869,7 @@ function editSavedRule(event){
 
     // setup the form
     HTML.rule.edit.name.value = this.name;
-    HTML.rule.selector.textContent = this.selector.selector;
+    HTML.rule.selector.textContent = this.parentSelector.selector;
     HTML.rule.edit.capture.textContent = this.capture;
     if ( this.follow || this.capture === "attr-href" ) {
         HTML.rule.edit.follow.checked = this.follow;
@@ -885,19 +884,18 @@ function editSavedRule(event){
     // show edit form after setting values, but before calling setupRuleForm
     // because Interface.activeForm needs to equal "edit"
     showEditForm();
-    setupRuleForm(this.selector.selector);
+    setupRuleForm(this.parentSelector.selector);
     showTab(HTML.tabs.rule);
 }
 
+/*
 function previewSavedRule(event){
-    HTML.preview.name.textContent = this.name;
-    HTML.preview.selector.textContent = this.selector.selector;
-    HTML.preview.capture.textContent = this.capture;
     //HTML.preview.contents;
-    var elements = parentElements(this.selector.selector);
+    var elements = parentElements(this.parentSelector.selector);
     generatePreviewElements(this.capture, elements);
     showTab(HTML.tabs.preview);
 }
+*/
 
 function deleteRuleEvent(event){
     clearClass("savedPreview");
@@ -1020,7 +1018,15 @@ function addRule(rule, selector){
     );
 
     selector.addRule(ruleObject,
-        [selectorViewRule, unselectorViewRule, editSavedRule, previewSavedRule, deleteRuleEvent]);
+        [selectorViewRule, unselectorViewRule, editSavedRule, deleteRuleEvent],
+        HTML.perm.page.select);
+
+    // if rule follow=true, add an option for it
+    /*
+    if ( rule.follow ) {
+        Collect.current.group.pages[rule.name].addOption(HTML.perm.page.select);
+    }
+    */
 }
 
 /*
@@ -1146,9 +1152,6 @@ function setupHostname(){
                 }
             };
             chrome.storage.local.set({'sites': storage.sites});
-
-            HTML.perm.schema.select.appendChild(newOption("default"));
-
         } else {
             options(Object.keys(site.schemas), HTML.perm.schema.select);
             schema = site.schemas['default'];
@@ -1191,7 +1194,6 @@ function createSchema(){
             return;
         }
 
-        HTML.perm.schema.select.appendChild(newOption(name));
         schema = newSchema(name);
         storage.sites[host].schemas[name] = schema;
 
@@ -1286,13 +1288,12 @@ function deletePage(){
     // just delete all of the rules for "default" option
     if ( defaultPage ) {
         page = new Page("default");
+        page.addOption(HTML.perm.page.select);
         Collect.current.schema.addPage(page);
     } else {
         Collect.current.schema.removePage(Collect.current.page.name);
-        var currOption = HTML.perm.page.select.querySelector("option:checked");
-        currOption.parentElement.removeChild(currOption);
-        HTML.perm.page.select.querySelector("option[value=default]").selected = true;
         page = Collect.current.schema.pages["default"];
+        page.htmlElements.option.selected = true;
     }
     saveSchema();
     baseCancel();
@@ -1324,8 +1325,8 @@ function createSelectorSet(){
         alertMessage("a selector set named \"" + name + "\" already exists");
         return;
     }
-    HTML.perm.set.select.appendChild(newOption(name));
     var set = new SelectorSet(name);
+    set.addOption(HTML.perm.set.select);
     Collect.current.page.addSet(set);
     saveSchema();
 
@@ -1345,17 +1346,18 @@ function deleteSelectorSet(){
         return;
     }
 
-    Collect.current.page.removeSet(Collect.current.set.name);
     var set;
     // handle setting new current SelectorSet
     if ( defaultSet ) {
+        Collect.current.page.removeSet("default");
         set = new SelectorSet("default");
+        set.addOption(HTML.perm.set.select);
         Collect.current.page.addSet(set);
     } else {
-        var currOption = HTML.perm.set.select.querySelector("option:checked");
-        currOption.parentElement.removeChild(currOption);
+        Collect.current.set.remove();
+        Collect.current.set = undefined;
         set = Collect.current.page.sets["default"];
-        HTML.perm.set.select.querySelector("option[value=default]").selected = true;
+        set.htmlElements.option.selected = true;
     }
 
     saveSchema();
@@ -1393,6 +1395,7 @@ function setOptions(options){
 
 // creates an empty schema object
 function newSchema(name){
+    HTML.perm.schema.select.appendChild(newOption(name));
     return {
         name: name,
         pages: {"default": newPage("default", false)},
@@ -1451,9 +1454,8 @@ function loadSchemaObject(schema){
     var url = window.location.href;
     HTML.perm.schema.indexToggle.checked = schema.urls[url] !== undefined;
 
-    // clear out current options and populate with current schema's pages
+    // clear out current page options
     HTML.perm.page.select.innerHTML = "";
-    options(Object.keys(schema.pages), HTML.perm.page.select);
     var schemaObject,
         page, pageObject, pageName,
         set, setObject, setName,
@@ -1469,11 +1471,17 @@ function loadSchemaObject(schema){
     // create all pages and child objects for the schema
     for ( pageName in schema.pages ) {
         page = schema.pages[pageName];
+
         pageObject = new Page(page.name, page.index, page.next);
+        pageObject.addOption(HTML.perm.page.select);
+
         schemaObject.addPage(pageObject);
         for ( setName in page.sets ) {
             set = page.sets[setName];
+
             setObject = new SelectorSet(set.name, set.parent);
+            setObject.addOption(HTML.perm.set.select);
+
             pageObject.addSet(setObject);
             for ( selectorName in set.selectors ) {
                 selector = set.selectors[selectorName];

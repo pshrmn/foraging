@@ -161,10 +161,10 @@ describe("Schema", function(){
             var g = new Schema("Titans"),
                 p = new Page("locations");
             expect(g.pages["locations"]).toBeUndefined();
-            expect(p.schema).toBeUndefined();
+            expect(p.parentSchema).toBeUndefined();
             g.addPage(p);
             expect(g.pages["locations"]).toBeDefined();
-            expect(p.schema).toBeDefined();
+            expect(p.parentSchema).toBeDefined();
         });
 
         it("generates html if schema html has been generated", function(){
@@ -404,7 +404,7 @@ describe("Page", function(){
             expect(p.sets["Seasons"]).toBeUndefined();
             p.addSet(s);
             expect(p.sets["Seasons"]).toBeDefined();
-            expect(s.page).toBeDefined();
+            expect(s.parentPage).toBeDefined();
         });
     });
 
@@ -478,20 +478,11 @@ describe("SelectorSet", function(){
             var set = new SelectorSet("Cubs"),
                 sel = new Selector(".player");
             expect(set.selectors[".player"]).toBeUndefined();
-            expect(sel.selectorSet).toBeUndefined();
+            expect(sel.parentSet).toBeUndefined();
             set.addSelector(sel);
             expect(set.selectors[".player"]).toBeDefined();
-            expect(sel.set).toBeDefined();
+            expect(sel.parentSet).toBeDefined();
         });
-        /*
-        // this should be moved to selector tests once those are created
-        it("creates a new page if schema/page are defined", function(){
-            var g = new Schema("Pirates"),
-                r = new Rule("two", "a", "attr-href", false, true);
-            g.pages["default"].sets["default"].addRule(r);
-            expect(g.pages["two"]).toBeDefined();
-        });
-*/
     });
 
     describe("removeSelector", function(){
@@ -513,15 +504,6 @@ describe("SelectorSet", function(){
             expect(set.selectors[".player"]).toBeDefined();
             set.remove();
             expect(Object.keys(set.selectors).length).toEqual(0);
-            /*
-            // reuse for selector.remove test
-            var g = new Schema("One"),
-                r = new Rule("two", "a", "attr-href", false, true);
-            g.pages["default"].sets["default"].addRule(r);
-            expect(g.pages["two"]).toBeDefined();
-            g.pages["default"].sets["default"].removeRule("two");
-            expect(g.pages["two"]).toBeUndefined();
-            */
         });
     });
 });
@@ -583,6 +565,15 @@ describe("Selector", function(){
             sel.addRule(rule);
             expect(sel.rules[rule.name]).toEqual(rule);
         });
+
+        it("creates a new page if schema/page are defined", function(){
+            var g = new Schema("Pirates"),
+                s = new Selector("a"),
+                r = new Rule("two", "attr-href", true);
+            g.pages["default"].sets["default"].addSelector(s);
+            s.addRule(r);
+            expect(g.pages["two"]).toBeDefined();
+        });
     });
 
     describe("removeRule", function(){
@@ -622,6 +613,17 @@ describe("Selector", function(){
                 holder = sel.html(fakeEvent, fakeEvent, fakeEvent);
             expect(holder.tagName).toEqual("LI");
             expect(sel.htmlElements.nametag.textContent).toEqual(".foo");
+        });
+    });
+
+    describe("remove", function(){
+        it("removes selector from its parent set", function(){
+            var set = new SelectorSet("test"),
+                sel = new Selector(".item");
+            set.addSelector(sel);
+            expect(set.selectors[".item"]).toBeDefined();
+            sel.remove();
+            expect(set.selectors[".item"]).toBeUndefined();
         });
     });
 });
@@ -664,7 +666,7 @@ describe("Rule", function(){
             // blank function since we don't care about events in this test
             var fakeEvent = function(){},
                 r1 = new Rule("seasons", "attr-href"),
-                ele = r1.html(fakeEvent, fakeEvent, fakeEvent, fakeEvent, fakeEvent);
+                ele = r1.html(fakeEvent, fakeEvent, fakeEvent, fakeEvent);
             expect(ele.tagName).toEqual("LI");
             expect(r1.htmlElements.nametag.textContent).toEqual(r1.name);
         });
