@@ -581,14 +581,12 @@ Selector.prototype.html = function(newRuleEvent, editEvent, deleteEvent){
 
     appendChildren(holder, [identifier, nametag, editSelector, newRule, remove, rules]);
 
-    this.htmlElements = {
-        holder: holder,
-        nametag: nametag,
-        newRule: newRule,
-        editSelector: editSelector,
-        remove: remove,
-        rules: rules
-    };
+    this.htmlElements.holder = holder;
+    this.htmlElements.nametag = nametag;
+    this.htmlElements.newRule = newRule;
+    this.htmlElements.editSelector = editSelector;
+    this.htmlElements.remove = remove;
+    this.htmlElements.rules = rules;
 
     return holder;
 };
@@ -654,13 +652,11 @@ Rule.prototype.html = function(selectorViewEvent, unselectorViewEvent, editEvent
     edit.addEventListener("click", editEvent.bind(this), false);
     deltog.addEventListener("click", deleteEvent.bind(this), false);
     
-    this.htmlElements = {
-        holder: holder,
-        nametag: nametag,
-        capturetag: capturetag,
-        edit: edit,
-        deltog: deltog
-    };
+    this.htmlElements.holder = holder;
+    this.htmlElements.nametag = nametag;
+    this.htmlElements.capturetag = capturetag;
+    this.htmlElements.edit = edit;
+    this.htmlElements.deltog = deltog;
 
     return holder;
 };

@@ -1097,14 +1097,12 @@ Selector.prototype.html = function(newRuleEvent, editEvent, deleteEvent){
 
     appendChildren(holder, [identifier, nametag, editSelector, newRule, remove, rules]);
 
-    this.htmlElements = {
-        holder: holder,
-        nametag: nametag,
-        newRule: newRule,
-        editSelector: editSelector,
-        remove: remove,
-        rules: rules
-    };
+    this.htmlElements.holder = holder;
+    this.htmlElements.nametag = nametag;
+    this.htmlElements.newRule = newRule;
+    this.htmlElements.editSelector = editSelector;
+    this.htmlElements.remove = remove;
+    this.htmlElements.rules = rules;
 
     return holder;
 };
@@ -1170,13 +1168,11 @@ Rule.prototype.html = function(selectorViewEvent, unselectorViewEvent, editEvent
     edit.addEventListener("click", editEvent.bind(this), false);
     deltog.addEventListener("click", deleteEvent.bind(this), false);
     
-    this.htmlElements = {
-        holder: holder,
-        nametag: nametag,
-        capturetag: capturetag,
-        edit: edit,
-        deltog: deltog
-    };
+    this.htmlElements.holder = holder;
+    this.htmlElements.nametag = nametag;
+    this.htmlElements.capturetag = capturetag;
+    this.htmlElements.edit = edit;
+    this.htmlElements.deltog = deltog;
 
     return holder;
 };
@@ -1754,12 +1750,13 @@ var Family = {
         clearClass("queryCheck");
         clearClass("collectHighlight");
         var elements = this.elements(),
-            count;
+            totalCount;
         for ( var i=0, len=elements.length; i<len; i++ ) {
             elements[i].classList.add("queryCheck");
         }
-        count = elements.length ? elements.length : "";
-        HTML.selector.count.textContent = count;
+        totalCount = elements.length ? elements.length : "";
+
+        HTML.selector.count.textContent = elementCount(totalCount, Collect.parentCount);
         this.match();
         Interface.selectorCycle.setElements(Collect.matchedElements);
     },
@@ -2011,7 +2008,7 @@ function verifyAndApplyParentLow(event){
     clearClass("queryCheck");
     addClass("queryCheck", Collect.matchedElements);
     
-    HTML.selector.count.textContent = Collect.matchedElements.length;   
+    HTML.selector.count.textContent = elementCount(Collect.matchedElements.length, Collect.parentCount);
 }
 
 function verifyAndApplyParentHigh(event){
@@ -2029,7 +2026,7 @@ function verifyAndApplyParentHigh(event){
     clearClass("queryCheck");
     addClass("queryCheck", Collect.matchedElements);
     
-    HTML.selector.count.textContent = Collect.matchedElements.length;   
+    HTML.selector.count.textContent = elementCount(Collect.matchedElements.length, Collect.parentCount);
 }
 
 /*
@@ -2121,6 +2118,9 @@ function saveParent(selector){
         parent = {
             selector: selector
         };
+
+    Collect.parentCount = Collect.matchedElements.length;
+
     if ( !isNaN(low) ) {
         parent.low = low;
     }
@@ -2279,6 +2279,7 @@ function saveEditEvent(event){
 
 function deleteParentEvent(event){
     event.preventDefault();
+    delete Collect.parentCount;
     Collect.parent = {};
     HTML.perm.parent.holder.style.display = "none";
     HTML.perm.parent.selector.textContent = "";
@@ -2558,6 +2559,14 @@ function createRangeString(low, high){
     rangeString += " to ";
     rangeString += (high !== 0 && !isNaN(high)) ? high : "end";
     return rangeString;
+}
+
+function elementCount(count, parentCount){
+    if ( parentCount ) {
+        return parseInt(count/parentCount) + " per parent group";
+    } else {
+        return count + " total";
+    }
 }
 
 /***********************
@@ -2984,11 +2993,13 @@ function loadSetObject(set){
         HTML.perm.parent.selector.textContent = set.parent.selector;
         addParentSchema(set.parent.selector, set.parent.low, set.parent.high);
         HTML.perm.parent.range.textContent = createRangeString(set.parent.low, set.parent.high);
+        Collect.parentCount = Collect.all(set.parent.selector).length;
     } else {
         HTML.perm.parent.holder.style.display = "none";
         HTML.perm.parent.selector.textContent = "";
         HTML.perm.parent.range.textContent = "";
         clearClass("parentSchema");
+        delete Collect.parentCount;
     }
 
     // don't call these in loadSchemaObject or loadPageObject because we want to know if there is a
