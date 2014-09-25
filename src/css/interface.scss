@@ -141,6 +141,12 @@ body{
                 padding: 0 15px;
             }
 
+            .form{
+                > p {
+                    font-size: 1.25em;
+                }
+            }
+
             .form.column{
                 width: 25%;
                 min-width: 300px;
@@ -326,6 +332,10 @@ body{
     display: none;
 }
 
+#nextHolder{
+    display: none;
+}
+
 /* views */
 /* selectorView */
 #selectorView{
@@ -410,7 +420,7 @@ body{
     }
 }
 
-#parentForm, #nextForm, #editForm{
+#editForm{
     @extend #ruleForm;
     display: none;
 }

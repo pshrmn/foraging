@@ -142,8 +142,9 @@ describe("Schema", function(){
             var g = new Schema("Cowboys"),
                 testURL = "http://www.example.com";
             expect(g.urls[testURL]).toBeUndefined();
-            g.toggleURL(testURL);
+            var on = g.toggleURL(testURL);
             expect(g.urls[testURL]).toBe(true);
+            expect(on).toBe(true);
         });
 
         it("it removes a url from this.urls if it already exists", function(){
@@ -151,8 +152,9 @@ describe("Schema", function(){
                 testURL = "http://www.example.com";
             g.toggleURL(testURL);
             expect(g.urls[testURL]).toBe(true); 
-            g.toggleURL(testURL);
+            var on  = g.toggleURL(testURL);
             expect(g.urls[testURL]).toBeUndefined();
+            expect(on).toBe(false);
         });
     });
 

@@ -5,7 +5,6 @@
         <div class="tab" id="ruleTab" data-for="ruleView">Rule</div>
         <div class="tab" id="previewTab" data-for="previewView">Preview</div>
         <div class="tab" id="optionsTab" data-for="optionsView">Options</div>
-        <div class="tab" id="refreshCollect">&#8635;</div>
         <div class="tab" id="closeCollect">&times;</div>
     </div>
 </div>
@@ -19,15 +18,16 @@
                 Initial URL
                 <input type="checkbox" id="indexToggle" />
             </div>
+
+        </div>
+        <div>
+            Page: <select id="pageSelect"></select>
+            <button id="deletePage" title="delete current page">&times;</button>
             <div id="nextHolder" class="info">
                 Next:
                 <span id="nextSelectorView"></span>
                 <button id="removeNext">&times;</button>
             </div>
-        </div>
-        <div>
-            Page: <select id="pageSelect"></select>
-            <button id="deletePage" title="delete current page">&times;</button>
         </div>
         <div>
             Selector Set: <select id="selectorSetSelect"></select>

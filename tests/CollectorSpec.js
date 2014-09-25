@@ -1,7 +1,7 @@
 describe("Collect", function(){
     describe("not", function(){
         it("returns selector with :not(.noSelect) appended", function(){
-            expect(Collect.not("a")).toEqual("a:not(.noSelect)");
+            expect(Collect.not("a")).toEqual("body a:not(.noSelect)");
         });
 
         it("prepends prefix if it exists", function(){

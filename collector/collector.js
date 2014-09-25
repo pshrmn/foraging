@@ -618,8 +618,10 @@ Schema.prototype.deleteHTML = prototypeDeleteHTML;
 Schema.prototype.toggleURL = function(url){
     if ( this.urls[url] ) {
         delete this.urls[url];
+        return false;
     } else {
         this.urls[url] = true;
+        return true;
     }
 };
 
@@ -1465,7 +1467,7 @@ var marginBottom;
 (function addInterface(){
     var div = noSelectElement("div");
     div.classList.add("collectjs");
-    div.innerHTML = "<div class=\"tabHolder\"><div class=\"tabs\"><div class=\"tab active\" id=\"schemasTab\" data-for=\"schemasView\">Schema</div><div class=\"tab\" id=\"selectorTab\" data-for=\"selectorView\">Selector</div><div class=\"tab\" id=\"ruleTab\" data-for=\"ruleView\">Rule</div><div class=\"tab\" id=\"previewTab\" data-for=\"previewView\">Preview</div><div class=\"tab\" id=\"optionsTab\" data-for=\"optionsView\">Options</div><div class=\"tab\" id=\"refreshCollect\">&#8635;</div><div class=\"tab\" id=\"closeCollect\">&times;</div></div></div><div class=\"permanent\"><div class=\"currentInfo\"><div>Schema: <select id=\"schemaSelect\"></select><button id=\"createSchema\" title=\"create a new schema\">+</button><button id=\"deleteSchema\" title=\"delete current schema\">&times;</button><div id=\"indexMarker\" class=\"info\">Initial URL<input type=\"checkbox\" id=\"indexToggle\" /></div><div id=\"nextHolder\" class=\"info\">Next:<span id=\"nextSelectorView\"></span><button id=\"removeNext\">&times;</button></div></div><div>Page: <select id=\"pageSelect\"></select><button id=\"deletePage\" title=\"delete current page\">&times;</button></div><div>Selector Set: <select id=\"selectorSetSelect\"></select><button id=\"createSelectorSet\" title=\"create a new selector set\">+</button><button id=\"deleteSelectorSet\" title=\"delete current selector set\">&times;</button><div id=\"currentParent\" class=\"info\">Parent:<span id=\"parentSelectorView\"></span><span id=\"parentRangeView\"></span><button id=\"removeParent\">&times;</button></div></div><button id=\"uploadRules\">Upload Schema</button></div><div id=\"collectAlert\"></div></div><div class=\"views\"><div class=\"view\" id=\"emptyView\"></div><div class=\"view active\" id=\"schemasView\"><div id=\"schemaHolder\" class=\"rules\"></div></div><div class=\"view\" id=\"selectorView\"><div class=\"column form\"><!--displays what the current selector is--><p>Selector: <span id=\"currentSelector\"></span></p><p>Count: <span id=\"currentCount\"></span></p><div><h3>Type:</h3><p><label for=\"selectorRadio\">Selector</label><input type=\"radio\" id=\"selectorRadio\" name=\"selector\" value=\"selector\" checked/></p><p><label for=\"parentRadio\">Parent</label><input type=\"radio\" id=\"parentRadio\" name=\"selector\" value=\"parent\" /></p><p><label for=\"nextRadio\">Next</label><input type=\"radio\" id=\"nextRadio\" name=\"selector\" value=\"next\" /></p></div><div id=\"parentRange\"><label>Low: <input id=\"parentLow\" name=\"parentLow\" type=\"text\" /></label><label for=\"parentHigh\">High: <input id=\"parentHigh\" name=\"parentHigh\" type=\"text\" /></label></div><p><button id=\"saveSelector\">Save</button><button id=\"clearSelector\">Clear</button></p></div><div class=\"column\"><!--holds the interactive element for choosing a selector--><div id=\"selectorHolder\"></div><div id=\"selectorCycleHolder\"></div></div></div><div class=\"view\" id=\"ruleView\"><div id=\"ruleItems\" class=\"items\"><h3>Selector: <span id=\"ruleSelector\"></span></h3><form id=\"ruleForm\" class=\"column form\"><div class=\"rule\"><label for=\"ruleName\" title=\"the name of a rule\">Name:</label><input id=\"ruleName\" name=\"ruleName\" type=\"text\" /></div><div class=\"rule\"><label title=\"the attribute of an element to capture\">Capture:</label><span id=\"ruleAttr\"></span></div><div class=\"rule follow\"><label for=\"ruleFollow\" title=\"create a new page from the element's captured url (capture must be attr-href)\">Follow:</label><input id=\"ruleFollow\" name=\"ruleFollow\" type=\"checkbox\" disabled=\"true\" title=\"Can only follow rules that get href attribute from links\" /></div><div><button id=\"saveRule\">Save Rule</button><button id=\"cancelRule\">Cancel</button></div></form><form id=\"editForm\" class=\"column form\"><div class=\"rule\"><label for=\"ruleName\" title=\"the name of a rule\">Name:</label><input id=\"editName\" name=\"editName\" type=\"text\" /></div><div class=\"rule\"><label title=\"the attribute of an element to capture\">Capture:</label><span id=\"editAttr\"></span></div><div class=\"rule editFollow\"><label for=\"editFollow\" title=\"create a new page from the element's captured url (capture must be attr-href)\">Follow:</label><input id=\"editFollow\" name=\"editFollow\" type=\"checkbox\" disabled=\"true\" title=\"Can only follow rules that get href attribute from links\" /></div><div><button id=\"saveEdit\">Save Edited Rule</button><button id=\"cancelEdit\">Cancel</button></div></form><div class=\"modifiers column\"><div id=\"ruleCycleHolder\"></div></div></div></div><div class=\"view\" id=\"previewView\"><p>Name: <span id=\"previewName\" class=\"name\"></span>Selector: <span id=\"previewSelector\" class=\"name\"></span>Capture: <span id=\"previewCapture\" class=\"name\"></span><button id=\"previewClear\">Clear</button></p><div id=\"previewContents\"></div></div><div class=\"view\" id=\"optionsView\"><p><label for=\"ignore\">Ignore helper elements (eg tbody)</label><input type=\"checkbox\" id=\"ignore\" /></p></div></div>";
+    div.innerHTML = "<div class=\"tabHolder\"><div class=\"tabs\"><div class=\"tab active\" id=\"schemasTab\" data-for=\"schemasView\">Schema</div><div class=\"tab\" id=\"selectorTab\" data-for=\"selectorView\">Selector</div><div class=\"tab\" id=\"ruleTab\" data-for=\"ruleView\">Rule</div><div class=\"tab\" id=\"previewTab\" data-for=\"previewView\">Preview</div><div class=\"tab\" id=\"optionsTab\" data-for=\"optionsView\">Options</div><div class=\"tab\" id=\"closeCollect\">&times;</div></div></div><div class=\"permanent\"><div class=\"currentInfo\"><div>Schema: <select id=\"schemaSelect\"></select><button id=\"createSchema\" title=\"create a new schema\">+</button><button id=\"deleteSchema\" title=\"delete current schema\">&times;</button><div id=\"indexMarker\" class=\"info\">Initial URL<input type=\"checkbox\" id=\"indexToggle\" /></div></div><div>Page: <select id=\"pageSelect\"></select><button id=\"deletePage\" title=\"delete current page\">&times;</button><div id=\"nextHolder\" class=\"info\">Next:<span id=\"nextSelectorView\"></span><button id=\"removeNext\">&times;</button></div></div><div>Selector Set: <select id=\"selectorSetSelect\"></select><button id=\"createSelectorSet\" title=\"create a new selector set\">+</button><button id=\"deleteSelectorSet\" title=\"delete current selector set\">&times;</button><div id=\"currentParent\" class=\"info\">Parent:<span id=\"parentSelectorView\"></span><span id=\"parentRangeView\"></span><button id=\"removeParent\">&times;</button></div></div><button id=\"uploadRules\">Upload Schema</button></div><div id=\"collectAlert\"></div></div><div class=\"views\"><div class=\"view\" id=\"emptyView\"></div><div class=\"view active\" id=\"schemasView\"><div id=\"schemaHolder\" class=\"rules\"></div></div><div class=\"view\" id=\"selectorView\"><div class=\"column form\"><!--displays what the current selector is--><p>Selector: <span id=\"currentSelector\"></span></p><p>Count: <span id=\"currentCount\"></span></p><div><h3>Type:</h3><p><label for=\"selectorRadio\">Selector</label><input type=\"radio\" id=\"selectorRadio\" name=\"selector\" value=\"selector\" checked/></p><p><label for=\"parentRadio\">Parent</label><input type=\"radio\" id=\"parentRadio\" name=\"selector\" value=\"parent\" /></p><p><label for=\"nextRadio\">Next</label><input type=\"radio\" id=\"nextRadio\" name=\"selector\" value=\"next\" /></p></div><div id=\"parentRange\"><label>Low: <input id=\"parentLow\" name=\"parentLow\" type=\"text\" /></label><label for=\"parentHigh\">High: <input id=\"parentHigh\" name=\"parentHigh\" type=\"text\" /></label></div><p><button id=\"saveSelector\">Save</button><button id=\"clearSelector\">Clear</button></p></div><div class=\"column\"><!--holds the interactive element for choosing a selector--><div id=\"selectorHolder\"></div><div id=\"selectorCycleHolder\"></div></div></div><div class=\"view\" id=\"ruleView\"><div id=\"ruleItems\" class=\"items\"><h3>Selector: <span id=\"ruleSelector\"></span></h3><form id=\"ruleForm\" class=\"column form\"><div class=\"rule\"><label for=\"ruleName\" title=\"the name of a rule\">Name:</label><input id=\"ruleName\" name=\"ruleName\" type=\"text\" /></div><div class=\"rule\"><label title=\"the attribute of an element to capture\">Capture:</label><span id=\"ruleAttr\"></span></div><div class=\"rule follow\"><label for=\"ruleFollow\" title=\"create a new page from the element's captured url (capture must be attr-href)\">Follow:</label><input id=\"ruleFollow\" name=\"ruleFollow\" type=\"checkbox\" disabled=\"true\" title=\"Can only follow rules that get href attribute from links\" /></div><div><button id=\"saveRule\">Save Rule</button><button id=\"cancelRule\">Cancel</button></div></form><form id=\"editForm\" class=\"column form\"><div class=\"rule\"><label for=\"ruleName\" title=\"the name of a rule\">Name:</label><input id=\"editName\" name=\"editName\" type=\"text\" /></div><div class=\"rule\"><label title=\"the attribute of an element to capture\">Capture:</label><span id=\"editAttr\"></span></div><div class=\"rule editFollow\"><label for=\"editFollow\" title=\"create a new page from the element's captured url (capture must be attr-href)\">Follow:</label><input id=\"editFollow\" name=\"editFollow\" type=\"checkbox\" disabled=\"true\" title=\"Can only follow rules that get href attribute from links\" /></div><div><button id=\"saveEdit\">Save Edited Rule</button><button id=\"cancelEdit\">Cancel</button></div></form><div class=\"modifiers column\"><div id=\"ruleCycleHolder\"></div></div></div></div><div class=\"view\" id=\"previewView\"><p>Name: <span id=\"previewName\" class=\"name\"></span>Selector: <span id=\"previewSelector\" class=\"name\"></span>Capture: <span id=\"previewCapture\" class=\"name\"></span><button id=\"previewClear\">Clear</button></p><div id=\"previewContents\"></div></div><div class=\"view\" id=\"optionsView\"><p><label for=\"ignore\">Ignore helper elements (eg tbody)</label><input type=\"checkbox\" id=\"ignore\" /></p></div></div>";
     document.body.appendChild(div);
     addNoSelect(div.querySelectorAll("*"));
 
@@ -1495,6 +1497,7 @@ var Collect = {
     },
     not: function(selector, prefix){
         selector += ":not(.noSelect)";
+        prefix = prefix || "body";
         return prefix ? prefix + " " + selector : selector;
     },
     options: {},
@@ -1541,7 +1544,6 @@ var Interface = {
     */
     turnOn: function(){
         var curr;
-
         this.turnOff();
         Collect.allElements = parentElements("*");
 
@@ -1551,8 +1553,7 @@ var Interface = {
             curr.addEventListener('mouseenter', highlightElement, false);
             curr.addEventListener('mouseleave', unhighlightElement, false);
         }
-        clearClass("queryCheck");
-        clearClass("collectHighlight");
+        clearCollectClasses();
     },
     /*
     removes event listeners from elements in this.ele
@@ -1628,11 +1629,17 @@ var HTML = {
         schema: {
             select: document.getElementById("schemaSelect"),
             holder: document.getElementById("schemaHolder"),
-            index: document.getElementById("indexMarker"),
-            indexToggle: document.getElementById("indexToggle")
+            index: {
+                holder: document.getElementById("indexMarker"),
+                checkbox: document.getElementById("indexToggle")
+            }
         },
         page: {
             select: document.getElementById("pageSelect"),
+            next: {
+                holder: document.getElementById("nextHolder"),
+                selector: document.getElementById("nextSelectorView")
+            }
         },
         set: {
             select: document.getElementById("selectorSetSelect")
@@ -1641,10 +1648,6 @@ var HTML = {
             holder: document.getElementById("currentParent"),
             selector: document.getElementById("parentSelectorView"),
             range: document.getElementById("parentRangeView")
-        },
-        next: {
-            holder: document.getElementById("nextHolder"),
-            selector: document.getElementById("nextSelectorView")
         }
     },
     info: {
@@ -1671,12 +1674,6 @@ var Family = {
         event.stopPropagation();
         event.preventDefault();
 
-        resetInterface(); 
-        if ( Interface.editing.rule ) {
-            // preserve name when switching selector while editing
-            HTML.rule.edit.name.value = Interface.editing.rule.name;
-        }
-        
         var sf = new SelectorFamily(this,
             Collect.parent.selector,
             HTML.selector.family,
@@ -1784,20 +1781,20 @@ var Family = {
 Interface.setup();
 
 function resetInterface(){
-    clearClass("queryCheck");
-    clearClass("collectHighlight");
-    clearClass("savedPreview");
+    clearCollectClasses();
     resetSelectorView();
     resetRulesView();
     resetPreviewView();
 }
 
-function resetSelectorView(){
-    Family.remove();
-
+function clearCollectClasses(){
     clearClass("queryCheck");
     clearClass("collectHighlight");
     clearClass("savedPreview");
+}
+
+function resetSelectorView(){
+    Family.remove();
 
     Interface.activeSelector = "selector";
     Interface.selectorCycle.reset();
@@ -1809,6 +1806,7 @@ function resetSelectorView(){
     HTML.selector.parent.low.value = "";
     HTML.selector.parent.high.value = "";
     HTML.selector.count.textContent = "";
+    //test
 }
 
 function resetRulesView(){
@@ -1842,7 +1840,6 @@ function resetPreviewView(){
 
 // encapsulate event activeTabEvent to keep track of current tab/view
 function tabEvents(){
-    idEvent("refreshCollect", "click", refreshElements);
     idEvent("closeCollect", "click", function removeInterface(event){
         event.stopPropagation();
         event.preventDefault();
@@ -1982,12 +1979,6 @@ function unhighlightElement(event){
     this.classList.remove("collectHighlight");
 }
 
-// 
-function refreshElements(){
-    resetInterface();
-    Interface.turnOn();
-}
-
 function cancelRuleEvent(event){
     event.stopPropagation();
     event.preventDefault();
@@ -2094,7 +2085,6 @@ function saveSelectorEvent(event){
         return;
     }
 
-
     switch(Interface.activeSelector){
     case "selector":
         saveSelector(selector);
@@ -2143,48 +2133,61 @@ function saveParent(selector){
     HTML.perm.parent.holder.style.display = "inline-block";
     HTML.perm.parent.selector.textContent = selector;
     HTML.perm.parent.range.textContent = createRangeString(low, high);
-    addParentSchema(selector, parent.low, parent.high);
+
+    addParentSchema(parent);
 
     // attach the parent to the current set and save
     Collect.current.set.addParent(parent);
     saveSchema();
-    refreshElements();
 }
 
 function saveNext(selector){
     var match = document.querySelector(selector),
         name = Collect.current.page.name;
 
-    if ( name !== "default" ) {
-        alertMessage("Cannot add next selector to '" + name + "' page, only to default");
-        return;
-    }
-    if ( errorCheck(!match.hasAttribute("href"), HTML.selector.selector, "selector must select element with href attribute") ) {
+    if ( errorCheck( (name !== "default" ), HTML.selector.selector,
+            ("Cannot add next selector to '" + name + "' page, only to default")) || 
+        errorCheck(!match.hasAttribute("href"), HTML.selector.selector,
+            "selector must select element with href attribute") ) {
         return;
     }
 
-    HTML.perm.next.selector.textContent = selector;
+    HTML.perm.page.next.selector.textContent = selector;
+    HTML.perm.page.next.holder.style.display = "inline-block";
 
     Collect.current.page.index = true;
     Collect.current.page.next = selector;
+
     saveSchema();
-
-    showRuleForm();
-    if ( Collect.parent.selector ) {
-        addParentSchema(Collect.parent.selector, Collect.parent.low, Collect.parent.high);
-    }
-
-    refreshElements();
 }
 
 function clearSelectorEvent(event){
     event.preventDefault();
-    resetSelectorView();
+    resetInterface();
 }
 
 function updateRadioEvent(event){
     Interface.activeSelector = this.value;
-    HTML.selector.parent.holder.style.display = (Interface.activeSelector === "parent") ? "block": "none";
+    switch(this.value) {
+    case "selector":
+        if ( Collect.parent ) {
+            addParentSchema(Collect.parent);
+        }
+        HTML.selector.parent.holder.style.display = "none";
+        break;
+    case "parent":
+        // don't show the current parent if you want to set a new one
+        clearClass("parentSchema");
+        HTML.selector.parent.holder.style.display = "block";
+        break;
+    case "next":
+        // don't rely on parent when setting next
+        clearClass("parentSchema");
+        HTML.selector.parent.holder.style.display = "none";
+        break;
+    }
+    // reset elements
+    Interface.turnOn();
 }
 
 function removeSelectorEvent(event){
@@ -2193,9 +2196,6 @@ function removeSelectorEvent(event){
     saveSchema();
 }
 
-/******************
-    RULE EVENTS
-******************/
 function newRuleEvent(event){
     event.preventDefault();
     Collect.current.selector = this;
@@ -2216,6 +2216,9 @@ function editSelectorEvent(event){
     showTab(HTML.tabs.selector);
 }
 
+/******************
+    RULE EVENTS
+******************/
 function saveRuleEvent(event){
     event.preventDefault();
     var name = HTML.rule.rule.name.value,
@@ -2301,15 +2304,22 @@ function deleteParentEvent(event){
 function deleteNextEvent(event){
     event.preventDefault();
     delete Collect.next;
-    HTML.perm.next.holder.style.display = "none";
-    HTML.perm.next.selector.textContent = "";
+    HTML.perm.page.next.holder.style.display = "none";
+    HTML.perm.page.next.selector.textContent = "";
     Collect.current.page.removeNext();
     saveSchema();
     Interface.turnOn();
 }
 
+/*
+toggle whether the current page is an index page
+if toggled off and the current page has a next selector, remove it
+*/
 function toggleURLEvent(event){
-    Collect.current.schema.toggleURL(window.location.href);
+    var on = Collect.current.schema.toggleURL(window.location.href);
+    if ( !on && Collect.current.page.next ) {
+        delete Collect.current.page.next;
+    }
     saveSchema();
 }
 
@@ -2389,6 +2399,23 @@ function showTab(tab){
     Interface.tabs.view = view;
     Interface.tabs.tab.classList.add("active");
     Interface.tabs.view.classList.add("active");
+
+    switch(target){
+    case "selectorView":
+        showSelectorTab();
+        break;
+    default:
+        hideSelectorTab();
+    }
+}
+
+function showSelectorTab(){
+    Interface.activeSelector = "selector";
+    Interface.turnOn();
+}
+
+function hideSelectorTab(){
+    Interface.turnOff();
 }
 
 //generate paragraphs html for the captured attribute on all of the elements and attach them to #rulePreview
@@ -2495,9 +2522,10 @@ function addRule(rule, selector){
 /*
 add .parentSchema to all elements matching parent selector and in range
 */
-function addParentSchema(selector, low,  high){
-    low = low || 0;
-    high = high || 0;
+function addParentSchema(parent){
+    var selector = parent.selector,
+        low = parent.low || 0,
+        high = parent.high || 0;
     var elements = Collect.all(selector),
         end = elements.length + high;
         // add high because it is negative
@@ -2511,26 +2539,28 @@ uses Collect.parent to limit selected elements to children of elements matching 
 if Collect.parent.high/low are defined, only use Collect.parent.selector elements within that range
 */
 function parentElements(selector){
-    var low = Collect.parent.low || 0,
-        high = Collect.parent.high || 0,
-        allElements = [];
-
-    // don't restrict to Collect.parent.selector when setting next selector
-    if ( low !== 0 || high !== 0 ) {
-        var elements = document.querySelectorAll(Collect.parent.selector),
-            // add high because it is negative
-            end = elements.length + high,
-            currElements;
-        for ( ; low<end; low++ ) {
-            currElements = elements[low].querySelectorAll(Collect.not(selector));
-            allElements = allElements.concat(Array.prototype.slice.call(currElements));
+    var allElements = [];
+    if ( Interface.activeSelector === "selector" && Collect.parent ) {
+        var low = Collect.parent.low || 0,
+            high = Collect.parent.high || 0;
+        if ( low !== 0 || high !== 0 ) {
+            // iterate over all child elements of elements matched by parent selector
+            var parents = document.querySelectorAll(Collect.parent.selector),
+                // add high because it is negative
+                end = parents.length + high,
+                currElements;
+            for ( ; low<end; low++ ) {
+                currElements = parents[low].querySelectorAll(Collect.not(selector));
+                allElements = allElements.concat(Array.prototype.slice.call(currElements));
+            }
+        } else {
+            allElements = Collect.all(selector, Collect.parent.selector);
         }
-        return allElements;
     } else {
-        var prefix = Collect.parent.selector ? Collect.parent.selector : "body";
-        allElements = Array.prototype.slice.call(Collect.all(selector, prefix));
+        // don't care about parent when choosing next selector or a new parent selector
+        allElements = Collect.all(selector, "body");
     }
-    return allElements;
+    return Array.prototype.slice.call(allElements);
 }
 
 function setupRuleForm(selector){
@@ -2556,6 +2586,9 @@ function showEditForm(){
 
 function baseCancel(){
     Interface.editing = {};
+    if ( Collect.parent ) {
+        addParentSchema(Collect.parent);
+    }
     resetInterface();
     showRuleForm();
 }
@@ -2923,7 +2956,7 @@ function loadSchemaObject(schema){
     HTML.perm.schema.select.querySelector("option[value=" + schema.name + "]").selected = true;
 
     var url = window.location.href;
-    HTML.perm.schema.indexToggle.checked = schema.urls[url] !== undefined;
+    HTML.perm.schema.index.checkbox.checked = (schema.urls[url] !== undefined );
 
     // clear out current page options
     HTML.perm.page.select.innerHTML = "";
@@ -2971,19 +3004,23 @@ function loadSchemaObject(schema){
 function loadPageObject(page){
     Collect.current.page = page;
     if ( page.name === "default" ) {
-        HTML.perm.schema.index.style.display = "inline-block";
-        HTML.perm.next.holder.style.display = "inline-block";
+        HTML.perm.schema.index.holder.style.display = "inline-block";
+        
+        HTML.selector.radio.next.disabled = false;
         // handle whether or not next has already been set
         if ( page.next ) {
             Collect.next = page.next;
-            HTML.perm.next.selector.textContent = page.next;
+            HTML.perm.page.next.holder.style.display = "inline-block";
+            HTML.perm.page.next.selector.textContent = page.next;
         } else {
             delete Collect.next;
-            HTML.perm.next.selector.textContent = "";
+            HTML.perm.page.next.holder.style.display = "none";
+            HTML.perm.page.next.selector.textContent = "";
         }
     } else {
-        HTML.perm.schema.index.style.display = "none";
-        HTML.perm.next.holder.style.display = "none";
+        HTML.perm.schema.index.holder.style.display = "none";
+        HTML.perm.page.next.holder.style.display = "none";
+        HTML.selector.radio.next.disabled = true;
     }
 
     options(Object.keys(page.sets), HTML.perm.set.select);
@@ -2998,7 +3035,7 @@ function loadSetObject(set){
     if ( set.parent ) {
         HTML.perm.parent.holder.style.display = "inline-block";
         HTML.perm.parent.selector.textContent = set.parent.selector;
-        addParentSchema(set.parent.selector, set.parent.low, set.parent.high);
+        addParentSchema(set.parent);
         HTML.perm.parent.range.textContent = createRangeString(set.parent.low, set.parent.high);
         Collect.parentCount = Collect.all(set.parent.selector).length;
     } else {
@@ -3011,6 +3048,5 @@ function loadSetObject(set){
 
     // don't call these in loadSchemaObject or loadPageObject because we want to know if there is a
     // parent selector
-    Interface.turnOn();
     Interface.update();
 }

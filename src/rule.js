@@ -102,8 +102,10 @@ Schema.prototype.deleteHTML = prototypeDeleteHTML;
 Schema.prototype.toggleURL = function(url){
     if ( this.urls[url] ) {
         delete this.urls[url];
+        return false;
     } else {
         this.urls[url] = true;
+        return true;
     }
 };
 
