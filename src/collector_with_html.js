@@ -38,9 +38,38 @@ var Collect = {
         prefix = prefix || "body";
         return prefix ? prefix + " " + selector : selector;
     },
+    /*
+    matches elements in a page based on selector
+    if Collect.parent is defined, limit selected elements to children of elements matching Collect.parent.selector
+    if Collect.parent.high/low are defined, only use Collect.parent.selector elements within that range
+    */
+    matchedElements: function(selector){
+        var allElements = [];
+        if ( Interface.activeSelector === "selector" && this.parent ) {
+            var low = this.parent.low || 0,
+                high = this.parent.high || 0;
+            if ( low !== 0 || high !== 0 ) {
+                // if either high or low is defined, 
+                // iterate over all child elements of elements matched by parent selector
+                var parents = document.querySelectorAll(this.parent.selector),
+                    // add high because it is negative
+                    end = parents.length + high,
+                    currElements;
+                for ( ; low<end; low++ ) {
+                    currElements = parents[low].querySelectorAll(this.not(selector));
+                    allElements = allElements.concat(Array.prototype.slice.call(currElements));
+                }
+            } else {
+                allElements = this.all(selector, this.parent.selector);
+            }
+        } else {
+            // don't care about parent when choosing next selector or a new parent selector
+            allElements = this.all(selector, "body");
+        }
+        return Array.prototype.slice.call(allElements);
+    },
     options: {},
-    allElements: [],
-    indexPage: false,
+    elements: [],
     current: {
         schema: undefined,
         page: undefined,
@@ -78,15 +107,15 @@ var Interface = {
     adds events listeners based on whether or not Collect.parent.elector is set
     if it is, only add them to children of that element, otherwise add them to all elements
     that don't have the noSelect class
-    store elements with eventlisteners in this.ele
+    store elements with eventlisteners in this.elements
     */
-    turnOn: function(){
+    turnSelectorsOn: function(){
         var curr;
-        this.turnOff();
-        Collect.allElements = parentElements("*");
+        this.turnSelectorsOff();
+        Collect.elements = Collect.matchedElements("*");
 
-        for ( var i=0, len=Collect.allElements.length; i<len; i++ ) {
-            curr = Collect.allElements[i];
+        for ( var i=0, len=Collect.elements.length; i<len; i++ ) {
+            curr = Collect.elements[i];
             curr.addEventListener('click', Family.create, false);
             curr.addEventListener('mouseenter', highlightElement, false);
             curr.addEventListener('mouseleave', unhighlightElement, false);
@@ -94,18 +123,18 @@ var Interface = {
         clearCollectClasses();
     },
     /*
-    removes event listeners from elements in this.ele
+    removes event listeners from elements in this.elements
     */
-    turnOff: function(){
+    turnSelectorsOff: function(){
         var curr;
-        for ( var i=0, len=Collect.allElements.length; i<len; i++ ) {
-            curr = Collect.allElements[i];
+        for ( var i=0, len=Collect.elements.length; i<len; i++ ) {
+            curr = Collect.elements[i];
             curr.removeEventListener('click', Family.create);
             curr.removeEventListener('mouseenter', highlightElement);
             curr.removeEventListener('mouseleave', unhighlightElement);
             
         }
-        Collect.allElements = [];
+        Collect.elements = [];
     },
     events: function(){
         // tabs
@@ -132,7 +161,6 @@ var HTML = {
         family: document.getElementById("selectorHolder"),
         selector: document.getElementById("currentSelector"),
         count: document.getElementById("currentCount"),
-        save: document.getElementById("saveSelector"),
         parent: {
             holder: document.getElementById("parentRange"),
             low: document.getElementById("parentLow"),
@@ -186,16 +214,13 @@ var HTML = {
             holder: document.getElementById("currentParent"),
             selector: document.getElementById("parentSelectorView"),
             range: document.getElementById("parentRangeView")
-        }
-    },
-    info: {
+        },
         alert: document.getElementById("collectAlert"),
     },
     interface: document.querySelector(".collectjs"),
     // elements in the preview view
     preview: {
-        contents: document.getElementById("previewContents"),
-        clear: document.getElementById("previewClear")
+        contents: document.getElementById("previewContents")
     },
     tabs: {
         selector: document.getElementById("selectorTab"),
@@ -224,7 +249,7 @@ var Family = {
         showTab(HTML.tabs.selector);
     },
     edit: function(selector){
-        var eles = parentElements(selector);
+        var eles = Collect.matchedElements(selector);
         if ( !eles.length ) {
             return;
         }
@@ -277,7 +302,7 @@ var Family = {
         if ( selector === "") {
             return [];
         }
-        return parentElements(selector);
+        return Collect.matchedElements(selector);
     },
     /*
     sets Collect.matchedElements to elements matching the current selector
@@ -381,7 +406,7 @@ function tabEvents(){
     idEvent("closeCollect", "click", function removeInterface(event){
         event.stopPropagation();
         event.preventDefault();
-        Interface.turnOff();
+        Interface.turnSelectorsOff();
         clearClass('queryCheck');
         clearClass('collectHighlight');
         clearClass('parentSchema');
@@ -668,9 +693,7 @@ function saveParent(selector){
 
 
     Collect.parent = parent;
-    HTML.perm.parent.holder.style.display = "inline-block";
-    HTML.perm.parent.selector.textContent = selector;
-    HTML.perm.parent.range.textContent = createRangeString(low, high);
+    showParent();
 
     addParentSchema(parent);
 
@@ -725,7 +748,7 @@ function updateRadioEvent(event){
         break;
     }
     // reset elements
-    Interface.turnOn();
+    Interface.turnSelectorsOn();
 }
 
 function removeSelectorEvent(event){
@@ -829,14 +852,10 @@ function deleteParentEvent(event){
     event.preventDefault();
     delete Collect.parentCount;
     Collect.parent = {};
-    HTML.perm.parent.holder.style.display = "none";
-    HTML.perm.parent.selector.textContent = "";
-    HTML.perm.parent.range.textContent = "";
+    hideParent();
     Collect.current.set.removeParent();
     saveSchema();
     clearClass("parentSchema");
-    showRuleForm();
-    Interface.turnOn();
 }
 
 function deleteNextEvent(event){
@@ -846,7 +865,6 @@ function deleteNextEvent(event){
     HTML.perm.page.next.selector.textContent = "";
     Collect.current.page.removeNext();
     saveSchema();
-    Interface.turnOn();
 }
 
 /*
@@ -867,7 +885,7 @@ function toggleURLEvent(event){
 function selectorViewRule(event){
     clearClass("queryCheck");
     clearClass("collectHighlight");
-    var elements = parentElements(this.parentSelector.selector);
+    var elements = Collect.matchedElements(this.parentSelector.selector);
     addClass("savedPreview", elements);
 }
 
@@ -902,7 +920,7 @@ function editSavedRule(event){
 /*
 function previewSavedRule(event){
     //HTML.preview.contents;
-    var elements = parentElements(this.parentSelector.selector);
+    var elements = Collect.matchedElements(this.parentSelector.selector);
     generatePreviewElements(this.capture, elements);
     showTab(HTML.tabs.preview);
 }
@@ -940,20 +958,12 @@ function showTab(tab){
 
     switch(target){
     case "selectorView":
-        showSelectorTab();
+        Interface.activeSelector = "selector";
+        Interface.turnSelectorsOn();
         break;
     default:
-        hideSelectorTab();
+        Interface.turnSelectorsOff();
     }
-}
-
-function showSelectorTab(){
-    Interface.activeSelector = "selector";
-    Interface.turnOn();
-}
-
-function hideSelectorTab(){
-    Interface.turnOff();
 }
 
 //generate paragraphs html for the captured attribute on all of the elements and attach them to #rulePreview
@@ -994,9 +1004,9 @@ add the message to #ruleAlert
 function alertMessage(msg){
     var p = noSelectElement("p");
     p.textContent = msg;
-    HTML.info.alert.appendChild(p);
+    HTML.perm.alert.appendChild(p);
     setTimeout(function(){
-        HTML.info.alert.removeChild(p);
+        HTML.perm.alert.removeChild(p);
     }, 2000);
 }
 
@@ -1048,13 +1058,6 @@ function addRule(rule, selector){
     selector.addRule(ruleObject,
         [selectorViewRule, unselectorViewRule, editSavedRule, deleteRuleEvent],
         HTML.perm.page.select);
-
-    // if rule follow=true, add an option for it
-    /*
-    if ( rule.follow ) {
-        Collect.current.group.pages[rule.name].addOption(HTML.perm.page.select);
-    }
-    */
 }
 
 /*
@@ -1072,38 +1075,24 @@ function addParentSchema(parent){
     }
 }
 
-/*
-uses Collect.parent to limit selected elements to children of elements matching Collect.parent.selector
-if Collect.parent.high/low are defined, only use Collect.parent.selector elements within that range
-*/
-function parentElements(selector){
-    var allElements = [];
-    if ( Interface.activeSelector === "selector" && Collect.parent ) {
-        var low = Collect.parent.low || 0,
-            high = Collect.parent.high || 0;
-        if ( low !== 0 || high !== 0 ) {
-            // iterate over all child elements of elements matched by parent selector
-            var parents = document.querySelectorAll(Collect.parent.selector),
-                // add high because it is negative
-                end = parents.length + high,
-                currElements;
-            for ( ; low<end; low++ ) {
-                currElements = parents[low].querySelectorAll(Collect.not(selector));
-                allElements = allElements.concat(Array.prototype.slice.call(currElements));
-            }
-        } else {
-            allElements = Collect.all(selector, Collect.parent.selector);
-        }
-    } else {
-        // don't care about parent when choosing next selector or a new parent selector
-        allElements = Collect.all(selector, "body");
+function showParent(){
+    if ( !Collect.parent ) {
+        return;
     }
-    return Array.prototype.slice.call(allElements);
+    HTML.perm.parent.holder.style.display = "inline-block";
+    HTML.perm.parent.selector.textContent = Collect.parent.selector;
+    HTML.perm.parent.range.textContent = createRangeString(Collect.parent.low, Collect.parent.high);
+}
+
+function hideParent(){
+    HTML.perm.parent.holder.style.display = "none";
+    HTML.perm.parent.selector.textContent = "";
+    HTML.perm.parent.range.textContent = "";
 }
 
 function setupRuleForm(selector){
     HTML.rule.selector.textContent = selector;
-    var elements = parentElements(selector);
+    var elements = Collect.matchedElements(selector);
     Interface.ruleCycle.setElements(elements);
     addClass("queryCheck", elements);
     // set global for allLinks (fix?)
@@ -1571,15 +1560,11 @@ function loadSetObject(set){
     Collect.current.set = set;
 
     if ( set.parent ) {
-        HTML.perm.parent.holder.style.display = "inline-block";
-        HTML.perm.parent.selector.textContent = set.parent.selector;
+        showParent();
         addParentSchema(set.parent);
-        HTML.perm.parent.range.textContent = createRangeString(set.parent.low, set.parent.high);
         Collect.parentCount = Collect.all(set.parent.selector).length;
     } else {
-        HTML.perm.parent.holder.style.display = "none";
-        HTML.perm.parent.selector.textContent = "";
-        HTML.perm.parent.range.textContent = "";
+        hideParent();
         clearClass("parentSchema");
         delete Collect.parentCount;
     }
