@@ -654,6 +654,7 @@ function saveSelector(selector){
     // if editing just update the selector, otherwise add it to the current set
     if ( Interface.editing.selector ) {
         Interface.editing.selector.updateSelector(selector);
+        showTab(HTML.tabs.schema);
     } else {
         Collect.current.set.addSelector(sel, [newRuleEvent, editSelectorEvent, removeSelectorEvent]);
     }
@@ -812,12 +813,9 @@ function saveEditEvent(event){
         rule.follow = true;
         select = HTML.perm.page.select;
     }
-    var oldName = Interface.editing.rule.name,
-        set = Interface.editing.rule.selector.set;
 
     // include select for follow page
     Interface.editing.rule.update(rule, select);
-
     saveSchema();
 
     delete Interface.editing.rule;

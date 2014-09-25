@@ -133,7 +133,7 @@ describe("Schema", function(){
             var ele = g.html();
             expect(ele.tagName).toEqual("DIV");
             expect(g.htmlElements.pages.tagName).toEqual("UL");
-            expect(g.htmlElements.nametag.textContent).toEqual("Schema: Colts");
+            expect(g.htmlElements.nametag.textContent).toEqual("Colts schema");
         });
     });
 
@@ -393,7 +393,7 @@ describe("Page", function(){
                 ele = p.html();
             expect(ele.tagName).toEqual("LI");
             expect(p.htmlElements.sets.tagName).toEqual("UL");
-            expect(p.htmlElements.nametag.textContent).toEqual("Page: Thunder");
+            expect(p.htmlElements.nametag.textContent).toEqual("Thunder page");
         });
     });
 
@@ -469,7 +469,7 @@ describe("SelectorSet", function(){
                 ele = s1.html();
             expect(ele.tagName).toEqual("LI");
             expect(s1.htmlElements.selectors.tagName).toEqual("UL");
-            expect(s1.htmlElements.nametag.textContent).toEqual("Selector Set: Cardinals");
+            expect(s1.htmlElements.nametag.textContent).toEqual("Cardinals selector set");
         });
     });
 

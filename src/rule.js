@@ -83,7 +83,7 @@ Schema.prototype.html = function(){
         pages = noSelectElement("ul");
 
     holder.classList.add("schema");
-    nametag.textContent = "Schema: " + this.name;
+    nametag.textContent = this.name + " schema";
     appendChildren(holder, [nametag, pages]);
 
     for ( var key in this.pages ) {
@@ -247,7 +247,7 @@ Page.prototype.html = function(){
         sets = noSelectElement("ul");
 
     holder.classList.add("page");
-    nametag.textContent = "Page: " + this.name;
+    nametag.textContent = this.name + " page";
     appendChildren(holder, [nametag, sets]);
 
     for ( var key in this.sets ) {
@@ -342,6 +342,14 @@ Page.prototype.updateName = function(name){
         this.parentSchema.pages[name] = this;
         delete this.parentSchema.pages[oldName];
     }
+
+    if ( this.htmlElements.option ) {
+        this.htmlElements.option.setAttribute("value", this.name);
+        this.textContent = this.name;
+    }
+    if ( this.htmlElements.nametag ) {
+        this.htmlElements.nametag.textContent = this.name + " page";
+    }
 };
 
 /********************
@@ -415,7 +423,7 @@ SelectorSet.prototype.html = function(){
         ul = noSelectElement("ul");
         
     holder.classList.add("set");
-    nametag.textContent = "Selector Set: " + this.name;
+    nametag.textContent = this.name + " selector set";
     appendChildren(holder, [nametag, ul]);
 
     this.htmlElements.holder = holder;
@@ -667,7 +675,6 @@ Rule.prototype.update = function(object, select){
     var oldName = this.name,
         newName = object.name;
     if ( oldName !== newName ) {
-        this.name = newName;
         // update nametag if html has been generated
         if ( this.htmlElements.nametag ) {
             this.htmlElements.nametag.textContent = newName;
@@ -679,7 +686,6 @@ Rule.prototype.update = function(object, select){
     }
     var oldCapture = this.capture,
         newCapture = object.capture;
-    this.capture = object.capture;
     if ( oldCapture !== newCapture && this.htmlElements.capturetag ) {
         this.htmlElements.capturetag.textContent = "(" + newCapture + ")";
     }
@@ -689,11 +695,12 @@ Rule.prototype.update = function(object, select){
     if ( this.hasSchema() ) {
         var schema = this.getSchema();
         if ( oldFollow && !newFollow ) {
-            schema.removePage(this.name);
+            // remove based on oldName in case that was also changed
+            schema.removePage(oldName);
         } else if ( newFollow && !oldFollow ) {
             // create the follow page
-            var page = new Page(this.name);
-            schema.addpage(page);
+            var page = new Page(newName);
+            schema.addPage(page);
             if ( select ) {
                 page.addOption(select);
             }
@@ -702,6 +709,8 @@ Rule.prototype.update = function(object, select){
             schema.pages[oldName].updateName(newName);
         }
     }
+    this.name = newName;
+    this.capture = newCapture;
     this.follow = newFollow;
 };
 
