@@ -8,6 +8,6 @@ var chrome = {
     }
 };
 
-var Interface = {
+var UI = {
 
 };

@@ -347,7 +347,7 @@ Page.prototype.updateName = function(name){
 
     if ( this.htmlElements.option ) {
         this.htmlElements.option.setAttribute("value", this.name);
-        this.textContent = this.name;
+        this.htmlElements.option.textContent = this.name;
     }
     if ( this.htmlElements.nametag ) {
         this.htmlElements.nametag.textContent = this.name + " page";

@@ -159,15 +159,7 @@ var Cycle = (function(){
     if #ruleAttr is set, add .selected class to the matching #ruleHTML .capture span
     */
     function markCapture(){
-        var capture = "";
-        switch(Interface.activeForm){
-        case "rule":
-            capture = HTML.rule.rule.capture.textContent;
-            break;
-        case "edit":
-            capture = HTML.rule.edit.capture.textContent;
-            break;
-        }
+        var capture = HTML.rule.capture.textContent;
         if ( capture !== "") {
             var selector = ".capture[data-capture='" + capture + "']";
             document.querySelector(selector).classList.add("selected");

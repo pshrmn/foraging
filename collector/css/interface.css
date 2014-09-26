@@ -90,6 +90,29 @@ body {
         padding: 0 15px; }
       .collectjs .views .view .form > p {
         font-size: 1.25em; }
+      .collectjs .views .view .form input.error {
+        border-color: #c91900;
+        border-style: solid; }
+      .collectjs .views .view .form span.error {
+        border-bottom: 1px solid #c91900; }
+      .collectjs .views .view .form input[type=text] {
+        width: 150px;
+        border-width: 0 0 1px; }
+      .collectjs .views .view .form .rule {
+        height: 20px;
+        font-size: 1em;
+        margin-bottom: 5px;
+        border: 0;
+        overflow: visible; }
+        .collectjs .views .view .form .rule span {
+          min-width: 50px; }
+        .collectjs .views .view .form .rule label {
+          width: 75px; }
+        .collectjs .views .view .form .rule label, .collectjs .views .view .form .rule input {
+          margin: 0;
+          display: inline-block; }
+      .collectjs .views .view .form .rule.follow {
+        display: none; }
       .collectjs .views .view .form.column {
         width: 25%;
         min-width: 300px;
@@ -237,34 +260,6 @@ body {
     padding: 2px 15px; }
   #previewContents p:nth-of-type(even) {
     background: #efefef; }
-
-/* rulesView */
-#ruleForm input.error, #editForm input.error {
-  border-color: #c91900;
-  border-style: solid; }
-#ruleForm span.error, #editForm span.error {
-  border-bottom: 1px solid #c91900; }
-#ruleForm input[type=text], #editForm input[type=text] {
-  width: 150px;
-  border-width: 0 0 1px; }
-#ruleForm .rule, #editForm .rule {
-  height: 20px;
-  font-size: 1em;
-  margin-bottom: 5px;
-  border: 0;
-  overflow: visible; }
-  #ruleForm .rule span, #editForm .rule span {
-    min-width: 50px; }
-  #ruleForm .rule label, #editForm .rule label {
-    width: 75px; }
-  #ruleForm .rule label, #editForm .rule label, #ruleForm .rule input, #editForm .rule input {
-    margin: 0;
-    display: inline-block; }
-#ruleForm .rule.follow, #editForm .rule.follow {
-  display: none; }
-
-#editForm {
-  display: none; }
 
 /* Selector */
 #selectorHolder {
