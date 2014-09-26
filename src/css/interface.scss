@@ -239,12 +239,12 @@ body{
             background: $gold;
         }
 
-        .deltog, .editRule, .previewRule{
+        .deltog, .editRule{
             cursor: pointer;
             padding: 0 3px;
         }
 
-        .deltog:hover, .editRule:hover, .previewRule:hover{
+        .deltog:hover, .editRule:hover{
             color: $red;
         }
     }
@@ -358,6 +358,11 @@ body{
 #previewView{
     .name{
         margin-right: 15px;
+    }
+
+    .previewSet{
+        margin: 10px 5px;
+        border: 1px solid $black;
     }
 }
 

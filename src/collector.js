@@ -93,6 +93,9 @@ var Interface = {
         tab: document.querySelector(".tab.active"),
         view: document.querySelector(".view.active")
     },
+    preview: {
+        dirty: true
+    },
     setup: function(){        
         loadOptions();
         setupHostname();
@@ -142,7 +145,6 @@ var Interface = {
         selectorViewEvents();
         ruleViewEvents();
         optionsViewEvents();
-        previewViewEvents();
         permanentBarEvents();
     }
 };
@@ -211,7 +213,6 @@ var HTML = {
         alert: document.getElementById("collectAlert"),
     },
     interface: document.querySelector(".collectjs"),
-    // elements in the preview view
     preview: {
         contents: document.getElementById("previewContents")
     },
@@ -344,7 +345,6 @@ function resetInterface(){
     clearSelectorClasses();
     resetSelectorView();
     resetRulesView();
-    resetPreviewView();
     showRuleForm();
 }
 
@@ -388,10 +388,6 @@ function resetRulesView(){
     HTML.rule.edit.follow.checked = false;
     HTML.rule.edit.follow.disabled = true;
     HTML.rule.edit.followHolder.style.display = "none";
-}
-
-function resetPreviewView(){
-    HTML.preview.contents.innerHTML = "";
 }
 
 /******************
@@ -458,13 +454,6 @@ function optionsViewEvents(){
             Collect.options.ignore = document.getElementById("ignore").checked;
         }
         setOptions(Collect.options);
-    });
-}
-
-function previewViewEvents(){
-    idEvent("previewClear", "click", function(event){
-        event.preventDefault();
-        resetPreviewView();
     });
 }
 
@@ -911,15 +900,6 @@ function editSavedRule(event){
     showTab(HTML.tabs.rule);
 }
 
-/*
-function previewSavedRule(event){
-    //HTML.preview.contents;
-    var elements = Collect.matchedElements(this.parentSelector.selector);
-    generatePreviewElements(this.capture, elements);
-    showTab(HTML.tabs.preview);
-}
-*/
-
 function deleteRuleEvent(event){
     clearClass("savedPreview");
     // also need to remove rule from set
@@ -955,6 +935,10 @@ function showTab(tab){
         Interface.activeSelector = "selector";
         Interface.turnSelectorsOn();
         break;
+    case "previewView":
+        generatePreview();
+        Interface.turnSelectorsOff();
+        break;
     default:
         Interface.turnSelectorsOff();
     }
@@ -962,36 +946,12 @@ function showTab(tab){
 }
 
 
-//generate paragraphs html for the captured attribute on all of the elements and attach them to #rulePreview
-//update
-function generatePreviewElements(capture, elements) {
-    if ( capture === "" ) {
-        return;
+function generatePreview(){
+    // only regen preview when something in the schema has changed
+    if (  Interface.preview.dirty ) {
+        HTML.preview.contents.innerHTML = Collect.current.page.preview();
     }
-    var fn = captureFunction(capture),
-        previewHTML = "";
-    for ( var i=0, len=elements.length; i<len; i++ ) {
-        previewHTML += "<p class=\"noSelect\">" + fn(elements[i]) + "</p>";
-    }
-    if ( previewHTML === "" ) {
-        previewHTML = "No selector/attribute to capture selected";
-    }
-    HTML.preview.contents.innerHTML = previewHTML;
-}
-
-
-function captureFunction(capture){
-    if (capture==="text") { 
-        return function(ele){
-            return ele.textContent;
-        };
-    } else if (capture.indexOf("attr-")===0) {
-        // return substring after first hyphen so that it works with data- attributes
-        var attribute = capture.slice(capture.indexOf("-")+1);
-        return function(ele){
-            return ele.getAttribute(attribute);
-        };
-    }
+    Interface.preview.dirty = false;
 }
 
 /*
@@ -1261,6 +1221,7 @@ function saveSchema(){
             schema = Collect.current.schema.object();
         storage.sites[host].schemas[schema.name] = schema;
         chrome.storage.local.set({"sites": storage.sites});
+        Interface.preview.dirty = true;
     });
 }
 
@@ -1519,6 +1480,13 @@ function loadSchemaObject(schema){
 
 function loadPageObject(page){
     Collect.current.page = page;
+    // clear out preview when loading a new page
+    // and auto-generate if currently on preview tab
+    Interface.preview.dirty = true;
+    HTML.preview.contents.innerHTML = "";
+    if ( Interface.tabs.view.id === "previewView") {
+        generatePreview();
+    }
     if ( page.name === "default" ) {
         HTML.perm.schema.index.holder.style.display = "inline-block";
         

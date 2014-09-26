@@ -870,6 +870,14 @@ Page.prototype.updateName = function(name){
     }
 };
 
+Page.prototype.preview = function(){
+    var value = "";
+    for ( var key in this.sets ) {
+        value += this.sets[key].preview();
+    }
+    return value;
+};
+
 /********************
         SelectorSet
 *********************
@@ -1016,6 +1024,30 @@ SelectorSet.prototype.followedRules = function(){
     return following;
 };
 
+SelectorSet.prototype.preview = function(){
+    var value = "",
+        key;
+    if ( this.parent ) {
+        var parentElements = document.querySelectorAll(this.parent.selector),
+            len = parentElements.length,
+            low = this.parent.low || 0,
+            high = this.parent.high || 0,
+            elements = Array.prototype.slice.call(parentElements).slice(low, len + high);
+        for ( var i=0, eLen = elements.length; i<eLen; i++ ) {
+            value += "<div class=\"previewSet noSelect\">";
+            for ( key in this.selectors ) {
+                value += this.selectors[key].preview(elements[i]);
+            }
+            value +=  "</div>";
+        }
+    } else {
+        for ( key in this.selectors ) {
+            value += this.selectors[key].preview(document.body);
+        }
+    }
+    return value;
+};
+
 /********************
         SELECTOR
 ********************/
@@ -1128,6 +1160,15 @@ Selector.prototype.remove = function(){
     if ( this.parentSet ) {
         delete this.parentSet.selectors[this.selector];
     }
+};
+
+Selector.prototype.preview = function(dom){
+    var value = "",
+        element = dom.querySelector(this.selector);
+    for ( var key in this.rules ) {
+        value += this.rules[key].preview(element);
+    }
+    return value;
 };
 
 /********************
@@ -1270,6 +1311,18 @@ Rule.prototype.getSchema = function(){
     if ( this.hasSchema() ) {
         return this.parentSelector.parentSet.parentPage.parentSchema;
     }
+};
+
+Rule.prototype.preview = function(element){
+    
+    var cap;
+    if ( this.capture.indexOf("attr-") !== -1 ) {
+        var attr = this.capture.slice(5);
+        cap = element.getAttribute(attr);
+    } else {
+        cap = element.textContent;
+    }
+    return "<p class=\"noSelect\">" + this.name + ": " + cap + "</p>";
 };
 
 // shared delete function
@@ -1470,7 +1523,7 @@ var marginBottom;
 (function addInterface(){
     var div = noSelectElement("div");
     div.classList.add("collectjs");
-    div.innerHTML = "<div class=\"tabHolder\"><div class=\"tabs\"><div class=\"tab active\" id=\"schemasTab\" data-for=\"schemasView\">Schema</div><div class=\"tab\" id=\"selectorTab\" data-for=\"selectorView\">Selector</div><div class=\"tab\" id=\"ruleTab\" data-for=\"ruleView\">Rule</div><div class=\"tab\" id=\"previewTab\" data-for=\"previewView\">Preview</div><div class=\"tab\" id=\"optionsTab\" data-for=\"optionsView\">Options</div><div class=\"tab\" id=\"closeCollect\">&times;</div></div></div><div class=\"permanent\"><div class=\"currentInfo\"><div>Schema: <select id=\"schemaSelect\"></select><button id=\"createSchema\" title=\"create a new schema\">+</button><button id=\"deleteSchema\" title=\"delete current schema\">&times;</button><div id=\"indexMarker\" class=\"info\">Initial URL<input type=\"checkbox\" id=\"indexToggle\" /></div></div><div>Page: <select id=\"pageSelect\"></select><button id=\"deletePage\" title=\"delete current page\">&times;</button><div id=\"nextHolder\" class=\"info\">Next:<span id=\"nextSelectorView\"></span><button id=\"removeNext\">&times;</button></div></div><div>Selector Set: <select id=\"selectorSetSelect\"></select><button id=\"createSelectorSet\" title=\"create a new selector set\">+</button><button id=\"deleteSelectorSet\" title=\"delete current selector set\">&times;</button><div id=\"currentParent\" class=\"info\">Parent:<span id=\"parentSelectorView\"></span><span id=\"parentRangeView\"></span><button id=\"removeParent\">&times;</button></div></div><button id=\"uploadRules\">Upload Schema</button></div><div id=\"collectAlert\"></div></div><div class=\"views\"><div class=\"view\" id=\"emptyView\"></div><div class=\"view active\" id=\"schemasView\"><div id=\"schemaHolder\" class=\"rules\"></div></div><div class=\"view\" id=\"selectorView\"><div class=\"column form\"><!--displays what the current selector is--><p>Selector: <span id=\"currentSelector\"></span></p><p>Count: <span id=\"currentCount\"></span></p><div><h3>Type:</h3><p><label for=\"selectorRadio\">Selector</label><input type=\"radio\" id=\"selectorRadio\" name=\"selector\" value=\"selector\" checked/></p><p><label for=\"parentRadio\">Parent</label><input type=\"radio\" id=\"parentRadio\" name=\"selector\" value=\"parent\" /></p><p><label for=\"nextRadio\">Next</label><input type=\"radio\" id=\"nextRadio\" name=\"selector\" value=\"next\" /></p></div><div id=\"parentRange\"><label>Low: <input id=\"parentLow\" name=\"parentLow\" type=\"text\" /></label><label for=\"parentHigh\">High: <input id=\"parentHigh\" name=\"parentHigh\" type=\"text\" /></label></div><p><button id=\"saveSelector\">Save</button><button id=\"clearSelector\">Clear</button></p></div><div class=\"column\"><!--holds the interactive element for choosing a selector--><div id=\"selectorHolder\"></div><div id=\"selectorCycleHolder\"></div></div></div><div class=\"view\" id=\"ruleView\"><div id=\"ruleItems\" class=\"items\"><h3>Selector: <span id=\"ruleSelector\"></span></h3><form id=\"ruleForm\" class=\"column form\"><div class=\"rule\"><label for=\"ruleName\" title=\"the name of a rule\">Name:</label><input id=\"ruleName\" name=\"ruleName\" type=\"text\" /></div><div class=\"rule\"><label title=\"the attribute of an element to capture\">Capture:</label><span id=\"ruleAttr\"></span></div><div class=\"rule follow\"><label for=\"ruleFollow\" title=\"create a new page from the element's captured url (capture must be attr-href)\">Follow:</label><input id=\"ruleFollow\" name=\"ruleFollow\" type=\"checkbox\" disabled=\"true\" title=\"Can only follow rules that get href attribute from links\" /></div><div><button id=\"saveRule\">Save Rule</button><button id=\"cancelRule\">Cancel</button></div></form><form id=\"editForm\" class=\"column form\"><div class=\"rule\"><label for=\"ruleName\" title=\"the name of a rule\">Name:</label><input id=\"editName\" name=\"editName\" type=\"text\" /></div><div class=\"rule\"><label title=\"the attribute of an element to capture\">Capture:</label><span id=\"editAttr\"></span></div><div class=\"rule editFollow\"><label for=\"editFollow\" title=\"create a new page from the element's captured url (capture must be attr-href)\">Follow:</label><input id=\"editFollow\" name=\"editFollow\" type=\"checkbox\" disabled=\"true\" title=\"Can only follow rules that get href attribute from links\" /></div><div><button id=\"saveEdit\">Save Edited Rule</button><button id=\"cancelEdit\">Cancel</button></div></form><div class=\"modifiers column\"><div id=\"ruleCycleHolder\"></div></div></div></div><div class=\"view\" id=\"previewView\"><p>Name: <span id=\"previewName\" class=\"name\"></span>Selector: <span id=\"previewSelector\" class=\"name\"></span>Capture: <span id=\"previewCapture\" class=\"name\"></span><button id=\"previewClear\">Clear</button></p><div id=\"previewContents\"></div></div><div class=\"view\" id=\"optionsView\"><p><label for=\"ignore\">Ignore helper elements (eg tbody)</label><input type=\"checkbox\" id=\"ignore\" /></p></div></div>";
+    div.innerHTML = "<div class=\"tabHolder\"><div class=\"tabs\"><div class=\"tab active\" id=\"schemasTab\" data-for=\"schemasView\">Schema</div><div class=\"tab\" id=\"selectorTab\" data-for=\"selectorView\">Selector</div><div class=\"tab\" id=\"ruleTab\" data-for=\"ruleView\">Rule</div><div class=\"tab\" id=\"previewTab\" data-for=\"previewView\">Preview</div><div class=\"tab\" id=\"optionsTab\" data-for=\"optionsView\">Options</div><div class=\"tab\" id=\"closeCollect\">&times;</div></div></div><div class=\"permanent\"><div class=\"currentInfo\"><div>Schema: <select id=\"schemaSelect\"></select><button id=\"createSchema\" title=\"create a new schema\">+</button><button id=\"deleteSchema\" title=\"delete current schema\">&times;</button><div id=\"indexMarker\" class=\"info\">Initial URL<input type=\"checkbox\" id=\"indexToggle\" /></div></div><div>Page: <select id=\"pageSelect\"></select><button id=\"deletePage\" title=\"delete current page\">&times;</button><div id=\"nextHolder\" class=\"info\">Next:<span id=\"nextSelectorView\"></span><button id=\"removeNext\">&times;</button></div></div><div>Selector Set: <select id=\"selectorSetSelect\"></select><button id=\"createSelectorSet\" title=\"create a new selector set\">+</button><button id=\"deleteSelectorSet\" title=\"delete current selector set\">&times;</button><div id=\"currentParent\" class=\"info\">Parent:<span id=\"parentSelectorView\"></span><span id=\"parentRangeView\"></span><button id=\"removeParent\">&times;</button></div></div><button id=\"uploadRules\">Upload Schema</button></div><div id=\"collectAlert\"></div></div><div class=\"views\"><div class=\"view\" id=\"emptyView\"></div><div class=\"view active\" id=\"schemasView\"><div id=\"schemaHolder\" class=\"rules\"></div></div><div class=\"view\" id=\"selectorView\"><div class=\"column form\"><!--displays what the current selector is--><p>Selector: <span id=\"currentSelector\"></span></p><p>Count: <span id=\"currentCount\"></span></p><div><h3>Type:</h3><p><label for=\"selectorRadio\">Selector</label><input type=\"radio\" id=\"selectorRadio\" name=\"selector\" value=\"selector\" checked/></p><p><label for=\"parentRadio\">Parent</label><input type=\"radio\" id=\"parentRadio\" name=\"selector\" value=\"parent\" /></p><p><label for=\"nextRadio\">Next</label><input type=\"radio\" id=\"nextRadio\" name=\"selector\" value=\"next\" /></p></div><div id=\"parentRange\"><label>Low: <input id=\"parentLow\" name=\"parentLow\" type=\"text\" /></label><label for=\"parentHigh\">High: <input id=\"parentHigh\" name=\"parentHigh\" type=\"text\" /></label></div><p><button id=\"saveSelector\">Save</button><button id=\"clearSelector\">Clear</button></p></div><div class=\"column\"><!--holds the interactive element for choosing a selector--><div id=\"selectorHolder\"></div><div id=\"selectorCycleHolder\"></div></div></div><div class=\"view\" id=\"ruleView\"><div id=\"ruleItems\" class=\"items\"><h3>Selector: <span id=\"ruleSelector\"></span></h3><form id=\"ruleForm\" class=\"column form\"><div class=\"rule\"><label for=\"ruleName\" title=\"the name of a rule\">Name:</label><input id=\"ruleName\" name=\"ruleName\" type=\"text\" /></div><div class=\"rule\"><label title=\"the attribute of an element to capture\">Capture:</label><span id=\"ruleAttr\"></span></div><div class=\"rule follow\"><label for=\"ruleFollow\" title=\"create a new page from the element's captured url (capture must be attr-href)\">Follow:</label><input id=\"ruleFollow\" name=\"ruleFollow\" type=\"checkbox\" disabled=\"true\" title=\"Can only follow rules that get href attribute from links\" /></div><div><button id=\"saveRule\">Save Rule</button><button id=\"cancelRule\">Cancel</button></div></form><form id=\"editForm\" class=\"column form\"><div class=\"rule\"><label for=\"ruleName\" title=\"the name of a rule\">Name:</label><input id=\"editName\" name=\"editName\" type=\"text\" /></div><div class=\"rule\"><label title=\"the attribute of an element to capture\">Capture:</label><span id=\"editAttr\"></span></div><div class=\"rule editFollow\"><label for=\"editFollow\" title=\"create a new page from the element's captured url (capture must be attr-href)\">Follow:</label><input id=\"editFollow\" name=\"editFollow\" type=\"checkbox\" disabled=\"true\" title=\"Can only follow rules that get href attribute from links\" /></div><div><button id=\"saveEdit\">Save Edited Rule</button><button id=\"cancelEdit\">Cancel</button></div></form><div class=\"modifiers column\"><div id=\"ruleCycleHolder\"></div></div></div></div><div class=\"view\" id=\"previewView\"><div id=\"previewContents\"></div></div><div class=\"view\" id=\"optionsView\"><p><label for=\"ignore\">Ignore helper elements (eg tbody)</label><input type=\"checkbox\" id=\"ignore\" /></p></div></div>";
     document.body.appendChild(div);
     addNoSelect(div.querySelectorAll("*"));
 
@@ -1558,6 +1611,9 @@ var Interface = {
         tab: document.querySelector(".tab.active"),
         view: document.querySelector(".view.active")
     },
+    preview: {
+        dirty: true
+    },
     setup: function(){        
         loadOptions();
         setupHostname();
@@ -1607,7 +1663,6 @@ var Interface = {
         selectorViewEvents();
         ruleViewEvents();
         optionsViewEvents();
-        previewViewEvents();
         permanentBarEvents();
     }
 };
@@ -1676,7 +1731,6 @@ var HTML = {
         alert: document.getElementById("collectAlert"),
     },
     interface: document.querySelector(".collectjs"),
-    // elements in the preview view
     preview: {
         contents: document.getElementById("previewContents")
     },
@@ -1809,7 +1863,6 @@ function resetInterface(){
     clearSelectorClasses();
     resetSelectorView();
     resetRulesView();
-    resetPreviewView();
     showRuleForm();
 }
 
@@ -1853,10 +1906,6 @@ function resetRulesView(){
     HTML.rule.edit.follow.checked = false;
     HTML.rule.edit.follow.disabled = true;
     HTML.rule.edit.followHolder.style.display = "none";
-}
-
-function resetPreviewView(){
-    HTML.preview.contents.innerHTML = "";
 }
 
 /******************
@@ -1923,13 +1972,6 @@ function optionsViewEvents(){
             Collect.options.ignore = document.getElementById("ignore").checked;
         }
         setOptions(Collect.options);
-    });
-}
-
-function previewViewEvents(){
-    idEvent("previewClear", "click", function(event){
-        event.preventDefault();
-        resetPreviewView();
     });
 }
 
@@ -2376,15 +2418,6 @@ function editSavedRule(event){
     showTab(HTML.tabs.rule);
 }
 
-/*
-function previewSavedRule(event){
-    //HTML.preview.contents;
-    var elements = Collect.matchedElements(this.parentSelector.selector);
-    generatePreviewElements(this.capture, elements);
-    showTab(HTML.tabs.preview);
-}
-*/
-
 function deleteRuleEvent(event){
     clearClass("savedPreview");
     // also need to remove rule from set
@@ -2420,6 +2453,10 @@ function showTab(tab){
         Interface.activeSelector = "selector";
         Interface.turnSelectorsOn();
         break;
+    case "previewView":
+        generatePreview();
+        Interface.turnSelectorsOff();
+        break;
     default:
         Interface.turnSelectorsOff();
     }
@@ -2427,36 +2464,12 @@ function showTab(tab){
 }
 
 
-//generate paragraphs html for the captured attribute on all of the elements and attach them to #rulePreview
-//update
-function generatePreviewElements(capture, elements) {
-    if ( capture === "" ) {
-        return;
+function generatePreview(){
+    // only regen preview when something in the schema has changed
+    if (  Interface.preview.dirty ) {
+        HTML.preview.contents.innerHTML = Collect.current.page.preview();
     }
-    var fn = captureFunction(capture),
-        previewHTML = "";
-    for ( var i=0, len=elements.length; i<len; i++ ) {
-        previewHTML += "<p class=\"noSelect\">" + fn(elements[i]) + "</p>";
-    }
-    if ( previewHTML === "" ) {
-        previewHTML = "No selector/attribute to capture selected";
-    }
-    HTML.preview.contents.innerHTML = previewHTML;
-}
-
-
-function captureFunction(capture){
-    if (capture==="text") { 
-        return function(ele){
-            return ele.textContent;
-        };
-    } else if (capture.indexOf("attr-")===0) {
-        // return substring after first hyphen so that it works with data- attributes
-        var attribute = capture.slice(capture.indexOf("-")+1);
-        return function(ele){
-            return ele.getAttribute(attribute);
-        };
-    }
+    Interface.preview.dirty = false;
 }
 
 /*
@@ -2726,6 +2739,7 @@ function saveSchema(){
             schema = Collect.current.schema.object();
         storage.sites[host].schemas[schema.name] = schema;
         chrome.storage.local.set({"sites": storage.sites});
+        Interface.preview.dirty = true;
     });
 }
 
@@ -2984,6 +2998,13 @@ function loadSchemaObject(schema){
 
 function loadPageObject(page){
     Collect.current.page = page;
+    // clear out preview when loading a new page
+    // and auto-generate if currently on preview tab
+    Interface.preview.dirty = true;
+    HTML.preview.contents.innerHTML = "";
+    if ( Interface.tabs.view.id === "previewView") {
+        generatePreview();
+    }
     if ( page.name === "default" ) {
         HTML.perm.schema.index.holder.style.display = "inline-block";
         

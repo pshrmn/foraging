@@ -149,10 +149,10 @@ body {
       padding: 0 5px; }
     .collectjs .rules .savedRuleName.editing {
       background: gold; }
-    .collectjs .rules .deltog, .collectjs .rules .editRule, .collectjs .rules .previewRule {
+    .collectjs .rules .deltog, .collectjs .rules .editRule {
       cursor: pointer;
       padding: 0 3px; }
-    .collectjs .rules .deltog:hover, .collectjs .rules .editRule:hover, .collectjs .rules .previewRule:hover {
+    .collectjs .rules .deltog:hover, .collectjs .rules .editRule:hover {
       color: #c91900; }
   .collectjs .items {
     font-size: 16px;
@@ -223,6 +223,9 @@ body {
 /* previewView */
 #previewView .name {
   margin-right: 15px; }
+#previewView .previewSet {
+  margin: 10px 5px;
+  border: 1px solid black; }
 
 #previewContents {
   font-size: 16px;

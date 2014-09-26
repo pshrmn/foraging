@@ -354,6 +354,14 @@ Page.prototype.updateName = function(name){
     }
 };
 
+Page.prototype.preview = function(){
+    var value = "";
+    for ( var key in this.sets ) {
+        value += this.sets[key].preview();
+    }
+    return value;
+};
+
 /********************
         SelectorSet
 *********************
@@ -500,6 +508,30 @@ SelectorSet.prototype.followedRules = function(){
     return following;
 };
 
+SelectorSet.prototype.preview = function(){
+    var value = "",
+        key;
+    if ( this.parent ) {
+        var parentElements = document.querySelectorAll(this.parent.selector),
+            len = parentElements.length,
+            low = this.parent.low || 0,
+            high = this.parent.high || 0,
+            elements = Array.prototype.slice.call(parentElements).slice(low, len + high);
+        for ( var i=0, eLen = elements.length; i<eLen; i++ ) {
+            value += "<div class=\"previewSet noSelect\">";
+            for ( key in this.selectors ) {
+                value += this.selectors[key].preview(elements[i]);
+            }
+            value +=  "</div>";
+        }
+    } else {
+        for ( key in this.selectors ) {
+            value += this.selectors[key].preview(document.body);
+        }
+    }
+    return value;
+};
+
 /********************
         SELECTOR
 ********************/
@@ -612,6 +644,15 @@ Selector.prototype.remove = function(){
     if ( this.parentSet ) {
         delete this.parentSet.selectors[this.selector];
     }
+};
+
+Selector.prototype.preview = function(dom){
+    var value = "",
+        element = dom.querySelector(this.selector);
+    for ( var key in this.rules ) {
+        value += this.rules[key].preview(element);
+    }
+    return value;
 };
 
 /********************
@@ -754,6 +795,18 @@ Rule.prototype.getSchema = function(){
     if ( this.hasSchema() ) {
         return this.parentSelector.parentSet.parentPage.parentSchema;
     }
+};
+
+Rule.prototype.preview = function(element){
+    
+    var cap;
+    if ( this.capture.indexOf("attr-") !== -1 ) {
+        var attr = this.capture.slice(5);
+        cap = element.getAttribute(attr);
+    } else {
+        cap = element.textContent;
+    }
+    return "<p class=\"noSelect\">" + this.name + ": " + cap + "</p>";
 };
 
 // shared delete function

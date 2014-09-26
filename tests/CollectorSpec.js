@@ -50,25 +50,6 @@ describe("event helpers", function(){
 });
 
 describe("misc.", function(){
-    describe("captureFunction", function(){
-        it("\"text\" argument returns a function to capture text of element", function(){
-            var ele = document.createElement("div"),
-                captureText = captureFunction("text");
-            ele.textContent = "this is only a test";
-            expect(captureText(ele)).toEqual("this is only a test");
-        });
-
-        it("\"attr-___\" argument returns a function to capture attribute of element", function(){
-            var ele = document.createElement("a"),
-                captureID = captureFunction("attr-id"),
-                captureHREF = captureFunction("attr-href");
-            ele.setAttribute("id", "foo");
-            ele.setAttribute("href", "http://www.example.com");
-            expect(captureID(ele)).toEqual("foo");
-            expect(captureHREF(ele)).toEqual("http://www.example.com");
-        });
-    });
-
     describe("isLink", function(){
         it("returns true if an element is an anchor", function(){
             var link = document.createElement("a");
