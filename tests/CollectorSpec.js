@@ -114,28 +114,6 @@ describe("misc.", function(){
 });
 
 describe("storage helpers", function(){
-
-    describe("newPage", function(){
-        it("returns a new page object with a default set", function(){
-            var nonIndexPage = newPage("George"),
-                indexPage = newPage("Bill", true);
-
-            expect(nonIndexPage.name).toEqual("George");
-            expect(nonIndexPage.index).toBe(false);
-            expect(nonIndexPage.sets["default"]).toBeDefined();
-
-            expect(indexPage.name).toEqual("Bill");
-            expect(indexPage.index).toBe(true);
-        });
-    });
-
-    describe("newSet", function(){
-        it("returns a set with provided name", function(){
-            var set = newSet("Barack");
-            expect(set.name).toEqual("Barack");
-        });
-    });
-
     describe("legalFilename", function(){
         it("returns true for legal filenames", function(){
             var goodNames = ["test", "good.jpg", "this is legal !"];

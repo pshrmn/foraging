@@ -8,6 +8,7 @@ var Cycle = (function(){
     }
 
     Cycle.prototype.setElements = function(elements){
+        this.holder.style.display = "block";
         this.elements = elements;
         this.preview();
     };
@@ -17,6 +18,7 @@ var Cycle = (function(){
         this.index = 0;
         this.htmlElements.preview.textContent = "";
         this.htmlElements.index.textContent = "";
+        this.holder.style.display = "none";
     };
 
     Cycle.prototype.generateHTML = function(){
@@ -37,7 +39,8 @@ var Cycle = (function(){
             next: nextButton,
             preview: preview
         };
-
+        // hide until elements are added
+        this.holder.style.display = "none";
         appendChildren(this.holder, [previousButton, index, nextButton, preview]);
     };
 
