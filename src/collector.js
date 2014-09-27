@@ -461,9 +461,9 @@ function permanentBarEvents(){
         loadPage(this);
     });
 
-    idEvent("deletePage", "click", function deletePageEvent(event){
+    idEvent("clearPage", "click", function clearPageEvent(event){
         event.preventDefault();
-        deletePage();
+        clearPage();
     });
 
     // don't need to create a page, those are automatically made when creating a rule that captures
@@ -701,32 +701,6 @@ function updateRadioEvent(event){
     UI.turnSelectorsOn();
 }
 
-function removeSelectorEvent(event){
-    event.preventDefault();
-    this.remove();
-    saveSchema();
-}
-
-function newRuleEvent(event){
-    event.preventDefault();
-    Collect.current.selector = this;
-
-    setupRuleForm(this.selector);
-    showTab(HTML.tabs.rule);
-}
-
-function editSelectorEvent(event){
-    event.preventDefault();
-    UI.editing.selector = this;
-    Family.fromSelector(this.selector);
-    Family.match();
-
-    HTML.selector.radio.parent.disabled = true;
-    HTML.selector.radio.next.disabled = true;
-
-    showTab(HTML.tabs.selector);
-}
-
 /******************
     RULE EVENTS
 ******************/
@@ -800,52 +774,6 @@ function toggleURLEvent(event){
     if ( !on && Collect.current.page.next ) {
         delete Collect.current.page.next;
     }
-    saveSchema();
-}
-
-/************************
-    SAVED RULE EVENTS
-************************/
-function selectorViewRule(event){
-    clearClass("queryCheck");
-    clearClass("collectHighlight");
-    var elements = Collect.matchedElements(this.parentSelector.selector);
-    addClass("savedPreview", elements);
-}
-
-function unselectorViewRule(event){
-    clearClass("savedPreview");
-}
-
-function editSavedRule(event){
-    UI.editing.rule = this;
-
-    // setup the form
-    HTML.rule.name.value = this.name;
-    HTML.rule.selector.textContent = this.parentSelector.selector;
-    HTML.rule.capture.textContent = this.capture;
-    if ( this.capture === "attr-href" ) {
-        HTML.rule.follow.checked = this.follow;
-        HTML.rule.follow.disabled = false;
-        HTML.rule.followHolder.style.display = "block";
-    } else {
-        HTML.rule.follow.checked = false;
-        HTML.rule.follow.disabled = true;
-        HTML.rule.followHolder.style.display = "none";
-    }
-
-    setupRuleForm(this.parentSelector.selector);
-    showTab(HTML.tabs.rule);
-}
-
-function deleteRuleEvent(event){
-    clearClass("savedPreview");
-    // also need to remove rule from set
-    if ( this.follow ) {
-        var pageOption = HTML.perm.page.select.querySelector("option[value=" + this.name + "]");
-        pageOption.parentElement.removeChild(pageOption);
-    }
-    this.remove();
     saveSchema();
 }
 
@@ -952,8 +880,7 @@ function addSelectorSet(set, page){
 }
 
 function addSelector(selector, set){
-    set.addSelector(selector,
-        [newRuleEvent, editSelectorEvent, removeSelectorEvent]);
+    set.addSelector(selector);
 }
 
 /*
@@ -968,9 +895,7 @@ function addRule(rule, selector){
         Collect.parent.selector
     );
 
-    selector.addRule(ruleObject,
-        [selectorViewRule, unselectorViewRule, editSavedRule, deleteRuleEvent],
-        HTML.perm.page.select);
+    selector.addRule(ruleObject);
 }
 
 /*
@@ -1195,31 +1120,16 @@ function loadPage(ele){
     loadPageObject(Collect.current.schema.pages[name]);
 }
 
-function deletePage(){
-    var defaultPage = (Collect.current.page.name === "default"),
-        confirmed;
-    if ( defaultPage ) {
-        confirmed = confirm("Cannot delete \"default\" page. Do you want to clear out all of its rule sets instead?");
-    } else {
-        confirmed = confirm("Are you sure you want to delete this page and all of its related rule sets?");    
-    }
+function clearPage(){
+    var confirmed = confirm("Clear out all selector sets, selectors, and rules from the page?");
     if ( !confirmed ) {
         return;
     }
+    Collect.current.page.reset();
 
-    var page;
-    // just delete all of the rules for "default" option
-    if ( defaultPage ) {
-        page = new Page("default");
-        addPage(page, Collect.current.schema);
-    } else {
-        Collect.current.schema.removePage(Collect.current.page.name);
-        page = Collect.current.schema.pages["default"];
-        page.htmlElements.option.selected = true;
-    }
     saveSchema();
     resetInterface();
-    loadPageObject(page);
+    loadPageObject(Collect.current.page);
 }
 
 /***********************

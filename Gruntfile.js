@@ -62,7 +62,7 @@ module.exports = function(grunt){
                 src: 'src/rule.js',
                 options: {
                     specs: 'tests/RuleSpec.js',
-                    helpers: 'src/utility.js'
+                    helpers: ['src/utility.js', 'tests/RuleHelper.js']
                 }
             }
         }

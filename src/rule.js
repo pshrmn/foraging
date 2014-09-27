@@ -121,6 +121,7 @@ Schema.prototype.addPage = function(page){
         var ele = page.html();
         this.htmlElements.pages.appendChild(ele);
     }
+    // need to do something with select
 };
 
 Schema.prototype.removePage = function(name){
@@ -292,6 +293,17 @@ Page.prototype.addSet = function(selectorSet){
         var ele = selectorSet.html();
         this.htmlElements.sets.appendChild(ele);
     }
+};
+
+/*
+get rid of selector sets, selectors, and rules in the page
+*/
+Page.prototype.reset = function(){
+    for ( var key in this.sets ) {
+        this.removeSet(key);
+    }
+    var defaultSet = new SelectorSet("default");
+    this.addSet(defaultSet);
 };
 
 Page.prototype.removeSet = function(name){
@@ -466,10 +478,10 @@ SelectorSet.prototype.removeParent = function(){
     this.parent = undefined;
 };
 
-SelectorSet.prototype.addSelector = function(selector, events){
+SelectorSet.prototype.addSelector = function(selector){
     this.selectors[selector.selector] = selector;
     if ( this.htmlElements.selectors) {
-        var ele = selector.html.apply(selector, events);
+        var ele = selector.html();
         this.htmlElements.selectors.appendChild(ele);
     }
     selector.parentSet = this;
@@ -565,7 +577,7 @@ Selector.prototype.uploadObject = function(){
     return this.object();
 };
 
-Selector.prototype.addRule = function(rule, events, select){
+Selector.prototype.addRule = function(rule){
     this.rules[rule.name] = rule;
     rule.parentSelector = this;
 
@@ -573,19 +585,23 @@ Selector.prototype.addRule = function(rule, events, select){
     // add a new Page to the schema with the name of the Rule
     if ( rule.follow && this.parentSet && this.parentSet.parentPage && this.parentSet.parentPage.parentSchema ) {
         var page = new Page(rule.name);
-        page.addOption(select);
+        page.addOption(HTML.perm.page.select);
         this.parentSet.parentPage.parentSchema.addPage(page);
     }
 
     // if Selector html exists, also create html for rule
     if ( this.htmlElements.rules ) {
-        var ele = rule.html.apply(rule, events);
+        var ele = rule.html();
         this.htmlElements.rules.appendChild(ele);
     }
 };
 
 Selector.prototype.removeRule = function(name){
-    delete this.rules[name];
+    var rule = this.rules[name];
+    if ( rule ) {
+        rule.remove();
+        delete this.rules[name];
+    }
 };
 
 Selector.prototype.updateSelector = function(newSelector){
@@ -601,7 +617,7 @@ Selector.prototype.updateSelector = function(newSelector){
     }
 };
 
-Selector.prototype.html = function(newRuleEvent, editEvent, deleteEvent){
+Selector.prototype.html = function(){
     var holder = noSelectElement("li"),
         identifier = document.createTextNode("Selector: "),
         nametag = noSelectElement("span"),
@@ -617,9 +633,11 @@ Selector.prototype.html = function(newRuleEvent, editEvent, deleteEvent){
     editSelector.textContent = "edit";
     remove.textContent = "×";
 
-    newRule.addEventListener("click", newRuleEvent.bind(this), false);
-    editSelector.addEventListener("click", editEvent.bind(this), false);
-    remove.addEventListener("click", deleteEvent.bind(this), false);
+    holder.addEventListener("mouseenter", this.events.preview.bind(this), false);
+    holder.addEventListener("mouseleave", this.events.unpreview.bind(this), false);
+    newRule.addEventListener("click", this.events.newRule.bind(this), false);
+    editSelector.addEventListener("click", this.events.edit.bind(this), false);
+    remove.addEventListener("click", this.events.remove.bind(this), false);
 
     appendChildren(holder, [identifier, nametag, editSelector, newRule, remove, rules]);
 
@@ -631,6 +649,41 @@ Selector.prototype.html = function(newRuleEvent, editEvent, deleteEvent){
     this.htmlElements.rules = rules;
 
     return holder;
+};
+
+Selector.prototype.events = {
+    preview: function(event){
+        clearClass("queryCheck");
+        clearClass("collectHighlight");
+        var elements = Collect.matchedElements(this.selector);
+        addClass("savedPreview", elements);
+    },
+    unpreview: function(event){
+        clearClass("savedPreview");
+    },
+    remove: function(event){
+        event.preventDefault();
+        this.remove();
+        saveSchema();
+    },
+    newRule: function(event){
+        event.preventDefault();
+        Collect.current.selector = this;
+
+        setupRuleForm(this.selector);
+        showTab(HTML.tabs.rule);
+    },
+    edit: function(event){
+        event.preventDefault();
+        UI.editing.selector = this;
+        Family.fromSelector(this.selector);
+        Family.match();
+
+        HTML.selector.radio.parent.disabled = true;
+        HTML.selector.radio.next.disabled = true;
+
+        showTab(HTML.tabs.selector);
+    }
 };
 
 Selector.prototype.deleteHTML = prototypeDeleteHTML;
@@ -680,7 +733,7 @@ Rule.prototype.object = function(){
     return data;
 };
 
-Rule.prototype.html = function(selectorViewEvent, unselectorViewEvent, editEvent, deleteEvent){
+Rule.prototype.html = function(){
     var holder = noSelectElement("li"),
         nametag = noSelectElement("span"),
         capturetag = noSelectElement("span"),
@@ -698,10 +751,8 @@ Rule.prototype.html = function(selectorViewEvent, unselectorViewEvent, editEvent
 
     appendChildren(holder, [nametag, capturetag, edit, deltog]);
 
-    holder.addEventListener("mouseenter", selectorViewEvent.bind(this), false);
-    holder.addEventListener("mouseleave", unselectorViewEvent.bind(this), false);
-    edit.addEventListener("click", editEvent.bind(this), false);
-    deltog.addEventListener("click", deleteEvent.bind(this), false);
+    edit.addEventListener("click", this.events.edit.bind(this), false);
+    deltog.addEventListener("click", this.events.remove.bind(this), false);
     
     this.htmlElements.holder = holder;
     this.htmlElements.nametag = nametag;
@@ -712,9 +763,37 @@ Rule.prototype.html = function(selectorViewEvent, unselectorViewEvent, editEvent
     return holder;
 };
 
+Rule.prototype.events = {
+    edit: function(event){
+        UI.editing.rule = this;
+
+        // setup the form
+        HTML.rule.name.value = this.name;
+        HTML.rule.selector.textContent = this.parentSelector.selector;
+        HTML.rule.capture.textContent = this.capture;
+        if ( this.capture === "attr-href" ) {
+            HTML.rule.follow.checked = this.follow;
+            HTML.rule.follow.disabled = false;
+            HTML.rule.followHolder.style.display = "block";
+        } else {
+            HTML.rule.follow.checked = false;
+            HTML.rule.follow.disabled = true;
+            HTML.rule.followHolder.style.display = "none";
+        }
+
+        setupRuleForm(this.parentSelector.selector);
+        showTab(HTML.tabs.rule);
+    },
+    remove: function(event){
+        clearClass("savedPreview");
+        this.remove();
+        saveSchema();
+    }
+};
+
 Rule.prototype.deleteHTML = prototypeDeleteHTML;
 
-Rule.prototype.update = function(object, select){
+Rule.prototype.update = function(object){
     var oldName = this.name,
         newName = object.name;
     if ( oldName !== newName ) {
@@ -744,9 +823,6 @@ Rule.prototype.update = function(object, select){
             // create the follow page
             var page = new Page(newName);
             schema.addPage(page);
-            if ( select ) {
-                page.addOption(select);
-            }
         } else if ( oldFollow && newFollow && oldName !== newName) {
             // update the name of the follow page
             schema.pages[oldName].updateName(newName);
