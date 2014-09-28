@@ -514,6 +514,9 @@ function noSelectEle(tag, otherClasses){
 }
 
 // Source: src/rule.js
+// this exists in a separate file for ease of use
+// but has dependencies on variables in collector.js and thus is not modular
+
 /********************
         SCHEMA
 ********************/
@@ -595,11 +598,12 @@ Schema.prototype.uploadObject = function(){
 
 Schema.prototype.html = function(){
     var holder = noSelectElement("div"),
-        nametag = noSelectElement("h3"),
+        nametag = noSelectElement("span"),
         pages = noSelectElement("ul");
 
     holder.classList.add("schema");
-    nametag.textContent = this.name + " schema";
+    nametag.textContent = this.name;
+    nametag.setAttribute("title", "Schema");
     appendChildren(holder, [nametag, pages]);
 
     for ( var key in this.pages ) {
@@ -762,12 +766,16 @@ Page.prototype.uploadObject = function(){
 
 Page.prototype.html = function(){
     var holder = noSelectElement("li"),
-        nametag = noSelectElement("h4"),
+        nametag = noSelectElement("span"),
+        addSet = noSelectElement("button"),
         sets = noSelectElement("ul");
 
     holder.classList.add("page");
-    nametag.textContent = this.name + " page";
-    appendChildren(holder, [nametag, sets]);
+    nametag.textContent = this.name;
+    nametag.setAttribute("title", "Page");
+    addSet.textContent = "add set";
+    addSet.addEventListener("click", this.events.addSet.bind(this), false);
+    appendChildren(holder, [nametag, addSet, sets]);
 
     for ( var key in this.sets ) {
         sets.appendChild(this.sets[key].html());
@@ -778,6 +786,13 @@ Page.prototype.html = function(){
     this.htmlElements.sets = sets;
 
     return holder;
+};
+
+Page.prototype.events = {
+    addSet: function(event){
+        event.preventDefault();
+        createSelectorSet(this);
+    }
 };
 
 Page.prototype.addOption = function(select){
@@ -878,7 +893,7 @@ Page.prototype.updateName = function(name){
         this.htmlElements.option.textContent = this.name;
     }
     if ( this.htmlElements.nametag ) {
-        this.htmlElements.nametag.textContent = this.name + " page";
+        this.htmlElements.nametag.textContent = this.name;
     }
 };
 
@@ -957,11 +972,16 @@ SelectorSet.prototype.uploadObject = function(){
 
 SelectorSet.prototype.html = function(){
     var holder = noSelectElement("li"),
-        nametag = noSelectElement("h5"),
+        nametag = noSelectElement("span"),
+        //addSelector = noSelectElement("button"),
         ul = noSelectElement("ul");
         
     holder.classList.add("set");
-    nametag.textContent = this.name + " selector set";
+    nametag.textContent = this.name;
+    nametag.setAttribute("title", "Selector Set");
+    //addSelector.textContent = "add selector";
+    //addSelector.addEventListener("click", this.events.addSelector.bind(this), false);
+    //appendChildren(holder, [nametag, addSelector, ul]);
     appendChildren(holder, [nametag, ul]);
 
     this.htmlElements.holder = holder;
@@ -970,6 +990,21 @@ SelectorSet.prototype.html = function(){
 
     return holder;
 };
+
+/*
+// don't use this quite yet
+SelectorSet.prototype.events = {
+    addSelector: function(event){
+        event.preventDefault();
+        // make this the current selector set
+        Collect.current.set = this;
+        if ( this.option ) {
+            this.option.selected = true;
+        }
+        showTab(HTML.tabs.selector);
+    }
+};
+*/
 
 SelectorSet.prototype.addOption = function(select){
     if ( !select ) {
@@ -1100,9 +1135,12 @@ Selector.prototype.addRule = function(rule){
     // if the Rule has follow=true and the SelectorSet has a Page (which in turn has a Schema)
     // add a new Page to the schema with the name of the Rule
     if ( rule.follow && this.parentSet && this.parentSet.parentPage && this.parentSet.parentPage.parentSchema ) {
-        var page = new Page(rule.name);
-        page.addOption(HTML.perm.page.select);
-        this.parentSet.parentPage.parentSchema.addPage(page);
+        // only add page if it doesn't already exist
+        if ( !this.parentSet.parentPage.parentSchema.pages[rule.name] ) {
+            var page = new Page(rule.name);
+            page.addOption(HTML.perm.page.select);
+            this.parentSet.parentPage.parentSchema.addPage(page);
+        }
     }
 
     // if Selector html exists, also create html for rule
@@ -1258,7 +1296,6 @@ Rule.prototype.html = function(){
 
     holder.classList.add("rule");
     nametag.textContent = this.name;
-    nametag.classList.add("savedRuleName");
     capturetag.textContent = "(" + this.capture + ")";
     edit.classList.add("editRule");
     edit.textContent = "edit";
@@ -2055,10 +2092,10 @@ function permanentBarEvents(){
     // don't need to create a page, those are automatically made when creating a rule that captures
     // attr-href and follow=true
 
-    // rule set events
+    // selector set events
     idEvent("createSelectorSet", "click", function newSelectorSetEvent(event){
         event.preventDefault();
-        createSelectorSet();
+        createSelectorSet(Collect.current.page);
     });
 
     idEvent("selectorSetSelect", "change", function loadSetEvent(event){
@@ -2729,7 +2766,7 @@ function loadSet(ele){
     loadSetObject(Collect.current.page.sets[name]);
 }
 
-function createSelectorSet(){
+function createSelectorSet(page){
     var name = prompt("Selector Set Name");
     if ( name === null ) {
         return;
@@ -2744,7 +2781,7 @@ function createSelectorSet(){
         return;
     }
     var set = new SelectorSet(name);
-    addSelectorSet(set, Collect.current.page);
+    addSelectorSet(set, page);
     saveSchema();
 
     resetInterface();

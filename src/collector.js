@@ -469,10 +469,10 @@ function permanentBarEvents(){
     // don't need to create a page, those are automatically made when creating a rule that captures
     // attr-href and follow=true
 
-    // rule set events
+    // selector set events
     idEvent("createSelectorSet", "click", function newSelectorSetEvent(event){
         event.preventDefault();
-        createSelectorSet();
+        createSelectorSet(Collect.current.page);
     });
 
     idEvent("selectorSetSelect", "change", function loadSetEvent(event){
@@ -1143,7 +1143,7 @@ function loadSet(ele){
     loadSetObject(Collect.current.page.sets[name]);
 }
 
-function createSelectorSet(){
+function createSelectorSet(page){
     var name = prompt("Selector Set Name");
     if ( name === null ) {
         return;
@@ -1158,7 +1158,7 @@ function createSelectorSet(){
         return;
     }
     var set = new SelectorSet(name);
-    addSelectorSet(set, Collect.current.page);
+    addSelectorSet(set, page);
     saveSchema();
 
     resetInterface();

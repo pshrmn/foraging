@@ -269,25 +269,6 @@ body{
             background: $light-gray;
             display: inline-block;
         }
-
-        .savedRuleName{
-            cursor: pointer;
-            font-weight: bold;
-            padding: 0 5px;
-        }
-
-        .savedRuleName.editing{
-            background: $gold;
-        }
-
-        .deltog, .editRule{
-            cursor: pointer;
-            padding: 0 3px;
-        }
-
-        .deltog:hover, .editRule:hover{
-            color: $red;
-        }
     }
 
     .items{
