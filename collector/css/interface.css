@@ -17,7 +17,9 @@ body {
   font-family: sans-serif;
   color: black;
   text-align: left;
-  box-sizing: border-box; }
+  box-sizing: border-box;
+  /* lots of sites like to customize how various inputs look, 
+  so this is trying to keep these close to (chrome) default css */ }
   .collectjs * {
     color: black;
     box-sizing: border-box; }
@@ -45,22 +47,6 @@ body {
       height: 30px;
       line-height: 30px;
       cursor: pointer; }
-      .collectjs .tabs .tab div {
-        display: inline-block; }
-      .collectjs .tabs .tab button {
-        background: transparent;
-        font-size: 100%;
-        line-height: 1;
-        border: 0;
-        cursor: pointer;
-        height: 18px;
-        font-family: sans-serif;
-        vertical-align: inherit; }
-      .collectjs .tabs .tab label {
-        cursor: pointer; }
-      .collectjs .tabs .tab .smallSelector {
-        font-size: 0.75em;
-        margin: 0 3px; }
     .collectjs .tabs .toggle {
       cursor: pointer; }
     .collectjs .tabs .tab.active {
@@ -202,6 +188,24 @@ body {
       color: white; }
   .collectjs .selectorSchema:hover .deltog, .collectjs .selectorSchema:hover .onlychild, .collectjs .selectorSchema:hover .nthtype {
     color: #777; }
+  .collectjs button {
+    background: #dddddd;
+    color: black;
+    border: 2px outset #dddddd;
+    border-radius: initial;
+    box-shadow: none;
+    cursor: pointer;
+    font-weight: norma;
+    margin: 2px;
+    padding: 1px 6px;
+    min-width: initial; }
+  .collectjs button:active {
+    border-style: inset;
+    color: black; }
+  .collectjs select {
+    display: inline-block;
+    border: 1px solid #a9a9a9;
+    margin: 2px; }
 
 /* tab buttons */
 #refreshCollect {

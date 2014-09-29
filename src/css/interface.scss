@@ -68,30 +68,6 @@ body{
             height: 30px;
             line-height: 30px;
             cursor: pointer;
-
-            div{
-                display: inline-block;
-            }
-
-            button{
-                background: transparent;
-                font-size: 100%;
-                line-height: 1;
-                border: 0;
-                cursor: pointer;
-                height: 18px;
-                font-family: sans-serif;
-                vertical-align: inherit;
-            }
-
-            label{
-                cursor: pointer;
-            }
-
-            .smallSelector{
-                font-size: 0.75em;
-                margin: 0 3px;
-            }
         }
 
         .toggle{
@@ -333,6 +309,32 @@ body{
         .deltog, .onlychild, .nthtype{
             color: #777;
         }
+    }
+
+    /* lots of sites like to customize how various inputs look, 
+    so this is trying to keep these close to (chrome) default css */
+    button {
+        background: #dddddd;
+        color: $black;
+        border: 2px outset #dddddd;
+        border-radius: initial;
+        box-shadow: none;
+        cursor: pointer;
+        font-weight: norma;
+        margin: 2px;
+        padding: 1px 6px;
+        min-width: initial;
+    }
+
+    button:active{
+        border-style: inset;
+        color: $black;
+    }
+
+    select {
+        display: inline-block;
+        border: 1px solid #a9a9a9;
+        margin: 2px;
     }
 }
 
