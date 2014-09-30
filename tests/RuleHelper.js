@@ -5,3 +5,11 @@ var HTML = {
         }
     }
 };
+
+var Collect = {
+    site: {
+        current: {}
+    }
+}
+
+var showParent = hideParent = function(){};

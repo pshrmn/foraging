@@ -43,15 +43,15 @@ var Collect = {
     if Collect.parent is defined, limit selected elements to children of elements matching Collect.parent.selector
     if Collect.parent.high/low are defined, only use Collect.parent.selector elements within that range
     */
-    matchedElements: function(selector){
+    matchedElements: function(selector, parent){
         var allElements = [];
-        if ( UI.activeSelector === "selector" && this.parent ) {
-            var low = this.parent.low || 0,
-                high = this.parent.high || 0;
+        if ( UI.activeSelector === "selector" && parent ) {
+            var low = parent.low || 0,
+                high = parent.high || 0;
             if ( low !== 0 || high !== 0 ) {
                 // if either high or low is defined, 
                 // iterate over all child elements of elements matched by parent selector
-                var parents = document.querySelectorAll(this.parent.selector),
+                var parents = document.querySelectorAll(parent.selector),
                     // add high because it is negative
                     end = parents.length + high,
                     currElements;
@@ -60,7 +60,7 @@ var Collect = {
                     allElements = allElements.concat(Array.prototype.slice.call(currElements));
                 }
             } else {
-                allElements = this.all(selector, this.parent.selector);
+                allElements = this.all(selector, parent.selector);
             }
         } else {
             // don't care about parent when choosing next selector or a new parent selector
@@ -70,16 +70,8 @@ var Collect = {
     },
     options: {},
     elements: [],
-    current: {
-        schema: undefined,
-        page: undefined,
-        set: undefined,
-        selector: undefined
-    },
-    // parent.selector is set when Collect.current.set index=true
     parent: {},
-    // currently loaded Schema
-    schema: undefined
+    site: undefined
 };
 
 /*
@@ -111,9 +103,10 @@ var UI = {
     store elements with eventlisteners in this.elements
     */
     turnSelectorsOn: function(){
-        var curr;
+        var curr,
+            parent = Collect.site.current.set.parent;
         this.turnSelectorsOff();
-        Collect.elements = Collect.matchedElements("*");
+        Collect.elements = Collect.matchedElements("*", parent);
 
         for ( var i=0, len=Collect.elements.length; i<len; i++ ) {
             curr = Collect.elements[i];
@@ -235,21 +228,6 @@ var Family = {
         Family.family.update();
         showTab(HTML.tabs.selector);
     },
-    edit: function(selector){
-        var eles = Collect.matchedElements(selector);
-        if ( !eles.length ) {
-            return;
-        }
-        Family.family = new SelectorFamily(eles[0],
-            Collect.parent.selector,
-            HTML.selector.family,
-            HTML.selector.selector,
-            Family.test.bind(Family),
-            Collect.options
-        );
-        Family.family.update();
-        showTab(HTML.tabs.selector);  
-    },
     remove: function(){
         if ( this.family ) {
             this.family.remove();
@@ -282,11 +260,12 @@ var Family = {
     // uses current SelectorFamily's computed selector to match elements in the page
     // uses Collect.parent to limit matches
     elements: function(){
-        var selector = this.selector();
+        var selector = this.selector(),
+            parent = Collect.site.current.set.parent;
         if ( selector === "") {
             return [];
         }
-        return Collect.matchedElements(selector);
+        return Collect.matchedElements(selector, parent);
     },
     /*
     sets Collect.matchedElements to elements matching the current selector
@@ -333,7 +312,7 @@ especially useful for when cancelling creating or editing a selector or rule
 */
 function resetInterface(){
     UI.editing = {};
-    if ( Collect.parent.selector ) {
+    if ( Collect.parent ) {
         addParentSchema(Collect.parent);
     }
     clearSelectorClasses();
@@ -441,24 +420,6 @@ function optionsViewEvents(){
 }
 
 function permanentBarEvents(){
-    // schema events
-    idEvent("deleteSchema", "click", function deleteSchemaEvent(event){
-        event.preventDefault();
-        deleteSchema();
-    });
-
-
-    // selector set events
-    idEvent("createSelectorSet", "click", function newSelectorSetEvent(event){
-        event.preventDefault();
-        createSelectorSet(Collect.current.page);
-    });
-
-    idEvent("deleteSelectorSet", "click", function deleteSelectorSetEvent(event){
-        event.preventDefault();
-        deleteSelectorSet();
-    });
-
     idEvent("removeParent", "click", deleteParentEvent);
     idEvent("removeNext", "click", deleteNextEvent);
 
@@ -587,16 +548,17 @@ function saveSelectorEvent(event){
     resetInterface();
 }
 
+//update
 function saveSelector(selector){
     var sel = new Selector(selector);
     // if editing just update the selector, otherwise add it to the current set
     if ( UI.editing.selector ) {
         UI.editing.selector.updateSelector(selector);
-        showTab(HTML.tabs.schema);
     } else {
-        addSelector(sel, Collect.current.set);
+        Collect.site.current.set.addSelector(sel);
     }
-    saveSchema();
+    showTab(HTML.tabs.schema);
+    Collect.site.saveCurrent();
 }
 
 function saveParent(selector){
@@ -618,17 +580,16 @@ function saveParent(selector){
 
     Collect.parent = parent;
     showParent();
-
     addParentSchema(parent);
 
     // attach the parent to the current set and save
-    Collect.current.set.addParent(parent);
-    saveSchema();
+    Collect.site.current.set.addParent(parent);
+    Collect.site.save();
 }
 
 function saveNext(selector){
     var match = document.querySelector(selector),
-        name = Collect.current.page.name;
+        name = Collect.site.current.page.name;
 
     if ( errorCheck( (name !== "default" ), HTML.selector.selector,
             ("Cannot add next selector to '" + name + "' page, only to default")) || 
@@ -640,10 +601,9 @@ function saveNext(selector){
     HTML.perm.page.next.selector.textContent = selector;
     HTML.perm.page.next.holder.style.display = "inline-block";
 
-    Collect.current.page.index = true;
-    Collect.current.page.next = selector;
-
-    saveSchema();
+    Collect.site.current.page.next = selector;
+    Collect.site.save();
+    showTab(HTML.tabs.schema);
 }
 
 function clearSelectorEvent(event){
@@ -678,45 +638,41 @@ function updateRadioEvent(event){
 /******************
     RULE EVENTS
 ******************/
+//update
 function saveRuleEvent(event){
     event.preventDefault();
     var name = HTML.rule.name.value,
         capture = HTML.rule.capture.textContent,
-        follow = HTML.rule.follow.checked,
-        rule = {
-            name: name,
-            capture: capture
-        };
+        follow = HTML.rule.follow.checked;
 
     // error checking
     clearErrors();
     if ( emptyErrorCheck(name, HTML.rule.name, "Name needs to be filled in") ||
         emptyErrorCheck(capture, HTML.rule.capture, "No attribute selected") || 
-        reservedWordErrorCheck(rule.name, HTML.rule.name, "Cannot use " + rule.name + 
+        reservedWordErrorCheck(name, HTML.rule.name, "Cannot use " + name + 
             " because it is a reserved word") ) {
         return;
     }
 
-    if ( follow ) {
-        rule.follow = true;
-    }
-
     if ( UI.editing.rule ) {
-        UI.editing.rule.update(rule, HTML.perm.page.select);
+        UI.editing.rule.update({
+            name: name,
+            capture: capture,
+            follow: follow
+        });
         delete UI.editing.rule;
     } else {
-        if ( !Collect.current.schema.uniqueRuleName(name) ) {
+        if ( !Collect.site.current.schema.uniqueRuleName(name) ) {
             // some markup to signify you need to change the rule's name
             alertMessage("Rule name is not unique");
             HTML.rule.name.classList.add("error");
             return;
         }
-        var selector = Collect.current.selector;
-        addRule(rule, selector);
+        var rule = new Rule(name, capture, follow);
+        Collect.site.current.selector.addRule(rule);
     }
-
-    saveSchema();
-    resetInterface();
+    Collect.site.current.selector = undefined;
+    Collect.site.save();
     showTab(HTML.tabs.schema);
 }
 
@@ -725,8 +681,8 @@ function deleteParentEvent(event){
     delete Collect.parentCount;
     Collect.parent = {};
     hideParent();
-    Collect.current.set.removeParent();
-    saveSchema();
+    Collect.site.current.set.removeParent();
+    Collect.site.save();
     clearClass("parentSchema");
 }
 
@@ -735,8 +691,8 @@ function deleteNextEvent(event){
     delete Collect.next;
     HTML.perm.page.next.holder.style.display = "none";
     HTML.perm.page.next.selector.textContent = "";
-    Collect.current.page.removeNext();
-    saveSchema();
+    Collect.site.current.page.removeNext();
+    Collect.site.save();
 }
 
 /*
@@ -744,11 +700,11 @@ toggle whether the current page is an index page
 if toggled off and the current page has a next selector, remove it
 */
 function toggleURLEvent(event){
-    var on = Collect.current.schema.toggleURL(window.location.href);
-    if ( !on && Collect.current.page.next ) {
-        delete Collect.current.page.next;
+    var on = Collect.site.current.schema.toggleURL(window.location.href);
+    if ( !on && Collect.site.current.page.next ) {
+        delete Collect.site.current.page.next;
     }
-    saveSchema();
+    Collect.site.saveCurrent();
 }
 
 /***********************
@@ -789,7 +745,7 @@ function showTab(tab){
 function generatePreview(){
     // only regen preview when something in the schema has changed
     if (  UI.preview.dirty ) {
-        HTML.preview.contents.innerHTML = Collect.current.page.preview();
+        HTML.preview.contents.innerHTML = Collect.site.current.page.preview();
     }
     UI.preview.dirty = false;
 }
@@ -839,39 +795,6 @@ function clearErrors(){
     }
 }
 
-/***************
-    rule object shortcuts
-***************/
-
-function addPage(page, schema){
-    page.addOption(HTML.perm.page.select);
-    schema.addPage(page);
-}
-
-function addSelectorSet(set, page){
-    set.addOption(HTML.perm.set.select);
-    page.addSet(set);
-}
-
-function addSelector(selector, set){
-    set.addSelector(selector);
-}
-
-/*
-rule is a JSON object representing a rule
-selector a a Selector object to attach the rule to
-*/
-function addRule(rule, selector){
-    var ruleObject = new Rule(
-        rule.name,
-        rule.capture,
-        rule.follow || false,
-        Collect.parent.selector
-    );
-
-    selector.addRule(ruleObject);
-}
-
 /*
 add .parentSchema to all elements matching parent selector and in range
 */
@@ -904,7 +827,8 @@ function hideParent(){
 
 function setupRuleForm(selector){
     HTML.rule.selector.textContent = selector;
-    var elements = Collect.matchedElements(selector);
+    var parent = Collect.site.current.set.parent;
+    var elements = Collect.matchedElements(selector, parent);
     UI.ruleCycle.setElements(elements);
     addClass("queryCheck", elements);
     // set global for allLinks (fix?)
@@ -967,16 +891,8 @@ function setupHostname(){
         // default setup if page hasn't been visited before
         if ( !siteObject ) {
             site = new Site(host);
-            /*schema = newSchema("default");
-            storage.sites[host] = {
-                site: host,
-                schemas: {
-                    "default": schema
-                }
-            };
-            chrome.storage.local.set({'sites': storage.sites});
-            */
-
+            // save it right away
+            site.save();
         } else {
             site = new Site(host, siteObject.schemas);
         }
@@ -984,120 +900,15 @@ function setupHostname(){
         var siteHTML = site.html();
         HTML.schema.holder.appendChild(siteHTML);
         site.loadSchema("default");
-        //loadSchemaObject(schema);
     });
 }
 
 function uploadSchema(){
     var data = {
-        schema: Collect.current.schema.uploadObject(),
+        schema: Collect.site.current.schema.uploadObject(),
         site: window.location.host
     };
     chrome.runtime.sendMessage({type: 'upload', data: data});
-}
-
-/***********************
-    SCHEMA STORAGE
-***********************/
-
-/*
-saving function for all things schema related
-*/
-function saveSchema(){
-    chrome.storage.local.get('sites', function saveSchemaChrome(storage){
-        var host = window.location.hostname,
-            site = storage.sites[host],
-            schema = Collect.current.schema.object();
-        storage.sites[host].schemas[schema.name] = schema;
-        chrome.storage.local.set({"sites": storage.sites});
-        UI.preview.dirty = true;
-    });
-}
-
-/*
-deletes the schema currently selected, and removes its associated option from #allSchemas
-if the current schema is "default", delete the rules for the schema but don't delete the schema
-*/
-function deleteSchema(){
-    var defaultSchema = (Collect.current.schema.name === "default"),
-        confirmed;
-    if ( defaultSchema ) {
-        confirmed = confirm("Cannot delete \"default\" schema. Do you want to clear out all of its pages instead?");
-    } else {
-        confirmed = confirm("Are you sure you want to delete this schema and all of its related pages?");    
-    }
-    if ( !confirmed ) {
-        return;
-    }
-    chrome.storage.local.get("sites", function deleteSchemaChrome(storage){
-        var host = window.location.hostname,
-            site = storage.sites[host],
-            currOption = HTML.perm.schema.select.querySelector("option:checked");
-        // just delete all of the rules for "default" option
-        if ( defaultSchema ) {
-            site.schemas["default"] = newSchema("default");
-        } else {
-            delete site.schemas[Collect.current.schema.name];
-            currOption.parentElement.removeChild(currOption);
-        }
-        storage.sites[host] = site;
-        chrome.storage.local.set({'sites': storage.sites});
-        resetInterface();
-        loadSchemaObject(site.schemas["default"]);
-    });
-}
-
-/***********************
-    SELECTOR SET STORAGE
-***********************/
-
-function createSelectorSet(page){
-    var name = prompt("Selector Set Name");
-    if ( name === null ) {
-        return;
-    }
-    else if ( name === "" ) {
-        alertMessage("selector set name cannot be blank");
-        return;
-    }
-    
-    if ( !Collect.current.schema.uniqueSelectorSetName(name) ) {
-        alertMessage("a selector set named \"" + name + "\" already exists");
-        return;
-    }
-    var set = new SelectorSet(name);
-    addSelectorSet(set, page);
-    saveSchema();
-
-    resetInterface();
-    loadSetObject(set);
-}
-
-function deleteSelectorSet(){
-    var defaultSet = (Collect.current.set.name === "default"),
-        question = defaultSet ?
-            "Cannot delete \"default\" rule set. Do you want to clear out all of its rules instead?" :
-            "Are you sure you want to delete this selector set and all of its related selectors and rules?";
-    if ( !confirm(question) ) {
-        return;
-    }
-
-    var set;
-    // handle setting new current SelectorSet
-    if ( defaultSet ) {
-        Collect.current.page.removeSet("default");
-        set = new SelectorSet("default");
-        addSelectorSet(set, Collect.current.page);
-    } else {
-        Collect.current.set.remove();
-        Collect.current.set = undefined;
-        set = Collect.current.page.sets["default"];
-        set.htmlElements.option.selected = true;
-    }
-
-    saveSchema();
-    resetInterface();
-    loadSetObject(set);
 }
 
 /***********************
@@ -1122,129 +933,4 @@ function loadOptions(){
 // override current options with passed in options
 function setOptions(options){
     chrome.storage.local.set({"options": options});
-}
-
-/***********************
-    STORAGE HELPERS
-***********************/
-
-// creates an empty schema object
-function newSchema(name){
-    HTML.perm.schema.select.appendChild(newOption(name));
-    return {
-        name: name,
-        pages: {
-            "default": {
-                name: "default",
-                index: false,
-                sets: {
-                    "default": {
-                        name: "default",
-                        selectors: {}
-                    }
-                }
-            }
-        },
-        urls: {}
-    };
-}
-
-/*
-given JSON representing a schema, create that Schema's object and all associated 
-Page/SelectorSet/Selector/Rule objects
-also setup relevant HTML data associated with the Schema
-*/
-function loadSchemaObject(schema){
-    HTML.perm.schema.select.querySelector("option[value=" + schema.name + "]").selected = true;
-
-    var url = window.location.href;
-    HTML.perm.schema.index.checkbox.checked = (schema.urls[url] !== undefined );
-
-    // clear out current page options
-    HTML.perm.page.select.innerHTML = "";
-    var schemaObject,
-        page, pageObject, pageName,
-        set, setObject, setName,
-        selector, selectorObject, selectorName,
-        rule, ruleObject, ruleName;
-
-    schemaObject = new Schema(schema.name, schema.urls);
-    // clear out previous schema
-    HTML.perm.schema.holder.innerHTML = "";
-    HTML.perm.schema.holder.appendChild(schemaObject.html());
-
-    Collect.current.schema = schemaObject;    
-    // create all pages and child objects for the schema
-    for ( pageName in schema.pages ) {
-        page = schema.pages[pageName];
-
-        pageObject = new Page(page.name, page.index, page.next);
-        addPage(pageObject, schemaObject);
-        for ( setName in page.sets ) {
-            set = page.sets[setName];
-            setObject = new SelectorSet(set.name, set.parent);
-            addSelectorSet(setObject, pageObject);
-            
-            for ( selectorName in set.selectors ) {
-                selector = set.selectors[selectorName];
-                selectorObject = new Selector(selector.selector);
-                addSelector(selectorObject, setObject);
-                
-                for ( ruleName in selector.rules ) {
-                    rule = selector.rules[ruleName];
-                    addRule(rule, selectorObject);
-                }
-            }
-        }
-    }
-    loadPageObject(Collect.current.schema.pages["default"]);
-}
-
-function loadPageObject(page){
-    Collect.current.page = page;
-    // clear out preview when loading a new page
-    // and auto-generate if currently on preview tab
-    UI.preview.dirty = true;
-    HTML.preview.contents.innerHTML = "";
-    if ( UI.tabs.view.id === "previewView") {
-        generatePreview();
-    }
-    if ( page.name === "default" ) {
-        HTML.perm.schema.index.holder.style.display = "inline-block";
-        
-        HTML.selector.radio.next.disabled = false;
-        // handle whether or not next has already been set
-        if ( page.next ) {
-            Collect.next = page.next;
-            HTML.perm.page.next.holder.style.display = "inline-block";
-            HTML.perm.page.next.selector.textContent = page.next;
-        } else {
-            delete Collect.next;
-            HTML.perm.page.next.holder.style.display = "none";
-            HTML.perm.page.next.selector.textContent = "";
-        }
-    } else {
-        HTML.perm.schema.index.holder.style.display = "none";
-        HTML.perm.page.next.holder.style.display = "none";
-        HTML.selector.radio.next.disabled = true;
-    }
-
-    options(Object.keys(page.sets), HTML.perm.set.select);
-
-    loadSetObject(page.sets["default"]);
-}
-
-function loadSetObject(set){
-    Collect.parent = set.parent || {};
-    Collect.current.set = set;
-
-    if ( set.parent ) {
-        showParent();
-        addParentSchema(set.parent);
-        Collect.parentCount = Collect.all(set.parent.selector).length;
-    } else {
-        hideParent();
-        clearClass("parentSchema");
-        delete Collect.parentCount;
-    }
 }

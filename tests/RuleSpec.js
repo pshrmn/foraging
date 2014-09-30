@@ -1,9 +1,13 @@
+describe("Site", function(){
+
+});
+
 describe("Schema", function(){
     describe("constructor", function(){
         it("sets name and urls", function(){
             var urls = {"http://www.example.com/packers": true,
                 "http://www.example.com/football": true};
-            var g = new Schema("Packers", urls);
+            var g = new Schema("Packers", undefined, urls);
             expect(g.name).toEqual("Packers");
             expect(JSON.stringify(g.urls)).toEqual(JSON.stringify(urls));
         });
@@ -29,7 +33,6 @@ describe("Schema", function(){
                 pages: {
                     "default": {
                         name: "default",
-                        index: false,
                         sets: {
                             "default": {
                                 name: "default",
@@ -39,7 +42,7 @@ describe("Schema", function(){
                     }
                 }
             }
-            var g = new Schema("Lions", urls);
+            var g = new Schema("Lions", undefined, urls);
             expect(JSON.stringify(g.object())).toEqual(JSON.stringify(schemaJSON));
         });
     });
@@ -78,7 +81,6 @@ describe("Schema", function(){
                 urls: [],
                 page: {
                     name: "default",
-                    index: false,
                     sets: {
                         "Bar": {
                             name: "Bar",
@@ -97,7 +99,6 @@ describe("Schema", function(){
                             pages: {
                                 "Foo": {
                                     name: "Foo",
-                                    index: false,
                                     sets: {
                                         "Baz": {
                                             name: "Baz",
@@ -130,10 +131,10 @@ describe("Schema", function(){
     describe("html", function(){
         it("builds and returns html elements representing the schema", function(){
             var g = new Schema("Colts");
-            var ele = g.html();
-            expect(ele.tagName).toEqual("DIV");
-            expect(g.htmlElements.pages.tagName).toEqual("UL");
-            expect(g.htmlElements.nametag.textContent).toEqual("Colts");
+            g.html();
+            expect(g.eles.holder.tagName).toEqual("DIV");
+            expect(g.eles.pages.tagName).toEqual("UL");
+            expect(g.eles.nametag.textContent).toEqual("Colts");
         });
     });
 
@@ -174,8 +175,8 @@ describe("Schema", function(){
                 p = new Page("wins");
             g.html();
             g.addPage(p);
-            expect(g.htmlElements.holder).toBeDefined();
-            expect(p.htmlElements.holder).toBeDefined();
+            expect(g.eles.holder).toBeDefined();
+            expect(p.eles.holder).toBeDefined();
         })
     });
 
@@ -262,18 +263,15 @@ describe("Schema", function(){
 
 describe("Page", function(){
     describe("constructor", function(){
-        it("returns new Page with index/next set as passed", function(){
-            var p1 = new Page("Lakers", true, ".winning"),
-                p2 = new Page("Clippers", false);
-            expect(p1.index).toBe(true);
+        it("returns new Page with next set as passed", function(){
+            var p1 = new Page("Lakers", undefined, ".winning"),
+                p2 = new Page("Clippers");
             expect(p1.next).toBe(".winning");
-            expect(p2.index).toBe(false);
             expect(p2.next).toBeUndefined();
         });
 
-        it("uses defaults for index/next if not provided", function(){
+        it("uses defaults for next if not provided", function(){
             var p1 = new Page("Supersonics");
-            expect(p1.index).toBe(false);
             expect(p1.next).toBeUndefined();
         });
 
@@ -285,10 +283,9 @@ describe("Page", function(){
 
     describe("object", function(){
         it("returns a JSON object respresenting a Page", function(){
-            var p = new Page("Suns", true, ".cssselector");
+            var p = new Page("Suns", undefined, ".cssselector");
             var expected = {
                 name: "Suns",
-                index: true,
                 sets: {
                     "default": {
                         name: "default",
@@ -304,7 +301,6 @@ describe("Page", function(){
             var p = new Page("Warriors");
             var expected = {
                 name: "Warriors",
-                index: false,
                 sets: {
                     "default": {
                         name: "default",
@@ -325,7 +321,6 @@ describe("Page", function(){
             sel.addRule(rule);
             var expected = {
                 name: "Nuggets",
-                index: false,
                 sets: {
                     "default": {
                         name: "default",
@@ -360,7 +355,6 @@ describe("Page", function(){
                 rule = new Rule("game", "text");
             var expected = {
                 name: "Rockets",
-                index: false,
                 sets: {
                     "Seasons": {
                         name: "Seasons",
@@ -391,11 +385,11 @@ describe("Page", function(){
 
     describe("html", function(){
         it("generates html to represent a page", function(){
-            var p = new Page("Thunder"),
-                ele = p.html();
-            expect(ele.tagName).toEqual("LI");
-            expect(p.htmlElements.sets.tagName).toEqual("UL");
-            expect(p.htmlElements.nametag.textContent).toEqual("Thunder");
+            var p = new Page("Thunder");
+            p.html();
+            expect(p.eles.holder.tagName).toEqual("LI");
+            expect(p.eles.sets.tagName).toEqual("UL");
+            expect(p.eles.nametag.textContent).toEqual("Thunder");
         });
     });
 
@@ -422,12 +416,10 @@ describe("Page", function(){
     });
 
     describe("removeNext", function(){
-        it("sets page.next to undefined and page.index to false", function(){
-            var p = new Page("Jazz", true, ".seasons");
-            expect(p.index).toBe(true);
+        it("sets page.next to undefined", function(){
+            var p = new Page("Jazz", undefined, ".seasons");
             expect(p.next).toBe(".seasons");
             p.removeNext();
-            expect(p.index).toBe(false);
             expect(p.next).toBeUndefined();
         });
     });
@@ -442,7 +434,7 @@ describe("SelectorSet", function(){
         });
 
         it("sets parent if provided", function(){
-            var s1 = new SelectorSet("Red Sox", {"selector": ".players"});
+            var s1 = new SelectorSet("Red Sox", undefined, {"selector": ".players"});
             expect(s1.parent).toBeDefined();
         });
     });
@@ -467,11 +459,11 @@ describe("SelectorSet", function(){
 
     describe("html", function(){
         it("generates html to represent a SelectorSet", function(){
-            var s1 = new SelectorSet("Cardinals"),
-                ele = s1.html();
-            expect(ele.tagName).toEqual("LI");
-            expect(s1.htmlElements.selectors.tagName).toEqual("UL");
-            expect(s1.htmlElements.nametag.textContent).toEqual("Cardinals");
+            var s1 = new SelectorSet("Cardinals");
+            s1.html();
+            expect(s1.eles.holder.tagName).toEqual("LI");
+            expect(s1.eles.selectors.tagName).toEqual("UL");
+            expect(s1.eles.nametag.textContent).toEqual("Cardinals");
         });
     });
 
@@ -610,11 +602,10 @@ describe("Selector", function(){
 
     describe("html", function(){
         it("generates an html element representing a selector", function(){
-            var sel = new Selector(".foo"),
-                fakeEvent = function(){},
-                holder = sel.html(fakeEvent, fakeEvent, fakeEvent);
-            expect(holder.tagName).toEqual("LI");
-            expect(sel.htmlElements.nametag.textContent).toEqual(".foo");
+            var sel = new Selector(".foo");
+            sel.html();
+            expect(sel.eles.holder.tagName).toEqual("LI");
+            expect(sel.eles.nametag.textContent).toEqual(".foo");
         });
     });
 
@@ -666,11 +657,10 @@ describe("Rule", function(){
     describe("html", function(){
         it("generates a html element representing a Rule", function(){
             // blank function since we don't care about events in this test
-            var fakeEvent = function(){},
-                r1 = new Rule("seasons", "attr-href"),
-                ele = r1.html(fakeEvent, fakeEvent, fakeEvent, fakeEvent);
-            expect(ele.tagName).toEqual("LI");
-            expect(r1.htmlElements.nametag.textContent).toEqual(r1.name);
+            var r1 = new Rule("seasons", "attr-href");
+            r1.html();
+            expect(r1.eles.holder.tagName).toEqual("LI");
+            expect(r1.eles.nametag.textContent).toEqual(r1.name);
         });
     });
 

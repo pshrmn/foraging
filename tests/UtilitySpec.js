@@ -125,4 +125,24 @@ describe("utility functions", function(){
             expect(holder.childElementCount).toEqual(10);
         });
     });
+
+    describe("legalSchemaName", function(){
+        it("returns true for legal filenames", function(){
+            var goodNames = ["test", "good.jpg", "this is legal !"];
+            for ( var i=0, len=goodNames.length; i<len; i++ ) {
+                expect(legalSchemaName(goodNames[i])).toBe(true);
+            }
+        });
+
+        it("returns false for filenames that contain illegal characters", function(){
+            var badNames = ["<", ">", ":", "\"", "\"", "/", "|", "?", "*"];
+            for ( var i=0, len=badNames.length; i<len; i++ ) {
+                expect(legalSchemaName(badNames[i])).toBe(false);
+            }
+        });
+
+        it("returns false for null name", function(){
+            expect(legalSchemaName(null)).toBe(false);
+        });
+    });
 });

@@ -236,6 +236,10 @@ body{
             background: $light-gray;
         }
 
+        .set.active{
+            border: 2px solid $blue;
+        }
+
         .selector{
             margin: 2px 0;
             background: $white;
