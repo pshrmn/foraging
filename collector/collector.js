@@ -518,17 +518,133 @@ function noSelectEle(tag, otherClasses){
 // but has dependencies on variables in collector.js and thus is not modular
 
 /********************
+        SITE
+********************/
+/*
+name is the hostname of the site
+schemas is an object containing the various schemas in the page
+selects are select elements used to switch between different schemas, different pages, and
+different sets
+*/
+function Site(name, schemas){
+    this.name = name;
+    this.schemas = {};
+
+    // create Schemas
+    if ( schemas ) {
+        var schemaObj, schema;
+        for ( var key in schemas ) {
+            schemaObj = schemas[key];
+            schema = new Schema(schemaObj.name, schemaObj.pages, schemaObj.urls);
+            schema.parentSite = this;
+            this.schemas[key] = schema;
+        }
+        
+    } else {
+        this.schemas["default"] = new Schema("default");
+        this.schemas["default"].parentSite = this;
+    }
+
+    // relies on the fact that default schema/page/selector set needs to exist
+    this.current = {
+        schema: undefined,
+        page: undefined,
+        set: undefined
+    };
+
+    this.hasHTML = false;
+    this.eles = {};
+}
+
+Site.prototype.html = function(){
+    var holder = noSelectElement("div"),
+        schemas = noSelectElement("div"),
+        schemaSelect = noSelectElement("select"); 
+
+    this.hasHTML = true;
+    this.eles = {
+        holder: holder,
+        schemas: schemas,
+        select: schemaSelect
+    };
+    // automatically attach the schema select to the page since it will always be shown
+    HTML.perm.schema.select.appendChild(schemaSelect);
+    appendChildren(holder, [schemas]);
+
+    // create html for all schemas, but only show the default one
+    for ( var key in this.schemas ) {
+        this.schemas[key].html();
+        // only show the default schema when first generating html
+        if ( key === "default") {
+            this.schemas[key].eles.holder.classList.add("active");
+        }
+    }
+    return holder;
+};
+
+Site.prototype.addSchema = function(schema){
+    this.schemas[schema.name] = schema;
+    if ( this.hasHTML ) {
+        schema.html();
+        this.loadSchema(schema.name);
+    }
+    this.current.schema = schema;
+};
+
+Site.prototype.loadSchema = function(name){
+    var schema = this.schemas[name],
+        prevSchema = this.current.schema;
+    // if schema doesn't exist or is the same as the current one, do nothing
+    if ( !schema || (prevSchema && prevSchema.name === name) ) {
+        return;
+    }
+
+    this.current.schema = schema;
+    if ( this.hasHTML ) {
+        // select the schema's option
+        if ( schema.eles.option ) {
+            schema.eles.option.selected = true;
+        }
+        // load in the select for the schema's pages
+        HTML.perm.page.select.innerHTML = "";
+        HTML.perm.page.select.appendChild(schema.eles.select);
+        if ( schema.eles.holder ) {
+            // only hide previous schema if it actually exists
+            if ( prevSchema ) {
+                prevSchema.eles.holder.classList.remove("active");
+            }
+            schema.eles.holder.classList.add("active");
+        }
+    }
+
+    // load the default page
+    schema.loadPage("default");
+};
+
+/********************
         SCHEMA
 ********************/
-function Schema(name, urls){
+function Schema(name, pages, urls){
     this.name = name;
     this.urls = urls || {};
-    this.pages = {
-        "default": new Page("default")
-    };
-    this.pageOptions;
-    this.pages["default"].parentSchema = this;
-    this.htmlElements = {};
+    this.pages = {};
+    // create Pages
+    if ( pages ) {
+        var pageObj, page;
+        for ( var key in pages ) {
+            pageObj = pages[key];
+            page = new Page(pageObj.name, pageObj.sets, pageObj.index, pageObj.next);
+            page.parentSchema = this;
+            this.pages[key] = page;
+        }
+    } else {
+        this.pages["default"] = new Page("default");
+        this.pages["default"].parentSchema = this;
+    }
+
+    this.hasHTML = false;
+    this.eles = {};
+    this.parentSite;
 }
 
 Schema.prototype.object = function(){
@@ -599,25 +715,89 @@ Schema.prototype.uploadObject = function(){
 Schema.prototype.html = function(){
     var holder = noSelectElement("div"),
         nametag = noSelectElement("span"),
-        pages = noSelectElement("ul");
+        rename = noSelectElement("button"),
+        pages = noSelectElement("ul"),
+        option = noSelectElement("option"),
+        select = noSelectElement("select");
 
+
+    this.hasHTML = true;
+    this.eles = {
+        holder: holder,
+        nametag: nametag,
+        pages: pages,
+        option: option,
+        select: select
+    };
+
+    // schema tab
     holder.classList.add("schema");
     nametag.textContent = this.name;
     nametag.setAttribute("title", "Schema");
-    appendChildren(holder, [nametag, pages]);
+    rename.textContent = "rename";
+    rename.addEventListener("click", this.events.rename.bind(this), false);
+    appendChildren(holder, [nametag, rename, pages]);
 
     for ( var key in this.pages ) {
-        pages.appendChild(this.pages[key].html());
+        this.pages[key].html();
     }
 
-    this.htmlElements.holder = holder;
-    this.htmlElements.nametag = nametag;
-    this.htmlElements.pages = pages;
+    // Schema option and Page select
+    option.textContent = this.name;
+    option.setAttribute("value", this.name);
 
-    return holder;
+    // automatically append to parent site's schema holder and schema select
+    if ( this.parentSite && this.parentSite.hasHTML ) {
+        this.parentSite.eles.schemas.appendChild(holder);
+        this.parentSite.eles.select.appendChild(option);
+    }
 };
 
 Schema.prototype.deleteHTML = prototypeDeleteHTML;
+
+Schema.prototype.events = {
+    rename: function(event){
+        // do nothing for now
+        event.preventDefault();
+    }
+};
+
+Schema.prototype.loadPage = function(name){
+    var page = this.pages[name],
+        prevPage = this.parentSite.current.page;
+    // if page doesn't exist or is the same as the current one, do nothing
+    if ( !page || (prevPage && prevPage.name === name) ) {
+        return;
+    }
+
+    this.parentSite.current.page = page;
+    if ( this.hasHTML ) {
+        // select the option for the page
+        if ( page.eles.option ) {
+            page.eles.option.selected = true;
+        }
+        // show the select for the page's selector set
+        HTML.perm.set.select.innerHTML = "";
+        HTML.perm.set.select.appendChild(page.eles.select);
+    }
+    page.loadSet("default");
+};
+
+Schema.prototype.rename = function(newName){
+    var oldName = this.name;
+    // always need a default group, so if renaming default, create a new default as well
+    if ( oldName === "default" ) {
+        var def = new Schema("default");
+    }
+
+
+    this.name = newName;
+    if ( this.eles.nametag ) {
+        this.eles.nametag.textContent = newName;
+    }
+
+    // will need to change select option once that is tied to the Schema object
+};
 
 Schema.prototype.toggleURL = function(url){
     if ( this.urls[url] ) {
@@ -637,11 +817,9 @@ Schema.prototype.addPage = function(page){
     this.pages[name] = page;
     page.parentSchema = this;
     // if html for schema exists, also generate html for page
-    if ( this.htmlElements.holder) {
-        var ele = page.html();
-        this.htmlElements.pages.appendChild(ele);
+    if ( this.eles.pages) {
+        page.html();
     }
-    // need to do something with select
 };
 
 Schema.prototype.removePage = function(name){
@@ -697,15 +875,25 @@ Schema.prototype.uniqueRuleName = function(name){
 /********************
         PAGE
 ********************/
-function Page(name, index, next){
+function Page(name, sets, index, next){
     this.name = name,
     this.index = index || false;
     this.next = next;
-    this.sets = {
-        "default": new SelectorSet("default")
-    };
-    this.sets["default"].parentPage = this;
-    this.htmlElements = {};
+    this.sets = {};
+    if ( sets ) {
+        var setObject, set;
+        for ( var key in sets ) {
+            setObject = sets[key];
+            set = new SelectorSet(setObject.name, setObject.selectors, setObject.parent);
+            set.parentPage = this;
+            this.sets[key] = set;
+        }
+    } else {
+        this.sets["default"] = new SelectorSet("default");
+        this.sets["default"].parentPage = this;
+    }
+    this.hasHTML = false;
+    this.eles = {};
     // added when a schema calls addPage
     this.parentSchema;
 }
@@ -768,8 +956,21 @@ Page.prototype.html = function(){
     var holder = noSelectElement("li"),
         nametag = noSelectElement("span"),
         addSet = noSelectElement("button"),
-        sets = noSelectElement("ul");
+        sets = noSelectElement("ul"),
+        option = noSelectElement("option"),
+        setSelect = noSelectElement("select");
 
+    this.hasHTML = true;
+    // elements that need to be interacted with
+    this.eles = {
+        holder: holder,
+        nametag: nametag,
+        option: option,
+        sets: sets,
+        select: setSelect
+    };
+
+    // Schema tab html
     holder.classList.add("page");
     nametag.textContent = this.name;
     nametag.setAttribute("title", "Page");
@@ -778,14 +979,18 @@ Page.prototype.html = function(){
     appendChildren(holder, [nametag, addSet, sets]);
 
     for ( var key in this.sets ) {
-        sets.appendChild(this.sets[key].html());
+        this.sets[key].html();
     }
 
-    this.htmlElements.holder = holder;
-    this.htmlElements.nametag = nametag;
-    this.htmlElements.sets = sets;
+    // Page option, SelectorSet select
+    option.textContent = this.name;
+    option.setAttribute("value", this.name);
 
-    return holder;
+    // automatically append to parent schema's html elements
+    if ( this.parentSchema && this.parentSchema.hasHTML ) {
+        this.parentSchema.eles.pages.appendChild(holder);
+        this.parentSchema.eles.select.appendChild(option);
+    }
 };
 
 Page.prototype.events = {
@@ -793,19 +998,6 @@ Page.prototype.events = {
         event.preventDefault();
         createSelectorSet(this);
     }
-};
-
-Page.prototype.addOption = function(select){
-    if ( !select ) {
-        return;
-    }
-    var option = noSelectElement("option");
-
-    option.setAttribute("value", this.name);
-    option.textContent = this.name;
-
-    select.appendChild(option);
-    this.htmlElements.option = option;
 };
 
 Page.prototype.deleteHTML = prototypeDeleteHTML;
@@ -820,9 +1012,25 @@ Page.prototype.addSet = function(selectorSet){
     this.sets[name] = selectorSet;
     selectorSet.parentPage = this;
     // if html for page exists, also create html for SelectorSet
-    if ( this.htmlElements.holder ) {
-        var ele = selectorSet.html();
-        this.htmlElements.sets.appendChild(ele);
+    if ( this.eles.holder ) {
+        selectorSet.html();
+    }
+};
+
+Page.prototype.loadSet = function(name){
+    var set = this.sets[name],
+        prevSet = this.parentSchema.parentSite.current.set;
+    // if set doesn't exist or is the same as the current one, do nothing
+    if ( !set || (prevSet && prevSet.name === name) ) {
+        return;
+    }
+
+    this.parentSchema.parentSite.current.set = set;
+    if ( this.hasHTML ) {
+        // select the option for the page
+        if ( set.eles.option ) {
+            set.eles.option.selected = true;
+        }
     }
 };
 
@@ -888,12 +1096,12 @@ Page.prototype.updateName = function(name){
         delete this.parentSchema.pages[oldName];
     }
 
-    if ( this.htmlElements.option ) {
-        this.htmlElements.option.setAttribute("value", this.name);
-        this.htmlElements.option.textContent = this.name;
+    if ( this.eles.option ) {
+        this.eles.option.setAttribute("value", this.name);
+        this.eles.option.textContent = this.name;
     }
-    if ( this.htmlElements.nametag ) {
-        this.htmlElements.nametag.textContent = this.name;
+    if ( this.eles.nametag ) {
+        this.eles.nametag.textContent = this.name;
     }
 };
 
@@ -911,12 +1119,19 @@ Page.prototype.preview = function(){
 name: name of the selector set
 parent: selector/range for selecting a selector set's parent element
 ********************/
-function SelectorSet(name, parent){
+function SelectorSet(name, selectors, parent){
     this.name = name;
     this.parent = parent;
     this.selectors = {};
-    this.htmlElements = {};
-    // added when a page calls addSet
+    var selectorObj, selector;
+    for ( var key in selectors ) {
+        selectorObj = selectors[key];
+        selector = new Selector(selectorObj.selector, selectorObj.rules);
+        selector.parentSet = this;
+        this.selectors[key] = selector;
+    }
+    this.hasHTML = false;
+    this.eles = {};
     this.parentPage;
 }
 
@@ -974,21 +1189,38 @@ SelectorSet.prototype.html = function(){
     var holder = noSelectElement("li"),
         nametag = noSelectElement("span"),
         //addSelector = noSelectElement("button"),
-        ul = noSelectElement("ul");
-        
+        selectors = noSelectElement("selectors"),
+        option = noSelectElement("option");
+
+    this.hasHTML = true;
+    this.eles = {
+        holder: holder,
+        nametag: nametag,
+        selectors: selectors,
+        option: option
+    };
+
+    // Schema tab html        
     holder.classList.add("set");
     nametag.textContent = this.name;
     nametag.setAttribute("title", "Selector Set");
     //addSelector.textContent = "add selector";
     //addSelector.addEventListener("click", this.events.addSelector.bind(this), false);
     //appendChildren(holder, [nametag, addSelector, ul]);
-    appendChildren(holder, [nametag, ul]);
+    appendChildren(holder, [nametag, selectors]);
 
-    this.htmlElements.holder = holder;
-    this.htmlElements.nametag = nametag;
-    this.htmlElements.selectors = ul;
+    for ( var key in this.selectors ) {
+        this.selectors[key].html();
+    }
 
-    return holder;
+    // SelectorSet option
+    option.textContent = this.name;
+    option.setAttribute("value", this.name);
+
+    if ( this.parentPage && this.parentPage.hasHTML ) {
+        this.parentPage.eles.sets.appendChild(holder);
+        this.parentPage.eles.select.appendChild(option);
+    }
 };
 
 /*
@@ -1006,19 +1238,6 @@ SelectorSet.prototype.events = {
 };
 */
 
-SelectorSet.prototype.addOption = function(select){
-    if ( !select ) {
-        return;
-    }
-    var option = noSelectElement("option");
-
-    option.setAttribute("value", this.name);
-    option.textContent = this.name;
-
-    select.appendChild(option);
-    this.htmlElements.option = option;
-};
-
 SelectorSet.prototype.deleteHTML = prototypeDeleteHTML;
 
 SelectorSet.prototype.addParent = function(parent){
@@ -1031,11 +1250,10 @@ SelectorSet.prototype.removeParent = function(){
 
 SelectorSet.prototype.addSelector = function(selector){
     this.selectors[selector.selector] = selector;
-    if ( this.htmlElements.selectors) {
-        var ele = selector.html();
-        this.htmlElements.selectors.appendChild(ele);
-    }
     selector.parentSet = this;
+    if ( this.hasHTML ) {
+        selector.html();
+    }
 };
 
 SelectorSet.prototype.removeSelector = function(name){
@@ -1100,8 +1318,17 @@ SelectorSet.prototype.preview = function(){
 ********************/
 function Selector(selector, rules){
     this.selector = selector;
-    this.rules = rules || {};
-    this.htmlElements = {};
+    this.rules = {};
+    var ruleObj, rule;
+    for ( var key in rules ) {
+        ruleObj = rules[key];
+        rule = new Rule(ruleObj.name, ruleObj.capture, ruleObj.follow);
+        rule.parentSelector = this;
+        this.rules[key] = rule;
+    }
+    this.hasHTML = false;
+    this.eles = {};
+    this.parentSet;
 }
 
 Selector.prototype.object = function(){
@@ -1136,17 +1363,15 @@ Selector.prototype.addRule = function(rule){
     // add a new Page to the schema with the name of the Rule
     if ( rule.follow && this.parentSet && this.parentSet.parentPage && this.parentSet.parentPage.parentSchema ) {
         // only add page if it doesn't already exist
-        if ( !this.parentSet.parentPage.parentSchema.pages[rule.name] ) {
+        if ( !this.parentSet.parentPage.parentSchema.uniquePageName(rule.name) ) {
             var page = new Page(rule.name);
-            page.addOption(HTML.perm.page.select);
             this.parentSet.parentPage.parentSchema.addPage(page);
         }
     }
 
     // if Selector html exists, also create html for rule
-    if ( this.htmlElements.rules ) {
-        var ele = rule.html();
-        this.htmlElements.rules.appendChild(ele);
+    if ( this.hasHTML ) {
+        rule.html();
     }
 };
 
@@ -1161,8 +1386,8 @@ Selector.prototype.removeRule = function(name){
 Selector.prototype.updateSelector = function(newSelector){
     var oldSelector = this.selector;
     this.selector = newSelector;
-    if ( this.htmlElements.nametag ) {
-        this.htmlElements.nametag.textContent = newSelector;
+    if ( this.eles.nametag ) {
+        this.eles.nametag.textContent = newSelector;
     }
 
     if ( this.parentSet ) {
@@ -1180,13 +1405,18 @@ Selector.prototype.html = function(){
         remove = noSelectElement("button"),
         rules = noSelectElement("ul");
 
+    this.hasHTML = true;
+    this.eles = {
+        holder: holder,
+        nametag: nametag,
+        rules: rules
+    };
+
     holder.classList.add("selector");
     nametag.textContent = this.selector;
-
     newRule.textContent = "add rule";
     editSelector.textContent = "edit";
     remove.textContent = "×";
-
     holder.addEventListener("mouseenter", this.events.preview.bind(this), false);
     holder.addEventListener("mouseleave", this.events.unpreview.bind(this), false);
     newRule.addEventListener("click", this.events.newRule.bind(this), false);
@@ -1195,14 +1425,9 @@ Selector.prototype.html = function(){
 
     appendChildren(holder, [identifier, nametag, editSelector, newRule, remove, rules]);
 
-    this.htmlElements.holder = holder;
-    this.htmlElements.nametag = nametag;
-    this.htmlElements.newRule = newRule;
-    this.htmlElements.editSelector = editSelector;
-    this.htmlElements.remove = remove;
-    this.htmlElements.rules = rules;
-
-    return holder;
+    if ( this.parentSet && this.parentSet.hasHTML ) {
+        this.parentSet.eles.selectors.appendChild(holder);
+    }
 };
 
 Selector.prototype.events = {
@@ -1269,7 +1494,8 @@ function Rule(name, capture, follow){
     this.name = name;
     this.capture = capture;
     this.follow = follow || false;
-    this.htmlElements = {};
+    this.hasHTML = false;
+    this.eles = {};
     // added when a SelectorSet calls addRule
     this.parentSelector;
 }
@@ -1294,6 +1520,13 @@ Rule.prototype.html = function(){
         edit = noSelectElement("button"),
         deltog = noSelectElement("button");
 
+    this.hasHTML = true;
+    this.eles = {
+        holder: holder,
+        nametag: nametag,
+        capturetag: capturetag
+    };
+
     holder.classList.add("rule");
     nametag.textContent = this.name;
     capturetag.textContent = "(" + this.capture + ")";
@@ -1307,13 +1540,10 @@ Rule.prototype.html = function(){
     edit.addEventListener("click", this.events.edit.bind(this), false);
     deltog.addEventListener("click", this.events.remove.bind(this), false);
     
-    this.htmlElements.holder = holder;
-    this.htmlElements.nametag = nametag;
-    this.htmlElements.capturetag = capturetag;
-    this.htmlElements.edit = edit;
-    this.htmlElements.deltog = deltog;
-
-    return holder;
+    // automatically append to parent selector's rule holder
+    if ( this.parentSelector && this.parentSelector.hasHTML ) {
+        this.parentSelector.eles.pages.appendChild(holder);
+    }
 };
 
 Rule.prototype.events = {
@@ -1351,8 +1581,8 @@ Rule.prototype.update = function(object){
         newName = object.name;
     if ( oldName !== newName ) {
         // update nametag if html has been generated
-        if ( this.htmlElements.nametag ) {
-            this.htmlElements.nametag.textContent = newName;
+        if ( this.eles.nametag ) {
+            this.eles.nametag.textContent = newName;
         }
         if ( this.parentSelector ) {
             this.parentSelector.rules[newName] = this;
@@ -1361,8 +1591,8 @@ Rule.prototype.update = function(object){
     }
     var oldCapture = this.capture,
         newCapture = object.capture;
-    if ( oldCapture !== newCapture && this.htmlElements.capturetag ) {
-        this.htmlElements.capturetag.textContent = "(" + newCapture + ")";
+    if ( oldCapture !== newCapture && this.eles.capturetag ) {
+        this.eles.capturetag.textContent = "(" + newCapture + ")";
     }
 
     var oldFollow = this.follow,
@@ -1440,8 +1670,8 @@ Rule.prototype.preview = function(element){
 
 // shared delete function
 function prototypeDeleteHTML(){
-    var holder = this.htmlElements.holder,
-        option = this.htmlElements.option;
+    var holder = this.eles.holder,
+        option = this.eles.option;
     if ( option && option.parentElement ) {
         option.parentElement.removeChild(option);
     }
@@ -1628,7 +1858,7 @@ var marginBottom;
 (function addInterface(){
     var div = noSelectElement("div");
     div.classList.add("collectjs");
-    div.innerHTML = "<div class=\"tabHolder\"><div class=\"tabs\"><div class=\"tab active\" id=\"schemasTab\" data-for=\"schemasView\">Schema</div><div class=\"tab\" id=\"selectorTab\" data-for=\"selectorView\">Selector</div><div class=\"tab\" id=\"ruleTab\" data-for=\"ruleView\">Rule</div><div class=\"tab\" id=\"previewTab\" data-for=\"previewView\">Preview</div><div class=\"tab\" id=\"optionsTab\" data-for=\"optionsView\">Options</div><div class=\"tab\" id=\"closeCollect\">&times;</div></div></div><div class=\"permanent\"><div class=\"currentInfo\"><div>Schema: <select id=\"schemaSelect\"></select><button id=\"createSchema\" title=\"create a new schema\">+</button><button id=\"deleteSchema\" title=\"delete current schema\">&times;</button><div id=\"indexMarker\" class=\"info\">Initial URL<input type=\"checkbox\" id=\"indexToggle\" /></div></div><div>Page: <select id=\"pageSelect\"></select><button id=\"clearPage\" title=\"clear out current page\">&times;</button><div id=\"nextHolder\" class=\"info\">Next:<span id=\"nextSelectorView\"></span><button id=\"removeNext\">&times;</button></div></div><div>Selector Set: <select id=\"selectorSetSelect\"></select><button id=\"createSelectorSet\" title=\"create a new selector set\">+</button><button id=\"deleteSelectorSet\" title=\"delete current selector set\">&times;</button><div id=\"currentParent\" class=\"info\">Parent:<span id=\"parentSelectorView\"></span><span id=\"parentRangeView\"></span><button id=\"removeParent\">&times;</button></div></div><button id=\"uploadRules\">Upload Schema</button></div><div id=\"collectAlert\"></div></div><div class=\"views\"><div class=\"view\" id=\"emptyView\"></div><div class=\"view active\" id=\"schemasView\"><div id=\"schemaHolder\" class=\"rules\"></div></div><div class=\"view\" id=\"selectorView\"><div class=\"column form\"><!--displays what the current selector is--><p>Selector: <span id=\"currentSelector\"></span></p><p>Count: <span id=\"currentCount\"></span></p><div><h3>Type:</h3><p><label for=\"selectorRadio\">Selector</label><input type=\"radio\" id=\"selectorRadio\" name=\"selector\" value=\"selector\" checked/></p><p><label for=\"parentRadio\">Parent</label><input type=\"radio\" id=\"parentRadio\" name=\"selector\" value=\"parent\" /></p><p><label for=\"nextRadio\">Next</label><input type=\"radio\" id=\"nextRadio\" name=\"selector\" value=\"next\" /></p></div><div id=\"parentRange\"><label>Low: <input id=\"parentLow\" name=\"parentLow\" type=\"text\" /></label><label for=\"parentHigh\">High: <input id=\"parentHigh\" name=\"parentHigh\" type=\"text\" /></label></div><p><button id=\"saveSelector\">Save</button><button id=\"clearSelector\">Clear</button></p></div><div class=\"column\"><!--holds the interactive element for choosing a selector--><div id=\"selectorHolder\"></div><div id=\"selectorCycleHolder\"></div></div></div><div class=\"view\" id=\"ruleView\"><div id=\"ruleItems\" class=\"items\"><h3>Selector: <span id=\"ruleSelector\"></span></h3><form id=\"ruleForm\" class=\"column form\"><div class=\"rule\"><label for=\"ruleName\" title=\"the name of a rule\">Name:</label><input id=\"ruleName\" name=\"ruleName\" type=\"text\" /></div><div class=\"rule\"><label title=\"the attribute of an element to capture\">Capture:</label><span id=\"ruleAttr\"></span></div><div class=\"rule follow\"><label for=\"ruleFollow\" title=\"create a new page from the element's captured url (capture must be attr-href)\">Follow:</label><input id=\"ruleFollow\" name=\"ruleFollow\" type=\"checkbox\" disabled=\"true\" title=\"Can only follow rules that get href attribute from links\" /></div><div><button id=\"saveRule\">Save Rule</button><button id=\"cancelRule\">Cancel</button></div></form><div class=\"modifiers column\"><div id=\"ruleCycleHolder\"></div></div></div></div><div class=\"view\" id=\"previewView\"><div id=\"previewContents\"></div></div><div class=\"view\" id=\"optionsView\"><p><label for=\"ignore\">Ignore helper elements (eg tbody)</label><input type=\"checkbox\" id=\"ignore\" /></p></div></div>";
+    div.innerHTML = "<div class=\"tabHolder\"><div class=\"tabs\"><div class=\"tab active\" id=\"schemasTab\" data-for=\"schemasView\">Schema</div><div class=\"tab\" id=\"selectorTab\" data-for=\"selectorView\">Selector</div><div class=\"tab\" id=\"ruleTab\" data-for=\"ruleView\">Rule</div><div class=\"tab\" id=\"previewTab\" data-for=\"previewView\">Preview</div><div class=\"tab\" id=\"optionsTab\" data-for=\"optionsView\">Options</div><div class=\"tab\" id=\"closeCollect\">&times;</div></div></div><div class=\"permanent\"><div class=\"currentInfo\"><div>Schema: <div id=\"schemaSelect\"></div><button id=\"createSchema\" title=\"create a new schema\">+</button><button id=\"deleteSchema\" title=\"delete current schema\">&times;</button><div id=\"indexMarker\" class=\"info\">Initial URL<input type=\"checkbox\" id=\"indexToggle\" /></div></div><div>Page: <div id=\"pageSelect\"></div><button id=\"clearPage\" title=\"clear out current page\">&times;</button><div id=\"nextHolder\" class=\"info\">Next:<span id=\"nextSelectorView\"></span><button id=\"removeNext\">&times;</button></div></div><div>Selector Set: <div id=\"selectorSetSelect\"></div><button id=\"createSelectorSet\" title=\"create a new selector set\">+</button><button id=\"deleteSelectorSet\" title=\"delete current selector set\">&times;</button><div id=\"currentParent\" class=\"info\">Parent:<span id=\"parentSelectorView\"></span><span id=\"parentRangeView\"></span><button id=\"removeParent\">&times;</button></div></div><button id=\"uploadRules\">Upload Schema</button></div><div id=\"collectAlert\"></div></div><div class=\"views\"><div class=\"view\" id=\"emptyView\"></div><div class=\"view active\" id=\"schemasView\"><div id=\"schemaHolder\" class=\"rules\"></div></div><div class=\"view\" id=\"selectorView\"><div class=\"column form\"><!--displays what the current selector is--><p>Selector: <span id=\"currentSelector\"></span></p><p>Count: <span id=\"currentCount\"></span></p><div><h3>Type:</h3><p><label for=\"selectorRadio\">Selector</label><input type=\"radio\" id=\"selectorRadio\" name=\"selector\" value=\"selector\" checked/></p><p><label for=\"parentRadio\">Parent</label><input type=\"radio\" id=\"parentRadio\" name=\"selector\" value=\"parent\" /></p><p><label for=\"nextRadio\">Next</label><input type=\"radio\" id=\"nextRadio\" name=\"selector\" value=\"next\" /></p></div><div id=\"parentRange\"><label>Low: <input id=\"parentLow\" name=\"parentLow\" type=\"text\" /></label><label for=\"parentHigh\">High: <input id=\"parentHigh\" name=\"parentHigh\" type=\"text\" /></label></div><p><button id=\"saveSelector\">Save</button><button id=\"clearSelector\">Clear</button></p></div><div class=\"column\"><!--holds the interactive element for choosing a selector--><div id=\"selectorHolder\"></div><div id=\"selectorCycleHolder\"></div></div></div><div class=\"view\" id=\"ruleView\"><div id=\"ruleItems\" class=\"items\"><h3>Selector: <span id=\"ruleSelector\"></span></h3><form id=\"ruleForm\" class=\"column form\"><div class=\"rule\"><label for=\"ruleName\" title=\"the name of a rule\">Name:</label><input id=\"ruleName\" name=\"ruleName\" type=\"text\" /></div><div class=\"rule\"><label title=\"the attribute of an element to capture\">Capture:</label><span id=\"ruleAttr\"></span></div><div class=\"rule follow\"><label for=\"ruleFollow\" title=\"create a new page from the element's captured url (capture must be attr-href)\">Follow:</label><input id=\"ruleFollow\" name=\"ruleFollow\" type=\"checkbox\" disabled=\"true\" title=\"Can only follow rules that get href attribute from links\" /></div><div><button id=\"saveRule\">Save Rule</button><button id=\"cancelRule\">Cancel</button></div></form><div class=\"modifiers column\"><div id=\"ruleCycleHolder\"></div></div></div></div><div class=\"view\" id=\"previewView\"><div id=\"previewContents\"></div></div><div class=\"view\" id=\"optionsView\"><p><label for=\"ignore\">Ignore helper elements (eg tbody)</label><input type=\"checkbox\" id=\"ignore\" /></p></div></div>";
     document.body.appendChild(div);
     addNoSelect(div.querySelectorAll("*"));
 
@@ -1774,6 +2004,9 @@ var UI = {
 
 // save commonly referenced to elements
 var HTML = {
+    schema: {
+        holder: document.getElementById("schemaHolder")
+    },
     // elements in the selector view
     selector: {
         family: document.getElementById("selectorHolder"),
@@ -1803,7 +2036,6 @@ var HTML = {
     perm: {
         schema: {
             select: document.getElementById("schemaSelect"),
-            holder: document.getElementById("schemaHolder"),
             index: {
                 holder: document.getElementById("indexMarker"),
                 checkbox: document.getElementById("indexToggle")
@@ -2610,12 +2842,13 @@ If the site object exists for a host, load the saved rules
 function setupHostname(){
     chrome.storage.local.get("sites", function setupHostnameChrome(storage){
         var host = window.location.hostname,
-            site = storage.sites[host],
-            schema,
+            siteObject = storage.sites[host],
+            site,
             key;
         // default setup if page hasn't been visited before
-        if ( !site ) {
-            schema = newSchema("default");
+        if ( !siteObject ) {
+            site = new Site(host);
+            /*schema = newSchema("default");
             storage.sites[host] = {
                 site: host,
                 schemas: {
@@ -2623,11 +2856,16 @@ function setupHostname(){
                 }
             };
             chrome.storage.local.set({'sites': storage.sites});
+            */
+
         } else {
-            options(Object.keys(site.schemas), HTML.perm.schema.select);
-            schema = site.schemas['default'];
+            site = new Site(host, siteObject.schemas);
         }
-        loadSchemaObject(schema);
+        Collect.site = site;
+        var siteHTML = site.html();
+        HTML.schema.holder.appendChild(siteHTML);
+        site.loadSchema("default");
+        //loadSchemaObject(schema);
     });
 }
 

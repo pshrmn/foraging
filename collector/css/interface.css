@@ -7,6 +7,7 @@ body {
 .collectjs {
   z-index: 1000;
   position: fixed;
+  left: 0;
   bottom: 0;
   width: 100%;
   min-width: 450px;
@@ -135,7 +136,10 @@ body {
       border-style: solid;
       border-color: #cccccc; }
     .collectjs .rules .schema {
-      background: #efefef; }
+      background: #efefef;
+      display: none; }
+    .collectjs .rules .schema.active {
+      display: block; }
     .collectjs .rules .page {
       margin: 3px 0;
       background: white; }

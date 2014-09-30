@@ -22,6 +22,7 @@ body{
 .collectjs{
     z-index:1000;
     position: fixed;
+    left: 0;
     bottom: 0;
     width: 100%;
     min-width: 450px;
@@ -218,6 +219,11 @@ body{
 
         .schema{
             background: $light-gray;
+            display: none;
+        }
+
+        .schema.active{
+            display: block;
         }
 
         .page{

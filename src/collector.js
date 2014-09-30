@@ -151,6 +151,9 @@ var UI = {
 
 // save commonly referenced to elements
 var HTML = {
+    schema: {
+        holder: document.getElementById("schemaHolder")
+    },
     // elements in the selector view
     selector: {
         family: document.getElementById("selectorHolder"),
@@ -180,7 +183,6 @@ var HTML = {
     perm: {
         schema: {
             select: document.getElementById("schemaSelect"),
-            holder: document.getElementById("schemaHolder"),
             index: {
                 holder: document.getElementById("indexMarker"),
                 checkbox: document.getElementById("indexToggle")
@@ -440,44 +442,16 @@ function optionsViewEvents(){
 
 function permanentBarEvents(){
     // schema events
-    idEvent("schemaSelect", "change", function loadSchemaEvent(event){
-        event.preventDefault();
-        loadSchema(this);
-    });
-
-    idEvent("createSchema", "click", function newSchemaEvent(event){
-        event.preventDefault();
-        createSchema();
-    });
-
     idEvent("deleteSchema", "click", function deleteSchemaEvent(event){
         event.preventDefault();
         deleteSchema();
     });
 
-    // page events
-    idEvent("pageSelect", "change", function loadPageEvent(event){
-        event.preventDefault();
-        loadPage(this);
-    });
-
-    idEvent("clearPage", "click", function clearPageEvent(event){
-        event.preventDefault();
-        clearPage();
-    });
-
-    // don't need to create a page, those are automatically made when creating a rule that captures
-    // attr-href and follow=true
 
     // selector set events
     idEvent("createSelectorSet", "click", function newSelectorSetEvent(event){
         event.preventDefault();
         createSelectorSet(Collect.current.page);
-    });
-
-    idEvent("selectorSetSelect", "change", function loadSetEvent(event){
-        event.preventDefault();
-        loadSet(this);
     });
 
     idEvent("deleteSelectorSet", "click", function deleteSelectorSetEvent(event){
@@ -987,12 +961,13 @@ If the site object exists for a host, load the saved rules
 function setupHostname(){
     chrome.storage.local.get("sites", function setupHostnameChrome(storage){
         var host = window.location.hostname,
-            site = storage.sites[host],
-            schema,
+            siteObject = storage.sites[host],
+            site,
             key;
         // default setup if page hasn't been visited before
-        if ( !site ) {
-            schema = newSchema("default");
+        if ( !siteObject ) {
+            site = new Site(host);
+            /*schema = newSchema("default");
             storage.sites[host] = {
                 site: host,
                 schemas: {
@@ -1000,11 +975,16 @@ function setupHostname(){
                 }
             };
             chrome.storage.local.set({'sites': storage.sites});
+            */
+
         } else {
-            options(Object.keys(site.schemas), HTML.perm.schema.select);
-            schema = site.schemas['default'];
+            site = new Site(host, siteObject.schemas);
         }
-        loadSchemaObject(schema);
+        Collect.site = site;
+        var siteHTML = site.html();
+        HTML.schema.holder.appendChild(siteHTML);
+        site.loadSchema("default");
+        //loadSchemaObject(schema);
     });
 }
 
@@ -1019,48 +999,6 @@ function uploadSchema(){
 /***********************
     SCHEMA STORAGE
 ***********************/
-
-function createSchema(){
-    var name = prompt("Schema Name");
-    // null when cancelling prompt
-    if ( name === null ) {
-        return;
-    }
-    // make sure name isn't empty string or string that can't be used in a filename
-    else if ( name === "" || !legalFilename(name)) {
-        alertMessage("\'" + name + "\' is not a valid schema name");
-        return;
-    }
-    
-    chrome.storage.local.get("sites", function(storage){
-        var host = window.location.hostname,
-            site = storage.sites[host],
-            schema;
-
-        if ( !uniqueSchemaName(name, site.schemas)){
-            alertMessage("a schema named \"" + name + "\" already exists");
-            return;
-        }
-
-        schema = newSchema(name);
-        storage.sites[host].schemas[name] = schema;
-
-        chrome.storage.local.set({'sites': storage.sites});
-        loadSchemaObject(schema);
-    });
-}
-
-function loadSchema(ele){
-    var option = ele.querySelector('option:checked'),
-        name = option.value;
-    chrome.storage.local.get('sites', function loadSchemasChrome(storage){
-        var host = window.location.hostname,
-            site = storage.sites[host],
-            schema = site.schemas[name];
-        resetInterface();
-        loadSchemaObject(schema);
-    });
-}
 
 /*
 saving function for all things schema related
@@ -1110,38 +1048,8 @@ function deleteSchema(){
 }
 
 /***********************
-    PAGE STORAGE
-***********************/
-
-function loadPage(ele){
-    var option = ele.querySelector('option:checked'),
-        name = option.value;
-    resetInterface();
-    loadPageObject(Collect.current.schema.pages[name]);
-}
-
-function clearPage(){
-    var confirmed = confirm("Clear out all selector sets, selectors, and rules from the page?");
-    if ( !confirmed ) {
-        return;
-    }
-    Collect.current.page.reset();
-
-    saveSchema();
-    resetInterface();
-    loadPageObject(Collect.current.page);
-}
-
-/***********************
     SELECTOR SET STORAGE
 ***********************/
-
-function loadSet(ele){
-    var option = ele.querySelector("option:checked"),
-        name = option.value;
-    resetInterface();
-    loadSetObject(Collect.current.page.sets[name]);
-}
 
 function createSelectorSet(page){
     var name = prompt("Selector Set Name");
@@ -1239,28 +1147,6 @@ function newSchema(name){
         },
         urls: {}
     };
-}
-
-function uniqueSchemaName(name, schemas){
-    for ( var key in schemas ) {
-        if ( name === key ) {
-            return false;
-        }
-    }
-    return true;
-}
-
-/*
-a schema's name will be the name of the file when it is uploaded, so make sure that any characters in the name will be legal to use
-rejects if name contains characters not allowed in filename: <, >, :, ", \, /, |, ?, *
-*/
-function legalFilename(name){
-    if ( name === null ) {
-        return false;
-    }
-    var badCharacters = /[<>:"\/\\\|\?\*]/,
-        match = name.match(badCharacters);
-    return ( match === null );
 }
 
 /*
