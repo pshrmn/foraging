@@ -10,16 +10,14 @@ class Page(object):
     """
     name is the name of the page
     sets are the selector sets associated with the page
-    index is whether or not the page is an index (starting) page from which more pages are generated
-    next is a selector for another index page (only used when index=True)
+    next is a selector for another index page
     dynamic is whether or not data necessary to collect is dynamically loaded (so need to
         use selenium/phantomjs)
     """
-    def __init__(self, name, sets, index=False, next=None, dynamic=False):
+    def __init__(self, name, sets, next=None, dynamic=False):
         self.name = name
         self.sets = sets
         self.next = next
-        self.index = index
         # if dynamic, will make a request to a url using selenium/phantomjs
         # otherwise just use requests for nice and simple stuff
         self.dynamic = dynamic
@@ -32,10 +30,9 @@ class Page(object):
         name = page_json["name"]
         sel_sets = page_json["sets"]
         sets = {key: SelectorSet.from_json(ss) for key, ss in sel_sets.iteritems()}
-        index = page_json.get("index", False)
         next = page_json.get("next")
         dynamic = page_json.get("dynamic", False)
-        return cls(name, sets, index, next, dynamic)
+        return cls(name, sets, next, dynamic)
 
     def get(self, url):
         """

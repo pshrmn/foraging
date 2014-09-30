@@ -36,7 +36,7 @@ class Schema(object):
                     new_data.append(val)
                 crawled_data[key] = new_data
             # if the page has a next selector, use it to get
-            if self.page.index:
+            if self.page.next:
                 next_url = self.page.next_page(url)
                 if next_url:
                     self.urls.put(next_url)

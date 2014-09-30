@@ -30,25 +30,21 @@ class FromJSONTestCase(unittest.TestCase):
         # do tests on default page
         page = self.schema.page
         self.assertEqual(page.name, "default")
-        self.assertFalse(page.index)
         self.assertIsNone(page.next)
 
         # page with next
         next_json = {
             "name": "default",
             "sets": {},
-            "index": True,
             "next": "a.next"
         }
         page_next = Page.from_json(next_json)
-        self.assertTrue(page_next.index)
         self.assertIsInstance(page_next.next, CSSSelector)
 
         # page with next but not default
         other_next_json = {
             "name": "not_default",
             "sets": {},
-            "index": True,
             "next": "a.next"
         }
         other_page_next = Page.from_json(other_next_json)
