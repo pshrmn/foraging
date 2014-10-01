@@ -158,6 +158,17 @@ body {
       padding: 5px;
       background: #efefef;
       display: inline-block; }
+    .collectjs .rules .parent.hidden {
+      display: none; }
+    .collectjs .rules .next.hidden {
+      display: none; }
+    .collectjs .rules button {
+      font-weight: bold;
+      background: transparent; }
+    .collectjs .rules button.pos:hover {
+      color: #489675; }
+    .collectjs .rules button.neg:hover {
+      color: #c91900; }
   .collectjs .items {
     font-size: 16px;
     color: black; }

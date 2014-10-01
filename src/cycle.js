@@ -113,8 +113,9 @@ var Cycle = (function(){
     takes an element and remove collectjs related classes and shorten text, then returns outerHTML
     */
     function cleanElement(ele){
-        ele.classList.remove('queryCheck');
-        ele.classList.remove('collectHighlight');
+        ele.classList.remove("queryCheck");
+        ele.classList.remove("collectHighlight");
+        ele.classList.remove("savedPreview");
         if ( ele.hasAttribute('src') ) {
             var value = ele.getAttribute('src'),
                 query = value.indexOf('?');

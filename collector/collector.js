@@ -83,6 +83,16 @@ function legalSchemaName(name){
     return ( match === null );
 }
 
+function createRangeString(low, high){
+    var rangeString = "Range: ";
+    low = parseInt(low, 10);
+    high = parseInt(high, 10);
+    rangeString += (low !== 0 && !isNaN(low)) ? low : "start";
+    rangeString += " to ";
+    rangeString += (high !== 0 && !isNaN(high)) ? high : "end";
+    return rangeString;
+}
+
 // Source: src/selector.js
 /********************
     SELECTORFAMILY
@@ -833,7 +843,10 @@ Schema.prototype.html = function(){
         //rename = noSelectElement("button"),
         pages = noSelectElement("ul"),
         option = noSelectElement("option"),
-        select = noSelectElement("select");
+        select = noSelectElement("select"),
+        indexHolder = noSelectElement("div"),
+        indexText = document.createTextNode("Initial URL: "),
+        indexCheckbox = noSelectElement("input");
 
 
     this.hasHTML = true;
@@ -842,7 +855,11 @@ Schema.prototype.html = function(){
         nametag: nametag,
         pages: pages,
         option: option,
-        select: select
+        select: select,
+        index: {
+            holder: indexHolder,
+            checkbox: indexCheckbox
+        }
     };
 
     // schema tab
@@ -852,7 +869,16 @@ Schema.prototype.html = function(){
     //rename.textContent = "rename";
     //rename.addEventListener("click", this.events.rename.bind(this), false);
     //appendChildren(holder, [nametag, rename, pages]);
-    appendChildren(holder, [nametag, pages]);
+
+    var url = window.location.href;
+    indexCheckbox.setAttribute("type", "checkbox");
+    indexCheckbox.addEventListener("change", this.events.toggleURL.bind(this), false);
+    if ( this.urls[url] ) {
+        indexCheckbox.checked = true;
+    }
+
+    appendChildren(indexHolder, [indexText, indexCheckbox]);
+    appendChildren(holder, [nametag, indexHolder, pages]);
 
     for ( var key in this.pages ) {
         this.pages[key].html();
@@ -882,6 +908,15 @@ Schema.prototype.events = {
             name = option.value;
         resetInterface();
         this.loadPage(name);
+    },
+    toggleURL: function(event){
+        var on = this.toggleURL(window.location.href),
+            defaultPage = this.pages["default"];
+        
+        if ( !on && defaultPage.next ) {
+            defaultPage.removeNext();
+        }
+        Collect.site.saveCurrent();
     }
 };
 
@@ -1097,7 +1132,11 @@ Page.prototype.html = function(){
         clear = noSelectElement("button"),
         sets = noSelectElement("ul"),
         option = noSelectElement("option"),
-        setSelect = noSelectElement("select");
+        setSelect = noSelectElement("select"),
+        nextHolder = noSelectElement("div"),
+        nextText = document.createTextNode("Next: "),
+        nextSelector = noSelectElement("span"),
+        nextRemove = noSelectElement("button");
 
     this.hasHTML = true;
     // elements that need to be interacted with
@@ -1106,22 +1145,43 @@ Page.prototype.html = function(){
         nametag: nametag,
         option: option,
         sets: sets,
-        select: setSelect
+        select: setSelect,
+        next: {
+            holder: nextHolder,
+            selector: nextSelector,
+            remove: nextRemove
+        }
     };
 
     // Schema tab html
     holder.classList.add("page");
     nametag.textContent = this.name;
     nametag.setAttribute("title", "Page");
-    createSet.textContent = "add set";
+    createSet.textContent = "+Set";
+    createSet.classList.add("pos");
     createSet.addEventListener("click", this.events.createSet.bind(this), false);
     clear.textContent = "clear";
     clear.addEventListener("click", this.events.clear.bind(this), false);
-    appendChildren(holder, [nametag, createSet, sets]);
+
+    // Next
+    nextRemove.innerHTML = "&times;";
+    nextRemove.addEventListener("click", this.events.removeNext.bind(this), false);
+    nextHolder.classList.add("next");
+    if ( this.next ) {
+        nextSelector.textContent = this.next;
+    } else {
+        nextSelector.textContent = "";
+        nextHolder.classList.add("hidden");
+    }
+
+    appendChildren(nextHolder, [nextText, nextSelector, nextRemove]);
+    appendChildren(holder, [nametag, createSet, nextHolder, sets]);
 
     for ( var key in this.sets ) {
         this.sets[key].html();
     }
+
+
 
     // Page option, SelectorSet select
     option.textContent = this.name;
@@ -1153,7 +1213,7 @@ Page.prototype.events = {
         }
         var set = new SelectorSet(name);
         this.addSet(set);
-        Collect.current.site.save();
+        Collect.site.save();
     },
     clear: function(event){
         var confirmed = confirm("Clear out all selector sets, selectors, and rules from the page?");
@@ -1161,13 +1221,16 @@ Page.prototype.events = {
             return;
         }
         this.reset();
-        Collect.current.site.save();
+        Collect.site.save();
     },
     loadSet: function(event){
         var option = this.eles.select.querySelector('option:checked'),
             name = option.value;
         resetInterface();
         this.loadSet(name);
+    },
+    removeNext: function(event){
+        this.removeNext();
     }
 };
 
@@ -1205,11 +1268,9 @@ Page.prototype.loadSet = function(name){
     // show the selector set's parent if it exists
     if ( set.parent ) {
         Collect.parent = set.parent;
-        showParent();
         addParentSchema(set.parent);
     } else {
         Collect.parent = {};
-        hideParent();
         clearClass("parentSchema");
     }
 
@@ -1254,8 +1315,20 @@ Page.prototype.remove = function(){
     }
 };
 
+Page.prototype.addNext = function(selector){
+    this.next = selector;
+    if ( this.hasHTML ) {
+        this.eles.next.holder.classList.remove("hidden");
+        this.eles.next.selector.textContent = selector;
+    }
+};
+
 Page.prototype.removeNext = function(){
     this.next = undefined;
+    if ( this.hasHTML ) {
+        this.eles.next.holder.classList.add("hidden");
+        this.eles.next.selector.textContent = "";
+    }
 };
 
 /***
@@ -1380,6 +1453,12 @@ SelectorSet.prototype.html = function(){
         nametag = noSelectElement("span"),
         remove = noSelectElement("button"),
         addSelector = noSelectElement("button"),
+        parentHolder = noSelectElement("div"),
+        parentText = document.createTextNode("Parent Selector: "),
+        parentSelector = noSelectElement("span"),
+        rangeText = document.createTextNode("Parent Range: "),
+        parentRange = noSelectElement("span"),
+        removeParent = noSelectElement("button"),
         selectors = noSelectElement("ul"),
         option = noSelectElement("option");
 
@@ -1388,19 +1467,41 @@ SelectorSet.prototype.html = function(){
         holder: holder,
         nametag: nametag,
         selectors: selectors,
-        option: option
+        option: option,
+        parent: {
+            holder: parentHolder,
+            selector: parentSelector,
+            range: parentRange,
+            remove: removeParent
+        }
     };
 
     // Schema tab html        
     holder.classList.add("set");
     nametag.textContent = this.name;
     nametag.setAttribute("title", "Selector Set");
-    addSelector.textContent = "add selector";
+    addSelector.textContent = "+Selector";
+    addSelector.classList.add("pos");
     addSelector.addEventListener("click", this.events.addSelector.bind(this), false);
-    remove.textContent = "remove";
+    remove.innerHTML = "&times;";
+    remove.classList.add("neg");
     remove.addEventListener("click", this.events.remove.bind(this), false);
 
-    appendChildren(holder, [nametag, remove, addSelector, selectors]);
+
+    // Selector Set Parent
+    parentHolder.classList.add("parent");
+    if ( this.parent ) {
+        parentSelector.textContent = this.parent.selector;
+        parentRange.texTContent = createRangeString(this.parent.low, this.parent.high);
+    } else {
+        parentHolder.classList.add("hidden");
+    }
+    removeParent.innerHTML = "&times;";
+    removeParent.classList.add("neg");
+    removeParent.addEventListener("click", this.events.removeParent.bind(this), false);
+
+    appendChildren(parentHolder, [parentText, parentSelector, rangeText, parentRange, removeParent]);
+    appendChildren(holder, [nametag, addSelector, remove, parentHolder, selectors]);
 
     for ( var key in this.selectors ) {
         this.selectors[key].html();
@@ -1425,6 +1526,7 @@ SelectorSet.prototype.events = {
         showTab(HTML.tabs.selector);
     },
     remove: function(event){
+        event.preventDefault();
         var defaultSet = (this.name === "default"),
             question = defaultSet ?
                 "Cannot delete \"default\" selector set. Do you want to reset it instead?" :
@@ -1443,6 +1545,15 @@ SelectorSet.prototype.events = {
             this.remove();
         }
         site.save();
+    },
+    removeParent: function(event){
+        event.preventDefault();
+        this.removeParent();
+        Collect.site.save();
+
+        clearClass("parentSchema");
+        delete Collect.parentCount;
+        Collect.parent = {};
     }
 };
 
@@ -1462,10 +1573,20 @@ SelectorSet.prototype.activate = function(){
 
 SelectorSet.prototype.addParent = function(parent){
     this.parent = parent;
+    if ( this.hasHTML ) {
+        this.eles.parent.holder.classList.remove("hidden");
+        this.eles.parent.selector.textContent = parent.selector;
+        this.eles.parent.range.textContent = createRangeString(parent.low, parent.high);
+    }
 };
 
 SelectorSet.prototype.removeParent = function(){
     this.parent = undefined;
+    if ( this.hasHTML ) {
+        this.eles.parent.holder.classList.add("hidden");
+        this.eles.parent.selector.textContent = "";
+        this.eles.parent.range.textContent = "";
+    }
 };
 
 SelectorSet.prototype.addSelector = function(selector){
@@ -1640,9 +1761,11 @@ Selector.prototype.html = function(){
 
     holder.classList.add("selector");
     nametag.textContent = this.selector;
-    newRule.textContent = "add rule";
+    newRule.textContent = "+Rule";
+    newRule.classList.add("pos");
     editSelector.textContent = "edit";
-    remove.textContent = "×";
+    remove.innerHTML = "&times;";
+    remove.classList.add("neg");
     holder.addEventListener("mouseenter", this.events.preview.bind(this), false);
     holder.addEventListener("mouseleave", this.events.unpreview.bind(this), false);
     newRule.addEventListener("click", this.events.newRule.bind(this), false);
@@ -1768,6 +1891,7 @@ Rule.prototype.html = function(){
     edit.classList.add("editRule");
     edit.textContent = "edit";
     deltog.innerHTML = "&times;";
+    deltog.classList.add("neg");
     deltog.classList.add("deltog");
 
     appendChildren(holder, [nametag, capturetag, edit, deltog]);
@@ -1832,19 +1956,18 @@ Rule.prototype.update = function(object){
 
     var oldFollow = this.follow,
         newFollow = object.follow || false;
-    if ( this.hasSchema() ) {
-        var schema = this.getSchema();
-        if ( oldFollow && !newFollow ) {
-            // remove based on oldName in case that was also changed
-            schema.removePage(oldName);
-        } else if ( newFollow && !oldFollow ) {
-            // create the follow page
-            var page = new Page(newName);
-            schema.addPage(page);
-        } else if ( oldFollow && newFollow && oldName !== newName) {
-            // update the name of the follow page
-            schema.pages[oldName].updateName(newName);
+    if ( oldFollow && !newFollow ) {
+        // remove based on oldName in case that was also changed
+        if ( Collect.site.current.schema ) {
+            Collect.site.current.schema.removePage(oldName);
         }
+    } else if ( newFollow && !oldFollow ) {
+        // create the follow page
+        var page = new Page(newName);
+        Collect.site.current.schema.addPage(page);
+    } else if ( oldFollow && newFollow && oldName !== newName) {
+        // update the name of the follow page
+        Collect.site.current.schema.pages[oldName].updateName(newName);
     }
     this.name = newName;
     this.capture = newCapture;
@@ -2031,8 +2154,9 @@ var Cycle = (function(){
     takes an element and remove collectjs related classes and shorten text, then returns outerHTML
     */
     function cleanElement(ele){
-        ele.classList.remove('queryCheck');
-        ele.classList.remove('collectHighlight');
+        ele.classList.remove("queryCheck");
+        ele.classList.remove("collectHighlight");
+        ele.classList.remove("savedPreview");
         if ( ele.hasAttribute('src') ) {
             var value = ele.getAttribute('src'),
                 query = value.indexOf('?');
@@ -2093,7 +2217,7 @@ var marginBottom;
 (function addInterface(){
     var div = noSelectElement("div");
     div.classList.add("collectjs");
-    div.innerHTML = "<div class=\"tabHolder\"><div class=\"tabs\"><div class=\"tab active\" id=\"schemasTab\" data-for=\"schemasView\">Schema</div><div class=\"tab\" id=\"selectorTab\" data-for=\"selectorView\">Selector</div><div class=\"tab\" id=\"ruleTab\" data-for=\"ruleView\">Rule</div><div class=\"tab\" id=\"previewTab\" data-for=\"previewView\">Preview</div><div class=\"tab\" id=\"optionsTab\" data-for=\"optionsView\">Options</div><div class=\"tab\" id=\"closeCollect\">&times;</div></div></div><div class=\"permanent\"><div class=\"currentInfo\"><div>Schema: <div id=\"schemaSelect\"></div><button id=\"createSchema\" title=\"create a new schema\">+</button><button id=\"deleteSchema\" title=\"delete current schema\">&times;</button><div id=\"indexMarker\" class=\"info\">Initial URL<input type=\"checkbox\" id=\"indexToggle\" /></div></div><div>Page: <div id=\"pageSelect\"></div><div id=\"nextHolder\" class=\"info\">Next:<span id=\"nextSelectorView\"></span><button id=\"removeNext\">&times;</button></div></div><div>Selector Set: <div id=\"selectorSetSelect\"></div><!--<button id=\"createSelectorSet\" title=\"create a new selector set\">+</button><button id=\"deleteSelectorSet\" title=\"delete current selector set\">&times;</button>--><div id=\"currentParent\" class=\"info\">Parent:<span id=\"parentSelectorView\"></span><span id=\"parentRangeView\"></span><button id=\"removeParent\">&times;</button></div></div><button id=\"uploadRules\">Upload Schema</button></div><div id=\"collectAlert\"></div></div><div class=\"views\"><div class=\"view\" id=\"emptyView\"></div><div class=\"view active\" id=\"schemasView\"><div id=\"schemaHolder\" class=\"rules\"></div></div><div class=\"view\" id=\"selectorView\"><div class=\"column form\"><!--displays what the current selector is--><p>Selector: <span id=\"currentSelector\"></span></p><p>Count: <span id=\"currentCount\"></span></p><div><h3>Type:</h3><p><label for=\"selectorRadio\">Selector</label><input type=\"radio\" id=\"selectorRadio\" name=\"selector\" value=\"selector\" checked/></p><p><label for=\"parentRadio\">Parent</label><input type=\"radio\" id=\"parentRadio\" name=\"selector\" value=\"parent\" /></p><p><label for=\"nextRadio\">Next</label><input type=\"radio\" id=\"nextRadio\" name=\"selector\" value=\"next\" /></p></div><div id=\"parentRange\"><label>Low: <input id=\"parentLow\" name=\"parentLow\" type=\"text\" /></label><label for=\"parentHigh\">High: <input id=\"parentHigh\" name=\"parentHigh\" type=\"text\" /></label></div><p><button id=\"saveSelector\">Save</button><button id=\"clearSelector\">Clear</button></p></div><div class=\"column\"><!--holds the interactive element for choosing a selector--><div id=\"selectorHolder\"></div><div id=\"selectorCycleHolder\"></div></div></div><div class=\"view\" id=\"ruleView\"><div id=\"ruleItems\" class=\"items\"><h3>Selector: <span id=\"ruleSelector\"></span></h3><form id=\"ruleForm\" class=\"column form\"><div class=\"rule\"><label for=\"ruleName\" title=\"the name of a rule\">Name:</label><input id=\"ruleName\" name=\"ruleName\" type=\"text\" /></div><div class=\"rule\"><label title=\"the attribute of an element to capture\">Capture:</label><span id=\"ruleAttr\"></span></div><div class=\"rule follow\"><label for=\"ruleFollow\" title=\"create a new page from the element's captured url (capture must be attr-href)\">Follow:</label><input id=\"ruleFollow\" name=\"ruleFollow\" type=\"checkbox\" disabled=\"true\" title=\"Can only follow rules that get href attribute from links\" /></div><div><button id=\"saveRule\">Save Rule</button><button id=\"cancelRule\">Cancel</button></div></form><div class=\"modifiers column\"><div id=\"ruleCycleHolder\"></div></div></div></div><div class=\"view\" id=\"previewView\"><div id=\"previewContents\"></div></div><div class=\"view\" id=\"optionsView\"><p><label for=\"ignore\">Ignore helper elements (eg tbody)</label><input type=\"checkbox\" id=\"ignore\" /></p></div></div>";
+    div.innerHTML = "<div class=\"tabHolder\"><div class=\"tabs\"><div class=\"tab active\" id=\"schemasTab\" data-for=\"schemasView\">Schema</div><div class=\"tab\" id=\"selectorTab\" data-for=\"selectorView\">Selector</div><div class=\"tab\" id=\"ruleTab\" data-for=\"ruleView\">Rule</div><div class=\"tab\" id=\"previewTab\" data-for=\"previewView\">Preview</div><div class=\"tab\" id=\"optionsTab\" data-for=\"optionsView\">Options</div><div class=\"tab\" id=\"closeCollect\">&times;</div></div></div><div class=\"permanent\"><div class=\"currentInfo\"><div>Schema: <div id=\"schemaSelect\"></div><button id=\"createSchema\" title=\"create a new schema\">+</button><button id=\"deleteSchema\" title=\"delete current schema\">&times;</button></div><div>Page: <div id=\"pageSelect\"></div></div><div>Selector Set: <div id=\"selectorSetSelect\"></div><!--<button id=\"createSelectorSet\" title=\"create a new selector set\">+</button><button id=\"deleteSelectorSet\" title=\"delete current selector set\">&times;</button>--></div><button id=\"uploadRules\">Upload Schema</button></div><div id=\"collectAlert\"></div></div><div class=\"views\"><div class=\"view\" id=\"emptyView\"></div><div class=\"view active\" id=\"schemasView\"><div id=\"schemaHolder\" class=\"rules\"></div></div><div class=\"view\" id=\"selectorView\"><div class=\"column form\"><!--displays what the current selector is--><p>Selector: <span id=\"currentSelector\"></span></p><p>Count: <span id=\"currentCount\"></span></p><div><h3>Type:</h3><p><label for=\"selectorRadio\">Selector</label><input type=\"radio\" id=\"selectorRadio\" name=\"selector\" value=\"selector\" checked/></p><p><label for=\"parentRadio\">Parent</label><input type=\"radio\" id=\"parentRadio\" name=\"selector\" value=\"parent\" /></p><p><label for=\"nextRadio\">Next</label><input type=\"radio\" id=\"nextRadio\" name=\"selector\" value=\"next\" /></p></div><div id=\"parentRange\"><label>Low: <input id=\"parentLow\" name=\"parentLow\" type=\"text\" /></label><label for=\"parentHigh\">High: <input id=\"parentHigh\" name=\"parentHigh\" type=\"text\" /></label></div><p><button id=\"saveSelector\">Save</button><button id=\"clearSelector\">Clear</button></p></div><div class=\"column\"><!--holds the interactive element for choosing a selector--><div id=\"selectorHolder\"></div><div id=\"selectorCycleHolder\"></div></div></div><div class=\"view\" id=\"ruleView\"><div id=\"ruleItems\" class=\"items\"><h3>Selector: <span id=\"ruleSelector\"></span></h3><form id=\"ruleForm\" class=\"column form\"><div class=\"rule\"><label for=\"ruleName\" title=\"the name of a rule\">Name:</label><input id=\"ruleName\" name=\"ruleName\" type=\"text\" /></div><div class=\"rule\"><label title=\"the attribute of an element to capture\">Capture:</label><span id=\"ruleAttr\"></span></div><div class=\"rule follow\"><label for=\"ruleFollow\" title=\"create a new page from the element's captured url (capture must be attr-href)\">Follow:</label><input id=\"ruleFollow\" name=\"ruleFollow\" type=\"checkbox\" disabled=\"true\" title=\"Can only follow rules that get href attribute from links\" /></div><div><button id=\"saveRule\">Save Rule</button><button id=\"cancelRule\">Cancel</button></div></form><div class=\"modifiers column\"><div id=\"ruleCycleHolder\"></div></div></div></div><div class=\"view\" id=\"previewView\"><div id=\"previewContents\"></div></div><div class=\"view\" id=\"optionsView\"><p><label for=\"ignore\">Ignore helper elements (eg tbody)</label><input type=\"checkbox\" id=\"ignore\" /></p></div></div>";
     document.body.appendChild(div);
     addNoSelect(div.querySelectorAll("*"));
 
@@ -2264,25 +2388,12 @@ var HTML = {
     perm: {
         schema: {
             select: document.getElementById("schemaSelect"),
-            index: {
-                holder: document.getElementById("indexMarker"),
-                checkbox: document.getElementById("indexToggle")
-            }
         },
         page: {
             select: document.getElementById("pageSelect"),
-            next: {
-                holder: document.getElementById("nextHolder"),
-                selector: document.getElementById("nextSelectorView")
-            }
         },
         set: {
             select: document.getElementById("selectorSetSelect")
-        },
-        parent: {
-            holder: document.getElementById("currentParent"),
-            selector: document.getElementById("parentSelectorView"),
-            range: document.getElementById("parentRangeView")
         },
         alert: document.getElementById("collectAlert"),
     },
@@ -2508,17 +2619,12 @@ function optionsViewEvents(){
 }
 
 function permanentBarEvents(){
-    idEvent("removeParent", "click", deleteParentEvent);
-    idEvent("removeNext", "click", deleteNextEvent);
 
     // upload events
     idEvent("uploadRules", "click", function uploadEvent(event){
         event.preventDefault();
         uploadSchema();
     });
-
-    // index events
-    idEvent("indexToggle", "change", toggleURLEvent);
 }
 
 // add .collectHighlight to an element on mouseenter
@@ -2667,7 +2773,7 @@ function saveParent(selector){
 
 
     Collect.parent = parent;
-    showParent();
+    //showParent();
     addParentSchema(parent);
 
     // attach the parent to the current set and save
@@ -2686,10 +2792,7 @@ function saveNext(selector){
         return;
     }
 
-    HTML.perm.page.next.selector.textContent = selector;
-    HTML.perm.page.next.holder.style.display = "inline-block";
-
-    Collect.site.current.page.next = selector;
+    Collect.site.current.page.addNext(selector);
     Collect.site.save();
     showTab(HTML.tabs.schema);
 }
@@ -2762,37 +2865,6 @@ function saveRuleEvent(event){
     Collect.site.current.selector = undefined;
     Collect.site.save();
     showTab(HTML.tabs.schema);
-}
-
-function deleteParentEvent(event){
-    event.preventDefault();
-    delete Collect.parentCount;
-    Collect.parent = {};
-    hideParent();
-    Collect.site.current.set.removeParent();
-    Collect.site.save();
-    clearClass("parentSchema");
-}
-
-function deleteNextEvent(event){
-    event.preventDefault();
-    delete Collect.next;
-    HTML.perm.page.next.holder.style.display = "none";
-    HTML.perm.page.next.selector.textContent = "";
-    Collect.site.current.page.removeNext();
-    Collect.site.save();
-}
-
-/*
-toggle whether the current page is an index page
-if toggled off and the current page has a next selector, remove it
-*/
-function toggleURLEvent(event){
-    var on = Collect.site.current.schema.toggleURL(window.location.href);
-    if ( !on && Collect.site.current.page.next ) {
-        delete Collect.site.current.page.next;
-    }
-    Collect.site.saveCurrent();
 }
 
 /***********************
@@ -2898,21 +2970,6 @@ function addParentSchema(parent){
     }
 }
 
-function showParent(){
-    if ( !Collect.parent ) {
-        return;
-    }
-    HTML.perm.parent.holder.style.display = "inline-block";
-    HTML.perm.parent.selector.textContent = Collect.parent.selector;
-    HTML.perm.parent.range.textContent = createRangeString(Collect.parent.low, Collect.parent.high);
-}
-
-function hideParent(){
-    HTML.perm.parent.holder.style.display = "none";
-    HTML.perm.parent.selector.textContent = "";
-    HTML.perm.parent.range.textContent = "";
-}
-
 function setupRuleForm(selector){
     HTML.rule.selector.textContent = selector;
     var parent = Collect.site.current.set.parent;
@@ -2921,14 +2978,6 @@ function setupRuleForm(selector){
     addClass("queryCheck", elements);
     // set global for allLinks (fix?)
     Collect.elements = elements;
-}
-
-function createRangeString(low, high){
-    var rangeString = "Range: ";
-    rangeString += (low !== 0 && !isNaN(low)) ? low : "start";
-    rangeString += " to ";
-    rangeString += (high !== 0 && !isNaN(high)) ? high : "end";
-    return rangeString;
 }
 
 function elementCount(count, parentCount){

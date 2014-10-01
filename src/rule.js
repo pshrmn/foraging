@@ -304,7 +304,10 @@ Schema.prototype.html = function(){
         //rename = noSelectElement("button"),
         pages = noSelectElement("ul"),
         option = noSelectElement("option"),
-        select = noSelectElement("select");
+        select = noSelectElement("select"),
+        indexHolder = noSelectElement("div"),
+        indexText = document.createTextNode("Initial URL: "),
+        indexCheckbox = noSelectElement("input");
 
 
     this.hasHTML = true;
@@ -313,7 +316,11 @@ Schema.prototype.html = function(){
         nametag: nametag,
         pages: pages,
         option: option,
-        select: select
+        select: select,
+        index: {
+            holder: indexHolder,
+            checkbox: indexCheckbox
+        }
     };
 
     // schema tab
@@ -323,7 +330,16 @@ Schema.prototype.html = function(){
     //rename.textContent = "rename";
     //rename.addEventListener("click", this.events.rename.bind(this), false);
     //appendChildren(holder, [nametag, rename, pages]);
-    appendChildren(holder, [nametag, pages]);
+
+    var url = window.location.href;
+    indexCheckbox.setAttribute("type", "checkbox");
+    indexCheckbox.addEventListener("change", this.events.toggleURL.bind(this), false);
+    if ( this.urls[url] ) {
+        indexCheckbox.checked = true;
+    }
+
+    appendChildren(indexHolder, [indexText, indexCheckbox]);
+    appendChildren(holder, [nametag, indexHolder, pages]);
 
     for ( var key in this.pages ) {
         this.pages[key].html();
@@ -353,6 +369,15 @@ Schema.prototype.events = {
             name = option.value;
         resetInterface();
         this.loadPage(name);
+    },
+    toggleURL: function(event){
+        var on = this.toggleURL(window.location.href),
+            defaultPage = this.pages["default"];
+        
+        if ( !on && defaultPage.next ) {
+            defaultPage.removeNext();
+        }
+        Collect.site.saveCurrent();
     }
 };
 
@@ -568,7 +593,11 @@ Page.prototype.html = function(){
         clear = noSelectElement("button"),
         sets = noSelectElement("ul"),
         option = noSelectElement("option"),
-        setSelect = noSelectElement("select");
+        setSelect = noSelectElement("select"),
+        nextHolder = noSelectElement("div"),
+        nextText = document.createTextNode("Next: "),
+        nextSelector = noSelectElement("span"),
+        nextRemove = noSelectElement("button");
 
     this.hasHTML = true;
     // elements that need to be interacted with
@@ -577,22 +606,43 @@ Page.prototype.html = function(){
         nametag: nametag,
         option: option,
         sets: sets,
-        select: setSelect
+        select: setSelect,
+        next: {
+            holder: nextHolder,
+            selector: nextSelector,
+            remove: nextRemove
+        }
     };
 
     // Schema tab html
     holder.classList.add("page");
     nametag.textContent = this.name;
     nametag.setAttribute("title", "Page");
-    createSet.textContent = "add set";
+    createSet.textContent = "+Set";
+    createSet.classList.add("pos");
     createSet.addEventListener("click", this.events.createSet.bind(this), false);
     clear.textContent = "clear";
     clear.addEventListener("click", this.events.clear.bind(this), false);
-    appendChildren(holder, [nametag, createSet, sets]);
+
+    // Next
+    nextRemove.innerHTML = "&times;";
+    nextRemove.addEventListener("click", this.events.removeNext.bind(this), false);
+    nextHolder.classList.add("next");
+    if ( this.next ) {
+        nextSelector.textContent = this.next;
+    } else {
+        nextSelector.textContent = "";
+        nextHolder.classList.add("hidden");
+    }
+
+    appendChildren(nextHolder, [nextText, nextSelector, nextRemove]);
+    appendChildren(holder, [nametag, createSet, nextHolder, sets]);
 
     for ( var key in this.sets ) {
         this.sets[key].html();
     }
+
+
 
     // Page option, SelectorSet select
     option.textContent = this.name;
@@ -624,7 +674,7 @@ Page.prototype.events = {
         }
         var set = new SelectorSet(name);
         this.addSet(set);
-        Collect.current.site.save();
+        Collect.site.save();
     },
     clear: function(event){
         var confirmed = confirm("Clear out all selector sets, selectors, and rules from the page?");
@@ -632,13 +682,16 @@ Page.prototype.events = {
             return;
         }
         this.reset();
-        Collect.current.site.save();
+        Collect.site.save();
     },
     loadSet: function(event){
         var option = this.eles.select.querySelector('option:checked'),
             name = option.value;
         resetInterface();
         this.loadSet(name);
+    },
+    removeNext: function(event){
+        this.removeNext();
     }
 };
 
@@ -676,11 +729,9 @@ Page.prototype.loadSet = function(name){
     // show the selector set's parent if it exists
     if ( set.parent ) {
         Collect.parent = set.parent;
-        showParent();
         addParentSchema(set.parent);
     } else {
         Collect.parent = {};
-        hideParent();
         clearClass("parentSchema");
     }
 
@@ -725,8 +776,20 @@ Page.prototype.remove = function(){
     }
 };
 
+Page.prototype.addNext = function(selector){
+    this.next = selector;
+    if ( this.hasHTML ) {
+        this.eles.next.holder.classList.remove("hidden");
+        this.eles.next.selector.textContent = selector;
+    }
+};
+
 Page.prototype.removeNext = function(){
     this.next = undefined;
+    if ( this.hasHTML ) {
+        this.eles.next.holder.classList.add("hidden");
+        this.eles.next.selector.textContent = "";
+    }
 };
 
 /***
@@ -851,6 +914,12 @@ SelectorSet.prototype.html = function(){
         nametag = noSelectElement("span"),
         remove = noSelectElement("button"),
         addSelector = noSelectElement("button"),
+        parentHolder = noSelectElement("div"),
+        parentText = document.createTextNode("Parent Selector: "),
+        parentSelector = noSelectElement("span"),
+        rangeText = document.createTextNode("Parent Range: "),
+        parentRange = noSelectElement("span"),
+        removeParent = noSelectElement("button"),
         selectors = noSelectElement("ul"),
         option = noSelectElement("option");
 
@@ -859,19 +928,41 @@ SelectorSet.prototype.html = function(){
         holder: holder,
         nametag: nametag,
         selectors: selectors,
-        option: option
+        option: option,
+        parent: {
+            holder: parentHolder,
+            selector: parentSelector,
+            range: parentRange,
+            remove: removeParent
+        }
     };
 
     // Schema tab html        
     holder.classList.add("set");
     nametag.textContent = this.name;
     nametag.setAttribute("title", "Selector Set");
-    addSelector.textContent = "add selector";
+    addSelector.textContent = "+Selector";
+    addSelector.classList.add("pos");
     addSelector.addEventListener("click", this.events.addSelector.bind(this), false);
-    remove.textContent = "remove";
+    remove.innerHTML = "&times;";
+    remove.classList.add("neg");
     remove.addEventListener("click", this.events.remove.bind(this), false);
 
-    appendChildren(holder, [nametag, remove, addSelector, selectors]);
+
+    // Selector Set Parent
+    parentHolder.classList.add("parent");
+    if ( this.parent ) {
+        parentSelector.textContent = this.parent.selector;
+        parentRange.texTContent = createRangeString(this.parent.low, this.parent.high);
+    } else {
+        parentHolder.classList.add("hidden");
+    }
+    removeParent.innerHTML = "&times;";
+    removeParent.classList.add("neg");
+    removeParent.addEventListener("click", this.events.removeParent.bind(this), false);
+
+    appendChildren(parentHolder, [parentText, parentSelector, rangeText, parentRange, removeParent]);
+    appendChildren(holder, [nametag, addSelector, remove, parentHolder, selectors]);
 
     for ( var key in this.selectors ) {
         this.selectors[key].html();
@@ -896,6 +987,7 @@ SelectorSet.prototype.events = {
         showTab(HTML.tabs.selector);
     },
     remove: function(event){
+        event.preventDefault();
         var defaultSet = (this.name === "default"),
             question = defaultSet ?
                 "Cannot delete \"default\" selector set. Do you want to reset it instead?" :
@@ -914,6 +1006,15 @@ SelectorSet.prototype.events = {
             this.remove();
         }
         site.save();
+    },
+    removeParent: function(event){
+        event.preventDefault();
+        this.removeParent();
+        Collect.site.save();
+
+        clearClass("parentSchema");
+        delete Collect.parentCount;
+        Collect.parent = {};
     }
 };
 
@@ -933,10 +1034,20 @@ SelectorSet.prototype.activate = function(){
 
 SelectorSet.prototype.addParent = function(parent){
     this.parent = parent;
+    if ( this.hasHTML ) {
+        this.eles.parent.holder.classList.remove("hidden");
+        this.eles.parent.selector.textContent = parent.selector;
+        this.eles.parent.range.textContent = createRangeString(parent.low, parent.high);
+    }
 };
 
 SelectorSet.prototype.removeParent = function(){
     this.parent = undefined;
+    if ( this.hasHTML ) {
+        this.eles.parent.holder.classList.add("hidden");
+        this.eles.parent.selector.textContent = "";
+        this.eles.parent.range.textContent = "";
+    }
 };
 
 SelectorSet.prototype.addSelector = function(selector){
@@ -1111,9 +1222,11 @@ Selector.prototype.html = function(){
 
     holder.classList.add("selector");
     nametag.textContent = this.selector;
-    newRule.textContent = "add rule";
+    newRule.textContent = "+Rule";
+    newRule.classList.add("pos");
     editSelector.textContent = "edit";
-    remove.textContent = "×";
+    remove.innerHTML = "&times;";
+    remove.classList.add("neg");
     holder.addEventListener("mouseenter", this.events.preview.bind(this), false);
     holder.addEventListener("mouseleave", this.events.unpreview.bind(this), false);
     newRule.addEventListener("click", this.events.newRule.bind(this), false);
@@ -1239,6 +1352,7 @@ Rule.prototype.html = function(){
     edit.classList.add("editRule");
     edit.textContent = "edit";
     deltog.innerHTML = "&times;";
+    deltog.classList.add("neg");
     deltog.classList.add("deltog");
 
     appendChildren(holder, [nametag, capturetag, edit, deltog]);
@@ -1303,19 +1417,18 @@ Rule.prototype.update = function(object){
 
     var oldFollow = this.follow,
         newFollow = object.follow || false;
-    if ( this.hasSchema() ) {
-        var schema = this.getSchema();
-        if ( oldFollow && !newFollow ) {
-            // remove based on oldName in case that was also changed
-            schema.removePage(oldName);
-        } else if ( newFollow && !oldFollow ) {
-            // create the follow page
-            var page = new Page(newName);
-            schema.addPage(page);
-        } else if ( oldFollow && newFollow && oldName !== newName) {
-            // update the name of the follow page
-            schema.pages[oldName].updateName(newName);
+    if ( oldFollow && !newFollow ) {
+        // remove based on oldName in case that was also changed
+        if ( Collect.site.current.schema ) {
+            Collect.site.current.schema.removePage(oldName);
         }
+    } else if ( newFollow && !oldFollow ) {
+        // create the follow page
+        var page = new Page(newName);
+        Collect.site.current.schema.addPage(page);
+    } else if ( oldFollow && newFollow && oldName !== newName) {
+        // update the name of the follow page
+        Collect.site.current.schema.pages[oldName].updateName(newName);
     }
     this.name = newName;
     this.capture = newCapture;

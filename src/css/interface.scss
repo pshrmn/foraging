@@ -255,6 +255,27 @@ body{
             background: $light-gray;
             display: inline-block;
         }
+
+        .parent.hidden{
+            display: none;
+        }
+
+        .next.hidden{
+            display: none;
+        }
+
+        button{
+            font-weight: bold;
+            background: transparent;
+        }
+
+        button.pos:hover{
+            color: $green;
+        }
+
+        button.neg:hover{
+            color: $red;
+        }
     }
 
     .items{

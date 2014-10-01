@@ -176,25 +176,12 @@ var HTML = {
     perm: {
         schema: {
             select: document.getElementById("schemaSelect"),
-            index: {
-                holder: document.getElementById("indexMarker"),
-                checkbox: document.getElementById("indexToggle")
-            }
         },
         page: {
             select: document.getElementById("pageSelect"),
-            next: {
-                holder: document.getElementById("nextHolder"),
-                selector: document.getElementById("nextSelectorView")
-            }
         },
         set: {
             select: document.getElementById("selectorSetSelect")
-        },
-        parent: {
-            holder: document.getElementById("currentParent"),
-            selector: document.getElementById("parentSelectorView"),
-            range: document.getElementById("parentRangeView")
         },
         alert: document.getElementById("collectAlert"),
     },
@@ -420,17 +407,12 @@ function optionsViewEvents(){
 }
 
 function permanentBarEvents(){
-    idEvent("removeParent", "click", deleteParentEvent);
-    idEvent("removeNext", "click", deleteNextEvent);
 
     // upload events
     idEvent("uploadRules", "click", function uploadEvent(event){
         event.preventDefault();
         uploadSchema();
     });
-
-    // index events
-    idEvent("indexToggle", "change", toggleURLEvent);
 }
 
 // add .collectHighlight to an element on mouseenter
@@ -579,7 +561,7 @@ function saveParent(selector){
 
 
     Collect.parent = parent;
-    showParent();
+    //showParent();
     addParentSchema(parent);
 
     // attach the parent to the current set and save
@@ -598,10 +580,7 @@ function saveNext(selector){
         return;
     }
 
-    HTML.perm.page.next.selector.textContent = selector;
-    HTML.perm.page.next.holder.style.display = "inline-block";
-
-    Collect.site.current.page.next = selector;
+    Collect.site.current.page.addNext(selector);
     Collect.site.save();
     showTab(HTML.tabs.schema);
 }
@@ -674,37 +653,6 @@ function saveRuleEvent(event){
     Collect.site.current.selector = undefined;
     Collect.site.save();
     showTab(HTML.tabs.schema);
-}
-
-function deleteParentEvent(event){
-    event.preventDefault();
-    delete Collect.parentCount;
-    Collect.parent = {};
-    hideParent();
-    Collect.site.current.set.removeParent();
-    Collect.site.save();
-    clearClass("parentSchema");
-}
-
-function deleteNextEvent(event){
-    event.preventDefault();
-    delete Collect.next;
-    HTML.perm.page.next.holder.style.display = "none";
-    HTML.perm.page.next.selector.textContent = "";
-    Collect.site.current.page.removeNext();
-    Collect.site.save();
-}
-
-/*
-toggle whether the current page is an index page
-if toggled off and the current page has a next selector, remove it
-*/
-function toggleURLEvent(event){
-    var on = Collect.site.current.schema.toggleURL(window.location.href);
-    if ( !on && Collect.site.current.page.next ) {
-        delete Collect.site.current.page.next;
-    }
-    Collect.site.saveCurrent();
 }
 
 /***********************
@@ -810,21 +758,6 @@ function addParentSchema(parent){
     }
 }
 
-function showParent(){
-    if ( !Collect.parent ) {
-        return;
-    }
-    HTML.perm.parent.holder.style.display = "inline-block";
-    HTML.perm.parent.selector.textContent = Collect.parent.selector;
-    HTML.perm.parent.range.textContent = createRangeString(Collect.parent.low, Collect.parent.high);
-}
-
-function hideParent(){
-    HTML.perm.parent.holder.style.display = "none";
-    HTML.perm.parent.selector.textContent = "";
-    HTML.perm.parent.range.textContent = "";
-}
-
 function setupRuleForm(selector){
     HTML.rule.selector.textContent = selector;
     var parent = Collect.site.current.set.parent;
@@ -833,14 +766,6 @@ function setupRuleForm(selector){
     addClass("queryCheck", elements);
     // set global for allLinks (fix?)
     Collect.elements = elements;
-}
-
-function createRangeString(low, high){
-    var rangeString = "Range: ";
-    rangeString += (low !== 0 && !isNaN(low)) ? low : "start";
-    rangeString += " to ";
-    rangeString += (high !== 0 && !isNaN(high)) ? high : "end";
-    return rangeString;
 }
 
 function elementCount(count, parentCount){
