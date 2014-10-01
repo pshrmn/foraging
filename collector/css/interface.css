@@ -147,7 +147,8 @@ body {
       margin: 2px 0;
       background: #efefef; }
     .collectjs .rules .set.active {
-      border: 2px solid #45aacc; }
+      background: #45aacc;
+      border-color: #45aacc; }
     .collectjs .rules .selector {
       margin: 2px 0;
       background: white; }
@@ -164,11 +165,15 @@ body {
       display: none; }
     .collectjs .rules button {
       font-weight: bold;
-      background: transparent; }
+      background: white;
+      border: 1px solid #cccccc;
+      border-radius: 3px; }
     .collectjs .rules button.pos:hover {
       color: #489675; }
     .collectjs .rules button.neg:hover {
       color: #c91900; }
+    .collectjs .rules .nametag {
+      font-weight: bold; }
   .collectjs .items {
     font-size: 16px;
     color: black; }

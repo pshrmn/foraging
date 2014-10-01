@@ -237,7 +237,8 @@ body{
         }
 
         .set.active{
-            border: 2px solid $blue;
+            background: $blue;
+            border-color: $blue;
         }
 
         .selector{
@@ -266,7 +267,9 @@ body{
 
         button{
             font-weight: bold;
-            background: transparent;
+            background: $white;
+            border: 1px solid $gray;
+            border-radius: 3px;
         }
 
         button.pos:hover{
@@ -275,6 +278,10 @@ body{
 
         button.neg:hover{
             color: $red;
+        }
+
+        .nametag{
+            font-weight: bold;
         }
     }
 

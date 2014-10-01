@@ -327,6 +327,7 @@ Schema.prototype.html = function(){
     holder.classList.add("schema");
     nametag.textContent = this.name;
     nametag.setAttribute("title", "Schema");
+    nametag.classList.add("nametag");
     //rename.textContent = "rename";
     //rename.addEventListener("click", this.events.rename.bind(this), false);
     //appendChildren(holder, [nametag, rename, pages]);
@@ -618,6 +619,7 @@ Page.prototype.html = function(){
     holder.classList.add("page");
     nametag.textContent = this.name;
     nametag.setAttribute("title", "Page");
+    nametag.classList.add("nametag");
     createSet.textContent = "+Set";
     createSet.classList.add("pos");
     createSet.addEventListener("click", this.events.createSet.bind(this), false);
@@ -915,9 +917,8 @@ SelectorSet.prototype.html = function(){
         remove = noSelectElement("button"),
         addSelector = noSelectElement("button"),
         parentHolder = noSelectElement("div"),
-        parentText = document.createTextNode("Parent Selector: "),
+        parentText = document.createTextNode("Parent: "),
         parentSelector = noSelectElement("span"),
-        rangeText = document.createTextNode("Parent Range: "),
         parentRange = noSelectElement("span"),
         removeParent = noSelectElement("button"),
         selectors = noSelectElement("ul"),
@@ -940,6 +941,7 @@ SelectorSet.prototype.html = function(){
     // Schema tab html        
     holder.classList.add("set");
     nametag.textContent = this.name;
+    nametag.classList.add("nametag");
     nametag.setAttribute("title", "Selector Set");
     addSelector.textContent = "+Selector";
     addSelector.classList.add("pos");
@@ -953,7 +955,7 @@ SelectorSet.prototype.html = function(){
     parentHolder.classList.add("parent");
     if ( this.parent ) {
         parentSelector.textContent = this.parent.selector;
-        parentRange.texTContent = createRangeString(this.parent.low, this.parent.high);
+        parentRange.textContent = createRangeString(this.parent.low, this.parent.high);
     } else {
         parentHolder.classList.add("hidden");
     }
@@ -961,7 +963,7 @@ SelectorSet.prototype.html = function(){
     removeParent.classList.add("neg");
     removeParent.addEventListener("click", this.events.removeParent.bind(this), false);
 
-    appendChildren(parentHolder, [parentText, parentSelector, rangeText, parentRange, removeParent]);
+    appendChildren(parentHolder, [parentText, parentSelector, parentRange, removeParent]);
     appendChildren(holder, [nametag, addSelector, remove, parentHolder, selectors]);
 
     for ( var key in this.selectors ) {
@@ -984,7 +986,7 @@ SelectorSet.prototype.events = {
         event.preventDefault();
         // make sure current.page is the selector set's parent page
         this.activate();
-        showTab(HTML.tabs.selector);
+        showSelectorView();
     },
     remove: function(event){
         event.preventDefault();
@@ -1222,6 +1224,7 @@ Selector.prototype.html = function(){
 
     holder.classList.add("selector");
     nametag.textContent = this.selector;
+    nametag.classList.add("nametag");
     newRule.textContent = "+Rule";
     newRule.classList.add("pos");
     editSelector.textContent = "edit";
@@ -1269,7 +1272,7 @@ Selector.prototype.events = {
         Collect.site.current.selector = this;
 
         setupRuleForm(this.selector);
-        showTab(HTML.tabs.rule);
+        showRuleView();
     },
     edit: function(event){
         event.preventDefault();
@@ -1280,7 +1283,7 @@ Selector.prototype.events = {
         HTML.selector.radio.parent.disabled = true;
         HTML.selector.radio.next.disabled = true;
 
-        showTab(HTML.tabs.selector);
+        showSelectorView();
     }
 };
 
@@ -1348,7 +1351,9 @@ Rule.prototype.html = function(){
 
     holder.classList.add("rule");
     nametag.textContent = this.name;
+    nametag.classList.add("nametag");
     capturetag.textContent = "(" + this.capture + ")";
+    capturetag.classList.add("nametag");
     edit.classList.add("editRule");
     edit.textContent = "edit";
     deltog.innerHTML = "&times;";
@@ -1385,7 +1390,7 @@ Rule.prototype.events = {
         }
 
         setupRuleForm(this.parentSelector.selector);
-        showTab(HTML.tabs.rule);
+        showRuleView();
     },
     remove: function(event){
         clearClass("savedPreview");

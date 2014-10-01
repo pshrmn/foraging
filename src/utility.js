@@ -82,11 +82,11 @@ function legalSchemaName(name){
 }
 
 function createRangeString(low, high){
-    var rangeString = "Range: ";
+    var rangeString = "(";
     low = parseInt(low, 10);
     high = parseInt(high, 10);
     rangeString += (low !== 0 && !isNaN(low)) ? low : "start";
     rangeString += " to ";
     rangeString += (high !== 0 && !isNaN(high)) ? high : "end";
-    return rangeString;
+    return rangeString + ")";
 }

@@ -62,6 +62,11 @@ var Cycle = (function(){
         this.htmlElements.index.textContent = (this.idex === 0) ? "" : this.index + " / " + negative;
         this.htmlElements.preview.innerHTML = "";
 
+        // return if element doesn't exist
+        if ( !element ) {
+            return;
+        }
+
         var clone = cleanElement(element.cloneNode(true)),
             html = clone.outerHTML,
             attrs = clone.attributes,

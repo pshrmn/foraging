@@ -40,8 +40,9 @@ var Collect = {
     },
     /*
     matches elements in a page based on selector
-    if Collect.parent is defined, limit selected elements to children of elements matching Collect.parent.selector
-    if Collect.parent.high/low are defined, only use Collect.parent.selector elements within that range
+    parent is an optional parent selector that limits selected elements to children of
+        elements matching Collect.parent.selector
+    if parent.high/low are defined, only use parent.selector elements within that range
     */
     matchedElements: function(selector, parent){
         var allElements = [];
@@ -81,9 +82,9 @@ var UI = {
     activeForm: "rule",
     activeSelector: "selector",
     editing: {},
-    tabs: {
-        tab: document.querySelector(".tab.active"),
-        view: document.querySelector(".view.active")
+    view: {
+        view: undefined,
+        tab: undefined
     },
     preview: {
         dirty: true
@@ -103,10 +104,9 @@ var UI = {
     store elements with eventlisteners in this.elements
     */
     turnSelectorsOn: function(){
-        var curr,
-            parent = Collect.site.current.set.parent;
+        var curr;
         this.turnSelectorsOff();
-        Collect.elements = Collect.matchedElements("*", parent);
+        Collect.elements = Collect.matchedElements("*", Collect.parent);
 
         for ( var i=0, len=Collect.elements.length; i<len; i++ ) {
             curr = Collect.elements[i];
@@ -190,11 +190,16 @@ var HTML = {
         contents: document.getElementById("previewContents")
     },
     tabs: {
-        selector: document.getElementById("selectorTab"),
-        rule: document.getElementById("ruleTab"),
-        schema: document.getElementById("schemasTab"),
+        schema: document.getElementById("schemaTab"),
         preview: document.getElementById("previewTab"),
         options: document.getElementById("optionsTab")
+    },
+    views: {
+        schema: document.getElementById("schemaView"),
+        selector: document.getElementById("selectorView"),
+        rule: document.getElementById("ruleView"),
+        preview: document.getElementById("previewView"),
+        options: document.getElementById("optionsView")
     }
 };
 
@@ -205,15 +210,19 @@ var Family = {
         event.stopPropagation();
         event.preventDefault();
 
+        var parentSelector;
+        if ( UI.activeSelector === "selector" && Collect.parent ) {
+            parentSelector = Collect.parent.selector;
+        }
+
         Family.family = new SelectorFamily(this,
-            Collect.parent.selector,
+            parentSelector,
             HTML.selector.family,
             HTML.selector.selector,
             Family.test.bind(Family),
             Collect.options
         );
         Family.family.update();
-        showTab(HTML.tabs.selector);
     },
     remove: function(){
         if ( this.family ) {
@@ -358,16 +367,20 @@ function tabEvents(){
         document.body.style.marginBottom = marginBottom + "px";
     });
 
-    // querySelectorAll because getElementsByClassName could overlap with native elements
-    var tabs = document.querySelectorAll(".tabHolder .tab");
-    for ( var key in HTML.tabs ) {
-        HTML.tabs[key].addEventListener("click", showTabEvent, false);
-    }
+    // set default view/tab for UI
+    UI.view.view = HTML.views.schema;
+    UI.view.tab = HTML.tabs.schema;
+    idEvent("schemaTab", "click", function(event){
+        showSchemaView();
+    });
 
-    function showTabEvent(event){
-        resetInterface();
-        showTab(this);
-    }
+    idEvent("previewTab", "click", function(event){
+        showPreviewView();
+    });
+
+    idEvent("optionsTab", "click", function(event){
+        showOptionsView();
+    });
 }
 
 function setupSelectorView(){
@@ -429,7 +442,7 @@ function cancelRuleEvent(event){
     event.stopPropagation();
     event.preventDefault();
     resetInterface();
-    showTab(HTML.tabs.schema);
+    showSchemaView();
 }
 
 function verifyAndApplyParentRange(event){
@@ -528,6 +541,7 @@ function saveSelectorEvent(event){
         break;
     }
     resetInterface();
+    showSchemaView();
 }
 
 //update
@@ -539,7 +553,7 @@ function saveSelector(selector){
     } else {
         Collect.site.current.set.addSelector(sel);
     }
-    showTab(HTML.tabs.schema);
+    
     Collect.site.saveCurrent();
 }
 
@@ -558,7 +572,6 @@ function saveParent(selector){
     if ( !isNaN(high) ) {
         parent.high = high;
     }
-
 
     Collect.parent = parent;
     //showParent();
@@ -582,7 +595,6 @@ function saveNext(selector){
 
     Collect.site.current.page.addNext(selector);
     Collect.site.save();
-    showTab(HTML.tabs.schema);
 }
 
 function clearSelectorEvent(event){
@@ -652,43 +664,56 @@ function saveRuleEvent(event){
     }
     Collect.site.current.selector = undefined;
     Collect.site.save();
-    showTab(HTML.tabs.schema);
+    showSchemaView();
 }
 
 /***********************
     EVENT HELPERS
 ***********************/
-
-function showTab(tab){
-    var target = tab.dataset.for,
-        view = document.getElementById(target);
-    // fail if either data-for or related element is undefined
-    if ( !target || !view || tab === UI.tabs.tab) {
-        return;
-    }
-    UI.tabs.tab.classList.remove("active");
-    UI.tabs.view.classList.remove("active");
-
-    UI.tabs.tab = tab;
-    UI.tabs.view = view;
-    UI.tabs.tab.classList.add("active");
-    UI.tabs.view.classList.add("active");
-
-    switch(target){
-    case "selectorView":
-        UI.activeSelector = "selector";
-        UI.turnSelectorsOn();
-        break;
-    case "previewView":
-        generatePreview();
-        UI.turnSelectorsOff();
-        break;
-    default:
-        UI.turnSelectorsOff();
-    }
+function showSelectorView(){
+    UI.activeSelector = "selector";
+    UI.turnSelectorsOn();
     clearSelectorClasses();
+    setCurrentView(HTML.views.selector, HTML.tabs.schema);
 }
 
+function showSchemaView(){
+    UI.turnSelectorsOff();
+    clearSelectorClasses();
+    setCurrentView(HTML.views.schema, HTML.tabs.schema);
+}
+
+function showRuleView(){
+    UI.turnSelectorsOff();
+    clearSelectorClasses();
+    setCurrentView(HTML.views.rule, HTML.tabs.schema);
+}
+
+function showPreviewView(){
+    generatePreview();
+    UI.turnSelectorsOff();
+    clearSelectorClasses();
+    setCurrentView(HTML.views.preview, HTML.tabs.preview);
+}
+
+function showOptionsView(){
+    UI.turnSelectorsOff();
+    clearSelectorClasses();
+    setCurrentView(HTML.views.options, HTML.tabs.options);
+}
+
+function setCurrentView(view, tab){
+    hideCurrentView();
+    UI.view.view = view;
+    UI.view.tab = tab;
+    view.classList.add("active");
+    tab.classList.add("active");
+}
+
+function hideCurrentView(){
+    UI.view.view.classList.remove("active");
+    UI.view.tab.classList.remove("active");
+}
 
 function generatePreview(){
     // only regen preview when something in the schema has changed
