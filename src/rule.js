@@ -43,7 +43,9 @@ function Site(name, schemas){
 
 Site.prototype.html = function(){
     var schemas = noSelectElement("div"),
-        schemaSelect = noSelectElement("select"); 
+        createSchema = noSelectElement("button"),
+        removeSchema = noSelectElement("button"),
+        schemaSelect = noSelectElement("select");
 
     this.hasHTML = true;
     this.eles = {
@@ -52,6 +54,16 @@ Site.prototype.html = function(){
     };
     // automatically attach the schema select to the page since it will always be shown
     HTML.perm.schema.select.appendChild(schemaSelect);
+
+    createSchema.textContent = "+Schema";
+    createSchema.setAttribute("title", "create a new schema");
+    createSchema.addEventListener("click", this.events.createSchema.bind(this), false);
+
+    removeSchema.textContent = "-Schema";
+    removeSchema.setAttribute("title", "delete current schema");
+    removeSchema.addEventListener("click", this.events.removeSchema.bind(this), false);
+
+    appendChildren(HTML.perm.schema.buttons, [createSchema, removeSchema]);
 
     // create html for all schemas, but only show the default one
     for ( var key in this.schemas ) {
@@ -94,7 +106,11 @@ Site.prototype.events = {
         var schema = new Schema(name);
         this.addSchema(schema);
         this.save(name);
-        this.loadSchema(name);
+    },
+    removeSchema: function(event){
+        event.preventDefault();
+        var schema = this.current.schema;
+        this.removeSchema(schema.name);
     }
 };
 
@@ -132,6 +148,7 @@ Site.prototype.saveCurrent = function(){
 };
 
 Site.prototype.addSchema = function(schema){
+    schema.parentSite = this;
     this.schemas[schema.name] = schema;
     if ( this.hasHTML ) {
         schema.html();
@@ -140,11 +157,25 @@ Site.prototype.addSchema = function(schema){
     this.current.schema = schema;
 };
 
+/*
+set schema to site.current.schema
+hide currently active schema's html and show new current schema's html
+*/
 Site.prototype.loadSchema = function(name){
+    // reset before loading schmea
+    if ( Collect.site.current.schema ) {
+        Collect.site.current.schema.eles.holder.classList.remove("active");
+    }
+    Collect.site.current = {
+        schema: undefined,
+        page: undefined,
+        set: undefined,
+        selector: undefined
+    };
     var schema = this.schemas[name],
         prevSchema = this.current.schema;
-    // if schema doesn't exist or is the same as the current one, do nothing
-    if ( !schema || (prevSchema && prevSchema.name === name) ) {
+    // if schema doesn't exist, do nothing
+    if ( !schema ) {
         return;
     }
 
@@ -158,15 +189,11 @@ Site.prototype.loadSchema = function(name){
         HTML.perm.page.select.innerHTML = "";
         HTML.perm.page.select.appendChild(schema.eles.select);
         if ( schema.eles.holder ) {
-            // only hide previous schema if it actually exists
-            if ( prevSchema ) {
-                prevSchema.eles.holder.classList.remove("active");
-            }
             schema.eles.holder.classList.add("active");
         }
     }
 
-    // load the default page
+    // load the default page for the schema
     schema.loadPage("default");
 };
 
@@ -386,7 +413,6 @@ Schema.prototype.loadPage = function(name){
     if ( !page || (prevPage && prevPage.name === name) ) {
         return;
     }
-
     if ( this.hasHTML ) {
         // select the option for the page
         if ( page.eles.option ) {
@@ -1173,17 +1199,25 @@ Selector.prototype.addRule = function(rule){
 
     // if the Rule has follow=true and the SelectorSet has a Page (which in turn has a Schema)
     // add a new Page to the schema with the name of the Rule
-    if ( rule.follow && this.parentSet && this.parentSet.parentPage && this.parentSet.parentPage.parentSchema ) {
-        // only add page if it doesn't already exist
-        if ( this.parentSet.parentPage.parentSchema.uniquePageName(rule.name) ) {
+    // only add page if it doesn't already exist
+    if ( rule.follow ) {
+        var schema = this.getSchema();
+        if ( schema ) {
             var page = new Page(rule.name);
-            this.parentSet.parentPage.parentSchema.addPage(page);
+            schema.addPage(page);
         }
     }
 
     // if Selector html exists, also create html for rule
     if ( this.hasHTML ) {
         rule.html();
+    }
+};
+
+// uggggggggly
+Selector.prototype.getSchema = function(){
+    if ( this.parentSet && this.parentSet.parentPage && this.parentSet.parentPage.parentSchema ) {
+        return this.parentSet.parentPage.parentSchema;
     }
 };
 

@@ -176,6 +176,7 @@ var HTML = {
     perm: {
         schema: {
             select: document.getElementById("schemaSelect"),
+            buttons: document.getElementById("schemaButtons")
         },
         page: {
             select: document.getElementById("pageSelect"),
@@ -420,7 +421,6 @@ function optionsViewEvents(){
 }
 
 function permanentBarEvents(){
-
     // upload events
     idEvent("uploadRules", "click", function uploadEvent(event){
         event.preventDefault();

@@ -582,7 +582,9 @@ function Site(name, schemas){
 
 Site.prototype.html = function(){
     var schemas = noSelectElement("div"),
-        schemaSelect = noSelectElement("select"); 
+        createSchema = noSelectElement("button"),
+        removeSchema = noSelectElement("button"),
+        schemaSelect = noSelectElement("select");
 
     this.hasHTML = true;
     this.eles = {
@@ -591,6 +593,16 @@ Site.prototype.html = function(){
     };
     // automatically attach the schema select to the page since it will always be shown
     HTML.perm.schema.select.appendChild(schemaSelect);
+
+    createSchema.textContent = "+Schema";
+    createSchema.setAttribute("title", "create a new schema");
+    createSchema.addEventListener("click", this.events.createSchema.bind(this), false);
+
+    removeSchema.textContent = "-Schema";
+    removeSchema.setAttribute("title", "delete current schema");
+    removeSchema.addEventListener("click", this.events.removeSchema.bind(this), false);
+
+    appendChildren(HTML.perm.schema.buttons, [createSchema, removeSchema]);
 
     // create html for all schemas, but only show the default one
     for ( var key in this.schemas ) {
@@ -633,7 +645,11 @@ Site.prototype.events = {
         var schema = new Schema(name);
         this.addSchema(schema);
         this.save(name);
-        this.loadSchema(name);
+    },
+    removeSchema: function(event){
+        event.preventDefault();
+        var schema = this.current.schema;
+        this.removeSchema(schema.name);
     }
 };
 
@@ -671,6 +687,7 @@ Site.prototype.saveCurrent = function(){
 };
 
 Site.prototype.addSchema = function(schema){
+    schema.parentSite = this;
     this.schemas[schema.name] = schema;
     if ( this.hasHTML ) {
         schema.html();
@@ -679,11 +696,25 @@ Site.prototype.addSchema = function(schema){
     this.current.schema = schema;
 };
 
+/*
+set schema to site.current.schema
+hide currently active schema's html and show new current schema's html
+*/
 Site.prototype.loadSchema = function(name){
+    // reset before loading schmea
+    if ( Collect.site.current.schema ) {
+        Collect.site.current.schema.eles.holder.classList.remove("active");
+    }
+    Collect.site.current = {
+        schema: undefined,
+        page: undefined,
+        set: undefined,
+        selector: undefined
+    };
     var schema = this.schemas[name],
         prevSchema = this.current.schema;
-    // if schema doesn't exist or is the same as the current one, do nothing
-    if ( !schema || (prevSchema && prevSchema.name === name) ) {
+    // if schema doesn't exist, do nothing
+    if ( !schema ) {
         return;
     }
 
@@ -697,15 +728,11 @@ Site.prototype.loadSchema = function(name){
         HTML.perm.page.select.innerHTML = "";
         HTML.perm.page.select.appendChild(schema.eles.select);
         if ( schema.eles.holder ) {
-            // only hide previous schema if it actually exists
-            if ( prevSchema ) {
-                prevSchema.eles.holder.classList.remove("active");
-            }
             schema.eles.holder.classList.add("active");
         }
     }
 
-    // load the default page
+    // load the default page for the schema
     schema.loadPage("default");
 };
 
@@ -925,7 +952,6 @@ Schema.prototype.loadPage = function(name){
     if ( !page || (prevPage && prevPage.name === name) ) {
         return;
     }
-
     if ( this.hasHTML ) {
         // select the option for the page
         if ( page.eles.option ) {
@@ -1712,17 +1738,25 @@ Selector.prototype.addRule = function(rule){
 
     // if the Rule has follow=true and the SelectorSet has a Page (which in turn has a Schema)
     // add a new Page to the schema with the name of the Rule
-    if ( rule.follow && this.parentSet && this.parentSet.parentPage && this.parentSet.parentPage.parentSchema ) {
-        // only add page if it doesn't already exist
-        if ( this.parentSet.parentPage.parentSchema.uniquePageName(rule.name) ) {
+    // only add page if it doesn't already exist
+    if ( rule.follow ) {
+        var schema = this.getSchema();
+        if ( schema ) {
             var page = new Page(rule.name);
-            this.parentSet.parentPage.parentSchema.addPage(page);
+            schema.addPage(page);
         }
     }
 
     // if Selector html exists, also create html for rule
     if ( this.hasHTML ) {
         rule.html();
+    }
+};
+
+// uggggggggly
+Selector.prototype.getSchema = function(){
+    if ( this.parentSet && this.parentSet.parentPage && this.parentSet.parentPage.parentSchema ) {
+        return this.parentSet.parentPage.parentSchema;
     }
 };
 
@@ -2229,7 +2263,7 @@ var marginBottom;
 (function addInterface(){
     var div = noSelectElement("div");
     div.classList.add("collectjs");
-    div.innerHTML = "<div class=\"tabHolder\"><div class=\"tabs\"><div class=\"tab active\" id=\"schemaTab\">Schema</div><div class=\"tab\" id=\"previewTab\">Preview</div><div class=\"tab\" id=\"optionsTab\">Options</div><div class=\"tab\" id=\"closeCollect\">&times;</div></div></div><div class=\"permanent\"><div class=\"currentInfo\"><div>Schema: <div id=\"schemaSelect\"></div><button id=\"createSchema\" title=\"create a new schema\">+</button><button id=\"deleteSchema\" title=\"delete current schema\">&times;</button></div><div>Page: <div id=\"pageSelect\"></div></div><div>Selector Set: <div id=\"selectorSetSelect\"></div><!--<button id=\"createSelectorSet\" title=\"create a new selector set\">+</button><button id=\"deleteSelectorSet\" title=\"delete current selector set\">&times;</button>--></div><button id=\"uploadRules\">Upload Schema</button></div><div id=\"collectAlert\"></div></div><div class=\"views\"><div class=\"view\" id=\"emptyView\"></div><div class=\"view active\" id=\"schemaView\"><div id=\"schemaHolder\" class=\"rules\"></div></div><div class=\"view\" id=\"selectorView\"><div class=\"column form\"><!--displays what the current selector is--><p>Selector: <span id=\"currentSelector\"></span></p><p>Count: <span id=\"currentCount\"></span></p><div><h3>Type:</h3><p><label for=\"selectorRadio\">Selector</label><input type=\"radio\" id=\"selectorRadio\" name=\"selector\" value=\"selector\" checked/></p><p><label for=\"parentRadio\">Parent</label><input type=\"radio\" id=\"parentRadio\" name=\"selector\" value=\"parent\" /></p><p><label for=\"nextRadio\">Next</label><input type=\"radio\" id=\"nextRadio\" name=\"selector\" value=\"next\" /></p></div><div id=\"parentRange\"><label>Low: <input id=\"parentLow\" name=\"parentLow\" type=\"text\" /></label><label for=\"parentHigh\">High: <input id=\"parentHigh\" name=\"parentHigh\" type=\"text\" /></label></div><p><button id=\"saveSelector\">Save</button><button id=\"clearSelector\">Clear</button></p></div><div class=\"column\"><!--holds the interactive element for choosing a selector--><div id=\"selectorHolder\"></div><div id=\"selectorCycleHolder\"></div></div></div><div class=\"view\" id=\"ruleView\"><div id=\"ruleItems\" class=\"items\"><h3>Selector: <span id=\"ruleSelector\"></span></h3><form id=\"ruleForm\" class=\"column form\"><div class=\"rule\"><label for=\"ruleName\" title=\"the name of a rule\">Name:</label><input id=\"ruleName\" name=\"ruleName\" type=\"text\" /></div><div class=\"rule\"><label title=\"the attribute of an element to capture\">Capture:</label><span id=\"ruleAttr\"></span></div><div class=\"rule follow\"><label for=\"ruleFollow\" title=\"create a new page from the element's captured url (capture must be attr-href)\">Follow:</label><input id=\"ruleFollow\" name=\"ruleFollow\" type=\"checkbox\" disabled=\"true\" title=\"Can only follow rules that get href attribute from links\" /></div><div><button id=\"saveRule\">Save Rule</button><button id=\"cancelRule\">Cancel</button></div></form><div class=\"modifiers column\"><div id=\"ruleCycleHolder\"></div></div></div></div><div class=\"view\" id=\"previewView\"><div id=\"previewContents\"></div></div><div class=\"view\" id=\"optionsView\"><p><label for=\"ignore\">Ignore helper elements (eg tbody)</label><input type=\"checkbox\" id=\"ignore\" /></p></div></div>";
+    div.innerHTML = "<div class=\"tabHolder\"><div class=\"tabs\"><div class=\"tab active\" id=\"schemaTab\">Schema</div><div class=\"tab\" id=\"previewTab\">Preview</div><div class=\"tab\" id=\"optionsTab\">Options</div><div class=\"tab\" id=\"closeCollect\">&times;</div></div></div><div class=\"permanent\"><div class=\"currentInfo\"><div>Schema: <div id=\"schemaSelect\"></div><div id=\"schemaButtons\"></div></div><div>Page: <div id=\"pageSelect\"></div></div><div>Selector Set: <div id=\"selectorSetSelect\"></div><!--<button id=\"createSelectorSet\" title=\"create a new selector set\">+</button><button id=\"deleteSelectorSet\" title=\"delete current selector set\">&times;</button>--></div><button id=\"uploadRules\">Upload Schema</button></div><div id=\"collectAlert\"></div></div><div class=\"views\"><div class=\"view\" id=\"emptyView\"></div><div class=\"view active\" id=\"schemaView\"><div id=\"schemaHolder\" class=\"rules\"></div></div><div class=\"view\" id=\"selectorView\"><div class=\"column form\"><!--displays what the current selector is--><p>Selector: <span id=\"currentSelector\"></span></p><p>Count: <span id=\"currentCount\"></span></p><div><h3>Type:</h3><p><label for=\"selectorRadio\">Selector</label><input type=\"radio\" id=\"selectorRadio\" name=\"selector\" value=\"selector\" checked/></p><p><label for=\"parentRadio\">Parent</label><input type=\"radio\" id=\"parentRadio\" name=\"selector\" value=\"parent\" /></p><p><label for=\"nextRadio\">Next</label><input type=\"radio\" id=\"nextRadio\" name=\"selector\" value=\"next\" /></p></div><div id=\"parentRange\"><label>Low: <input id=\"parentLow\" name=\"parentLow\" type=\"text\" /></label><label for=\"parentHigh\">High: <input id=\"parentHigh\" name=\"parentHigh\" type=\"text\" /></label></div><p><button id=\"saveSelector\">Save</button><button id=\"clearSelector\">Clear</button></p></div><div class=\"column\"><!--holds the interactive element for choosing a selector--><div id=\"selectorHolder\"></div><div id=\"selectorCycleHolder\"></div></div></div><div class=\"view\" id=\"ruleView\"><div id=\"ruleItems\" class=\"items\"><h3>Selector: <span id=\"ruleSelector\"></span></h3><form id=\"ruleForm\" class=\"column form\"><div class=\"rule\"><label for=\"ruleName\" title=\"the name of a rule\">Name:</label><input id=\"ruleName\" name=\"ruleName\" type=\"text\" /></div><div class=\"rule\"><label title=\"the attribute of an element to capture\">Capture:</label><span id=\"ruleAttr\"></span></div><div class=\"rule follow\"><label for=\"ruleFollow\" title=\"create a new page from the element's captured url (capture must be attr-href)\">Follow:</label><input id=\"ruleFollow\" name=\"ruleFollow\" type=\"checkbox\" disabled=\"true\" title=\"Can only follow rules that get href attribute from links\" /></div><div><button id=\"saveRule\">Save Rule</button><button id=\"cancelRule\">Cancel</button></div></form><div class=\"modifiers column\"><div id=\"ruleCycleHolder\"></div></div></div></div><div class=\"view\" id=\"previewView\"><div id=\"previewContents\"></div></div><div class=\"view\" id=\"optionsView\"><p><label for=\"ignore\">Ignore helper elements (eg tbody)</label><input type=\"checkbox\" id=\"ignore\" /></p></div></div>";
     document.body.appendChild(div);
     addNoSelect(div.querySelectorAll("*"));
 
@@ -2400,6 +2434,7 @@ var HTML = {
     perm: {
         schema: {
             select: document.getElementById("schemaSelect"),
+            buttons: document.getElementById("schemaButtons")
         },
         page: {
             select: document.getElementById("pageSelect"),
@@ -2644,7 +2679,6 @@ function optionsViewEvents(){
 }
 
 function permanentBarEvents(){
-
     // upload events
     idEvent("uploadRules", "click", function uploadEvent(event){
         event.preventDefault();
