@@ -139,6 +139,9 @@ body {
     .collectjs .rules .schema.active {
       display: block; }
     .collectjs .rules .page {
+      display: inline-block;
+      vertical-align: top;
+      width: 50%;
       margin: 3px 0;
       background: white; }
     .collectjs .rules .set {

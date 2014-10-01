@@ -673,7 +673,7 @@ Page.prototype.events = {
         }
         var set = new SelectorSet(name);
         this.addSet(set);
-        Collect.site.save();
+        Collect.site.saveCurrent();
     },
     clear: function(event){
         var confirmed = confirm("Clear out all selector sets, selectors, and rules from the page?");
@@ -681,7 +681,7 @@ Page.prototype.events = {
             return;
         }
         this.reset();
-        Collect.site.save();
+        Collect.site.saveCurrent();
     },
     loadSet: function(event){
         var option = this.eles.select.querySelector('option:checked'),
@@ -982,6 +982,7 @@ SelectorSet.prototype.html = function(){
 SelectorSet.prototype.events = {
     activate: function(event){
         this.activate();
+        this.eles.holder.scrollIntoViewIfNeeded();
     },
     addSelector: function(event){
         event.preventDefault();
@@ -1008,12 +1009,12 @@ SelectorSet.prototype.events = {
             this.parentPage.loadSet("default");
             this.remove();
         }
-        site.save();
+        site.saveCurrent();
     },
     removeParent: function(event){
         event.preventDefault();
         this.removeParent();
-        Collect.site.save();
+        Collect.site.saveCurrent();
 
         clearClass("parentSchema");
         delete Collect.parentCount;
@@ -1266,7 +1267,7 @@ Selector.prototype.events = {
     remove: function(event){
         event.preventDefault();
         this.remove();
-        Collect.site.save();
+        Collect.site.saveCurrent();
     },
     newRule: function(event){
         event.preventDefault();
@@ -1396,7 +1397,7 @@ Rule.prototype.events = {
     remove: function(event){
         clearClass("savedPreview");
         this.remove();
-        Collect.site.save();
+        Collect.site.saveCurrent();
     }
 };
 

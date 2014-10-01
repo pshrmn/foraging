@@ -579,7 +579,7 @@ function saveParent(selector){
 
     // attach the parent to the current set and save
     Collect.site.current.set.addParent(parent);
-    Collect.site.save();
+    Collect.site.saveCurrent();
 }
 
 function saveNext(selector){
@@ -594,7 +594,7 @@ function saveNext(selector){
     }
 
     Collect.site.current.page.addNext(selector);
-    Collect.site.save();
+    Collect.site.saveCurrent();
 }
 
 function clearSelectorEvent(event){
@@ -663,7 +663,7 @@ function saveRuleEvent(event){
         Collect.site.current.selector.addRule(rule);
     }
     Collect.site.current.selector = undefined;
-    Collect.site.save();
+    Collect.site.saveCurrent();
     showSchemaView();
 }
 
@@ -789,7 +789,6 @@ function setupRuleForm(selector){
     var elements = Collect.matchedElements(selector, parent);
     UI.ruleCycle.setElements(elements);
     addClass("queryCheck", elements);
-    // set global for allLinks (fix?)
     Collect.elements = elements;
 }
 
