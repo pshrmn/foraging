@@ -42,19 +42,16 @@ function Site(name, schemas){
 }
 
 Site.prototype.html = function(){
-    var holder = noSelectElement("div"),
-        schemas = noSelectElement("div"),
+    var schemas = noSelectElement("div"),
         schemaSelect = noSelectElement("select"); 
 
     this.hasHTML = true;
     this.eles = {
-        holder: holder,
         schemas: schemas,
         select: schemaSelect
     };
     // automatically attach the schema select to the page since it will always be shown
     HTML.perm.schema.select.appendChild(schemaSelect);
-    appendChildren(holder, [schemas]);
 
     // create html for all schemas, but only show the default one
     for ( var key in this.schemas ) {
@@ -67,7 +64,7 @@ Site.prototype.html = function(){
 
     schemaSelect.addEventListener("change", this.events.loadSchema.bind(this), false);
 
-    return holder;
+    return schemas;
 };
 
 Site.prototype.events = {
@@ -940,6 +937,7 @@ SelectorSet.prototype.html = function(){
 
     // Schema tab html        
     holder.classList.add("set");
+    holder.addEventListener("click", this.events.activate.bind(this), false);
     nametag.textContent = this.name;
     nametag.classList.add("nametag");
     nametag.setAttribute("title", "Selector Set");
@@ -982,6 +980,9 @@ SelectorSet.prototype.html = function(){
 
 // don't use this quite yet
 SelectorSet.prototype.events = {
+    activate: function(event){
+        this.activate();
+    },
     addSelector: function(event){
         event.preventDefault();
         // make sure current.page is the selector set's parent page

@@ -62,8 +62,6 @@ body {
     .collectjs .permanent .currentInfo div {
       display: inline-block;
       margin: 0 8px; }
-    .collectjs .permanent .currentInfo > div {
-      border-bottom: 1px solid #444444; }
   .collectjs .views {
     box-sizing: border-box;
     min-height: 150px;
@@ -239,14 +237,12 @@ body {
 #ruleHTML {
   line-height: 2; }
 
-/* permanent bar */
-#currentParent {
-  display: none; }
-
-#nextHolder {
-  display: none; }
-
 /* views */
+/* schemaView */
+#schemaHolder {
+  max-height: 350px;
+  overflow-y: scroll; }
+
 /* selectorView */
 #selectorView {
   font-size: 14px; }

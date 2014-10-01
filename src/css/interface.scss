@@ -95,10 +95,6 @@ body{
                 display: inline-block;
                 margin: 0 8px;
             }
-
-            > div{
-                border-bottom: 1px solid $dark-gray;
-            }
         }
     }
 
@@ -389,16 +385,14 @@ body{
     line-height: 2;
 }
 
-/* permanent bar */
-#currentParent{
-    display: none;
-}
-
-#nextHolder{
-    display: none;
-}
 
 /* views */
+/* schemaView */
+#schemaHolder{
+    max-height: 350px;
+    overflow-y: scroll;    
+}
+
 /* selectorView */
 #selectorView{
     font-size: 14px;
