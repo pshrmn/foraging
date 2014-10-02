@@ -46,7 +46,7 @@ var Collect = {
     */
     matchedElements: function(selector, parent){
         var allElements = [];
-        if ( UI.activeSelector === "selector" && parent ) {
+        if ( UI.selectorType === "selector" && parent ) {
             var low = parent.low || 0,
                 high = parent.high || 0;
             if ( low !== 0 || high !== 0 ) {
@@ -79,8 +79,7 @@ var Collect = {
 Object that controls the functionality of the interface
 */
 var UI = {
-    activeForm: "rule",
-    activeSelector: "selector",
+    selectorType: "selector",
     editing: {},
     view: {
         view: undefined,
@@ -157,11 +156,7 @@ var HTML = {
             low: document.getElementById("parentLow"),
             high: document.getElementById("parentHigh")
         },
-        radio: {
-            selector: document.getElementById("selectorRadio"),
-            parent: document.getElementById("parentRadio"),
-            next: document.getElementById("nextRadio")
-        }
+        type: document.getElementById("selectorType")
     },
     // elements in the rule view
     rule: {
@@ -211,13 +206,8 @@ var Family = {
         event.stopPropagation();
         event.preventDefault();
 
-        var parentSelector;
-        if ( UI.activeSelector === "selector" && Collect.parent ) {
-            parentSelector = Collect.parent.selector;
-        }
-
         Family.family = new SelectorFamily(this,
-            parentSelector,
+            Collect.parent.selector,
             HTML.selector.family,
             HTML.selector.selector,
             Family.test.bind(Family),
@@ -326,12 +316,9 @@ function clearSelectorClasses(){
 function resetSelectorView(){
     Family.remove();
 
-    UI.activeSelector = "selector";
+    UI.selectorType = "selector";
     UI.selectorCycle.reset();
 
-    HTML.selector.radio.selector.checked = true;
-    HTML.selector.radio.parent.disabled = false;
-    HTML.selector.radio.next.disabled = false;
     HTML.selector.parent.holder.style.display = "none";
     HTML.selector.parent.low.value = "";
     HTML.selector.parent.high.value = "";
@@ -395,9 +382,6 @@ function setupRulesView() {
 function selectorViewEvents(){
     idEvent("saveSelector", "click", saveSelectorEvent);
     idEvent("clearSelector", "click", clearSelectorEvent);
-    idEvent("selectorRadio", "change", updateRadioEvent);
-    idEvent("parentRadio", "change", updateRadioEvent);
-    idEvent("nextRadio", "change", updateRadioEvent);
 }
 
 function ruleViewEvents(){
@@ -528,20 +512,24 @@ function saveSelectorEvent(event){
     if ( emptyErrorCheck(selector, HTML.selector.selector, "No CSS selector selected") ) {
         return;
     }
-
-    switch(UI.activeSelector){
+    var success;
+    switch(UI.selectorType){
     case "selector":
-        saveSelector(selector);
+        success = saveSelector(selector);
         break;
     case "parent":
-        saveParent(selector);
+        success = saveParent(selector);
         break;
     case "next":
-        saveNext(selector);
+        success = saveNext(selector);
         break;
+    default:
+        success = true;
     }
-    resetInterface();
-    showSchemaView();
+    if ( success ) {
+        resetInterface();
+        showSchemaView();
+    }
 }
 
 //update
@@ -555,6 +543,7 @@ function saveSelector(selector){
     }
     
     Collect.site.saveCurrent();
+    return true;
 }
 
 function saveParent(selector){
@@ -580,6 +569,7 @@ function saveParent(selector){
     // attach the parent to the current set and save
     Collect.site.current.set.addParent(parent);
     Collect.site.saveCurrent();
+    return true;
 }
 
 function saveNext(selector){
@@ -590,41 +580,20 @@ function saveNext(selector){
             ("Cannot add next selector to '" + name + "' page, only to default")) || 
         errorCheck(!match.hasAttribute("href"), HTML.selector.selector,
             "selector must select element with href attribute") ) {
-        return;
+        return false;
     }
 
     Collect.site.current.page.addNext(selector);
     Collect.site.saveCurrent();
+    return true;
 }
 
 function clearSelectorEvent(event){
     event.preventDefault();
     resetInterface();
+    showSchemaView();
 }
 
-function updateRadioEvent(event){
-    UI.activeSelector = this.value;
-    switch(this.value) {
-    case "selector":
-        if ( Collect.parent.selector ) {
-            addParentSchema(Collect.parent);
-        }
-        HTML.selector.parent.holder.style.display = "none";
-        break;
-    case "parent":
-        // don't show the current parent if you want to set a new one
-        clearClass("parentSchema");
-        HTML.selector.parent.holder.style.display = "block";
-        break;
-    case "next":
-        // don't rely on parent when setting next
-        clearClass("parentSchema");
-        HTML.selector.parent.holder.style.display = "none";
-        break;
-    }
-    // reset elements
-    UI.turnSelectorsOn();
-}
 
 /******************
     RULE EVENTS
@@ -671,7 +640,12 @@ function saveRuleEvent(event){
     EVENT HELPERS
 ***********************/
 function showSelectorView(){
-    UI.activeSelector = "selector";
+    HTML.selector.type.textContent = UI.selectorType;
+    if ( UI.selectorType === "parent" ) {
+        HTML.selector.parent.holder.style.display = "block";
+    } else {
+        HTML.selector.parent.holder.style.display = "none";
+    }
     UI.turnSelectorsOn();
     clearSelectorClasses();
     setCurrentView(HTML.views.selector, HTML.tabs.schema);

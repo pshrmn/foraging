@@ -160,9 +160,7 @@ body {
       padding: 5px;
       background: #efefef;
       display: inline-block; }
-    .collectjs .rules .parent.hidden {
-      display: none; }
-    .collectjs .rules .next.hidden {
+    .collectjs .rules .parent .hidden, .collectjs .rules .next .hidden {
       display: none; }
     .collectjs .rules button {
       font-weight: bold;

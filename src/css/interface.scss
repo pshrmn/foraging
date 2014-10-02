@@ -256,13 +256,12 @@ body{
             display: inline-block;
         }
 
-        .parent.hidden{
-            display: none;
+        .parent, .next{
+            .hidden{
+                display: none;
+            }
         }
 
-        .next.hidden{
-            display: none;
-        }
 
         button{
             font-weight: bold;
