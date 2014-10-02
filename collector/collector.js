@@ -1354,7 +1354,8 @@ Page.prototype.remove = function(){
 Page.prototype.addNext = function(selector){
     this.next = selector;
     if ( this.hasHTML ) {
-        this.eles.next.holder.classList.remove("hidden");
+        this.eles.next.add.classList.add("hidden");
+        this.eles.next.remove.classList.remove("hidden");
         this.eles.next.selector.textContent = selector;
     }
 };
@@ -1362,7 +1363,8 @@ Page.prototype.addNext = function(selector){
 Page.prototype.removeNext = function(){
     this.next = undefined;
     if ( this.hasHTML ) {
-        this.eles.next.holder.classList.add("hidden");
+        this.eles.next.add.classList.remove("hidden");
+        this.eles.next.remove.classList.add("hidden");
         this.eles.next.selector.textContent = "";
     }
 };
@@ -1644,6 +1646,11 @@ SelectorSet.prototype.removeParent = function(){
 };
 
 SelectorSet.prototype.addSelector = function(selector){
+    // don't override an existing selector
+    if ( this.selectors[selector.selector]) {
+        return;
+    }
+
     this.selectors[selector.selector] = selector;
     selector.parentSet = this;
     if ( this.hasHTML ) {
