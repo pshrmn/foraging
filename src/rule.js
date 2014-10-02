@@ -1310,17 +1310,15 @@ Selector.prototype.html = function(){
 
 Selector.prototype.events = {
     preview: function(event){
-        clearClass("queryCheck");
-        clearClass("collectHighlight");
-        var parent, elements;
-        if ( this.parentSet ) {
-            parent = this.parentSet.parent;
-        }
-        elements = Collect.matchedElements(this.selector, parent);
+        var parent = this.parentSet ? this.parentSet.parent : undefined,
+            elements = Collect.matchedElements(this.selector, parent);
         addClass("savedPreview", elements);
     },
     unpreview: function(event){
-        clearClass("savedPreview");
+        // only "unpreview" when still on the schema view
+        if ( UI.view.view.id === "schemaView" ) {
+            clearClass("savedPreview");
+        }
     },
     remove: function(event){
         event.preventDefault();
@@ -1338,11 +1336,6 @@ Selector.prototype.events = {
         event.preventDefault();
         UI.editing.selector = this;
         Family.fromSelector(this.selector);
-        Family.match();
-
-        HTML.selector.radio.parent.disabled = true;
-        HTML.selector.radio.next.disabled = true;
-
         showSelectorView();
     }
 };

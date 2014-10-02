@@ -1,4 +1,6 @@
 var Cycle = (function(){
+    // used to 
+    var canFollow = false;
     function Cycle(holder, interactive){
         this.index = 0;
         this.elements = [];
@@ -10,11 +12,13 @@ var Cycle = (function(){
     Cycle.prototype.setElements = function(elements){
         this.holder.style.display = "block";
         this.elements = elements;
+        canFollow = allLinks(elements);
         this.preview();
     };
 
     Cycle.prototype.reset = function(){
         this.elements = [];
+        canFollow = false;
         this.index = 0;
         this.htmlElements.preview.textContent = "";
         this.htmlElements.index.textContent = "";
@@ -159,6 +163,54 @@ var Cycle = (function(){
         span.textContent = text;
         span.addEventListener("click", capturePreview, false);
         return span;
+    }
+
+
+    /*
+    if the .capture element clicked does not have the .selected class, set attribute to capture
+    otherwise, clear the attribute to capture
+    toggle .selected class
+    */
+    function capturePreview(event){
+        var capture = HTML.rule.capture,
+            follow = HTML.rule.follow,
+            followHolder = HTML.rule.followHolder;
+
+        if ( !this.classList.contains("selected") ){
+            clearClass("selected");
+            var captureVal = this.dataset.capture;
+            capture.textContent = captureVal;
+            this.classList.add("selected");
+
+            // toggle follow based on if capture is attr-href or something else
+            if ( captureVal === "attr-href" && canFollow ){
+                followHolder.style.display = "block";
+                follow.removeAttribute("disabled");
+                follow.setAttribute("title", "Follow link to get data for more rules");
+            } else {
+                followHolder.style.display = "none";
+                follow.checked = false;
+                follow.setAttribute("disabled", "true");
+                follow.setAttribute("title", "Can only follow rules that get href attribute from links");
+            }
+        } else {
+            capture.textContent = "";
+            follow.disabled = true;
+            followHolder.style.display = "none";
+            this.classList.remove("selected");
+        }   
+    }
+
+    function isLink(element, index, array){
+        return element.tagName === "A";
+    }
+
+    /*
+    iterate over elements and if each is an anchor element, return true
+    */
+    function allLinks(elements){
+        elements = Array.prototype.slice.call(elements);
+        return elements.every(isLink);
     }
 
     /*

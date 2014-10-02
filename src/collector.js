@@ -39,14 +39,13 @@ var Collect = {
         return prefix ? prefix + " " + selector : selector;
     },
     /*
-    matches elements in a page based on selector
-    parent is an optional parent selector that limits selected elements to children of
-        elements matching Collect.parent.selector
+    uses selector to match elements in the page
+    parent is an optional object containing a selector and a low/high range to limit matched elements
     if parent.high/low are defined, only use parent.selector elements within that range
     */
     matchedElements: function(selector, parent){
         var allElements = [];
-        if ( UI.selectorType === "selector" && parent ) {
+        if ( parent ) {
             var low = parent.low || 0,
                 high = parent.high || 0;
             if ( low !== 0 || high !== 0 ) {
@@ -70,7 +69,7 @@ var Collect = {
         return Array.prototype.slice.call(allElements);
     },
     options: {},
-    elements: [],
+    ruleElements: [],
     parent: {},
     site: undefined
 };
@@ -95,39 +94,6 @@ var UI = {
 
         setupSelectorView();
         setupRulesView();
-    },
-    /*
-    adds events listeners based on whether or not Collect.parent.elector is set
-    if it is, only add them to children of that element, otherwise add them to all elements
-    that don't have the noSelect class
-    store elements with eventlisteners in this.elements
-    */
-    turnSelectorsOn: function(){
-        var curr;
-        this.turnSelectorsOff();
-        Collect.elements = Collect.matchedElements("*", Collect.parent);
-
-        for ( var i=0, len=Collect.elements.length; i<len; i++ ) {
-            curr = Collect.elements[i];
-            curr.addEventListener('click', Family.create, false);
-            curr.addEventListener('mouseenter', highlightElement, false);
-            curr.addEventListener('mouseleave', unhighlightElement, false);
-        }
-        clearSelectorClasses();
-    },
-    /*
-    removes event listeners from elements in this.elements
-    */
-    turnSelectorsOff: function(){
-        var curr;
-        for ( var i=0, len=Collect.elements.length; i<len; i++ ) {
-            curr = Collect.elements[i];
-            curr.removeEventListener('click', Family.create);
-            curr.removeEventListener('mouseenter', highlightElement);
-            curr.removeEventListener('mouseleave', unhighlightElement);
-            
-        }
-        Collect.elements = [];
     },
     events: function(){
         // tabs
@@ -202,6 +168,8 @@ var HTML = {
 // Family derived from clicked element in the page
 var Family = {
     family: undefined,
+    elements: [],
+    selectableElements: [],
     create: function(event){
         event.stopPropagation();
         event.preventDefault();
@@ -246,19 +214,13 @@ var Family = {
     },
     // uses current SelectorFamily's computed selector to match elements in the page
     // uses Collect.parent to limit matches
-    elements: function(){
+    selectorElements: function(){
         var selector = this.selector(),
             parent = Collect.site.current.set.parent;
         if ( selector === "") {
             return [];
         }
         return Collect.matchedElements(selector, parent);
-    },
-    /*
-    sets Collect.matchedElements to elements matching the current selector
-    */
-    match: function(){
-        Collect.elements = this.elements();
     },
     /*
     add queryCheck class to all elements matching selector
@@ -268,27 +230,57 @@ var Family = {
     test: function(){
         clearClass("queryCheck");
         clearClass("collectHighlight");
-        var elements = this.elements(),
-            totalCount;
+        //Family.match();
+
+        var elements = this.selectorElements(),
+            totalCount  = elements.length ? elements.length : "";
         for ( var i=0, len=elements.length; i<len; i++ ) {
             elements[i].classList.add("queryCheck");
         }
-        totalCount = elements.length ? elements.length : "";
-
+        this.elements = elements;
         HTML.selector.count.textContent = elementCount(totalCount, Collect.parentCount);
-        this.match();
-        UI.selectorCycle.setElements(Collect.elements);
+        UI.selectorCycle.setElements(elements);
+    },
+    selectorsOn: false,
+    /*
+    match all child elements of parent selector (or "body" if no parent seletor is provided)
+        and save in Family.elements
+    selectable elements are restricted by :not(.noSelect)
+    add event listeners to all of those elements
+    */
+    turnOn: function(){
+        var curr;
+        if ( this.selectorsOn ) {
+            this.turnOff();
+        }
+        var parent = UI.selectorType === "selector" ? Collect.parent: undefined;
+        this.selectableElements = Collect.matchedElements("*", parent);
+        for ( var i=0, len=this.selectableElements.length; i<len; i++ ) {
+            curr = this.selectableElements[i];
+            curr.addEventListener('click', this.create, false);
+            curr.addEventListener('mouseenter', highlightElement, false);
+            curr.addEventListener('mouseleave', unhighlightElement, false);
+        }
+        this.selectorsOn = true;
     },
     /*
-    only select elements that fall between low/elements.length + high (because high is negative)
-    applies a range to the elements selected by the current selector
+    remove events from all elements in Family.elements
+    clear out any classes that would be set by events on the elements
     */
-    range: function(low, high){
-        Family.match();
-        var len = Collect.elements.length;
-        Collect.elements = Array.prototype.slice.call(Collect.elements).slice(low, len + high);
-        UI.selectorCycle.setElements(Collect.elements);
-    }
+    turnOff: function(){
+        clearSelectorClasses();
+        var curr;
+        for ( var i=0, len=this.selectableElements.length; i<len; i++ ) {
+            curr = this.selectableElements[i];
+            curr.removeEventListener('click', this.create);
+            curr.removeEventListener('mouseenter', highlightElement);
+            curr.removeEventListener('mouseleave', unhighlightElement);
+            
+        }
+        this.selectableElements = [];
+        this.selectorsOn = true;
+        this.elements = [];
+    },
 };
 
 UI.setup();
@@ -299,6 +291,7 @@ especially useful for when cancelling creating or editing a selector or rule
 */
 function resetInterface(){
     UI.editing = {};
+    Family.turnOff();
     if ( Collect.parent ) {
         addParentSchema(Collect.parent);
     }
@@ -307,6 +300,9 @@ function resetInterface(){
     resetRulesView();
 }
 
+/*
+clear classes from all elements with matching classes
+*/
 function clearSelectorClasses(){
     clearClass("queryCheck");
     clearClass("collectHighlight");
@@ -348,8 +344,7 @@ function tabEvents(){
     idEvent("closeCollect", "click", function removeInterface(event){
         event.stopPropagation();
         event.preventDefault();
-        UI.turnSelectorsOff();
-        clearSelectorClasses();
+        resetInterface();
         clearClass("parentSchema");
         HTML.ui.parentElement.removeChild(HTML.ui);
         document.body.style.marginBottom = marginBottom + "px";
@@ -460,48 +455,14 @@ function verifyAndApplyParentRange(event){
         return;
     }
 
-    Family.range(low, high);
-    clearClass("queryCheck");
-    addClass("queryCheck", Collect.elements);
-    
-    HTML.selector.count.textContent = elementCount(Collect.elements.length, Collect.parentCount);
+    var elements = Family.selectorElements(),
+        len = elements.length;
+    elements = Array.prototype.slice.call(elements).slice(low, len + high);
+    addClass("queryCheck", elements);
+    UI.selectorCycle.setElements(elements);
+    HTML.selector.count.textContent = elementCount(elements.length, Collect.parentCount);
 }
 
-/*
-if the .capture element clicked does not have the .selected class, set attribute to capture
-otherwise, clear the attribute to capture
-toggle .selected class
-*/
-function capturePreview(event){
-    var capture = HTML.rule.capture,
-        follow = HTML.rule.follow,
-        followHolder = HTML.rule.followHolder;
-
-    if ( !this.classList.contains("selected") ){
-        clearClass("selected");
-        var elements = Family.elements(),
-            captureVal = this.dataset.capture;
-        capture.textContent = captureVal;
-        this.classList.add("selected");
-
-        // toggle follow based on if capture is attr-href or something else
-        if ( captureVal === "attr-href" && allLinks(Collect.elements) ){
-            followHolder.style.display = "block";
-            follow.removeAttribute("disabled");
-            follow.setAttribute("title", "Follow link to get data for more rules");
-        } else {
-            followHolder.style.display = "none";
-            follow.checked = false;
-            follow.setAttribute("disabled", "true");
-            follow.setAttribute("title", "Can only follow rules that get href attribute from links");
-        }
-    } else {
-        capture.textContent = "";
-        follow.disabled = true;
-        followHolder.style.display = "none";
-        this.classList.remove("selected");
-    }   
-}
 /******************
     SELECTOR EVENTS
 ******************/
@@ -553,8 +514,6 @@ function saveParent(selector){
             selector: selector
         };
 
-    Collect.parentCount = Collect.elements.length;
-
     if ( !isNaN(low) ) {
         parent.low = low;
     }
@@ -563,7 +522,6 @@ function saveParent(selector){
     }
 
     Collect.parent = parent;
-    //showParent();
     addParentSchema(parent);
 
     // attach the parent to the current set and save
@@ -631,6 +589,7 @@ function saveRuleEvent(event){
         var rule = new Rule(name, capture, follow);
         Collect.site.current.selector.addRule(rule);
     }
+    Collect.ruleElements = [];
     Collect.site.current.selector = undefined;
     Collect.site.saveCurrent();
     showSchemaView();
@@ -646,33 +605,24 @@ function showSelectorView(){
     } else {
         HTML.selector.parent.holder.style.display = "none";
     }
-    UI.turnSelectorsOn();
-    clearSelectorClasses();
+    Family.turnOn();
     setCurrentView(HTML.views.selector, HTML.tabs.schema);
 }
 
 function showSchemaView(){
-    UI.turnSelectorsOff();
-    clearSelectorClasses();
     setCurrentView(HTML.views.schema, HTML.tabs.schema);
 }
 
 function showRuleView(){
-    UI.turnSelectorsOff();
-    clearSelectorClasses();
     setCurrentView(HTML.views.rule, HTML.tabs.schema);
 }
 
 function showPreviewView(){
     generatePreview();
-    UI.turnSelectorsOff();
-    clearSelectorClasses();
     setCurrentView(HTML.views.preview, HTML.tabs.preview);
 }
 
 function showOptionsView(){
-    UI.turnSelectorsOff();
-    clearSelectorClasses();
     setCurrentView(HTML.views.options, HTML.tabs.options);
 }
 
@@ -685,6 +635,10 @@ function setCurrentView(view, tab){
 }
 
 function hideCurrentView(){
+    // turn selectors off when leaving selector view
+    if ( UI.view.view.id === "selectorView" ) {
+        Family.turnOff();
+    }
     UI.view.view.classList.remove("active");
     UI.view.tab.classList.remove("active");
 }
@@ -752,18 +706,22 @@ function addParentSchema(parent){
     var elements = Collect.all(selector),
         end = elements.length + high;
         // add high because it is negative
+    Collect.parentCount = 0;
     for ( ; low<end ; low++ ){
         elements[low].classList.add("parentSchema");
+        Collect.parentCount++;
     }
 }
 
 function setupRuleForm(selector){
     HTML.rule.selector.textContent = selector;
-    var parent = Collect.site.current.set.parent;
-    var elements = Collect.matchedElements(selector, parent);
+
+    var parent = Collect.site.current.set.parent,
+        elements = Collect.matchedElements(selector, parent);
     UI.ruleCycle.setElements(elements);
-    addClass("queryCheck", elements);
-    Collect.elements = elements;
+    addClass("savedPreview", elements);
+    // elements matching the selector for the current rule
+    Collect.ruleElements = elements;
 }
 
 function elementCount(count, parentCount){
@@ -772,19 +730,6 @@ function elementCount(count, parentCount){
     } else {
         return count + " total";
     }
-}
-
-/***********************
-    UTILITY FUNCTIONS
-general helper functions
-***********************/
-function isLink(element, index, array){
-    return element.tagName === "A";
-}
-
-function allLinks(elements){
-    elements = Array.prototype.slice.call(elements);
-    return elements.every(isLink);
 }
 
 /***********************
