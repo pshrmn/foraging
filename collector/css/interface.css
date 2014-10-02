@@ -59,7 +59,7 @@ body {
     border-bottom: 1px solid #cccccc;
     padding: 3px 15px;
     background: #efefef; }
-    .collectjs .permanent .currentInfo div {
+    .collectjs .permanent div {
       display: inline-block;
       margin: 0 8px; }
   .collectjs .views {

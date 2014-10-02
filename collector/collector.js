@@ -581,18 +581,28 @@ function Site(name, schemas){
 }
 
 Site.prototype.html = function(){
-    var schemas = noSelectElement("div"),
+    var schemas = noSelectElement("div");
+
+    var schemaText = document.createTextNode("Schema: "),
+        schemaSelect = noSelectElement("select"),
         createSchema = noSelectElement("button"),
         removeSchema = noSelectElement("button"),
-        schemaSelect = noSelectElement("select");
+        upload = noSelectElement("button"),
+        pageText = document.createTextNode("Page: "),
+        pageSelect = noSelectElement("div"),
+        selectorText = document.createTextNode("Selector Set: "),
+        setSelect = noSelectElement("div");
 
     this.hasHTML = true;
     this.eles = {
         schemas: schemas,
-        select: schemaSelect
+        select: schemaSelect,
+        bar: {
+            schema: schemaSelect,
+            page: pageSelect,
+            set: setSelect
+        }
     };
-    // automatically attach the schema select to the page since it will always be shown
-    HTML.perm.schema.select.appendChild(schemaSelect);
 
     createSchema.textContent = "+Schema";
     createSchema.setAttribute("title", "create a new schema");
@@ -602,7 +612,11 @@ Site.prototype.html = function(){
     removeSchema.setAttribute("title", "delete current schema");
     removeSchema.addEventListener("click", this.events.removeSchema.bind(this), false);
 
-    appendChildren(HTML.perm.schema.buttons, [removeSchema, createSchema]);
+    upload.textContent = "Upload";
+    upload.addEventListener("click", this.events.upload.bind(this), false);
+
+    appendChildren(HTML.schema.info, [schemaText, schemaSelect, createSchema, removeSchema,
+        pageText, pageSelect, selectorText, setSelect, upload]);
 
     // create html for all schemas, but only show the default one
     for ( var key in this.schemas ) {
@@ -650,6 +664,10 @@ Site.prototype.events = {
         event.preventDefault();
         var schema = this.current.schema;
         this.removeSchema(schema.name);
+    },
+    upload: function(event){
+        event.preventDefault();
+        this.upload();
     }
 };
 
@@ -669,6 +687,15 @@ Site.prototype.save = function(schemaName){
         UI.preview.dirty = true;
     });
     resetInterface();
+};
+
+Site.prototype.upload = function(){
+    var schema = this.current.schema;
+    var data = {
+        schema: schema.uploadObject(),
+        site: this.name
+    };
+    chrome.runtime.sendMessage({type: 'upload', data: data});
 };
 
 Site.prototype.object = function(){
@@ -725,8 +752,8 @@ Site.prototype.loadSchema = function(name){
             schema.eles.option.selected = true;
         }
         // load in the select for the schema's pages
-        HTML.perm.page.select.innerHTML = "";
-        HTML.perm.page.select.appendChild(schema.eles.select);
+        this.eles.bar.page.innerHTML = "";
+        this.eles.bar.page.appendChild(schema.eles.select);
         if ( schema.eles.holder ) {
             schema.eles.holder.classList.add("active");
         }
@@ -945,26 +972,6 @@ Schema.prototype.events = {
     }
 };
 
-Schema.prototype.loadPage = function(name){
-    var page = this.pages[name],
-        prevPage = this.parentSite.current.page;
-    // if page doesn't exist or is the same as the current one, do nothing
-    if ( !page || (prevPage && prevPage.name === name) ) {
-        return;
-    }
-    if ( this.hasHTML ) {
-        // select the option for the page
-        if ( page.eles.option ) {
-            page.eles.option.selected = true;
-        }
-        // show the select for the page's selector set
-        HTML.perm.set.select.innerHTML = "";
-        HTML.perm.set.select.appendChild(page.eles.select);
-    }
-    Collect.site.current.page = page;
-    page.loadSet("default");
-};
-
 Schema.prototype.remove = function(){
     this.deleteHTML();
     for ( var key in this.pages ) {
@@ -981,8 +988,15 @@ Schema.prototype.reset = function(){
     for ( var key in this.pages ) {
         this.removePage(key);
     }
+    // reset current values
+    if ( this.parentSite ) {
+        this.parentSite.current.schema = this;
+        this.parentSite.current.page = undefined;
+        this.parentSite.current.set = undefined;
+    }
     var page = new Page("default");
     this.addPage(page);
+    this.loadPage(page.name);
 };
 
 Schema.prototype.rename = function(newName){
@@ -1022,6 +1036,27 @@ Schema.prototype.addPage = function(page){
     if ( this.eles.pages) {
         page.html();
     }
+};
+
+Schema.prototype.loadPage = function(name){
+    var page = this.pages[name],
+        prevPage = this.parentSite.current.page;
+    // if page doesn't exist or is the same as the current one, do nothing
+    if ( !page || page === prevPage ) {
+        return;
+    }
+    if ( this.hasHTML ) {
+        // select the option for the page
+        if ( page.eles.option ) {
+            page.eles.option.selected = true;
+        }
+        // show the select for the page's selector set
+        var site = this.parentSite;
+        site.eles.bar.set.innerHTML = "";
+        site.eles.bar.set.appendChild(page.eles.select);
+    }
+    Collect.site.current.page = page;
+    page.loadSet("default");
 };
 
 Schema.prototype.removePage = function(name){
@@ -1153,7 +1188,7 @@ Page.prototype.html = function(){
     var holder = noSelectElement("li"),
         nametag = noSelectElement("span"),
         createSet = noSelectElement("button"),
-        clear = noSelectElement("button"),
+        resetPage = noSelectElement("button"),
         sets = noSelectElement("ul"),
         option = noSelectElement("option"),
         setSelect = noSelectElement("select"),
@@ -1187,8 +1222,9 @@ Page.prototype.html = function(){
     createSet.textContent = "+Set";
     createSet.classList.add("pos");
     createSet.addEventListener("click", this.events.createSet.bind(this), false);
-    clear.textContent = "clear";
-    clear.addEventListener("click", this.events.clear.bind(this), false);
+
+    resetPage.innerHTML = "&times;";
+    resetPage.addEventListener("click", this.events.reset.bind(this), false);
 
     // Next
     nextAdd.textContent = "+Next";
@@ -1205,7 +1241,7 @@ Page.prototype.html = function(){
     }
 
     appendChildren(nextHolder, [nextText, nextSelector, nextAdd, nextRemove]);
-    appendChildren(holder, [nametag, createSet, nextHolder, sets]);
+    appendChildren(holder, [nametag, createSet, resetPage, nextHolder, sets]);
 
     for ( var key in this.sets ) {
         this.sets[key].html();
@@ -1244,7 +1280,7 @@ Page.prototype.events = {
         this.addSet(set);
         Collect.site.saveCurrent();
     },
-    clear: function(event){
+    reset: function(event){
         var confirmed = confirm("Clear out all selector sets, selectors, and rules from the page?");
         if ( !confirmed ) {
             return;
@@ -2339,7 +2375,7 @@ var marginBottom;
 (function addInterface(){
     var div = noSelectElement("div");
     div.classList.add("collectjs");
-    div.innerHTML = "<div class=\"tabHolder\"><div class=\"tabs\"><div class=\"tab active\" id=\"schemaTab\">Schema</div><div class=\"tab\" id=\"previewTab\">Preview</div><div class=\"tab\" id=\"optionsTab\">Options</div><div class=\"tab\" id=\"closeCollect\">&times;</div></div></div><div class=\"permanent\"><div class=\"currentInfo\"><div>Schema: <div id=\"schemaSelect\"></div><div id=\"schemaButtons\"></div></div><div>Page: <div id=\"pageSelect\"></div></div><div>Selector Set: <div id=\"selectorSetSelect\"></div><!--<button id=\"createSelectorSet\" title=\"create a new selector set\">+</button><button id=\"deleteSelectorSet\" title=\"delete current selector set\">&times;</button>--></div><button id=\"uploadRules\">Upload Schema</button></div><div id=\"collectAlert\"></div></div><div class=\"views\"><div class=\"view\" id=\"emptyView\"></div><div class=\"view active\" id=\"schemaView\"><div id=\"schemaHolder\" class=\"rules\"></div></div><div class=\"view\" id=\"selectorView\"><div class=\"column form\"><!--displays what the current selector is--><p>Selector: <span id=\"currentSelector\"></span></p><p>Count: <span id=\"currentCount\"></span></p><div><h3>Type:<span id=\"selectorType\">Selector</span></h3></div><div id=\"parentRange\"><label>Low: <input id=\"parentLow\" name=\"parentLow\" type=\"text\" /></label><label for=\"parentHigh\">High: <input id=\"parentHigh\" name=\"parentHigh\" type=\"text\" /></label></div><p><button id=\"saveSelector\">Save</button><button id=\"clearSelector\">Clear</button></p></div><div class=\"column\"><!--holds the interactive element for choosing a selector--><div id=\"selectorHolder\"></div><div id=\"selectorCycleHolder\"></div></div></div><div class=\"view\" id=\"ruleView\"><div id=\"ruleItems\" class=\"items\"><h3>Selector: <span id=\"ruleSelector\"></span></h3><form id=\"ruleForm\" class=\"column form\"><div class=\"rule\"><label for=\"ruleName\" title=\"the name of a rule\">Name:</label><input id=\"ruleName\" name=\"ruleName\" type=\"text\" /></div><div class=\"rule\"><label title=\"the attribute of an element to capture\">Capture:</label><span id=\"ruleAttr\"></span></div><div class=\"rule follow\"><label for=\"ruleFollow\" title=\"create a new page from the element's captured url (capture must be attr-href)\">Follow:</label><input id=\"ruleFollow\" name=\"ruleFollow\" type=\"checkbox\" disabled=\"true\" title=\"Can only follow rules that get href attribute from links\" /></div><div><button id=\"saveRule\">Save Rule</button><button id=\"cancelRule\">Cancel</button></div></form><div class=\"modifiers column\"><div id=\"ruleCycleHolder\"></div></div></div></div><div class=\"view\" id=\"previewView\"><div id=\"previewContents\"></div></div><div class=\"view\" id=\"optionsView\"><p><label for=\"ignore\">Ignore helper elements (eg tbody)</label><input type=\"checkbox\" id=\"ignore\" /></p></div></div>";
+    div.innerHTML = "<div class=\"tabHolder\"><div class=\"tabs\"><div class=\"tab active\" id=\"schemaTab\">Schema</div><div class=\"tab\" id=\"previewTab\">Preview</div><div class=\"tab\" id=\"optionsTab\">Options</div><div class=\"tab\" id=\"closeCollect\">&times;</div></div></div><div class=\"permanent\"><div id=\"schemaInfo\"></div><div id=\"collectAlert\"></div></div><div class=\"views\"><div class=\"view\" id=\"emptyView\"></div><div class=\"view active\" id=\"schemaView\"><div id=\"schemaHolder\" class=\"rules\"></div></div><div class=\"view\" id=\"selectorView\"><div class=\"column form\"><!--displays what the current selector is--><p>Selector: <span id=\"currentSelector\"></span></p><p>Count: <span id=\"currentCount\"></span></p><div><h3>Type:<span id=\"selectorType\">Selector</span></h3></div><div id=\"parentRange\"><label>Low: <input id=\"parentLow\" name=\"parentLow\" type=\"text\" /></label><label for=\"parentHigh\">High: <input id=\"parentHigh\" name=\"parentHigh\" type=\"text\" /></label></div><p><button id=\"saveSelector\">Save</button><button id=\"clearSelector\">Clear</button></p></div><div class=\"column\"><!--holds the interactive element for choosing a selector--><div id=\"selectorHolder\"></div><div id=\"selectorCycleHolder\"></div></div></div><div class=\"view\" id=\"ruleView\"><div id=\"ruleItems\" class=\"items\"><h3>Selector: <span id=\"ruleSelector\"></span></h3><form id=\"ruleForm\" class=\"column form\"><div class=\"rule\"><label for=\"ruleName\" title=\"the name of a rule\">Name:</label><input id=\"ruleName\" name=\"ruleName\" type=\"text\" /></div><div class=\"rule\"><label title=\"the attribute of an element to capture\">Capture:</label><span id=\"ruleAttr\"></span></div><div class=\"rule follow\"><label for=\"ruleFollow\" title=\"create a new page from the element's captured url (capture must be attr-href)\">Follow:</label><input id=\"ruleFollow\" name=\"ruleFollow\" type=\"checkbox\" disabled=\"true\" title=\"Can only follow rules that get href attribute from links\" /></div><div><button id=\"saveRule\">Save Rule</button><button id=\"cancelRule\">Cancel</button></div></form><div class=\"modifiers column\"><div id=\"ruleCycleHolder\"></div></div></div></div><div class=\"view\" id=\"previewView\"><div id=\"previewContents\"></div></div><div class=\"view\" id=\"optionsView\"><p><label for=\"ignore\">Ignore helper elements (eg tbody)</label><input type=\"checkbox\" id=\"ignore\" /></p></div></div>";
     document.body.appendChild(div);
     addNoSelect(div.querySelectorAll("*"));
 
@@ -2380,15 +2416,14 @@ var Collect = {
     matchedElements: function(selector, parent){
         var allElements = [];
         if ( parent ) {
-            var low = parent.low || 0,
-                high = parent.high || 0;
+            var low = parent.low || 0;
+            var high = parent.high || 0;
             if ( low !== 0 || high !== 0 ) {
                 // if either high or low is defined, 
                 // iterate over all child elements of elements matched by parent selector
-                var parents = document.querySelectorAll(parent.selector),
-                    // add high because it is negative
-                    end = parents.length + high,
-                    currElements;
+                var parents = document.querySelectorAll(parent.selector);
+                var end = parents.length + high; // add high because it is negative
+                var currElements;
                 for ( ; low<end; low++ ) {
                     currElements = parents[low].querySelectorAll(this.not(selector));
                     allElements = allElements.concat(Array.prototype.slice.call(currElements));
@@ -2424,12 +2459,7 @@ var UI = {
     setup: function(){        
         loadOptions();
         setupHostname();
-        this.events();
-
-        setupSelectorView();
-        setupRulesView();
-    },
-    events: function(){
+        
         // tabs
         tabEvents();
 
@@ -2437,13 +2467,16 @@ var UI = {
         selectorViewEvents();
         ruleViewEvents();
         optionsViewEvents();
-        permanentBarEvents();
+
+        setupSelectorView();
+        setupRulesView();
     }
 };
 
 // save commonly referenced to elements
 var HTML = {
     schema: {
+        info: document.getElementById("schemaInfo"),
         holder: document.getElementById("schemaHolder")
     },
     // elements in the selector view
@@ -2481,7 +2514,6 @@ var HTML = {
         },
         alert: document.getElementById("collectAlert"),
     },
-    ui: document.querySelector(".collectjs"),
     preview: {
         contents: document.getElementById("previewContents")
     },
@@ -2522,6 +2554,7 @@ var Family = {
             this.family.remove();
             this.family = undefined;
         }
+        this.elements = [];
     },
     // create a SelectorFamily given a css selector string
     fromSelector: function(selector){
@@ -2564,7 +2597,6 @@ var Family = {
     test: function(){
         clearClass("queryCheck");
         clearClass("collectHighlight");
-        //Family.match();
 
         var elements = this.selectorElements(),
             totalCount  = elements.length ? elements.length : "";
@@ -2656,8 +2688,6 @@ function resetSelectorView(){
 }
 
 function resetRulesView(){
-    Family.remove();
-
     UI.ruleCycle.reset();
     HTML.rule.selector.textContent = "";
 
@@ -2680,7 +2710,8 @@ function tabEvents(){
         event.preventDefault();
         resetInterface();
         clearClass("parentSchema");
-        HTML.ui.parentElement.removeChild(HTML.ui);
+        var ui = document.querySelector(".collectjs");
+        ui.parentElement.removeChild(ui);
         document.body.style.marginBottom = marginBottom + "px";
     });
 
@@ -2730,14 +2761,6 @@ function optionsViewEvents(){
             Collect.options.ignore = document.getElementById("ignore").checked;
         }
         setOptions(Collect.options);
-    });
-}
-
-function permanentBarEvents(){
-    // upload events
-    idEvent("uploadRules", "click", function uploadEvent(event){
-        event.preventDefault();
-        uploadSchema();
     });
 }
 
@@ -2791,6 +2814,7 @@ function verifyAndApplyParentRange(event){
 
     var elements = Family.selectorElements(),
         len = elements.length;
+    // restrict to range
     elements = Array.prototype.slice.call(elements).slice(low, len + high);
     addClass("queryCheck", elements);
     UI.selectorCycle.setElements(elements);
@@ -3023,8 +3047,7 @@ function emptyErrorCheck(attr, ele, msg){
 }
 
 function clearErrors(){
-    // doing this instead of clearClass("error") in case the native page also uses the error class
-    var errors = HTML.ui.getElementsByClassName("error");
+    var errors = document.querySelectorAll(".collectjs .error");
     for ( var i=0, errorLen = errors.length; i<errorLen; i++ ) {
         errors[i].classList.remove("error");
     }
@@ -3106,11 +3129,7 @@ function setupHostname(){
 }
 
 function uploadSchema(){
-    var data = {
-        schema: Collect.site.current.schema.uploadObject(),
-        site: window.location.host
-    };
-    chrome.runtime.sendMessage({type: 'upload', data: data});
+    
 }
 
 /***********************

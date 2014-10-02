@@ -5,7 +5,7 @@ var marginBottom;
 (function addInterface(){
     var div = noSelectElement("div");
     div.classList.add("collectjs");
-    div.innerHTML = "<div class=\"tabHolder\"><div class=\"tabs\"><div class=\"tab active\" id=\"schemaTab\">Schema</div><div class=\"tab\" id=\"previewTab\">Preview</div><div class=\"tab\" id=\"optionsTab\">Options</div><div class=\"tab\" id=\"closeCollect\">&times;</div></div></div><div class=\"permanent\"><div class=\"currentInfo\"><div>Schema: <div id=\"schemaSelect\"></div><div id=\"schemaButtons\"></div></div><div>Page: <div id=\"pageSelect\"></div></div><div>Selector Set: <div id=\"selectorSetSelect\"></div><!--<button id=\"createSelectorSet\" title=\"create a new selector set\">+</button><button id=\"deleteSelectorSet\" title=\"delete current selector set\">&times;</button>--></div><button id=\"uploadRules\">Upload Schema</button></div><div id=\"collectAlert\"></div></div><div class=\"views\"><div class=\"view\" id=\"emptyView\"></div><div class=\"view active\" id=\"schemaView\"><div id=\"schemaHolder\" class=\"rules\"></div></div><div class=\"view\" id=\"selectorView\"><div class=\"column form\"><!--displays what the current selector is--><p>Selector: <span id=\"currentSelector\"></span></p><p>Count: <span id=\"currentCount\"></span></p><div><h3>Type:<span id=\"selectorType\">Selector</span></h3></div><div id=\"parentRange\"><label>Low: <input id=\"parentLow\" name=\"parentLow\" type=\"text\" /></label><label for=\"parentHigh\">High: <input id=\"parentHigh\" name=\"parentHigh\" type=\"text\" /></label></div><p><button id=\"saveSelector\">Save</button><button id=\"clearSelector\">Clear</button></p></div><div class=\"column\"><!--holds the interactive element for choosing a selector--><div id=\"selectorHolder\"></div><div id=\"selectorCycleHolder\"></div></div></div><div class=\"view\" id=\"ruleView\"><div id=\"ruleItems\" class=\"items\"><h3>Selector: <span id=\"ruleSelector\"></span></h3><form id=\"ruleForm\" class=\"column form\"><div class=\"rule\"><label for=\"ruleName\" title=\"the name of a rule\">Name:</label><input id=\"ruleName\" name=\"ruleName\" type=\"text\" /></div><div class=\"rule\"><label title=\"the attribute of an element to capture\">Capture:</label><span id=\"ruleAttr\"></span></div><div class=\"rule follow\"><label for=\"ruleFollow\" title=\"create a new page from the element's captured url (capture must be attr-href)\">Follow:</label><input id=\"ruleFollow\" name=\"ruleFollow\" type=\"checkbox\" disabled=\"true\" title=\"Can only follow rules that get href attribute from links\" /></div><div><button id=\"saveRule\">Save Rule</button><button id=\"cancelRule\">Cancel</button></div></form><div class=\"modifiers column\"><div id=\"ruleCycleHolder\"></div></div></div></div><div class=\"view\" id=\"previewView\"><div id=\"previewContents\"></div></div><div class=\"view\" id=\"optionsView\"><p><label for=\"ignore\">Ignore helper elements (eg tbody)</label><input type=\"checkbox\" id=\"ignore\" /></p></div></div>";
+    div.innerHTML = "<div class=\"tabHolder\"><div class=\"tabs\"><div class=\"tab active\" id=\"schemaTab\">Schema</div><div class=\"tab\" id=\"previewTab\">Preview</div><div class=\"tab\" id=\"optionsTab\">Options</div><div class=\"tab\" id=\"closeCollect\">&times;</div></div></div><div class=\"permanent\"><div id=\"schemaInfo\"></div><div id=\"collectAlert\"></div></div><div class=\"views\"><div class=\"view\" id=\"emptyView\"></div><div class=\"view active\" id=\"schemaView\"><div id=\"schemaHolder\" class=\"rules\"></div></div><div class=\"view\" id=\"selectorView\"><div class=\"column form\"><!--displays what the current selector is--><p>Selector: <span id=\"currentSelector\"></span></p><p>Count: <span id=\"currentCount\"></span></p><div><h3>Type:<span id=\"selectorType\">Selector</span></h3></div><div id=\"parentRange\"><label>Low: <input id=\"parentLow\" name=\"parentLow\" type=\"text\" /></label><label for=\"parentHigh\">High: <input id=\"parentHigh\" name=\"parentHigh\" type=\"text\" /></label></div><p><button id=\"saveSelector\">Save</button><button id=\"clearSelector\">Clear</button></p></div><div class=\"column\"><!--holds the interactive element for choosing a selector--><div id=\"selectorHolder\"></div><div id=\"selectorCycleHolder\"></div></div></div><div class=\"view\" id=\"ruleView\"><div id=\"ruleItems\" class=\"items\"><h3>Selector: <span id=\"ruleSelector\"></span></h3><form id=\"ruleForm\" class=\"column form\"><div class=\"rule\"><label for=\"ruleName\" title=\"the name of a rule\">Name:</label><input id=\"ruleName\" name=\"ruleName\" type=\"text\" /></div><div class=\"rule\"><label title=\"the attribute of an element to capture\">Capture:</label><span id=\"ruleAttr\"></span></div><div class=\"rule follow\"><label for=\"ruleFollow\" title=\"create a new page from the element's captured url (capture must be attr-href)\">Follow:</label><input id=\"ruleFollow\" name=\"ruleFollow\" type=\"checkbox\" disabled=\"true\" title=\"Can only follow rules that get href attribute from links\" /></div><div><button id=\"saveRule\">Save Rule</button><button id=\"cancelRule\">Cancel</button></div></form><div class=\"modifiers column\"><div id=\"ruleCycleHolder\"></div></div></div></div><div class=\"view\" id=\"previewView\"><div id=\"previewContents\"></div></div><div class=\"view\" id=\"optionsView\"><p><label for=\"ignore\">Ignore helper elements (eg tbody)</label><input type=\"checkbox\" id=\"ignore\" /></p></div></div>";
     document.body.appendChild(div);
     addNoSelect(div.querySelectorAll("*"));
 
@@ -46,15 +46,14 @@ var Collect = {
     matchedElements: function(selector, parent){
         var allElements = [];
         if ( parent ) {
-            var low = parent.low || 0,
-                high = parent.high || 0;
+            var low = parent.low || 0;
+            var high = parent.high || 0;
             if ( low !== 0 || high !== 0 ) {
                 // if either high or low is defined, 
                 // iterate over all child elements of elements matched by parent selector
-                var parents = document.querySelectorAll(parent.selector),
-                    // add high because it is negative
-                    end = parents.length + high,
-                    currElements;
+                var parents = document.querySelectorAll(parent.selector);
+                var end = parents.length + high; // add high because it is negative
+                var currElements;
                 for ( ; low<end; low++ ) {
                     currElements = parents[low].querySelectorAll(this.not(selector));
                     allElements = allElements.concat(Array.prototype.slice.call(currElements));
@@ -90,12 +89,7 @@ var UI = {
     setup: function(){        
         loadOptions();
         setupHostname();
-        this.events();
-
-        setupSelectorView();
-        setupRulesView();
-    },
-    events: function(){
+        
         // tabs
         tabEvents();
 
@@ -103,13 +97,16 @@ var UI = {
         selectorViewEvents();
         ruleViewEvents();
         optionsViewEvents();
-        permanentBarEvents();
+
+        setupSelectorView();
+        setupRulesView();
     }
 };
 
 // save commonly referenced to elements
 var HTML = {
     schema: {
+        info: document.getElementById("schemaInfo"),
         holder: document.getElementById("schemaHolder")
     },
     // elements in the selector view
@@ -147,7 +144,6 @@ var HTML = {
         },
         alert: document.getElementById("collectAlert"),
     },
-    ui: document.querySelector(".collectjs"),
     preview: {
         contents: document.getElementById("previewContents")
     },
@@ -188,6 +184,7 @@ var Family = {
             this.family.remove();
             this.family = undefined;
         }
+        this.elements = [];
     },
     // create a SelectorFamily given a css selector string
     fromSelector: function(selector){
@@ -230,7 +227,6 @@ var Family = {
     test: function(){
         clearClass("queryCheck");
         clearClass("collectHighlight");
-        //Family.match();
 
         var elements = this.selectorElements(),
             totalCount  = elements.length ? elements.length : "";
@@ -322,8 +318,6 @@ function resetSelectorView(){
 }
 
 function resetRulesView(){
-    Family.remove();
-
     UI.ruleCycle.reset();
     HTML.rule.selector.textContent = "";
 
@@ -346,7 +340,8 @@ function tabEvents(){
         event.preventDefault();
         resetInterface();
         clearClass("parentSchema");
-        HTML.ui.parentElement.removeChild(HTML.ui);
+        var ui = document.querySelector(".collectjs");
+        ui.parentElement.removeChild(ui);
         document.body.style.marginBottom = marginBottom + "px";
     });
 
@@ -396,14 +391,6 @@ function optionsViewEvents(){
             Collect.options.ignore = document.getElementById("ignore").checked;
         }
         setOptions(Collect.options);
-    });
-}
-
-function permanentBarEvents(){
-    // upload events
-    idEvent("uploadRules", "click", function uploadEvent(event){
-        event.preventDefault();
-        uploadSchema();
     });
 }
 
@@ -457,6 +444,7 @@ function verifyAndApplyParentRange(event){
 
     var elements = Family.selectorElements(),
         len = elements.length;
+    // restrict to range
     elements = Array.prototype.slice.call(elements).slice(low, len + high);
     addClass("queryCheck", elements);
     UI.selectorCycle.setElements(elements);
@@ -689,8 +677,7 @@ function emptyErrorCheck(attr, ele, msg){
 }
 
 function clearErrors(){
-    // doing this instead of clearClass("error") in case the native page also uses the error class
-    var errors = HTML.ui.getElementsByClassName("error");
+    var errors = document.querySelectorAll(".collectjs .error");
     for ( var i=0, errorLen = errors.length; i<errorLen; i++ ) {
         errors[i].classList.remove("error");
     }
@@ -772,11 +759,7 @@ function setupHostname(){
 }
 
 function uploadSchema(){
-    var data = {
-        schema: Collect.site.current.schema.uploadObject(),
-        site: window.location.host
-    };
-    chrome.runtime.sendMessage({type: 'upload', data: data});
+    
 }
 
 /***********************
