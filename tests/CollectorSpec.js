@@ -1,15 +1,3 @@
-describe("Collect", function(){
-    describe("not", function(){
-        it("returns selector with :not(.noSelect) appended", function(){
-            expect(Collect.not("a")).toEqual("body a:not(.noSelect)");
-        });
-
-        it("prepends prefix if it exists", function(){
-            expect(Collect.not("a", "#main")).toEqual("#main a:not(.noSelect)");
-        });
-    });
-});
-
 describe("event helpers", function(){
     describe("errors", function(){
 

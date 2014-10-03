@@ -536,6 +536,65 @@ function noSelectEle(tag, otherClasses){
     return ele;
 }
 
+// Source: src/fetch.js
+/*
+functions to get elements in the page
+*/
+var Fetch = {
+    /***
+    select the first element in the page to match the selector
+    if prefix is provided, append that in front of the selector
+    ***/
+    one: function(selector, prefix){
+        return document.querySelector(this.not(selector, prefix));
+    },
+    /***
+    select all elements in the page that match the selector
+    ***/
+    all: function(selector, prefix){
+        return document.querySelectorAll(this.not(selector, prefix));
+    },
+    /***
+    returns a string for a css selector suffixed by :not(.noSelect)
+    in order to ignore elements that are part of the collectorjs interface
+    ***/
+    not: function(selector, prefix){
+        selector += ":not(.noSelect)";
+        return prefix ? prefix + " " + selector : selector;
+    },
+    /*
+    uses selector to match elements in the page
+    parent is an optional object containing a selector and a low/high range to limit matched elements
+    if parent.high/low are defined, only use parent.selector elements within that range
+    */
+    matchedElements: function(selector, parent){
+        var allElements = [];
+        if ( parent ) {
+            var low = parent.low || 0;
+            var high = parent.high || 0;
+            // if either high or low is defined, 
+            // iterate over all child elements of elements matched by parent selector
+            if ( low !== 0 || high !== 0 ) {
+                var parents = document.querySelectorAll(parent.selector);
+                var end = parents.length + high; // add high because it is negative
+                var currElements;
+                var notSelector = this.not(selector);
+                // select elements within parent that match the selector, then merge into allElements
+                for ( ; low<end; low++ ) {
+                    currElements = parents[low].querySelectorAll(notSelector);
+                    allElements = allElements.concat(Array.prototype.slice.call(currElements));
+                }
+            } else {
+                allElements = this.all(selector, parent.selector);
+            }
+        } else {
+            // don't care about parent when choosing next selector or a new parent selector
+            allElements = this.all(selector, "body");
+        }
+        return Array.prototype.slice.call(allElements);
+    },
+};
+
 // Source: src/rule.js
 // this exists in a separate file for ease of use
 // but has dependencies on variables in collector.js and thus is not modular
@@ -591,7 +650,8 @@ Site.prototype.html = function(){
         pageText = document.createTextNode("Page: "),
         pageSelect = noSelectElement("div"),
         selectorText = document.createTextNode("Selector Set: "),
-        setSelect = noSelectElement("div");
+        setSelect = noSelectElement("div"),
+        topbar = noSelectElement("div");
 
     this.hasHTML = true;
     this.eles = {
@@ -615,7 +675,7 @@ Site.prototype.html = function(){
     upload.textContent = "Upload";
     upload.addEventListener("click", this.events.upload.bind(this), false);
 
-    appendChildren(HTML.schema.info, [schemaText, schemaSelect, createSchema, removeSchema,
+    appendChildren(topbar, [schemaText, schemaSelect, createSchema, removeSchema,
         pageText, pageSelect, selectorText, setSelect, upload]);
 
     // create html for all schemas, but only show the default one
@@ -629,7 +689,10 @@ Site.prototype.html = function(){
 
     schemaSelect.addEventListener("change", this.events.loadSchema.bind(this), false);
 
-    return schemas;
+    return {
+        schema: schemas,
+        topbar: topbar
+    };
 };
 
 Site.prototype.events = {
@@ -1367,6 +1430,9 @@ Page.prototype.reset = function(){
     }
     var defaultSet = new SelectorSet("default");
     this.addSet(defaultSet);
+    if ( this.next ) {
+        this.removeNext();
+    }
 };
 
 Page.prototype.removeSet = function(name){
@@ -1706,6 +1772,10 @@ SelectorSet.prototype.reset = function(){
     for ( var key in this.selectors ) {
         this.removeSelector(key);
     }
+    if ( this.parent ) {
+        this.removeParent();
+        clearClass("parentSchema");
+    }
 };
 
 SelectorSet.prototype.remove = function(){
@@ -1893,7 +1963,7 @@ Selector.prototype.html = function(){
 Selector.prototype.events = {
     preview: function(event){
         var parent = this.parentSet ? this.parentSet.parent : undefined,
-            elements = Collect.matchedElements(this.selector, parent);
+            elements = Fetch.matchedElements(this.selector, parent);
         addClass("savedPreview", elements);
     },
     unpreview: function(event){
@@ -2009,22 +2079,7 @@ Rule.prototype.html = function(){
 Rule.prototype.events = {
     edit: function(event){
         UI.editing.rule = this;
-
-        // setup the form
-        HTML.rule.name.value = this.name;
-        HTML.rule.selector.textContent = this.parentSelector.selector;
-        HTML.rule.capture.textContent = this.capture;
-        if ( this.capture === "attr-href" ) {
-            HTML.rule.follow.checked = this.follow;
-            HTML.rule.follow.disabled = false;
-            HTML.rule.followHolder.style.display = "block";
-        } else {
-            HTML.rule.follow.checked = false;
-            HTML.rule.follow.disabled = true;
-            HTML.rule.followHolder.style.display = "none";
-        }
-
-        setupRuleForm(this.parentSelector.selector);
+        setupRuleForm(this.parentSelector.selector, this.object());
         showRuleView();
     },
     remove: function(event){
@@ -2370,24 +2425,27 @@ var Cycle = (function(){
 })();
 
 // Source: src/collector_with_html.js
-var marginBottom;
-// add the interface first so that html elements are present
-(function addInterface(){
-    var div = noSelectElement("div");
-    div.classList.add("collectjs");
-    div.innerHTML = "<div class=\"tabHolder\"><div class=\"tabs\"><div class=\"tab active\" id=\"schemaTab\">Schema</div><div class=\"tab\" id=\"previewTab\">Preview</div><div class=\"tab\" id=\"optionsTab\">Options</div><div class=\"tab\" id=\"closeCollect\">&times;</div></div></div><div class=\"permanent\"><div id=\"schemaInfo\"></div><div id=\"collectAlert\"></div></div><div class=\"views\"><div class=\"view\" id=\"emptyView\"></div><div class=\"view active\" id=\"schemaView\"><div id=\"schemaHolder\" class=\"rules\"></div></div><div class=\"view\" id=\"selectorView\"><div class=\"column form\"><!--displays what the current selector is--><p>Selector: <span id=\"currentSelector\"></span></p><p>Count: <span id=\"currentCount\"></span></p><div><h3>Type:<span id=\"selectorType\">Selector</span></h3></div><div id=\"parentRange\"><label>Low: <input id=\"parentLow\" name=\"parentLow\" type=\"text\" /></label><label for=\"parentHigh\">High: <input id=\"parentHigh\" name=\"parentHigh\" type=\"text\" /></label></div><p><button id=\"saveSelector\">Save</button><button id=\"clearSelector\">Clear</button></p></div><div class=\"column\"><!--holds the interactive element for choosing a selector--><div id=\"selectorHolder\"></div><div id=\"selectorCycleHolder\"></div></div></div><div class=\"view\" id=\"ruleView\"><div id=\"ruleItems\" class=\"items\"><h3>Selector: <span id=\"ruleSelector\"></span></h3><form id=\"ruleForm\" class=\"column form\"><div class=\"rule\"><label for=\"ruleName\" title=\"the name of a rule\">Name:</label><input id=\"ruleName\" name=\"ruleName\" type=\"text\" /></div><div class=\"rule\"><label title=\"the attribute of an element to capture\">Capture:</label><span id=\"ruleAttr\"></span></div><div class=\"rule follow\"><label for=\"ruleFollow\" title=\"create a new page from the element's captured url (capture must be attr-href)\">Follow:</label><input id=\"ruleFollow\" name=\"ruleFollow\" type=\"checkbox\" disabled=\"true\" title=\"Can only follow rules that get href attribute from links\" /></div><div><button id=\"saveRule\">Save Rule</button><button id=\"cancelRule\">Cancel</button></div></form><div class=\"modifiers column\"><div id=\"ruleCycleHolder\"></div></div></div></div><div class=\"view\" id=\"previewView\"><div id=\"previewContents\"></div></div><div class=\"view\" id=\"optionsView\"><p><label for=\"ignore\">Ignore helper elements (eg tbody)</label><input type=\"checkbox\" id=\"ignore\" /></p></div></div>";
-    document.body.appendChild(div);
-    addNoSelect(div.querySelectorAll("*"));
+// create interface and return a function to remove the collectorjs interface
+var removeInterface = (function(){
+    var marginBottom = 0,
+        element = noSelectElement("div");
+
+    element.classList.add("collectjs");
+    element.innerHTML = "<div class=\"tabHolder\"><div class=\"tabs\"><div class=\"tab active\" id=\"schemaTab\">Schema</div><div class=\"tab\" id=\"previewTab\">Preview</div><div class=\"tab\" id=\"optionsTab\">Options</div><div class=\"tab\" id=\"closeCollect\">&times;</div></div></div><div class=\"permanent\"><div id=\"schemaInfo\"></div><div id=\"collectAlert\"></div></div><div class=\"views\"><div class=\"view\" id=\"emptyView\"></div><div class=\"view active\" id=\"schemaView\"><div id=\"schemaHolder\" class=\"rules\"></div></div><div class=\"view\" id=\"selectorView\"><div class=\"column form\"><h3>Type:<span id=\"selectorType\">Selector</span></h3><!--displays what the current selector is--><p>Selector: <span id=\"currentSelector\"></span></p><p>Count: <span id=\"currentCount\"></span></p><div id=\"parentRange\"><label>Low: <input id=\"parentLow\" name=\"parentLow\" type=\"text\" /></label><label for=\"parentHigh\">High: <input id=\"parentHigh\" name=\"parentHigh\" type=\"text\" /></label></div><p><button id=\"saveSelector\">Save</button><button id=\"clearSelector\">Clear</button></p></div><div class=\"column\"><!--holds the interactive element for choosing a selector--><div id=\"selectorHolder\"></div><div id=\"selectorCycleHolder\"></div></div></div><div class=\"view\" id=\"ruleView\"><div id=\"ruleItems\" class=\"items\"><h3>Selector: <span id=\"ruleSelector\"></span></h3><form id=\"ruleForm\" class=\"column form\"><div class=\"rule\"><label for=\"ruleName\" title=\"the name of a rule\">Name:</label><input id=\"ruleName\" name=\"ruleName\" type=\"text\" /></div><div class=\"rule\"><label title=\"the attribute of an element to capture\">Capture:</label><span id=\"ruleAttr\"></span></div><div class=\"rule follow\"><label for=\"ruleFollow\" title=\"create a new page from the element's captured url (capture must be attr-href)\">Follow:</label><input id=\"ruleFollow\" name=\"ruleFollow\" type=\"checkbox\" disabled=\"true\" title=\"Can only follow rules that get href attribute from links\" /></div><div><button id=\"saveRule\">Save Rule</button><button id=\"cancelRule\">Cancel</button></div></form><div class=\"modifiers column\"><div id=\"ruleCycleHolder\"></div></div></div></div><div class=\"view\" id=\"previewView\"><div id=\"previewContents\"></div></div><div class=\"view\" id=\"optionsView\"><p><label for=\"ignore\">Ignore helper elements (eg tbody)</label><input type=\"checkbox\" id=\"ignore\" /></p></div></div>";
+    document.body.appendChild(element);
+    addNoSelect(element.querySelectorAll("*"));    
 
     // some some margin at the bottom of the page
     var currentMargin = parseInt(document.body.style.marginBottom, 10);
-    if ( isNaN(currentMargin) ) {
-        marginBottom = 0;
-    } else {
-        marginBottom = currentMargin;
-    }
+    marginBottom = isNaN(currentMargin) ? 0 : currentMargin;
     document.body.style.marginBottom = (marginBottom + 500) + "px";
+
+    return function(){
+        element.parentElement.removeChild(element);
+        document.body.style.marginBottom = marginBottom + "px";
+    };
 })();
+
 
 /*********************************
             GLOBALS
@@ -2397,48 +2455,7 @@ Object that stores information related to elements that match the current select
 (and how to select them)
 */
 var Collect = {
-    one: function(selector, prefix){
-        return document.querySelector(Collect.not(selector, prefix));
-    },
-    all: function(selector, prefix){
-        return document.querySelectorAll(Collect.not(selector, prefix));
-    },
-    not: function(selector, prefix){
-        selector += ":not(.noSelect)";
-        prefix = prefix || "body";
-        return prefix ? prefix + " " + selector : selector;
-    },
-    /*
-    uses selector to match elements in the page
-    parent is an optional object containing a selector and a low/high range to limit matched elements
-    if parent.high/low are defined, only use parent.selector elements within that range
-    */
-    matchedElements: function(selector, parent){
-        var allElements = [];
-        if ( parent ) {
-            var low = parent.low || 0;
-            var high = parent.high || 0;
-            if ( low !== 0 || high !== 0 ) {
-                // if either high or low is defined, 
-                // iterate over all child elements of elements matched by parent selector
-                var parents = document.querySelectorAll(parent.selector);
-                var end = parents.length + high; // add high because it is negative
-                var currElements;
-                for ( ; low<end; low++ ) {
-                    currElements = parents[low].querySelectorAll(this.not(selector));
-                    allElements = allElements.concat(Array.prototype.slice.call(currElements));
-                }
-            } else {
-                allElements = this.all(selector, parent.selector);
-            }
-        } else {
-            // don't care about parent when choosing next selector or a new parent selector
-            allElements = this.all(selector, "body");
-        }
-        return Array.prototype.slice.call(allElements);
-    },
     options: {},
-    ruleElements: [],
     parent: {},
     site: undefined
 };
@@ -2539,6 +2556,9 @@ var Family = {
     create: function(event){
         event.stopPropagation();
         event.preventDefault();
+        if ( event.currentTarget !== event.target ) {
+            return;
+        }
 
         Family.family = new SelectorFamily(this,
             Collect.parent.selector,
@@ -2559,7 +2579,7 @@ var Family = {
     // create a SelectorFamily given a css selector string
     fromSelector: function(selector){
         var prefix = Collect.parent.selector ? Collect.parent.selector: "body",
-            element = Collect.one(selector, prefix);
+            element = Fetch.one(selector, prefix);
         if ( element ) {
             this.family = new SelectorFamily(element,
                 Collect.parent.selector,
@@ -2587,7 +2607,7 @@ var Family = {
         if ( selector === "") {
             return [];
         }
-        return Collect.matchedElements(selector, parent);
+        return Fetch.matchedElements(selector, parent);
     },
     /*
     add queryCheck class to all elements matching selector
@@ -2598,13 +2618,12 @@ var Family = {
         clearClass("queryCheck");
         clearClass("collectHighlight");
 
-        var elements = this.selectorElements(),
-            totalCount  = elements.length ? elements.length : "";
+        var elements = this.selectorElements();
         for ( var i=0, len=elements.length; i<len; i++ ) {
             elements[i].classList.add("queryCheck");
         }
         this.elements = elements;
-        HTML.selector.count.textContent = elementCount(totalCount, Collect.parentCount);
+        HTML.selector.count.textContent = elementCount(elements.length, Collect.parentCount);
         UI.selectorCycle.setElements(elements);
     },
     selectorsOn: false,
@@ -2620,7 +2639,7 @@ var Family = {
             this.turnOff();
         }
         var parent = UI.selectorType === "selector" ? Collect.parent: undefined;
-        this.selectableElements = Collect.matchedElements("*", parent);
+        this.selectableElements = Fetch.matchedElements("*", parent);
         for ( var i=0, len=this.selectableElements.length; i<len; i++ ) {
             curr = this.selectableElements[i];
             curr.addEventListener('click', this.create, false);
@@ -2705,14 +2724,12 @@ function resetRulesView(){
 
 // encapsulate event activeTabEvent to keep track of current tab/view
 function tabEvents(){
-    idEvent("closeCollect", "click", function removeInterface(event){
+    idEvent("closeCollect", "click", function(event){
         event.stopPropagation();
         event.preventDefault();
         resetInterface();
         clearClass("parentSchema");
-        var ui = document.querySelector(".collectjs");
-        ui.parentElement.removeChild(ui);
-        document.body.style.marginBottom = marginBottom + "px";
+        removeInterface();
     });
 
     // set default view/tab for UI
@@ -2880,7 +2897,6 @@ function saveParent(selector){
     }
 
     Collect.parent = parent;
-    addParentSchema(parent);
 
     // attach the parent to the current set and save
     Collect.site.current.set.addParent(parent);
@@ -2947,7 +2963,6 @@ function saveRuleEvent(event){
         var rule = new Rule(name, capture, follow);
         Collect.site.current.selector.addRule(rule);
     }
-    Collect.ruleElements = [];
     Collect.site.current.selector = undefined;
     Collect.site.saveCurrent();
     showSchemaView();
@@ -2958,13 +2973,22 @@ function saveRuleEvent(event){
 ***********************/
 function showSelectorView(){
     HTML.selector.type.textContent = UI.selectorType;
-    if ( UI.selectorType === "parent" ) {
-        HTML.selector.parent.holder.style.display = "block";
-    } else {
+    switch(UI.selectorType){
+    case "selector":
         HTML.selector.parent.holder.style.display = "none";
+        break;
+    case "parent":
+        HTML.selector.parent.holder.style.display = "block";
+        break;
+    case "next":
+        delete Collect.parentCount;
+        HTML.selector.parent.holder.style.display = "none";
+        clearClass("parentSchema");
+        break;
     }
-    Family.turnOn();
+
     setCurrentView(HTML.views.selector, HTML.tabs.schema);
+    Family.turnOn();
 }
 
 function showSchemaView(){
@@ -3060,9 +3084,8 @@ function addParentSchema(parent){
     var selector = parent.selector,
         low = parent.low || 0,
         high = parent.high || 0;
-    var elements = Collect.all(selector),
+    var elements = Fetch.all(selector),
         end = elements.length + high;
-        // add high because it is negative
     Collect.parentCount = 0;
     for ( ; low<end ; low++ ){
         elements[low].classList.add("parentSchema");
@@ -3070,15 +3093,28 @@ function addParentSchema(parent){
     }
 }
 
-function setupRuleForm(selector){
-    HTML.rule.selector.textContent = selector;
+function setupRuleForm(selector, rule){
+    // setup based on (optional) rule
+    if ( rule ) {
+        HTML.rule.name.value = rule.name;
+        HTML.rule.capture.textContent = rule.capture;
+        if ( rule.capture === "attr-href" ) {
+            HTML.rule.follow.checked = rule.follow;
+            HTML.rule.follow.disabled = false;
+            HTML.rule.followHolder.style.display = "block";
+        } else {
+            HTML.rule.follow.checked = false;
+            HTML.rule.follow.disabled = true;
+            HTML.rule.followHolder.style.display = "none";
+        }
+    }
 
+    // setup based on selector
+    HTML.rule.selector.textContent = selector;
     var parent = Collect.site.current.set.parent,
-        elements = Collect.matchedElements(selector, parent);
+        elements = Fetch.matchedElements(selector, parent);
     UI.ruleCycle.setElements(elements);
     addClass("savedPreview", elements);
-    // elements matching the selector for the current rule
-    Collect.ruleElements = elements;
 }
 
 function elementCount(count, parentCount){
@@ -3110,26 +3146,20 @@ If the site object exists for a host, load the saved rules
 function setupHostname(){
     chrome.storage.local.get("sites", function setupHostnameChrome(storage){
         var host = window.location.hostname,
-            siteObject = storage.sites[host],
-            site,
-            key;
+            siteObject = storage.sites[host];
         // default setup if page hasn't been visited before
         if ( !siteObject ) {
-            site = new Site(host);
+            Collect.site = new Site(host);
             // save it right away
-            site.save();
+            Collect.site.save();
         } else {
-            site = new Site(host, siteObject.schemas);
+            Collect.site = new Site(host, siteObject.schemas);
         }
-        Collect.site = site;
-        var siteHTML = site.html();
-        HTML.schema.holder.appendChild(siteHTML);
-        site.loadSchema("default");
+        var siteHTML = Collect.site.html();
+        HTML.schema.info.appendChild(siteHTML.topbar);
+        HTML.schema.holder.appendChild(siteHTML.schema);
+        Collect.site.loadSchema("default");
     });
-}
-
-function uploadSchema(){
-    
 }
 
 /***********************

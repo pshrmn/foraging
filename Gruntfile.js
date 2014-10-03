@@ -32,7 +32,7 @@ module.exports = function(grunt){
         },
         concat: {
             dist: {
-                src: ['src/utility.js', 'src/selector.js', 'src/rule.js', 
+                src: ['src/utility.js', 'src/selector.js', 'src/fetch.js', 'src/rule.js', 
                     'src/cycle.js', 'src/collector_with_html.js'],
                 dest: 'collector/collector.js',
                 options: {
@@ -49,7 +49,14 @@ module.exports = function(grunt){
                 src: 'src/collector_with_html.js',
                 options: {
                     specs: 'tests/CollectorSpec.js',
-                    helpers: ['src/utility.js', 'src/Cycle.js', 'tests/CollectorHelper.js']
+                    helpers: ['src/utility.js', 'src/fetch.js', 'src/Cycle.js',
+                        'tests/CollectorHelper.js']
+                }
+            },
+            fetch: {
+                src: 'src/fetch.js',
+                options: {
+                    specs: 'tests/FetchSpec.js'
                 }
             },
             utility: {

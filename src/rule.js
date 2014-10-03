@@ -52,7 +52,8 @@ Site.prototype.html = function(){
         pageText = document.createTextNode("Page: "),
         pageSelect = noSelectElement("div"),
         selectorText = document.createTextNode("Selector Set: "),
-        setSelect = noSelectElement("div");
+        setSelect = noSelectElement("div"),
+        topbar = noSelectElement("div");
 
     this.hasHTML = true;
     this.eles = {
@@ -76,7 +77,7 @@ Site.prototype.html = function(){
     upload.textContent = "Upload";
     upload.addEventListener("click", this.events.upload.bind(this), false);
 
-    appendChildren(HTML.schema.info, [schemaText, schemaSelect, createSchema, removeSchema,
+    appendChildren(topbar, [schemaText, schemaSelect, createSchema, removeSchema,
         pageText, pageSelect, selectorText, setSelect, upload]);
 
     // create html for all schemas, but only show the default one
@@ -90,7 +91,10 @@ Site.prototype.html = function(){
 
     schemaSelect.addEventListener("change", this.events.loadSchema.bind(this), false);
 
-    return schemas;
+    return {
+        schema: schemas,
+        topbar: topbar
+    };
 };
 
 Site.prototype.events = {
@@ -828,6 +832,9 @@ Page.prototype.reset = function(){
     }
     var defaultSet = new SelectorSet("default");
     this.addSet(defaultSet);
+    if ( this.next ) {
+        this.removeNext();
+    }
 };
 
 Page.prototype.removeSet = function(name){
@@ -1167,6 +1174,10 @@ SelectorSet.prototype.reset = function(){
     for ( var key in this.selectors ) {
         this.removeSelector(key);
     }
+    if ( this.parent ) {
+        this.removeParent();
+        clearClass("parentSchema");
+    }
 };
 
 SelectorSet.prototype.remove = function(){
@@ -1354,7 +1365,7 @@ Selector.prototype.html = function(){
 Selector.prototype.events = {
     preview: function(event){
         var parent = this.parentSet ? this.parentSet.parent : undefined,
-            elements = Collect.matchedElements(this.selector, parent);
+            elements = Fetch.matchedElements(this.selector, parent);
         addClass("savedPreview", elements);
     },
     unpreview: function(event){
@@ -1470,22 +1481,7 @@ Rule.prototype.html = function(){
 Rule.prototype.events = {
     edit: function(event){
         UI.editing.rule = this;
-
-        // setup the form
-        HTML.rule.name.value = this.name;
-        HTML.rule.selector.textContent = this.parentSelector.selector;
-        HTML.rule.capture.textContent = this.capture;
-        if ( this.capture === "attr-href" ) {
-            HTML.rule.follow.checked = this.follow;
-            HTML.rule.follow.disabled = false;
-            HTML.rule.followHolder.style.display = "block";
-        } else {
-            HTML.rule.follow.checked = false;
-            HTML.rule.follow.disabled = true;
-            HTML.rule.followHolder.style.display = "none";
-        }
-
-        setupRuleForm(this.parentSelector.selector);
+        setupRuleForm(this.parentSelector.selector, this.object());
         showRuleView();
     },
     remove: function(event){
