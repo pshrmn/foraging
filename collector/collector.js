@@ -106,7 +106,7 @@ fn is a callback for when SelectorFamily.update is called
 options are optional
 */
 function SelectorFamily(ele, parent, holder, text, fn, options){
-    this.parent = parent || "body";
+    //this.parent = parent || "body";
     this.selectors = [];
     this.ele = noSelectEle("div", ["selectorFamily"]);
     // Generates the selectors array with Selectors from ele to parent (ignoring document.body)
@@ -117,7 +117,8 @@ function SelectorFamily(ele, parent, holder, text, fn, options){
     if ( ele.tagName === "SELECT" && ele.childElementCount > 0 ) {
         ele = ele.children[0];
     }
-    while ( ele !== null && ele.tagName !== "BODY" ) {
+    while ( ele !== null && ele !== parent ) {
+    //while ( ele !== null && ele.tagName !== "BODY" ) {
         // ignore element if it isn't allowed
         if ( options.ignore && !allowedElement(ele.tagName) ) {
             ele = ele.parentElement;
@@ -125,9 +126,9 @@ function SelectorFamily(ele, parent, holder, text, fn, options){
         }
 
         sel = new EleSelector(ele, this);
-        if ( this.parent && sel.matches(this.parent)) {
+        /*if ( this.parent && sel.matches(this.parent)) {
             break;
-        }
+        }*/
         this.selectors.push(sel);
         ele = ele.parentElement;
     }
@@ -2008,6 +2009,9 @@ Selector.prototype.remove = function(){
 Selector.prototype.preview = function(dom){
     var value = "",
         element = dom.querySelector(this.selector);
+    if ( !element ) {
+        return "";
+    }
     for ( var key in this.rules ) {
         value += this.rules[key].preview(element);
     }
@@ -2548,6 +2552,30 @@ var HTML = {
     }
 };
 
+/*
+brute force to find parent element of the passed in element argument that matches the parentSelector
+O(n^2), so not ideal but works for the time being
+*/
+function nearestParent(element, parentSelector){
+    var parents = Fetch.all(parentSelector),
+        elementParents = [],
+        curr = element;
+    // get all parent elements of element up to BODY
+    while ( curr !== null && curr.tagName !== "BODY" ) {
+        curr = curr.parentElement;
+        elementParents.push(curr);
+    }
+    for ( var i=0, iLen=elementParents.length; i<iLen; i++ ) {
+        var par = elementParents[i];
+        for ( var j=0, jLen=parents.length; j<jLen; j++ ) {
+            if ( par === parents[j] ) {
+                return par;
+            }
+        }
+    }
+    return;
+}
+
 // Family derived from clicked element in the page
 var Family = {
     family: undefined,
@@ -2560,8 +2588,11 @@ var Family = {
             return;
         }
 
+        var parent = Collect.parent.selector ?
+            nearestParent(this, Collect.parent.selector) : document.body;
+
         Family.family = new SelectorFamily(this,
-            Collect.parent.selector,
+            parent,
             HTML.selector.family,
             HTML.selector.selector,
             Family.test.bind(Family),
@@ -2581,8 +2612,12 @@ var Family = {
         var prefix = Collect.parent.selector ? Collect.parent.selector: "body",
             element = Fetch.one(selector, prefix);
         if ( element ) {
+
+            var parent = Collect.parent.selector ?
+                nearestParent(element, Collect.parent.selector) : document.body;
+
             this.family = new SelectorFamily(element,
-                Collect.parent.selector,
+                parent,
                 HTML.selector.family,
                 HTML.selector.selector,
                 Family.test.bind(Family),

@@ -303,5 +303,15 @@ img.collectHighlight {
 img.savedPreview {
   border: 1px solid rgba(255, 0, 0, 0.25) !important; }
 
+@-webkit-keyframes pulseParent {
+  0% {
+    border-color: #3c3c3c; }
+
+  50% {
+    border-color: rgba(60, 60, 60, 0.5); }
+
+  100% {
+    border-color: #3c3c3c; } }
 .parentSchema {
-  border: 1px solid blue !important; }
+  border: 1px solid #3c3c3c !important;
+  -webkit-animation: pulseParent 1s infinite; }

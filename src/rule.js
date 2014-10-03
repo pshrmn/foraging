@@ -1410,6 +1410,9 @@ Selector.prototype.remove = function(){
 Selector.prototype.preview = function(dom){
     var value = "",
         element = dom.querySelector(this.selector);
+    if ( !element ) {
+        return "";
+    }
     for ( var key in this.rules ) {
         value += this.rules[key].preview(element);
     }

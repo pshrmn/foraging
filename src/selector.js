@@ -10,7 +10,7 @@ fn is a callback for when SelectorFamily.update is called
 options are optional
 */
 function SelectorFamily(ele, parent, holder, text, fn, options){
-    this.parent = parent || "body";
+    //this.parent = parent || "body";
     this.selectors = [];
     this.ele = noSelectEle("div", ["selectorFamily"]);
     // Generates the selectors array with Selectors from ele to parent (ignoring document.body)
@@ -21,7 +21,8 @@ function SelectorFamily(ele, parent, holder, text, fn, options){
     if ( ele.tagName === "SELECT" && ele.childElementCount > 0 ) {
         ele = ele.children[0];
     }
-    while ( ele !== null && ele.tagName !== "BODY" ) {
+    while ( ele !== null && ele !== parent ) {
+    //while ( ele !== null && ele.tagName !== "BODY" ) {
         // ignore element if it isn't allowed
         if ( options.ignore && !allowedElement(ele.tagName) ) {
             ele = ele.parentElement;
@@ -29,9 +30,9 @@ function SelectorFamily(ele, parent, holder, text, fn, options){
         }
 
         sel = new EleSelector(ele, this);
-        if ( this.parent && sel.matches(this.parent)) {
+        /*if ( this.parent && sel.matches(this.parent)) {
             break;
-        }
+        }*/
         this.selectors.push(sel);
         ele = ele.parentElement;
     }

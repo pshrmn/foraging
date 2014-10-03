@@ -123,6 +123,30 @@ var HTML = {
     }
 };
 
+/*
+brute force to find parent element of the passed in element argument that matches the parentSelector
+O(n^2), so not ideal but works for the time being
+*/
+function nearestParent(element, parentSelector){
+    var parents = Fetch.all(parentSelector),
+        elementParents = [],
+        curr = element;
+    // get all parent elements of element up to BODY
+    while ( curr !== null && curr.tagName !== "BODY" ) {
+        curr = curr.parentElement;
+        elementParents.push(curr);
+    }
+    for ( var i=0, iLen=elementParents.length; i<iLen; i++ ) {
+        var par = elementParents[i];
+        for ( var j=0, jLen=parents.length; j<jLen; j++ ) {
+            if ( par === parents[j] ) {
+                return par;
+            }
+        }
+    }
+    return;
+}
+
 // Family derived from clicked element in the page
 var Family = {
     family: undefined,
@@ -135,8 +159,11 @@ var Family = {
             return;
         }
 
+        var parent = Collect.parent.selector ?
+            nearestParent(this, Collect.parent.selector) : document.body;
+
         Family.family = new SelectorFamily(this,
-            Collect.parent.selector,
+            parent,
             HTML.selector.family,
             HTML.selector.selector,
             Family.test.bind(Family),
@@ -156,8 +183,12 @@ var Family = {
         var prefix = Collect.parent.selector ? Collect.parent.selector: "body",
             element = Fetch.one(selector, prefix);
         if ( element ) {
+
+            var parent = Collect.parent.selector ?
+                nearestParent(element, Collect.parent.selector) : document.body;
+
             this.family = new SelectorFamily(element,
-                Collect.parent.selector,
+                parent,
                 HTML.selector.family,
                 HTML.selector.selector,
                 Family.test.bind(Family),
