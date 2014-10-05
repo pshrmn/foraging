@@ -4,6 +4,14 @@ import os
 from .page import Page
 
 class Schema(object):
+    """
+    The whole set of rules to be collected across one or more pages of a website
+
+    :param string name: name of the Schema
+    :param Page page: the default page for the Schema
+    :param list urls: list of initial urls to collect data from
+
+    """
     def __init__(self, name, page, urls=None):
         self.name = name
         self.page = page
@@ -45,6 +53,8 @@ class Schema(object):
     def get(self, url):
         """
         takes a url and iterates over pages, starting with the default page
+
+        :param string url: url to collect data from
         """
         return self.page.get(url)
 

@@ -8,10 +8,13 @@ page_cache = make_cache(os.getcwd())
 
 class Page(object):
     """
-    name is the name of the page
-    sets are the selector sets associated with the page
-    next is a selector for another index page
-    dynamic is whether or not data necessary to collect is dynamically loaded (so need to
+    A Page is analogous to a webpage on a website. Given a url, the Page fetches the DOM for that
+    url and the Page uses its SelectorSets to collect data
+    
+    :param string name: name of the page
+    :param list sets: the selector sets associated with the page
+    :param string next: is a selector for another index page (optional)
+    :param boolean dynamic: whether or not data necessary to collect is dynamically loaded (so need to
         use selenium/phantomjs)
     """
     def __init__(self, name, sets, next=None, dynamic=False):
@@ -76,8 +79,13 @@ class Page(object):
 class SelectorSet(object):
     """
     A SelectorSet consists of a group of (related?) selector/rule pairs in a page
-    seletors is a dict containing selectors for the set
-    parent (optional) is a dict with a selector and an optional low/high range
+
+    :param string name: name of the selector set
+    :param list selectors: selectors that correspond to the selector set
+    :param list pages: pages whose data cannot be crawled until a rule (with follow=True) in one of
+        the selectors has been captured
+    :param Parent parent: (optional) parent selector and range (high/low) to limit matches for the
+        selectors
     """
     def __init__(self, name, selectors, pages=None, parent=None):
         self.name = name
@@ -144,9 +152,45 @@ class SelectorSet(object):
 
 class Parent(object):
     """
-    selector is the selector break up the dom into multiple elements
-    low is the number of elements to skip from the beginning
-    high is the number of elements to skip from the end
+    A Parent is used to limit selectors to a subset of the page. A Parent is especially useful
+    if there are multiple sets of selectors/rules in a page that should be captured. For example,
+    given a table where you want to capture data from multiple columns for each row, a Parent
+    selector that selects the rows could then be used to capture the column data across the row
+    and return a list of the captured data for each row in the table.
+
+    Given the following html::
+
+        <table>
+            <th>
+                <td>Name</td>
+                <td>Age</td>
+            </th>
+            <tr>
+                <td class="name">Bill</td>
+                <td class="age">32</td>
+            </tr>
+            <tr>
+                <td class="name">Dave</td>
+                <td class="age">51</td>
+            </tr>
+            <tr>
+                <td class="name">Sue</td>
+                <td class="age">28</td>
+            </tr>
+        </table>
+
+    A Parent selector of "tr" would allow you to use the selectors ".name" and ".age" to collect
+    the name and age for each row individually, giving you the data::
+
+        [
+            {"name": "Bill", "age": 32},
+            {"name": "Dave", "age": 51},
+            {"name": "Sue", "age": 28}
+        ]
+
+    :param string selector: the selector to break up the dom into multiple elements
+    :param int low: is the number of elements to skip from the beginning
+    :param int high: is the number of elements to skip from the end
     """
     def __init__(self, selector, low=None, high=None):
         self.selector = selector

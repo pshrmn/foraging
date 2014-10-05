@@ -3,6 +3,12 @@ from lxml.cssselect import CSSSelector
 class Selector(object):
     """
     A selector is used to select element(s) from a dom to apply rules to
+
+    :param string selector: CSS selector to select element(s) in the DOM that Rule data should be
+        captured from
+    :param list rules: list of Rules that are applied to elements matching the selector
+    :param boolean multiple: whether or not the selector should only match the first element or all
+        elements that match the selector
     """
     def __init__(self, selector, rules, multiple=False):
         self.selector = selector
@@ -35,8 +41,9 @@ class Selector(object):
 class Rule(object):
     """
     A rule corresponds to a column in a sql tuple
-    name is the name of the column
-    capture is the attribute of the item(s) that you want to store
+
+    :param string name: the name of the column
+    :param string capture: is the attribute of the item(s) that you want to store
         eg. attr-href means that you want to get the element's href attribute
         text means that you want the text content of the element
     """
