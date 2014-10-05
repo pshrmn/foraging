@@ -74,7 +74,7 @@ module used to crawl a website
 Create a Schema from a (properly formatted) json file
 
     import json
-    from collector.crawl.schema import Schema
+    from collector.crawl import Schema
 
     with open("schema.json") as fp:
         data = json.load(fp)

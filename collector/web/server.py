@@ -4,7 +4,7 @@ import os
 import argparse
 import multiprocessing
 
-from dynamic_check import test_group
+from dynamic_check import test_schema
 
 app = Flask(__name__)
 
@@ -33,7 +33,7 @@ def host_folder(host):
 @app.route('/upload', methods=['POST'])
 def upload():
     """
-    save rules json in <sitename>/<groupname>.json
+    save rules json in <sitename>/<schemaname>.json
     dangerous because on save, overwrites existing saved site
     manually load request.data in case content-type: application/json isn't set
     """
@@ -42,28 +42,28 @@ def upload():
     except ValueError:
         return jsonify({"error": True})
 
-    test_upload(data["group"])
+    test_upload(data["schema"])
 
     site = data["site"]
-    name = data["group"]["name"]
+    name = data["schema"]["name"]
     folder = host_folder(site)
 
     filename = "%s.json" % (name)
     path = os.path.join(folder, filename)
     with open(path, 'w') as fp:
-        json.dump(data["group"], fp, indent=2)
+        json.dump(data["schema"], fp, indent=2)
     return jsonify({"error": False})
 
-def test_upload(group_json):
+def test_upload(schema_json):
     """
     use multiplrocessing so that the test is async and the upload can return sooner
     """
-    multiprocessing.Process(target=test_group, args=(group_json,)).start()
+    multiprocessing.Process(target=test_schema, args=(schema_json,)).start()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Server to run with collectorjs')
     parser.add_argument('--folder', '-F', dest='directory',
-                   help='folder to save groups to')
+                   help='folder to save schemas to')
     args = parser.parse_args()    
 
     directory = args.directory or os.path.join(os.path.dirname(os.path.realpath(__file__)), 'rules')

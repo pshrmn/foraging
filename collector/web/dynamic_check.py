@@ -6,18 +6,18 @@ from lxml import html
 from lxml.cssselect import CSSSelector
 
 """
-given an uploaded group, test (using default url or a provided one) the initial page and the 
+given an uploaded schema, test (using default url or a provided one) the initial page and the 
 subsequent pages to see if the default html can be used to capture rule values or whether
 dynamically loaded data needs to be downloaded as well.
 """
 
-def test_group(group, url=None):
+def test_schema(schema, url=None):
     if not url:
-        urls = group["urls"]
+        urls = schema["urls"]
         if len(urls) == 0:
             return
         url = urls[0]
-    default_page = group["page"]
+    default_page = schema["page"]
     test_page(default_page, url)
 
 def test_page(page, url):
@@ -68,8 +68,8 @@ def has_follow(selector, ele):
 
 def load_json(filename):
     with open(filename, "r") as fp:
-        group_json = json.load(fp)
-    return group_json
+        schema_json = json.load(fp)
+    return schema_json
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="""Determine whether json for collector needs to be
@@ -77,5 +77,5 @@ loaded dynamically or with a simple get request""")
     parser.add_argument('--json', '-J', dest='json', help='json file to test')
     parser.add_argument('--url', '-U', dest='url', help='starting url to test')
     args = parser.parse_args()
-    group_json = load_json(args.json)
-    test_group(group_json)
+    schema_json = load_json(args.json)
+    test_schema(schema_json)
