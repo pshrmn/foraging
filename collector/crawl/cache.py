@@ -52,6 +52,8 @@ class Cache(object):
     """
     given a cache folder for a website, when attempting to fetch a url, first check if a saved copy is
     stored in the cache folder and if there is, open that file, otherwise send a get request to the url
+
+    :param string folder: folder to store cache html files
     """
     def __init__(self, folder):
         self.folder = folder

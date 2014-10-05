@@ -31,3 +31,12 @@ Rule
 
 .. autoclass:: collector.crawl.Rule
     :inherited-members:
+
+Cache
+-----
+
+.. autofunction:: collector.crawl.cache.make_cache
+
+.. autoclass:: collector.crawl.cache.Cache
+
+.. autoclass:: collector.crawl.cache.Site

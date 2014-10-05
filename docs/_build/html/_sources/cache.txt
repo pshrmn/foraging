@@ -1,0 +1,8 @@
+.. _cache:
+
+.. module:: cache
+
+Cache
+=====
+
+

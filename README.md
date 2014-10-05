@@ -1,7 +1,7 @@
 ##Collector
 
 ####Collector.web
-Web app that runs in conjunction with collect-chrome extension (https://github.com/psherman/collectjs-chrome) to get rules to be used in a crawler
+Web app that runs in conjunction with collect-chrome extension (https://github.com/psherman/collectorjs) to get rules to be used in a crawler
 
 for default folder to save files, call
 
