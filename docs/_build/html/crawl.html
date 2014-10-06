@@ -7,7 +7,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Crawl &mdash; Collector 0.6.2 documentation</title>
+  <title>Crawl &mdash; Collector 0.6.3 documentation</title>
   
 
   
@@ -28,7 +28,7 @@
   
 
   
-    <link rel="top" title="Collector 0.6.2 documentation" href="index.html"/>
+    <link rel="top" title="Collector 0.6.3 documentation" href="index.html"/>
         <link rel="next" title="Tutorial" href="tutorial.html"/>
         <link rel="prev" title="Collector" href="index.html"/> 
 
@@ -59,6 +59,7 @@
         
             <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="">Crawl</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#shortcuts">Shortcuts</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#schema">Schema</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#page">Page</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#rule">Rule</a></li>
@@ -104,6 +105,41 @@
             
   <span class="target" id="module-crawl"><span id="crawl"></span></span><div class="section" id="id1">
 <h1>Crawl<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="shortcuts">
+<h2>Shortcuts<a class="headerlink" href="#shortcuts" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="collector.crawl.shortcuts.crawl_url">
+<tt class="descclassname">collector.crawl.shortcuts.</tt><tt class="descname">crawl_url</tt><big>(</big><em>filename</em>, <em>url</em><big>)</big><a class="headerlink" href="#collector.crawl.shortcuts.crawl_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>given a filename for a JSON file for a Schema, get the data from the provided url</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>filename</strong> (<em>string</em>) &#8211; location of Schema JSON file</li>
+<li><strong>url</strong> (<em>string</em>) &#8211; url to collect data from</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="collector.crawl.shortcuts.crawl_schema">
+<tt class="descclassname">collector.crawl.shortcuts.</tt><tt class="descname">crawl_schema</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#collector.crawl.shortcuts.crawl_schema" title="Permalink to this definition">¶</a></dt>
+<dd><p>given a filename for a JSON file for a Schema, crawl all urls and return the associated data</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filename</strong> (<em>string</em>) &#8211; location of Schema JSON file</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
 <div class="section" id="schema">
 <h2>Schema<a class="headerlink" href="#schema" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
@@ -404,7 +440,7 @@ stored in the cache folder and if there is, open that file, otherwise send a get
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.6.2',
+            VERSION:'0.6.3',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

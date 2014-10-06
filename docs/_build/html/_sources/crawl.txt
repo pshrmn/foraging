@@ -5,6 +5,14 @@
 Crawl
 =====
 
+Shortcuts
+---------
+
+.. autofunction:: collector.crawl.shortcuts.crawl_url
+
+.. autofunction:: collector.crawl.shortcuts.crawl_schema
+
+
 Schema
 ------
 
