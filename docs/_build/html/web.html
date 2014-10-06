@@ -7,7 +7,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Search &mdash; Collector 0.6.3 documentation</title>
+  <title>Web &mdash; Collector 0.6.3 documentation</title>
   
 
   
@@ -28,7 +28,9 @@
   
 
   
-    <link rel="top" title="Collector 0.6.3 documentation" href="index.html"/> 
+    <link rel="top" title="Collector 0.6.3 documentation" href="index.html"/>
+        <link rel="next" title="Filter" href="filter.html"/>
+        <link rel="prev" title="Crawl" href="crawl.html"/> 
 
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
@@ -44,7 +46,7 @@
       <div class="wy-side-nav-search">
         <a href="index.html" class="fa fa-home"> Collector</a>
         <div role="search">
-  <form id ="rtd-search-form" class="wy-form" action="#" method="get">
+  <form id ="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
@@ -65,8 +67,8 @@
 </ul>
 </li>
 </ul>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="web.html">Web</a></li>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="">Web</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="filter.html">Filter</a><ul>
@@ -100,8 +102,10 @@
   <ul class="wy-breadcrumbs">
     <li><a href="index.html">Docs</a> &raquo;</li>
       
-    <li></li>
+    <li>Web</li>
       <li class="wy-breadcrumbs-aside">
+        
+          <a href="_sources/web.txt" rel="nofollow"> View page source</a>
         
       </li>
   </ul>
@@ -109,22 +113,31 @@
 </div>
           <div role="main">
             
-  <noscript>
-  <div id="fallback" class="admonition warning">
-    <p class="last">
-      Please activate JavaScript to enable the search
-      functionality.
-    </p>
-  </div>
-  </noscript>
+  <span class="target" id="module-web"><span id="web"></span></span><div class="section" id="id1">
+<h1>Web<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
+<p>Start the server from the command line:</p>
+<div class="highlight-python"><div class="highlight"><pre>python -m collector.web.server
+</pre></div>
+</div>
+<p>By default, uploaded schemas will be saved into a <tt class="docutils literal"><span class="pre">rules</span></tt> directory in the current working
+directory. Specify where to save the uploaded schemas using either the <tt class="docutils literal"><span class="pre">--folder</span></tt> or <tt class="docutils literal"><span class="pre">-F</span></tt> flags:</p>
+<div class="highlight-python"><div class="highlight"><pre>python -m collector.web.server --folder some/other/folder
+</pre></div>
+</div>
+</div>
 
-  
-  <div id="search-results">
-  
-  </div>
 
           </div>
           <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="filter.html" class="btn btn-neutral float-right" title="Filter"/>Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="crawl.html" class="btn btn-neutral" title="Crawl"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
   
 
   <hr/>
@@ -160,7 +173,6 @@
       <script type="text/javascript" src="_static/jquery.js"></script>
       <script type="text/javascript" src="_static/underscore.js"></script>
       <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="_static/searchtools.js"></script>
 
   
 
@@ -176,14 +188,7 @@
           SphinxRtdTheme.StickyNav.enable();
       });
   </script>
-  
-  <script type="text/javascript">
-    jQuery(function() { Search.loadIndex("searchindex.js"); });
-  </script>
-  
-  <script type="text/javascript" id="searchindexloader"></script>
    
-
 
 </body>
 </html>

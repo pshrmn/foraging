@@ -5,9 +5,25 @@ Crawl Documentation
 -------------------
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 1
 
     crawl
+
+Web Documentation
+-----------------
+
+.. toctree::
+    :maxdepth: 1
+
+    web
+
+Filter Documentation
+-------------------
+
+.. toctree::
+    :maxdepth: 1
+
+    filter
 
 Tutorial
 --------------

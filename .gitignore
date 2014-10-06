@@ -7,3 +7,4 @@ tests/rules
 /cache
 ghostdriver.log
 phantomjs
+rules

@@ -65,9 +65,10 @@ if __name__ == "__main__":
     parser.add_argument('--folder', '-F', dest='directory',
                    help='folder to save schemas to')
     args = parser.parse_args()    
-
-    directory = args.directory or os.path.join(os.path.dirname(os.path.realpath(__file__)), 'rules')
+    # default to current working directory
+    directory = args.directory or os.path.join(os.getcwd(), 'rules')
     set_directory(directory)
+    print directory
     app.run(debug=True)
 else:
     set_directory(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'rules'))
