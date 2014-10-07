@@ -1,10 +1,7 @@
 *.pyc
 venv
-collector/web/rules
-log.txt
-collector/crawl/log.txt
 tests/rules
 /cache
 ghostdriver.log
 phantomjs
-rules
+/rules
