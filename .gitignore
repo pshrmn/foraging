@@ -6,7 +6,6 @@ ghostdriver.log
 phantomjs
 /rules
 /build
-docs/
 dist
 pycollector.egg-info/
 .pypirc
