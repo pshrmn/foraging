@@ -5,8 +5,8 @@ cache/
 ghostdriver.log
 phantomjs
 /rules
-build/
-docs/_build/
+/build
+docs/
 dist
 pycollector.egg-info/
 .pypirc
