@@ -21,30 +21,30 @@ def test_schema(schema, url=None):
     test_page(default_page, url)
 
 def test_page(page, url):
-    print("Page:\t{}".format(page["name"]))
+    print(("Page:\t{}".format(page["name"])))
     resp = requests.get(url)
     dom = html.document_fromstring(resp.text)
     working_selector_sets = []
-    for selector_set in page.get("sets").itervalues():
+    for selector_set in page.get("sets").values():
         works = test_selector_set(selector_set, dom)
         working_selector_sets.append(works)
     if not all(working_selector_sets):
-        print("Page:\t{} may need to be loaded dynamically".format(page["name"]))
+        print(("Page:\t{} may need to be loaded dynamically".format(page["name"])))
 
 def test_selector_set(selector_set, dom):
     """
     iterate over selectors in a selector set to test if they match anything in the page
     then iterate over any child pages of the set
     """
-    print("  Rule Set: {}".format(selector_set["name"]))
+    print(("  Rule Set: {}".format(selector_set["name"])))
     working_selectors = []
     matched_pages = {}
-    for selector in selector_set["selectors"].itervalues():
+    for selector in selector_set["selectors"].values():
         works, follow = test_selector(selector, dom)
         working_selectors.append(works)
         if works and follow:
             matched_pages[rule["name"]] = follow
-    for name, page_url in matched_pages.iteritems():
+    for name, page_url in matched_pages.items():
         page = selector_set["pages"][name]
         test_page(page, page_url)
     return all(working_selectors)
@@ -57,11 +57,11 @@ def test_selector(selector, dom):
     follow_url = None
     if works:
         follow_url = has_follow(selector, eles[0])
-    print(selector_output.format(selector["selector"], works_char))
+    print((selector_output.format(selector["selector"], works_char)))
     return works, follow_url
 
 def has_follow(selector, ele):
-    for rule in selector["rules"].itervalues():
+    for rule in selector["rules"].values():
         if rule.get("follow", False):
             return ele.get("href")
     return None

@@ -1,4 +1,7 @@
-from Queue import Queue
+try:
+    from queue import Queue
+except ImportError:
+    from Queue import Queue
 import os
 
 from .page import Page
@@ -36,7 +39,7 @@ class Schema(object):
         while not self.urls.empty():
             url = self.urls.get()
             data = self.get(url)
-            for key, val in data.iteritems():
+            for key, val in data.items():
                 new_data = crawled_data.get(key, [])
                 if isinstance(val, list):
                     new_data.extend(val)

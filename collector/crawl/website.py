@@ -1,7 +1,10 @@
 import os
 import glob
 import json
-from Queue import Queue
+try:
+    from queue import Queue
+except ImportError:
+    from Queue import Queue
 
 from .schema import Schema
 

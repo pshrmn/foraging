@@ -38,9 +38,9 @@ class CollectTestCase(unittest.TestCase):
 
     def test_upload(self):
         headers = [('Content-Type', 'application/json')]
-        example_group = {
+        example_schema = {
             "name": "example",
-            "index_urls": [
+            "urls": [
                 "http://www.example.com/pageone.html",
                 "http://www.example.com/pagetwo.html"
             ],
@@ -70,7 +70,7 @@ class CollectTestCase(unittest.TestCase):
         }
 
         upload = {
-            "group": example_group,
+            "schema": example_schema,
             "site": "www.example.com"
         }
 
@@ -86,7 +86,7 @@ class CollectTestCase(unittest.TestCase):
         data_file = os.path.join(data_folder, 'example.json')
         with open(data_file) as fp:
             saved_rules = json.load(fp)
-        self.assertEqual(saved_rules, example_group)
+        self.assertEqual(saved_rules, example_schema)
 
         # clear out the directory
         os.remove(data_file)

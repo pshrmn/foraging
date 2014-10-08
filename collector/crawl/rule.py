@@ -20,7 +20,7 @@ class Selector(object):
     def from_json(cls, selector_json):
         selector = selector_json["selector"]
         rules = selector_json["rules"]
-        rules = {key: Rule.from_json(rule) for key, rule in rules.iteritems()}
+        rules = {key: Rule.from_json(rule) for key, rule in rules.items()}
         multiple = selector_json.get("multiple", False)
         return cls(selector, rules)
 
@@ -30,7 +30,7 @@ class Selector(object):
             return None
 
         data = {}
-        for rule_name, rule in self.rules.iteritems():
+        for rule_name, rule in self.rules.items():
             # return None if the xpath gets no matches
             if self.multiple:
                 data[rule_name] = map(rule.get, eles)

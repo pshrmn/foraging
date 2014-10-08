@@ -2,7 +2,10 @@ import os
 import glob
 import re
 import time
-import urlparse
+try:
+    from urllib.parse import urlparse
+except ImportError:
+    from urlparse import urlparse
 
 from lxml import html
 from lxml.cssselect import CSSSelector
@@ -62,12 +65,12 @@ class Cache(object):
         
     def _make_sites(self):
         walk_generator = os.walk(self.folder)
-        path, folders, files = walk_generator.next()
+        path, folders, files = next(walk_generator)
         for folder in folders:
             self.sites[folder] = Site(folder, self.folder)
 
     def fetch(self, url, dynamic=False):
-        domain = urlparse.urlparse(url).netloc.replace(".", "_")
+        domain = urlparse(url).netloc.replace(".", "_")
         if domain not in self.sites:
             self.sites[domain] = Site(domain, self.folder)
         site = self.sites.get(domain)
@@ -77,7 +80,7 @@ class Cache(object):
         """
         check whether a url has been visited
         """
-        domain = urlparse.urlparse(url).netloc.replace(".", "_")
+        domain = urlparse(url).netloc.replace(".", "_")
         if domain not in self.sites:
             return False
         site = self.sites.get(domain)
@@ -87,7 +90,7 @@ class Cache(object):
         """
         clear out all of the stored html files
         """
-        for name, site in self.sites.iteritems():
+        for name, site in self.sites.items():
             site.clear()
             os.rmdir(os.path.join(self.folder, name))
 
@@ -116,7 +119,7 @@ class Site(object):
             with open(os.path.join(self.folder, clean_url)) as fp:
                 text = fp.read()
             new_file = True
-            print("<cache>:\t%s" % url)
+            print(("<cache>:\t%s" % url))
         else:
             """
             limit the number of hits on a server by setting a "wait_until" time of 5 seconds
@@ -145,7 +148,7 @@ class Site(object):
             with open(os.path.join(self.folder, clean_url), 'w') as fp:
                 fp.write(text.encode('utf-8'))
             # only sleep when actually hitting the server
-            print("<web>:\t%s" % url)
+            print(("<web>:\t%s" % url))
             self.wait = True
             self.wait_until = time.time() + 5
 
@@ -165,5 +168,5 @@ class Site(object):
         return clean_url in self.filenames
 
     def clear(self):
-        for f in self.filenames.iterkeys():
+        for f in self.filenames.keys():
             os.remove(f)

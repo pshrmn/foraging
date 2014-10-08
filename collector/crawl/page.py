@@ -32,7 +32,7 @@ class Page(object):
     def from_json(cls, page_json):
         name = page_json["name"]
         sel_sets = page_json["sets"]
-        sets = {key: SelectorSet.from_json(ss) for key, ss in sel_sets.iteritems()}
+        sets = {key: SelectorSet.from_json(ss) for key, ss in sel_sets.items()}
         next = page_json.get("next")
         dynamic = page_json.get("dynamic", False)
         return cls(name, sets, next, dynamic)
@@ -48,7 +48,7 @@ class Page(object):
         data = {
             "url": canonical_url
         }
-        for key, selector_set in self.sets.iteritems():
+        for key, selector_set in self.sets.items():
             set_data = selector_set.get(dom)
             if set_data is not None:
                 data[key] = set_data
@@ -97,12 +97,12 @@ class SelectorSet(object):
     def from_json(cls, selector_set_json):
         name = selector_set_json["name"]
         selector_dict = selector_set_json["selectors"]
-        selectors = {key: Selector.from_json(sel) for key, sel in selector_dict.iteritems()}
+        selectors = {key: Selector.from_json(sel) for key, sel in selector_dict.items()}
 
         json_pages = selector_set_json.get("pages")
         pages = None
         if json_pages:
-            pages = {key: Page.from_json(page) for key, page in json_pages.iteritems()}
+            pages = {key: Page.from_json(page) for key, page in json_pages.items()}
 
         parent_json = selector_set_json.get("parent")
         parent = None
@@ -130,16 +130,16 @@ class SelectorSet(object):
         """
         data = {}
         # iterate over self.selector to get values
-        for selector in self.selectors.itervalues():
+        for selector in self.selectors.values():
             rule_data = selector.get(dom)
             # if any of the rules return None, have the whole thing fail
             if rule_data:
-                for name, value in rule_data.iteritems():
+                for name, value in rule_data.items():
                     data[name] = value
             else:
                 return None
         if self.pages:
-            for page in self.pages.itervalues():
+            for page in self.pages.values():
                 page_url = data[page.name]
                 page_data = page.get(page_url)
                 # overwrite url with page

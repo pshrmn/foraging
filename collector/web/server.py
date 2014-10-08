@@ -4,7 +4,7 @@ import os
 import argparse
 import multiprocessing
 
-from dynamic_check import test_schema
+from .dynamic_check import test_schema
 
 app = Flask(__name__)
 
@@ -70,4 +70,4 @@ if __name__ == "__main__":
     set_directory(directory)
     app.run(debug=True)
 else:
-    set_directory(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'rules'))
+    set_directory(os.path.join(os.getcwd(), 'rules'))

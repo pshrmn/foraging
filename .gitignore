@@ -1,7 +1,11 @@
 *.pyc
+*.egg
 venv
-tests/rules
-/cache
+cache/
 ghostdriver.log
 phantomjs
-/rules
+rules/
+build/
+docs/_build
+dist
+Collector.egg-info
