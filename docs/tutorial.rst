@@ -7,7 +7,7 @@ With a schema json file ``schema.json`` (generated from CollectorJS), crawl data
 Schema.urls::
 
     import json
-    from collector import Schema
+    from pycollector import Schema
 
     with open("schema.json", "r") as fp:
         schema_json = json.load(fp)
@@ -23,12 +23,12 @@ and save the data as ``output.json``::
 
 Or just use the shortcuts to crawl a schema::
 
-    from collector import crawl_schema
+    from pycollector import crawl_schema
 
     data = crawl_schema("schema.json")
 
 or an individual url::
 
-    from collector import crawl_url
+    from pycollector import crawl_url
 
     data = crawl_url("schema.json", "http://www.example.com")

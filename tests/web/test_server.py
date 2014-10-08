@@ -3,7 +3,7 @@ import shutil
 import unittest
 import json
 
-from collector.web import server
+from pycollector.web import server
 
 class CollectTestCase(unittest.TestCase):
     

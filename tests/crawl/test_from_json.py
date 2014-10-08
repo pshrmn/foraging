@@ -1,6 +1,6 @@
-from collector.crawl.schema import Schema
-from collector.crawl.page import Page, SelectorSet, Parent
-from collector.crawl.rule import Selector, Rule
+from pycollector.crawl.schema import Schema
+from pycollector.crawl.page import Page, SelectorSet, Parent
+from pycollector.crawl.rule import Selector, Rule
 
 import unittest
 import os

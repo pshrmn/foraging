@@ -4,8 +4,9 @@ venv
 cache/
 ghostdriver.log
 phantomjs
-rules/
+/rules
 build/
-docs/_build
+docs/_build/
 dist
-Collector.egg-info
+pycollector.egg-info/
+.pypirc

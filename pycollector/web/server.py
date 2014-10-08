@@ -4,7 +4,7 @@ import os
 import argparse
 import multiprocessing
 
-from .dynamic_check import test_schema
+from dynamic_check import test_schema
 
 app = Flask(__name__)
 

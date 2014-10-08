@@ -72,7 +72,7 @@ def load_json(filename):
     return schema_json
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="""Determine whether json for collector needs to be
+    parser = argparse.ArgumentParser(description="""Determine whether json for schema needs to be
 loaded dynamically or with a simple get request""")
     parser.add_argument('--json', '-J', dest='json', help='json file to test')
     parser.add_argument('--url', '-U', dest='url', help='starting url to test')

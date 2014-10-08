@@ -1,11 +1,11 @@
-##Collector
+##pycollector
 
-####Collector.web
+####pycollector.web
 Web app that runs in conjunction with collect-chrome extension (https://github.com/psherman/collectorjs) to get rules to be used in a crawler
 
 for default folder to save files, call
 
-    python collector.web.server.py
+    python pycollector.web.server.py
 
 to specify which folder to save rules to, use 
 
@@ -68,13 +68,13 @@ A parent is a selector for how to match an object within the DOM. This is useful
     }
 
 
-####Collector.crawl
+####pycollector.crawl
 module used to crawl a website
 
 Create a Schema from a (properly formatted) json file
 
     import json
-    from collector.crawl import Schema
+    from pycollector.crawl import Schema
 
     with open("schema.json") as fp:
         data = json.load(fp)

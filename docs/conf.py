@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Collector documentation build configuration file, created by
+# pycollector documentation build configuration file, created by
 # sphinx-quickstart on Sat Oct 04 23:24:59 2014.
 #
 # This file is execfile()d with the current directory set to its
@@ -20,8 +20,8 @@ import os
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #sys.path.insert(0, os.path.abspath('.'))
 sys.path.insert(0, os.path.abspath('..'))
-import collector
-from collector import __version__
+import pycollector
+from pycollector import __version__
 
 # -- General configuration ------------------------------------------------
 
@@ -49,7 +49,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'Collector'
+project = u'pycollector'
 copyright = u'2014, Paul Sherman'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -184,7 +184,7 @@ html_static_path = ['_static']
 #html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'Collectordoc'
+htmlhelp_basename = 'pycollectordoc'
 
 
 # -- Options for LaTeX output ---------------------------------------------
@@ -204,7 +204,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  ('index', 'Collector.tex', u'Collector Documentation',
+  ('index', 'pycollector.tex', u'pycollector Documentation',
    u'Paul Sherman', 'manual'),
 ]
 
@@ -234,7 +234,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'collector', u'Collector Documentation',
+    ('index', 'pycollector', u'Pycollector Documentation',
      [u'Paul Sherman'], 1)
 ]
 
@@ -248,8 +248,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'Collector', u'Collector Documentation',
-   u'Paul Sherman', 'Collector', 'One line description of project.',
+  ('index', 'pycollector', u'Pycollector Documentation',
+   u'Paul Sherman', 'pycollector', 'One line description of project.',
    'Miscellaneous'),
 ]
 

@@ -1,4 +1,4 @@
-Collector
+Pycollector
 =====================================
 
 Crawl Documentation

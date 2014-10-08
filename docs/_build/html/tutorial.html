@@ -7,7 +7,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Tutorial &mdash; Collector 0.6.3 documentation</title>
+  <title>Tutorial &mdash; pycollector 0.6.4.1 documentation</title>
   
 
   
@@ -28,7 +28,7 @@
   
 
   
-    <link rel="top" title="Collector 0.6.3 documentation" href="index.html"/>
+    <link rel="top" title="pycollector 0.6.4.1 documentation" href="index.html"/>
         <link rel="prev" title="Filter" href="filter.html"/> 
 
   
@@ -43,7 +43,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-nav-search">
-        <a href="index.html" class="fa fa-home"> Collector</a>
+        <a href="index.html" class="fa fa-home"> pycollector</a>
         <div role="search">
   <form id ="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -90,7 +90,7 @@
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="index.html">Collector</a>
+        <a href="index.html">pycollector</a>
       </nav>
 
 
@@ -117,7 +117,7 @@
 <p>With a schema json file <tt class="docutils literal"><span class="pre">schema.json</span></tt> (generated from CollectorJS), crawl data from all urls in
 Schema.urls:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">from</span> <span class="nn">collector</span> <span class="kn">import</span> <span class="n">Schema</span>
+<span class="kn">from</span> <span class="nn">pycollector</span> <span class="kn">import</span> <span class="n">Schema</span>
 
 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&quot;schema.json&quot;</span><span class="p">,</span> <span class="s">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
     <span class="n">schema_json</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
@@ -132,13 +132,13 @@ Schema.urls:</p>
 </pre></div>
 </div>
 <p>Or just use the shortcuts to crawl a schema:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">collector</span> <span class="kn">import</span> <span class="n">crawl_schema</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pycollector</span> <span class="kn">import</span> <span class="n">crawl_schema</span>
 
 <span class="n">data</span> <span class="o">=</span> <span class="n">crawl_schema</span><span class="p">(</span><span class="s">&quot;schema.json&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>or an individual url:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">collector</span> <span class="kn">import</span> <span class="n">crawl_url</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pycollector</span> <span class="kn">import</span> <span class="n">crawl_url</span>
 
 <span class="n">data</span> <span class="o">=</span> <span class="n">crawl_url</span><span class="p">(</span><span class="s">&quot;schema.json&quot;</span><span class="p">,</span> <span class="s">&quot;http://www.example.com&quot;</span><span class="p">)</span>
 </pre></div>
@@ -181,7 +181,7 @@ Schema.urls:</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.6.3',
+            VERSION:'0.6.4.1',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

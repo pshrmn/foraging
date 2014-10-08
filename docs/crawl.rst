@@ -8,43 +8,43 @@ Crawl
 Shortcuts
 ---------
 
-.. autofunction:: collector.crawl.shortcuts.crawl_url
+.. autofunction:: pycollector.crawl.shortcuts.crawl_url
 
-.. autofunction:: collector.crawl.shortcuts.crawl_schema
+.. autofunction:: pycollector.crawl.shortcuts.crawl_schema
 
 
 Schema
 ------
 
-.. autoclass:: collector.crawl.Schema
+.. autoclass:: pycollector.crawl.Schema
     :inherited-members:
 
 Page
 ----
 
-.. autoclass:: collector.crawl.Page
+.. autoclass:: pycollector.crawl.Page
     :inherited-members:
 
-.. autoclass:: collector.crawl.SelectorSet
+.. autoclass:: pycollector.crawl.SelectorSet
     :inherited-members:
 
-.. autoclass:: collector.crawl.Parent
+.. autoclass:: pycollector.crawl.Parent
     :inherited-members:
 
 Rule
 ----
 
-.. autoclass:: collector.crawl.Selector
+.. autoclass:: pycollector.crawl.Selector
     :inherited-members:
 
-.. autoclass:: collector.crawl.Rule
+.. autoclass:: pycollector.crawl.Rule
     :inherited-members:
 
 Cache
 -----
 
-.. autofunction:: collector.crawl.cache.make_cache
+.. autofunction:: pycollector.crawl.cache.make_cache
 
-.. autoclass:: collector.crawl.cache.Cache
+.. autoclass:: pycollector.crawl.cache.Cache
 
-.. autoclass:: collector.crawl.cache.Site
+.. autoclass:: pycollector.crawl.cache.Site
