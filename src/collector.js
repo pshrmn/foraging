@@ -246,6 +246,9 @@ var Family = {
         }
         var parent = UI.selectorType === "selector" ? Collect.parent: undefined;
         this.selectableElements = Fetch.matchedElements("*", parent);
+        console.log("-----------START------------");
+        console.log(this.selectableElements);
+        console.log("------------END-------------");
         for ( var i=0, len=this.selectableElements.length; i<len; i++ ) {
             curr = this.selectableElements[i];
             curr.addEventListener('click', this.create, false);
@@ -364,7 +367,7 @@ function setupRulesView() {
 
 function selectorViewEvents(){
     idEvent("saveSelector", "click", saveSelectorEvent);
-    idEvent("clearSelector", "click", clearSelectorEvent);
+    idEvent("cancelSelector", "click", cancelSelectorEvent);
 }
 
 function ruleViewEvents(){
@@ -387,7 +390,7 @@ function optionsViewEvents(){
     });
 }
 
-// add .collectHighlight to an element on mouseenter
+// add .pycollector to an element on mouseenter
 function highlightElement(event){
     this.classList.add("collectHighlight");
 }
@@ -526,7 +529,7 @@ function saveNext(selector){
     return true;
 }
 
-function clearSelectorEvent(event){
+function cancelSelectorEvent(event){
     event.preventDefault();
     resetInterface();
     showSchemaView();

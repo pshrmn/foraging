@@ -18,10 +18,12 @@ var Fetch = {
     /***
     returns a string for a css selector suffixed by :not(.noSelect)
     in order to ignore elements that are part of the collectorjs interface
+    default prefix is "body"
     ***/
     not: function(selector, prefix){
+        prefix = prefix || "body";
         selector += ":not(.noSelect)";
-        return prefix ? prefix + " " + selector : selector;
+        return prefix + " " + selector;
     },
     /*
     uses selector to match elements in the page

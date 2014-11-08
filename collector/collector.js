@@ -106,51 +106,59 @@ fn is a callback for when SelectorFamily.update is called
 options are optional
 */
 function SelectorFamily(ele, parent, holder, text, fn, options){
-    //this.parent = parent || "body";
-    this.selectors = [];
-    this.ele = noSelectEle("div", ["selectorFamily"]);
-    // Generates the selectors array with Selectors from ele to parent (ignoring document.body)
-    // Order is from most senior element to provided ele
-    var sel;
-    options = options || {};
-    // if a select is given, swap ele to be the first option
-    if ( ele.tagName === "SELECT" && ele.childElementCount > 0 ) {
-        ele = ele.children[0];
-    }
-    while ( ele !== null && ele !== parent ) {
-    //while ( ele !== null && ele.tagName !== "BODY" ) {
-        // ignore element if it isn't allowed
-        if ( options.ignore && !allowedElement(ele.tagName) ) {
-            ele = ele.parentElement;
-            continue;
-        }
-
-        sel = new EleSelector(ele, this);
-        /*if ( this.parent && sel.matches(this.parent)) {
-            break;
-        }*/
-        this.selectors.push(sel);
-        ele = ele.parentElement;
-    }
-    // reverse selectors so 0-index is selector closest to body
-    this.selectors.reverse();
-    for ( var i=0, len=this.selectors.length; i<len; i++ ) {
-        sel = this.selectors[i];
-        this.ele.appendChild(sel.ele);
-        sel.index = i;
-    }
-    this.selectors[this.selectors.length-1].setAll();
-
-    this.holder = holder;
-    this.text = text;
+    this.selectors      = [];
+    this.ele            = noSelectEle("div", ["selectorFamily"]);
+    this.text           = text;
     this.updateFunction = fn;
+    this.options        = options || {};
+
     // clear out holder, then attach SelectorFamily.ele
-    this.holder.innerHTML = "";
-    this.holder.appendChild(this.ele);
+    holder.innerHTML = "";
+    holder.appendChild(this.ele);
+
+    this._makeSelectors(ele, parent);
 }
 
 SelectorFamily.prototype = {
     // "Private" methods
+    /***
+    given the element, its parent element, and selector options, iterate from the element (inclusive)
+    to the parent (exclusive) and create an ToggleableElement for each element
+    ***/
+    _makeSelectors: function(ele, parent){
+        // Generates the selectors array with Selectors from ele to parent (ignoring document.body)
+        // Order is from most senior element to provided ele
+        // if a select is given, swap ele to be the first option
+        if ( ele.tagName === "SELECT" && ele.childElementCount > 0 ) {
+            ele = ele.children[0];
+        }
+        while ( ele !== null && ele !== parent ) {
+            if ( !this.filter(ele) ) {
+                ele = ele.parentElement;
+                continue;
+            }
+            this.selectors.push(new ToggleableElement(ele, this));
+            ele = ele.parentElement;
+        }
+        // reverse selectors so 0-index is selector closest to body
+        this.selectors.reverse();
+        var curr;
+        for ( var i=0, len=this.selectors.length; i<len; i++ ) {
+            curr = this.selectors[i];
+            this.ele.appendChild(curr.ele);
+            curr.index = i;
+        }
+        this.selectors[this.selectors.length-1].setAll();
+    },
+    /***
+    only include an element if it meets requirements (determined by options)
+    ***/
+    filter: function(ele){
+        if ( this.options.ignore && !allowedElement(ele.tagName) ) {
+            return false;
+        }
+        return true;
+    },
     removeSelector: function(index){
         this.selectors.splice(index, 1);
         // reset index values after splice
@@ -161,9 +169,7 @@ SelectorFamily.prototype = {
     },
     // "Public" methods
     remove: function(){
-        if ( this.holder ) {
-            this.holder.innerHTML = "";    
-        }
+        this.ele.parentElement.removeChild(this.ele);
         if ( this.text ) {
             this.text.textContent = "";
         }
@@ -242,17 +248,12 @@ var fragments = {
 /********************
     FRAGMENT
 ********************/
-function Fragment(name, selector, on){
-    this.selector = selector;
-    this.name = name;
-    var classes = ["toggleable", "realselector"];
-    if ( !on ) {
-        classes.push("off");
-    }
-    this.ele = noSelectEle("span", classes);
-    this.ele.textContent = this.name;
+function Fragment(name, selector){
+    this.selector   = selector;
+    this.name       = name;
+    this.ele        = noSelectEle("span", ["toggleable", "realselector", "off"]);
 
-    //Events
+    this.ele.textContent = this.name;
     this.ele.addEventListener("click", fragments.toggleOff.bind(this), false);
 }
 
@@ -269,18 +270,14 @@ Fragment.prototype = {
     NTHFRAGMENT
 a fragment representing an nth-ot-type css pseudoselector
 ********************/
-function NthFragment(selector, on){
-    this.selector = selector;
-    var classes = ["toggleable"];
-    // explicit false
-    if ( on === false ) {
-        classes.push("off");
-    }
-    
-    this.ele = noSelectEle("span", classes);
+function NthFragment(selector){
+    this.selector   = selector;
+    this.ele        = noSelectEle("span", ["toggleable"]);   
     this.beforeText = document.createTextNode(":nth-of-type(");
-    this.afterText = document.createTextNode(")");
-    this.input = noSelectEle("input", ["childtoggle"]);
+    this.afterText  = document.createTextNode(")");
+    this.input      = noSelectEle("input", ["childtoggle"]);
+
+
     this.input.setAttribute("type", "text");
     this.input.value = 1;
     this.input.setAttribute("title", "options: an+b (a & b are integers), a positive integer (1,2,3...), odd, even");
@@ -288,7 +285,6 @@ function NthFragment(selector, on){
     this.ele.appendChild(this.beforeText);
     this.ele.appendChild(this.input);
     this.ele.appendChild(this.afterText);
-    
 
     //Events
     this.ele.addEventListener("click", fragments.toggleOff.bind(this), false);
@@ -316,18 +312,26 @@ NthFragment.prototype = {
 /********************
     SELECTOR
 ********************/
-function EleSelector(ele, family){
-    this.family = family;
-    this.tag = new Fragment(ele.tagName.toLowerCase(), this);
-    this.id = ele.hasAttribute('id') ? new Fragment('#' + ele.getAttribute('id'), this) : undefined;
-    this.classes = [];
-    this.ele = noSelectEle("div", ["selectorSchema"]);
+/***
+ele is an element to create an ToggleableElement for
+family is the SelectorFamily the ToggleableElement belongs to
+***/
+function ToggleableElement(ele, family){
+    this.family         = family;
+    this.tag            = new Fragment(ele.tagName.toLowerCase(), this);
+    this.id             = ele.hasAttribute('id') ?
+                            new Fragment('#' + ele.getAttribute('id'), this) : undefined;
+    this.classes        = [];
+    this.ele            = noSelectEle("div", ["selectorSchema"]);
+    this.nthtypeCreator = selectorSpan("+t", ["nthtype", "noSelect"], "add the nth-of-type pseudo selector"),
+
     this.ele.appendChild(this.tag.ele);
     if ( this.id ) {
         this.ele.appendChild(this.id.ele);
     }
 
     var curr, deltog, frag;
+    // generate a fragment for all of the element's classes
     for ( var i=0, len=ele.classList.length; i<len; i++ ) {
         curr = ele.classList[i];
         // classes used collect.js, not native to page 
@@ -339,38 +343,48 @@ function EleSelector(ele, family){
         this.ele.appendChild(frag.ele);
     }
 
-    this.nthtypeCreator = selectorSpan("+t", ["nthtype", "noSelect"], "add the nth-of-type pseudo selector"),
+    this.ele.addEventListener("click", this.events.cleanSelector.bind(this), false);
+    
+    this.nthtypeCreator.addEventListener('click', this.events.createNthofType.bind(this), false);
     this.ele.appendChild(this.nthtypeCreator);
-    this.nthtypeCreator.addEventListener('click', createNthofType.bind(this), false);
 
     deltog = selectorSpan("x", ["deltog", "noSelect"]);
+    deltog.addEventListener('click', this.events.removeSelector.bind(this), false);
     this.ele.appendChild(deltog);
-    deltog.addEventListener('click', removeSelectorSchema.bind(this), false);
 
-    this.ele.addEventListener("click", cleanSelector.bind(this), false);
 }
 
-function cleanSelector(event){
-    if ( !event.target.classList.contains("toggleable") ) {
-        return;
-    }
+ToggleableElement.prototype = {
+    events: {
+        cleanSelector: function(event){
+            if ( !event.target.classList.contains("toggleable") ) {
+                return;
+            }
 
-    // only care if nthoftype exists
-    if ( this.nthoftype && this.nthoftype.on() ) {
-        // lxml requires a tag when using :nth-of-type
-        // if turning on nthoftype, turn on tag as well
-        if ( event.target === this.nthoftype.ele ) {
-            this.tag.turnOn();
+            // only care if nthoftype exists
+            if ( this.nthoftype && this.nthoftype.on() ) {
+                // lxml requires a tag when using :nth-of-type
+                // if turning on nthoftype, turn on tag as well
+                if ( event.target === this.nthoftype.ele ) {
+                    this.tag.turnOn();
+                }
+                // if turning off tag, turn off nthoftype as well
+                else if ( event.target === this.tag.ele && !this.tag.on() ) {
+                    this.nthoftype.turnOff();
+                }
+            }
+            this.family.update();
+        },
+        removeSelector: function(event){
+            // get rid of the html element
+            this.ele.parentElement.removeChild(this.ele);
+            this.family.removeSelector(this.index);
+        },
+        createNthofType: function(event){
+            event.stopPropagation();
+            this.addNthofType();
         }
-        // if turning off tag, turn off nthoftype as well
-        else if ( event.target === this.tag.ele && !this.tag.on() ) {
-            this.nthoftype.turnOff();
-        }
-    }
-    this.family.update();
-}
-
-EleSelector.prototype = {
+    },
     addNthofType: function(){
         if ( this.nthoftype ) {
             return;
@@ -390,8 +404,6 @@ EleSelector.prototype = {
 
         var sibling = selectors[len-1].nextSibling;
         this.ele.insertBefore(this.nthoftype.ele, sibling);
-
-
     },
     /* turn on (remove .off) from all toggleable parts of a selector if bool is undefined or true
     turn off (add .off) to all toggleable parts if bool is false */
@@ -500,17 +512,6 @@ EleSelector.prototype = {
     }
 };
 
-function createNthofType(event){
-    event.stopPropagation();
-    this.addNthofType();
-}
-
-function removeSelectorSchema(event){
-    // get rid of the html element
-    this.ele.parentElement.removeChild(this.ele);
-    this.family.removeSelector(this.index);
-}
-
 /*********************************
             Helpers
 *********************************/
@@ -558,10 +559,12 @@ var Fetch = {
     /***
     returns a string for a css selector suffixed by :not(.noSelect)
     in order to ignore elements that are part of the collectorjs interface
+    default prefix is "body"
     ***/
     not: function(selector, prefix){
+        prefix = prefix || "body";
         selector += ":not(.noSelect)";
-        return prefix ? prefix + " " + selector : selector;
+        return prefix + " " + selector;
     },
     /*
     uses selector to match elements in the page
@@ -2435,7 +2438,7 @@ var removeInterface = (function(){
         element = noSelectElement("div");
 
     element.classList.add("collectjs");
-    element.innerHTML = "<div class=\"tabHolder\"><div class=\"tabs\"><div class=\"tab active\" id=\"schemaTab\">Schema</div><div class=\"tab\" id=\"previewTab\">Preview</div><div class=\"tab\" id=\"optionsTab\">Options</div><div class=\"tab\" id=\"closeCollect\">&times;</div></div></div><div class=\"permanent\"><div id=\"schemaInfo\"></div><div id=\"collectAlert\"></div></div><div class=\"views\"><div class=\"view\" id=\"emptyView\"></div><div class=\"view active\" id=\"schemaView\"><div id=\"schemaHolder\" class=\"rules\"></div></div><div class=\"view\" id=\"selectorView\"><div class=\"column form\"><h3>Type:<span id=\"selectorType\">Selector</span></h3><!--displays what the current selector is--><p>Selector: <span id=\"currentSelector\"></span></p><p>Count: <span id=\"currentCount\"></span></p><div id=\"parentRange\"><label>Low: <input id=\"parentLow\" name=\"parentLow\" type=\"text\" /></label><label for=\"parentHigh\">High: <input id=\"parentHigh\" name=\"parentHigh\" type=\"text\" /></label></div><p><button id=\"saveSelector\">Save</button><button id=\"clearSelector\">Clear</button></p></div><div class=\"column\"><!--holds the interactive element for choosing a selector--><div id=\"selectorHolder\"></div><div id=\"selectorCycleHolder\"></div></div></div><div class=\"view\" id=\"ruleView\"><div id=\"ruleItems\" class=\"items\"><h3>Selector: <span id=\"ruleSelector\"></span></h3><form id=\"ruleForm\" class=\"column form\"><div class=\"rule\"><label for=\"ruleName\" title=\"the name of a rule\">Name:</label><input id=\"ruleName\" name=\"ruleName\" type=\"text\" /></div><div class=\"rule\"><label title=\"the attribute of an element to capture\">Capture:</label><span id=\"ruleAttr\"></span></div><div class=\"rule follow\"><label for=\"ruleFollow\" title=\"create a new page from the element's captured url (capture must be attr-href)\">Follow:</label><input id=\"ruleFollow\" name=\"ruleFollow\" type=\"checkbox\" disabled=\"true\" title=\"Can only follow rules that get href attribute from links\" /></div><div><button id=\"saveRule\">Save Rule</button><button id=\"cancelRule\">Cancel</button></div></form><div class=\"modifiers column\"><div id=\"ruleCycleHolder\"></div></div></div></div><div class=\"view\" id=\"previewView\"><div id=\"previewContents\"></div></div><div class=\"view\" id=\"optionsView\"><p><label for=\"ignore\">Ignore helper elements (eg tbody)</label><input type=\"checkbox\" id=\"ignore\" /></p></div></div>";
+    element.innerHTML = "<div class=\"tabHolder\"><div class=\"tabs\"><div class=\"tab active\" id=\"schemaTab\">Schema</div><div class=\"tab\" id=\"previewTab\">Preview</div><div class=\"tab\" id=\"optionsTab\">Options</div><div class=\"tab\" id=\"closeCollect\">&times;</div></div></div><div class=\"permanent\"><div id=\"schemaInfo\"></div><div id=\"collectAlert\"></div></div><div class=\"views\"><div class=\"view\" id=\"emptyView\"></div><div class=\"view active\" id=\"schemaView\"><div id=\"schemaHolder\" class=\"rules\"></div></div><div class=\"view\" id=\"selectorView\"><div class=\"column form\"><h3>Type:<span id=\"selectorType\">Selector</span></h3><!--displays what the current selector is--><p>Selector: <span id=\"currentSelector\"></span></p><p>Count: <span id=\"currentCount\"></span></p><div id=\"parentRange\"><label>Low: <input id=\"parentLow\" name=\"parentLow\" type=\"text\" /></label><label for=\"parentHigh\">High: <input id=\"parentHigh\" name=\"parentHigh\" type=\"text\" /></label></div><p><button id=\"saveSelector\">Save</button><button id=\"cancelSelector\">Cancel</button></p></div><div class=\"column\"><!--holds the interactive element for choosing a selector--><div id=\"selectorHolder\"></div><div id=\"selectorCycleHolder\"></div></div></div><div class=\"view\" id=\"ruleView\"><div id=\"ruleItems\" class=\"items\"><h3>Selector: <span id=\"ruleSelector\"></span></h3><form id=\"ruleForm\" class=\"column form\"><div class=\"rule\"><label for=\"ruleName\" title=\"the name of a rule\">Name:</label><input id=\"ruleName\" name=\"ruleName\" type=\"text\" /></div><div class=\"rule\"><label title=\"the attribute of an element to capture\">Capture:</label><span id=\"ruleAttr\"></span></div><div class=\"rule follow\"><label for=\"ruleFollow\" title=\"create a new page from the element's captured url (capture must be attr-href)\">Follow:</label><input id=\"ruleFollow\" name=\"ruleFollow\" type=\"checkbox\" disabled=\"true\" title=\"Can only follow rules that get href attribute from links\" /></div><div><button id=\"saveRule\">Save Rule</button><button id=\"cancelRule\">Cancel</button></div></form><div class=\"modifiers column\"><div id=\"ruleCycleHolder\"></div></div></div></div><div class=\"view\" id=\"previewView\"><div id=\"previewContents\"></div></div><div class=\"view\" id=\"optionsView\"><p><label for=\"ignore\">Ignore helper elements (eg tbody)</label><input type=\"checkbox\" id=\"ignore\" /></p></div></div>";
     document.body.appendChild(element);
     addNoSelect(element.querySelectorAll("*"));    
 
@@ -2675,6 +2678,9 @@ var Family = {
         }
         var parent = UI.selectorType === "selector" ? Collect.parent: undefined;
         this.selectableElements = Fetch.matchedElements("*", parent);
+        console.log("-----------START------------");
+        console.log(this.selectableElements);
+        console.log("------------END-------------");
         for ( var i=0, len=this.selectableElements.length; i<len; i++ ) {
             curr = this.selectableElements[i];
             curr.addEventListener('click', this.create, false);
@@ -2793,7 +2799,7 @@ function setupRulesView() {
 
 function selectorViewEvents(){
     idEvent("saveSelector", "click", saveSelectorEvent);
-    idEvent("clearSelector", "click", clearSelectorEvent);
+    idEvent("cancelSelector", "click", cancelSelectorEvent);
 }
 
 function ruleViewEvents(){
@@ -2816,7 +2822,7 @@ function optionsViewEvents(){
     });
 }
 
-// add .collectHighlight to an element on mouseenter
+// add .pycollector to an element on mouseenter
 function highlightElement(event){
     this.classList.add("collectHighlight");
 }
@@ -2955,7 +2961,7 @@ function saveNext(selector){
     return true;
 }
 
-function clearSelectorEvent(event){
+function cancelSelectorEvent(event){
     event.preventDefault();
     resetInterface();
     showSchemaView();
