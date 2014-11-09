@@ -2678,9 +2678,6 @@ var Family = {
         }
         var parent = UI.selectorType === "selector" ? Collect.parent: undefined;
         this.selectableElements = Fetch.matchedElements("*", parent);
-        console.log("-----------START------------");
-        console.log(this.selectableElements);
-        console.log("------------END-------------");
         for ( var i=0, len=this.selectableElements.length; i<len; i++ ) {
             curr = this.selectableElements[i];
             curr.addEventListener('click', this.create, false);
@@ -2874,6 +2871,7 @@ function verifyAndApplyParentRange(event){
         len = elements.length;
     // restrict to range
     elements = Array.prototype.slice.call(elements).slice(low, len + high);
+    clearClass("queryCheck");
     addClass("queryCheck", elements);
     UI.selectorCycle.setElements(elements);
     HTML.selector.count.textContent = elementCount(elements.length, Collect.parentCount);
