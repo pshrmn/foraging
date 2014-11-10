@@ -241,7 +241,6 @@ var fragments = {
     },
     toggleOff: function(event){
         this.ele.classList.toggle("off");
-        //this.selector.family.update();
     }
 };
 
@@ -389,11 +388,9 @@ ToggleableElement.prototype = {
         if ( this.nthoftype ) {
             return;
         }
-        // if the current string for selector is empty, turn on the tag
-        // needs to be called before nthoftype is created
-        if ( this.toString() === "") {
-            this.tag.turnOn();
-        }
+        // lxml requires a tag to be used alongside :nth-of-type, so make sure that that is on
+        this.tag.turnOn();
+        
         this.nthoftype = new NthFragment(this);
         this.ele.removeChild(this.nthtypeCreator);
         this.nthtypeCreator = undefined;
