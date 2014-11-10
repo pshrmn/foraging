@@ -12,9 +12,7 @@ from lxml.cssselect import CSSSelector
 import requests
 from selenium import webdriver
 
-cache_dir = os.path.abspath(__file__)
-collector_dir = os.path.join(cache_dir, os.pardir, os.pardir)
-PHANTOM_PATH = os.path.join(os.path.abspath(collector_dir), "phantomjs", "phantomjs.exe")
+PHANTOM_PATH = os.path.join(os.getcwd(), "phantomjs", "phantomjs.exe")
 
 def clean_url_filename(url):
     illegal_chars = re.compile(r'(\/|\\|:|\*|\?|"|\<|\>|\|)')

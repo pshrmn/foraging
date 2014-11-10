@@ -1,5 +1,22 @@
 ##collector
 
+#####Install
+
+Install collector using pip
+
+    pip install git+git://github.com/psherman/collector.git
+
+If your crawler is going to need to fetch dynamic pages, you will need to download phantomjs
+
+    http://phantomjs.org/download.html
+
+and place the phantomjs folder in your project folder
+
+    <project folder>
+    +--<virtual environment>
+    +--phantomjs
+    +--<other files>
+
 #####Rules Format
 
 A schema along with the hostname of the site for the rules is uploaded by collectJS extension
