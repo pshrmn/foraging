@@ -1,15 +1,4 @@
-##pycollector
-
-####pycollector.web
-Web app that runs in conjunction with collect-chrome extension (https://github.com/psherman/collectorjs) to get rules to be used in a crawler
-
-for default folder to save files, call
-
-    python pycollector.web.server.py
-
-to specify which folder to save rules to, use 
-
-    -F <folder> or --folder <folder>
+##collector
 
 #####Rules Format
 
@@ -25,14 +14,13 @@ A Schema is a set of data to be captured from various rules
     Schema = {
         name: <string>
         urls: [<string>...],
-        pages: {<Page>...}
+        page: <Page>
     }
 
 A Page is a webpage and contains selector sets to capture elements in a webpage
 
     Page = {
         name: <string>,
-        index: <boolean>,
         next: <string> (optional),
         sets: {<SelectorSet>...}
     }
@@ -41,8 +29,9 @@ A selector set is a group of selectors within a page, optionally linked together
 
     SelectorSet = {
         name: <string>,
-        selectors: {<selector>...},
-        parent: <Parent> (optional)
+        selectors: {<Selector>...},
+        parent: <Parent> (optional),
+        pages: {<Page>...}
     }
 
 A Selector is a css selector and associated rules
@@ -68,13 +57,13 @@ A parent is a selector for how to match an object within the DOM. This is useful
     }
 
 
-####pycollector.crawl
+####collector.crawl
 module used to crawl a website
 
 Create a Schema from a (properly formatted) json file
 
     import json
-    from pycollector.crawl import Schema
+    from collector.crawl import Schema
 
     with open("schema.json") as fp:
         data = json.load(fp)

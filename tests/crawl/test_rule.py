@@ -1,4 +1,4 @@
-from pycollector.crawl.rule import Rule
+from collector.crawl.rule import Rule
 import unittest
 from lxml.html import document_fromstring
 from lxml.cssselect import CSSSelector

@@ -1,7 +1,7 @@
 import unittest
 import os
 
-from pycollector.crawl import cache
+from collector.crawl import cache
 
 TEST_DIR = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir))
 

@@ -1,4 +1,4 @@
-from pycollector.filter import strings
+from collector.filter import strings
 import unittest
 
 class NumberTest(unittest.TestCase):
