@@ -93,3 +93,12 @@ Get data by crawling urls in Schema.urls (and any subsequent urls from successiv
 Or set a specific page to get data from
 
     spec_url_data = s.get(url)
+
+To automatically test a schema to determine whether or not a page needs to be loaded through PhantomJS, use dynamic_check
+
+    python -m collector.crawl.dynamic_check -json <path to schema json>
+
+Flags:
+    `--json` (`-J`): specifies the json schema file to test
+    `--url` (`-U`): specifies the initial url to test. This is optional and the urls[0] url of the schema will be used if none is provided. If urls[0] does not exist, the program will just return
+    `--debug` (`-D`): if true, print the page/selector set/selector checks to standard out
