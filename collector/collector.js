@@ -2103,9 +2103,7 @@ Selector.prototype.events = {
     newRuleEvent: function(event){
         event.preventDefault();
         Collect.site.current.selector = this;
-
-        setupRuleForm(this.selector);
-        showRuleView();
+        RuleView.setup(this.selector);
     },
     editEvent: function(event){
         event.preventDefault();
@@ -2546,76 +2544,131 @@ var Cycle = (function(){
     return Cycle;
 })();
 
-// Source: src/collector.js
-/*********************************
-            GLOBALS
-*********************************/
-/*
-Object that stores information related to elements that match the current selector
-(and how to select them)
-*/
-var Collect = {
-    options: {},
-    parent: {},
-    site: undefined
-};
+// Source: src/family.js
+// Family derived from clicked element in the page
+var Family = {
+    family: undefined,
+    elements: [],
+    selectableElements: [],
+    create: function(event){
+        event.stopPropagation();
+        event.preventDefault();
+        if ( event.currentTarget !== event.target ) {
+            return;
+        }
 
-// save commonly referenced to elements
-var HTML = {
-    schema: {
-        info: document.getElementById("schemaInfo"),
-        holder: document.getElementById("schemaHolder")
+        var parent = parentElement(this);
+        Family.family = new SelectorFamily(this,
+            parent,
+            HTML.selector.family,
+            HTML.selector.selector,
+            Family.test.bind(Family),
+            Collect.options
+        );
+        Family.family.update();
     },
-    // elements in the selector view
-    selector: {
-        family: document.getElementById("selectorHolder"),
-        selector: document.getElementById("currentSelector"),
-        count: document.getElementById("currentCount"),
-        parent: {
-            holder: document.getElementById("parentRange"),
-            low: document.getElementById("parentLow"),
-            high: document.getElementById("parentHigh")
-        },
-        type: document.getElementById("selectorType")
+    remove: function(){
+        if ( this.family ) {
+            this.family.remove();
+            this.family = undefined;
+        }
+        this.elements = [];
     },
-    // elements in the rule view
-    rule: {
-        selector: document.getElementById("ruleSelector"),
-        form: document.getElementById("ruleForm"),
-        name: document.getElementById("ruleName"),
-        capture: document.getElementById("ruleAttr"),
-        follow: document.getElementById("ruleFollow"),
-        followHolder: document.querySelector("#ruleItems .follow")
+    // create a SelectorFamily given a css selector string
+    fromSelector: function(selector, prefix){
+        // default to using provided parent, then check Collect.parent, lastly use "body"
+        prefix = prefix ? prefix : parentSelector();
+        var element = Fetch.one(selector, prefix);
+        // clear out existing SelectorFamily
+        this.family = undefined;
+        if ( element ) {
+            var parent = parentElement(this);
+            this.family = new SelectorFamily(element,
+                parent,
+                HTML.selector.family,
+                HTML.selector.selector,
+                Family.test.bind(Family),
+                Collect.options
+            );
+            this.family.match(selector);
+        }    
     },
-    // elements in the the permament bar
-    perm: {
-        schema: {
-            select: document.getElementById("schemaSelect"),
-            buttons: document.getElementById("schemaButtons")
-        },
-        page: {
-            select: document.getElementById("pageSelect"),
-        },
-        set: {
-            select: document.getElementById("selectorSetSelect")
-        },
-        alert: document.getElementById("collectAlert"),
+    // returns a string representing the current selector or if none, an empty string
+    selector: function(){
+        if ( this.family ) {
+            return this.family.toString();
+        } else {
+            return "";
+        }
     },
-    preview: {
-        contents: document.getElementById("previewContents")
+    // uses current SelectorFamily's computed selector to match elements in the page
+    // uses Collect.parent to limit matches
+    selectorElements: function(){
+        var selector = this.selector(),
+            parent = parentObject();
+        if ( selector === "") {
+            return [];
+        }
+        return Fetch.matchedElements(selector, parent);
     },
-    tabs: {
-        schema: document.getElementById("schemaTab"),
-        preview: document.getElementById("previewTab"),
-        options: document.getElementById("optionsTab")
+    /*
+    add queryCheck class to all elements matching selector
+    set the count based on number of matching elements
+    set the preview
+    */
+    test: function(){
+        clearClass("queryCheck");
+        clearClass("collectHighlight");
+
+        var elements = this.selectorElements();
+        for ( var i=0, len=elements.length; i<len; i++ ) {
+            elements[i].classList.add("queryCheck");
+        }
+        this.elements = elements;
+        var parentCount = UI.editing && UI.selectorType === "parent" ? undefined : Collect.parentCount;
+        HTML.selector.count.textContent = elementCount(elements.length, parentCount);
+        UI.selectorCycle.setElements(elements);
     },
-    views: {
-        schema: document.getElementById("schemaView"),
-        selector: document.getElementById("selectorView"),
-        rule: document.getElementById("ruleView"),
-        preview: document.getElementById("previewView"),
-        options: document.getElementById("optionsView")
-    }
+    selectorsOn: false,
+    /*
+    match all child elements of parent selector (or "body" if no parent selector is provided)
+        and save in Family.elements
+    selectable elements are restricted by :not(.noSelect)
+    add event listeners to all of those elements
+    */
+    turnOn: function(){
+        var curr;
+        if ( this.selectorsOn ) {
+            this.turnOff();
+        }
+        var parent = UI.selectorType === "selector" ? Collect.parent: undefined;
+        this.selectableElements = Fetch.matchedElements("*", parent);
+        for ( var i=0, len=this.selectableElements.length; i<len; i++ ) {
+            curr = this.selectableElements[i];
+            curr.addEventListener('click', this.create, false);
+            curr.addEventListener('mouseenter', highlightElement, false);
+            curr.addEventListener('mouseleave', unhighlightElement, false);
+        }
+        this.selectorsOn = true;
+    },
+    /*
+    remove events from all elements in Family.elements
+    clear out any classes that would be set by events on the elements
+    */
+    turnOff: function(){
+        clearSelectorClasses();
+        var curr;
+        for ( var i=0, len=this.selectableElements.length; i<len; i++ ) {
+            curr = this.selectableElements[i];
+            curr.removeEventListener('click', this.create);
+            curr.removeEventListener('mouseenter', highlightElement);
+            curr.removeEventListener('mouseleave', unhighlightElement);
+            
+        }
+        this.selectableElements = [];
+        this.selectorsOn = true;
+        this.elements = [];
+    },
 };
 
 /*
@@ -2642,6 +2695,125 @@ function nearestParent(element, parentSelector){
     return;
 }
 
+// returns the nearest parent element (as determined by Collect.parent) to the passed in element
+// defaults to the body if there is no parent or the current UI.selectorType !== "selector"
+function parentElement(element){
+    var parent;
+    switch(UI.selectorType){
+        case "selector":
+            parent = Collect.parent.selector ? nearestParent(element, Collect.parent.selector) : document.body;
+            break;
+        default:
+            parent = document.body;
+    }
+    return parent;
+}
+
+// returns the parent selector
+// if UI.selectorType !== "selector", always return "body". Then check if there is a parent selector
+// and if there is use that, defaulting to "body" if there is none
+function parentSelector(){
+    var parent;
+    switch(UI.selectorType){
+        case "selector":
+            parent = Collect.parent.selector ? Collect.parent.selector: "body";
+            break;
+        default:
+            parent = "body";
+    }
+    return parent;
+}
+
+// returns the Collect.parent object if it exists and UI.selectorType === "selector"
+// otherwise returns undefined
+function parentObject(){
+    var parent;
+    switch(UI.selectorType){
+        case "selector":
+            parent = Collect.parent;
+            break;
+    }
+    return parent;
+}
+// Source: src/collector.js
+/*********************************
+            GLOBALS
+*********************************/
+/*
+Object that stores information related to elements that match the current selector
+(and how to select them)
+*/
+var Collect = {
+    options: {},
+    parent: {},
+    site: undefined
+};
+
+/*
+brute force to find parent element of the passed in element argument that matches the parentSelector
+O(n^2), so not ideal but works for the time being
+*/
+function nearestParent(element, parentSelector){
+    var parents = Fetch.all(parentSelector),
+        elementParents = [],
+        curr = element;
+    // get all parent elements of element up to BODY
+    while ( curr !== null && curr.tagName !== "BODY" ) {
+        curr = curr.parentElement;
+        elementParents.push(curr);
+    }
+    for ( var i=0, iLen=elementParents.length; i<iLen; i++ ) {
+        var par = elementParents[i];
+        for ( var j=0, jLen=parents.length; j<jLen; j++ ) {
+            if ( par === parents[j] ) {
+                return par;
+            }
+        }
+    }
+    return;
+}
+
+// returns the nearest parent element (as determined by Collect.parent) to the passed in element
+// defaults to the body if there is no parent or the current UI.selectorType !== "selector"
+function parentElement(element){
+    var parent;
+    switch(UI.selectorType){
+        case "selector":
+            parent = Collect.parent.selector ? nearestParent(element, Collect.parent.selector) : document.body;
+            break;
+        default:
+            parent = document.body;
+    }
+    return parent;
+}
+
+// returns the parent selector
+// if UI.selectorType !== "selector", always return "body". Then check if there is a parent selector
+// and if there is use that, defaulting to "body" if there is none
+function parentSelector(){
+    var parent;
+    switch(UI.selectorType){
+        case "selector":
+            parent = Collect.parent.selector ? Collect.parent.selector: "body";
+            break;
+        default:
+            parent = "body";
+    }
+    return parent;
+}
+
+// returns the Collect.parent object if it exists and UI.selectorType === "selector"
+// otherwise returns undefined
+function parentObject(){
+    var parent;
+    switch(UI.selectorType){
+        case "selector":
+            parent = Collect.parent;
+            break;
+    }
+    return parent;
+}
+
 // Family derived from clicked element in the page
 var Family = {
     family: undefined,
@@ -2654,9 +2826,7 @@ var Family = {
             return;
         }
 
-        var parent = Collect.parent.selector ?
-            nearestParent(this, Collect.parent.selector) : document.body;
-
+        var parent = parentElement(this);
         Family.family = new SelectorFamily(this,
             parent,
             HTML.selector.family,
@@ -2676,14 +2846,12 @@ var Family = {
     // create a SelectorFamily given a css selector string
     fromSelector: function(selector, prefix){
         // default to using provided parent, then check Collect.parent, lastly use "body"
-        prefix = prefix ? prefix : (Collect.parent.selector ? Collect.parent.selector: "body");
+        prefix = prefix ? prefix : parentSelector();
         var element = Fetch.one(selector, prefix);
         // clear out existing SelectorFamily
         this.family = undefined;
         if ( element ) {
-            var parent = Collect.parent.selector ?
-                nearestParent(element, Collect.parent.selector) : document.body;
-
+            var parent = parentElement(this);
             this.family = new SelectorFamily(element,
                 parent,
                 HTML.selector.family,
@@ -2706,10 +2874,7 @@ var Family = {
     // uses Collect.parent to limit matches
     selectorElements: function(){
         var selector = this.selector(),
-            parent = Collect.site.current.set.parent;
-        if ( UI.editing && UI.selectorType === "parent" ) {
-            parent = undefined;
-        }
+            parent = parentObject();
         if ( selector === "") {
             return [];
         }
@@ -2791,8 +2956,7 @@ function resetInterface(){
     }
     clearSelectorClasses();
     SelectorView.reset();
-    //RuleView.reset();
-    resetRulesView();
+    RuleView.reset();
 }
 
 /*
@@ -2848,17 +3012,46 @@ var SelectorView = {
     }
 };
 
-function resetRulesView(){
-    UI.ruleCycle.reset();
-    HTML.rule.selector.textContent = "";
+// control the rule view
+var RuleView = {
+    reset: function(){
+        UI.ruleCycle.reset();
+        HTML.rule.selector.textContent = "";
 
-    // reset rule form
-    HTML.rule.name.value = "";
-    HTML.rule.capture.textContent = "";
-    HTML.rule.follow.checked = false;
-    HTML.rule.follow.disabled = true;
-    HTML.rule.followHolder.style.display = "none";
-}
+        // reset rule form
+        HTML.rule.name.value = "";
+        HTML.rule.capture.textContent = "";
+        HTML.rule.follow.checked = false;
+        HTML.rule.follow.disabled = true;
+        HTML.rule.followHolder.style.display = "none";
+    },
+    setup: function(selector, rule){
+        //test
+        // setup based on (optional) rule
+        if ( rule ) {
+            HTML.rule.name.value = rule.name;
+            HTML.rule.capture.textContent = rule.capture;
+            if ( rule.capture === "attr-href" ) {
+                HTML.rule.follow.checked = rule.follow;
+                HTML.rule.follow.disabled = false;
+                HTML.rule.followHolder.style.display = "block";
+            } else {
+                HTML.rule.follow.checked = false;
+                HTML.rule.follow.disabled = true;
+                HTML.rule.followHolder.style.display = "none";
+            }
+        }
+
+        // setup based on selector
+        HTML.rule.selector.textContent = selector;
+        var parent = Collect.site.current.set.parent,
+            elements = Fetch.matchedElements(selector, parent);
+        UI.ruleCycle.setElements(elements);
+        addClass("savedPreview", elements);
+
+        setCurrentView(HTML.views.rule, HTML.tabs.schema);
+    }
+};
 
 /******************
     EVENTS
@@ -2923,7 +3116,7 @@ function optionsViewEvents(){
     });
 }
 
-// add .pycollector to an element on mouseenter
+// add .collectHighlight to an element on mouseenter
 function highlightElement(event){
     this.classList.add("collectHighlight");
 }
@@ -3139,16 +3332,11 @@ function editSelector(selector){
 function editRule(rule){
     UI.editing = true;
     UI.editingObject = rule;
-    setupRuleForm(rule.parentSelector.selector, rule.object());
-    showRuleView();
+    RuleView.setup(rule.parentSelector.selector, rule.object());
 }
 
 function showSchemaView(){
     setCurrentView(HTML.views.schema, HTML.tabs.schema);
-}
-
-function showRuleView(){
-    setCurrentView(HTML.views.rule, HTML.tabs.schema);
 }
 
 function showPreviewView(){
@@ -3248,27 +3436,7 @@ function addParentSchema(parent){
 // setup the rule form using the selector
 // if a rule is passed in, preset values based on the rule
 function setupRuleForm(selector, rule){
-    // setup based on (optional) rule
-    if ( rule ) {
-        HTML.rule.name.value = rule.name;
-        HTML.rule.capture.textContent = rule.capture;
-        if ( rule.capture === "attr-href" ) {
-            HTML.rule.follow.checked = rule.follow;
-            HTML.rule.follow.disabled = false;
-            HTML.rule.followHolder.style.display = "block";
-        } else {
-            HTML.rule.follow.checked = false;
-            HTML.rule.follow.disabled = true;
-            HTML.rule.followHolder.style.display = "none";
-        }
-    }
-
-    // setup based on selector
-    HTML.rule.selector.textContent = selector;
-    var parent = Collect.site.current.set.parent,
-        elements = Fetch.matchedElements(selector, parent);
-    UI.ruleCycle.setElements(elements);
-    addClass("savedPreview", elements);
+    //test2
 }
 
 function elementCount(count, parentCount){

@@ -1393,9 +1393,7 @@ Selector.prototype.events = {
     newRuleEvent: function(event){
         event.preventDefault();
         Collect.site.current.selector = this;
-
-        setupRuleForm(this.selector);
-        showRuleView();
+        RuleView.setup(this.selector);
     },
     editEvent: function(event){
         event.preventDefault();
