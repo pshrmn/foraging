@@ -9,5 +9,5 @@ var chrome = {
 };
 
 var UI = {
-
+    setup: function(){ return; }
 };

@@ -8,8 +8,7 @@ module.exports = function(grunt){
                 validthis: true,
                 globalstrict: true,
                 globals: {
-                    chrome: true,
-                    //tabs: true
+                    chrome: true
                 },
                 devel: true,
                 expr: true
@@ -26,14 +25,14 @@ module.exports = function(grunt){
         html_to_js_str: {
             test: {
                 files: {
-                  'src/collector_with_html.js': 'src/collector.js'
+                  'src/interface_with_html.js': 'src/interface.js'
                 }
             }
         },
         concat: {
             dist: {
-                src: ['src/utility.js', 'src/selector.js', 'src/fetch.js', 'src/rule.js', 
-                    'src/cycle.js', 'src/collector_with_html.js'],
+                src: ['src/utility.js', 'src/selector.js', 'src/interface_with_html.js',
+                    'src/fetch.js', 'src/rule.js', 'src/cycle.js', 'src/collector.js'],
                 dest: 'collector/collector.js',
                 options: {
                     banner: "'use strict';\n",
@@ -46,11 +45,11 @@ module.exports = function(grunt){
         },
         jasmine: {
             collector: {
-                src: 'src/collector_with_html.js',
+                src: 'src/collector.js',
                 options: {
                     specs: 'tests/CollectorSpec.js',
-                    helpers: ['src/utility.js', 'src/fetch.js', 'src/Cycle.js',
-                        'tests/CollectorHelper.js']
+                    helpers: ['src/utility.js', 'src/interface_with_html.js', 'src/fetch.js',
+                        'src/Cycle.js', 'tests/CollectorHelper.js']
                 }
             },
             fetch: {

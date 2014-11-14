@@ -68,14 +68,14 @@ Site.prototype.html = function(){
 
     createSchema.textContent = "+Schema";
     createSchema.setAttribute("title", "create a new schema");
-    createSchema.addEventListener("click", this.events.createSchema.bind(this), false);
+    createSchema.addEventListener("click", this.events.createSchemaEvent.bind(this), false);
 
     removeSchema.innerHTML = "&times;";
     removeSchema.setAttribute("title", "delete current schema");
-    removeSchema.addEventListener("click", this.events.removeSchema.bind(this), false);
+    removeSchema.addEventListener("click", this.events.removeSchemaEvent.bind(this), false);
 
     upload.textContent = "Upload";
-    upload.addEventListener("click", this.events.upload.bind(this), false);
+    upload.addEventListener("click", this.events.uploadEvent.bind(this), false);
 
     appendChildren(topbar, [schemaText, schemaSelect, createSchema, removeSchema,
         pageText, pageSelect, selectorText, setSelect, upload]);
@@ -89,7 +89,7 @@ Site.prototype.html = function(){
         }
     }
 
-    schemaSelect.addEventListener("change", this.events.loadSchema.bind(this), false);
+    schemaSelect.addEventListener("change", this.events.loadSchemaEvent.bind(this), false);
 
     return {
         schema: schemas,
@@ -98,13 +98,13 @@ Site.prototype.html = function(){
 };
 
 Site.prototype.events = {
-    loadSchema: function(event){
+    loadSchemaEvent: function(event){
         var option = this.eles.select.querySelector('option:checked'),
             name = option.value;
         this.loadSchema(name);    
         resetInterface();
     },
-    createSchema: function(event){
+    createSchemaEvent: function(event){
         event.preventDefault();
         var name = prompt("Schema Name");
         // null when cancelling prompt
@@ -125,12 +125,12 @@ Site.prototype.events = {
         this.addSchema(schema);
         this.save(name);
     },
-    removeSchema: function(event){
+    removeSchemaEvent: function(event){
         event.preventDefault();
         var schema = this.current.schema;
         this.removeSchema(schema.name);
     },
-    upload: function(event){
+    uploadEvent: function(event){
         event.preventDefault();
         this.upload();
     }
@@ -384,12 +384,12 @@ Schema.prototype.html = function(){
     nametag.setAttribute("title", "Schema");
     nametag.classList.add("nametag");
     //rename.textContent = "rename";
-    //rename.addEventListener("click", this.events.rename.bind(this), false);
+    //rename.addEventListener("click", this.events.renameEvent.bind(this), false);
     //appendChildren(holder, [nametag, rename, pages]);
 
     var url = window.location.href;
     indexCheckbox.setAttribute("type", "checkbox");
-    indexCheckbox.addEventListener("change", this.events.toggleURL.bind(this), false);
+    indexCheckbox.addEventListener("change", this.events.toggleURLEvent.bind(this), false);
     if ( this.urls[url] ) {
         indexCheckbox.checked = true;
     }
@@ -404,7 +404,7 @@ Schema.prototype.html = function(){
     // Schema option and Page select
     option.textContent = this.name;
     option.setAttribute("value", this.name);
-    select.addEventListener("change", this.events.loadPage.bind(this), false);
+    select.addEventListener("change", this.events.loadPageEvent.bind(this), false);
 
     // automatically append to parent site's schema holder and schema select
     if ( this.parentSite && this.parentSite.hasHTML ) {
@@ -416,17 +416,17 @@ Schema.prototype.html = function(){
 Schema.prototype.deleteHTML = prototypeDeleteHTML;
 
 Schema.prototype.events = {
-    rename: function(event){
+    renameEvent: function(event){
         // do nothing for now
         event.preventDefault();
     },
-    loadPage: function(evenT){
+    loadPageEvent: function(evenT){
         var option = this.eles.select.querySelector('option:checked'),
             name = option.value;
         resetInterface();
         this.loadPage(name);
     },
-    toggleURL: function(event){
+    toggleURLEvent: function(event){
         var on = this.toggleURL(window.location.href),
             defaultPage = this.pages["default"];
         
@@ -686,16 +686,16 @@ Page.prototype.html = function(){
     nametag.classList.add("nametag");
     createSet.textContent = "+Set";
     createSet.classList.add("pos");
-    createSet.addEventListener("click", this.events.createSet.bind(this), false);
+    createSet.addEventListener("click", this.events.createSetEvent.bind(this), false);
 
     resetPage.innerHTML = "&times;";
-    resetPage.addEventListener("click", this.events.reset.bind(this), false);
+    resetPage.addEventListener("click", this.events.resetEvent.bind(this), false);
 
     // Next
     nextAdd.textContent = "+Next";
-    nextAdd.addEventListener("click", this.events.addNext.bind(this), false);
+    nextAdd.addEventListener("click", this.events.addNextEvent.bind(this), false);
     nextRemove.innerHTML = "&times;";
-    nextRemove.addEventListener("click", this.events.removeNext.bind(this), false);
+    nextRemove.addEventListener("click", this.events.removeNextEvent.bind(this), false);
     nextHolder.classList.add("next");
     if ( this.next ) {
         nextSelector.textContent = this.next;
@@ -716,7 +716,7 @@ Page.prototype.html = function(){
     // Page option, SelectorSet select
     option.textContent = this.name;
     option.setAttribute("value", this.name);
-    setSelect.addEventListener("change", this.events.loadSet.bind(this), false);
+    setSelect.addEventListener("change", this.events.loadSetEvent.bind(this), false);
 
     // automatically append to parent schema's html elements
     if ( this.parentSchema && this.parentSchema.hasHTML ) {
@@ -726,7 +726,7 @@ Page.prototype.html = function(){
 };
 
 Page.prototype.events = {
-    createSet: function(event){
+    createSetEvent: function(event){
         event.preventDefault();
         var name = prompt("Selector Set Name");
         if ( name === null ) {
@@ -745,7 +745,7 @@ Page.prototype.events = {
         this.addSet(set);
         Collect.site.saveCurrent();
     },
-    reset: function(event){
+    resetEvent: function(event){
         var confirmed = confirm("Clear out all selector sets, selectors, and rules from the page?");
         if ( !confirmed ) {
             return;
@@ -753,18 +753,17 @@ Page.prototype.events = {
         this.reset();
         Collect.site.saveCurrent();
     },
-    loadSet: function(event){
+    loadSetEvent: function(event){
         var option = this.eles.select.querySelector('option:checked'),
             name = option.value;
         resetInterface();
         this.loadSet(name);
     },
-    addNext: function(event){
+    addNextEvent: function(event){
         event.preventDefault();
-        UI.selectorType = "next";
-        showSelectorView();
+        SelectorView.setup("next");
     },
-    removeNext: function(event){
+    removeNextEvent: function(event){
         event.preventDefault();
         this.removeNext();
     }
@@ -1000,6 +999,7 @@ SelectorSet.prototype.html = function(){
         parentSelector = noSelectElement("span"),
         parentRange = noSelectElement("span"),
         addParent = noSelectElement("button"),
+        editParent = noSelectElement("button"),
         removeParent = noSelectElement("button"),
         selectors = noSelectElement("ul"),
         option = noSelectElement("option");
@@ -1015,22 +1015,23 @@ SelectorSet.prototype.html = function(){
             selector: parentSelector,
             range: parentRange,
             add: addParent,
+            edit: editParent,
             remove: removeParent
         }
     };
 
     // Schema tab html        
     holder.classList.add("set");
-    holder.addEventListener("click", this.events.activate.bind(this), false);
+    holder.addEventListener("click", this.events.activateEvent.bind(this), false);
     nametag.textContent = this.name;
     nametag.classList.add("nametag");
     nametag.setAttribute("title", "Selector Set");
     addSelector.textContent = "+Selector";
     addSelector.classList.add("pos");
-    addSelector.addEventListener("click", this.events.addSelector.bind(this), false);
+    addSelector.addEventListener("click", this.events.addSelectorEvent.bind(this), false);
     remove.innerHTML = "&times;";
     remove.classList.add("neg");
-    remove.addEventListener("click", this.events.remove.bind(this), false);
+    remove.addEventListener("click", this.events.removeEvent.bind(this), false);
 
 
     // Selector Set Parent
@@ -1040,16 +1041,21 @@ SelectorSet.prototype.html = function(){
         parentRange.textContent = createRangeString(this.parent.low, this.parent.high);
         addParent.classList.add("hidden");
     } else {
+        editParent.classList.add("hidden");
         removeParent.classList.add("hidden");
     }
     addParent.textContent = "+Parent";
     addParent.classList.add("pos");
-    addParent.addEventListener("click", this.events.addParent.bind(this), false);
+    addParent.addEventListener("click", this.events.addParentEvent.bind(this), false);
+    editParent.textContent = "edit";
+    editParent.classList.add("pos");
+    editParent.addEventListener("click", this.events.editParentEvent.bind(this), false);
     removeParent.innerHTML = "&times;";
     removeParent.classList.add("neg");
-    removeParent.addEventListener("click", this.events.removeParent.bind(this), false);
+    removeParent.addEventListener("click", this.events.removeParentEvent.bind(this), false);
 
-    appendChildren(parentHolder, [parentText, parentSelector, parentRange, addParent, removeParent]);
+    appendChildren(parentHolder, [parentText, parentSelector, parentRange,
+        addParent, editParent, removeParent]);
     appendChildren(holder, [nametag, addSelector, remove, parentHolder, selectors]);
 
     for ( var key in this.selectors ) {
@@ -1068,17 +1074,17 @@ SelectorSet.prototype.html = function(){
 
 // don't use this quite yet
 SelectorSet.prototype.events = {
-    activate: function(event){
+    activateEvent: function(event){
         this.activate();
         this.eles.holder.scrollIntoViewIfNeeded();
     },
-    addSelector: function(event){
+    addSelectorEvent: function(event){
         event.preventDefault();
         // make sure current.page is the selector set's parent page
         this.activate();
-        showSelectorView();
+        SelectorView.setup("selector");
     },
-    remove: function(event){
+    removeEvent: function(event){
         event.preventDefault();
         var defaultSet = (this.name === "default"),
             question = defaultSet ?
@@ -1099,12 +1105,15 @@ SelectorSet.prototype.events = {
         }
         site.saveCurrent();
     },
-    addParent: function(event){
+    addParentEvent: function(event){
         event.preventDefault();
-        UI.selectorType = "parent";
-        showSelectorView();
+        SelectorView.setup("parent");
     },
-    removeParent: function(event){
+    editParentEvent: function(event){
+        event.preventDefault();
+        editParent(this);
+    },
+    removeParentEvent: function(event){
         event.preventDefault();
         this.removeParent();
         Collect.site.saveCurrent();
@@ -1133,6 +1142,7 @@ SelectorSet.prototype.addParent = function(parent){
     this.parent = parent;
     if ( this.hasHTML ) {
         this.eles.parent.add.classList.add("hidden");
+        this.eles.parent.edit.classList.remove("hidden");
         this.eles.parent.remove.classList.remove("hidden");
         this.eles.parent.selector.textContent = parent.selector;
         this.eles.parent.range.textContent = createRangeString(parent.low, parent.high);
@@ -1143,6 +1153,7 @@ SelectorSet.prototype.removeParent = function(){
     this.parent = undefined;
     if ( this.hasHTML ) {
         this.eles.parent.add.classList.remove("hidden");
+        this.eles.parent.edit.classList.add("hidden");
         this.eles.parent.remove.classList.add("hidden");
         this.eles.parent.selector.textContent = "";
         this.eles.parent.range.textContent = "";
@@ -1344,11 +1355,11 @@ Selector.prototype.html = function(){
     editSelector.textContent = "edit";
     remove.innerHTML = "&times;";
     remove.classList.add("neg");
-    holder.addEventListener("mouseenter", this.events.preview.bind(this), false);
-    holder.addEventListener("mouseleave", this.events.unpreview.bind(this), false);
-    newRule.addEventListener("click", this.events.newRule.bind(this), false);
-    editSelector.addEventListener("click", this.events.edit.bind(this), false);
-    remove.addEventListener("click", this.events.remove.bind(this), false);
+    holder.addEventListener("mouseenter", this.events.previewEvent.bind(this), false);
+    holder.addEventListener("mouseleave", this.events.unpreviewEvent.bind(this), false);
+    newRule.addEventListener("click", this.events.newRuleEvent.bind(this), false);
+    editSelector.addEventListener("click", this.events.editEvent.bind(this), false);
+    remove.addEventListener("click", this.events.removeEvent.bind(this), false);
 
     appendChildren(holder, [identifier, nametag, editSelector, newRule, remove, rules]);
 
@@ -1363,34 +1374,32 @@ Selector.prototype.html = function(){
 };
 
 Selector.prototype.events = {
-    preview: function(event){
+    previewEvent: function(event){
         var parent = this.parentSet ? this.parentSet.parent : undefined,
             elements = Fetch.matchedElements(this.selector, parent);
         addClass("savedPreview", elements);
     },
-    unpreview: function(event){
+    unpreviewEvent: function(event){
         // only "unpreview" when still on the schema view
         if ( UI.view.view.id === "schemaView" ) {
             clearClass("savedPreview");
         }
     },
-    remove: function(event){
+    removeEvent: function(event){
         event.preventDefault();
         this.remove();
         Collect.site.saveCurrent();
     },
-    newRule: function(event){
+    newRuleEvent: function(event){
         event.preventDefault();
         Collect.site.current.selector = this;
 
         setupRuleForm(this.selector);
         showRuleView();
     },
-    edit: function(event){
+    editEvent: function(event){
         event.preventDefault();
-        UI.editing.selector = this;
-        Family.fromSelector(this.selector);
-        showSelectorView();
+        editSelector(this);
     }
 };
 
@@ -1472,8 +1481,8 @@ Rule.prototype.html = function(){
 
     appendChildren(holder, [nametag, capturetag, edit, deltog]);
 
-    edit.addEventListener("click", this.events.edit.bind(this), false);
-    deltog.addEventListener("click", this.events.remove.bind(this), false);
+    edit.addEventListener("click", this.events.editEvent.bind(this), false);
+    deltog.addEventListener("click", this.events.removeEvent.bind(this), false);
     
     // automatically append to parent selector's rule holder
     if ( this.parentSelector && this.parentSelector.hasHTML ) {
@@ -1482,12 +1491,10 @@ Rule.prototype.html = function(){
 };
 
 Rule.prototype.events = {
-    edit: function(event){
-        UI.editing.rule = this;
-        setupRuleForm(this.parentSelector.selector, this.object());
-        showRuleView();
+    editEvent: function(event){
+        editRule(this);
     },
-    remove: function(event){
+    removeEvent: function(event){
         clearClass("savedPreview");
         this.remove();
         Collect.site.saveCurrent();

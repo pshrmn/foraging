@@ -334,7 +334,8 @@ function ToggleableElement(ele, family){
     for ( var i=0, len=ele.classList.length; i<len; i++ ) {
         curr = ele.classList[i];
         // classes used collect.js, not native to page 
-        if ( curr === "collectHighlight" || curr === "queryCheck" || curr === "savedPreview" ) {
+        if ( curr === "collectHighlight" || curr === "queryCheck" ||
+            curr === "savedPreview" || curr === "parentSchema" ) {
             continue;
         }
         frag = new Fragment('.' + curr, this);
@@ -535,6 +536,116 @@ function noSelectEle(tag, otherClasses){
     return ele;
 }
 
+// Source: src/interface_with_html.js
+// create interface and return a function to remove the collectorjs interface
+var removeInterface = (function(){
+    var marginBottom = 0,
+        element = noSelectElement("div");
+
+    element.classList.add("collectjs");
+    element.innerHTML = "<div class=\"tabHolder\"><div class=\"tabs\"><div class=\"tab active\" id=\"schemaTab\">Schema</div><div class=\"tab\" id=\"previewTab\">Preview</div><div class=\"tab\" id=\"optionsTab\">Options</div><div class=\"tab\" id=\"closeCollect\">&times;</div></div></div><div class=\"permanent\"><div id=\"schemaInfo\"></div><div id=\"collectAlert\"></div></div><div class=\"views\"><div class=\"view\" id=\"emptyView\"></div><div class=\"view active\" id=\"schemaView\"><div id=\"schemaHolder\" class=\"rules\"></div></div><div class=\"view\" id=\"selectorView\"><div class=\"column form\"><h3>Type:<span id=\"selectorType\">Selector</span></h3><!--displays what the current selector is--><p>Selector: <span id=\"currentSelector\"></span></p><p>Count: <span id=\"currentCount\"></span></p><div id=\"parentRange\"><label>Low: <input id=\"parentLow\" name=\"parentLow\" type=\"text\" /></label><label>High: <input id=\"parentHigh\" name=\"parentHigh\" type=\"text\" /></label></div><p><button id=\"saveSelector\">Save</button><button id=\"cancelSelector\">Cancel</button></p></div><div class=\"column\"><!--holds the interactive element for choosing a selector--><div id=\"selectorHolder\"></div><div id=\"selectorCycleHolder\"></div></div></div><div class=\"view\" id=\"ruleView\"><div id=\"ruleItems\" class=\"items\"><h3>Selector: <span id=\"ruleSelector\"></span></h3><form id=\"ruleForm\" class=\"column form\"><div class=\"rule\"><label for=\"ruleName\" title=\"the name of a rule\">Name:</label><input id=\"ruleName\" name=\"ruleName\" type=\"text\" /></div><div class=\"rule\"><label title=\"the attribute of an element to capture\">Capture:</label><span id=\"ruleAttr\"></span></div><div class=\"rule follow\"><label for=\"ruleFollow\" title=\"create a new page from the element's captured url (capture must be attr-href)\">Follow:</label><input id=\"ruleFollow\" name=\"ruleFollow\" type=\"checkbox\" disabled=\"true\" title=\"Can only follow rules that get href attribute from links\" /></div><div><button id=\"saveRule\">Save Rule</button><button id=\"cancelRule\">Cancel</button></div></form><div class=\"modifiers column\"><div id=\"ruleCycleHolder\"></div></div></div></div><div class=\"view\" id=\"previewView\"><div id=\"previewContents\"></div></div><div class=\"view\" id=\"optionsView\"><p><label for=\"ignore\">Ignore helper elements (eg tbody)</label><input type=\"checkbox\" id=\"ignore\" /></p></div></div>";
+    document.body.appendChild(element);
+    addNoSelect(element.querySelectorAll("*"));    
+
+    // some some margin at the bottom of the page
+    var currentMargin = parseInt(document.body.style.marginBottom, 10);
+    marginBottom = isNaN(currentMargin) ? 0 : currentMargin;
+    document.body.style.marginBottom = (marginBottom + 500) + "px";
+
+    return function(){
+        element.parentElement.removeChild(element);
+        document.body.style.marginBottom = marginBottom + "px";
+    };
+})();
+
+// save commonly referenced to elements
+var HTML = {
+    schema: {
+        info: document.getElementById("schemaInfo"),
+        holder: document.getElementById("schemaHolder")
+    },
+    // elements in the selector view
+    selector: {
+        family: document.getElementById("selectorHolder"),
+        selector: document.getElementById("currentSelector"),
+        count: document.getElementById("currentCount"),
+        parent: {
+            holder: document.getElementById("parentRange"),
+            low: document.getElementById("parentLow"),
+            high: document.getElementById("parentHigh")
+        },
+        type: document.getElementById("selectorType")
+    },
+    // elements in the rule view
+    rule: {
+        selector: document.getElementById("ruleSelector"),
+        form: document.getElementById("ruleForm"),
+        name: document.getElementById("ruleName"),
+        capture: document.getElementById("ruleAttr"),
+        follow: document.getElementById("ruleFollow"),
+        followHolder: document.querySelector("#ruleItems .follow")
+    },
+    // elements in the the permament bar
+    perm: {
+        schema: {
+            select: document.getElementById("schemaSelect"),
+            buttons: document.getElementById("schemaButtons")
+        },
+        page: {
+            select: document.getElementById("pageSelect"),
+        },
+        set: {
+            select: document.getElementById("selectorSetSelect")
+        },
+        alert: document.getElementById("collectAlert"),
+    },
+    preview: {
+        contents: document.getElementById("previewContents")
+    },
+    tabs: {
+        schema: document.getElementById("schemaTab"),
+        preview: document.getElementById("previewTab"),
+        options: document.getElementById("optionsTab")
+    },
+    views: {
+        schema: document.getElementById("schemaView"),
+        selector: document.getElementById("selectorView"),
+        rule: document.getElementById("ruleView"),
+        preview: document.getElementById("previewView"),
+        options: document.getElementById("optionsView")
+    }
+};
+
+/*
+Object that controls the functionality of the interface
+*/
+var UI = {
+    selectorType: "selector",
+    editing: false,
+    view: {
+        view: undefined,
+        tab: undefined
+    },
+    preview: {
+        dirty: true
+    },
+    setup: function(){        
+        loadOptions();
+        setupHostname();
+        
+        // tabs
+        tabEvents();
+
+        //views
+        selectorViewEvents();
+        ruleViewEvents();
+        optionsViewEvents();
+
+        setupSelectorView();
+        setupRulesView();
+    }
+};
+
 // Source: src/fetch.js
 /*
 functions to get elements in the page
@@ -667,14 +778,14 @@ Site.prototype.html = function(){
 
     createSchema.textContent = "+Schema";
     createSchema.setAttribute("title", "create a new schema");
-    createSchema.addEventListener("click", this.events.createSchema.bind(this), false);
+    createSchema.addEventListener("click", this.events.createSchemaEvent.bind(this), false);
 
     removeSchema.innerHTML = "&times;";
     removeSchema.setAttribute("title", "delete current schema");
-    removeSchema.addEventListener("click", this.events.removeSchema.bind(this), false);
+    removeSchema.addEventListener("click", this.events.removeSchemaEvent.bind(this), false);
 
     upload.textContent = "Upload";
-    upload.addEventListener("click", this.events.upload.bind(this), false);
+    upload.addEventListener("click", this.events.uploadEvent.bind(this), false);
 
     appendChildren(topbar, [schemaText, schemaSelect, createSchema, removeSchema,
         pageText, pageSelect, selectorText, setSelect, upload]);
@@ -688,7 +799,7 @@ Site.prototype.html = function(){
         }
     }
 
-    schemaSelect.addEventListener("change", this.events.loadSchema.bind(this), false);
+    schemaSelect.addEventListener("change", this.events.loadSchemaEvent.bind(this), false);
 
     return {
         schema: schemas,
@@ -697,13 +808,13 @@ Site.prototype.html = function(){
 };
 
 Site.prototype.events = {
-    loadSchema: function(event){
+    loadSchemaEvent: function(event){
         var option = this.eles.select.querySelector('option:checked'),
             name = option.value;
         this.loadSchema(name);    
         resetInterface();
     },
-    createSchema: function(event){
+    createSchemaEvent: function(event){
         event.preventDefault();
         var name = prompt("Schema Name");
         // null when cancelling prompt
@@ -724,12 +835,12 @@ Site.prototype.events = {
         this.addSchema(schema);
         this.save(name);
     },
-    removeSchema: function(event){
+    removeSchemaEvent: function(event){
         event.preventDefault();
         var schema = this.current.schema;
         this.removeSchema(schema.name);
     },
-    upload: function(event){
+    uploadEvent: function(event){
         event.preventDefault();
         this.upload();
     }
@@ -983,12 +1094,12 @@ Schema.prototype.html = function(){
     nametag.setAttribute("title", "Schema");
     nametag.classList.add("nametag");
     //rename.textContent = "rename";
-    //rename.addEventListener("click", this.events.rename.bind(this), false);
+    //rename.addEventListener("click", this.events.renameEvent.bind(this), false);
     //appendChildren(holder, [nametag, rename, pages]);
 
     var url = window.location.href;
     indexCheckbox.setAttribute("type", "checkbox");
-    indexCheckbox.addEventListener("change", this.events.toggleURL.bind(this), false);
+    indexCheckbox.addEventListener("change", this.events.toggleURLEvent.bind(this), false);
     if ( this.urls[url] ) {
         indexCheckbox.checked = true;
     }
@@ -1003,7 +1114,7 @@ Schema.prototype.html = function(){
     // Schema option and Page select
     option.textContent = this.name;
     option.setAttribute("value", this.name);
-    select.addEventListener("change", this.events.loadPage.bind(this), false);
+    select.addEventListener("change", this.events.loadPageEvent.bind(this), false);
 
     // automatically append to parent site's schema holder and schema select
     if ( this.parentSite && this.parentSite.hasHTML ) {
@@ -1015,17 +1126,17 @@ Schema.prototype.html = function(){
 Schema.prototype.deleteHTML = prototypeDeleteHTML;
 
 Schema.prototype.events = {
-    rename: function(event){
+    renameEvent: function(event){
         // do nothing for now
         event.preventDefault();
     },
-    loadPage: function(evenT){
+    loadPageEvent: function(evenT){
         var option = this.eles.select.querySelector('option:checked'),
             name = option.value;
         resetInterface();
         this.loadPage(name);
     },
-    toggleURL: function(event){
+    toggleURLEvent: function(event){
         var on = this.toggleURL(window.location.href),
             defaultPage = this.pages["default"];
         
@@ -1285,16 +1396,16 @@ Page.prototype.html = function(){
     nametag.classList.add("nametag");
     createSet.textContent = "+Set";
     createSet.classList.add("pos");
-    createSet.addEventListener("click", this.events.createSet.bind(this), false);
+    createSet.addEventListener("click", this.events.createSetEvent.bind(this), false);
 
     resetPage.innerHTML = "&times;";
-    resetPage.addEventListener("click", this.events.reset.bind(this), false);
+    resetPage.addEventListener("click", this.events.resetEvent.bind(this), false);
 
     // Next
     nextAdd.textContent = "+Next";
-    nextAdd.addEventListener("click", this.events.addNext.bind(this), false);
+    nextAdd.addEventListener("click", this.events.addNextEvent.bind(this), false);
     nextRemove.innerHTML = "&times;";
-    nextRemove.addEventListener("click", this.events.removeNext.bind(this), false);
+    nextRemove.addEventListener("click", this.events.removeNextEvent.bind(this), false);
     nextHolder.classList.add("next");
     if ( this.next ) {
         nextSelector.textContent = this.next;
@@ -1315,7 +1426,7 @@ Page.prototype.html = function(){
     // Page option, SelectorSet select
     option.textContent = this.name;
     option.setAttribute("value", this.name);
-    setSelect.addEventListener("change", this.events.loadSet.bind(this), false);
+    setSelect.addEventListener("change", this.events.loadSetEvent.bind(this), false);
 
     // automatically append to parent schema's html elements
     if ( this.parentSchema && this.parentSchema.hasHTML ) {
@@ -1325,7 +1436,7 @@ Page.prototype.html = function(){
 };
 
 Page.prototype.events = {
-    createSet: function(event){
+    createSetEvent: function(event){
         event.preventDefault();
         var name = prompt("Selector Set Name");
         if ( name === null ) {
@@ -1344,7 +1455,7 @@ Page.prototype.events = {
         this.addSet(set);
         Collect.site.saveCurrent();
     },
-    reset: function(event){
+    resetEvent: function(event){
         var confirmed = confirm("Clear out all selector sets, selectors, and rules from the page?");
         if ( !confirmed ) {
             return;
@@ -1352,18 +1463,17 @@ Page.prototype.events = {
         this.reset();
         Collect.site.saveCurrent();
     },
-    loadSet: function(event){
+    loadSetEvent: function(event){
         var option = this.eles.select.querySelector('option:checked'),
             name = option.value;
         resetInterface();
         this.loadSet(name);
     },
-    addNext: function(event){
+    addNextEvent: function(event){
         event.preventDefault();
-        UI.selectorType = "next";
-        showSelectorView();
+        SelectorView.setup("next");
     },
-    removeNext: function(event){
+    removeNextEvent: function(event){
         event.preventDefault();
         this.removeNext();
     }
@@ -1599,6 +1709,7 @@ SelectorSet.prototype.html = function(){
         parentSelector = noSelectElement("span"),
         parentRange = noSelectElement("span"),
         addParent = noSelectElement("button"),
+        editParent = noSelectElement("button"),
         removeParent = noSelectElement("button"),
         selectors = noSelectElement("ul"),
         option = noSelectElement("option");
@@ -1614,22 +1725,23 @@ SelectorSet.prototype.html = function(){
             selector: parentSelector,
             range: parentRange,
             add: addParent,
+            edit: editParent,
             remove: removeParent
         }
     };
 
     // Schema tab html        
     holder.classList.add("set");
-    holder.addEventListener("click", this.events.activate.bind(this), false);
+    holder.addEventListener("click", this.events.activateEvent.bind(this), false);
     nametag.textContent = this.name;
     nametag.classList.add("nametag");
     nametag.setAttribute("title", "Selector Set");
     addSelector.textContent = "+Selector";
     addSelector.classList.add("pos");
-    addSelector.addEventListener("click", this.events.addSelector.bind(this), false);
+    addSelector.addEventListener("click", this.events.addSelectorEvent.bind(this), false);
     remove.innerHTML = "&times;";
     remove.classList.add("neg");
-    remove.addEventListener("click", this.events.remove.bind(this), false);
+    remove.addEventListener("click", this.events.removeEvent.bind(this), false);
 
 
     // Selector Set Parent
@@ -1639,16 +1751,21 @@ SelectorSet.prototype.html = function(){
         parentRange.textContent = createRangeString(this.parent.low, this.parent.high);
         addParent.classList.add("hidden");
     } else {
+        editParent.classList.add("hidden");
         removeParent.classList.add("hidden");
     }
     addParent.textContent = "+Parent";
     addParent.classList.add("pos");
-    addParent.addEventListener("click", this.events.addParent.bind(this), false);
+    addParent.addEventListener("click", this.events.addParentEvent.bind(this), false);
+    editParent.textContent = "edit";
+    editParent.classList.add("pos");
+    editParent.addEventListener("click", this.events.editParentEvent.bind(this), false);
     removeParent.innerHTML = "&times;";
     removeParent.classList.add("neg");
-    removeParent.addEventListener("click", this.events.removeParent.bind(this), false);
+    removeParent.addEventListener("click", this.events.removeParentEvent.bind(this), false);
 
-    appendChildren(parentHolder, [parentText, parentSelector, parentRange, addParent, removeParent]);
+    appendChildren(parentHolder, [parentText, parentSelector, parentRange,
+        addParent, editParent, removeParent]);
     appendChildren(holder, [nametag, addSelector, remove, parentHolder, selectors]);
 
     for ( var key in this.selectors ) {
@@ -1667,17 +1784,17 @@ SelectorSet.prototype.html = function(){
 
 // don't use this quite yet
 SelectorSet.prototype.events = {
-    activate: function(event){
+    activateEvent: function(event){
         this.activate();
         this.eles.holder.scrollIntoViewIfNeeded();
     },
-    addSelector: function(event){
+    addSelectorEvent: function(event){
         event.preventDefault();
         // make sure current.page is the selector set's parent page
         this.activate();
-        showSelectorView();
+        SelectorView.setup("selector");
     },
-    remove: function(event){
+    removeEvent: function(event){
         event.preventDefault();
         var defaultSet = (this.name === "default"),
             question = defaultSet ?
@@ -1698,12 +1815,15 @@ SelectorSet.prototype.events = {
         }
         site.saveCurrent();
     },
-    addParent: function(event){
+    addParentEvent: function(event){
         event.preventDefault();
-        UI.selectorType = "parent";
-        showSelectorView();
+        SelectorView.setup("parent");
     },
-    removeParent: function(event){
+    editParentEvent: function(event){
+        event.preventDefault();
+        editParent(this);
+    },
+    removeParentEvent: function(event){
         event.preventDefault();
         this.removeParent();
         Collect.site.saveCurrent();
@@ -1732,6 +1852,7 @@ SelectorSet.prototype.addParent = function(parent){
     this.parent = parent;
     if ( this.hasHTML ) {
         this.eles.parent.add.classList.add("hidden");
+        this.eles.parent.edit.classList.remove("hidden");
         this.eles.parent.remove.classList.remove("hidden");
         this.eles.parent.selector.textContent = parent.selector;
         this.eles.parent.range.textContent = createRangeString(parent.low, parent.high);
@@ -1742,6 +1863,7 @@ SelectorSet.prototype.removeParent = function(){
     this.parent = undefined;
     if ( this.hasHTML ) {
         this.eles.parent.add.classList.remove("hidden");
+        this.eles.parent.edit.classList.add("hidden");
         this.eles.parent.remove.classList.add("hidden");
         this.eles.parent.selector.textContent = "";
         this.eles.parent.range.textContent = "";
@@ -1943,11 +2065,11 @@ Selector.prototype.html = function(){
     editSelector.textContent = "edit";
     remove.innerHTML = "&times;";
     remove.classList.add("neg");
-    holder.addEventListener("mouseenter", this.events.preview.bind(this), false);
-    holder.addEventListener("mouseleave", this.events.unpreview.bind(this), false);
-    newRule.addEventListener("click", this.events.newRule.bind(this), false);
-    editSelector.addEventListener("click", this.events.edit.bind(this), false);
-    remove.addEventListener("click", this.events.remove.bind(this), false);
+    holder.addEventListener("mouseenter", this.events.previewEvent.bind(this), false);
+    holder.addEventListener("mouseleave", this.events.unpreviewEvent.bind(this), false);
+    newRule.addEventListener("click", this.events.newRuleEvent.bind(this), false);
+    editSelector.addEventListener("click", this.events.editEvent.bind(this), false);
+    remove.addEventListener("click", this.events.removeEvent.bind(this), false);
 
     appendChildren(holder, [identifier, nametag, editSelector, newRule, remove, rules]);
 
@@ -1962,34 +2084,32 @@ Selector.prototype.html = function(){
 };
 
 Selector.prototype.events = {
-    preview: function(event){
+    previewEvent: function(event){
         var parent = this.parentSet ? this.parentSet.parent : undefined,
             elements = Fetch.matchedElements(this.selector, parent);
         addClass("savedPreview", elements);
     },
-    unpreview: function(event){
+    unpreviewEvent: function(event){
         // only "unpreview" when still on the schema view
         if ( UI.view.view.id === "schemaView" ) {
             clearClass("savedPreview");
         }
     },
-    remove: function(event){
+    removeEvent: function(event){
         event.preventDefault();
         this.remove();
         Collect.site.saveCurrent();
     },
-    newRule: function(event){
+    newRuleEvent: function(event){
         event.preventDefault();
         Collect.site.current.selector = this;
 
         setupRuleForm(this.selector);
         showRuleView();
     },
-    edit: function(event){
+    editEvent: function(event){
         event.preventDefault();
-        UI.editing.selector = this;
-        Family.fromSelector(this.selector);
-        showSelectorView();
+        editSelector(this);
     }
 };
 
@@ -2071,8 +2191,8 @@ Rule.prototype.html = function(){
 
     appendChildren(holder, [nametag, capturetag, edit, deltog]);
 
-    edit.addEventListener("click", this.events.edit.bind(this), false);
-    deltog.addEventListener("click", this.events.remove.bind(this), false);
+    edit.addEventListener("click", this.events.editEvent.bind(this), false);
+    deltog.addEventListener("click", this.events.removeEvent.bind(this), false);
     
     // automatically append to parent selector's rule holder
     if ( this.parentSelector && this.parentSelector.hasHTML ) {
@@ -2081,12 +2201,10 @@ Rule.prototype.html = function(){
 };
 
 Rule.prototype.events = {
-    edit: function(event){
-        UI.editing.rule = this;
-        setupRuleForm(this.parentSelector.selector, this.object());
-        showRuleView();
+    editEvent: function(event){
+        editRule(this);
     },
-    remove: function(event){
+    removeEvent: function(event){
         clearClass("savedPreview");
         this.remove();
         Collect.site.saveCurrent();
@@ -2428,29 +2546,7 @@ var Cycle = (function(){
     return Cycle;
 })();
 
-// Source: src/collector_with_html.js
-// create interface and return a function to remove the collectorjs interface
-var removeInterface = (function(){
-    var marginBottom = 0,
-        element = noSelectElement("div");
-
-    element.classList.add("collectjs");
-    element.innerHTML = "<div class=\"tabHolder\"><div class=\"tabs\"><div class=\"tab active\" id=\"schemaTab\">Schema</div><div class=\"tab\" id=\"previewTab\">Preview</div><div class=\"tab\" id=\"optionsTab\">Options</div><div class=\"tab\" id=\"closeCollect\">&times;</div></div></div><div class=\"permanent\"><div id=\"schemaInfo\"></div><div id=\"collectAlert\"></div></div><div class=\"views\"><div class=\"view\" id=\"emptyView\"></div><div class=\"view active\" id=\"schemaView\"><div id=\"schemaHolder\" class=\"rules\"></div></div><div class=\"view\" id=\"selectorView\"><div class=\"column form\"><h3>Type:<span id=\"selectorType\">Selector</span></h3><!--displays what the current selector is--><p>Selector: <span id=\"currentSelector\"></span></p><p>Count: <span id=\"currentCount\"></span></p><div id=\"parentRange\"><label>Low: <input id=\"parentLow\" name=\"parentLow\" type=\"text\" /></label><label for=\"parentHigh\">High: <input id=\"parentHigh\" name=\"parentHigh\" type=\"text\" /></label></div><p><button id=\"saveSelector\">Save</button><button id=\"cancelSelector\">Cancel</button></p></div><div class=\"column\"><!--holds the interactive element for choosing a selector--><div id=\"selectorHolder\"></div><div id=\"selectorCycleHolder\"></div></div></div><div class=\"view\" id=\"ruleView\"><div id=\"ruleItems\" class=\"items\"><h3>Selector: <span id=\"ruleSelector\"></span></h3><form id=\"ruleForm\" class=\"column form\"><div class=\"rule\"><label for=\"ruleName\" title=\"the name of a rule\">Name:</label><input id=\"ruleName\" name=\"ruleName\" type=\"text\" /></div><div class=\"rule\"><label title=\"the attribute of an element to capture\">Capture:</label><span id=\"ruleAttr\"></span></div><div class=\"rule follow\"><label for=\"ruleFollow\" title=\"create a new page from the element's captured url (capture must be attr-href)\">Follow:</label><input id=\"ruleFollow\" name=\"ruleFollow\" type=\"checkbox\" disabled=\"true\" title=\"Can only follow rules that get href attribute from links\" /></div><div><button id=\"saveRule\">Save Rule</button><button id=\"cancelRule\">Cancel</button></div></form><div class=\"modifiers column\"><div id=\"ruleCycleHolder\"></div></div></div></div><div class=\"view\" id=\"previewView\"><div id=\"previewContents\"></div></div><div class=\"view\" id=\"optionsView\"><p><label for=\"ignore\">Ignore helper elements (eg tbody)</label><input type=\"checkbox\" id=\"ignore\" /></p></div></div>";
-    document.body.appendChild(element);
-    addNoSelect(element.querySelectorAll("*"));    
-
-    // some some margin at the bottom of the page
-    var currentMargin = parseInt(document.body.style.marginBottom, 10);
-    marginBottom = isNaN(currentMargin) ? 0 : currentMargin;
-    document.body.style.marginBottom = (marginBottom + 500) + "px";
-
-    return function(){
-        element.parentElement.removeChild(element);
-        document.body.style.marginBottom = marginBottom + "px";
-    };
-})();
-
-
+// Source: src/collector.js
 /*********************************
             GLOBALS
 *********************************/
@@ -2462,36 +2558,6 @@ var Collect = {
     options: {},
     parent: {},
     site: undefined
-};
-
-/*
-Object that controls the functionality of the interface
-*/
-var UI = {
-    selectorType: "selector",
-    editing: {},
-    view: {
-        view: undefined,
-        tab: undefined
-    },
-    preview: {
-        dirty: true
-    },
-    setup: function(){        
-        loadOptions();
-        setupHostname();
-        
-        // tabs
-        tabEvents();
-
-        //views
-        selectorViewEvents();
-        ruleViewEvents();
-        optionsViewEvents();
-
-        setupSelectorView();
-        setupRulesView();
-    }
 };
 
 // save commonly referenced to elements
@@ -2608,11 +2674,13 @@ var Family = {
         this.elements = [];
     },
     // create a SelectorFamily given a css selector string
-    fromSelector: function(selector){
-        var prefix = Collect.parent.selector ? Collect.parent.selector: "body",
-            element = Fetch.one(selector, prefix);
+    fromSelector: function(selector, prefix){
+        // default to using provided parent, then check Collect.parent, lastly use "body"
+        prefix = prefix ? prefix : (Collect.parent.selector ? Collect.parent.selector: "body");
+        var element = Fetch.one(selector, prefix);
+        // clear out existing SelectorFamily
+        this.family = undefined;
         if ( element ) {
-
             var parent = Collect.parent.selector ?
                 nearestParent(element, Collect.parent.selector) : document.body;
 
@@ -2639,6 +2707,9 @@ var Family = {
     selectorElements: function(){
         var selector = this.selector(),
             parent = Collect.site.current.set.parent;
+        if ( UI.editing && UI.selectorType === "parent" ) {
+            parent = undefined;
+        }
         if ( selector === "") {
             return [];
         }
@@ -2658,12 +2729,13 @@ var Family = {
             elements[i].classList.add("queryCheck");
         }
         this.elements = elements;
-        HTML.selector.count.textContent = elementCount(elements.length, Collect.parentCount);
+        var parentCount = UI.editing && UI.selectorType === "parent" ? undefined : Collect.parentCount;
+        HTML.selector.count.textContent = elementCount(elements.length, parentCount);
         UI.selectorCycle.setElements(elements);
     },
     selectorsOn: false,
     /*
-    match all child elements of parent selector (or "body" if no parent seletor is provided)
+    match all child elements of parent selector (or "body" if no parent selector is provided)
         and save in Family.elements
     selectable elements are restricted by :not(.noSelect)
     add event listeners to all of those elements
@@ -2710,13 +2782,16 @@ reset state of interface
 especially useful for when cancelling creating or editing a selector or rule
 */
 function resetInterface(){
-    UI.editing = {};
+    UI.editing = false;
+    delete UI.editingObject;
+
     Family.turnOff();
     if ( Collect.parent ) {
         addParentSchema(Collect.parent);
     }
     clearSelectorClasses();
-    resetSelectorView();
+    SelectorView.reset();
+    //RuleView.reset();
     resetRulesView();
 }
 
@@ -2729,17 +2804,49 @@ function clearSelectorClasses(){
     clearClass("savedPreview");
 }
 
-function resetSelectorView(){
-    Family.remove();
+// control the selector view
+var SelectorView = {
+    reset: function(){
+        Family.remove();
+        UI.selectorType = "selector";
+        UI.selectorCycle.reset();
 
-    UI.selectorType = "selector";
-    UI.selectorCycle.reset();
+        HTML.selector.parent.holder.style.display = "none";
+        HTML.selector.parent.low.value = "";
+        HTML.selector.parent.high.value = "";
+        HTML.selector.count.textContent = "";
+    },
+    // type is the type of selector that is being created
+    // selector is a pre-existing selector to be edited
+    setup: function(type, selector){
+        HTML.selector.type.textContent = type;
+        UI.selectorType = type;
+        switch(type){
+        case "selector":
+            HTML.selector.parent.holder.style.display = "none";
+            if ( selector ) {
+                HTML.selector.selector.textContent = selector.selector;
+            }
+            break;
+        case "parent":
+            HTML.selector.parent.holder.style.display = "block";
+            if ( selector ) {
+                HTML.selector.parent.low.value = selector.low || "";
+                HTML.selector.parent.high.value = selector.high || "";
+                HTML.selector.selector.textContent = selector.selector;
+            }
+            break;
+        case "next":
+            delete Collect.parentCount;
+            HTML.selector.parent.holder.style.display = "none";
+            clearClass("parentSchema");
+            break;
+        }
 
-    HTML.selector.parent.holder.style.display = "none";
-    HTML.selector.parent.low.value = "";
-    HTML.selector.parent.high.value = "";
-    HTML.selector.count.textContent = "";
-}
+        setCurrentView(HTML.views.selector, HTML.tabs.schema);
+        Family.turnOn();
+    }
+};
 
 function resetRulesView(){
     UI.ruleCycle.reset();
@@ -2871,7 +2978,8 @@ function verifyAndApplyParentRange(event){
     clearClass("queryCheck");
     addClass("queryCheck", elements);
     UI.selectorCycle.setElements(elements);
-    HTML.selector.count.textContent = elementCount(elements.length, Collect.parentCount);
+    var parentCount = UI.editing && UI.selectorType === "parent" ? undefined : Collect.parentCount;
+    HTML.selector.count.textContent = elementCount(elements.length, parentCount);
 }
 
 /******************
@@ -2908,8 +3016,8 @@ function saveSelectorEvent(event){
 function saveSelector(selector){
     var sel = new Selector(selector);
     // if editing just update the selector, otherwise add it to the current set
-    if ( UI.editing.selector ) {
-        UI.editing.selector.updateSelector(selector);
+    if ( UI.editing ) {
+        UI.editingObject.updateSelector(selector);
     } else {
         Collect.site.current.set.addSelector(sel);
     }
@@ -2982,13 +3090,13 @@ function saveRuleEvent(event){
         return;
     }
 
-    if ( UI.editing.rule ) {
-        UI.editing.rule.update({
+    if ( UI.editing ) {
+        UI.editingObject.update({
             name: name,
             capture: capture,
             follow: follow
         });
-        delete UI.editing.rule;
+        delete UI.editingObject;
     } else {
         if ( !Collect.site.current.schema.uniqueRuleName(name) ) {
             // some markup to signify you need to change the rule's name
@@ -3007,24 +3115,32 @@ function saveRuleEvent(event){
 /***********************
     EVENT HELPERS
 ***********************/
-function showSelectorView(){
-    HTML.selector.type.textContent = UI.selectorType;
-    switch(UI.selectorType){
-    case "selector":
-        HTML.selector.parent.holder.style.display = "none";
-        break;
-    case "parent":
-        HTML.selector.parent.holder.style.display = "block";
-        break;
-    case "next":
-        delete Collect.parentCount;
-        HTML.selector.parent.holder.style.display = "none";
-        clearClass("parentSchema");
-        break;
-    }
 
-    setCurrentView(HTML.views.selector, HTML.tabs.schema);
-    Family.turnOn();
+// setup the selector form to edit the parent. selectorSet is passed in because parent is part of it
+function editParent(selectorSet){
+    UI.editing = true;
+    UI.editingObject = selectorSet;
+    var selector = selectorSet.parent.selector,
+        low = selectorSet.parent.low || "",
+        high = selectorSet.parent.high || "";
+    Family.fromSelector(selectorSet.parent.selector, "body");
+    SelectorView.setup("parent", selectorSet.object().parent);
+}
+
+// setup the selector form to edit the selector
+function editSelector(selector){
+    UI.editing = true;
+    UI.editingObject = selector;
+    Family.fromSelector(selector.selector);
+    SelectorView.setup("selector", selector.object());
+}
+
+// setup the rule form to edit the rule
+function editRule(rule){
+    UI.editing = true;
+    UI.editingObject = rule;
+    setupRuleForm(rule.parentSelector.selector, rule.object());
+    showRuleView();
 }
 
 function showSchemaView(){
@@ -3129,6 +3245,8 @@ function addParentSchema(parent){
     }
 }
 
+// setup the rule form using the selector
+// if a rule is passed in, preset values based on the rule
 function setupRuleForm(selector, rule){
     // setup based on (optional) rule
     if ( rule ) {

@@ -1,27 +1,5 @@
 "use strict";
 
-// create interface and return a function to remove the collectorjs interface
-var removeInterface = (function(){
-    var marginBottom = 0,
-        element = noSelectElement("div");
-
-    element.classList.add("collectjs");
-    element.innerHTML = {{src/collector.html}};
-    document.body.appendChild(element);
-    addNoSelect(element.querySelectorAll("*"));    
-
-    // some some margin at the bottom of the page
-    var currentMargin = parseInt(document.body.style.marginBottom, 10);
-    marginBottom = isNaN(currentMargin) ? 0 : currentMargin;
-    document.body.style.marginBottom = (marginBottom + 500) + "px";
-
-    return function(){
-        element.parentElement.removeChild(element);
-        document.body.style.marginBottom = marginBottom + "px";
-    };
-})();
-
-
 /*********************************
             GLOBALS
 *********************************/
@@ -33,36 +11,6 @@ var Collect = {
     options: {},
     parent: {},
     site: undefined
-};
-
-/*
-Object that controls the functionality of the interface
-*/
-var UI = {
-    selectorType: "selector",
-    editing: {},
-    view: {
-        view: undefined,
-        tab: undefined
-    },
-    preview: {
-        dirty: true
-    },
-    setup: function(){        
-        loadOptions();
-        setupHostname();
-        
-        // tabs
-        tabEvents();
-
-        //views
-        selectorViewEvents();
-        ruleViewEvents();
-        optionsViewEvents();
-
-        setupSelectorView();
-        setupRulesView();
-    }
 };
 
 // save commonly referenced to elements
@@ -179,11 +127,13 @@ var Family = {
         this.elements = [];
     },
     // create a SelectorFamily given a css selector string
-    fromSelector: function(selector){
-        var prefix = Collect.parent.selector ? Collect.parent.selector: "body",
-            element = Fetch.one(selector, prefix);
+    fromSelector: function(selector, prefix){
+        // default to using provided parent, then check Collect.parent, lastly use "body"
+        prefix = prefix ? prefix : (Collect.parent.selector ? Collect.parent.selector: "body");
+        var element = Fetch.one(selector, prefix);
+        // clear out existing SelectorFamily
+        this.family = undefined;
         if ( element ) {
-
             var parent = Collect.parent.selector ?
                 nearestParent(element, Collect.parent.selector) : document.body;
 
@@ -210,6 +160,9 @@ var Family = {
     selectorElements: function(){
         var selector = this.selector(),
             parent = Collect.site.current.set.parent;
+        if ( UI.editing && UI.selectorType === "parent" ) {
+            parent = undefined;
+        }
         if ( selector === "") {
             return [];
         }
@@ -229,12 +182,13 @@ var Family = {
             elements[i].classList.add("queryCheck");
         }
         this.elements = elements;
-        HTML.selector.count.textContent = elementCount(elements.length, Collect.parentCount);
+        var parentCount = UI.editing && UI.selectorType === "parent" ? undefined : Collect.parentCount;
+        HTML.selector.count.textContent = elementCount(elements.length, parentCount);
         UI.selectorCycle.setElements(elements);
     },
     selectorsOn: false,
     /*
-    match all child elements of parent selector (or "body" if no parent seletor is provided)
+    match all child elements of parent selector (or "body" if no parent selector is provided)
         and save in Family.elements
     selectable elements are restricted by :not(.noSelect)
     add event listeners to all of those elements
@@ -281,13 +235,16 @@ reset state of interface
 especially useful for when cancelling creating or editing a selector or rule
 */
 function resetInterface(){
-    UI.editing = {};
+    UI.editing = false;
+    delete UI.editingObject;
+
     Family.turnOff();
     if ( Collect.parent ) {
         addParentSchema(Collect.parent);
     }
     clearSelectorClasses();
-    resetSelectorView();
+    SelectorView.reset();
+    //RuleView.reset();
     resetRulesView();
 }
 
@@ -300,17 +257,49 @@ function clearSelectorClasses(){
     clearClass("savedPreview");
 }
 
-function resetSelectorView(){
-    Family.remove();
+// control the selector view
+var SelectorView = {
+    reset: function(){
+        Family.remove();
+        UI.selectorType = "selector";
+        UI.selectorCycle.reset();
 
-    UI.selectorType = "selector";
-    UI.selectorCycle.reset();
+        HTML.selector.parent.holder.style.display = "none";
+        HTML.selector.parent.low.value = "";
+        HTML.selector.parent.high.value = "";
+        HTML.selector.count.textContent = "";
+    },
+    // type is the type of selector that is being created
+    // selector is a pre-existing selector to be edited
+    setup: function(type, selector){
+        HTML.selector.type.textContent = type;
+        UI.selectorType = type;
+        switch(type){
+        case "selector":
+            HTML.selector.parent.holder.style.display = "none";
+            if ( selector ) {
+                HTML.selector.selector.textContent = selector.selector;
+            }
+            break;
+        case "parent":
+            HTML.selector.parent.holder.style.display = "block";
+            if ( selector ) {
+                HTML.selector.parent.low.value = selector.low || "";
+                HTML.selector.parent.high.value = selector.high || "";
+                HTML.selector.selector.textContent = selector.selector;
+            }
+            break;
+        case "next":
+            delete Collect.parentCount;
+            HTML.selector.parent.holder.style.display = "none";
+            clearClass("parentSchema");
+            break;
+        }
 
-    HTML.selector.parent.holder.style.display = "none";
-    HTML.selector.parent.low.value = "";
-    HTML.selector.parent.high.value = "";
-    HTML.selector.count.textContent = "";
-}
+        setCurrentView(HTML.views.selector, HTML.tabs.schema);
+        Family.turnOn();
+    }
+};
 
 function resetRulesView(){
     UI.ruleCycle.reset();
@@ -442,7 +431,8 @@ function verifyAndApplyParentRange(event){
     clearClass("queryCheck");
     addClass("queryCheck", elements);
     UI.selectorCycle.setElements(elements);
-    HTML.selector.count.textContent = elementCount(elements.length, Collect.parentCount);
+    var parentCount = UI.editing && UI.selectorType === "parent" ? undefined : Collect.parentCount;
+    HTML.selector.count.textContent = elementCount(elements.length, parentCount);
 }
 
 /******************
@@ -479,8 +469,8 @@ function saveSelectorEvent(event){
 function saveSelector(selector){
     var sel = new Selector(selector);
     // if editing just update the selector, otherwise add it to the current set
-    if ( UI.editing.selector ) {
-        UI.editing.selector.updateSelector(selector);
+    if ( UI.editing ) {
+        UI.editingObject.updateSelector(selector);
     } else {
         Collect.site.current.set.addSelector(sel);
     }
@@ -553,13 +543,13 @@ function saveRuleEvent(event){
         return;
     }
 
-    if ( UI.editing.rule ) {
-        UI.editing.rule.update({
+    if ( UI.editing ) {
+        UI.editingObject.update({
             name: name,
             capture: capture,
             follow: follow
         });
-        delete UI.editing.rule;
+        delete UI.editingObject;
     } else {
         if ( !Collect.site.current.schema.uniqueRuleName(name) ) {
             // some markup to signify you need to change the rule's name
@@ -578,24 +568,32 @@ function saveRuleEvent(event){
 /***********************
     EVENT HELPERS
 ***********************/
-function showSelectorView(){
-    HTML.selector.type.textContent = UI.selectorType;
-    switch(UI.selectorType){
-    case "selector":
-        HTML.selector.parent.holder.style.display = "none";
-        break;
-    case "parent":
-        HTML.selector.parent.holder.style.display = "block";
-        break;
-    case "next":
-        delete Collect.parentCount;
-        HTML.selector.parent.holder.style.display = "none";
-        clearClass("parentSchema");
-        break;
-    }
 
-    setCurrentView(HTML.views.selector, HTML.tabs.schema);
-    Family.turnOn();
+// setup the selector form to edit the parent. selectorSet is passed in because parent is part of it
+function editParent(selectorSet){
+    UI.editing = true;
+    UI.editingObject = selectorSet;
+    var selector = selectorSet.parent.selector,
+        low = selectorSet.parent.low || "",
+        high = selectorSet.parent.high || "";
+    Family.fromSelector(selectorSet.parent.selector, "body");
+    SelectorView.setup("parent", selectorSet.object().parent);
+}
+
+// setup the selector form to edit the selector
+function editSelector(selector){
+    UI.editing = true;
+    UI.editingObject = selector;
+    Family.fromSelector(selector.selector);
+    SelectorView.setup("selector", selector.object());
+}
+
+// setup the rule form to edit the rule
+function editRule(rule){
+    UI.editing = true;
+    UI.editingObject = rule;
+    setupRuleForm(rule.parentSelector.selector, rule.object());
+    showRuleView();
 }
 
 function showSchemaView(){
@@ -700,6 +698,8 @@ function addParentSchema(parent){
     }
 }
 
+// setup the rule form using the selector
+// if a rule is passed in, preset values based on the rule
 function setupRuleForm(selector, rule){
     // setup based on (optional) rule
     if ( rule ) {
