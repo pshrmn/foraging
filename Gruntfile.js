@@ -32,8 +32,7 @@ module.exports = function(grunt){
         concat: {
             dist: {
                 src: ['src/utility.js', 'src/selector.js', 'src/interface_with_html.js',
-                    'src/fetch.js', 'src/rule.js', 'src/cycle.js', 'src/family.js',
-                    'src/collector.js'],
+                    'src/fetch.js', 'src/parent.js', 'src/rule.js', 'src/cycle.js', 'src/collector.js'],
                 dest: 'collector/collector.js',
                 options: {
                     banner: "'use strict';\n",
@@ -69,7 +68,14 @@ module.exports = function(grunt){
                 src: 'src/rule.js',
                 options: {
                     specs: 'tests/RuleSpec.js',
-                    helpers: ['src/utility.js', 'tests/RuleHelper.js']
+                    helpers: ['src/utility.js', 'src/parent.js', 'tests/RuleHelper.js']
+                }
+            },
+            parent: {
+                src: 'src/parent.js',
+                options: {
+                    specs: 'tests/ParentSpec.js',
+                    helpers: ['src/fetch.js']
                 }
             }
         }

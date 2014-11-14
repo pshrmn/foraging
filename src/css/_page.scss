@@ -54,3 +54,7 @@ img.savedPreview{
     border: 1px solid rgba(60, 60, 60, 1) !important;
     -webkit-animation: pulseParent 1s infinite;
 }
+
+.parentSchema.hidden{
+    border: 0 !important;
+}

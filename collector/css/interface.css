@@ -315,3 +315,6 @@ img.savedPreview {
 .parentSchema {
   border: 1px solid #3c3c3c !important;
   -webkit-animation: pulseParent 1s infinite; }
+
+.parentSchema.hidden {
+  border: 0 !important; }

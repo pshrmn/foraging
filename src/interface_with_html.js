@@ -98,11 +98,8 @@ var UI = {
         tabEvents();
 
         //views
-        selectorViewEvents();
-        ruleViewEvents();
+        SelectorView.setup();
+        RuleView.setup();
         optionsViewEvents();
-
-        setupSelectorView();
-        setupRulesView();
     }
 };

@@ -761,7 +761,7 @@ Page.prototype.events = {
     },
     addNextEvent: function(event){
         event.preventDefault();
-        SelectorView.setup("next");
+        SelectorView.show("next");
     },
     removeNextEvent: function(event){
         event.preventDefault();
@@ -804,10 +804,9 @@ Page.prototype.loadSet = function(name){
     // clear out the previous set's parentSchema
     clearClass("parentSchema");
     if ( set.parent ) {
-        Collect.parent = set.parent;
-        addParentSchema(set.parent);
+        Parent.set(set.parent);
     } else {
-        Collect.parent = {};
+        Parent.remove();
     }
 
     if ( this.hasHTML ) {
@@ -1082,7 +1081,7 @@ SelectorSet.prototype.events = {
         event.preventDefault();
         // make sure current.page is the selector set's parent page
         this.activate();
-        SelectorView.setup("selector");
+        SelectorView.show("selector");
     },
     removeEvent: function(event){
         event.preventDefault();
@@ -1107,7 +1106,7 @@ SelectorSet.prototype.events = {
     },
     addParentEvent: function(event){
         event.preventDefault();
-        SelectorView.setup("parent");
+        SelectorView.show("parent");
     },
     editParentEvent: function(event){
         event.preventDefault();
@@ -1117,10 +1116,7 @@ SelectorSet.prototype.events = {
         event.preventDefault();
         this.removeParent();
         Collect.site.saveCurrent();
-
-        clearClass("parentSchema");
-        delete Collect.parentCount;
-        Collect.parent = {};
+        Parent.remove();
     }
 };
 
@@ -1393,7 +1389,7 @@ Selector.prototype.events = {
     newRuleEvent: function(event){
         event.preventDefault();
         Collect.site.current.selector = this;
-        RuleView.setup(this.selector);
+        RuleView.show(this.selector);
     },
     editEvent: function(event){
         event.preventDefault();
