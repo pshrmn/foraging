@@ -31,29 +31,31 @@ var Fetch = {
     if parent.high/low are defined, only use parent.selector elements within that range
     */
     matchedElements: function(selector, parent){
-        var allElements = [];
-        if ( parent ) {
-            var low = parent.low || 0;
-            var high = parent.high || 0;
-            // if either high or low is defined, 
-            // iterate over all child elements of elements matched by parent selector
-            if ( low !== 0 || high !== 0 ) {
-                var parents = document.querySelectorAll(parent.selector);
-                var end = parents.length + high; // add high because it is negative
-                var currElements;
-                var notSelector = this.not(selector);
-                // select elements within parent that match the selector, then merge into allElements
-                for ( ; low<end; low++ ) {
-                    currElements = parents[low].querySelectorAll(notSelector);
-                    allElements = allElements.concat(Array.prototype.slice.call(currElements));
-                }
-            } else {
-                allElements = this.all(selector, parent.selector);
-            }
-        } else {
-            // don't care about parent when choosing next selector or a new parent selector
-            allElements = this.all(selector, "body");
-        }
+        var allElements = parent ? this.matchedParentElements(selector, parent)
+            : this.all(selector, "body");
         return Array.prototype.slice.call(allElements);
     },
+    matchedParentElements: function(selector, parent){
+        var allElements     = [];
+        var low             = parent.low || 0;
+        var high            = parent.high || 0;
+        var end;
+        var parents;
+        var currElements;
+        var notSelector;
+        // if either high or low is defined, 
+        // iterate over all child elements of elements matched by parent selector
+        if ( low !== 0 || high !== 0 ) {
+            parents         = document.querySelectorAll(parent.selector);
+            end             = parents.length + high; // add high because it is negative
+            notSelector     = this.not(selector);
+            // select elements within parent that match the selector, then merge into allElements
+            for ( ; low<end; low++ ) {
+                currElements = parents[low].querySelectorAll(notSelector);
+                allElements = allElements.concat(Array.prototype.slice.call(currElements));
+            }
+        } else {
+            allElements = this.all(selector, parent.selector);
+        }
+    }
 };

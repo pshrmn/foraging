@@ -6,10 +6,8 @@ var HTML = {
     }
 };
 
-var Collect = {
-    site: {
-        current: {}
-    }
-}
+var CurrentSite = {
+    current: {}
+};
 
 var showParent = hideParent = function(){};

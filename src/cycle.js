@@ -2,10 +2,10 @@ var Cycle = (function(){
     // used to 
     var canFollow = false;
     function Cycle(holder, interactive){
-        this.index = 0;
-        this.elements = [];
-        this.interactive = interactive || false;
-        this.holder = holder;
+        this.index          = 0;
+        this.elements       = [];
+        this.interactive    = interactive || false;
+        this.holder         = holder;
         this.generateHTML();
     }
 
@@ -26,10 +26,10 @@ var Cycle = (function(){
     };
 
     Cycle.prototype.generateHTML = function(){
-        var previousButton = noSelectElement("button"),
-            index = noSelectElement("span"),
-            nextButton = noSelectElement("button"),
-            preview = noSelectElement("span");
+        var previousButton  = noSelectElement("button");
+        var index           = noSelectElement("span");
+        var nextButton      = noSelectElement("button");
+        var preview         = noSelectElement("span");
 
         previousButton.textContent = "<<";
         nextButton.textContent = ">>";
@@ -38,10 +38,10 @@ var Cycle = (function(){
         nextButton.addEventListener("click", this.next.bind(this), false);
 
         this.htmlElements = {
-            previous: previousButton,
-            index: index,
-            next: nextButton,
-            preview: preview
+            previous:   previousButton,
+            index:      index,
+            next:       nextButton,
+            preview:    preview
         };
         // hide until elements are added
         this.holder.style.display = "none";
@@ -61,8 +61,8 @@ var Cycle = (function(){
     };
 
     Cycle.prototype.preview = function(){
-        var element = this.elements[this.index],
-            negative = this.index - this.elements.length;
+        var element     = this.elements[this.index];
+        var negative    = this.index - this.elements.length;
         this.htmlElements.index.textContent = (this.idex === 0) ? "" : this.index + " / " + negative;
         this.htmlElements.preview.innerHTML = "";
 
@@ -71,10 +71,15 @@ var Cycle = (function(){
             return;
         }
 
-        var clone = cleanElement(element.cloneNode(true)),
-            html = clone.outerHTML,
-            attrs = clone.attributes,
-            curr, text, splitHTML, firstHalf, secondHalf, captureEle;
+        var clone   = cleanElement(element.cloneNode(true));
+        var html    = clone.outerHTML;
+        var attrs   = clone.attributes;
+        var curr;
+        var text;
+        var splitHTML;
+        var firstHalf;
+        var secondHalf;
+        var captureEle;
         if ( this.interactive ) {
             for ( var i=0, len =attrs.length; i<len; i++ ) {
                 curr = attrs[i];
@@ -172,13 +177,13 @@ var Cycle = (function(){
     toggle .selected class
     */
     function capturePreview(event){
-        var capture = HTML.rule.capture,
-            follow = HTML.rule.follow,
-            followHolder = HTML.rule.followHolder;
-
+        var capture         = HTML.rule.capture;
+        var follow          = HTML.rule.follow;
+        var followHolder    = HTML.rule.followHolder;
+        var captureVal;
         if ( !this.classList.contains("selected") ){
             clearClass("selected");
-            var captureVal = this.dataset.capture;
+            captureVal = this.dataset.capture;
             capture.textContent = captureVal;
             this.classList.add("selected");
 
@@ -209,8 +214,7 @@ var Cycle = (function(){
     iterate over elements and if each is an anchor element, return true
     */
     function allLinks(elements){
-        elements = Array.prototype.slice.call(elements);
-        return elements.every(isLink);
+        return Array.prototype.slice.call(elements).every(isLink);
     }
 
     /*

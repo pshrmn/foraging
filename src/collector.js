@@ -7,10 +7,7 @@
 Object that stores information related to elements that match the current selector
 (and how to select them)
 */
-var Collect = {
-    options: {},
-    site: undefined
-};
+var CollectOptions = {};
 
 // Family derived from clicked element in the page
 var Family = {
@@ -24,13 +21,13 @@ var Family = {
             return;
         }
 
-        var parent = Parent.element(this);
+        var parent = Parent.element(this, UI.selectorType);
         Family.family = new SelectorFamily(this,
             parent,
             HTML.selector.family,
             HTML.selector.selector,
             Family.test.bind(Family),
-            Collect.options
+            CollectOptions
         );
         Family.family.update();
     },
@@ -44,18 +41,18 @@ var Family = {
     // create a SelectorFamily given a css selector string
     fromSelector: function(selector, prefix){
         // default to using provided prefix, then check Parent, lastly use "body"
-        prefix = prefix ? prefix : Parent.selector();
+        prefix = prefix ? prefix : Parent.selector(UI.selectorType);
         var element = Fetch.one(selector, prefix);
         // clear out existing SelectorFamily
         this.family = undefined;
         if ( element ) {
-            var parent = Parent.element(element);
+            var parent = Parent.element(element, UI.selectorType);
             this.family = new SelectorFamily(element,
                 parent,
                 HTML.selector.family,
                 HTML.selector.selector,
                 Family.test.bind(Family),
-                Collect.options
+                CollectOptions
             );
             this.family.match(selector);
         }    
@@ -72,7 +69,7 @@ var Family = {
     // uses Parent to limit matches
     selectorElements: function(){
         var selector = this.selector(),
-            parent = Parent.object();
+            parent = Parent.object(UI.selectorType);
         if ( selector === "") {
             return [];
         }
@@ -108,7 +105,7 @@ var Family = {
         if ( this.selectorsOn ) {
             this.turnOff();
         }
-        var parent = Parent.object();
+        var parent = Parent.object(UI.selectorType);
         this.selectableElements = Fetch.matchedElements("*", parent);
         for ( var i=0, len=this.selectableElements.length; i<len; i++ ) {
             curr = this.selectableElements[i];
@@ -289,17 +286,17 @@ var RuleView = {
             });
             delete UI.editingObject;
         } else {
-            if ( !Collect.site.current.schema.uniqueRuleName(name) ) {
+            if ( !CurrentSite.current.schema.uniqueRuleName(name) ) {
                 // some markup to signify you need to change the rule's name
                 alertMessage("Rule name is not unique");
                 HTML.rule.name.classList.add("error");
                 return;
             }
             var rule = new Rule(name, capture, follow);
-            Collect.site.current.selector.addRule(rule);
+            CurrentSite.current.selector.addRule(rule);
         }
-        Collect.site.current.selector = undefined;
-        Collect.site.saveCurrent();
+        CurrentSite.current.selector = undefined;
+        CurrentSite.saveCurrent();
         showSchemaView();
     },
     cancelEvent: function(event){
@@ -412,12 +409,12 @@ function tabEvents(){
 function optionsViewEvents(){
     idEvent("ignore", "change", function toggleTabOption(event){
         // if option exists, toggle it, otherwise set based on whether or not html element is checked
-        if ( Collect.options.ignore ) {
-            Collect.options.ignore = !Collect.options.ignore;
+        if ( CollectOptions.ignore ) {
+            CollectOptions.ignore = !CollectOptions.ignore;
         } else {
-            Collect.options.ignore = document.getElementById("ignore").checked;
+            CollectOptions.ignore = document.getElementById("ignore").checked;
         }
-        setOptions(Collect.options);
+        setOptions(CollectOptions);
     });
 }
 
@@ -442,10 +439,10 @@ function saveSelector(selector){
     if ( UI.editing ) {
         UI.editingObject.updateSelector(selector);
     } else {
-        Collect.site.current.set.addSelector(sel);
+        CurrentSite.current.set.addSelector(sel);
     }
     
-    Collect.site.saveCurrent();
+    CurrentSite.saveCurrent();
     return true;
 }
 
@@ -465,14 +462,14 @@ function saveParent(selector){
     Parent.set(parent);
 
     // attach the parent to the current set and save
-    Collect.site.current.set.addParent(parent);
-    Collect.site.saveCurrent();
+    CurrentSite.current.set.addParent(parent);
+    CurrentSite.saveCurrent();
     return true;
 }
 
 function saveNext(selector){
     var match = document.querySelector(selector),
-        name = Collect.site.current.page.name;
+        name = CurrentSite.current.page.name;
 
     if ( errorCheck( (name !== "default" ), HTML.selector.selector,
             ("Cannot add next selector to '" + name + "' page, only to default")) || 
@@ -481,8 +478,8 @@ function saveNext(selector){
         return false;
     }
 
-    Collect.site.current.page.addNext(selector);
-    Collect.site.saveCurrent();
+    CurrentSite.current.page.addNext(selector);
+    CurrentSite.saveCurrent();
     return true;
 }
 
@@ -552,7 +549,7 @@ function hideCurrentView(){
 function generatePreview(){
     // only regen preview when something in the schema has changed
     if (  UI.preview.dirty ) {
-        HTML.preview.contents.innerHTML = Collect.site.current.page.preview();
+        HTML.preview.innerHTML = CurrentSite.current.page.preview();
     }
     UI.preview.dirty = false;
 }
@@ -563,9 +560,9 @@ add the message to #ruleAlert
 function alertMessage(msg){
     var p = noSelectElement("p");
     p.textContent = msg;
-    HTML.perm.alert.appendChild(p);
+    HTML.alert.appendChild(p);
     setTimeout(function(){
-        HTML.perm.alert.removeChild(p);
+        HTML.alert.removeChild(p);
     }, 2000);
 }
 
@@ -639,16 +636,16 @@ function setupHostname(){
             siteObject = storage.sites[host];
         // default setup if page hasn't been visited before
         if ( !siteObject ) {
-            Collect.site = new Site(host);
+            CurrentSite = new Site(host);
             // save it right away
-            Collect.site.save();
+            CurrentSite.save();
         } else {
-            Collect.site = new Site(host, siteObject.schemas);
+            CurrentSite = new Site(host, siteObject.schemas);
         }
-        var siteHTML = Collect.site.html();
+        var siteHTML = CurrentSite.html();
         HTML.schema.info.appendChild(siteHTML.topbar);
         HTML.schema.holder.appendChild(siteHTML.schema);
-        Collect.site.loadSchema("default");
+        CurrentSite.loadSchema("default");
     });
 }
 
@@ -659,7 +656,7 @@ function setupHostname(){
 function loadOptions(){
     chrome.storage.local.get("options", function(storage){
         var input;
-        Collect.options = storage.options;
+        CollectOptions = storage.options;
         for ( var key in storage.options ) {
             if ( storage.options[key] ) {
                 input = document.getElementById(key);

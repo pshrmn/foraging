@@ -1,3 +1,4 @@
+/* requires fetch.js and utility.js */
 var Parent = {
     exists:     false,
     count:      0,
@@ -31,14 +32,9 @@ var Parent = {
         }
     },
     clearMarkup: function(){
-        var elements    = document.getElementsByClassName("parentSchema");
         this.hidden     = false;
         this.html       = false;
-        // need to go backwards because elements are removed from the NodeList as the parentSchema
-        // class is removed
-        for ( var i=elements.length-1; i>0; i-- ) {
-            elements[i].classList.remove("parentSchema");
-        }
+        clearClass("parentSchema");
     },
     show: function(){
         // add the markup first if it doesn't exist
@@ -64,11 +60,11 @@ var Parent = {
         }
     },
     // returns the parent selector
-    // if UI.selectorType !== "selector", always return "body". Then check if there is a parent selector
+    // if type !== "selector", always return "body". Then check if there is a parent selector
     // and if there is use that, defaulting to "body" if there is none
-    selector: function(){
+    selector: function(type){
         var parent;
-        switch(UI.selectorType){
+        switch(type){
             case "selector":
                 parent = this.exists ? this.parent.selector : "body";
                 break;
@@ -102,10 +98,10 @@ var Parent = {
         return;
     },
     // returns nearest parent element (as determined by the parent selector) to the passed in element
-    // defaults to the body if there is no parent or the current UI.selectorType !== "selector"
-    element: function(ele){
+    // defaults to the body if there is no parent or the current ype !== "selector"
+    element: function(ele, type){
         var parent;
-        switch(UI.selectorType){
+        switch(type){
             case "selector":
                 parent = this.exists ? this.nearest(ele, this.parent.selector) : document.body;
                 break;
@@ -114,9 +110,9 @@ var Parent = {
         }
         return parent;
     },
-    object: function(){
+    object: function(type){
         var parent;
-        switch(UI.selectorType){
+        switch(type){
             case "selector":
                 parent = this.parent;
                 break;
