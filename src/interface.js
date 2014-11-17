@@ -21,10 +21,6 @@ var removeInterface = (function(){
 
 // save commonly referenced to elements
 var HTML = {
-    schema: {
-        info:       document.getElementById("schemaInfo"),
-        holder:     document.getElementById("schemaHolder")
-    },
     // elements in the selector view
     selector: {
         family:     document.getElementById("selectorHolder"),
@@ -47,30 +43,78 @@ var HTML = {
         followHolder:   document.getElementById("ruleFollowHolder")
     },
     alert:      document.getElementById("collectAlert"),
-    preview:    document.getElementById("previewContents"),
-    tabs: {
-        schema:     document.getElementById("schemaTab"),
-        preview:    document.getElementById("previewTab"),
-        options:    document.getElementById("optionsTab")
-    },
-    views: {
-        schema:     document.getElementById("schemaView"),
-        selector:   document.getElementById("selectorView"),
-        rule:       document.getElementById("ruleView"),
-        preview:    document.getElementById("previewView"),
-        options:    document.getElementById("optionsView")
-    }
+    preview:    document.getElementById("previewContents")
 };
 
 /*
 Object that controls the functionality of the interface
 */
-var UI = {
-    selectorType: "selector",
-    editing: false,
-    view: {
-        view: undefined,
-        tab: undefined
-    },
-    previewDirty: true
-};
+var UI = (function(){
+    var tabs        = {
+        schema:     document.getElementById("schemaTab"),
+        preview:    document.getElementById("previewTab"),
+        options:    document.getElementById("optionsTab")
+    };
+    var views       = {
+        schema:     document.getElementById("schemaView"),
+        selector:   document.getElementById("selectorView"),
+        rule:       document.getElementById("ruleView"),
+        preview:    document.getElementById("previewView"),
+        options:    document.getElementById("optionsView")
+    };
+    var current     = {
+        view: views.schema,
+        tab: tabs.schema
+    };
+
+    function setCurrentView(view, tab){
+        hideCurrentView();
+        current.view = view;
+        current.tab = tab;
+        view.classList.add("active");
+        tab.classList.add("active");
+    }
+
+    function hideCurrentView(){
+        // turn selectors off when leaving selector view
+        if ( current.view.id === "selectorView" && Family ) {
+            Family.turnOff();
+        }
+        current.view.classList.remove("active");
+        current.tab.classList.remove("active");
+    }    
+
+    function generatePreview(){
+        // only regen preview when something in the schema has changed
+        if (  ui.dirty ) {
+            HTML.preview.innerHTML = CurrentSite.current.page.preview();
+        }
+        ui.dirty = false;
+    }
+
+    var ui = {
+        editing:        false,
+        dirty:          true,
+        selectorType:   "selector",
+        showSelectorView: function(){
+            setCurrentView(views.selector, tabs.schema);
+        },
+        showRuleView: function(){
+            setCurrentView(views.rule, tabs.schema);
+        },
+        showSchemaView: function(){
+            setCurrentView(views.schema, tabs.schema);
+            if ( Parent && Parent.exists ) {
+                Parent.show();
+            }
+        },
+        showPreviewView: function(){
+            generatePreview();
+            setCurrentView(views.preview, tabs.preview);
+        },
+        showOptionsView: function(){
+            setCurrentView(views.options, tabs.options);
+        }
+    };
+    return ui;
+})();

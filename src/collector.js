@@ -5,7 +5,7 @@
     Fetch:      used to select elements
     Parent:     used to limit selections to children element of parent selector
     HTML:       cache of various HTML elements that are referred to
-    UI:         used to inter
+    UI:         used to interact with the CollectorJS user interface
 ****************************************************************************************/
 var CollectOptions = {};
 
@@ -151,6 +151,9 @@ var SelectorView = {
         UI.selectorCycle = new Cycle(document.getElementById("selectorCycleHolder"));
         idEvent("saveSelector", "click", this.saveEvent);
         idEvent("cancelSelector", "click", this.cancelEvent);
+
+        idEvent("parentLow", "blur", this.rangeEvent);
+        idEvent("parentHigh", "blur", this.rangeEvent);
     },
     // type is the type of selector that is being created
     // selector is a pre-existing selector to be edited
@@ -178,8 +181,7 @@ var SelectorView = {
             Parent.hide();
             break;
         }
-
-        setCurrentView(HTML.views.selector, HTML.tabs.schema);
+        UI.showSelectorView();
         Family.turnOn();
     },
     saveEvent: function(event){
@@ -205,107 +207,15 @@ var SelectorView = {
         }
         if ( success ) {
             resetInterface();
-            showSchemaView();
+            UI.showSchemaView();
         }
     },
     cancelEvent: function(event){
         event.preventDefault();
         resetInterface();
-        showSchemaView();
-    }
-};
-
-// control the rule view
-var RuleView = {
-    reset: function(){
-        UI.ruleCycle.reset();
-        HTML.rule.selector.textContent = "";
-
-        // reset rule form
-        HTML.rule.name.value = "";
-        HTML.rule.capture.textContent = "";
-        HTML.rule.follow.checked = false;
-        HTML.rule.follow.disabled = true;
-        HTML.rule.followHolder.style.display = "none";
+        UI.showSchemaView();
     },
-    setup: function(){
-        UI.ruleCycle = new Cycle(document.getElementById("ruleCycleHolder"), true);   
-
-        idEvent("saveRule", "click", this.saveEvent);
-        idEvent("cancelRule", "click", this.cancelEvent);
-
-        idEvent("parentLow", "blur", this.rangeEvent);
-        idEvent("parentHigh", "blur", this.rangeEvent);
-    },
-    show: function(selector, rule){
-        //test
-        // setup based on (optional) rule
-        if ( rule ) {
-            HTML.rule.name.value = rule.name;
-            HTML.rule.capture.textContent = rule.capture;
-            if ( rule.capture === "attr-href" ) {
-                HTML.rule.follow.checked = rule.follow;
-                HTML.rule.follow.disabled = false;
-                HTML.rule.followHolder.style.display = "block";
-            } else {
-                HTML.rule.follow.checked = false;
-                HTML.rule.follow.disabled = true;
-                HTML.rule.followHolder.style.display = "none";
-            }
-        }
-
-        // setup based on selector
-        HTML.rule.selector.textContent = selector;
-        var parent = Parent.parent,
-            elements = Fetch.matchedElements(selector, parent);
-        UI.ruleCycle.setElements(elements);
-        addClass("savedPreview", elements);
-
-        setCurrentView(HTML.views.rule, HTML.tabs.schema);
-    },
-    saveEvent: function(event){
-        event.preventDefault();
-        var name = HTML.rule.name.value,
-            capture = HTML.rule.capture.textContent,
-            follow = HTML.rule.follow.checked;
-
-        // error checking
-        clearErrors();
-        if ( emptyErrorCheck(name, HTML.rule.name, "Name needs to be filled in") ||
-            emptyErrorCheck(capture, HTML.rule.capture, "No attribute selected") || 
-            reservedWordErrorCheck(name, HTML.rule.name, "Cannot use " + name + 
-                " because it is a reserved word") ) {
-            return;
-        }
-
-        if ( UI.editing ) {
-            UI.editingObject.update({
-                name: name,
-                capture: capture,
-                follow: follow
-            });
-            delete UI.editingObject;
-        } else {
-            if ( !CurrentSite.current.schema.uniqueRuleName(name) ) {
-                // some markup to signify you need to change the rule's name
-                alertMessage("Rule name is not unique");
-                HTML.rule.name.classList.add("error");
-                return;
-            }
-            var rule = new Rule(name, capture, follow);
-            CurrentSite.current.selector.addRule(rule);
-        }
-        CurrentSite.current.selector = undefined;
-        CurrentSite.saveCurrent();
-        showSchemaView();
-    },
-    cancelEvent: function(event){
-        event.stopPropagation();
-        event.preventDefault();
-        resetInterface();
-        showSchemaView();
-    },
-    rangeEvent: function(event){
+        rangeEvent: function(event){
         var lowVal = HTML.selector.parent.low.value,
             highVal = HTML.selector.parent.high.value,
             low = parseInt(lowVal, 10),
@@ -348,7 +258,95 @@ var RuleView = {
     }
 };
 
-(function(){
+// control the rule view
+var RuleView = {
+    reset: function(){
+        UI.ruleCycle.reset();
+        HTML.rule.selector.textContent = "";
+
+        // reset rule form
+        HTML.rule.name.value = "";
+        HTML.rule.capture.textContent = "";
+        HTML.rule.follow.checked = false;
+        HTML.rule.follow.disabled = true;
+        HTML.rule.followHolder.style.display = "none";
+    },
+    setup: function(){
+        UI.ruleCycle = new Cycle(document.getElementById("ruleCycleHolder"), true);   
+
+        idEvent("saveRule", "click", this.saveEvent);
+        idEvent("cancelRule", "click", this.cancelEvent);
+    },
+    show: function(selector, rule){
+        //test
+        // setup based on (optional) rule
+        if ( rule ) {
+            HTML.rule.name.value = rule.name;
+            HTML.rule.capture.textContent = rule.capture;
+            if ( rule.capture === "attr-href" ) {
+                HTML.rule.follow.checked = rule.follow;
+                HTML.rule.follow.disabled = false;
+                HTML.rule.followHolder.style.display = "block";
+            } else {
+                HTML.rule.follow.checked = false;
+                HTML.rule.follow.disabled = true;
+                HTML.rule.followHolder.style.display = "none";
+            }
+        }
+
+        // setup based on selector
+        HTML.rule.selector.textContent = selector;
+        var parent = Parent.parent,
+            elements = Fetch.matchedElements(selector, parent);
+        UI.ruleCycle.setElements(elements);
+        addClass("savedPreview", elements);
+        UI.showRuleView();
+    },
+    saveEvent: function(event){
+        event.preventDefault();
+        var name = HTML.rule.name.value,
+            capture = HTML.rule.capture.textContent,
+            follow = HTML.rule.follow.checked;
+
+        // error checking
+        clearErrors();
+        if ( emptyErrorCheck(name, HTML.rule.name, "Name needs to be filled in") ||
+            emptyErrorCheck(capture, HTML.rule.capture, "No attribute selected") || 
+            reservedWordErrorCheck(name, HTML.rule.name, "Cannot use " + name + 
+                " because it is a reserved word") ) {
+            return;
+        }
+
+        if ( UI.editing ) {
+            UI.editingObject.update({
+                name: name,
+                capture: capture,
+                follow: follow
+            });
+            delete UI.editingObject;
+        } else {
+            if ( !CurrentSite.current.schema.uniqueRuleName(name) ) {
+                // some markup to signify you need to change the rule's name
+                alertMessage("Rule name is not unique");
+                HTML.rule.name.classList.add("error");
+                return;
+            }
+            var rule = new Rule(name, capture, follow);
+            CurrentSite.current.selector.addRule(rule);
+        }
+        CurrentSite.current.selector = undefined;
+        CurrentSite.saveCurrent();
+        UI.showSchemaView();
+    },
+    cancelEvent: function(event){
+        event.stopPropagation();
+        event.preventDefault();
+        resetInterface();
+        UI.showSchemaView();
+    }
+};
+
+(function runCollectorJS(){
     chromeLoadOptions();
     chromeSetupHostname();
     
@@ -400,20 +398,17 @@ function tabEvents(){
         Parent.remove();
         removeInterface();
     });
-
-    // set default view/tab for UI
-    UI.view.view = HTML.views.schema;
-    UI.view.tab = HTML.tabs.schema;
+    
     idEvent("schemaTab", "click", function(event){
-        showSchemaView();
+        UI.showSchemaView();
     });
 
     idEvent("previewTab", "click", function(event){
-        showPreviewView();
+        UI.showPreviewView();
     });
 
     idEvent("optionsTab", "click", function(event){
-        showOptionsView();
+        UI.showOptionsView();
     });
 }
 
@@ -522,47 +517,6 @@ function editRule(rule){
     UI.editing = true;
     UI.editingObject = rule;
     RuleView.show(rule.parentSelector.selector, rule.object());
-}
-
-function showSchemaView(){
-    setCurrentView(HTML.views.schema, HTML.tabs.schema);
-    if ( Parent.exists ) {
-        Parent.show();
-    }
-}
-
-function showPreviewView(){
-    generatePreview();
-    setCurrentView(HTML.views.preview, HTML.tabs.preview);
-}
-
-function showOptionsView(){
-    setCurrentView(HTML.views.options, HTML.tabs.options);
-}
-
-function setCurrentView(view, tab){
-    hideCurrentView();
-    UI.view.view = view;
-    UI.view.tab = tab;
-    view.classList.add("active");
-    tab.classList.add("active");
-}
-
-function hideCurrentView(){
-    // turn selectors off when leaving selector view
-    if ( UI.view.view.id === "selectorView" ) {
-        Family.turnOff();
-    }
-    UI.view.view.classList.remove("active");
-    UI.view.tab.classList.remove("active");
-}
-
-function generatePreview(){
-    // only regen preview when something in the schema has changed
-    if (  UI.previewDirty ) {
-        HTML.preview.innerHTML = CurrentSite.current.page.preview();
-    }
-    UI.previewDirty = false;
 }
 
 /*

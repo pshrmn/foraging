@@ -12,7 +12,8 @@ function chromeSave(obj, siteName, schemaName){
             storage.sites[siteName] = obj;
         }
         chrome.storage.local.set({"sites": storage.sites});
-        UI.previewDirty = true;
+        // mark as dirty so that preview will be regenerated
+        UI.dirty = true;
     });
 }
 
@@ -49,8 +50,8 @@ function chromeSetupHostname(){
             CurrentSite = new Site(host, siteObject.schemas);
         }
         var siteHTML = CurrentSite.html();
-        HTML.schema.info.appendChild(siteHTML.topbar);
-        HTML.schema.holder.appendChild(siteHTML.schema);
+        document.getElementById("schemaInfo").appendChild(siteHTML.topbar);
+        document.getElementById("schemaHolder").appendChild(siteHTML.schema);
         CurrentSite.loadSchema("default");
     });
 }
