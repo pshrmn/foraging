@@ -21,9 +21,7 @@ var Fetch = {
     default prefix is "body"
     ***/
     not: function(selector, prefix){
-        prefix = prefix || "body";
-        selector += ":not(.noSelect)";
-        return prefix + " " + selector;
+        return (prefix || "body") + " " + selector + ":not(.noSelect)";
     },
     /*
     uses selector to match elements in the page

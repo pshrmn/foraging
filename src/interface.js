@@ -19,22 +19,6 @@ var removeInterface = (function(){
     };
 })();
 
-// save commonly referenced to elements
-var HTML = {
-    // elements in the selector view
-    selector: {
-        family:     document.getElementById("selectorHolder"),
-        selector:   document.getElementById("currentSelector"),
-        count:      document.getElementById("currentCount"),
-    },
-    // elements in the rule view
-    rule: {
-        capture:        document.getElementById("ruleAttr"),
-        follow:         document.getElementById("ruleFollow"),
-        followHolder:   document.getElementById("ruleFollowHolder")
-    }
-};
-
 /*
 Object that controls the functionality of the interface
 */
@@ -94,7 +78,7 @@ var UI = (function(){
         },
         showSchemaView: function(){
             setCurrentView(views.schema, tabs.schema);
-            if ( Parent && Parent.exists ) {
+            if ( Parent && Parent.exists() ) {
                 Parent.show();
             }
         },
@@ -150,4 +134,39 @@ var error = (function(){
             }        
         }
     };
+})();
+
+// encapsulate event activeTabEvent to keep track of current tab/view
+(function tabEvents(){
+    idEvent("closeCollect", "click", function(event){
+        event.stopPropagation();
+        event.preventDefault();
+        resetInterface();
+        Parent.remove();
+        removeInterface();
+    });
+    
+    idEvent("schemaTab", "click", function(event){
+        UI.showSchemaView();
+    });
+
+    idEvent("previewTab", "click", function(event){
+        UI.showPreviewView();
+    });
+
+    idEvent("optionsTab", "click", function(event){
+        UI.showOptionsView();
+    });
+})();
+
+(function optionsViewEvents(){
+    idEvent("ignore", "change", function toggleTabOption(event){
+        // if option exists, toggle it, otherwise set based on whether or not html element is checked
+        if ( CollectOptions.ignore ) {
+            CollectOptions.ignore = !CollectOptions.ignore;
+        } else {
+            CollectOptions.ignore = document.getElementById("ignore").checked;
+        }
+        chromeSetOptions(CollectOptions);
+    });
 })();

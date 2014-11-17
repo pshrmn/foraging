@@ -1,10 +1,8 @@
 describe("Parent", function(){
     describe("defaults", function(){
         it("expect default values to be set", function(){
-            expect(Parent.exists).toBe(false);
-            expect(Parent.count).toEqual(0);
-            expect(Parent.hidden).toBe(false);
-            expect(Parent.html).toBe(false);
+            expect(Parent.exists()).toBe(false);
+            expect(Parent.getCount()).toEqual(0);
         });
     });
 
@@ -35,9 +33,8 @@ describe("Parent", function(){
                 selector: ".parent"
             };
             Parent.set(p);
-            expect(Parent.exists).toBe(true);
-            expect(Parent.count).toEqual(10);
-            expect(Parent.html).toBe(true);
+            expect(Parent.exists()).toBe(true);
+            expect(Parent.getCount()).toEqual(10);
         });
 
         it("uses range", function(){
@@ -46,7 +43,7 @@ describe("Parent", function(){
                 low: 3
             };
             Parent.set(p);
-            expect(Parent.count).toEqual(7);
+            expect(Parent.getCount()).toEqual(7);
         })
     });
 
@@ -77,12 +74,10 @@ describe("Parent", function(){
                 selector: ".parent"
             }
             Parent.set(p);
-            expect(Parent.exists).toBe(true);
+            expect(Parent.exists()).toBe(true);
             Parent.remove();
-            expect(Parent.exists).toBe(false);
-            expect(Parent.parent).toBeUndefined();
-            expect(Parent.count).toEqual(0);
-            expect(Parent.html).toBe(false);
+            expect(Parent.exists()).toBe(false);
+            expect(Parent.getCount()).toEqual(0);
         });
 
     });

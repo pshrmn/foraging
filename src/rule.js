@@ -1,8 +1,3 @@
-// this exists in a separate file for ease of use
-// but has dependencies on variables in collector.js and thus is not modular
-
-/* requires parent.js, fetch.js, and utility.js */
-
 var CurrentSite;
 
 /********************
@@ -819,12 +814,8 @@ Page.prototype.loadSet = function(name){
     // show the selector set's parent if it exists
     // clear out the previous set's parentSchema
     clearClass("parentSchema");
-    if ( set.parent ) {
-        Parent.set(set.parent);
-    } else {
-        Parent.remove();
-    }
-
+    loadParent(set.parent);
+    
     if ( this.hasHTML ) {
         // select the option for the page
         if ( set.eles.option ) {
@@ -1134,7 +1125,7 @@ SelectorSet.prototype.events = {
         event.preventDefault();
         this.removeParent();
         CurrentSite.saveCurrent();
-        Parent.remove();
+        removeParent();
     }
 };
 

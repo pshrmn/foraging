@@ -19,7 +19,7 @@ var SelectorView = (function(){
         type:       "selector",
         reset: function(){
             Family.remove();
-            Parent.type = "selector";
+            Parent.setType("selector");
             this.editing = false;
             delete this.editingObject;
             cycle.reset();
@@ -35,8 +35,9 @@ var SelectorView = (function(){
         // type is the type of selector that is being created
         // selector is a pre-existing selector to be edited
         show: function(type, selector){
-            html.type.textContent = this.type;
-            switch(this.type){
+            Parent.setType(type);
+            html.type.textContent = type;
+            switch(type){
             case "selector":
                 html.parent.holder.style.display = "none";
                 if ( selector ) {
@@ -81,7 +82,7 @@ var SelectorView = (function(){
         if ( error.empty(selector, html.selector, "No CSS selector selected") ) {
             return;
         }
-        switch(sv.type){
+        switch(Parent.getType()){
         case "selector":
             success = saveSelector(selector);
             break;
@@ -243,7 +244,7 @@ var RuleView = (function(){
 
             // setup based on selector
             html.selector.textContent = selector;
-            var elements = Fetch.matchedElements(selector, Parent.parent);
+            var elements = Fetch.matchedElements(selector, Parent.getParent());
             cycle.setElements(elements);
             addClass("savedPreview", elements);
             UI.showRuleView();

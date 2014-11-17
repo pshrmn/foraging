@@ -1,7 +1,11 @@
 /* functions that are related to the extension */
-/* requires UI, rules.js, HTML, and CollectOptions */
 
 var CollectOptions = {};
+
+function chromeLoad(){
+    chromeLoadOptions();
+    chromeSetupHostname();
+}
 
 // takes an object to save, the name of the site, and an optional schemaName
 // if schemaName is provided, obj is a schema object to be saved

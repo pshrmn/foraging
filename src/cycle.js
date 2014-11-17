@@ -171,15 +171,21 @@ var Cycle = (function(){
     }
 
 
+    var intHTML = {
+        capture:        document.getElementById("ruleAttr"),
+        follow:         document.getElementById("ruleFollow"),
+        followHolder:   document.getElementById("ruleFollowHolder")
+    };
+
     /*
     if the .capture element clicked does not have the .selected class, set attribute to capture
     otherwise, clear the attribute to capture
     toggle .selected class
     */
     function capturePreview(event){
-        var capture         = HTML.rule.capture;
-        var follow          = HTML.rule.follow;
-        var followHolder    = HTML.rule.followHolder;
+        var capture         = intHTML.capture;
+        var follow          = intHTML.follow;
+        var followHolder    = intHTML.followHolder;
         var captureVal;
         if ( !this.classList.contains("selected") ){
             clearClass("selected");
@@ -221,7 +227,7 @@ var Cycle = (function(){
     if #ruleAttr is set, add .selected class to the matching #ruleHTML .capture span
     */
     function markCapture(){
-        var capture = HTML.rule.capture.textContent;
+        var capture = intHTML.capture.textContent;
         if ( capture !== "") {
             var selector = ".capture[data-capture='" + capture + "']";
             document.querySelector(selector).classList.add("selected");

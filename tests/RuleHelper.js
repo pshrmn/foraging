@@ -10,4 +10,4 @@ var CurrentSite = {
     current: {}
 };
 
-var showParent = hideParent = function(){};
+var showParent = hideParent = loadParent = function(){};
