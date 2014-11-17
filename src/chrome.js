@@ -1,5 +1,5 @@
 /* functions that are related to the extension */
-/* requires UI, rules.js, HTML, and CollectOptions */
+/* requires UI, rules.js, and CollectOptions */
 
 var CollectOptions = {};
 
