@@ -1,6 +1,8 @@
 // this exists in a separate file for ease of use
 // but has dependencies on variables in collector.js and thus is not modular
 
+/* requires parent.js, fetch.js, and utility.js */
+
 var CurrentSite;
 
 /********************
@@ -43,7 +45,20 @@ function Site(name, schemas){
 }
 
 Site.prototype.html = function(){
-    var schemas         = noSelectElement("div");
+    /*
+    <div> // topbar
+        Schema: <select>...</select>
+            <button>+Schema</button>
+            <button>×</button>
+            <button>Upload</button>
+        Page: <select>...</select>
+        Selector Set: <select>...</select>
+        <button>Upload</button>
+    </div>
+    <div>...</div> // schemas
+    */
+
+    var topbar          = noSelectElement("div");
     var schemaText      = document.createTextNode("Schema: ");
     var schemaSelect    = noSelectElement("select");
     var createSchema    = noSelectElement("button");
@@ -53,7 +68,8 @@ Site.prototype.html = function(){
     var pageSelect      = noSelectElement("div");
     var selectorText    = document.createTextNode("Selector Set: ");
     var setSelect       = noSelectElement("div");
-    var topbar          = noSelectElement("div");
+
+    var schemas         = noSelectElement("div");
 
     this.hasHTML    = true;
     this.eles       = {
@@ -141,27 +157,16 @@ Site.prototype.events = {
 if name is provided, only save that schema, otherwise save all
 */
 Site.prototype.save = function(schemaName){
-    var _this = this;
-    var host;
-    chrome.storage.local.get('sites', function saveSchemaChrome(storage){
-        host = _this.name;
-        if ( schemaName ) {
-            storage.sites[host].schemas[schemaName] = _this.schemas[schemaName].object();
-        } else {
-            storage.sites[host] = _this.object();
-        }
-        chrome.storage.local.set({"sites": storage.sites});
-        UI.preview.dirty = true;
-    });
+    var obj = schemaName ? this.schemas[schemaName].object() : this.object();
+    chromeSave(obj, this.name, schemaName);
     resetInterface();
 };
 
 Site.prototype.upload = function(){
-    var data = {
+    chromeUpload({
         schema: this.current.schema.uploadObject(),
         site: this.name
-    };
-    chrome.runtime.sendMessage({type: 'upload', data: data});
+    });
 };
 
 Site.prototype.object = function(){

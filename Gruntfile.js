@@ -32,7 +32,8 @@ module.exports = function(grunt){
         concat: {
             dist: {
                 src: ['src/utility.js', 'src/selector.js', 'src/interface_with_html.js',
-                    'src/fetch.js', 'src/parent.js', 'src/rule.js', 'src/cycle.js', 'src/collector.js'],
+                    'src/fetch.js', 'src/parent.js', 'src/rule.js', 'src/chrome.js',
+                    'src/cycle.js', 'src/collector.js'],
                 dest: 'collector/collector.js',
                 options: {
                     banner: "'use strict';\n",

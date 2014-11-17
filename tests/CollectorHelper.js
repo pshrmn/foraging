@@ -8,6 +8,13 @@ var chrome = {
     }
 };
 
+function chromeLoadOptions(){}
+function chromeSetupHostname(){}
+
 var UI = {
-    setup: function(){ return; }
+    view: {
+        view: undefined,
+        tab: undefined
+    }
+
 };

@@ -57,5 +57,6 @@ var Fetch = {
         } else {
             allElements = this.all(selector, parent.selector);
         }
+        return allElements;
     }
 };

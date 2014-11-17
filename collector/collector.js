@@ -609,21 +609,7 @@ var UI = {
         view: undefined,
         tab: undefined
     },
-    preview: {
-        dirty: true
-    },
-    setup: function(){        
-        loadOptions();
-        setupHostname();
-        
-        // tabs
-        tabEvents();
-
-        //views
-        SelectorView.setup();
-        RuleView.setup();
-        optionsViewEvents();
-    }
+    previewDirty: true
 };
 
 // Source: src/fetch.js
@@ -686,6 +672,7 @@ var Fetch = {
         } else {
             allElements = this.all(selector, parent.selector);
         }
+        return allElements;
     }
 };
 
@@ -817,6 +804,8 @@ var Parent = {
 // this exists in a separate file for ease of use
 // but has dependencies on variables in collector.js and thus is not modular
 
+/* requires parent.js, fetch.js, and utility.js */
+
 var CurrentSite;
 
 /********************
@@ -859,7 +848,20 @@ function Site(name, schemas){
 }
 
 Site.prototype.html = function(){
-    var schemas         = noSelectElement("div");
+    /*
+    <div> // topbar
+        Schema: <select>...</select>
+            <button>+Schema</button>
+            <button>×</button>
+            <button>Upload</button>
+        Page: <select>...</select>
+        Selector Set: <select>...</select>
+        <button>Upload</button>
+    </div>
+    <div>...</div> // schemas
+    */
+
+    var topbar          = noSelectElement("div");
     var schemaText      = document.createTextNode("Schema: ");
     var schemaSelect    = noSelectElement("select");
     var createSchema    = noSelectElement("button");
@@ -869,7 +871,8 @@ Site.prototype.html = function(){
     var pageSelect      = noSelectElement("div");
     var selectorText    = document.createTextNode("Selector Set: ");
     var setSelect       = noSelectElement("div");
-    var topbar          = noSelectElement("div");
+
+    var schemas         = noSelectElement("div");
 
     this.hasHTML    = true;
     this.eles       = {
@@ -957,27 +960,16 @@ Site.prototype.events = {
 if name is provided, only save that schema, otherwise save all
 */
 Site.prototype.save = function(schemaName){
-    var _this = this;
-    var host;
-    chrome.storage.local.get('sites', function saveSchemaChrome(storage){
-        host = _this.name;
-        if ( schemaName ) {
-            storage.sites[host].schemas[schemaName] = _this.schemas[schemaName].object();
-        } else {
-            storage.sites[host] = _this.object();
-        }
-        chrome.storage.local.set({"sites": storage.sites});
-        UI.preview.dirty = true;
-    });
+    var obj = schemaName ? this.schemas[schemaName].object() : this.object();
+    chromeSave(obj, this.name, schemaName);
     resetInterface();
 };
 
 Site.prototype.upload = function(){
-    var data = {
+    chromeUpload({
         schema: this.current.schema.uploadObject(),
         site: this.name
-    };
-    chrome.runtime.sendMessage({type: 'upload', data: data});
+    });
 };
 
 Site.prototype.object = function(){
@@ -2427,6 +2419,88 @@ function prototypeDeleteHTML(){
     }
 }
 
+// Source: src/chrome.js
+/* functions that are related to the extension */
+/* requires UI, rules.js, HTML, and CollectOptions */
+
+// takes an object to save, the name of the site, and an optional schemaName
+// if schemaName is provided, obj is a schema object to be saved
+// otherwise obj is a site object
+function chromeSave(obj, siteName, schemaName){
+    chrome.storage.local.get('sites', function saveSchemaChrome(storage){
+        if ( schemaName ) {
+            storage.sites[siteName].schemas[schemaName] = obj;
+        } else {
+            storage.sites[siteName] = obj;
+        }
+        chrome.storage.local.set({"sites": storage.sites});
+        UI.previewDirty = true;
+    });
+}
+
+// takes a data object to be uploaded and passes it to the background page to handle
+function chromeUpload(data){
+    chrome.runtime.sendMessage({type: 'upload', data: data});
+}
+
+/*
+creates an object representing a site and saves it to chrome.storage.local
+the object is:
+    host:
+        site: <hostname>
+        schemas:
+            <name>:
+                name: <name>,
+                pages: {},
+                urls: {}
+
+urls is saved as an object for easier lookup, but converted to an array of the keys before uploading
+
+If the site object exists for a host, load the saved rules
+*/
+function chromeSetupHostname(){
+    chrome.storage.local.get("sites", function setupHostnameChrome(storage){
+        var host = window.location.hostname,
+            siteObject = storage.sites[host];
+        // default setup if page hasn't been visited before
+        if ( !siteObject ) {
+            CurrentSite = new Site(host);
+            // save it right away
+            CurrentSite.save();
+        } else {
+            CurrentSite = new Site(host, siteObject.schemas);
+        }
+        var siteHTML = CurrentSite.html();
+        HTML.schema.info.appendChild(siteHTML.topbar);
+        HTML.schema.holder.appendChild(siteHTML.schema);
+        CurrentSite.loadSchema("default");
+    });
+}
+
+/***********************
+    OPTIONS STORAGE
+***********************/
+
+function chromeLoadOptions(){
+    chrome.storage.local.get("options", function loadOptionsChrome(storage){
+        var input;
+        CollectOptions = storage.options;
+        for ( var key in storage.options ) {
+            if ( storage.options[key] ) {
+                input = document.getElementById(key);
+                if ( input ) {
+                    input.checked = true;
+                }
+            }
+        }
+    });
+}
+
+// override current options with passed in options
+function chromeSetOptions(options){
+    chrome.storage.local.set({"options": options});
+}
+
 // Source: src/cycle.js
 var Cycle = (function(){
     // used to 
@@ -2662,13 +2736,13 @@ var Cycle = (function(){
 })();
 
 // Source: src/collector.js
-/*********************************
+/****************************************************************************************
             GLOBALS
-*********************************/
-/*
-Object that stores information related to elements that match the current selector
-(and how to select them)
-*/
+    Fetch:      used to select elements
+    Parent:     used to limit selections to children element of parent selector
+    HTML:       cache of various HTML elements that are referred to
+    UI:         used to inter
+****************************************************************************************/
 var CollectOptions = {};
 
 // Family derived from clicked element in the page
@@ -3010,7 +3084,18 @@ var RuleView = {
     }
 };
 
-UI.setup();
+(function(){
+    chromeLoadOptions();
+    chromeSetupHostname();
+    
+    // tabs
+    tabEvents();
+
+    //views
+    SelectorView.setup();
+    RuleView.setup();
+    optionsViewEvents();
+})();
 
 /*
 reset state of interface
@@ -3076,7 +3161,7 @@ function optionsViewEvents(){
         } else {
             CollectOptions.ignore = document.getElementById("ignore").checked;
         }
-        setOptions(CollectOptions);
+        chromeSetOptions(CollectOptions);
     });
 }
 
@@ -3210,10 +3295,10 @@ function hideCurrentView(){
 
 function generatePreview(){
     // only regen preview when something in the schema has changed
-    if (  UI.preview.dirty ) {
+    if (  UI.previewDirty ) {
         HTML.preview.innerHTML = CurrentSite.current.page.preview();
     }
-    UI.preview.dirty = false;
+    UI.previewDirty = false;
 }
 
 /*
@@ -3272,65 +3357,4 @@ function elementCount(count, parentCount){
     } else {
         return count + " total";
     }
-}
-
-/***********************
-        STORAGE
-***********************/
-/*
-creates an object representing a site and saves it to chrome.storage.local
-the object is:
-    host:
-        site: <hostname>
-        schemas:
-            <name>:
-                name: <name>,
-                pages: {},
-                urls: {}
-
-urls is saved as an object for easier lookup, but converted to an array of the keys before uploading
-
-If the site object exists for a host, load the saved rules
-*/
-function setupHostname(){
-    chrome.storage.local.get("sites", function setupHostnameChrome(storage){
-        var host = window.location.hostname,
-            siteObject = storage.sites[host];
-        // default setup if page hasn't been visited before
-        if ( !siteObject ) {
-            CurrentSite = new Site(host);
-            // save it right away
-            CurrentSite.save();
-        } else {
-            CurrentSite = new Site(host, siteObject.schemas);
-        }
-        var siteHTML = CurrentSite.html();
-        HTML.schema.info.appendChild(siteHTML.topbar);
-        HTML.schema.holder.appendChild(siteHTML.schema);
-        CurrentSite.loadSchema("default");
-    });
-}
-
-/***********************
-    OPTIONS STORAGE
-***********************/
-
-function loadOptions(){
-    chrome.storage.local.get("options", function(storage){
-        var input;
-        CollectOptions = storage.options;
-        for ( var key in storage.options ) {
-            if ( storage.options[key] ) {
-                input = document.getElementById(key);
-                if ( input ) {
-                    input.checked = true;
-                }
-            }
-        }
-    });
-}
-
-// override current options with passed in options
-function setOptions(options){
-    chrome.storage.local.set({"options": options});
 }

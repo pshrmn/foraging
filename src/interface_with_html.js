@@ -72,19 +72,5 @@ var UI = {
         view: undefined,
         tab: undefined
     },
-    preview: {
-        dirty: true
-    },
-    setup: function(){        
-        loadOptions();
-        setupHostname();
-        
-        // tabs
-        tabEvents();
-
-        //views
-        SelectorView.setup();
-        RuleView.setup();
-        optionsViewEvents();
-    }
+    previewDirty: true
 };
