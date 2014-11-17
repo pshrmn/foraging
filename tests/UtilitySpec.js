@@ -145,4 +145,16 @@ describe("utility functions", function(){
             expect(legalSchemaName(null)).toBe(false);
         });
     });
+
+    describe("elementCount", function(){
+        it("returns the number of matched selectors", function(){
+            var total = elementCount(10);
+            expect(total).toEqual("10 total");
+        });
+
+        it("returns count divided by parent count if parent is set", function(){
+            var total = elementCount(10, 5);
+            expect(total).toEqual("2 per parent group");
+        });
+    });
 });

@@ -26,24 +26,13 @@ var HTML = {
         family:     document.getElementById("selectorHolder"),
         selector:   document.getElementById("currentSelector"),
         count:      document.getElementById("currentCount"),
-        parent: {
-            holder: document.getElementById("parentRange"),
-            low:    document.getElementById("parentLow"),
-            high:   document.getElementById("parentHigh")
-        },
-        type:       document.getElementById("selectorType")
     },
     // elements in the rule view
     rule: {
-        selector:       document.getElementById("ruleSelector"),
-        form:           document.getElementById("ruleForm"),
-        name:           document.getElementById("ruleName"),
         capture:        document.getElementById("ruleAttr"),
         follow:         document.getElementById("ruleFollow"),
         followHolder:   document.getElementById("ruleFollowHolder")
-    },
-    alert:      document.getElementById("collectAlert"),
-    preview:    document.getElementById("previewContents")
+    }
 };
 
 /*
@@ -66,6 +55,7 @@ var UI = (function(){
         view: views.schema,
         tab: tabs.schema
     };
+    var preview     = document.getElementById("previewContents");
 
     function setCurrentView(view, tab){
         hideCurrentView();
@@ -87,7 +77,7 @@ var UI = (function(){
     function generatePreview(){
         // only regen preview when something in the schema has changed
         if (  ui.dirty ) {
-            HTML.preview.innerHTML = CurrentSite.current.page.preview();
+            preview.innerHTML = CurrentSite.current.page.preview();
         }
         ui.dirty = false;
     }
@@ -117,4 +107,47 @@ var UI = (function(){
         }
     };
     return ui;
+})();
+
+var error = (function(){
+    var alert = document.getElementById("collectAlert");
+
+    return {
+        alertMessage: function(msg){
+            var p = noSelectElement("p");
+            p.textContent = msg;
+            alert.appendChild(p);
+            setTimeout(function(){
+                alert.removeChild(p);
+            }, 2000);
+        },
+        check: function(condition, ele, msg){
+            if ( condition ) {
+                ele.classList.add("error");
+                this.alertMessage(msg);
+                return true;
+            }
+            return false;
+        },
+        reservedWord: function(word, ele, msg){
+            var reservedWords   = ["default", "url"];
+            var reserved        = false;
+            for ( var i=0, len=reservedWords.length; i<len; i++ ) {
+                if ( word === reservedWords[i] ) {
+                    reserved = true;
+                    break;
+                }
+            }
+            return this.check(reserved, ele, msg);
+        },
+        empty: function(attr, ele, msg){
+            return this.check((attr === ""), ele, msg);
+        },
+        clear: function(){
+            var errors = document.querySelectorAll(".collectjs .error");
+            for ( var i=0, errorLen = errors.length; i<errorLen; i++ ) {
+                errors[i].classList.remove("error");
+            }        
+        }
+    };
 })();

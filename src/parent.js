@@ -4,6 +4,7 @@ var Parent = {
     count:      0,
     hidden:     false,
     html:       false,
+    type:       "selector",
     // set the parent object
     set: function(obj){
         this.parent     = obj;
@@ -62,9 +63,9 @@ var Parent = {
     // returns the parent selector
     // if type !== "selector", always return "body". Then check if there is a parent selector
     // and if there is use that, defaulting to "body" if there is none
-    selector: function(type){
+    selector: function(){
         var parent;
-        switch(type){
+        switch(this.type){
             case "selector":
                 parent = this.exists ? this.parent.selector : "body";
                 break;
@@ -99,9 +100,9 @@ var Parent = {
     },
     // returns nearest parent element (as determined by the parent selector) to the passed in element
     // defaults to the body if there is no parent or the current ype !== "selector"
-    element: function(ele, type){
+    element: function(ele){
         var parent;
-        switch(type){
+        switch(this.type){
             case "selector":
                 parent = this.exists ? this.nearest(ele, this.parent.selector) : document.body;
                 break;
@@ -110,13 +111,16 @@ var Parent = {
         }
         return parent;
     },
-    object: function(type){
+    object: function(){
         var parent;
-        switch(type){
+        switch(this.type){
             case "selector":
                 parent = this.parent;
                 break;
         }
         return parent;
+    },
+    getCount: function(){
+        return this.type === "selector" ? this.count : undefined;
     }
 };

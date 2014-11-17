@@ -130,11 +130,11 @@ Site.prototype.events = {
         }
         // make sure name isn't empty string or string that can't be used in a filename
         else if ( name === "" || !legalSchemaName(name)) {
-            alertMessage("\'" + name + "\' is not a valid schema name");
+            error.alertMessage("\'" + name + "\' is not a valid schema name");
             return;
         }
         else if ( !this.uniqueSchemaName(name)){
-            alertMessage("a schema named \"" + name + "\" already exists");
+            error.alertMessage("a schema named \"" + name + "\" already exists");
             return;
         }
         
@@ -749,12 +749,12 @@ Page.prototype.events = {
             return;
         }
         else if ( name === "" ) {
-            alertMessage("selector set name cannot be blank");
+            error.alertMessage("selector set name cannot be blank");
             return;
         }
         
         if ( !this.parentSchema.uniqueSelectorSetName(name) ) {
-            alertMessage("a selector set named \"" + name + "\" already exists");
+            error.alertMessage("a selector set named \"" + name + "\" already exists");
             return;
         }
         set = new SelectorSet(name);

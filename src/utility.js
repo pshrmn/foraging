@@ -15,6 +15,12 @@ function clearClass(name){
     }
 }
 
+function clearClasses(names){
+    names.forEach(function(d){
+        clearClass(d);
+    });
+}
+
 // iterate over array (or converted nodelist) and add a class to each element
 function addClass(name, eles){
     eles = Array.prototype.slice.call(eles);
@@ -88,3 +94,12 @@ function createRangeString(low, high){
     var highString  = high !== 0 && !isNaN(high) ? high : "end";
     return "(" + lowString + " to " + highString + ")";
 }
+
+function elementCount(count, parentCount){
+    if ( parentCount ) {
+        return parseInt(count/parentCount) + " per parent group";
+    } else {
+        return count + " total";
+    }
+}
+

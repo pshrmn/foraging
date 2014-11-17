@@ -33,7 +33,7 @@ module.exports = function(grunt){
             dist: {
                 src: ['src/utility.js', 'src/selector.js', 'src/interface_with_html.js',
                     'src/fetch.js', 'src/parent.js', 'src/rule.js', 'src/chrome.js',
-                    'src/cycle.js', 'src/collector.js'],
+                    'src/cycle.js', 'src/views.js', 'src/collector.js'],
                 dest: 'collector/collector.js',
                 options: {
                     banner: "'use strict';\n",
@@ -45,12 +45,11 @@ module.exports = function(grunt){
             },
         },
         jasmine: {
-            collector: {
-                src: 'src/collector.js',
+            interface: {
+                src: 'src/interface_with_html.js',
                 options: {
-                    specs: 'tests/CollectorSpec.js',
-                    helpers: ['src/utility.js', 'src/interface_with_html.js', 'src/fetch.js',
-                        'src/Cycle.js', 'tests/CollectorHelper.js']
+                    specs: 'tests/InterfaceSpec.js',
+                    helpers: ['src/utility.js']
                 }
             },
             fetch: {
