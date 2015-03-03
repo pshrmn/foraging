@@ -77,6 +77,12 @@ module.exports = function(grunt){
                     specs: 'tests/ParentSpec.js',
                     helpers: ['src/utility.js', 'src/fetch.js']
                 }
+            },
+            attributes: {
+                src: 'src/attributes.js',
+                options: {
+                    specs: 'tests/AttributesSpec.js'
+                }
             }
         }
     });
