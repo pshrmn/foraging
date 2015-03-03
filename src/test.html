@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>afewwe</title>
+    <style type="text/css">
+    .half {
+        background: red;
+    }
+    </style>
+</head>
+<body>
+
+<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script type="text/javascript" src="attributes.js"></script>
+<script type="text/javascript" src="vis.js"></script>
+<script type="text/javascript">
+    var fragment = document.createDocumentFragment();
+    var p;
+    for ( var i=0; i<20; i++ ) {
+        p = document.createElement("p");
+        if ( Math.random() > 0.5 ) {
+            p.classList.add("half");
+        }
+        p.textContent = i;
+        fragment.appendChild(p);
+    }
+    document.body.appendChild(fragment);
+
+    var av = AttributeView(document.body);
+    var ps = document.querySelectorAll("p");
+    av.setElements(ps);
+
+</script>
+</body>
+</html>
