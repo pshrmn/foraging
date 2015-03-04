@@ -11,7 +11,7 @@ function attributes(element) {
     // include text if it exists
     var text = element.textContent;
     if ( text !== "" ) {
-        attrMap["text"] = text;
+        attrMap.text = text;
     }
     return attrMap;
 }

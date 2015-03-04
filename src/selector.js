@@ -1,441 +1,61 @@
-/********************
-    SELECTORFAMILY
-********************/
-/*
-ele is the child element you want to build a selector from
-parent is the selector for the most senior element you want to build a selector up to
-    or "body" if parent is undefined or an empty string
-text is an element whose textContent will be set based on SelectorFamily.toString in update
-fn is a callback for when SelectorFamily.update is called
-options are optional
-*/
-function SelectorFamily(ele, parent, holder, text, fn, options){
-    this.selectors      = [];
-    this.ele            = noSelectEle("div", ["selectorFamily"]);
-    this.text           = text;
-    this.updateFunction = fn;
-    this.options        = options || {};
+// returns a function that takes an element and returns it's tag,
+// id, and classes in css selector form
+// include attribute selectors in the future?
+function SelectorParts(){
+    var skipTags = [];
+    var skipClasses = [];
 
-    // clear out holder, then attach SelectorFamily.ele
-    holder.innerHTML = "";
-    holder.appendChild(this.ele);
-
-    this._makeSelectors(ele, parent);
-}
-
-SelectorFamily.prototype = {
-    // "Private" methods
-    /***
-    given the element, its parent element, and selector options, iterate from the element (inclusive)
-    to the parent (exclusive) and create an ToggleableElement for each element
-    ***/
-    _makeSelectors: function(ele, parent){
-        // Generates the selectors array with Selectors from ele to parent (ignoring document.body)
-        // Order is from most senior element to provided ele
-        // if a select is given, swap ele to be the first option
-        if ( ele.tagName === "SELECT" && ele.childElementCount > 0 ) {
-            ele = ele.children[0];
-        }
-        while ( ele !== null && ele !== parent ) {
-            if ( !this.filter(ele) ) {
-                ele = ele.parentElement;
-                continue;
-            }
-            this.selectors.push(new ToggleableElement(ele, this));
-            ele = ele.parentElement;
-        }
-        // reverse selectors so 0-index is selector closest to body
-        this.selectors.reverse();
-        var curr;
-        for ( var i=0, len=this.selectors.length; i<len; i++ ) {
-            curr = this.selectors[i];
-            this.ele.appendChild(curr.ele);
-            curr.index = i;
-        }
-        this.selectors[this.selectors.length-1].setAll();
-    },
-    /***
-    only include an element if it meets requirements (determined by options)
-    ***/
-    filter: function(ele){
-        if ( this.options.ignore && !allowedElement(ele.tagName) ) {
-            return false;
-        }
-        return true;
-    },
-    removeSelector: function(index){
-        this.selectors.splice(index, 1);
-        // reset index values after splice
-        for ( var i=0, len=this.selectors.length; i<len; i++ ) {
-            this.selectors[i].index = i;
-        }
-        this.update();
-    },
-    // "Public" methods
-    remove: function(){
-        this.ele.parentElement.removeChild(this.ele);
-        if ( this.text ) {
-            this.text.textContent = "";
-        }
-    },
-    // called when something changes with the selectors/fragments
-    update: function(){
-        if ( this.text ) {
-            this.text.textContent = this.toString();
-        }
-        if ( this.updateFunction ) {
-            this.updateFunction();
-        }
-    },
-    // Turn on Fragments that match
-    match: function(selector){
-        var copy = this.selectors.slice(0, this.selectors.length),
-            selectorParts = selector.split(' '),
-            currSelector, currPart;
-
-        currSelector = copy.pop();
-        currPart = selectorParts.pop();
-
-        while ( currSelector !== undefined && currPart !== undefined) {
-            if ( currSelector.matches(currPart) ) {
-                currPart = selectorParts.pop();
-            }
-            currSelector = copy.pop();
-        }
-        this.update();
-    },
-    toString: function(){
-        var selectors = [],
-            selectorString;
-        for ( var i=0, len=this.selectors.length; i<len; i++ ) {
-            selectorString = this.selectors[i].toString();
-            if ( selectorString !== "" ) {
-                selectors.push(selectorString);
-            }
-        }
-        return selectors.join(' ');
-    }
-};
-
-function allowedElement(tag){
-    // make sure that these are capitalized
-    var illegal = ["CENTER", "TBODY", "THEAD", "TFOOT", "COLGROUP"],
-        allowed = true;
-    for ( var i=0, len=illegal.length; i<len; i++){
-        if ( tag === illegal[i] ) {
-            allowed = false;
-            break;
-        }
-    }
-    return allowed;
-}
-
-/***************************
-Functions shared by Fragment and NthFragment
-***************************/
-var fragments = {
-    on: function(){
-        return !this.ele.classList.contains("off");
-    },
-    turnOn: function(){
-        this.ele.classList.remove("off");
-    },
-    turnOff: function(){
-        this.ele.classList.add("off");
-    },
-    toggleOff: function(event){
-        this.ele.classList.toggle("off");
-    }
-};
-
-/********************
-    FRAGMENT
-********************/
-function Fragment(name, selector){
-    this.selector   = selector;
-    this.name       = name;
-    this.ele        = noSelectEle("span", ["toggleable", "realselector", "off"]);
-
-    this.ele.textContent = this.name;
-    this.ele.addEventListener("click", fragments.toggleOff.bind(this), false);
-}
-
-Fragment.prototype = {
-    on: fragments.on,
-    turnOn: fragments.turnOn,
-    turnOff: fragments.turnOff,
-    matches: function(name){
-        return name === this.name;
-    }
-};
-
-/********************
-    NTHFRAGMENT
-a fragment representing an nth-ot-type css pseudoselector
-********************/
-function NthFragment(selector){
-    this.selector   = selector;
-    this.ele        = noSelectEle("span", ["toggleable"]);   
-    this.beforeText = document.createTextNode(":nth-of-type(");
-    this.afterText  = document.createTextNode(")");
-    this.input      = noSelectEle("input", ["childtoggle"]);
-
-
-    this.input.setAttribute("type", "text");
-    this.input.value = 1;
-    this.input.setAttribute("title", "options: an+b (a & b are integers), a positive integer (1,2,3...), odd, even");
-
-    this.ele.appendChild(this.beforeText);
-    this.ele.appendChild(this.input);
-    this.ele.appendChild(this.afterText);
-
-    //Events
-    this.ele.addEventListener("click", fragments.toggleOff.bind(this), false);
-    this.input.addEventListener("click", function(event){
-        // don't toggle .off when clicking/focusing the input element
-        event.stopPropagation();
-    });
-    this.input.addEventListener("blur", (function(event){
-        this.selector.family.update();
-    }).bind(this));
-}
-
-NthFragment.prototype = {
-    on: fragments.on,
-    turnOn: fragments.turnOn,
-    turnOff: fragments.turnOff,
-    matches: function(name){
-        return this.text() === name;
-    },
-    text: function(){
-        return this.beforeText.textContent + this.input.value + this.afterText.textContent;
-    }
-};
-
-/********************
-    SELECTOR
-********************/
-/***
-ele is an element to create an ToggleableElement for
-family is the SelectorFamily the ToggleableElement belongs to
-***/
-function ToggleableElement(ele, family){
-    this.family         = family;
-    this.tag            = new Fragment(ele.tagName.toLowerCase(), this);
-    this.id             = ele.hasAttribute('id') ?
-                            new Fragment('#' + ele.getAttribute('id'), this) : undefined;
-    this.classes        = [];
-    this.ele            = noSelectEle("div", ["selectorSchema"]);
-    this.nthtypeCreator = selectorSpan("+t", ["nthtype", "noSelect"], "add the nth-of-type pseudo selector"),
-
-    this.ele.appendChild(this.tag.ele);
-    if ( this.id ) {
-        this.ele.appendChild(this.id.ele);
+    function tagAllowed(tag){
+        return !skipTags.some(function(st){
+            return st === tag;
+        });
     }
 
-    var curr, deltog, frag;
-    // generate a fragment for all of the element's classes
-    for ( var i=0, len=ele.classList.length; i<len; i++ ) {
-        curr = ele.classList[i];
-        // classes used collect.js, not native to page 
-        if ( curr === "collectHighlight" || curr === "queryCheck" ||
-            curr === "savedPreview" || curr === "parentSchema" ) {
-            continue;
-        }
-        frag = new Fragment('.' + curr, this);
-        this.classes.push(frag);
-        this.ele.appendChild(frag.ele);
+    function classAllowed(c){
+        return !skipClasses.some(function(sc){
+            return sc === c;
+        });
     }
 
-    this.ele.addEventListener("click", this.events.cleanSelector.bind(this), false);
-    
-    this.nthtypeCreator.addEventListener('click', this.events.createNthofType.bind(this), false);
-    this.ele.appendChild(this.nthtypeCreator);
-
-    deltog = selectorSpan("x", ["deltog", "noSelect"]);
-    deltog.addEventListener('click', this.events.removeSelector.bind(this), false);
-    this.ele.appendChild(deltog);
-
-}
-
-ToggleableElement.prototype = {
-    events: {
-        cleanSelector: function(event){
-            if ( !event.target.classList.contains("toggleable") ) {
-                return;
-            }
-
-            // only care if nthoftype exists
-            if ( this.nthoftype && this.nthoftype.on() ) {
-                // lxml requires a tag when using :nth-of-type
-                // if turning on nthoftype, turn on tag as well
-                if ( event.target === this.nthoftype.ele ) {
-                    this.tag.turnOn();
-                }
-                // if turning off tag, turn off nthoftype as well
-                else if ( event.target === this.tag.ele && !this.tag.on() ) {
-                    this.nthoftype.turnOff();
-                }
-            }
-            this.family.update();
-        },
-        removeSelector: function(event){
-            // get rid of the html element
-            this.ele.parentElement.removeChild(this.ele);
-            this.family.removeSelector(this.index);
-        },
-        createNthofType: function(event){
-            event.stopPropagation();
-            this.addNthofType();
-        }
-    },
-    addNthofType: function(){
-        if ( this.nthoftype ) {
+    function parts(element){
+        var pieces = [];
+        var tag = element.tagName.toLowerCase();
+        if ( tagAllowed(tag) ) {
+            pieces.push(tag);
+        } else {
             return;
         }
-        // lxml requires a tag to be used alongside :nth-of-type, so make sure that that is on
-        this.tag.turnOn();
-        
-        this.nthoftype = new NthFragment(this);
-        this.ele.removeChild(this.nthtypeCreator);
-        this.nthtypeCreator = undefined;
-        
 
-        var selectors = this.ele.getElementsByClassName("realselector"),
-            len = selectors.length;
-
-        var sibling = selectors[len-1].nextSibling;
-        this.ele.insertBefore(this.nthoftype.ele, sibling);
-    },
-    /* turn on (remove .off) from all toggleable parts of a selector if bool is undefined or true
-    turn off (add .off) to all toggleable parts if bool is false */
-    setAll: function(bool){
-        var fn = (bool === true || bool === undefined ) ? "remove": "add";
-        this.tag.ele.classList[fn]("off");
-        if ( this.id ) {
-            this.id.ele.classList[fn]("off");
-        }
-        for ( var i=0, len=this.classes.length; i<len; i++ ) {
-            this.classes[i].ele.classList[fn]("off");
-        }
-        if ( this.nthoftype ) {
-            this.nthoftype.classList[fn]("off");
-        }
-    },
-    /*
-    Given a selector string, return true if the Selector has attributes matching the query string
-    If returning true, also turn on the matching Fragments
-    */
-    matches: function(selector){
-        var tag, id, classes, nthoftype,
-            onlist = [];
-        // element tag
-        tag = selector.match(/^[a-z][\w0-9-]*/i);
-        if ( tag !== null) {
-            if ( this.tag.matches(tag[0]) ){
-                onlist.push(this.tag);
-            } else {
-                return false;
-            }
+        if ( element.id !== "" ) {
+            pieces.push("#" + element.id);
         }
 
-        // element id
-        id = selector.match(/#(?:[a-z][\w0-9-]*)/i);
-        if ( id !== null ) {
-            if ( this.id === undefined || !this.id.matches(id[0])) {
-                return false;
-            } else {
-                onlist.push(this.id);
+        // classes
+        var c;
+        for ( var i=0; i<element.classList.length; i++ ) {
+            c = element.classList.item(i);
+            if ( classAllowed(c) ) {
+                pieces.push ("." + c);
             }
         }
-
-        // element classes
-        classes = selector.match(/(\.[a-z][\w0-9-]*)/ig);
-        if ( classes !== null ) {
-            // if the provided selector has more classes than the selector, know it doesn't match
-            if ( classes.length > this.classes.length ) {
-                return false;
-            }
-            var thisClass, matchClass, found;
-            for ( var j=0, matchLen=classes.length; j<matchLen; j++ ) {
-                matchClass = classes[j];
-                found = false;
-                for ( var i=0, thisLen=this.classes.length; i<thisLen; i++ ) {    
-                    thisClass = this.classes[i];
-                    if ( thisClass.matches(matchClass) ) {
-                        onlist.push(thisClass);
-                        found = true;
-                        continue;
-                    }
-                }
-                if ( !found ) {
-                    return false;
-                }
-            }
-        }
-
-        // nth-of-type element
-        nthoftype = selector.match(/:nth-of-type\((?:odd|even|-?\d+n(?:\s*(?:\+|-)\s*\d+)?|\d+)\)/i);
-        if ( nthoftype !== null ) {
-            if ( this.nthoftype === undefined || !this.nthoftype.matches(nthoftype[0]) ){
-                return false;
-            } else {
-                onlist.push(this.nthoftype);
-            }
-        }
-
-        // everything matches, turn framents on and return true
-        for ( var k=0, len=onlist.length; k<len; k++ ) {
-            onlist[k].turnOn();
-        }
-        return true;
-    },
-    toString: function(){
-        var selector = "",
-            curr;
-        if ( this.tag.on() ) {
-            selector += this.tag.name;
-        }
-        if ( this.id && this.id.on() ) {
-            selector += this.id.name;
-        }
-        if ( this.classes.length ) {
-            for ( var i=0, len=this.classes.length; i<len; i++ ) {
-                curr = this.classes[i];
-                if ( curr.on() ) {
-                    selector += curr.name;
-                }
-            }
-        }
-        if ( this.nthoftype && this.nthoftype.on() ) {
-            selector += this.nthoftype.text();
-        }
-        return selector;
+        return pieces;
     }
-};
 
-/*********************************
-            Helpers
-*********************************/
-function selectorSpan(text, classes, title){
-    var span = document.createElement("span");
-    span.textContent = text;
-    if ( classes ) {
-        for ( var i=0, len=classes.length; i<len; i++ ) {
-            span.classList.add(classes[i]);
-        }    
-    }
-    if ( title ) {
-        span.setAttribute("title", title);
-    }
-    return span;
-}
+    // set the element tags to be ignored
+    // returns new function
+    parts.ignoreTags = function(tags){
+        if ( !arguments.length ) { return skipTags; }
+        skipTags = tags;
+        return parts;
+    };
 
-function noSelectEle(tag, otherClasses){
-    var ele = document.createElement(tag);
-    ele.classList.add("noSelect");
-    for ( var i=0, len=otherClasses.length; i<len; i++ ) {
-        ele.classList.add(otherClasses[i]);
-    }
-    return ele;
+    // set the element classes to be ignored
+    // returns new function
+    parts.ignoreClasses = function(classes){
+        if ( !arguments.length ) { return skipClasses; }
+        skipClasses = classes;
+        return parts;
+    };
+
+    return parts;
 }

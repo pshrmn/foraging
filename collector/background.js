@@ -14,7 +14,9 @@ chrome.storage.local.get(null, function(storage) {
 // inject collectjs interface when the browserAction icon is clicked
 chrome.browserAction.onClicked.addListener(function(tab) {
     chrome.tabs.insertCSS(null, {file: "css/interface.css"});
-    chrome.tabs.executeScript(null, {file: "collector.js"});
+    chrome.tabs.executeScript(null, {file: "lib/d3.js"}, function(){
+        chrome.tabs.executeScript(null, {file: "collector.js"});
+    });
 });
 
 chrome.runtime.onMessage.addListener(function(message, sender, sendResponse){

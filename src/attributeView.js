@@ -1,7 +1,11 @@
-function AttributeView(holder, saveFn){
+function AttributeView(options){
     var index = 0;
     var length = 0;
     var eles = [];
+
+    options = options || {};
+    var holder = options.holder || "body";
+    var saveFn = options.save || function(){};
 
     // ui
     var view = d3.select(holder).append("div");
@@ -33,14 +37,14 @@ function AttributeView(holder, saveFn){
             .attr("name", "name");
 
     form.append("button")
-        .text("Save Attr")
+        .text("Save Attr");
 
     // attribute display
     var display = view.append("div")
-        .classed({"display": true})
+        .classed({"display": true});
 
     var attributeHolder = display.append("div")
-        .classed({"attributes": true})
+        .classed({"attributes": true});
 
     var buttons = display.append("div");
     var previous = buttons.append("button")

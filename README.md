@@ -1,16 +1,62 @@
+Working on overhaul, currently broken
+
 ###CollectorJS
 
 A Chrome extension that allows you to get information necessary to crawl a page. Creates rules that consist of a css selector to get an element (or more) in the page and a capture value, which is either text or an element attribute. Should be run in correlation with the web.server module in https://github.com/psherman/collector
 
 #####Rules Format
 
-A schema refers to a set of data to be captured
+Data is captured through "attrs". An attr has a name and the attribute of an element to capture (or text).
+
+    attr = {
+        name: "url",
+        attr: "href"
+    }
+
+Attrs are created on "selectors". Selectors are made up of a selector (css selector), child selectors, and attrs. Additionally, an optional "index" can be used on a selector to specify a specific element to target. (default behavior includes all matching elements. "index" is zero-based)
+
+    selector = {
+        selector: "p",
+        children: [
+            {
+                selector: "a",
+                children: [],
+                attrs: [
+                    {
+                        name: "url",
+                        attr: "href"
+                    }
+                ]
+            }
+        ],
+        attrs: [
+            {
+                name: "description",
+                attr: "text"
+            }
+        ],
+        index: 2
+    }
+
+The above selector will select the second `p` element in the page and capture its `textContent` as the `description`. Any `a` elements that are children of the paragraph will have their `href` attribute captured and stored in a `url` array.
+
+A page starts with a root selector. By default this is body, but it can be changed to something more specific. Typically this should have children selectors, but the attrs array will most likely be empty.
+
+    page = {
+        selector: "body",
+        children: [...],
+        attrs: []
+    }
+
+A schema refers to a set of data to be captured. The schema's pages are used to collect data. The "default" page is the starting point. The names of other pages correspond to attrs.
     
     schema = {
         name: <string>
         urls: [<string>...],
         pages: {<page>...}
     }
+
+
 
 A page is a webpage and contains selector sets to capture elements in the page
 

@@ -8,7 +8,8 @@ module.exports = function(grunt){
                 validthis: true,
                 globalstrict: true,
                 globals: {
-                    chrome: true
+                    chrome: true,
+                    d3: true
                 },
                 devel: true,
                 expr: true
@@ -22,18 +23,11 @@ module.exports = function(grunt){
                 }
             }
         },
-        html_to_js_str: {
-            test: {
-                files: {
-                  'src/interface_with_html.js': 'src/interface.js'
-                }
-            }
-        },
         concat: {
             dist: {
-                src: ['src/utility.js', 'src/selector.js', 'src/fetch.js', 'src/parent.js',
-                    'src/rule.js', 'src/interface_with_html.js', 'src/chrome.js',
-                    'src/cycle.js', 'src/family.js', 'src/views.js', 'src/collector.js'],
+                src: ['src/attributes.js', 'src/objects.js', 'src/selector.js',
+                    'src/attributeView.js', 'src/schemaView.js', 'src/ui.js',
+                    'src/collector.js'],
                 dest: 'collector/collector.js',
                 options: {
                     banner: "'use strict';\n",
@@ -45,13 +39,6 @@ module.exports = function(grunt){
             },
         },
         jasmine: {
-            interface: {
-                src: 'src/interface_with_html.js',
-                options: {
-                    specs: 'tests/InterfaceSpec.js',
-                    helpers: ['src/utility.js']
-                }
-            },
             fetch: {
                 src: 'src/fetch.js',
                 options: {
@@ -62,20 +49,6 @@ module.exports = function(grunt){
                 src: 'src/utility.js',
                 options: {
                     specs: 'tests/UtilitySpec.js'
-                }
-            },
-            rule: {
-                src: 'src/rule.js',
-                options: {
-                    specs: 'tests/RuleSpec.js',
-                    helpers: ['src/utility.js', 'src/parent.js', 'tests/RuleHelper.js']
-                }
-            },
-            parent: {
-                src: 'src/parent.js',
-                options: {
-                    specs: 'tests/ParentSpec.js',
-                    helpers: ['src/utility.js', 'src/fetch.js']
                 }
             },
             attributes: {
@@ -89,11 +62,10 @@ module.exports = function(grunt){
     
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-sass');
-    grunt.loadNpmTasks('grunt-html-to-js-str');
     grunt.loadNpmTasks('grunt-contrib-jasmine');
     grunt.loadNpmTasks('grunt-contrib-concat');
     
-    grunt.registerTask('default', ['sass', 'html_to_js_str', 'concat', 'jshint']);
+    grunt.registerTask('default', ['sass', 'concat', 'jshint']);
 
-    grunt.registerTask('test', ['html_to_js_str', 'jasmine']);
+    grunt.registerTask('test', ['jasmine']);
 }
