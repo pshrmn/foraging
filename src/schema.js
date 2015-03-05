@@ -9,8 +9,11 @@ function tracePath(page, id){
         var found = selector.children.some(function(s){
             return find(s, lid);
         });
-        if ( !found ){
+        if ( found ) {
+            return true;
+        } else {
             path.pop();
+            return false;
         }
     }
     var found = find(page, id);
@@ -61,6 +64,19 @@ function cleanSchema(schema){
         clean(schema.pages[page]);
     }
     return schema;
+}
+
+// check if an identical selector already exists
+function matchSelector(sel, parent){
+    var match;
+    parent.children.some(function(s){
+        if ( s.selector === sel.selector && s.index === sel.index ) {
+            match = s.id;
+            return true;
+        }
+        return false;
+    });
+    return match;
 }
 
 /*

@@ -67,18 +67,19 @@ function SchemaView(options){
 
             var nodes = tree.nodes(page);
             var links = tree.links(nodes);
-
             var link = svg.selectAll(".link")
-                .data(links);
+                .data(links, function(d) { return d.source.id + "-" + d.target.id; });
+            var node = svg.selectAll(".node")
+                .data(nodes, function(d) { return d.id; });
+
+                
             link.enter().append("path")
-                .attr("class", "link")
-                .attr("d", diagonal);
+                .attr("class", "link");
+
+            link.attr("d", diagonal);
             link.exit().remove();
 
-            var node = svg.selectAll(".node")
-                .data(nodes);
             node.enter().append("g")
-                .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
                 .classed({
                     "node": true,
                     "hasAttrs": function(d){
@@ -90,7 +91,9 @@ function SchemaView(options){
                     selectorText.text(d.selector);
                 });
 
-            node.append("text")
+            node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+
+            node.append("text")                
                 .text(function(d){
                     return d.selector;
                 });

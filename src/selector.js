@@ -128,6 +128,8 @@ function elementHighlighter(){
             ele.removeEventListener("mouseleave", removeOption);
             ele.removeEventListener("click", selectOption);
             ele.classList.remove("selectableElement");
+            ele.classList.remove("queryCheck");
+            ele.classList.remove("collectHighlight");
         });
     };
 

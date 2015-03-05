@@ -201,6 +201,8 @@ function elementHighlighter(){
             ele.removeEventListener("mouseleave", removeOption);
             ele.removeEventListener("click", selectOption);
             ele.classList.remove("selectableElement");
+            ele.classList.remove("queryCheck");
+            ele.classList.remove("collectHighlight");
         });
     };
 
@@ -247,8 +249,11 @@ function tracePath(page, id){
         var found = selector.children.some(function(s){
             return find(s, lid);
         });
-        if ( !found ){
+        if ( found ) {
+            return true;
+        } else {
             path.pop();
+            return false;
         }
     }
     var found = find(page, id);
@@ -299,6 +304,19 @@ function cleanSchema(schema){
         clean(schema.pages[page]);
     }
     return schema;
+}
+
+// check if an identical selector already exists
+function matchSelector(sel, parent){
+    var match;
+    parent.children.some(function(s){
+        if ( s.selector === sel.selector && s.index === sel.index ) {
+            match = s.id;
+            return true;
+        }
+        return false;
+    });
+    return match;
 }
 
 /*
@@ -419,7 +437,6 @@ function collectorController(){
             // currentSelector is the last element in the path
             currentSelector = path[path.length-1];
             currentElements = queryPath(path);
-            console.log(currentSelector, currentElements);
         },
         events: {
             addChild: function(){
@@ -439,11 +456,19 @@ function collectorController(){
                 // get the selector from elements that are "on"
                 var vals = fns.dispatch.Selector.getValues();
                 var sel = newSelector.apply(null, vals);
-                currentSelector.children.push(sel);
-                // redraw the page
-                var clone = JSON.parse(JSON.stringify(page));
-                fns.dispatch.Schema.drawPage(clone);
+                var match = matchSelector(sel, currentSelector);
+                // only save if schema doesn't match pre-existing one
+                if ( match === undefined ) {
+                    sel.id = idCount++;
+                    currentSelector.children.push(sel);
+                    // redraw the page
+                    var clone = JSON.parse(JSON.stringify(page));
+                    fns.dispatch.Schema.drawPage(clone);
+                }
+
                 ui.showView("Schema");
+                fns.dispatch.Selector.reset();
+                eh.remove();
                 chromeSave(schemas);
             },
             cancelSelector: function(){
@@ -830,18 +855,19 @@ function SchemaView(options){
 
             var nodes = tree.nodes(page);
             var links = tree.links(nodes);
-
             var link = svg.selectAll(".link")
-                .data(links);
+                .data(links, function(d) { return d.source.id + "-" + d.target.id; });
+            var node = svg.selectAll(".node")
+                .data(nodes, function(d) { return d.id; });
+
+                
             link.enter().append("path")
-                .attr("class", "link")
-                .attr("d", diagonal);
+                .attr("class", "link");
+
+            link.attr("d", diagonal);
             link.exit().remove();
 
-            var node = svg.selectAll(".node")
-                .data(nodes);
             node.enter().append("g")
-                .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
                 .classed({
                     "node": true,
                     "hasAttrs": function(d){
@@ -853,7 +879,9 @@ function SchemaView(options){
                     selectorText.text(d.selector);
                 });
 
-            node.append("text")
+            node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+
+            node.append("text")                
                 .text(function(d){
                     return d.selector;
                 });
@@ -902,7 +930,9 @@ function SelectorView(options){
         getValues: function(){
             var sel = [];
             parts.each(function(d){
-                sel.push(d);
+                if ( this.classList.contains("on") ) {
+                    sel.push(d);
+                }
             });
             // no index for now
             return [sel.join(""), undefined];

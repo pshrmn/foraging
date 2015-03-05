@@ -37,7 +37,9 @@ function SelectorView(options){
         getValues: function(){
             var sel = [];
             parts.each(function(d){
-                sel.push(d);
+                if ( this.classList.contains("on") ) {
+                    sel.push(d);
+                }
             });
             // no index for now
             return [sel.join(""), undefined];

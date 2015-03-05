@@ -67,7 +67,6 @@ function collectorController(){
             // currentSelector is the last element in the path
             currentSelector = path[path.length-1];
             currentElements = queryPath(path);
-            console.log(currentSelector, currentElements);
         },
         events: {
             addChild: function(){
@@ -87,11 +86,19 @@ function collectorController(){
                 // get the selector from elements that are "on"
                 var vals = fns.dispatch.Selector.getValues();
                 var sel = newSelector.apply(null, vals);
-                currentSelector.children.push(sel);
-                // redraw the page
-                var clone = JSON.parse(JSON.stringify(page));
-                fns.dispatch.Schema.drawPage(clone);
+                var match = matchSelector(sel, currentSelector);
+                // only save if schema doesn't match pre-existing one
+                if ( match === undefined ) {
+                    sel.id = idCount++;
+                    currentSelector.children.push(sel);
+                    // redraw the page
+                    var clone = JSON.parse(JSON.stringify(page));
+                    fns.dispatch.Schema.drawPage(clone);
+                }
+
                 ui.showView("Schema");
+                fns.dispatch.Selector.reset();
+                eh.remove();
                 chromeSave(schemas);
             },
             cancelSelector: function(){
