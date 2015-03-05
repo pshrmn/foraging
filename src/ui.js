@@ -1,6 +1,7 @@
 function buildUI(){
     var holder = document.createElement("div");
     holder.classList.add("collectjs");
+    holder.classList.add("noSelect");
     document.body.appendChild(holder);
     holder.innerHTML = '<div class="tabHolder">' +
             '<div class="tabs">' +
@@ -38,6 +39,21 @@ function buildUI(){
     }
 
     return {
+        // make sure that all elements in the collectjs have the noSelect class
+        noSelect: function(){
+            var all = holder.querySelectorAll("*");
+            for ( var i=0; i<all.length; i++ ) {
+                all[i].classList.add("noSelect");
+            }
+        },
+        addViews: function(views){
+            var fn = this.addView;
+            var _this = this;
+            views.forEach(function(view){
+                fn.apply(_this, view);
+            });
+            this.noSelect();
+        },
         addView: function(viewFn, name, options, active){
             options = options || {};
 
@@ -67,6 +83,11 @@ function buildUI(){
             options.holder = v;
             fns[name] = viewFn(options);
         },
-        fns: fns
+        // make these global for the time being, might want to lock it down?
+        fns: fns,
+        loadSchema: function(schema, page){
+            fns.Schema.setSchema(schema);
+            fns.Schema.drawPage(page);
+        }
     };
 }

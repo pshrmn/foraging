@@ -1,25 +1,12 @@
 /* functions that are related to the extension */
 
-var CollectOptions = {};
-
-function chromeLoad(){
-    chromeLoadOptions();
-    chromeSetupHostname();
-}
-
 // takes an object to save, the name of the site, and an optional schemaName
 // if schemaName is provided, obj is a schema object to be saved
 // otherwise obj is a site object
-function chromeSave(obj, siteName, schemaName){
+function chromeSave(schemas, host){
     chrome.storage.local.get('sites', function saveSchemaChrome(storage){
-        if ( schemaName ) {
-            storage.sites[siteName].schemas[schemaName] = obj;
-        } else {
-            storage.sites[siteName] = obj;
-        }
+        storage.sites[host] = schemas;
         chrome.storage.local.set({"sites": storage.sites});
-        // mark as dirty so that preview will be regenerated
-        UI.dirty = true;
     });
 }
 
@@ -43,29 +30,26 @@ urls is saved as an object for easier lookup, but converted to an array of the k
 
 If the site object exists for a host, load the saved rules
 */
-function chromeSetupHostname(){
+function chromeLoad(){
     chrome.storage.local.get("sites", function setupHostnameChrome(storage){
         var host = window.location.hostname,
             siteObject = storage.sites[host];
-        // default setup if page hasn't been visited before
-        if ( !siteObject ) {
-            CurrentSite = new Site(host);
-            // save it right away
-            CurrentSite.save();
-        } else {
-            CurrentSite = new Site(host, siteObject.schemas);
-        }
-        var siteHTML = CurrentSite.html();
-        document.getElementById("schemaInfo").appendChild(siteHTML.topbar);
-        document.getElementById("schemaHolder").appendChild(siteHTML.schema);
-        CurrentSite.loadSchema("default");
+        SiteSchemas = siteObject ?
+            siteObject :
+            {
+                default: newSchema("default")
+            };
+        SiteSchemas = generateIds(SiteSchemas);
+        CurrentSite = "default";
+        ui.loadSchema(SiteSchemas.default, "default");
+        chromeSave(SiteSchemas, host);
     });
 }
 
 /***********************
     OPTIONS STORAGE
 ***********************/
-
+/*
 function chromeLoadOptions(){
     chrome.storage.local.get("options", function loadOptionsChrome(storage){
         var input;
@@ -85,3 +69,4 @@ function chromeLoadOptions(){
 function chromeSetOptions(options){
     chrome.storage.local.set({"options": options});
 }
+*/

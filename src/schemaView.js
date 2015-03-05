@@ -3,12 +3,56 @@ function SchemaView(options){
     var page;
     var nodes;
     var links;
+    var currentPath;
+    var currentElements;
     // focused selector
     var current;
     function setCurrent(d){
         current = d;
         selectorText.text(d.selector);
     }
+
+    var es = elementSelector();
+
+    var currentParts;
+    var eh = elementHighlighter()
+        .clicked(function(element){
+            var tagData = sp(element);
+            queryCheckMarkup(tagData.join(""));
+            currentParts = tags.selectAll("p.tag")
+                .data(tagData);
+            currentParts.enter().append("p")
+                .classed({
+                    "tag": true,
+                    "on": true
+                })
+                .on("click", function(){
+                    this.classList.toggle("on");
+                    var tags = [];
+                    currentParts.each(function(d){
+                        if ( this.classList.contains("on") ) {
+                            tags.push(d);
+                        }
+                    });
+                    queryCheckMarkup(tags.join(""));
+                });
+            ui.noSelect();
+            currentParts.text(function(d){ return d; });
+            currentParts.exit().remove();
+        });
+
+    function queryCheckMarkup(selector){
+        clearClass("queryCheck");
+        if ( selector !== "" ) {
+            es(currentElements, selector).forEach(function(ele){
+                ele.classList.add("queryCheck");
+            });
+        }
+    }
+
+    var sp = selectorParts()
+        .ignoreClasses(["collectHighlight", "queryCheck"]);
+
 
     /**********
         UI
@@ -24,7 +68,7 @@ function SchemaView(options){
         left: 15
     };
 
-    var view = d3.select(holder).append("div");
+    var view = d3.select(holder);
 
     // existing selector form
     var info = view.append("div")
@@ -39,11 +83,13 @@ function SchemaView(options){
     var selectorText = existing.append("p")
         .text("Selector: ")
         .append("span");
+    /*
     var edit = existing.append("button")
         .text("edit")
         .on("click", function(){
             // show the selectorView
         });
+    */
 
     var remove = existing.append("button")
         .text("remove");
@@ -51,10 +97,11 @@ function SchemaView(options){
     var addChild = existing.append("button")
         .text("add child")
         .on("click", function(){
-            
+            var eles = es(currentElements);
+            eh(eles);
             // enter editing mode
             // set the parent to be the current element
-
+            // turn on element select mode
 
             // show the create/edit form
             newSelector.classed({"hidden": false});
@@ -101,11 +148,6 @@ function SchemaView(options){
       END UI
     **********/
 
-    function updatePage(p){
-
-    }
-
-
     return {
         setSchema: function(s){
             schema = s;
@@ -121,7 +163,10 @@ function SchemaView(options){
                 // handle page not being found
                 return;
             }
-            nodes = tree.nodes(page);
+
+            // lazy clone the page because the layout removes the children array
+            var clone = JSON.parse(JSON.stringify(page));
+            nodes = tree.nodes(clone);
             links = tree.links(nodes);
 
             svg.selectAll(".link")
@@ -142,6 +187,8 @@ function SchemaView(options){
                     })
                     .on("click", function(d){
                         setCurrent(d);
+                        currentPath = selectorPath(schema.pages[pageName], d.id);
+                        currentElements = queryPath(currentPath);
                     });
 
             node.append("text")
@@ -150,7 +197,7 @@ function SchemaView(options){
                 });
         },
         getData: function(){
-            return links;
+            return schema;
         }
     };
 }

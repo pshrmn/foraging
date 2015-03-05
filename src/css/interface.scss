@@ -112,9 +112,26 @@ body{
                 padding: 0 15px;
             }
 
+            > *{
+                vertical-align: top;
+            }
+
+            > div{
+                display: inline-block;
+            }
+
             .form{
+
                 > p {
                     font-size: 1.25em;
+                }
+
+                .tag{
+                    color: $red;
+                }
+
+                .tag.on{
+                    color: $green;
                 }
                 
                 input.error{
@@ -159,6 +176,10 @@ body{
                 }
             }
 
+            .form.hidden{
+                display: none;
+            }
+
             .form.column{
                 width: 25%;
                 min-width: 300px;
@@ -169,6 +190,10 @@ body{
             .form label{
                 display: inline-block;
                 width: 75px;
+            }
+
+            svg {
+                border: 2px $gray inset;
             }
         }
 

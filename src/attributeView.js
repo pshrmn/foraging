@@ -8,7 +8,7 @@ function AttributeView(options){
     var saveFn = options.save || function(){};
 
     // ui
-    var view = d3.select(holder).append("div");
+    var view = d3.select(holder);
 
     // form
     var form = view.append("div")

@@ -73,8 +73,16 @@ body {
         display: inline-block;
         vertical-align: top;
         padding: 0 15px; }
+      .collectjs .views .view > * {
+        vertical-align: top; }
+      .collectjs .views .view > div {
+        display: inline-block; }
       .collectjs .views .view .form > p {
         font-size: 1.25em; }
+      .collectjs .views .view .form .tag {
+        color: #c91900; }
+      .collectjs .views .view .form .tag.on {
+        color: #489675; }
       .collectjs .views .view .form input.error {
         border-color: #c91900;
         border-style: solid; }
@@ -98,6 +106,8 @@ body {
           display: inline-block; }
       .collectjs .views .view .form .rule.follow {
         display: none; }
+      .collectjs .views .view .form.hidden {
+        display: none; }
       .collectjs .views .view .form.column {
         width: 25%;
         min-width: 300px;
@@ -106,6 +116,8 @@ body {
       .collectjs .views .view .form label {
         display: inline-block;
         width: 75px; }
+      .collectjs .views .view svg {
+        border: 2px #cccccc inset; }
     .collectjs .views .view.active {
       display: block; }
   .collectjs input {
