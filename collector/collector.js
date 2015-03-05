@@ -161,19 +161,26 @@ function elementHighlighter(){
     var option = "collectHighlight";
     var clicked = function(){};
 
+    function addOption(event){
+        this.classList.add(option);
+    }
+
+    function removeOption(event){
+        this.classList.remove(option);
+    }
+
+    function selectOption(event){
+        event.preventDefault();
+        event.stopPropagation();
+        clicked(this);
+    }
+
     function highlight(elements){
         elements.forEach(function(ele){
-            ele.addEventListener("mouseenter", function(event){
-                ele.classList.add(option);
-            }, false);
-            ele.addEventListener("mouseleave", function(event){
-                ele.classList.remove(option);
-            }, false);
-            ele.addEventListener("click", function(event){
-                event.preventDefault();
-                event.stopPropagation();
-                clicked(this);
-            }, false);
+            ele.addEventListener("mouseenter", addOption, false);
+            ele.addEventListener("mouseleave", removeOption, false);
+            ele.addEventListener("click", selectOption, false);
+            ele.classList.add("selectableElement");
         });
     }
 
@@ -185,6 +192,16 @@ function elementHighlighter(){
     highlight.option = function(css){
         option = css;
         return highlight;
+    };
+
+    highlight.remove = function(){
+        var elements = [].slice.call(document.getElementsByClassName("selectableElement"));
+        elements.forEach(function(ele){
+            ele.removeEventListener("mouseenter", addOption);
+            ele.removeEventListener("mouseleave", removeOption);
+            ele.removeEventListener("click", selectOption);
+            ele.classList.remove("selectableElement");
+        });
     };
 
     return highlight;
@@ -220,19 +237,19 @@ function getCurrentSelector(eles, selector){
 }
 // Source: src/schema.js
 // return an array of selectors from the root to the node with id
-function selectorPath(page, id){
+function tracePath(page, id){
     var path = [];
-    function find(selector, id){
+    function find(selector, lid){
         path.push(selector);
-        if ( selector.id === id ) {
+        if ( selector.id === lid ) {
             return true;
         }
-        selector.children.forEach(function(s){
-            if ( find(s, id) ) {
-                return true;
-            }
+        var found = selector.children.some(function(s){
+            return find(s, lid);
         });
-        path.pop();
+        if ( !found ){
+            path.pop();
+        }
     }
     var found = find(page, id);
     return path;
@@ -332,14 +349,124 @@ function editAttr(page, oldName, newAttr){
 */
 
 
+// Source: src/controller.js
+function collectorController(){
+    var schemas;
+    var schema;    
+    var page;
+    var currentElements;
+    var currentSelector;
+
+    // sp is given an element and returns an array containing its tag
+    // and if they exist, its id and any classes
+    var sp = selectorParts()
+        .ignoreClasses(["collectHighlight", "queryCheck", "selectableElement"]);
+
+    // es takes an array of elements and queries each to get their child elements
+    // if no selector is provided it uses the all selector (*)
+    var es = elementSelector();
+
+    // element highlighter takes an array of elements and adds event listeners
+    // to give the user the ability to select an element in the page (along with
+    // vanity markup to identify which element is being selected)
+    var eh = elementHighlighter()
+        .clicked(function(element){
+            var data = sp(element);
+            queryCheckMarkup(data.join(""));
+
+            var parts = fns.dispatch.Selector.addTags(data);
+            parts.on("click", function(){
+                    this.classList.toggle("on");
+                    var tags = [];
+                    parts.each(function(d){
+                        if ( this.classList.contains("on") ) {
+                            tags.push(d);
+                        }
+                    });
+                    queryCheckMarkup(tags.join(""));
+                });
+        });
+
+    function queryCheckMarkup(selector){
+        clearClass("queryCheck");
+        if ( selector !== "" ) {
+            es(currentElements, selector).forEach(function(ele){
+                ele.classList.add("queryCheck");
+            });
+        }
+    }
+
+    var fns = {
+        loadSchemas: function(s){
+            schemas = s;
+        },
+        setSchema: function(s, p){
+            schema = schemas[s];
+            page = schema.pages[p];
+            if ( this.dispatch.Schema ) {
+                // lazy clone the page because the layout removes the children array
+                var clone = JSON.parse(JSON.stringify(page));
+                this.dispatch.Schema.drawPage(clone);
+            }
+            schema = s;
+        },
+        setPage: function(name){
+            page = schema.pages[name];
+            return page;
+        },
+        setSelector: function(d){
+            var path = tracePath(page, d.id);
+            // currentSelector is the last element in the path
+            currentSelector = path[path.length-1];
+            currentElements = queryPath(path);
+            console.log(currentSelector, currentElements);
+        },
+        events: {
+            addChild: function(){
+                // switch to selector tab
+                ui.showView("Selector");
+
+                var eles = es(currentElements);
+                eh(eles);
+                // enter editing mode
+                // set the parent to be the current element
+                // turn on element select mode
+            },
+            addAttr: function(){
+
+            },
+            saveSelector: function(){
+                // get the selector from elements that are "on"
+                var vals = fns.dispatch.Selector.getValues();
+                var sel = newSelector.apply(null, vals);
+                currentSelector.children.push(sel);
+                // redraw the page
+                var clone = JSON.parse(JSON.stringify(page));
+                fns.dispatch.Schema.drawPage(clone);
+                ui.showView("Schema");
+                chromeSave(schemas);
+            },
+            cancelSelector: function(){
+                fns.dispatch.Selector.reset();
+                eh.remove();
+                ui.showView("Schema");
+            }
+        },
+        // used to interact with views
+        dispatch: {}
+    };
+
+    return fns;
+}
 // Source: src/chrome.js
 /* functions that are related to the extension */
 
 // takes an object to save, the name of the site, and an optional schemaName
 // if schemaName is provided, obj is a schema object to be saved
 // otherwise obj is a site object
-function chromeSave(schemas, host){
+function chromeSave(schemas){
     chrome.storage.local.get('sites', function saveSchemaChrome(storage){
+        var host = window.location.hostname;
         storage.sites[host] = schemas;
         chrome.storage.local.set({"sites": storage.sites});
     });
@@ -367,17 +494,18 @@ If the site object exists for a host, load the saved rules
 */
 function chromeLoad(){
     chrome.storage.local.get("sites", function setupHostnameChrome(storage){
-        var host = window.location.hostname,
-            siteObject = storage.sites[host];
-        SiteSchemas = siteObject ?
+        var host = window.location.hostname;
+        var siteObject = storage.sites[host];
+        var schemas = siteObject ?
             siteObject :
             {
                 default: newSchema("default")
             };
-        SiteSchemas = generateIds(SiteSchemas);
-        CurrentSite = "default";
-        ui.loadSchema(SiteSchemas.default, "default");
-        chromeSave(SiteSchemas, host);
+        schemas = generateIds(schemas);
+        controller.loadSchemas(schemas);
+        controller.setSchema("default", "default");
+        // save right away (for new schemas, maybe unncessary)
+        chromeSave(schemas);
     });
 }
 
@@ -634,61 +762,6 @@ function AttributeView(options){
 
 // Source: src/schemaView.js
 function SchemaView(options){
-    var schema;    
-    var page;
-    var nodes;
-    var links;
-    var currentPath;
-    var currentElements;
-    // focused selector
-    var current;
-    function setCurrent(d){
-        current = d;
-        selectorText.text(d.selector);
-    }
-
-    var es = elementSelector();
-
-    var currentParts;
-    var eh = elementHighlighter()
-        .clicked(function(element){
-            var tagData = sp(element);
-            queryCheckMarkup(tagData.join(""));
-            currentParts = tags.selectAll("p.tag")
-                .data(tagData);
-            currentParts.enter().append("p")
-                .classed({
-                    "tag": true,
-                    "on": true
-                })
-                .on("click", function(){
-                    this.classList.toggle("on");
-                    var tags = [];
-                    currentParts.each(function(d){
-                        if ( this.classList.contains("on") ) {
-                            tags.push(d);
-                        }
-                    });
-                    queryCheckMarkup(tags.join(""));
-                });
-            ui.noSelect();
-            currentParts.text(function(d){ return d; });
-            currentParts.exit().remove();
-        });
-
-    function queryCheckMarkup(selector){
-        clearClass("queryCheck");
-        if ( selector !== "" ) {
-            es(currentElements, selector).forEach(function(ele){
-                ele.classList.add("queryCheck");
-            });
-        }
-    }
-
-    var sp = selectorParts()
-        .ignoreClasses(["collectHighlight", "queryCheck"]);
-
-
     /**********
         UI
     **********/
@@ -705,69 +778,32 @@ function SchemaView(options){
 
     var view = d3.select(holder);
 
-    // existing selector form
-    var info = view.append("div")
-        .classed({
-            "info": true
-        });
-
-    var existing = info.append("div")
+    var form = view.append("div")
         .classed({
             "form": true
         });
-    var selectorText = existing.append("p")
+
+    var selectorText = form.append("p")
         .text("Selector: ")
         .append("span");
     /*
-    var edit = existing.append("button")
+    var edit = form.append("button")
         .text("edit")
         .on("click", function(){
             // show the selectorView
         });
     */
 
-    var remove = existing.append("button")
+    var remove = form.append("button")
         .text("remove");
 
-    var addChild = existing.append("button")
+    var addChild = form.append("button")
         .text("add child")
-        .on("click", function(){
-            var eles = es(currentElements);
-            eh(eles);
-            // enter editing mode
-            // set the parent to be the current element
-            // turn on element select mode
+        .on("click", controller.events.addChild);
 
-            // show the create/edit form
-            newSelector.classed({"hidden": false});
-            existing.classed({"hidden": true});
-        });
-
-    var addAttr = existing.append("button")
+    var addAttr = form.append("button")
         .text("add attr")
-        .on("click", function(){
-            // show the attributeView
-        });
-
-    // create/edit selector form
-    var newSelector = info.append("div")
-        .classed({
-            "form": true,
-            "hidden": true,
-        });
-    var tags = newSelector.append("div");
-    var saveSelector = newSelector.append("button")
-        .text("Save")
-        .on("click", function(){
-            var sel = newSelector();
-        });
-
-    var cancelSelector = newSelector.append("button")
-        .text("Cancel")
-        .on("click", function(){
-            newSelector.classed({"hidden": true});
-            existing.classed({"hidden": false});
-        });
+        .on("click", controller.events.addAttr);
 
 
     // tree
@@ -785,59 +821,100 @@ function SchemaView(options){
 
     return {
         setSchema: function(s){
-            schema = s;
+            controller.setSchema(s);
         },
-        drawPage: function(pageName){
-            if ( !schema ) {
-                // handle schema not being present
-                return;
-            }
-
-            page = schema.pages[pageName];
+        drawPage: function(page){
             if ( !page ) {
-                // handle page not being found
                 return;
             }
 
-            // lazy clone the page because the layout removes the children array
-            var clone = JSON.parse(JSON.stringify(page));
-            nodes = tree.nodes(clone);
-            links = tree.links(nodes);
+            var nodes = tree.nodes(page);
+            var links = tree.links(nodes);
 
-            svg.selectAll(".link")
-                    .data(links)
-                .enter().append("path")
-                    .attr("class", "link")
-                    .attr("d", diagonal);
+            var link = svg.selectAll(".link")
+                .data(links);
+            link.enter().append("path")
+                .attr("class", "link")
+                .attr("d", diagonal);
+            link.exit().remove();
 
             var node = svg.selectAll(".node")
-                    .data(nodes)
-                .enter().append("g")
-                    .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
-                    .classed({
-                        "node": true,
-                        "hasAttrs": function(d){
-                            return d.attrs && d.attrs.length > 0;
-                        }
-                    })
-                    .on("click", function(d){
-                        setCurrent(d);
-                        currentPath = selectorPath(schema.pages[pageName], d.id);
-                        currentElements = queryPath(currentPath);
-                    });
+                .data(nodes);
+            node.enter().append("g")
+                .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
+                .classed({
+                    "node": true,
+                    "hasAttrs": function(d){
+                        return d.attrs && d.attrs.length > 0;
+                    }
+                })
+                .on("click", function(d){
+                    controller.setSelector(d);
+                    selectorText.text(d.selector);
+                });
 
             node.append("text")
                 .text(function(d){
                     return d.selector;
                 });
-        },
-        getData: function(){
-            return schema;
+
+            node.exit().remove();
         }
     };
 }
+// Source: src/selectorView.js
+function SelectorView(options){
+
+    options = options || {};
+    var holder = options.holder || "body";
+    var view = d3.select(holder);
+
+
+    var form = view.append("div")
+        .classed({
+            "form": true
+        });
+    var tags = form.append("div");
+    var parts;
+    var saveSelector = form.append("button")
+        .text("Save")
+        .on("click", controller.events.saveSelector);
+
+    var cancelSelector = form.append("button")
+        .text("Cancel")
+        .on("click", controller.events.cancelSelector);
+
+    return {
+        addTags: function(data){
+            parts = tags.selectAll("p.tag")
+                .data(data);
+            parts.enter().append("p")
+                .classed({
+                    "tag": true,
+                    "on": true
+                });
+            ui.noSelect();
+            parts.text(function(d){ return d; });
+            parts.exit().remove();
+
+            return parts;
+        },
+        getValues: function(){
+            var sel = [];
+            parts.each(function(d){
+                sel.push(d);
+            });
+            // no index for now
+            return [sel.join(""), undefined];
+        },
+        reset: function(){
+            tags.selectAll("*").remove();
+        }
+    };
+}
+
 // Source: src/ui.js
-function buildUI(){
+function buildUI(controller){
     var holder = document.createElement("div");
     holder.classList.add("collectjs");
     holder.classList.add("noSelect");
@@ -859,7 +936,8 @@ function buildUI(){
 
     var tabs = {};
     var views = {};
-    var fns = {};
+
+    controller.dispatch = {};
 
     var activeTab;
     var activeView;
@@ -920,29 +998,23 @@ function buildUI(){
             }
 
             options.holder = v;
-            fns[name] = viewFn(options);
+            controller.dispatch[name] = viewFn(options);
         },
-        // make these global for the time being, might want to lock it down?
-        fns: fns,
-        loadSchema: function(schema, page){
-            fns.Schema.setSchema(schema);
-            fns.Schema.drawPage(page);
-        }
+        showView: showView
     };
 }
 
 // Source: src/collector.js
+var controller = collectorController();
+
 // build the ui
-var ui = buildUI();
+var ui = buildUI(controller);
 ui.addViews([
     [SchemaView, "Schema", {
         height: 200
     }, true],
+    [SelectorView, "Selector"],
     [AttributeView, "Attribute"]
 ]);
 
-// load or create schema for url
-var SiteSchemas;
-// not sure if this will be necessary
-var CurrentSite;
 chromeLoad();

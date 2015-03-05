@@ -1,4 +1,4 @@
-function buildUI(){
+function buildUI(controller){
     var holder = document.createElement("div");
     holder.classList.add("collectjs");
     holder.classList.add("noSelect");
@@ -20,7 +20,8 @@ function buildUI(){
 
     var tabs = {};
     var views = {};
-    var fns = {};
+
+    controller.dispatch = {};
 
     var activeTab;
     var activeView;
@@ -81,13 +82,8 @@ function buildUI(){
             }
 
             options.holder = v;
-            fns[name] = viewFn(options);
+            controller.dispatch[name] = viewFn(options);
         },
-        // make these global for the time being, might want to lock it down?
-        fns: fns,
-        loadSchema: function(schema, page){
-            fns.Schema.setSchema(schema);
-            fns.Schema.drawPage(page);
-        }
+        showView: showView
     };
 }

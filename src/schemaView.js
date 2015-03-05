@@ -1,59 +1,4 @@
 function SchemaView(options){
-    var schema;    
-    var page;
-    var nodes;
-    var links;
-    var currentPath;
-    var currentElements;
-    // focused selector
-    var current;
-    function setCurrent(d){
-        current = d;
-        selectorText.text(d.selector);
-    }
-
-    var es = elementSelector();
-
-    var currentParts;
-    var eh = elementHighlighter()
-        .clicked(function(element){
-            var tagData = sp(element);
-            queryCheckMarkup(tagData.join(""));
-            currentParts = tags.selectAll("p.tag")
-                .data(tagData);
-            currentParts.enter().append("p")
-                .classed({
-                    "tag": true,
-                    "on": true
-                })
-                .on("click", function(){
-                    this.classList.toggle("on");
-                    var tags = [];
-                    currentParts.each(function(d){
-                        if ( this.classList.contains("on") ) {
-                            tags.push(d);
-                        }
-                    });
-                    queryCheckMarkup(tags.join(""));
-                });
-            ui.noSelect();
-            currentParts.text(function(d){ return d; });
-            currentParts.exit().remove();
-        });
-
-    function queryCheckMarkup(selector){
-        clearClass("queryCheck");
-        if ( selector !== "" ) {
-            es(currentElements, selector).forEach(function(ele){
-                ele.classList.add("queryCheck");
-            });
-        }
-    }
-
-    var sp = selectorParts()
-        .ignoreClasses(["collectHighlight", "queryCheck"]);
-
-
     /**********
         UI
     **********/
@@ -70,69 +15,32 @@ function SchemaView(options){
 
     var view = d3.select(holder);
 
-    // existing selector form
-    var info = view.append("div")
-        .classed({
-            "info": true
-        });
-
-    var existing = info.append("div")
+    var form = view.append("div")
         .classed({
             "form": true
         });
-    var selectorText = existing.append("p")
+
+    var selectorText = form.append("p")
         .text("Selector: ")
         .append("span");
     /*
-    var edit = existing.append("button")
+    var edit = form.append("button")
         .text("edit")
         .on("click", function(){
             // show the selectorView
         });
     */
 
-    var remove = existing.append("button")
+    var remove = form.append("button")
         .text("remove");
 
-    var addChild = existing.append("button")
+    var addChild = form.append("button")
         .text("add child")
-        .on("click", function(){
-            var eles = es(currentElements);
-            eh(eles);
-            // enter editing mode
-            // set the parent to be the current element
-            // turn on element select mode
+        .on("click", controller.events.addChild);
 
-            // show the create/edit form
-            newSelector.classed({"hidden": false});
-            existing.classed({"hidden": true});
-        });
-
-    var addAttr = existing.append("button")
+    var addAttr = form.append("button")
         .text("add attr")
-        .on("click", function(){
-            // show the attributeView
-        });
-
-    // create/edit selector form
-    var newSelector = info.append("div")
-        .classed({
-            "form": true,
-            "hidden": true,
-        });
-    var tags = newSelector.append("div");
-    var saveSelector = newSelector.append("button")
-        .text("Save")
-        .on("click", function(){
-            var sel = newSelector();
-        });
-
-    var cancelSelector = newSelector.append("button")
-        .text("Cancel")
-        .on("click", function(){
-            newSelector.classed({"hidden": true});
-            existing.classed({"hidden": false});
-        });
+        .on("click", controller.events.addAttr);
 
 
     // tree
@@ -150,54 +58,44 @@ function SchemaView(options){
 
     return {
         setSchema: function(s){
-            schema = s;
+            controller.setSchema(s);
         },
-        drawPage: function(pageName){
-            if ( !schema ) {
-                // handle schema not being present
-                return;
-            }
-
-            page = schema.pages[pageName];
+        drawPage: function(page){
             if ( !page ) {
-                // handle page not being found
                 return;
             }
 
-            // lazy clone the page because the layout removes the children array
-            var clone = JSON.parse(JSON.stringify(page));
-            nodes = tree.nodes(clone);
-            links = tree.links(nodes);
+            var nodes = tree.nodes(page);
+            var links = tree.links(nodes);
 
-            svg.selectAll(".link")
-                    .data(links)
-                .enter().append("path")
-                    .attr("class", "link")
-                    .attr("d", diagonal);
+            var link = svg.selectAll(".link")
+                .data(links);
+            link.enter().append("path")
+                .attr("class", "link")
+                .attr("d", diagonal);
+            link.exit().remove();
 
             var node = svg.selectAll(".node")
-                    .data(nodes)
-                .enter().append("g")
-                    .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
-                    .classed({
-                        "node": true,
-                        "hasAttrs": function(d){
-                            return d.attrs && d.attrs.length > 0;
-                        }
-                    })
-                    .on("click", function(d){
-                        setCurrent(d);
-                        currentPath = selectorPath(schema.pages[pageName], d.id);
-                        currentElements = queryPath(currentPath);
-                    });
+                .data(nodes);
+            node.enter().append("g")
+                .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
+                .classed({
+                    "node": true,
+                    "hasAttrs": function(d){
+                        return d.attrs && d.attrs.length > 0;
+                    }
+                })
+                .on("click", function(d){
+                    controller.setSelector(d);
+                    selectorText.text(d.selector);
+                });
 
             node.append("text")
                 .text(function(d){
                     return d.selector;
                 });
-        },
-        getData: function(){
-            return schema;
+
+            node.exit().remove();
         }
     };
 }

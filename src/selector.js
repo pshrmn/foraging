@@ -88,19 +88,26 @@ function elementHighlighter(){
     var option = "collectHighlight";
     var clicked = function(){};
 
+    function addOption(event){
+        this.classList.add(option);
+    }
+
+    function removeOption(event){
+        this.classList.remove(option);
+    }
+
+    function selectOption(event){
+        event.preventDefault();
+        event.stopPropagation();
+        clicked(this);
+    }
+
     function highlight(elements){
         elements.forEach(function(ele){
-            ele.addEventListener("mouseenter", function(event){
-                ele.classList.add(option);
-            }, false);
-            ele.addEventListener("mouseleave", function(event){
-                ele.classList.remove(option);
-            }, false);
-            ele.addEventListener("click", function(event){
-                event.preventDefault();
-                event.stopPropagation();
-                clicked(this);
-            }, false);
+            ele.addEventListener("mouseenter", addOption, false);
+            ele.addEventListener("mouseleave", removeOption, false);
+            ele.addEventListener("click", selectOption, false);
+            ele.classList.add("selectableElement");
         });
     }
 
@@ -112,6 +119,16 @@ function elementHighlighter(){
     highlight.option = function(css){
         option = css;
         return highlight;
+    };
+
+    highlight.remove = function(){
+        var elements = [].slice.call(document.getElementsByClassName("selectableElement"));
+        elements.forEach(function(ele){
+            ele.removeEventListener("mouseenter", addOption);
+            ele.removeEventListener("mouseleave", removeOption);
+            ele.removeEventListener("click", selectOption);
+            ele.classList.remove("selectableElement");
+        });
     };
 
     return highlight;

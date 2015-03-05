@@ -1,17 +1,17 @@
 // return an array of selectors from the root to the node with id
-function selectorPath(page, id){
+function tracePath(page, id){
     var path = [];
-    function find(selector, id){
+    function find(selector, lid){
         path.push(selector);
-        if ( selector.id === id ) {
+        if ( selector.id === lid ) {
             return true;
         }
-        selector.children.forEach(function(s){
-            if ( find(s, id) ) {
-                return true;
-            }
+        var found = selector.children.some(function(s){
+            return find(s, lid);
         });
-        path.pop();
+        if ( !found ){
+            path.pop();
+        }
     }
     var found = find(page, id);
     return path;

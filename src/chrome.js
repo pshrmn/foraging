@@ -3,8 +3,9 @@
 // takes an object to save, the name of the site, and an optional schemaName
 // if schemaName is provided, obj is a schema object to be saved
 // otherwise obj is a site object
-function chromeSave(schemas, host){
+function chromeSave(schemas){
     chrome.storage.local.get('sites', function saveSchemaChrome(storage){
+        var host = window.location.hostname;
         storage.sites[host] = schemas;
         chrome.storage.local.set({"sites": storage.sites});
     });
@@ -32,17 +33,18 @@ If the site object exists for a host, load the saved rules
 */
 function chromeLoad(){
     chrome.storage.local.get("sites", function setupHostnameChrome(storage){
-        var host = window.location.hostname,
-            siteObject = storage.sites[host];
-        SiteSchemas = siteObject ?
+        var host = window.location.hostname;
+        var siteObject = storage.sites[host];
+        var schemas = siteObject ?
             siteObject :
             {
                 default: newSchema("default")
             };
-        SiteSchemas = generateIds(SiteSchemas);
-        CurrentSite = "default";
-        ui.loadSchema(SiteSchemas.default, "default");
-        chromeSave(SiteSchemas, host);
+        schemas = generateIds(schemas);
+        controller.loadSchemas(schemas);
+        controller.setSchema("default", "default");
+        // save right away (for new schemas, maybe unncessary)
+        chromeSave(schemas);
     });
 }
 

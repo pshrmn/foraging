@@ -194,6 +194,22 @@ body{
 
             svg {
                 border: 2px $gray inset;
+                .link {
+                  fill: none;
+                  stroke: #aaa;
+                }
+
+                .node{
+                    cursor: pointer;
+                }
+
+                .node.hasAttrs{
+                    fill: red;
+                }
+
+                .node text {
+                    text-anchor: middle;
+                }
             }
         }
 
