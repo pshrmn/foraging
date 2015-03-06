@@ -116,17 +116,15 @@ body {
       .collectjs .views .view .form label {
         display: inline-block;
         width: 75px; }
-      .collectjs .views .view svg {
-        border: 2px #cccccc inset; }
-        .collectjs .views .view svg .link {
-          fill: none;
-          stroke: #aaa; }
-        .collectjs .views .view svg .node {
-          cursor: pointer; }
-        .collectjs .views .view svg .node.hasAttrs {
-          fill: red; }
-        .collectjs .views .view svg .node text {
-          text-anchor: middle; }
+      .collectjs .views .view svg .link {
+        fill: none;
+        stroke: #aaa; }
+      .collectjs .views .view svg .node {
+        cursor: pointer; }
+      .collectjs .views .view svg .node.hasAttrs {
+        fill: red; }
+      .collectjs .views .view svg .node text {
+        text-anchor: middle; }
     .collectjs .views .view.active {
       display: block; }
   .collectjs input {

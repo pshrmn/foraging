@@ -140,6 +140,8 @@ function collectorController(){
                     selector.children.push(sel);
                     // redraw the page
                     fns.dispatch.Schema.drawPage(fns.clonePage());
+                    selector = sel;
+                    fns.dispatch.Schema.showSelector(selector);
                 }
 
                 ui.showView("Schema");
@@ -181,6 +183,7 @@ function collectorController(){
                 // redraw the page
                 chromeSave(schemas);
                 fns.dispatch.Schema.drawPage(fns.clonePage());
+                fns.dispatch.Schema.hideSelector();
             }
         },
         // used to interact with views

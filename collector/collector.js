@@ -475,6 +475,8 @@ function collectorController(){
                     selector.children.push(sel);
                     // redraw the page
                     fns.dispatch.Schema.drawPage(fns.clonePage());
+                    selector = sel;
+                    fns.dispatch.Schema.showSelector(selector);
                 }
 
                 ui.showView("Schema");
@@ -516,6 +518,7 @@ function collectorController(){
                 // redraw the page
                 chromeSave(schemas);
                 fns.dispatch.Schema.drawPage(fns.clonePage());
+                fns.dispatch.Schema.hideSelector();
             }
         },
         // used to interact with views
@@ -885,6 +888,8 @@ function SchemaView(options){
     var tree = d3.layout.tree()
         .size([width, height]);
     var diagonal = d3.svg.diagonal();
+    var link;
+    var node;
     /**********
       END UI
     **********/
@@ -895,11 +900,18 @@ function SchemaView(options){
                 return;
             }
 
+            if ( link ) {
+                link.remove();
+            }
+            if ( node ) {
+                node.remove();
+            }
+
             var nodes = tree.nodes(page);
             var links = tree.links(nodes);
-            var link = svg.selectAll(".link")
+            link = svg.selectAll(".link")
                 .data(links, function(d) { return d.source.id + "-" + d.target.id; });
-            var node = svg.selectAll(".node")
+            node = svg.selectAll(".node")
                 .data(nodes, function(d) { return d.id; });
 
                 
