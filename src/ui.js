@@ -64,9 +64,6 @@ function buildUI(controller){
             t.textContent = name;
             tabs[name] = t;
             tabHolder.appendChild(t);
-            t.addEventListener("click", function(event){
-                showView(name);
-            });
 
             // create a new view
             var v = document.createElement("div");

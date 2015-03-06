@@ -140,8 +140,9 @@ function elementSelector(){
         var matches = [];
         selector = selector || "*";
         for ( var i=0; i<elements.length; i++ ) {
+            var sel = selector + ":not(" + not + ")";
             [].push.apply(matches, [].slice.call(
-                elements[i].querySelectorAll(selector + ":not(" + not + ")"))
+                elements[i].querySelectorAll(sel))
             );
         }
         return matches;
@@ -220,6 +221,7 @@ function queryPath(parts){
     return currentElements;
 }
 
+// given parent elements, return all child elements that match the selector
 function getCurrentSelector(eles, selector){
     var s = selector.selector;
     var i = selector.index;
@@ -238,72 +240,36 @@ function getCurrentSelector(eles, selector){
     return newElements;
 }
 // Source: src/schema.js
-// return an array of selectors from the root to the node with id
-function tracePath(page, id){
-    var path = [];
-    function find(selector, lid){
-        path.push(selector);
-        if ( selector.id === lid ) {
-            return true;
-        }
-        var found = selector.children.some(function(s){
-            return find(s, lid);
-        });
-        if ( found ) {
-            return true;
-        } else {
-            path.pop();
-            return false;
-        }
+function cleanSchemas(schemas){
+    var ns = {};
+    for ( var s in schemas ) {
+        ns[s] = cleanSchema(schemas[s]);
     }
-    var found = find(page, id);
-    return path;
-}
-
-// global
-var idCount = 0;
-function generateIds(schemas){
-    function set(selector){
-        selector.id = idCount++;
-        selector.children.forEach(function(s){
-            set(s);
-        });
-    }
-    var curr;
-    for ( var name in schemas ) {
-        curr = schemas[name];
-        for ( var page in curr.pages ) {
-            set(curr.pages[page]);
-        }
-    }
-    return schemas;
+    return ns;
 }
 
 // get rid of extra information before saving
 function cleanSchema(schema){
-    console.log(schema);
-    var goodKeys = ["selector", "index", "children", "attrs"];
+    var ns = {
+        name: schema.name,
+        urls: schema.urls.slice(),
+        pages: {}
+    };
 
-    function goodKey(key){
-        return goodKeys.some(function(gk){
-            return gk === key;
+    function clonePage(s, clone){
+        clone.selector = s.selector;
+        clone.index = s.index;
+        clone.attrs = s.attrs.slice();
+        clone.children = s.children.map(function(child){
+            return clonePage(child, {});
         });
+        return clone;
     }
 
-    function clean(selector){
-        for ( var key in selector ) {
-            if ( !goodKey(key) ) {
-                delete selector[key];
-            }
-        }
-        selector.children.forEach(function(s){
-            clean(s);
-        });
-    }
     for ( var page in schema.pages ) {
-        clean(schema.pages[page]);
+        ns.pages[page] = clonePage(schema.pages[page], {});
     }
-    return schema;
+    return ns;
 }
 
 // check if an identical selector already exists
@@ -366,14 +332,12 @@ function editAttr(page, oldName, newAttr){
 }
 */
 
-
 // Source: src/controller.js
 function collectorController(){
     var schemas;
     var schema;    
     var page;
-    var currentElements;
-    var currentSelector;
+    var selector;
 
     // sp is given an element and returns an array containing its tag
     // and if they exist, its id and any classes
@@ -394,6 +358,7 @@ function collectorController(){
 
             var parts = fns.dispatch.Selector.addTags(data);
             parts.on("click", function(){
+                    d3.event.stopPropagation();
                     this.classList.toggle("on");
                     var tags = [];
                     parts.each(function(d){
@@ -405,45 +370,91 @@ function collectorController(){
                 });
         });
 
-    function queryCheckMarkup(selector){
+    function queryCheckMarkup(selectorString){
         clearClass("queryCheck");
-        if ( selector !== "" ) {
-            es(currentElements, selector).forEach(function(ele){
+        if ( selectorString !== "" ) {
+            es(selector.elements, selectorString).forEach(function(ele){
                 ele.classList.add("queryCheck");
             });
         }
     }
 
+    function getMatches(selectFn){
+        function match(elements, s){
+            s.elements = selectFn(elements, s.selector);
+            s.children.forEach(function(child){
+                match(s.elements, child);
+            });      
+        }
+
+        match([document], page);
+    }
+
+    var idCount = 0;
+    function setupPage(){
+        function set(s){
+            s.id = idCount++;
+            s.children.forEach(function(s){
+                set(s);
+            });
+        }
+        set(page);
+    }
+
     var fns = {
+        clonePage: function(){
+            function setClone(selector, clone){
+                clone.selector = selector.selector;
+                clone.id = selector.id;
+                clone.index = selector.index;
+                clone.attrs = selector.attrs.slice();
+                clone.elements = selector.elements.slice();
+                clone.children = selector.children.map(function(child){
+                    return setClone(child, {});
+                });
+                return clone;
+            }
+            return setClone(page, {});
+        },
         loadSchemas: function(s){
             schemas = s;
         },
-        setSchema: function(s, p){
-            schema = schemas[s];
-            page = schema.pages[p];
+        setSchema: function(schemaName, pageName){
+            idCount = 0;
+            schema = schemas[schemaName];
+
+            fns.setPage(pageName);
             if ( this.dispatch.Schema ) {
-                // lazy clone the page because the layout removes the children array
-                var clone = JSON.parse(JSON.stringify(page));
+                var clone = fns.clonePage();
                 this.dispatch.Schema.drawPage(clone);
             }
-            schema = s;
         },
         setPage: function(name){
             page = schema.pages[name];
-            return page;
+            setupPage();
+            getMatches(es);
         },
         setSelector: function(d){
-            var path = tracePath(page, d.id);
-            // currentSelector is the last element in the path
-            currentSelector = path[path.length-1];
-            currentElements = queryPath(path);
+            function find(s, lid){
+                if ( s.id === lid ) {
+                    selector = s;
+                    return true;
+                }
+                var found = s.children.some(function(child){
+                    return find(child, lid);
+                });
+                return false;
+            }
+
+            find(page, d.id);
+            fns.dispatch.Schema.showSelector(selector);
         },
         events: {
             addChild: function(){
                 // switch to selector tab
                 ui.showView("Selector");
 
-                var eles = es(currentElements);
+                var eles = es(selector.elements);
                 eh(eles);
                 // enter editing mode
                 // set the parent to be the current element
@@ -456,14 +467,14 @@ function collectorController(){
                 // get the selector from elements that are "on"
                 var vals = fns.dispatch.Selector.getValues();
                 var sel = newSelector.apply(null, vals);
-                var match = matchSelector(sel, currentSelector);
+                var match = matchSelector(sel, selector);
                 // only save if schema doesn't match pre-existing one
                 if ( match === undefined ) {
                     sel.id = idCount++;
-                    currentSelector.children.push(sel);
+                    sel.elements = es(selector.elements, sel.selector);    
+                    selector.children.push(sel);
                     // redraw the page
-                    var clone = JSON.parse(JSON.stringify(page));
-                    fns.dispatch.Schema.drawPage(clone);
+                    fns.dispatch.Schema.drawPage(fns.clonePage());
                 }
 
                 ui.showView("Schema");
@@ -475,10 +486,43 @@ function collectorController(){
                 fns.dispatch.Selector.reset();
                 eh.remove();
                 ui.showView("Schema");
+            },
+            removeSelector: function(){
+                var id = selector.id;
+                // handle deleting root
+                function find(selector, lid){
+                    if ( selector.id === lid ) {
+                        return true;
+                    }
+                    var curr;
+                    for ( var i=0; i<selector.children.length; i++ ) {
+                        curr = selector.children[i];
+                        if ( find(curr, lid) ) {
+                            // remove the child and return
+                            selector.children.splice(i, 1);
+                            return;
+                        }
+                    }
+                    return false;
+                }
+                if ( page.id === id ) {
+                    page =  newSelector("body");
+                    page.elements = [document.body];
+                    selector = page;
+                } else {
+                    find(page, id);
+                    selector = page;
+                }
+                // redraw the page
+                chromeSave(schemas);
+                fns.dispatch.Schema.drawPage(fns.clonePage());
             }
         },
         // used to interact with views
-        dispatch: {}
+        dispatch: {},
+        getData: function(){
+            return page;
+        }
     };
 
     return fns;
@@ -492,7 +536,7 @@ function collectorController(){
 function chromeSave(schemas){
     chrome.storage.local.get('sites', function saveSchemaChrome(storage){
         var host = window.location.hostname;
-        storage.sites[host] = schemas;
+        storage.sites[host] = cleanSchemas(schemas);
         chrome.storage.local.set({"sites": storage.sites});
     });
 }
@@ -526,7 +570,6 @@ function chromeLoad(){
             {
                 default: newSchema("default")
             };
-        schemas = generateIds(schemas);
         controller.loadSchemas(schemas);
         controller.setSchema("default", "default");
         // save right away (for new schemas, maybe unncessary)
@@ -805,7 +848,8 @@ function SchemaView(options){
 
     var form = view.append("div")
         .classed({
-            "form": true
+            "form": true,
+            "hidden": true
         });
 
     var selectorText = form.append("p")
@@ -820,7 +864,8 @@ function SchemaView(options){
     */
 
     var remove = form.append("button")
-        .text("remove");
+        .text("remove")
+        .on("click", controller.events.removeSelector);
 
     var addChild = form.append("button")
         .text("add child")
@@ -845,9 +890,6 @@ function SchemaView(options){
     **********/
 
     return {
-        setSchema: function(s){
-            controller.setSchema(s);
-        },
         drawPage: function(page){
             if ( !page ) {
                 return;
@@ -876,7 +918,16 @@ function SchemaView(options){
                 })
                 .on("click", function(d){
                     controller.setSelector(d);
-                    selectorText.text(d.selector);
+                })
+                .on("mouseenter", function(d){
+                    d.elements.forEach(function(ele){
+                        ele.classList.add("savedPreview");
+                    });
+                })
+                .on("mouseleave", function(d){
+                    d.elements.forEach(function(ele){
+                        ele.classList.remove("savedPreview");
+                    });
                 });
 
             node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
@@ -887,6 +938,13 @@ function SchemaView(options){
                 });
 
             node.exit().remove();
+        },
+        showSelector: function(selector){
+            form.classed("hidden", false);
+            selectorText.text(selector.selector);
+        },
+        hideSelector: function(){
+            form.classed("hidden", true);
         }
     };
 }
@@ -1010,9 +1068,6 @@ function buildUI(controller){
             t.textContent = name;
             tabs[name] = t;
             tabHolder.appendChild(t);
-            t.addEventListener("click", function(event){
-                showView(name);
-            });
 
             // create a new view
             var v = document.createElement("div");

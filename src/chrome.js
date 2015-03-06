@@ -6,7 +6,7 @@
 function chromeSave(schemas){
     chrome.storage.local.get('sites', function saveSchemaChrome(storage){
         var host = window.location.hostname;
-        storage.sites[host] = schemas;
+        storage.sites[host] = cleanSchemas(schemas);
         chrome.storage.local.set({"sites": storage.sites});
     });
 }
@@ -40,7 +40,6 @@ function chromeLoad(){
             {
                 default: newSchema("default")
             };
-        schemas = generateIds(schemas);
         controller.loadSchemas(schemas);
         controller.setSchema("default", "default");
         // save right away (for new schemas, maybe unncessary)

@@ -67,8 +67,9 @@ function elementSelector(){
         var matches = [];
         selector = selector || "*";
         for ( var i=0; i<elements.length; i++ ) {
+            var sel = selector + ":not(" + not + ")";
             [].push.apply(matches, [].slice.call(
-                elements[i].querySelectorAll(selector + ":not(" + not + ")"))
+                elements[i].querySelectorAll(sel))
             );
         }
         return matches;
@@ -147,6 +148,7 @@ function queryPath(parts){
     return currentElements;
 }
 
+// given parent elements, return all child elements that match the selector
 function getCurrentSelector(eles, selector){
     var s = selector.selector;
     var i = selector.index;

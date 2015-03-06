@@ -2,8 +2,7 @@ function collectorController(){
     var schemas;
     var schema;    
     var page;
-    var currentElements;
-    var currentSelector;
+    var selector;
 
     // sp is given an element and returns an array containing its tag
     // and if they exist, its id and any classes
@@ -24,6 +23,7 @@ function collectorController(){
 
             var parts = fns.dispatch.Selector.addTags(data);
             parts.on("click", function(){
+                    d3.event.stopPropagation();
                     this.classList.toggle("on");
                     var tags = [];
                     parts.each(function(d){
@@ -35,45 +35,91 @@ function collectorController(){
                 });
         });
 
-    function queryCheckMarkup(selector){
+    function queryCheckMarkup(selectorString){
         clearClass("queryCheck");
-        if ( selector !== "" ) {
-            es(currentElements, selector).forEach(function(ele){
+        if ( selectorString !== "" ) {
+            es(selector.elements, selectorString).forEach(function(ele){
                 ele.classList.add("queryCheck");
             });
         }
     }
 
+    function getMatches(selectFn){
+        function match(elements, s){
+            s.elements = selectFn(elements, s.selector);
+            s.children.forEach(function(child){
+                match(s.elements, child);
+            });      
+        }
+
+        match([document], page);
+    }
+
+    var idCount = 0;
+    function setupPage(){
+        function set(s){
+            s.id = idCount++;
+            s.children.forEach(function(s){
+                set(s);
+            });
+        }
+        set(page);
+    }
+
     var fns = {
+        clonePage: function(){
+            function setClone(selector, clone){
+                clone.selector = selector.selector;
+                clone.id = selector.id;
+                clone.index = selector.index;
+                clone.attrs = selector.attrs.slice();
+                clone.elements = selector.elements.slice();
+                clone.children = selector.children.map(function(child){
+                    return setClone(child, {});
+                });
+                return clone;
+            }
+            return setClone(page, {});
+        },
         loadSchemas: function(s){
             schemas = s;
         },
-        setSchema: function(s, p){
-            schema = schemas[s];
-            page = schema.pages[p];
+        setSchema: function(schemaName, pageName){
+            idCount = 0;
+            schema = schemas[schemaName];
+
+            fns.setPage(pageName);
             if ( this.dispatch.Schema ) {
-                // lazy clone the page because the layout removes the children array
-                var clone = JSON.parse(JSON.stringify(page));
+                var clone = fns.clonePage();
                 this.dispatch.Schema.drawPage(clone);
             }
-            schema = s;
         },
         setPage: function(name){
             page = schema.pages[name];
-            return page;
+            setupPage();
+            getMatches(es);
         },
         setSelector: function(d){
-            var path = tracePath(page, d.id);
-            // currentSelector is the last element in the path
-            currentSelector = path[path.length-1];
-            currentElements = queryPath(path);
+            function find(s, lid){
+                if ( s.id === lid ) {
+                    selector = s;
+                    return true;
+                }
+                var found = s.children.some(function(child){
+                    return find(child, lid);
+                });
+                return false;
+            }
+
+            find(page, d.id);
+            fns.dispatch.Schema.showSelector(selector);
         },
         events: {
             addChild: function(){
                 // switch to selector tab
                 ui.showView("Selector");
 
-                var eles = es(currentElements);
+                var eles = es(selector.elements);
                 eh(eles);
                 // enter editing mode
                 // set the parent to be the current element
@@ -86,14 +132,14 @@ function collectorController(){
                 // get the selector from elements that are "on"
                 var vals = fns.dispatch.Selector.getValues();
                 var sel = newSelector.apply(null, vals);
-                var match = matchSelector(sel, currentSelector);
+                var match = matchSelector(sel, selector);
                 // only save if schema doesn't match pre-existing one
                 if ( match === undefined ) {
                     sel.id = idCount++;
-                    currentSelector.children.push(sel);
+                    sel.elements = es(selector.elements, sel.selector);    
+                    selector.children.push(sel);
                     // redraw the page
-                    var clone = JSON.parse(JSON.stringify(page));
-                    fns.dispatch.Schema.drawPage(clone);
+                    fns.dispatch.Schema.drawPage(fns.clonePage());
                 }
 
                 ui.showView("Schema");
@@ -105,10 +151,43 @@ function collectorController(){
                 fns.dispatch.Selector.reset();
                 eh.remove();
                 ui.showView("Schema");
+            },
+            removeSelector: function(){
+                var id = selector.id;
+                // handle deleting root
+                function find(selector, lid){
+                    if ( selector.id === lid ) {
+                        return true;
+                    }
+                    var curr;
+                    for ( var i=0; i<selector.children.length; i++ ) {
+                        curr = selector.children[i];
+                        if ( find(curr, lid) ) {
+                            // remove the child and return
+                            selector.children.splice(i, 1);
+                            return;
+                        }
+                    }
+                    return false;
+                }
+                if ( page.id === id ) {
+                    page =  newSelector("body");
+                    page.elements = [document.body];
+                    selector = page;
+                } else {
+                    find(page, id);
+                    selector = page;
+                }
+                // redraw the page
+                chromeSave(schemas);
+                fns.dispatch.Schema.drawPage(fns.clonePage());
             }
         },
         // used to interact with views
-        dispatch: {}
+        dispatch: {},
+        getData: function(){
+            return page;
+        }
     };
 
     return fns;

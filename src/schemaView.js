@@ -17,7 +17,8 @@ function SchemaView(options){
 
     var form = view.append("div")
         .classed({
-            "form": true
+            "form": true,
+            "hidden": true
         });
 
     var selectorText = form.append("p")
@@ -32,7 +33,8 @@ function SchemaView(options){
     */
 
     var remove = form.append("button")
-        .text("remove");
+        .text("remove")
+        .on("click", controller.events.removeSelector);
 
     var addChild = form.append("button")
         .text("add child")
@@ -57,9 +59,6 @@ function SchemaView(options){
     **********/
 
     return {
-        setSchema: function(s){
-            controller.setSchema(s);
-        },
         drawPage: function(page){
             if ( !page ) {
                 return;
@@ -88,7 +87,16 @@ function SchemaView(options){
                 })
                 .on("click", function(d){
                     controller.setSelector(d);
-                    selectorText.text(d.selector);
+                })
+                .on("mouseenter", function(d){
+                    d.elements.forEach(function(ele){
+                        ele.classList.add("savedPreview");
+                    });
+                })
+                .on("mouseleave", function(d){
+                    d.elements.forEach(function(ele){
+                        ele.classList.remove("savedPreview");
+                    });
                 });
 
             node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
@@ -99,6 +107,13 @@ function SchemaView(options){
                 });
 
             node.exit().remove();
+        },
+        showSelector: function(selector){
+            form.classed("hidden", false);
+            selectorText.text(selector.selector);
+        },
+        hideSelector: function(){
+            form.classed("hidden", true);
         }
     };
 }

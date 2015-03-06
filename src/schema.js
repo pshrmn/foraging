@@ -1,69 +1,33 @@
-// return an array of selectors from the root to the node with id
-function tracePath(page, id){
-    var path = [];
-    function find(selector, lid){
-        path.push(selector);
-        if ( selector.id === lid ) {
-            return true;
-        }
-        var found = selector.children.some(function(s){
-            return find(s, lid);
-        });
-        if ( found ) {
-            return true;
-        } else {
-            path.pop();
-            return false;
-        }
+function cleanSchemas(schemas){
+    var ns = {};
+    for ( var s in schemas ) {
+        ns[s] = cleanSchema(schemas[s]);
     }
-    var found = find(page, id);
-    return path;
-}
-
-// global
-var idCount = 0;
-function generateIds(schemas){
-    function set(selector){
-        selector.id = idCount++;
-        selector.children.forEach(function(s){
-            set(s);
-        });
-    }
-    var curr;
-    for ( var name in schemas ) {
-        curr = schemas[name];
-        for ( var page in curr.pages ) {
-            set(curr.pages[page]);
-        }
-    }
-    return schemas;
+    return ns;
 }
 
 // get rid of extra information before saving
 function cleanSchema(schema){
-    console.log(schema);
-    var goodKeys = ["selector", "index", "children", "attrs"];
+    var ns = {
+        name: schema.name,
+        urls: schema.urls.slice(),
+        pages: {}
+    };
 
-    function goodKey(key){
-        return goodKeys.some(function(gk){
-            return gk === key;
+    function clonePage(s, clone){
+        clone.selector = s.selector;
+        clone.index = s.index;
+        clone.attrs = s.attrs.slice();
+        clone.children = s.children.map(function(child){
+            return clonePage(child, {});
         });
+        return clone;
     }
 
-    function clean(selector){
-        for ( var key in selector ) {
-            if ( !goodKey(key) ) {
-                delete selector[key];
-            }
-        }
-        selector.children.forEach(function(s){
-            clean(s);
-        });
-    }
     for ( var page in schema.pages ) {
-        clean(schema.pages[page]);
+        ns.pages[page] = clonePage(schema.pages[page], {});
     }
-    return schema;
+    return ns;
 }
 
 // check if an identical selector already exists
@@ -125,4 +89,3 @@ function editAttr(page, oldName, newAttr){
     return page;
 }
 */
-
