@@ -173,7 +173,10 @@ function elementHighlighter(){
     function selectOption(event){
         event.preventDefault();
         event.stopPropagation();
-        clicked(this);
+        var eles = [].slice.call(event.path).filter(function(ele){
+            return ele.classList && ele.classList.contains("selectableElement");
+        }).reverse();
+        clicked(eles);
     }
 
     function highlight(elements){
@@ -352,33 +355,33 @@ function collectorController(){
     // to give the user the ability to select an element in the page (along with
     // vanity markup to identify which element is being selected)
     var eh = elementHighlighter()
-        .clicked(function(element){
-            var data = sp(element);
-            queryCheckMarkup(data.join(""));
+        .clicked(elementChoices);
 
-            var parts = fns.dispatch.Selector.addTags(data);
-            parts.on("click", function(){
-                    d3.event.stopPropagation();
-                    this.classList.toggle("on");
-                    var tags = [];
-                    parts.each(function(d){
-                        if ( this.classList.contains("on") ) {
-                            tags.push(d);
-                        }
-                    });
-                    queryCheckMarkup(tags.join(""));
-                });
+    function elementChoices(elements){
+        var data = elements.map(function(ele){
+            return sp(ele);
         });
+        fns.dispatch.Selector.setChoices(data);
+        /*
+        queryCheckMarkup(data.join(""));
 
-    function queryCheckMarkup(selectorString){
-        clearClass("queryCheck");
-        if ( selectorString !== "" ) {
-            es(selector.elements, selectorString).forEach(function(ele){
-                ele.classList.add("queryCheck");
+        var parts = fns.dispatch.Selector.addTags(data);
+        parts.on("click", function(){
+                d3.event.stopPropagation();
+                this.classList.toggle("on");
+                var tags = [];
+                parts.each(function(d){
+                    if ( this.classList.contains("on") ) {
+                        tags.push(d);
+                    }
+                });
+                queryCheckMarkup(tags.join(""));
             });
-        }
+        */
     }
 
+    // get all of the elements that match each selector
+    // and store in object.elements
     function getMatches(selectFn){
         function match(elements, s){
             s.elements = selectFn(elements, s.selector);
@@ -390,6 +393,7 @@ function collectorController(){
         match([document], page);
     }
 
+    // attach an id to each node for d3
     var idCount = 0;
     function setupPage(){
         function set(s){
@@ -448,6 +452,14 @@ function collectorController(){
 
             find(page, d.id);
             fns.dispatch.Schema.showSelector(selector);
+        },
+        markup: function(selectorString){
+            clearClass("queryCheck");
+            if ( selectorString !== "" ) {
+                es(selector.elements, selectorString).forEach(function(ele){
+                    ele.classList.add("queryCheck");
+                });
+            }
         },
         events: {
             addChild: function(){
@@ -518,7 +530,7 @@ function collectorController(){
                 // redraw the page
                 chromeSave(schemas);
                 fns.dispatch.Schema.drawPage(fns.clonePage());
-                fns.dispatch.Schema.hideSelector();
+                fns.dispatch.Schema.showSelector(selector);
             }
         },
         // used to interact with views
@@ -968,10 +980,15 @@ function SelectorView(options){
     var view = d3.select(holder);
 
 
+    var elementChoices = view.append("div");
+    var choices;
+
     var form = view.append("div")
         .classed({
-            "form": true
+            "form": true,
+            "hidden": true
         });
+
     var tags = form.append("div");
     var parts;
     var saveSelector = form.append("button")
@@ -982,14 +999,47 @@ function SelectorView(options){
         .text("Cancel")
         .on("click", controller.events.cancelSelector);
 
-    return {
+    var fns = {
+        setChoices: function(data){
+            if ( choices ) {
+                choices.remove();
+            }
+            choices = elementChoices.selectAll("div.choice")
+                .data(data);
+            choices.enter().append("div")
+                .classed({
+                    "choice": true
+                })
+                .text(function(d){
+                    return d.join("");
+                })
+                .on("click", function(d){
+                    fns.addTags(d);
+                    elementChoices.classed("hidden", true);
+                    form.classed("hidden", false);
+                });
+            choices.exit().remove();
+        },
         addTags: function(data){
+            // initialize with full selector
+            controller.markup(data.join(""));
+
             parts = tags.selectAll("p.tag")
                 .data(data);
             parts.enter().append("p")
                 .classed({
                     "tag": true,
                     "on": true
+                })
+                .on("click", function(){
+                    this.classList.toggle("on");
+                    var tags = [];
+                    parts.each(function(d){
+                        if ( this.classList.contains("on") ) {
+                            tags.push(d);
+                        }
+                    });
+                    controller.markup(tags.join(""));
                 });
             ui.noSelect();
             parts.text(function(d){ return d; });
@@ -1009,8 +1059,13 @@ function SelectorView(options){
         },
         reset: function(){
             tags.selectAll("*").remove();
+            choices.remove();
+            form.classed("hidden", true);
+            elementChoices.classed("hidden", false);
         }
     };
+
+    return fns;
 }
 
 // Source: src/ui.js

@@ -36,8 +36,6 @@ body {
     word-spacing: -6px;
     width: 100%;
     background: transparent; }
-    .collectjs .tabs .tab:hover {
-      background: #e0bd00; }
     .collectjs .tabs .tab {
       background: gold;
       border-top: 1px solid #444444;
@@ -106,7 +104,7 @@ body {
           display: inline-block; }
       .collectjs .views .view .form .rule.follow {
         display: none; }
-      .collectjs .views .view .form.hidden {
+      .collectjs .views .view .hidden {
         display: none; }
       .collectjs .views .view .form.column {
         width: 25%;

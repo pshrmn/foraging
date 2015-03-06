@@ -17,33 +17,33 @@ function collectorController(){
     // to give the user the ability to select an element in the page (along with
     // vanity markup to identify which element is being selected)
     var eh = elementHighlighter()
-        .clicked(function(element){
-            var data = sp(element);
-            queryCheckMarkup(data.join(""));
+        .clicked(elementChoices);
 
-            var parts = fns.dispatch.Selector.addTags(data);
-            parts.on("click", function(){
-                    d3.event.stopPropagation();
-                    this.classList.toggle("on");
-                    var tags = [];
-                    parts.each(function(d){
-                        if ( this.classList.contains("on") ) {
-                            tags.push(d);
-                        }
-                    });
-                    queryCheckMarkup(tags.join(""));
-                });
+    function elementChoices(elements){
+        var data = elements.map(function(ele){
+            return sp(ele);
         });
+        fns.dispatch.Selector.setChoices(data);
+        /*
+        queryCheckMarkup(data.join(""));
 
-    function queryCheckMarkup(selectorString){
-        clearClass("queryCheck");
-        if ( selectorString !== "" ) {
-            es(selector.elements, selectorString).forEach(function(ele){
-                ele.classList.add("queryCheck");
+        var parts = fns.dispatch.Selector.addTags(data);
+        parts.on("click", function(){
+                d3.event.stopPropagation();
+                this.classList.toggle("on");
+                var tags = [];
+                parts.each(function(d){
+                    if ( this.classList.contains("on") ) {
+                        tags.push(d);
+                    }
+                });
+                queryCheckMarkup(tags.join(""));
             });
-        }
+        */
     }
 
+    // get all of the elements that match each selector
+    // and store in object.elements
     function getMatches(selectFn){
         function match(elements, s){
             s.elements = selectFn(elements, s.selector);
@@ -55,6 +55,7 @@ function collectorController(){
         match([document], page);
     }
 
+    // attach an id to each node for d3
     var idCount = 0;
     function setupPage(){
         function set(s){
@@ -113,6 +114,14 @@ function collectorController(){
 
             find(page, d.id);
             fns.dispatch.Schema.showSelector(selector);
+        },
+        markup: function(selectorString){
+            clearClass("queryCheck");
+            if ( selectorString !== "" ) {
+                es(selector.elements, selectorString).forEach(function(ele){
+                    ele.classList.add("queryCheck");
+                });
+            }
         },
         events: {
             addChild: function(){
@@ -183,7 +192,7 @@ function collectorController(){
                 // redraw the page
                 chromeSave(schemas);
                 fns.dispatch.Schema.drawPage(fns.clonePage());
-                fns.dispatch.Schema.hideSelector();
+                fns.dispatch.Schema.showSelector(selector);
             }
         },
         // used to interact with views

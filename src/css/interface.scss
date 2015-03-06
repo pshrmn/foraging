@@ -8,7 +8,6 @@ $light-gray: #efefef;
 $dark-gray: #444444;
 $gray: #CCCCCC;
 $gold: #FFD700;
-$dark-gold: #E0BD00;
 $white: #ffffff;
 $black: #000000;
 
@@ -55,10 +54,6 @@ body{
         width: 100%;
         background: transparent;
         
-        .tab:hover{
-            background: $dark-gold;
-        }
-
         .tab{
             background: $gold;
             border-top: 1px solid $dark-gray;
@@ -176,7 +171,7 @@ body{
                 }
             }
 
-            .form.hidden{
+            .hidden{
                 display: none;
             }
 

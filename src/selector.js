@@ -100,7 +100,10 @@ function elementHighlighter(){
     function selectOption(event){
         event.preventDefault();
         event.stopPropagation();
-        clicked(this);
+        var eles = [].slice.call(event.path).filter(function(ele){
+            return ele.classList && ele.classList.contains("selectableElement");
+        }).reverse();
+        clicked(eles);
     }
 
     function highlight(elements){
