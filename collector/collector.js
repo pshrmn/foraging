@@ -8,10 +8,13 @@ function attributes(element) {
     var curr;
     for ( var i=0; i<attrs.length; i++ ) {
         curr = attrs[i];
-        attrMap[curr.name] = curr.value;
+        // don't include empty attrs
+        if ( curr.value !== "") {
+            attrMap[curr.name] = curr.value;
+        }
     }
     // include text if it exists
-    var text = element.textContent;
+    var text = element.textContent.trim();
     if ( text !== "" ) {
         attrMap.text = text;
     }
@@ -305,15 +308,12 @@ function cleanSchema(schema){
 
 // check if an identical selector already exists
 function matchSelector(sel, parent){
-    var match;
-    parent.children.some(function(s){
+    return parent.children.some(function(s){
         if ( s.selector === sel.selector && s.index === sel.index ) {
-            match = s.id;
             return true;
         }
         return false;
     });
-    return match;
 }
 
 /*
@@ -417,21 +417,22 @@ function collectorController(){
         set(page);
     }
 
+    function clonePage(){
+        function setClone(selector, clone){
+            clone.selector = selector.selector;
+            clone.id = selector.id;
+            clone.index = selector.index;
+            clone.attrs = selector.attrs.slice();
+            clone.elements = selector.elements.slice();
+            clone.children = selector.children.map(function(child){
+                return setClone(child, {});
+            });
+            return clone;
+        }
+        return setClone(page, {});
+    }
+
     var fns = {
-        clonePage: function(){
-            function setClone(selector, clone){
-                clone.selector = selector.selector;
-                clone.id = selector.id;
-                clone.index = selector.index;
-                clone.attrs = selector.attrs.slice();
-                clone.elements = selector.elements.slice();
-                clone.children = selector.children.map(function(child){
-                    return setClone(child, {});
-                });
-                return clone;
-            }
-            return setClone(page, {});
-        },
         loadSchemas: function(s){
             schemas = s;
         },
@@ -440,9 +441,8 @@ function collectorController(){
             schema = schemas[schemaName];
 
             fns.setPage(pageName);
-            if ( this.dispatch.Schema ) {
-                var clone = fns.clonePage();
-                this.dispatch.Schema.drawPage(clone);
+            if ( fns.dispatch.Schema ) {
+                fns.dispatch.Schema.drawPage(clonePage());
             }
         },
         setPage: function(name){
@@ -479,6 +479,10 @@ function collectorController(){
         eleCount: function(selectorObject){
             return eSelect.count(selector.elements, selectorObject);
         },
+        legalName: function(name){
+            // filler function
+            return true;
+        },
         events: {
             addChild: function(){
                 // switch to selector tab
@@ -491,20 +495,19 @@ function collectorController(){
                 // turn on element select mode
             },
             addAttr: function(){
+                ui.showView("Attribute");
 
+                fns.dispatch.Attribute.setElements(selector.elements);
             },
             saveSelector: function(){
-                // get the selector from elements that are "on"
-                var vals = fns.dispatch.Selector.getValues();
-                var sel = newSelector.apply(null, vals);
-                var match = matchSelector(sel, selector);
+                var sel = fns.dispatch.Selector.getSelector();
                 // only save if schema doesn't match pre-existing one
-                if ( match === undefined ) {
+                if ( !matchSelector(sel, selector) ) {
                     sel.id = idCount++;
                     sel.elements = eSelect(selector.elements, sel);
                     selector.children.push(sel);
                     // redraw the page
-                    fns.dispatch.Schema.drawPage(fns.clonePage());
+                    fns.dispatch.Schema.drawPage(clonePage());
                     selector = sel;
                     fns.dispatch.Schema.showSelector(selector);
                 }
@@ -517,6 +520,22 @@ function collectorController(){
             cancelSelector: function(){
                 fns.dispatch.Selector.reset();
                 eHighlight.remove();
+                ui.showView("Schema");
+            },
+            saveAttr: function(){
+                var attr = fns.dispatch.Attribute.getAttr();
+                if ( attr === undefined ) {
+                    return;
+                }
+                selector.attrs.push(attr);
+
+                fns.dispatch.Schema.drawPage(clonePage());
+                ui.showView("Schema");
+                fns.dispatch.Attribute.reset();
+                chromeSave(schemas);
+            },
+            cancelAttr: function(){
+                fns.dispatch.Attribute.reset();
                 ui.showView("Schema");
             },
             removeSelector: function(){
@@ -547,7 +566,14 @@ function collectorController(){
                 }
                 // redraw the page
                 chromeSave(schemas);
-                fns.dispatch.Schema.drawPage(fns.clonePage());
+                fns.dispatch.Schema.drawPage(clonePage());
+                fns.dispatch.Schema.showSelector(selector);
+            },
+            removeAttr: function(d, i){
+                d3.event.preventDefault();
+                selector.attrs.splice(i, 1);
+                chromeSave(schemas);
+                fns.dispatch.Schema.drawPage(clonePage());
                 fns.dispatch.Schema.showSelector(selector);
             }
         },
@@ -744,8 +770,8 @@ function elementCount(count, parentCount){
 // Source: src/attributeView.js
 function AttributeView(options){
     var index = 0;
-    var length = 0;
     var eles = [];
+    var length = 0;
 
     options = options || {};
     var holder = options.holder || "body";
@@ -756,15 +782,7 @@ function AttributeView(options){
 
     // form
     var form = view.append("div")
-        .classed({"form": true})
-        .append("form")
-            .on("submit", function(){
-                d3.event.preventDefault();
-                saveFn({
-                    name: nameInput.property("value"),
-                    attr: attrInput.property("value")
-                });
-            });
+        .classed({"form": true});
 
     var nameInput = form.append("p")
         .append("label")
@@ -778,10 +796,15 @@ function AttributeView(options){
         .text("Attr:")
         .append("input")
             .attr("type", "text")
-            .attr("name", "name");
+            .attr("name", "attr");
 
-    form.append("button")
-        .text("Save Attr");
+    var saveButton = form.append("button")
+        .text("Save")
+        .on("click", controller.events.saveAttr);
+
+    var cancelButton = form.append("button")
+        .text("Cancel")
+        .on("click", controller.events.cancelAttr);
 
     // attribute display
     var display = view.append("div")
@@ -797,17 +820,18 @@ function AttributeView(options){
 
     var indexText = buttons.append("span")
         .text(function(){
-            return index + "/" + length;
+            return index;
         });
 
     var next = buttons.append("button")
         .text(">>")
         .on("click", showNext);
 
+    var attrs;
     function displayElement(){
         // show the index for the current element
         indexText.text(function(){
-            return index + "/" + (index - length);
+            return index;
         });
 
         var element = eles[index];
@@ -820,17 +844,16 @@ function AttributeView(options){
             });
         }
 
-        var attrs = attributeHolder.selectAll("div")
+        attrs = attributeHolder.selectAll("div")
             .data(attrData);
 
         attrs.enter().append("div")
             .on("click", function(d){
-                attrInput.attr("value", d.name);
+                attrInput.property("value", d.name);
             });
 
         attrs.text(function(d){
-            // using 11 as an arbitrary number right now
-            return d.name + "=" + abbreviate(d.value, 11);
+            return d.name + "=" + abbreviate(d.value, 21);
         });
 
         attrs.exit().remove();
@@ -858,6 +881,27 @@ function AttributeView(options){
             length = elements.length;
             displayElement();
         },
+        getAttr: function(){
+            var attr = attrInput.property("value");
+            var name = nameInput.property("value");
+
+            if ( name === "" || !controller.legalName(name)){
+                return;
+            }
+
+            return {
+                name: name,
+                attr: attr
+            };
+        },
+        reset: function(){
+            eles = undefined;
+            index = 0;
+            indexText.text("");
+            attrs.remove();
+            attrInput.property("value", "");
+            nameInput.property("value", "");
+        }
     };
 }
 
@@ -888,26 +932,23 @@ function SchemaView(options){
     var selectorText = form.append("p")
         .text("Selector: ")
         .append("span");
-    /*
-    var edit = form.append("button")
-        .text("edit")
-        .on("click", function(){
-            // show the selectorView
-        });
-    */
 
-    var remove = form.append("button")
+    var buttonHolder = form.append("div");
+
+    var remove = buttonHolder.append("button")
         .text("remove")
         .on("click", controller.events.removeSelector);
 
-    var addChild = form.append("button")
+    var addChild = buttonHolder.append("button")
         .text("add child")
         .on("click", controller.events.addChild);
 
-    var addAttr = form.append("button")
+    var addAttr = buttonHolder.append("button")
         .text("add attr")
         .on("click", controller.events.addAttr);
 
+    var selectorAttrs = form.append("ul");
+    var attrs;
 
     // tree
     var svg = view.append("svg")
@@ -984,6 +1025,19 @@ function SchemaView(options){
         showSelector: function(selector){
             form.classed("hidden", false);
             selectorText.text(selector.selector + (selector.index !== undefined ? " (" + selector.index + ")" : ""));
+            attrs = selectorAttrs.selectAll("li.attr")
+                .data(selector.attrs);
+            attrs.enter().append("li")
+                .classed({
+                    "attr": true
+                });
+            attrs.text(function(d){
+                    return d.name + ": " + d.attr;
+                });
+            attrs.append("button")
+                .text("remove")
+                .on("click", controller.events.removeAttr);
+            attrs.exit().remove();
         },
         hideSelector: function(){
             form.classed("hidden", true);
@@ -1099,7 +1153,7 @@ function SelectorView(options){
 
             return parts;
         },
-        getValues: function(){
+        getSelector: function(){
             var sel = [];
             parts.each(function(d){
                 if ( this.classList.contains("on") ) {
@@ -1109,11 +1163,13 @@ function SelectorView(options){
             var index = parseInt(selectElement.property("value"));
             index = !isNaN(index) ? index : undefined;
             // no index for now
-            return [sel.join(""), index];
+            return newSelector(sel.join(""), index);
         },
         reset: function(){
             tags.selectAll("*").remove();
-            choices.remove();
+            if ( choices ) {
+                choices.remove();
+            }
             form.classed("hidden", true);
             elementChoices.classed("hidden", false);
             selectElement.classed("hidden", true);

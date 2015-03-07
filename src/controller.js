@@ -51,21 +51,22 @@ function collectorController(){
         set(page);
     }
 
+    function clonePage(){
+        function setClone(selector, clone){
+            clone.selector = selector.selector;
+            clone.id = selector.id;
+            clone.index = selector.index;
+            clone.attrs = selector.attrs.slice();
+            clone.elements = selector.elements.slice();
+            clone.children = selector.children.map(function(child){
+                return setClone(child, {});
+            });
+            return clone;
+        }
+        return setClone(page, {});
+    }
+
     var fns = {
-        clonePage: function(){
-            function setClone(selector, clone){
-                clone.selector = selector.selector;
-                clone.id = selector.id;
-                clone.index = selector.index;
-                clone.attrs = selector.attrs.slice();
-                clone.elements = selector.elements.slice();
-                clone.children = selector.children.map(function(child){
-                    return setClone(child, {});
-                });
-                return clone;
-            }
-            return setClone(page, {});
-        },
         loadSchemas: function(s){
             schemas = s;
         },
@@ -74,9 +75,8 @@ function collectorController(){
             schema = schemas[schemaName];
 
             fns.setPage(pageName);
-            if ( this.dispatch.Schema ) {
-                var clone = fns.clonePage();
-                this.dispatch.Schema.drawPage(clone);
+            if ( fns.dispatch.Schema ) {
+                fns.dispatch.Schema.drawPage(clonePage());
             }
         },
         setPage: function(name){
@@ -113,6 +113,10 @@ function collectorController(){
         eleCount: function(selectorObject){
             return eSelect.count(selector.elements, selectorObject);
         },
+        legalName: function(name){
+            // filler function
+            return true;
+        },
         events: {
             addChild: function(){
                 // switch to selector tab
@@ -125,20 +129,19 @@ function collectorController(){
                 // turn on element select mode
             },
             addAttr: function(){
+                ui.showView("Attribute");
 
+                fns.dispatch.Attribute.setElements(selector.elements);
             },
             saveSelector: function(){
-                // get the selector from elements that are "on"
-                var vals = fns.dispatch.Selector.getValues();
-                var sel = newSelector.apply(null, vals);
-                var match = matchSelector(sel, selector);
+                var sel = fns.dispatch.Selector.getSelector();
                 // only save if schema doesn't match pre-existing one
-                if ( match === undefined ) {
+                if ( !matchSelector(sel, selector) ) {
                     sel.id = idCount++;
                     sel.elements = eSelect(selector.elements, sel);
                     selector.children.push(sel);
                     // redraw the page
-                    fns.dispatch.Schema.drawPage(fns.clonePage());
+                    fns.dispatch.Schema.drawPage(clonePage());
                     selector = sel;
                     fns.dispatch.Schema.showSelector(selector);
                 }
@@ -151,6 +154,22 @@ function collectorController(){
             cancelSelector: function(){
                 fns.dispatch.Selector.reset();
                 eHighlight.remove();
+                ui.showView("Schema");
+            },
+            saveAttr: function(){
+                var attr = fns.dispatch.Attribute.getAttr();
+                if ( attr === undefined ) {
+                    return;
+                }
+                selector.attrs.push(attr);
+
+                fns.dispatch.Schema.drawPage(clonePage());
+                ui.showView("Schema");
+                fns.dispatch.Attribute.reset();
+                chromeSave(schemas);
+            },
+            cancelAttr: function(){
+                fns.dispatch.Attribute.reset();
                 ui.showView("Schema");
             },
             removeSelector: function(){
@@ -181,7 +200,14 @@ function collectorController(){
                 }
                 // redraw the page
                 chromeSave(schemas);
-                fns.dispatch.Schema.drawPage(fns.clonePage());
+                fns.dispatch.Schema.drawPage(clonePage());
+                fns.dispatch.Schema.showSelector(selector);
+            },
+            removeAttr: function(d, i){
+                d3.event.preventDefault();
+                selector.attrs.splice(i, 1);
+                chromeSave(schemas);
+                fns.dispatch.Schema.drawPage(clonePage());
                 fns.dispatch.Schema.showSelector(selector);
             }
         },

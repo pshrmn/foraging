@@ -1,7 +1,7 @@
 function AttributeView(options){
     var index = 0;
-    var length = 0;
     var eles = [];
+    var length = 0;
 
     options = options || {};
     var holder = options.holder || "body";
@@ -12,15 +12,7 @@ function AttributeView(options){
 
     // form
     var form = view.append("div")
-        .classed({"form": true})
-        .append("form")
-            .on("submit", function(){
-                d3.event.preventDefault();
-                saveFn({
-                    name: nameInput.property("value"),
-                    attr: attrInput.property("value")
-                });
-            });
+        .classed({"form": true});
 
     var nameInput = form.append("p")
         .append("label")
@@ -34,10 +26,15 @@ function AttributeView(options){
         .text("Attr:")
         .append("input")
             .attr("type", "text")
-            .attr("name", "name");
+            .attr("name", "attr");
 
-    form.append("button")
-        .text("Save Attr");
+    var saveButton = form.append("button")
+        .text("Save")
+        .on("click", controller.events.saveAttr);
+
+    var cancelButton = form.append("button")
+        .text("Cancel")
+        .on("click", controller.events.cancelAttr);
 
     // attribute display
     var display = view.append("div")
@@ -53,17 +50,18 @@ function AttributeView(options){
 
     var indexText = buttons.append("span")
         .text(function(){
-            return index + "/" + length;
+            return index;
         });
 
     var next = buttons.append("button")
         .text(">>")
         .on("click", showNext);
 
+    var attrs;
     function displayElement(){
         // show the index for the current element
         indexText.text(function(){
-            return index + "/" + (index - length);
+            return index;
         });
 
         var element = eles[index];
@@ -76,17 +74,16 @@ function AttributeView(options){
             });
         }
 
-        var attrs = attributeHolder.selectAll("div")
+        attrs = attributeHolder.selectAll("div")
             .data(attrData);
 
         attrs.enter().append("div")
             .on("click", function(d){
-                attrInput.attr("value", d.name);
+                attrInput.property("value", d.name);
             });
 
         attrs.text(function(d){
-            // using 11 as an arbitrary number right now
-            return d.name + "=" + abbreviate(d.value, 11);
+            return d.name + "=" + abbreviate(d.value, 21);
         });
 
         attrs.exit().remove();
@@ -114,5 +111,26 @@ function AttributeView(options){
             length = elements.length;
             displayElement();
         },
+        getAttr: function(){
+            var attr = attrInput.property("value");
+            var name = nameInput.property("value");
+
+            if ( name === "" || !controller.legalName(name)){
+                return;
+            }
+
+            return {
+                name: name,
+                attr: attr
+            };
+        },
+        reset: function(){
+            eles = undefined;
+            index = 0;
+            indexText.text("");
+            attrs.remove();
+            attrInput.property("value", "");
+            nameInput.property("value", "");
+        }
     };
 }

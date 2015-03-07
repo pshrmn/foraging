@@ -24,26 +24,23 @@ function SchemaView(options){
     var selectorText = form.append("p")
         .text("Selector: ")
         .append("span");
-    /*
-    var edit = form.append("button")
-        .text("edit")
-        .on("click", function(){
-            // show the selectorView
-        });
-    */
 
-    var remove = form.append("button")
+    var buttonHolder = form.append("div");
+
+    var remove = buttonHolder.append("button")
         .text("remove")
         .on("click", controller.events.removeSelector);
 
-    var addChild = form.append("button")
+    var addChild = buttonHolder.append("button")
         .text("add child")
         .on("click", controller.events.addChild);
 
-    var addAttr = form.append("button")
+    var addAttr = buttonHolder.append("button")
         .text("add attr")
         .on("click", controller.events.addAttr);
 
+    var selectorAttrs = form.append("ul");
+    var attrs;
 
     // tree
     var svg = view.append("svg")
@@ -120,6 +117,19 @@ function SchemaView(options){
         showSelector: function(selector){
             form.classed("hidden", false);
             selectorText.text(selector.selector + (selector.index !== undefined ? " (" + selector.index + ")" : ""));
+            attrs = selectorAttrs.selectAll("li.attr")
+                .data(selector.attrs);
+            attrs.enter().append("li")
+                .classed({
+                    "attr": true
+                });
+            attrs.text(function(d){
+                    return d.name + ": " + d.attr;
+                });
+            attrs.append("button")
+                .text("remove")
+                .on("click", controller.events.removeAttr);
+            attrs.exit().remove();
         },
         hideSelector: function(){
             form.classed("hidden", true);

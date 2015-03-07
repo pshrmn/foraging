@@ -143,32 +143,6 @@ body{
                     width: 150px;
                     border-width: 0 0 1px;
                 }
-
-
-                .rule{
-                    height: 20px;
-                    font-size: 1em;
-                    margin-bottom: 5px;
-                    border: 0;
-                    overflow: visible;
-
-                    span{
-                        min-width: 50px;
-                    }
-
-                    label{
-                        width: 75px;
-                    }
-
-                    label, input{
-                        margin: 0;
-                        display: inline-block;
-                    }
-                }
-
-                .rule.follow{
-                    display: none;
-                }
             }
 
             .hidden{
@@ -184,7 +158,6 @@ body{
 
             .form label{
                 display: inline-block;
-                width: 75px;
             }
 
             svg {

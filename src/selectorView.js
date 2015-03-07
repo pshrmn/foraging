@@ -106,7 +106,7 @@ function SelectorView(options){
 
             return parts;
         },
-        getValues: function(){
+        getSelector: function(){
             var sel = [];
             parts.each(function(d){
                 if ( this.classList.contains("on") ) {
@@ -116,11 +116,13 @@ function SelectorView(options){
             var index = parseInt(selectElement.property("value"));
             index = !isNaN(index) ? index : undefined;
             // no index for now
-            return [sel.join(""), index];
+            return newSelector(sel.join(""), index);
         },
         reset: function(){
             tags.selectAll("*").remove();
-            choices.remove();
+            if ( choices ) {
+                choices.remove();
+            }
             form.classed("hidden", true);
             elementChoices.classed("hidden", false);
             selectElement.classed("hidden", true);

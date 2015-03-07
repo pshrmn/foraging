@@ -6,10 +6,13 @@ function attributes(element) {
     var curr;
     for ( var i=0; i<attrs.length; i++ ) {
         curr = attrs[i];
-        attrMap[curr.name] = curr.value;
+        // don't include empty attrs
+        if ( curr.value !== "") {
+            attrMap[curr.name] = curr.value;
+        }
     }
     // include text if it exists
-    var text = element.textContent;
+    var text = element.textContent.trim();
     if ( text !== "" ) {
         attrMap.text = text;
     }

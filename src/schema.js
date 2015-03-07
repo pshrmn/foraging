@@ -32,15 +32,12 @@ function cleanSchema(schema){
 
 // check if an identical selector already exists
 function matchSelector(sel, parent){
-    var match;
-    parent.children.some(function(s){
+    return parent.children.some(function(s){
         if ( s.selector === sel.selector && s.index === sel.index ) {
-            match = s.id;
             return true;
         }
         return false;
     });
-    return match;
 }
 
 /*

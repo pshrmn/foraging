@@ -89,21 +89,6 @@ body {
       .collectjs .views .view .form input[type=text] {
         width: 150px;
         border-width: 0 0 1px; }
-      .collectjs .views .view .form .rule {
-        height: 20px;
-        font-size: 1em;
-        margin-bottom: 5px;
-        border: 0;
-        overflow: visible; }
-        .collectjs .views .view .form .rule span {
-          min-width: 50px; }
-        .collectjs .views .view .form .rule label {
-          width: 75px; }
-        .collectjs .views .view .form .rule label, .collectjs .views .view .form .rule input {
-          margin: 0;
-          display: inline-block; }
-      .collectjs .views .view .form .rule.follow {
-        display: none; }
       .collectjs .views .view .hidden {
         display: none; }
       .collectjs .views .view .form.column {
@@ -112,8 +97,7 @@ body {
         padding-right: 50px;
         border-right: 1px solid #444444; }
       .collectjs .views .view .form label {
-        display: inline-block;
-        width: 75px; }
+        display: inline-block; }
       .collectjs .views .view svg .link {
         fill: none;
         stroke: #aaa; }
