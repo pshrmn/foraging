@@ -65,15 +65,43 @@ function elementSelector(){
 
     function select(elements, selector){
         var matches = [];
-        selector = selector || "*";
+        selector = selector || {};
+        var sel = selector.selector || "*";
+        sel = sel + ":not(" + not + ")";
+        var index = selector.index;
+        var eles;
         for ( var i=0; i<elements.length; i++ ) {
-            var sel = selector + ":not(" + not + ")";
-            [].push.apply(matches, [].slice.call(
-                elements[i].querySelectorAll(sel))
-            );
+            eles = elements[i].querySelectorAll(sel);
+            if ( index !== undefined ) {
+                if ( !eles[index] ) {
+                    continue;
+                } else {
+                    matches.push(eles[index]);
+                }
+            } else {
+                [].push.apply(matches, [].slice.call(eles));
+            }
         }
         return matches;
     }
+
+    // return the max number of children per element
+    select.count = function(elements, selector){
+        var max = -Infinity;
+        selector = selector || {};
+        var sel = selector.selector || "*";
+        sel = sel + ":not(" + not + ")";
+        var index = selector.index;
+        // index must specify only one element per parent
+        if ( index !== undefined ) {
+            return 1;
+        }
+        for ( var i=0; i<elements.length; i++ ) {
+            var count = elements[i].querySelectorAll(sel).length;
+            max = Math.max(max, count);
+        }
+        return max;
+    };
 
     // set a new avoid selector
     select.not = function(avoid){

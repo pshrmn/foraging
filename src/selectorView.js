@@ -16,13 +16,26 @@ function SelectorView(options){
 
     var tags = form.append("div");
     var parts;
+    var selectElement = form.append("select")
+        .classed({"hidden": true});
+
     var saveSelector = form.append("button")
         .text("Save")
         .on("click", controller.events.saveSelector);
 
-    var cancelSelector = form.append("button")
+
+    var cancelSelector = view.append("button")
         .text("Cancel")
         .on("click", controller.events.cancelSelector);
+
+    function markup(selector, index){
+        index = parseInt(index);
+        index = !isNaN(index) ? index : undefined;
+        controller.markup({
+            selector: selector,
+            index: index
+        });
+    }
 
     var fns = {
         setChoices: function(data){
@@ -47,8 +60,8 @@ function SelectorView(options){
         },
         addTags: function(data){
             // initialize with full selector
-            controller.markup(data.join(""));
-
+            var fullSelector = data.join("");
+            markup(fullSelector);
             parts = tags.selectAll("p.tag")
                 .data(data);
             parts.enter().append("p")
@@ -64,8 +77,29 @@ function SelectorView(options){
                             tags.push(d);
                         }
                     });
-                    controller.markup(tags.join(""));
+                    markup(tags.join(""), selectElement.property("value"));
                 });
+            var maxChildren = controller.eleCount({
+                selector: fullSelector,
+                index: undefined
+            });
+            var childCounts = ['-'].concat(d3.range(maxChildren));
+            selectElement.classed("hidden", false);
+            selectElement.on("change", function(){
+                var tags = [];
+                parts.each(function(d){
+                    if ( this.classList.contains("on") ) {
+                        tags.push(d);
+                    }
+                });
+                markup(tags.join(""), selectElement.property("value"));
+            });
+            selectElement.selectAll("option")
+                    .data(childCounts)
+                .enter().append("option")
+                    .text(function(d){ return d;})
+                    .attr("value", function(d){ return d;});
+
             ui.noSelect();
             parts.text(function(d){ return d; });
             parts.exit().remove();
@@ -79,14 +113,18 @@ function SelectorView(options){
                     sel.push(d);
                 }
             });
+            var index = parseInt(selectElement.property("value"));
+            index = !isNaN(index) ? index : undefined;
             // no index for now
-            return [sel.join(""), undefined];
+            return [sel.join(""), index];
         },
         reset: function(){
             tags.selectAll("*").remove();
             choices.remove();
             form.classed("hidden", true);
             elementChoices.classed("hidden", false);
+            selectElement.classed("hidden", true);
+            selectElement.selectAll("option").remove();
         }
     };
 

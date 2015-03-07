@@ -112,14 +112,14 @@ function SchemaView(options){
 
             node.append("text")                
                 .text(function(d){
-                    return d.selector;
+                    return d.selector + (d.index !== undefined ? " (" + d.index + ")" : "");
                 });
 
             node.exit().remove();
         },
         showSelector: function(selector){
             form.classed("hidden", false);
-            selectorText.text(selector.selector);
+            selectorText.text(selector.selector + (selector.index !== undefined ? " (" + selector.index + ")" : ""));
         },
         hideSelector: function(){
             form.classed("hidden", true);

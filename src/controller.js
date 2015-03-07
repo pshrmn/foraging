@@ -6,47 +6,31 @@ function collectorController(){
 
     // sp is given an element and returns an array containing its tag
     // and if they exist, its id and any classes
-    var sp = selectorParts()
+    var sParts = selectorParts()
         .ignoreClasses(["collectHighlight", "queryCheck", "selectableElement"]);
 
     // es takes an array of elements and queries each to get their child elements
     // if no selector is provided it uses the all selector (*)
-    var es = elementSelector();
+    var eSelect = elementSelector();
 
     // element highlighter takes an array of elements and adds event listeners
     // to give the user the ability to select an element in the page (along with
     // vanity markup to identify which element is being selected)
-    var eh = elementHighlighter()
+    var eHighlight = elementHighlighter()
         .clicked(elementChoices);
 
     function elementChoices(elements){
         var data = elements.map(function(ele){
-            return sp(ele);
+            return sParts(ele);
         });
         fns.dispatch.Selector.setChoices(data);
-        /*
-        queryCheckMarkup(data.join(""));
-
-        var parts = fns.dispatch.Selector.addTags(data);
-        parts.on("click", function(){
-                d3.event.stopPropagation();
-                this.classList.toggle("on");
-                var tags = [];
-                parts.each(function(d){
-                    if ( this.classList.contains("on") ) {
-                        tags.push(d);
-                    }
-                });
-                queryCheckMarkup(tags.join(""));
-            });
-        */
     }
 
     // get all of the elements that match each selector
     // and store in object.elements
     function getMatches(selectFn){
         function match(elements, s){
-            s.elements = selectFn(elements, s.selector);
+            s.elements = selectFn(elements, s);
             s.children.forEach(function(child){
                 match(s.elements, child);
             });      
@@ -98,7 +82,7 @@ function collectorController(){
         setPage: function(name){
             page = schema.pages[name];
             setupPage();
-            getMatches(es);
+            getMatches(eSelect);
         },
         setSelector: function(d){
             function find(s, lid){
@@ -115,21 +99,27 @@ function collectorController(){
             find(page, d.id);
             fns.dispatch.Schema.showSelector(selector);
         },
-        markup: function(selectorString){
+        markup: function(selectorObject){
             clearClass("queryCheck");
-            if ( selectorString !== "" ) {
-                es(selector.elements, selectorString).forEach(function(ele){
+            if ( selectorObject.selector !== "" ) {
+                eSelect(selector.elements, {
+                    selector: selectorObject.selector,
+                    index: selectorObject.index
+                }).forEach(function(ele){
                     ele.classList.add("queryCheck");
                 });
             }
+        },
+        eleCount: function(selectorObject){
+            return eSelect.count(selector.elements, selectorObject);
         },
         events: {
             addChild: function(){
                 // switch to selector tab
                 ui.showView("Selector");
 
-                var eles = es(selector.elements);
-                eh(eles);
+                var eles = eSelect(selector.elements);
+                eHighlight(eles);
                 // enter editing mode
                 // set the parent to be the current element
                 // turn on element select mode
@@ -145,7 +135,7 @@ function collectorController(){
                 // only save if schema doesn't match pre-existing one
                 if ( match === undefined ) {
                     sel.id = idCount++;
-                    sel.elements = es(selector.elements, sel.selector);    
+                    sel.elements = eSelect(selector.elements, sel);
                     selector.children.push(sel);
                     // redraw the page
                     fns.dispatch.Schema.drawPage(fns.clonePage());
@@ -155,12 +145,12 @@ function collectorController(){
 
                 ui.showView("Schema");
                 fns.dispatch.Selector.reset();
-                eh.remove();
+                eHighlight.remove();
                 chromeSave(schemas);
             },
             cancelSelector: function(){
                 fns.dispatch.Selector.reset();
-                eh.remove();
+                eHighlight.remove();
                 ui.showView("Schema");
             },
             removeSelector: function(){
