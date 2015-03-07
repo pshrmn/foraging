@@ -1,6 +1,6 @@
 {
   "name": "collectJS",
-  "version": "0.24.4",
+  "version": "0.24.5",
   "repository": {
     "type": "git",
     "url": "git://github.com/psherman/collectorjs.git"
