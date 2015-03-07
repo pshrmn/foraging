@@ -77,6 +77,7 @@ function collectorController(){
             fns.setPage(pageName);
             if ( fns.dispatch.Schema ) {
                 fns.dispatch.Schema.drawPage(clonePage());
+                ui.setUrl(fns.isUrl());
             }
         },
         setPage: function(name){
@@ -116,6 +117,19 @@ function collectorController(){
         legalName: function(name){
             // filler function
             return true;
+        },
+        getSchema: function(){
+            return schema;
+        },
+        isUrl: function(){
+            var url = window.location.href;
+            if ( schema ) {
+                return schema.urls.some(function(curl){
+                    return curl === url;
+                });
+            } else {
+                return false;
+            }
         },
         events: {
             addChild: function(){
@@ -209,13 +223,33 @@ function collectorController(){
                 chromeSave(schemas);
                 fns.dispatch.Schema.drawPage(clonePage());
                 fns.dispatch.Schema.showSelector(selector);
-            }
+            },
+            toggleUrl: function(){
+                var url = window.location.href;
+                var index;
+                schema.urls.some(function(curl, i){
+                    if ( curl === url ) {
+                        index = i;
+                        return true;
+                    }
+                    return false;
+                });
+                // remove it
+                if ( index !== undefined ) {
+                    schema.urls.splice(index, 1);
+                    ui.setUrl(false);
+                } else {
+                    schema.urls.push(url);
+                    ui.setUrl(true);
+                }
+                chromeSave(schemas);
+            },
+            upload: function(){
+                chromeUpload(schema);
+            },
         },
         // used to interact with views
         dispatch: {},
-        getData: function(){
-            return page;
-        }
     };
 
     return fns;
