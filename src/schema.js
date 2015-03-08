@@ -39,3 +39,40 @@ function matchSelector(sel, parent){
         return false;
     });
 }
+
+// get an array containing the names of all attrs in the schema
+function attrNames(schema){
+    var names = [];
+
+    function findNames(selector){
+        selector.attrs.forEach(function(n){
+            names.push(n);
+        });
+
+        selector.children.forEach(function(child){
+            findNames(child);
+        });
+    }
+
+    for ( var name in schema.pages ) {
+        findNames(schema.pages[name]);
+    }
+    return names;
+}
+
+function followedAttrs(page){
+    var attrs = [];
+
+    function findFollowedAttrs(selector){
+        selector.attrs.forEach(function(attr){
+            if ( attr.follow ) {
+                attrs.push(attr.name);
+            }
+        });
+        selector.children.forEach(function(child){
+            findFollowedAttrs(child);
+        });
+    }
+    findFollowedAttrs(page);
+    return attrs;
+}

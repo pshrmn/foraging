@@ -1,7 +1,11 @@
 function collectorController(){
     var schemas;
-    var schema;    
+    var schema;
+    // a list of all attr names in the schema
+    var schemaAttrs = [];
     var page;
+    // track the name of the current page
+    var currentPage;
     var selector;
 
     // sp is given an element and returns an array containing its tag
@@ -77,15 +81,21 @@ function collectorController(){
             schema = schemas[schemaName];
 
             fns.setPage(pageName);
-            if ( fns.dispatch.Schema ) {
-                fns.dispatch.Schema.drawPage(clonePage());
-                ui.setUrl(fns.isUrl());
-            }
+            ui.setPages(Object.keys(schema.pages));
         },
         setPage: function(name){
+            currentPage = name;
             page = schema.pages[name];
             setupPage();
             getMatches(eSelect);
+            fns.dispatch.Schema.drawPage(clonePage());
+            if ( name === "default" ) {
+                ui.setUrl(fns.isUrl());
+                ui.toggleUrl(true);
+            } else {
+                ui.toggleUrl(false);
+            }
+
         },
         setSelector: function(d){
             function find(s, lid){
@@ -117,8 +127,13 @@ function collectorController(){
             return eSelect.count(selector.elements, selectorObject);
         },
         legalName: function(name){
-            // filler function
-            return true;
+            // default is a reserved name
+            if ( name === "default" ) {
+                return false;
+            }
+            return !schemaAttrs.some(function(attr){
+                return attr === name;
+            });
         },
         getSchema: function(){
             return schema;
@@ -178,6 +193,12 @@ function collectorController(){
                     return;
                 }
                 selector.attrs.push(attr);
+
+                // if follow=true, create a new page with the name of the attr
+                if ( attr.follow ) {
+                    schema.pages[attr.name] = newSelector("body");
+                    ui.setPages(Object.keys(schema.pages));
+                }
 
                 fns.dispatch.Schema.drawPage(clonePage());
                 ui.showView("Schema");
@@ -249,6 +270,61 @@ function collectorController(){
             upload: function(){
                 chromeUpload(schema);
             },
+            loadPage: function(){
+                fns.setPage(ui.getPage());
+            },
+            removePage: function(){
+                var pagesToRemove = [];
+                function findChildPages(pageName){
+                    var currPage = schema.pages[pageName];
+                    if ( currPage ) {
+                        pagesToRemove.push(pageName);
+                        pagesToRemove = pagesToRemove.concat(followedAttrs(currPage));                       
+                    }
+                }
+                function removeAttr(selector, name){
+                    var found = selector.attrs.some(function(attr, index){
+                        if ( attr.name === name ) {
+                            selector.attrs.splice(index, 1);
+                            return true;
+                        }
+                        return false;
+                    });
+                    if ( !found ) {
+                        found = selector.children.some(function(child){
+                            return removeAttr(child, name);
+                        });
+                    }
+                    return found;
+                }
+                if ( currentPage === "default" ) {
+                    // only have the new page
+                    schema.pages = {
+                        "default": newSelector("body")
+                    };
+                } else {
+                    // recursively remove child pages
+                    findChildPages(currentPage);
+                    pagesToRemove.forEach(function(name){
+                        delete schema.pages[name];
+                    });
+
+                    // iterate over still existing pages and remove the attribute
+                    // from the rule with the currentPage name?
+                    var found = false;
+                    for ( var key in schema.pages ) {
+                        if ( removeAttr(schema.pages[key], currentPage) ) {
+                            break;
+                        }
+                    }
+                }
+
+
+                chromeSave(schemas);
+                ui.setPages(Object.keys(schema.pages));
+                // revert to the default page after removing a page
+                fns.setPage("default");
+            }
         },
         // used to interact with views
         dispatch: {},

@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "CollectorJS",
   "description": "Get's css selector rules for a crawler",
-  "version": "0.24.5",
+  "version": "0.24.6",
   "permissions": [
     "activeTab",
     "storage",

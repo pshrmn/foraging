@@ -316,11 +316,52 @@ function matchSelector(sel, parent){
     });
 }
 
+// get an array containing the names of all attrs in the schema
+function attrNames(schema){
+    var names = [];
+
+    function findNames(selector){
+        selector.attrs.forEach(function(n){
+            names.push(n);
+        });
+
+        selector.children.forEach(function(child){
+            findNames(child);
+        });
+    }
+
+    for ( var name in schema.pages ) {
+        findNames(schema.pages[name]);
+    }
+    return names;
+}
+
+function followedAttrs(page){
+    var attrs = [];
+
+    function findFollowedAttrs(selector){
+        selector.attrs.forEach(function(attr){
+            if ( attr.follow ) {
+                attrs.push(attr.name);
+            }
+        });
+        selector.children.forEach(function(child){
+            findFollowedAttrs(child);
+        });
+    }
+    findFollowedAttrs(page);
+    return attrs;
+}
+
 // Source: src/controller.js
 function collectorController(){
     var schemas;
-    var schema;    
+    var schema;
+    // a list of all attr names in the schema
+    var schemaAttrs = [];
     var page;
+    // track the name of the current page
+    var currentPage;
     var selector;
 
     // sp is given an element and returns an array containing its tag
@@ -396,15 +437,21 @@ function collectorController(){
             schema = schemas[schemaName];
 
             fns.setPage(pageName);
-            if ( fns.dispatch.Schema ) {
-                fns.dispatch.Schema.drawPage(clonePage());
-                ui.setUrl(fns.isUrl());
-            }
+            ui.setPages(Object.keys(schema.pages));
         },
         setPage: function(name){
+            currentPage = name;
             page = schema.pages[name];
             setupPage();
             getMatches(eSelect);
+            fns.dispatch.Schema.drawPage(clonePage());
+            if ( name === "default" ) {
+                ui.setUrl(fns.isUrl());
+                ui.toggleUrl(true);
+            } else {
+                ui.toggleUrl(false);
+            }
+
         },
         setSelector: function(d){
             function find(s, lid){
@@ -436,8 +483,13 @@ function collectorController(){
             return eSelect.count(selector.elements, selectorObject);
         },
         legalName: function(name){
-            // filler function
-            return true;
+            // default is a reserved name
+            if ( name === "default" ) {
+                return false;
+            }
+            return !schemaAttrs.some(function(attr){
+                return attr === name;
+            });
         },
         getSchema: function(){
             return schema;
@@ -497,6 +549,12 @@ function collectorController(){
                     return;
                 }
                 selector.attrs.push(attr);
+
+                // if follow=true, create a new page with the name of the attr
+                if ( attr.follow ) {
+                    schema.pages[attr.name] = newSelector("body");
+                    ui.setPages(Object.keys(schema.pages));
+                }
 
                 fns.dispatch.Schema.drawPage(clonePage());
                 ui.showView("Schema");
@@ -568,12 +626,125 @@ function collectorController(){
             upload: function(){
                 chromeUpload(schema);
             },
+            loadPage: function(){
+                fns.setPage(ui.getPage());
+            },
+            removePage: function(){
+                var pagesToRemove = [];
+                function findChildPages(pageName){
+                    var currPage = schema.pages[pageName];
+                    if ( currPage ) {
+                        pagesToRemove.push(pageName);
+                        pagesToRemove = pagesToRemove.concat(followedAttrs(currPage));                       
+                    }
+                }
+                function removeAttr(selector, name){
+                    var found = selector.attrs.some(function(attr, index){
+                        if ( attr.name === name ) {
+                            selector.attrs.splice(index, 1);
+                            return true;
+                        }
+                        return false;
+                    });
+                    if ( !found ) {
+                        found = selector.children.some(function(child){
+                            return removeAttr(child, name);
+                        });
+                    }
+                    return found;
+                }
+                if ( currentPage === "default" ) {
+                    // only have the new page
+                    schema.pages = {
+                        "default": newSelector("body")
+                    };
+                } else {
+                    // recursively remove child pages
+                    findChildPages(currentPage);
+                    pagesToRemove.forEach(function(name){
+                        delete schema.pages[name];
+                    });
+
+                    // iterate over still existing pages and remove the attribute
+                    // from the rule with the currentPage name?
+                    var found = false;
+                    for ( var key in schema.pages ) {
+                        if ( removeAttr(schema.pages[key], currentPage) ) {
+                            break;
+                        }
+                    }
+                }
+
+
+                chromeSave(schemas);
+                ui.setPages(Object.keys(schema.pages));
+                // revert to the default page after removing a page
+                fns.setPage("default");
+            }
         },
         // used to interact with views
         dispatch: {},
     };
 
     return fns;
+}
+// Source: src/topbar.js
+function topbar(options){
+    options = options || {};
+    var holder = options.holder || "body";
+
+    var bar = d3.select(holder);
+
+    var pageSelect = bar.append("select")
+        .on("change", controller.events.loadPage);
+
+    bar.append("button")
+        .text("remove page")
+        .on("click", controller.events.removePage);
+
+    bar.append("button")
+        .text("upload")
+        .on("click", controller.events.upload);
+
+    var toggleUrl = bar.append("button")
+        .text(function(){
+            return "add url";
+        })
+        .classed({
+            "on": false
+        })
+        .on("click", controller.events.toggleUrl);
+
+    return {
+        setUrl: function(on){
+            if ( on ) {
+                toggleUrl
+                    .text("remove url")
+                    .classed("on", true);
+            } else {
+                toggleUrl
+                    .text("add url")
+                    .classed("on", false);
+            }
+        },
+        toggleUrl: function(on){
+            toggleUrl.classed("hidden", !on);
+        },
+        setPages: function(names){
+            var pages = pageSelect.selectAll("option")
+                .data(names);
+
+            pages.enter().append("option");
+            pages
+                .text(function(d){ return d;})
+                .attr("value", function(d){ return d;});
+            pages.exit().remove();
+
+        },
+        getPage: function(){
+            return pageSelect.property("value");
+        }
+    };
 }
 // Source: src/chrome.js
 /* functions that are related to the extension */
@@ -720,6 +891,14 @@ function AttributeView(options){
             .attr("type", "text")
             .attr("name", "attr");
 
+    var followInput = form.append("p")
+        .append("label")
+        .text("Follow: ")
+        .append("input")
+            .attr("type", "checkbox")
+            .attr("name", "follow")
+            .property("disabled", true);
+
     var saveButton = form.append("button")
         .text("Save")
         .on("click", controller.events.saveAttr);
@@ -772,6 +951,9 @@ function AttributeView(options){
         attrs.enter().append("div")
             .on("click", function(d){
                 attrInput.property("value", d.name);
+                followInput.property("disabled", function(){
+                    return d.name !== "href";
+                });
             });
 
         attrs.text(function(d){
@@ -806,14 +988,15 @@ function AttributeView(options){
         getAttr: function(){
             var attr = attrInput.property("value");
             var name = nameInput.property("value");
-
+            var follow = followInput.property("checked") && attr === "href";
             if ( name === "" || !controller.legalName(name)){
                 return;
             }
 
             return {
                 name: name,
-                attr: attr
+                attr: attr,
+                follow: follow
             };
         },
         reset: function(){
@@ -823,6 +1006,8 @@ function AttributeView(options){
             attrs.remove();
             attrInput.property("value", "");
             nameInput.property("value", "");
+            followInput.property("disabled", true);
+            followInput.property("checked", false);
         }
     };
 }
@@ -1073,8 +1258,9 @@ function SelectorView(options){
                 });
                 markup(tags.join(""), selectElement.property("value"));
             });
-            selectElement.selectAll("option")
-                    .data(childCounts)
+            var eles = selectElement.selectAll("option");
+            eles.remove();
+            eles.data(childCounts)
                 .enter().append("option")
                     .text(function(d){ return d;})
                     .attr("value", function(d){ return d;});
@@ -1133,20 +1319,9 @@ function buildUI(controller){
     var tabHolder = holder.querySelector(".tabs");
     var viewHolder = holder.querySelector(".views");
 
-    var bar = d3.select("#schemaInfo");
-
-    var upload = bar.append("button")
-        .text("upload")
-        .on("click", controller.events.upload);
-
-    var toggleUrl = bar.append("button")
-        .text(function(){
-            return "add url";
-        })
-        .classed({
-            "on": false
-        })
-        .on("click", controller.events.toggleUrl);
+    var topbarFns = topbar({
+        holder: "#schemaInfo"
+    });
 
     var tabs = {};
     var views = {};
@@ -1212,17 +1387,10 @@ function buildUI(controller){
             controller.dispatch[name] = viewFn(options);
         },
         showView: showView,
-        setUrl: function(on){
-            if ( on ) {
-                toggleUrl
-                    .text("remove url")
-                    .classed("on", true);
-            } else {
-                toggleUrl
-                    .text("add url")
-                    .classed("on", false);
-            }
-        },
+        setUrl: topbarFns.setUrl,
+        toggleUrl: topbarFns.toggleUrl,
+        setPages: topbarFns.setPages,
+        getPage: topbarFns.getPage,
     };
 }
 

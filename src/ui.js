@@ -18,20 +18,9 @@ function buildUI(controller){
     var tabHolder = holder.querySelector(".tabs");
     var viewHolder = holder.querySelector(".views");
 
-    var bar = d3.select("#schemaInfo");
-
-    var upload = bar.append("button")
-        .text("upload")
-        .on("click", controller.events.upload);
-
-    var toggleUrl = bar.append("button")
-        .text(function(){
-            return "add url";
-        })
-        .classed({
-            "on": false
-        })
-        .on("click", controller.events.toggleUrl);
+    var topbarFns = topbar({
+        holder: "#schemaInfo"
+    });
 
     var tabs = {};
     var views = {};
@@ -97,16 +86,9 @@ function buildUI(controller){
             controller.dispatch[name] = viewFn(options);
         },
         showView: showView,
-        setUrl: function(on){
-            if ( on ) {
-                toggleUrl
-                    .text("remove url")
-                    .classed("on", true);
-            } else {
-                toggleUrl
-                    .text("add url")
-                    .classed("on", false);
-            }
-        },
+        setUrl: topbarFns.setUrl,
+        toggleUrl: topbarFns.toggleUrl,
+        setPages: topbarFns.setPages,
+        getPage: topbarFns.getPage,
     };
 }

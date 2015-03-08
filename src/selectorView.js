@@ -94,8 +94,9 @@ function SelectorView(options){
                 });
                 markup(tags.join(""), selectElement.property("value"));
             });
-            selectElement.selectAll("option")
-                    .data(childCounts)
+            var eles = selectElement.selectAll("option");
+            eles.remove();
+            eles.data(childCounts)
                 .enter().append("option")
                     .text(function(d){ return d;})
                     .attr("value", function(d){ return d;});
