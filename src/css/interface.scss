@@ -39,6 +39,14 @@ body{
         box-sizing: border-box;
     }
 
+    .hidden{
+        display: none;
+    }
+
+    ul{
+        list-style: none;
+    }
+
     .tabHolder{
         position: relative;
     }
@@ -101,12 +109,6 @@ body{
             display: none;
             padding: 5px;
 
-            .column{
-                display: inline-block;
-                vertical-align: top;
-                padding: 0 15px;
-            }
-
             > *{
                 vertical-align: top;
             }
@@ -145,22 +147,16 @@ body{
                 }
             }
 
-            .hidden{
-                display: none;
-            }
-
-            .form.column{
-                width: 25%;
-                min-width: 300px;
-                padding-right: 50px;
-                border-right: 1px solid $dark-gray;
-            }
-
             .form label{
                 display: inline-block;
             }
 
             svg {
+                font-size: 16px;
+
+                rect{
+                    fill: $white;
+                }
 
                 .link {
                   fill: none;
@@ -209,151 +205,6 @@ body{
         font-weight: normal;
     }
 
-    .rules{
-        font-size: 16px;
-
-        .schema, .page, .set, .selector, .rule{
-            padding: 5px 2px;
-            border-radius: 5px;
-            border-width: 1px;
-            border-style: solid;
-            border-color: $gray;
-        }
-
-        .schema{
-            background: $light-gray;
-            display: none;
-        }
-
-        .schema.active{
-            display: block;
-        }
-
-        .page{
-            display: inline-block;
-            vertical-align: top;
-            width: 50%;
-            margin: 3px 0;
-            background: $white;
-        }
-
-        .set{
-            margin: 2px 0;
-            background: $light-gray;
-        }
-
-        .set.active{
-            background: $blue;
-            border-color: $blue;
-        }
-
-        .selector{
-            margin: 2px 0;
-            background: $white;
-        }
-
-        .schema ul, .page ul, .set ul{
-            list-style: none;
-        }
-
-        .rule{
-            margin-right: 10px;
-            padding: 5px;
-            background: $light-gray;
-            display: inline-block;
-        }
-
-        .parent, .next{
-            .hidden{
-                display: none;
-            }
-        }
-
-
-        button{
-            font-weight: bold;
-            background: $white;
-            border: 1px solid $gray;
-            border-radius: 3px;
-        }
-
-        button.pos:hover{
-            color: $green;
-        }
-
-        button.neg:hover{
-            color: $red;
-        }
-
-        .nametag{
-            font-weight: bold;
-        }
-    }
-
-    .items{
-        font-size: 16px;
-        color: $black;
-        .modifiers{
-            padding-left: 15px;
-            max-width: 75%;
-
-            > div{
-                padding: 10px 0;
-            }
-
-            .capture{
-                background: #ddd;
-                padding: 2px;
-                cursor: pointer; 
-            }
-
-            .selected{
-                background: $light-green;
-            }
-
-        }
-
-    }
-
-    .selectorSchema{
-        display: inline-block;
-        white-space: nowrap;
-        padding: 2px 0 0 2px;
-        position: relative;
-        cursor: pointer;
-
-        *{
-            font-size: 16px;
-        }
-
-        .toggleable{
-            color: $dark-gray;
-            border-bottom: 1px solid #777;   
-            
-            .childtoggle{
-                border-width: 0 0 1px;
-                width: 50px;
-            }
-        }
-
-        .toggleable.off{
-            color: #ccc;
-        }
-
-        .deltog, .nthtype, .onlychild{
-            font-weight: bold;
-            padding: 0 3px 0 2px;
-            color: $white;
-        }
-
-    }
-
-    .selectorSchema:hover{
-        .deltog, .onlychild, .nthtype{
-            color: #777;
-        }
-    }
-
     /* lots of sites like to customize how various inputs look, 
     so this is trying to keep these close to (chrome) default css */
     button {
@@ -379,76 +230,6 @@ body{
         border: 1px solid #a9a9a9;
         margin: 2px;
     }
-}
-
-/* tab buttons */
-#refreshCollect{
-    background: $blue;
-}
-
-#closeCollect{
-    background: $light-red;
-}
-
-#ruleHTML{
-    line-height: 2;
-}
-
-
-/* views */
-/* schemaView */
-#schemaHolder{
-    max-height: 350px;
-    overflow-y: scroll;    
-}
-
-/* selectorView */
-#selectorView{
-    font-size: 14px;
-
-    input[type=text]{
-        width: 50px;
-    }
-
-    p{
-        margin: 3px 0;
-    }
-}
-
-#parentRange{
-    display: none;
-}
-
-/* previewView */
-#previewView{
-    .name{
-        margin-right: 15px;
-    }
-
-    .previewSet{
-        margin: 10px 5px;
-        border: 1px solid $black;
-    }
-}
-
-#previewContents{
-    font-size: 16px;
-    overflow-y: scroll;
-    height: 200px;
-    border: 2px inset;
-
-    p{
-        margin-bottom: 5px;
-        padding: 2px 15px;
-    }
-    p:nth-of-type(even){
-        background: $light-gray;
-    }
-}
-
-/* Selector */
-#selectorHolder{
-    line-height: 1.5;
 }
 
 @import 'page';

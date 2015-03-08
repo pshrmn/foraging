@@ -1,10 +1,3 @@
-// creates a new element with tagName of type that has class noSelect
-function noSelectElement(type){
-    var ele = document.createElement(type);
-    ele.classList.add("noSelect");
-    return ele;
-}
-
 // purge a classname from all elements with it
 function clearClass(name){
     var eles = document.getElementsByClassName(name),
@@ -30,50 +23,6 @@ function addClass(name, eles){
     }
 }
 
-// utility function to swap two classes
-function swapClasses(ele, oldClass, newClass){
-    ele.classList.remove(oldClass);
-    ele.classList.add(newClass);
-}
-
-// add an EventListener to a an element, given the id of the element
-function idEvent(id, type, fn){
-    document.getElementById(id).addEventListener(type, fn, false);
-}
-
-// add the .noSelect class to eles array, so that collect.js doesn't try to select them
-function addNoSelect(eles){
-    var len = eles.length;
-    for( var i=0; i<len; i++ ) {
-        eles[i].classList.add('noSelect');
-    }
-}
-
-function options(keys, holder){
-    // clear out any existing options when adding multiple new options
-    holder.innerHTML = "";
-    for ( var i=0, len=keys.length; i<len; i++ ){
-        holder.appendChild(newOption(keys[i]));
-    }
-}
-
-function newOption(name){
-    var option = noSelectElement("option");
-    option.setAttribute("value", name);
-    option.textContent = name;
-    return option;
-}
-
-// append all of the elements in children to the parent element
-function appendChildren(parent, children){
-    if ( parent === null ) {
-        return;
-    }
-    for ( var i=0, len=children.length; i<len; i++ ) {
-        parent.appendChild(children[i]);
-    }
-}
-
 /*
 a schema's name will be the name of the file when it is uploaded, so make sure that any characters in the name will be legal to use
 rejects if name contains characters not allowed in filename: <, >, :, ", \, /, |, ?, *
@@ -86,20 +35,3 @@ function legalSchemaName(name){
         match = name.match(badCharacters);
     return ( match === null );
 }
-
-function createRangeString(low, high){
-    low             = parseInt(low, 10);
-    high            = parseInt(high, 10);
-    var lowString   = low !== 0 && !isNaN(low) ? low : "start";
-    var highString  = high !== 0 && !isNaN(high) ? high : "end";
-    return "(" + lowString + " to " + highString + ")";
-}
-
-function elementCount(count, parentCount){
-    if ( parentCount ) {
-        return parseInt(count/parentCount) + " per parent group";
-    } else {
-        return count + " total";
-    }
-}
-

@@ -112,6 +112,16 @@ function SchemaView(options){
                     return d.selector + (d.index !== undefined ? " (" + d.index + ")" : "");
                 });
 
+            node.insert("rect", ":last-child")
+                .each(function(){
+                    // use the bounding box of the parent to set the rect's values
+                    var box = this.parentElement.getBBox();
+                    this.setAttribute("height", box.height);
+                    this.setAttribute("width", box.width);
+                    this.setAttribute("x", box.x);
+                    this.setAttribute("y", box.y);
+                });
+
             node.exit().remove();
         },
         showSelector: function(selector){

@@ -316,53 +316,6 @@ function matchSelector(sel, parent){
     });
 }
 
-/*
-function editSelector(page, oldSel, newSel){
-    // depth first search
-    function find(selector, name){
-        if ( selector.selector === name ) {
-            selector.selector = newSel;
-            return true;
-        }
-        selector.children.forEach(function(s){
-            if ( find(s, name) ) {
-                return true;
-            }
-        });
-        return false;
-    }
-
-    var found = find(page, oldSel);
-    if ( !found ) {
-        // handle case when selector is not found
-    }
-    return page;
-}
-
-function editAttr(page, oldName, newAttr){
-    // depth first search
-    function find(selector, name){
-        selector.attrs.forEach(function(attr){
-            if ( attr.name === name) {
-                attr = newAttr;
-                return true;
-            }
-        });
-        selector.children.forEach(function(s){
-            if ( find(s, name) ) {
-                return true;
-            }
-        });
-    }
-
-    var found = find(page, oldName);
-    if ( !found ) {
-        // handle case when selector is not found
-    }
-    return page;
-}
-*/
-
 // Source: src/controller.js
 function collectorController(){
     var schemas;
@@ -415,6 +368,8 @@ function collectorController(){
             });
         }
         set(page);
+        selector = page;
+        fns.dispatch.Schema.showSelector(selector);
     }
 
     function clonePage(){
@@ -696,13 +651,6 @@ function chromeSetOptions(options){
 }
 */
 // Source: src/utility.js
-// creates a new element with tagName of type that has class noSelect
-function noSelectElement(type){
-    var ele = document.createElement(type);
-    ele.classList.add("noSelect");
-    return ele;
-}
-
 // purge a classname from all elements with it
 function clearClass(name){
     var eles = document.getElementsByClassName(name),
@@ -728,50 +676,6 @@ function addClass(name, eles){
     }
 }
 
-// utility function to swap two classes
-function swapClasses(ele, oldClass, newClass){
-    ele.classList.remove(oldClass);
-    ele.classList.add(newClass);
-}
-
-// add an EventListener to a an element, given the id of the element
-function idEvent(id, type, fn){
-    document.getElementById(id).addEventListener(type, fn, false);
-}
-
-// add the .noSelect class to eles array, so that collect.js doesn't try to select them
-function addNoSelect(eles){
-    var len = eles.length;
-    for( var i=0; i<len; i++ ) {
-        eles[i].classList.add('noSelect');
-    }
-}
-
-function options(keys, holder){
-    // clear out any existing options when adding multiple new options
-    holder.innerHTML = "";
-    for ( var i=0, len=keys.length; i<len; i++ ){
-        holder.appendChild(newOption(keys[i]));
-    }
-}
-
-function newOption(name){
-    var option = noSelectElement("option");
-    option.setAttribute("value", name);
-    option.textContent = name;
-    return option;
-}
-
-// append all of the elements in children to the parent element
-function appendChildren(parent, children){
-    if ( parent === null ) {
-        return;
-    }
-    for ( var i=0, len=children.length; i<len; i++ ) {
-        parent.appendChild(children[i]);
-    }
-}
-
 /*
 a schema's name will be the name of the file when it is uploaded, so make sure that any characters in the name will be legal to use
 rejects if name contains characters not allowed in filename: <, >, :, ", \, /, |, ?, *
@@ -784,23 +688,6 @@ function legalSchemaName(name){
         match = name.match(badCharacters);
     return ( match === null );
 }
-
-function createRangeString(low, high){
-    low             = parseInt(low, 10);
-    high            = parseInt(high, 10);
-    var lowString   = low !== 0 && !isNaN(low) ? low : "start";
-    var highString  = high !== 0 && !isNaN(high) ? high : "end";
-    return "(" + lowString + " to " + highString + ")";
-}
-
-function elementCount(count, parentCount){
-    if ( parentCount ) {
-        return parseInt(count/parentCount) + " per parent group";
-    } else {
-        return count + " total";
-    }
-}
-
 
 // Source: src/attributeView.js
 function AttributeView(options){
@@ -888,7 +775,7 @@ function AttributeView(options){
             });
 
         attrs.text(function(d){
-            return d.name + "=" + abbreviate(d.value, 21);
+            return d.name + ": " + abbreviate(d.value, 51);
         });
 
         attrs.exit().remove();
@@ -1053,6 +940,16 @@ function SchemaView(options){
             node.append("text")                
                 .text(function(d){
                     return d.selector + (d.index !== undefined ? " (" + d.index + ")" : "");
+                });
+
+            node.insert("rect", ":last-child")
+                .each(function(){
+                    // use the bounding box of the parent to set the rect's values
+                    var box = this.parentElement.getBBox();
+                    this.setAttribute("height", box.height);
+                    this.setAttribute("width", box.width);
+                    this.setAttribute("x", box.x);
+                    this.setAttribute("y", box.y);
                 });
 
             node.exit().remove();

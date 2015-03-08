@@ -24,6 +24,10 @@ body {
   .collectjs * {
     color: black;
     box-sizing: border-box; }
+  .collectjs .hidden {
+    display: none; }
+  .collectjs ul {
+    list-style: none; }
   .collectjs .tabHolder {
     position: relative; }
   .collectjs .tabs {
@@ -67,10 +71,6 @@ body {
     .collectjs .views .view {
       display: none;
       padding: 5px; }
-      .collectjs .views .view .column {
-        display: inline-block;
-        vertical-align: top;
-        padding: 0 15px; }
       .collectjs .views .view > * {
         vertical-align: top; }
       .collectjs .views .view > div {
@@ -89,24 +89,21 @@ body {
       .collectjs .views .view .form input[type=text] {
         width: 150px;
         border-width: 0 0 1px; }
-      .collectjs .views .view .hidden {
-        display: none; }
-      .collectjs .views .view .form.column {
-        width: 25%;
-        min-width: 300px;
-        padding-right: 50px;
-        border-right: 1px solid #444444; }
       .collectjs .views .view .form label {
         display: inline-block; }
-      .collectjs .views .view svg .link {
-        fill: none;
-        stroke: #aaa; }
-      .collectjs .views .view svg .node {
-        cursor: pointer; }
-      .collectjs .views .view svg .node.hasAttrs {
-        fill: red; }
-      .collectjs .views .view svg .node text {
-        text-anchor: middle; }
+      .collectjs .views .view svg {
+        font-size: 16px; }
+        .collectjs .views .view svg rect {
+          fill: white; }
+        .collectjs .views .view svg .link {
+          fill: none;
+          stroke: #aaa; }
+        .collectjs .views .view svg .node {
+          cursor: pointer; }
+        .collectjs .views .view svg .node.hasAttrs {
+          fill: red; }
+        .collectjs .views .view svg .node text {
+          text-anchor: middle; }
     .collectjs .views .view.active {
       display: block; }
   .collectjs input {
@@ -126,90 +123,6 @@ body {
     font-size: 1em;
     cursor: pointer;
     font-weight: normal; }
-  .collectjs .rules {
-    font-size: 16px; }
-    .collectjs .rules .schema, .collectjs .rules .page, .collectjs .rules .set, .collectjs .rules .selector, .collectjs .rules .rule {
-      padding: 5px 2px;
-      border-radius: 5px;
-      border-width: 1px;
-      border-style: solid;
-      border-color: #cccccc; }
-    .collectjs .rules .schema {
-      background: #efefef;
-      display: none; }
-    .collectjs .rules .schema.active {
-      display: block; }
-    .collectjs .rules .page {
-      display: inline-block;
-      vertical-align: top;
-      width: 50%;
-      margin: 3px 0;
-      background: white; }
-    .collectjs .rules .set {
-      margin: 2px 0;
-      background: #efefef; }
-    .collectjs .rules .set.active {
-      background: #45aacc;
-      border-color: #45aacc; }
-    .collectjs .rules .selector {
-      margin: 2px 0;
-      background: white; }
-    .collectjs .rules .schema ul, .collectjs .rules .page ul, .collectjs .rules .set ul {
-      list-style: none; }
-    .collectjs .rules .rule {
-      margin-right: 10px;
-      padding: 5px;
-      background: #efefef;
-      display: inline-block; }
-    .collectjs .rules .parent .hidden, .collectjs .rules .next .hidden {
-      display: none; }
-    .collectjs .rules button {
-      font-weight: bold;
-      background: white;
-      border: 1px solid #cccccc;
-      border-radius: 3px; }
-    .collectjs .rules button.pos:hover {
-      color: #489675; }
-    .collectjs .rules button.neg:hover {
-      color: #c91900; }
-    .collectjs .rules .nametag {
-      font-weight: bold; }
-  .collectjs .items {
-    font-size: 16px;
-    color: black; }
-    .collectjs .items .modifiers {
-      padding-left: 15px;
-      max-width: 75%; }
-      .collectjs .items .modifiers > div {
-        padding: 10px 0; }
-      .collectjs .items .modifiers .capture {
-        background: #ddd;
-        padding: 2px;
-        cursor: pointer; }
-      .collectjs .items .modifiers .selected {
-        background: #bddbce; }
-  .collectjs .selectorSchema {
-    display: inline-block;
-    white-space: nowrap;
-    padding: 2px 0 0 2px;
-    position: relative;
-    cursor: pointer; }
-    .collectjs .selectorSchema * {
-      font-size: 16px; }
-    .collectjs .selectorSchema .toggleable {
-      color: #444444;
-      border-bottom: 1px solid #777; }
-      .collectjs .selectorSchema .toggleable .childtoggle {
-        border-width: 0 0 1px;
-        width: 50px; }
-    .collectjs .selectorSchema .toggleable.off {
-      color: #ccc; }
-    .collectjs .selectorSchema .deltog, .collectjs .selectorSchema .nthtype, .collectjs .selectorSchema .onlychild {
-      font-weight: bold;
-      padding: 0 3px 0 2px;
-      color: white; }
-  .collectjs .selectorSchema:hover .deltog, .collectjs .selectorSchema:hover .onlychild, .collectjs .selectorSchema:hover .nthtype {
-    color: #777; }
   .collectjs button {
     background: #dddddd;
     color: black;
@@ -228,55 +141,6 @@ body {
     display: inline-block;
     border: 1px solid #a9a9a9;
     margin: 2px; }
-
-/* tab buttons */
-#refreshCollect {
-  background: #45aacc; }
-
-#closeCollect {
-  background: #f296a3; }
-
-#ruleHTML {
-  line-height: 2; }
-
-/* views */
-/* schemaView */
-#schemaHolder {
-  max-height: 350px;
-  overflow-y: scroll; }
-
-/* selectorView */
-#selectorView {
-  font-size: 14px; }
-  #selectorView input[type=text] {
-    width: 50px; }
-  #selectorView p {
-    margin: 3px 0; }
-
-#parentRange {
-  display: none; }
-
-/* previewView */
-#previewView .name {
-  margin-right: 15px; }
-#previewView .previewSet {
-  margin: 10px 5px;
-  border: 1px solid black; }
-
-#previewContents {
-  font-size: 16px;
-  overflow-y: scroll;
-  height: 200px;
-  border: 2px inset; }
-  #previewContents p {
-    margin-bottom: 5px;
-    padding: 2px 15px; }
-  #previewContents p:nth-of-type(even) {
-    background: #efefef; }
-
-/* Selector */
-#selectorHolder {
-  line-height: 1.5; }
 
 .selectableElement {
   border: 1px solid blue !important; }

@@ -83,7 +83,7 @@ function AttributeView(options){
             });
 
         attrs.text(function(d){
-            return d.name + "=" + abbreviate(d.value, 21);
+            return d.name + ": " + abbreviate(d.value, 51);
         });
 
         attrs.exit().remove();

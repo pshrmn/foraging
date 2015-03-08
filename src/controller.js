@@ -49,6 +49,8 @@ function collectorController(){
             });
         }
         set(page);
+        selector = page;
+        fns.dispatch.Schema.showSelector(selector);
     }
 
     function clonePage(){
