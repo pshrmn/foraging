@@ -12,8 +12,8 @@ function chromeSave(schemas){
 }
 
 // takes a data object to be uploaded and passes it to the background page to handle
-function chromeUpload(schema){
-    var data = cleanSchema(schema);
+function chromeUpload(data){
+    data.schema = cleanSchema(data.schema);
     chrome.runtime.sendMessage({type: 'upload', data: data});
 }
 

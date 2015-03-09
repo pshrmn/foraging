@@ -276,7 +276,11 @@ function collectorController(){
                 chromeSave(schemas);
             },
             upload: function(){
-                chromeUpload(schema);
+                chromeUpload({
+                    name: currentSchema,
+                    site: window.location.hostname,
+                    schema: schema
+                });
             },
             loadSchema: function(){
                 fns.setSchema(ui.getSchema());

@@ -632,7 +632,11 @@ function collectorController(){
                 chromeSave(schemas);
             },
             upload: function(){
-                chromeUpload(schema);
+                chromeUpload({
+                    name: currentSchema,
+                    site: window.location.hostname,
+                    schema: schema
+                });
             },
             loadSchema: function(){
                 fns.setSchema(ui.getSchema());
@@ -832,8 +836,8 @@ function chromeSave(schemas){
 }
 
 // takes a data object to be uploaded and passes it to the background page to handle
-function chromeUpload(schema){
-    var data = cleanSchema(schema);
+function chromeUpload(data){
+    data.schema = cleanSchema(data.schema);
     chrome.runtime.sendMessage({type: 'upload', data: data});
 }
 
