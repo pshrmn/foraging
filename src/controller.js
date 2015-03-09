@@ -355,6 +355,10 @@ function collectorController(){
                 ui.setPages(Object.keys(schema.pages));
                 // revert to the default page after removing a page
                 fns.setPage("default");
+            },
+            close: function(){
+                eHighlight.remove();
+                ui.close();
             }
         },
         // used to interact with views

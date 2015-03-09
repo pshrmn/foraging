@@ -13,7 +13,7 @@ $black: #000000;
 
 /* general */
 body{
-    /* can break things */
+    /* can break some sites' layouts */
     margin: 0;
 }
 
@@ -71,11 +71,6 @@ body{
             padding: 0 5px;
             height: 30px;
             line-height: 30px;
-            cursor: pointer;
-        }
-
-        .toggle{
-            cursor: pointer;
         }
 
         .tab.active{
@@ -234,6 +229,11 @@ body{
 
 #schemaInfo div {
     display: inline-block;
+}
+
+#closeCollectjs{
+    background: $light-red;
+    cursor: pointer;
 }
 
 @import 'page';

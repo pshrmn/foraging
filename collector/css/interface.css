@@ -1,6 +1,6 @@
 /* general */
 body {
-  /* can break things */
+  /* can break some sites' layouts */
   margin: 0; }
 
 /* Interface */
@@ -48,10 +48,7 @@ body {
       display: inline-block;
       padding: 0 5px;
       height: 30px;
-      line-height: 30px;
-      cursor: pointer; }
-    .collectjs .tabs .toggle {
-      cursor: pointer; }
+      line-height: 30px; }
     .collectjs .tabs .tab.active {
       background: #efefef; }
     .collectjs .tabs .tab.set {
@@ -144,6 +141,10 @@ body {
 
 #schemaInfo div {
   display: inline-block; }
+
+#closeCollectjs {
+  background: #f296a3;
+  cursor: pointer; }
 
 .selectableElement {
   border: 1px solid blue !important; }

@@ -140,7 +140,9 @@ function AttributeView(options){
             eles = undefined;
             index = 0;
             indexText.text("");
-            attrs.remove();
+            if ( attrs ) {
+                attrs.remove();
+            }
             attrInput.property("value", "");
             nameInput.property("value", "");
             followInput.property("disabled", true);

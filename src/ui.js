@@ -1,32 +1,37 @@
 function buildUI(controller){
+    controller.dispatch = {};
+
+    // ugly, might want to convert to d3 since everything else uses it, but it works
     var holder = document.createElement("div");
     holder.classList.add("collectjs");
     holder.classList.add("noSelect");
-    document.body.appendChild(holder);
     holder.innerHTML = '<div class="tabHolder">' +
             '<div class="tabs">' +
+                '<div class="tab" id="closeCollectjs">&times;</div>' +
             '</div>' +
         '</div>' +
         '<div class="permanent">' +
             '<div id="schemaInfo"></div>' +
             '<div id="collectAlert"></div>' +
         '</div>' +
-        '<div class="views">' +
-            '<div class="view" id="emptyView"></div>' +
-        '</div>';
+        '<div class="views"></div>';
+    document.body.appendChild(holder);
 
-    var tabHolder = holder.querySelector(".tabs");
-    var viewHolder = holder.querySelector(".views");
+    var existingStyle = getComputedStyle(document.body);
+    var initialMargin = existingStyle.marginBottom;
+    document.body.style.marginBottom = "500px";
 
     var topbarFns = topbar({
         holder: "#schemaInfo"
     });
 
+    var closer = d3.select("#closeCollectjs")
+        .on("click", controller.events.close);
+
+    var tabHolder = holder.querySelector(".tabs");
+    var viewHolder = holder.querySelector(".views");
     var tabs = {};
     var views = {};
-
-    controller.dispatch = {};
-
     var activeTab;
     var activeView;
 
@@ -67,7 +72,7 @@ function buildUI(controller){
             t.classList.add("tab");
             t.textContent = name;
             tabs[name] = t;
-            tabHolder.appendChild(t);
+            tabHolder.insertBefore(t, tabHolder.lastChild);
 
             // create a new view
             var v = document.createElement("div");
@@ -84,6 +89,10 @@ function buildUI(controller){
 
             options.holder = v;
             controller.dispatch[name] = viewFn(options);
+        },
+        close: function(){
+            holder.parentElement.removeChild(holder);
+            document.body.style.marginBottom = initialMargin;
         },
         showView: showView,
         setUrl: topbarFns.setUrl,
