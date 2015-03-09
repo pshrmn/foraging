@@ -42,7 +42,7 @@ function chromeLoad(){
                 default: newSchema("default")
             };
         controller.loadSchemas(schemas);
-        controller.setSchema("default", "default");
+        controller.setSchema("default");
         // save right away (for new schemas, maybe unncessary)
         chromeSave(schemas);
     });

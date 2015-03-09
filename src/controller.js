@@ -1,5 +1,6 @@
 function collectorController(){
     var schemas;
+    var currentSchema;
     var schema;
     // a list of all attr names in the schema
     var schemaAttrs = [];
@@ -75,12 +76,16 @@ function collectorController(){
     var fns = {
         loadSchemas: function(s){
             schemas = s;
+            ui.setSchemas(Object.keys(schemas));
         },
-        setSchema: function(schemaName, pageName){
+        setSchema: function(schemaName){
+            currentSchema = schemaName;
             idCount = 0;
             schema = schemas[schemaName];
 
-            fns.setPage(pageName);
+            // use the default page when loading a schema
+            // might update if in the future this stores last used schema/page
+            fns.setPage("default");
             ui.setPages(Object.keys(schema.pages));
         },
         setPage: function(name){
@@ -166,6 +171,9 @@ function collectorController(){
             },
             saveSelector: function(){
                 var sel = fns.dispatch.Selector.getSelector();
+                if ( sel.selector === "" ) {
+                    return;
+                }
                 // only save if schema doesn't match pre-existing one
                 if ( !matchSelector(sel, selector) ) {
                     sel.id = idCount++;
@@ -269,6 +277,29 @@ function collectorController(){
             },
             upload: function(){
                 chromeUpload(schema);
+            },
+            loadSchema: function(){
+                fns.setSchema(ui.getSchema());
+            },
+            addSchema: function(){
+                var name = prompt("Schema name");
+                if ( name !== null && name !== "" &&
+                    schemas[name] === undefined && legalSchemaName(name) ) {
+                    schemas[name] = newSchema(name);
+                    ui.setSchemas(Object.keys(schemas), name);
+                    fns.setSchema(name);
+                    chromeSave(schemas);
+                }
+            },
+            removeSchema: function(){
+                if ( currentSchema === "default" ){
+                    schemas["default"] = newSchema("default");
+                } else {
+                    delete schemas[currentSchema];
+                }
+                fns.setSchema("default");
+                ui.setSchemas(Object.keys(schemas));
+                chromeSave(schemas);
             },
             loadPage: function(){
                 fns.setPage(ui.getPage());

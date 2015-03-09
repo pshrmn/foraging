@@ -142,6 +142,9 @@ body {
     border: 1px solid #a9a9a9;
     margin: 2px; }
 
+#schemaInfo div {
+  display: inline-block; }
+
 .selectableElement {
   border: 1px solid blue !important; }
 

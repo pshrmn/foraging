@@ -356,6 +356,7 @@ function followedAttrs(page){
 // Source: src/controller.js
 function collectorController(){
     var schemas;
+    var currentSchema;
     var schema;
     // a list of all attr names in the schema
     var schemaAttrs = [];
@@ -431,12 +432,16 @@ function collectorController(){
     var fns = {
         loadSchemas: function(s){
             schemas = s;
+            ui.setSchemas(Object.keys(schemas));
         },
-        setSchema: function(schemaName, pageName){
+        setSchema: function(schemaName){
+            currentSchema = schemaName;
             idCount = 0;
             schema = schemas[schemaName];
 
-            fns.setPage(pageName);
+            // use the default page when loading a schema
+            // might update if in the future this stores last used schema/page
+            fns.setPage("default");
             ui.setPages(Object.keys(schema.pages));
         },
         setPage: function(name){
@@ -522,6 +527,9 @@ function collectorController(){
             },
             saveSelector: function(){
                 var sel = fns.dispatch.Selector.getSelector();
+                if ( sel.selector === "" ) {
+                    return;
+                }
                 // only save if schema doesn't match pre-existing one
                 if ( !matchSelector(sel, selector) ) {
                     sel.id = idCount++;
@@ -626,6 +634,29 @@ function collectorController(){
             upload: function(){
                 chromeUpload(schema);
             },
+            loadSchema: function(){
+                fns.setSchema(ui.getSchema());
+            },
+            addSchema: function(){
+                var name = prompt("Schema name");
+                if ( name !== null && name !== "" &&
+                    schemas[name] === undefined && legalSchemaName(name) ) {
+                    schemas[name] = newSchema(name);
+                    ui.setSchemas(Object.keys(schemas), name);
+                    fns.setSchema(name);
+                    chromeSave(schemas);
+                }
+            },
+            removeSchema: function(){
+                if ( currentSchema === "default" ){
+                    schemas["default"] = newSchema("default");
+                } else {
+                    delete schemas[currentSchema];
+                }
+                fns.setSchema("default");
+                ui.setSchemas(Object.keys(schemas));
+                chromeSave(schemas);
+            },
             loadPage: function(){
                 fns.setPage(ui.getPage());
             },
@@ -695,13 +726,33 @@ function topbar(options){
 
     var bar = d3.select(holder);
 
-    var pageSelect = bar.append("select")
+    // schema
+    var schemaGroup = bar.append("div")
+        .text("Schema");
+
+    var schemaSelect = schemaGroup.append("select")
+        .on("change", controller.events.loadSchema);
+
+    schemaGroup.append("button")
+        .text("add schema")
+        .on("click", controller.events.addSchema);
+
+    schemaGroup.append("button")
+        .text("remove schema")
+        .on("click", controller.events.removeSchema);
+
+    // page
+    var pageGroup = bar.append("div")
+        .text("Page");
+
+    var pageSelect = pageGroup.append("select")
         .on("change", controller.events.loadPage);
 
-    bar.append("button")
+    pageGroup.append("button")
         .text("remove page")
         .on("click", controller.events.removePage);
 
+    // global
     bar.append("button")
         .text("upload")
         .on("click", controller.events.upload);
@@ -730,6 +781,19 @@ function topbar(options){
         toggleUrl: function(on){
             toggleUrl.classed("hidden", !on);
         },
+        setSchemas: function(names, focus){
+            focus = focus || "default";
+            var schemas = schemaSelect.selectAll("option")
+                .data(names);
+            schemas.enter().append("option");
+            schemas
+                .text(function(d){ return d;})
+                .attr("value", function(d){ return d;})
+                .property("selected", function(d){
+                    return d === focus;
+                });
+            schemas.exit().remove();
+        },
         setPages: function(names){
             var pages = pageSelect.selectAll("option")
                 .data(names);
@@ -740,6 +804,9 @@ function topbar(options){
                 .attr("value", function(d){ return d;});
             pages.exit().remove();
 
+        },
+        getSchema: function(){
+            return schemaSelect.property("value");
         },
         getPage: function(){
             return pageSelect.property("value");
@@ -791,7 +858,7 @@ function chromeLoad(){
                 default: newSchema("default")
             };
         controller.loadSchemas(schemas);
-        controller.setSchema("default", "default");
+        controller.setSchema("default");
         // save right away (for new schemas, maybe unncessary)
         chromeSave(schemas);
     });
@@ -1389,6 +1456,8 @@ function buildUI(controller){
         showView: showView,
         setUrl: topbarFns.setUrl,
         toggleUrl: topbarFns.toggleUrl,
+        getSchema: topbarFns.getSchema,
+        setSchemas: topbarFns.setSchemas,
         setPages: topbarFns.setPages,
         getPage: topbarFns.getPage,
     };
