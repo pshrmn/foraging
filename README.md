@@ -2,6 +2,10 @@
 
 Web app that runs in conjunction with CollectorJS chrome extension (https://github.com/psherman/collectorjs) to get rules to be used in a crawler
 
+###install
+
+    pip install git+git://github.com/psherman/uploador.git
+
 ####usage
 
 for default folder to save files, call

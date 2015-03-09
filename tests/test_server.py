@@ -1,30 +1,30 @@
 import os
-import shutil
 import unittest
 import json
 
 from uploador import server
 
+
 class CollectTestCase(unittest.TestCase):
-    
+
     def setUp(self):
         server.app.testing = True
-        parent_directory = os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir)
-        real_directory = os.path.abspath(parent_directory)
-        server.SITE_DIRECTORY = os.path.join(parent_directory, 'rules')
+        file_dir = os.path.dirname(os.path.realpath(__file__))
+        server.SITE_DIRECTORY = os.path.join(file_dir, 'rules')
         self.app = server.app.test_client()
 
     def test_underscore_host(self):
         hosts = [("www.example.com", "www_example_com"),
-            ("test.ing", "test_ing")]
+                 ("test.ing", "test_ing")]
         for before, after in hosts:
             self.assertEqual(server.underscore_host(before), after)
-    
+
     def test_host_folder(self):
         host = "www.example.com"
 
         folder = server.host_folder(host)
-        expected_folder = os.path.join(server.SITE_DIRECTORY, "www_example_com")
+        expected_folder = os.path.join(server.SITE_DIRECTORY,
+                                       "www_example_com")
         self.assertEqual(folder, expected_folder)
         self.assertTrue(os.path.isdir(folder))
 
@@ -40,44 +40,51 @@ class CollectTestCase(unittest.TestCase):
         headers = [('Content-Type', 'application/json')]
         example_schema = {
             "name": "example",
-            "urls": [
-                "http://www.example.com/pageone.html",
-                "http://www.example.com/pagetwo.html"
-            ],
+            "urls": [],
             "pages": {
                 "default": {
-                    "name": "default",
-                    "index": False,
-                    "sets": {
-                        "default": {
-                            "name": "default",
-                            "rules": {
-                                "links": {
-                                    "name": "links",
-                                    "capture": "attr-href",
-                                    "selector": "a"
+                    "children": [
+                        {
+                            "children": [
+                                {
+                                    "children": [
+                                        {
+                                            "children": [],
+                                            "attrs": [],
+                                            "selector": "a"
+                                        }
+                                    ],
+                                    "attrs": [],
+                                    "selector": "h2"
                                 },
-                                "images": {
-                                    "name": "images",
-                                    "capture": "attr-src",
-                                    "selector": "#main img",
+                                {
+                                    "children": [],
+                                    "attrs": [],
+                                    "selector": "p"
+                                },
+                                {
+                                    "children": [],
+                                    "attrs": [],
+                                    "selector": "img"
                                 }
-                            }
+                            ],
+                            "attrs": [],
+                            "selector": "div.site"
                         }
+                    ],
+                    "attrs": [],
+                    "selector": "body"
                     }
                 }
             }
-        }
 
         upload = {
             "schema": example_schema,
             "site": "www.example.com"
         }
 
-        # overwrite test_upload to prevent multiprocessing error showing up in output
-        server.test_upload = lambda x: None
-
-        resp = self.app.post('/upload', headers=headers, data=json.dumps(upload))
+        resp = self.app.post('/upload', headers=headers,
+                             data=json.dumps(upload))
         self.assertEqual(resp.status_code, 200)
         resp_json = json.loads(resp.data)
         self.assertFalse(resp_json["error"])
