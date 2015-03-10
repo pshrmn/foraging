@@ -1,19 +1,29 @@
-Working on overhaul, currently broken
+#CollectorJS
 
-###CollectorJS
+A Chrome extension to determine how to collect data from a page. 
 
-A Chrome extension that allows you to get information necessary to crawl a page. Creates rules that consist of a css selector to get an element (or more) in the page and a capture value, which is either text or an element attribute. Should be run in correlation with the web.server module in https://github.com/psherman/collector
+###Format
 
-#####Rules Format
+######Attr
 
-Data is captured through "attrs". An attr has a name and the attribute of an element to capture (or text).
+Data is captured through `attr`s. An attr has a name and the attribute of an element to capture (or text).
+
+    attr = {
+        name: "h1",
+        attr: "title"
+    }
+
+There is a special type of `attr` that can only be created on the `href` attribute of `a`s. For these `attr`s, if `follow=true`, a `page` with the same name as the `attr` will be created.
 
     attr = {
         name: "url",
-        attr: "href"
+        attr: "href",
+        follow: true
     }
 
-Attrs are created on "selectors". Selectors are made up of a selector (css selector), child selectors, and attrs. Additionally, an optional "index" can be used on a selector to specify a specific element to target. (default behavior includes all matching elements. "index" is zero-based)
+#####Selector
+
+Attrs are created on `selector`s. Selectors are made up of a css `selector`, `children` selectors, `attrs`, and an optional `index` that can be used on a selector to specify a specific element to target. (default behavior includes all matching elements. `index` is zero-based)
 
     selector = {
         selector: "p",
@@ -40,7 +50,9 @@ Attrs are created on "selectors". Selectors are made up of a selector (css selec
 
 The above selector will select the second `p` element in the page and capture its `textContent` as the `description`. Any `a` elements that are children of the paragraph will have their `href` attribute captured and stored in a `url` array.
 
-A page starts with a root selector. By default this is body, but it can be changed to something more specific. Typically this should have children selectors, but the attrs array will most likely be empty.
+#####Page
+
+A `page` is a special type of `selector`. Its `selector` is the document's `body`. Each `schema` is made up a series of pages. A schema requires a `default` page. Additional pages are created by `attr`s with property `follow=true` for the `href` value of an anchor (`a`) element. The created page will share the name of the `attr` that creates it.
 
     page = {
         selector: "body",
@@ -48,7 +60,9 @@ A page starts with a root selector. By default this is body, but it can be chang
         attrs: []
     }
 
-A schema refers to a set of data to be captured. The schema's pages are used to collect data. The "default" page is the starting point. The names of other pages correspond to attrs.
+#####Schema
+
+A schema refers to an overall set of data to be captured, possibly across a set of pages. The schema's pages are used to collect data. The `default` page is the starting point.
     
     schema = {
         name: <string>
@@ -56,64 +70,14 @@ A schema refers to a set of data to be captured. The schema's pages are used to 
         pages: {<page>...}
     }
 
+And a site can have multiple, independent schemas, each of which is uploaded individually to the server. The extension stores a `schemas` object for each site (determined by the hostname)
 
-
-A page is a webpage and contains selector sets to capture elements in the page
-
-    page = {
-        name: <string>,
-        index: <boolean>,
-        next: <string> (optional),
-        sets: {<selectorSet>...}
+    schemas = {
+        default: {...},
+        other: {...}
     }
 
-A selector set is a schema of selectors within a page, optionally linked together by a parent selector
-
-    selectorSet = {
-        name: <string>,
-        selectors: {<selector>...},
-        parent: <parent> (optional)
-    }
-
-A selector is a css selector and associated rules
-
-    selector = {
-        selector: <string>,
-        rules: {<rule>...}
-    }
-
-A rule is a name and a captured value (either text or an attribute)
-
-    rule = {
-        name: <string>,
-        capture: <string>
-    }
-
-A parent is a selector for how to match an object within the DOM. This is useful if there are multiple sets within a page
-
-    parent = {
-        selector: <string>,
-        low: <int> (optional),
-        high: <int> (optional)
-    }
-
-And a site can have multiple, independent schemas, each of which is uploaded individually to the server
-
-    site = {
-        schemas: {
-            schema1: {...},
-            schema2: {...}
-        }
-
-Naming of schemas, pages, and ruleSets is up to the user, but there a few reserverd words.
-
-* default (schema) - initial schema when visiting a new site
-* default (page) - first page to be crawled in a schema
-* default (ruleSet) - initial ruleSet for a page
-* default (rule) - because a page's name is based on an associated rule, cannot have a rule named default
-* next (ruleSet) - a next ruleSet can be added to a "default" page and contains one rule: a link with a capture of attr-href in order to generate more URLs for the default page to be applied to
-
-When a domain is visited (and collectjs is opened) for the first time, a "default" schema with a "default" page is generated. This can be used, although creating a new schema with a more relevant name is encouraged.
+When a domain is visited (and collectjs is opened) for the first time, a `default` schema with a `default` page is generated. This can be used, although creating a new schema with a more relevant name is encouraged.
 
 #####How to Use
 To pack extension and use:
@@ -126,4 +90,5 @@ To pack extension and use:
 
 #####Extra info
 Originally project was at https://github.com/psherman/collectjs, but transitioning over to an extension from a bookmarklet for ease of use.
-Uses https://github.com/psherman/selector and https://github.com/psherman/tabs
+
+Makes extensive use of [d3](http://d3js.org/).
