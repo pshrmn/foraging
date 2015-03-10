@@ -41,12 +41,6 @@ module.exports = function(grunt){
             },
         },
         jasmine: {
-            fetch: {
-                src: 'src/fetch.js',
-                options: {
-                    specs: 'tests/FetchSpec.js'
-                }
-            },
             utility: {
                 src: 'src/utility.js',
                 options: {
