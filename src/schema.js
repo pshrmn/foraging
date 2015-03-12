@@ -16,7 +16,7 @@ function cleanSchema(schema){
 
     function clonePage(s, clone){
         clone.selector = s.selector;
-        clone.index = s.index;
+        clone.spec = s.spec;
         clone.attrs = s.attrs.slice();
         clone.children = s.children.map(function(child){
             return clonePage(child, {});
@@ -32,8 +32,10 @@ function cleanSchema(schema){
 
 // check if an identical selector already exists
 function matchSelector(sel, parent){
+    var selIndex = sel.spec.type === "index" ? sel.spec.value : undefined;
     return parent.children.some(function(s){
-        if ( s.selector === sel.selector && s.index === sel.index ) {
+        var index = s.spec.type === "index" ? s.spec.value : undefined;
+        if ( s.selector === sel.selector && index === selIndex ) {
             return true;
         }
         return false;
@@ -41,12 +43,15 @@ function matchSelector(sel, parent){
 }
 
 // get an array containing the names of all attrs in the schema
-function attrNames(schema){
+function usedNames(schema){
     var names = [];
 
     function findNames(selector){
+        if ( selector.spec.type === "name" ) {
+            names.push(selector.spec.value);
+        }
         selector.attrs.forEach(function(n){
-            names.push(n);
+            names.push(n.name);
         });
 
         selector.children.forEach(function(child){

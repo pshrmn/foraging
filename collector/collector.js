@@ -47,12 +47,17 @@ function abbreviate(text, max) {
 }
 
 // Source: src/objects.js
-function newSelector(selector, index){
+/*
+selector is a string
+a spec is an object with type and value keys
+returns a new Selector object
+*/
+function newSelector(selector, spec){
     return {
         selector: selector,
+        spec: spec,
         children: [],
-        attrs: [],
-        index: index
+        attrs: []
     };
 }
 
@@ -68,7 +73,10 @@ function newSchema(name){
         name: name,
         urls: [],
         pages: {
-            default: newSelector("body")
+            default: newSelector("body", {
+                type: "index",
+                value: 0
+            })
         }
     };
 }
@@ -139,12 +147,11 @@ function selectorParts(){
 function elementSelector(){
     var not = ".noSelect";
 
-    function select(elements, selector){
+    function select(elements, selector, spec){
         var matches = [];
-        selector = selector || {};
-        var sel = selector.selector || "*";
+        var sel = selector || "*";
         sel = sel + ":not(" + not + ")";
-        var index = selector.index;
+        var index = spec && spec.type === "index" ? spec.value : undefined;
         var eles;
         for ( var i=0; i<elements.length; i++ ) {
             eles = elements[i].querySelectorAll(sel);
@@ -162,12 +169,12 @@ function elementSelector(){
     }
 
     // return the max number of children per element
-    select.count = function(elements, selector){
+    select.count = function(elements, selector, spec){
         var max = -Infinity;
         selector = selector || {};
         var sel = selector.selector || "*";
         sel = sel + ":not(" + not + ")";
-        var index = selector.index;
+        var index = spec && spec.type === "index" ? spec.value : undefined;
         // index must specify only one element per parent
         if ( index !== undefined ) {
             return 1;
@@ -244,35 +251,6 @@ function elementHighlighter(){
     return highlight;
 }
 
-function queryPath(parts){
-    var currentElements = [document];
-    for ( var i=0; i<parts.length; i++ ) {
-        currentElements = getCurrentSelector(currentElements, parts[i]);
-        if ( currentElements.length === 0 ) {
-            return [];
-        }
-    }
-    return currentElements;
-}
-
-// given parent elements, return all child elements that match the selector
-function getCurrentSelector(eles, selector){
-    var s = selector.selector;
-    var i = selector.index;
-    var newElements = [];
-    [].slice.call(eles).forEach(function(element){
-        var matches = [].slice.call(element.querySelectorAll(s));
-        if ( i !== undefined ) {
-            // skip if the index doesn't exist
-            if ( matches[i] === undefined ) {
-                return;
-            }
-            matches = [matches[i]];
-        }
-        [].push.apply(newElements, matches);
-    });
-    return newElements;
-}
 // Source: src/schema.js
 function cleanSchemas(schemas){
     var ns = {};
@@ -292,7 +270,7 @@ function cleanSchema(schema){
 
     function clonePage(s, clone){
         clone.selector = s.selector;
-        clone.index = s.index;
+        clone.spec = s.spec;
         clone.attrs = s.attrs.slice();
         clone.children = s.children.map(function(child){
             return clonePage(child, {});
@@ -308,8 +286,10 @@ function cleanSchema(schema){
 
 // check if an identical selector already exists
 function matchSelector(sel, parent){
+    var selIndex = sel.spec.type === "index" ? sel.spec.value : undefined;
     return parent.children.some(function(s){
-        if ( s.selector === sel.selector && s.index === sel.index ) {
+        var index = s.spec.type === "index" ? s.spec.value : undefined;
+        if ( s.selector === sel.selector && index === selIndex ) {
             return true;
         }
         return false;
@@ -317,12 +297,15 @@ function matchSelector(sel, parent){
 }
 
 // get an array containing the names of all attrs in the schema
-function attrNames(schema){
+function usedNames(schema){
     var names = [];
 
     function findNames(selector){
+        if ( selector.spec.type === "name" ) {
+            names.push(selector.spec.value);
+        }
         selector.attrs.forEach(function(n){
-            names.push(n);
+            names.push(n.name);
         });
 
         selector.children.forEach(function(child){
@@ -391,7 +374,7 @@ function collectorController(){
     // and store in object.elements
     function getMatches(selectFn){
         function match(elements, s){
-            s.elements = selectFn(elements, s);
+            s.elements = selectFn(elements, s.selector, s.spec);
             s.children.forEach(function(child){
                 match(s.elements, child);
             });      
@@ -418,7 +401,7 @@ function collectorController(){
         function setClone(selector, clone){
             clone.selector = selector.selector;
             clone.id = selector.id;
-            clone.index = selector.index;
+            clone.spec = selector.spec;
             clone.attrs = selector.attrs.slice();
             clone.elements = selector.elements.slice();
             clone.children = selector.children.map(function(child){
@@ -473,27 +456,25 @@ function collectorController(){
             find(page, d.id);
             fns.dispatch.Schema.showSelector(selector);
         },
-        markup: function(selectorObject){
+        markup: function(obj){
             clearClass("queryCheck");
-            if ( selectorObject.selector !== "" ) {
-                eSelect(selector.elements, {
-                    selector: selectorObject.selector,
-                    index: selectorObject.index
-                }).forEach(function(ele){
+            if ( obj.selector !== "" ) {
+                eSelect(selector.elements, obj.selector, obj.spec).forEach(function(ele){
                     ele.classList.add("queryCheck");
                 });
             }
         },
-        eleCount: function(selectorObject){
-            return eSelect.count(selector.elements, selectorObject);
+        eleCount: function(obj){
+            return eSelect.count(selector.elements, obj);
         },
         legalName: function(name){
             // default is a reserved name
             if ( name === "default" ) {
                 return false;
             }
-            return !schemaAttrs.some(function(attr){
-                return attr === name;
+
+            return !usedNames(schema).some(function(n){
+                return n === name;
             });
         },
         getSchema: function(){
@@ -511,14 +492,11 @@ function collectorController(){
         },
         events: {
             addChild: function(){
-                // switch to selector tab
-                ui.showView("Selector");
-
                 var eles = eSelect(selector.elements);
                 eHighlight(eles);
-                // enter editing mode
-                // set the parent to be the current element
-                // turn on element select mode
+
+                // switch to selector tab
+                ui.showView("Selector");
             },
             addAttr: function(){
                 ui.showView("Attribute");
@@ -527,13 +505,13 @@ function collectorController(){
             },
             saveSelector: function(){
                 var sel = fns.dispatch.Selector.getSelector();
-                if ( sel.selector === "" ) {
+                if ( sel === undefined || sel.selector === "" ) {
                     return;
                 }
                 // only save if schema doesn't match pre-existing one
                 if ( !matchSelector(sel, selector) ) {
                     sel.id = idCount++;
-                    sel.elements = eSelect(selector.elements, sel);
+                    sel.elements = eSelect(selector.elements, sel.selector, sel.spec);
                     selector.children.push(sel);
                     // redraw the page
                     fns.dispatch.Schema.drawPage(clonePage());
@@ -560,7 +538,10 @@ function collectorController(){
 
                 // if follow=true, create a new page with the name of the attr
                 if ( attr.follow ) {
-                    schema.pages[attr.name] = newSelector("body");
+                    schema.pages[attr.name] = newSelector("body",{
+                        type: "index",
+                        value: 0
+                    });
                     ui.setPages(Object.keys(schema.pages));
                 }
 
@@ -592,7 +573,10 @@ function collectorController(){
                     return false;
                 }
                 if ( page.id === id ) {
-                    page =  newSelector("body");
+                    page =  newSelector("body", {
+                        type: "index",
+                        value: 0
+                    });
                     page.elements = [document.body];
                     selector = page;
                 } else {
@@ -691,7 +675,10 @@ function collectorController(){
                 if ( currentPage === "default" ) {
                     // only have the new page
                     schema.pages = {
-                        "default": newSelector("body")
+                        "default": newSelector("body", {
+                            type: "index",
+                            value: 0
+                        })
                     };
                 } else {
                     // recursively remove child pages
@@ -1201,7 +1188,7 @@ function SchemaView(options){
 
             node.append("text")                
                 .text(function(d){
-                    return d.selector + (d.index !== undefined ? " (" + d.index + ")" : "");
+                    return d.selector + (d.spec.type === "index" ? "[" + d.spec.value + "]" : "");
                 });
 
             node.insert("rect", ":last-child")
@@ -1218,7 +1205,9 @@ function SchemaView(options){
         },
         showSelector: function(selector){
             form.classed("hidden", false);
-            selectorText.text(selector.selector + (selector.index !== undefined ? " (" + selector.index + ")" : ""));
+            selectorText.text(selector.selector + (selector.spec.type === "index" ?
+                "[" + selector.spec.value + "]" : "")
+            );
             attrs = selectorAttrs.selectAll("li.attr")
                 .data(selector.attrs);
             attrs.enter().append("li")
@@ -1246,26 +1235,73 @@ function SelectorView(options){
     var view = d3.select(holder);
 
 
-    var elementChoices = view.append("div");
+    var elementChoices = view.append("div")
+        .classed({
+            "column": true
+        });
     var choices;
 
+
+    var selectorChoices = view.append("div")
+        .classed({
+            "column": true
+        });
+    var tags = selectorChoices.append("div");
+    var parts;
+
+    // specify selector info div
     var form = view.append("div")
         .classed({
             "form": true,
-            "hidden": true
+            "hidden": true,
+            "column": true
         });
+    var inputs = form.append("div").selectAll("label")
+            .data(["all", "single"])
+        .enter().append("label")
+            .text(function(d){ return d;})
+            .append("input")
+                .attr("type", "radio")
+                .attr("name", "type")
+                .property("value", function(d){ return d;})
+                .property("checked", function(d, i){ return i === 0; })
+                .on("change", function(){
+                    switch ( this.value ) {
+                    case "single":
+                        nameGroup.classed("hidden", true);
+                        selectGroup.classed("hidden", false);
+                        break;
+                    case "all":
+                        nameGroup.classed("hidden", false);
+                        selectGroup.classed("hidden", true);
+                        break;
+                    }
+                });
 
-    var tags = form.append("div");
-    var parts;
-    var selectElement = form.append("select")
+    var nameGroup = form.append("div");
+    var nameElement = nameGroup.append("label")
+        .text("Name:")
+        .append("input")
+            .attr("type", "text");
+
+    var selectGroup = form.append("div")
         .classed({"hidden": true});
 
-    var saveSelector = form.append("button")
+    var selectElement = selectGroup.append("label")
+        .text("Index:")
+        .append("select");
+
+    var buttons = view.append("div")
+        .classed({
+            "column": true
+        });
+
+    var saveSelector = buttons.append("button")
         .text("Save")
         .on("click", controller.events.saveSelector);
 
 
-    var cancelSelector = view.append("button")
+    var cancelSelector = buttons.append("button")
         .text("Cancel")
         .on("click", controller.events.cancelSelector);
 
@@ -1324,7 +1360,6 @@ function SelectorView(options){
                 selector: fullSelector,
                 index: undefined
             });
-            var childCounts = ['-'].concat(d3.range(maxChildren));
             selectElement.classed("hidden", false);
             selectElement.on("change", function(){
                 var tags = [];
@@ -1337,7 +1372,7 @@ function SelectorView(options){
             });
             var eles = selectElement.selectAll("option");
             eles.remove();
-            eles.data(childCounts)
+            eles.data(d3.range(maxChildren))
                 .enter().append("option")
                     .text(function(d){ return d;})
                     .attr("value", function(d){ return d;});
@@ -1350,24 +1385,55 @@ function SelectorView(options){
         },
         getSelector: function(){
             var sel = [];
+            if ( !parts ) {
+                return;
+            }
             parts.each(function(d){
                 if ( this.classList.contains("on") ) {
                     sel.push(d);
                 }
             });
-            var index = parseInt(selectElement.property("value"));
-            index = !isNaN(index) ? index : undefined;
+            var spec;
+            var type;
+            inputs.each(function(){
+                if ( this.checked ) {
+                    type = this.value;
+                }
+            });
+            if ( type === "single" ) {
+                var index = parseInt(selectElement.property("value"));
+                spec = {
+                    type: "index",
+                    value: index
+                };
+            } else {
+                var name = nameElement.property("value");
+                if ( name === "" || !controller.legalName(name)){
+                    return;
+                }
+                spec = {
+                    type: "name",
+                    value: name
+                };
+            }
             // no index for now
-            return newSelector(sel.join(""), index);
+            return newSelector(sel.join(""), spec);
         },
         reset: function(){
+            elementChoices.classed("hidden", false);
+
             tags.selectAll("*").remove();
             if ( choices ) {
                 choices.remove();
             }
+            parts = undefined;
+
+            // form
             form.classed("hidden", true);
-            elementChoices.classed("hidden", false);
-            selectElement.classed("hidden", true);
+            inputs.property("checked", function(d, i){ return i === 0; });
+            nameGroup.classed("hidden", false);
+            nameElement.property("value", "");
+            selectGroup.classed("hidden", true);
             selectElement.selectAll("option").remove();
         }
     };

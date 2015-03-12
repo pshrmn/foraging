@@ -25,6 +25,18 @@ There is a special type of `attr` that can only be created on the `href` attribu
 
 Attrs are created on `selector`s. Selectors are made up of a css `selector`, `children` selectors, `attrs`, and an optional `index` that can be used on a selector to specify a specific element to target. (default behavior includes all matching elements. `index` is zero-based)
 
+    {
+        type: "index",
+        value: <int>
+    }
+    
+or
+
+    {
+        type: "name",
+        value: <string>
+    }
+
     selector = {
         selector: "p",
         children: [

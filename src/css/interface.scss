@@ -94,6 +94,14 @@ body{
         }
     }
 
+    .column{
+        display: inline-block;
+    }
+
+    .column.hidden{
+        display: none;
+    }
+
     .views{
         box-sizing: border-box;        
         min-height: 150px;
@@ -108,8 +116,12 @@ body{
                 vertical-align: top;
             }
 
-            > div{
-                display: inline-block;
+            .tag{
+                color: $red;
+            }
+
+            .tag.on{
+                color: $green;
             }
 
             .form{
@@ -118,14 +130,7 @@ body{
                     font-size: 1.25em;
                 }
 
-                .tag{
-                    color: $red;
-                }
-
-                .tag.on{
-                    color: $green;
-                }
-                
+               
                 input.error{
                     border-color: $red;
                     border-style: solid;

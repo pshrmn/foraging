@@ -61,6 +61,10 @@ body {
     .collectjs .permanent div {
       display: inline-block;
       margin: 0 8px; }
+  .collectjs .column {
+    display: inline-block; }
+  .collectjs .column.hidden {
+    display: none; }
   .collectjs .views {
     box-sizing: border-box;
     min-height: 150px;
@@ -70,14 +74,12 @@ body {
       padding: 5px; }
       .collectjs .views .view > * {
         vertical-align: top; }
-      .collectjs .views .view > div {
-        display: inline-block; }
+      .collectjs .views .view .tag {
+        color: #c91900; }
+      .collectjs .views .view .tag.on {
+        color: #489675; }
       .collectjs .views .view .form > p {
         font-size: 1.25em; }
-      .collectjs .views .view .form .tag {
-        color: #c91900; }
-      .collectjs .views .view .form .tag.on {
-        color: #489675; }
       .collectjs .views .view .form input.error {
         border-color: #c91900;
         border-style: solid; }

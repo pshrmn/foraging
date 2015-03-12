@@ -5,26 +5,73 @@ function SelectorView(options){
     var view = d3.select(holder);
 
 
-    var elementChoices = view.append("div");
+    var elementChoices = view.append("div")
+        .classed({
+            "column": true
+        });
     var choices;
 
+
+    var selectorChoices = view.append("div")
+        .classed({
+            "column": true
+        });
+    var tags = selectorChoices.append("div");
+    var parts;
+
+    // specify selector info div
     var form = view.append("div")
         .classed({
             "form": true,
-            "hidden": true
+            "hidden": true,
+            "column": true
         });
+    var inputs = form.append("div").selectAll("label")
+            .data(["all", "single"])
+        .enter().append("label")
+            .text(function(d){ return d;})
+            .append("input")
+                .attr("type", "radio")
+                .attr("name", "type")
+                .property("value", function(d){ return d;})
+                .property("checked", function(d, i){ return i === 0; })
+                .on("change", function(){
+                    switch ( this.value ) {
+                    case "single":
+                        nameGroup.classed("hidden", true);
+                        selectGroup.classed("hidden", false);
+                        break;
+                    case "all":
+                        nameGroup.classed("hidden", false);
+                        selectGroup.classed("hidden", true);
+                        break;
+                    }
+                });
 
-    var tags = form.append("div");
-    var parts;
-    var selectElement = form.append("select")
+    var nameGroup = form.append("div");
+    var nameElement = nameGroup.append("label")
+        .text("Name:")
+        .append("input")
+            .attr("type", "text");
+
+    var selectGroup = form.append("div")
         .classed({"hidden": true});
 
-    var saveSelector = form.append("button")
+    var selectElement = selectGroup.append("label")
+        .text("Index:")
+        .append("select");
+
+    var buttons = view.append("div")
+        .classed({
+            "column": true
+        });
+
+    var saveSelector = buttons.append("button")
         .text("Save")
         .on("click", controller.events.saveSelector);
 
 
-    var cancelSelector = view.append("button")
+    var cancelSelector = buttons.append("button")
         .text("Cancel")
         .on("click", controller.events.cancelSelector);
 
@@ -83,7 +130,6 @@ function SelectorView(options){
                 selector: fullSelector,
                 index: undefined
             });
-            var childCounts = ['-'].concat(d3.range(maxChildren));
             selectElement.classed("hidden", false);
             selectElement.on("change", function(){
                 var tags = [];
@@ -96,7 +142,7 @@ function SelectorView(options){
             });
             var eles = selectElement.selectAll("option");
             eles.remove();
-            eles.data(childCounts)
+            eles.data(d3.range(maxChildren))
                 .enter().append("option")
                     .text(function(d){ return d;})
                     .attr("value", function(d){ return d;});
@@ -109,24 +155,55 @@ function SelectorView(options){
         },
         getSelector: function(){
             var sel = [];
+            if ( !parts ) {
+                return;
+            }
             parts.each(function(d){
                 if ( this.classList.contains("on") ) {
                     sel.push(d);
                 }
             });
-            var index = parseInt(selectElement.property("value"));
-            index = !isNaN(index) ? index : undefined;
+            var spec;
+            var type;
+            inputs.each(function(){
+                if ( this.checked ) {
+                    type = this.value;
+                }
+            });
+            if ( type === "single" ) {
+                var index = parseInt(selectElement.property("value"));
+                spec = {
+                    type: "index",
+                    value: index
+                };
+            } else {
+                var name = nameElement.property("value");
+                if ( name === "" || !controller.legalName(name)){
+                    return;
+                }
+                spec = {
+                    type: "name",
+                    value: name
+                };
+            }
             // no index for now
-            return newSelector(sel.join(""), index);
+            return newSelector(sel.join(""), spec);
         },
         reset: function(){
+            elementChoices.classed("hidden", false);
+
             tags.selectAll("*").remove();
             if ( choices ) {
                 choices.remove();
             }
+            parts = undefined;
+
+            // form
             form.classed("hidden", true);
-            elementChoices.classed("hidden", false);
-            selectElement.classed("hidden", true);
+            inputs.property("checked", function(d, i){ return i === 0; });
+            nameGroup.classed("hidden", false);
+            nameElement.property("value", "");
+            selectGroup.classed("hidden", true);
             selectElement.selectAll("option").remove();
         }
     };

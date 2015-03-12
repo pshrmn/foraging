@@ -63,12 +63,11 @@ function selectorParts(){
 function elementSelector(){
     var not = ".noSelect";
 
-    function select(elements, selector){
+    function select(elements, selector, spec){
         var matches = [];
-        selector = selector || {};
-        var sel = selector.selector || "*";
+        var sel = selector || "*";
         sel = sel + ":not(" + not + ")";
-        var index = selector.index;
+        var index = spec && spec.type === "index" ? spec.value : undefined;
         var eles;
         for ( var i=0; i<elements.length; i++ ) {
             eles = elements[i].querySelectorAll(sel);
@@ -86,12 +85,12 @@ function elementSelector(){
     }
 
     // return the max number of children per element
-    select.count = function(elements, selector){
+    select.count = function(elements, selector, spec){
         var max = -Infinity;
         selector = selector || {};
         var sel = selector.selector || "*";
         sel = sel + ":not(" + not + ")";
-        var index = selector.index;
+        var index = spec && spec.type === "index" ? spec.value : undefined;
         // index must specify only one element per parent
         if ( index !== undefined ) {
             return 1;
@@ -166,34 +165,4 @@ function elementHighlighter(){
     };
 
     return highlight;
-}
-
-function queryPath(parts){
-    var currentElements = [document];
-    for ( var i=0; i<parts.length; i++ ) {
-        currentElements = getCurrentSelector(currentElements, parts[i]);
-        if ( currentElements.length === 0 ) {
-            return [];
-        }
-    }
-    return currentElements;
-}
-
-// given parent elements, return all child elements that match the selector
-function getCurrentSelector(eles, selector){
-    var s = selector.selector;
-    var i = selector.index;
-    var newElements = [];
-    [].slice.call(eles).forEach(function(element){
-        var matches = [].slice.call(element.querySelectorAll(s));
-        if ( i !== undefined ) {
-            // skip if the index doesn't exist
-            if ( matches[i] === undefined ) {
-                return;
-            }
-            matches = [matches[i]];
-        }
-        [].push.apply(newElements, matches);
-    });
-    return newElements;
 }

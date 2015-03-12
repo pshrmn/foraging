@@ -35,7 +35,7 @@ function collectorController(){
     // and store in object.elements
     function getMatches(selectFn){
         function match(elements, s){
-            s.elements = selectFn(elements, s);
+            s.elements = selectFn(elements, s.selector, s.spec);
             s.children.forEach(function(child){
                 match(s.elements, child);
             });      
@@ -62,7 +62,7 @@ function collectorController(){
         function setClone(selector, clone){
             clone.selector = selector.selector;
             clone.id = selector.id;
-            clone.index = selector.index;
+            clone.spec = selector.spec;
             clone.attrs = selector.attrs.slice();
             clone.elements = selector.elements.slice();
             clone.children = selector.children.map(function(child){
@@ -117,27 +117,25 @@ function collectorController(){
             find(page, d.id);
             fns.dispatch.Schema.showSelector(selector);
         },
-        markup: function(selectorObject){
+        markup: function(obj){
             clearClass("queryCheck");
-            if ( selectorObject.selector !== "" ) {
-                eSelect(selector.elements, {
-                    selector: selectorObject.selector,
-                    index: selectorObject.index
-                }).forEach(function(ele){
+            if ( obj.selector !== "" ) {
+                eSelect(selector.elements, obj.selector, obj.spec).forEach(function(ele){
                     ele.classList.add("queryCheck");
                 });
             }
         },
-        eleCount: function(selectorObject){
-            return eSelect.count(selector.elements, selectorObject);
+        eleCount: function(obj){
+            return eSelect.count(selector.elements, obj);
         },
         legalName: function(name){
             // default is a reserved name
             if ( name === "default" ) {
                 return false;
             }
-            return !schemaAttrs.some(function(attr){
-                return attr === name;
+
+            return !usedNames(schema).some(function(n){
+                return n === name;
             });
         },
         getSchema: function(){
@@ -155,14 +153,11 @@ function collectorController(){
         },
         events: {
             addChild: function(){
-                // switch to selector tab
-                ui.showView("Selector");
-
                 var eles = eSelect(selector.elements);
                 eHighlight(eles);
-                // enter editing mode
-                // set the parent to be the current element
-                // turn on element select mode
+
+                // switch to selector tab
+                ui.showView("Selector");
             },
             addAttr: function(){
                 ui.showView("Attribute");
@@ -171,13 +166,13 @@ function collectorController(){
             },
             saveSelector: function(){
                 var sel = fns.dispatch.Selector.getSelector();
-                if ( sel.selector === "" ) {
+                if ( sel === undefined || sel.selector === "" ) {
                     return;
                 }
                 // only save if schema doesn't match pre-existing one
                 if ( !matchSelector(sel, selector) ) {
                     sel.id = idCount++;
-                    sel.elements = eSelect(selector.elements, sel);
+                    sel.elements = eSelect(selector.elements, sel.selector, sel.spec);
                     selector.children.push(sel);
                     // redraw the page
                     fns.dispatch.Schema.drawPage(clonePage());
@@ -204,7 +199,10 @@ function collectorController(){
 
                 // if follow=true, create a new page with the name of the attr
                 if ( attr.follow ) {
-                    schema.pages[attr.name] = newSelector("body");
+                    schema.pages[attr.name] = newSelector("body",{
+                        type: "index",
+                        value: 0
+                    });
                     ui.setPages(Object.keys(schema.pages));
                 }
 
@@ -236,7 +234,10 @@ function collectorController(){
                     return false;
                 }
                 if ( page.id === id ) {
-                    page =  newSelector("body");
+                    page =  newSelector("body", {
+                        type: "index",
+                        value: 0
+                    });
                     page.elements = [document.body];
                     selector = page;
                 } else {
@@ -335,7 +336,10 @@ function collectorController(){
                 if ( currentPage === "default" ) {
                     // only have the new page
                     schema.pages = {
-                        "default": newSelector("body")
+                        "default": newSelector("body", {
+                            type: "index",
+                            value: 0
+                        })
                     };
                 } else {
                     // recursively remove child pages

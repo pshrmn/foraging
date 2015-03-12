@@ -109,7 +109,7 @@ function SchemaView(options){
 
             node.append("text")                
                 .text(function(d){
-                    return d.selector + (d.index !== undefined ? " (" + d.index + ")" : "");
+                    return d.selector + (d.spec.type === "index" ? "[" + d.spec.value + "]" : "");
                 });
 
             node.insert("rect", ":last-child")
@@ -126,7 +126,9 @@ function SchemaView(options){
         },
         showSelector: function(selector){
             form.classed("hidden", false);
-            selectorText.text(selector.selector + (selector.index !== undefined ? " (" + selector.index + ")" : ""));
+            selectorText.text(selector.selector + (selector.spec.type === "index" ?
+                "[" + selector.spec.value + "]" : "")
+            );
             attrs = selectorAttrs.selectAll("li.attr")
                 .data(selector.attrs);
             attrs.enter().append("li")

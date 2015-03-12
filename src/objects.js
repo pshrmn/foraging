@@ -1,9 +1,14 @@
-function newSelector(selector, index){
+/*
+selector is a string
+a spec is an object with type and value keys
+returns a new Selector object
+*/
+function newSelector(selector, spec){
     return {
         selector: selector,
+        spec: spec,
         children: [],
-        attrs: [],
-        index: index
+        attrs: []
     };
 }
 
@@ -19,7 +24,10 @@ function newSchema(name){
         name: name,
         urls: [],
         pages: {
-            default: newSelector("body")
+            default: newSelector("body", {
+                type: "index",
+                value: 0
+            })
         }
     };
 }
