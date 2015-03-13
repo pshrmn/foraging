@@ -1,5 +1,6 @@
 from .selector import Selector
 from .errors import BadJSONError
+from .fetch import Fetch
 
 
 class Schema(object):
@@ -7,6 +8,7 @@ class Schema(object):
         self.name = name
         self.urls = urls
         self.pages = pages
+        self.fetch = Fetch()
 
     @classmethod
     def from_json(cls, schema):
@@ -40,3 +42,7 @@ class SimpleSchema(Schema):
         pages = {key: Selector.from_json(val) for key, val
                  in schema["pages"].items()}
         return cls(name, urls, pages)
+
+    def get(self, url):
+        dom = self.fetch.get(url)
+        return self.pages["default"].get(dom)

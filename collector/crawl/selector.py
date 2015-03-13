@@ -42,27 +42,26 @@ class Selector(object):
             return self.getElementData(element)
         elif self.type == "name":
             data = [self.getElementData(e) for e in elements]
-            return [d for d in data if d]
+            return {self.value: [d for d in data if d]}
         pass
 
     def getElementData(self, element):
         data = self.attrData(element)
-        if not data:
-            return
         child_data = self.childData(element)
-        if not child_data:
-            return
-        for key, val in child_data.items():
-            data[key] = val
+        if child_data:
+            for key, val in child_data.items():
+                data[key] = val
         return data
 
     def attrData(self, element):
-        return {attr.name: attr.attr(element) for attr in self.attrs}
+        return {attr.name: attr.get(element) for attr in self.attrs}
 
     def childData(self, element):
         data = {}
         for child in self.children:
-            child_data = {key: val for key, val in child.get(element)}
+            child_data = child.get(element)
+            if not child_data:
+                continue
             for key, val in child_data.items():
                 data[key] = val
         return data

@@ -6,7 +6,6 @@ from collector.crawl.schema import (Schema, SimpleSchema)
 from collector.crawl.errors import BadJSONError
 
 path = os.path.join(os.getcwd(), "tests", "test_json")
-print path
 
 
 class SchemaTestCase(unittest.TestCase):

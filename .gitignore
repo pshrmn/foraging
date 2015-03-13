@@ -5,3 +5,6 @@ cache/
 
 phantomjs
 ghostdriver.log
+
+test_runner.py
+output.json
