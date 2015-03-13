@@ -1,2 +1,2 @@
-class BadSimpleSchemaError(Exception):
+class BadJSONError(Exception):
     pass

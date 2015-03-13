@@ -1,6 +1,7 @@
 from lxml.cssselect import CSSSelector
 
-from attr import Attr
+from .attr import Attr
+from .errors import BadJSONError
 
 
 class Selector(object):
@@ -8,8 +9,9 @@ class Selector(object):
         self.selector = selector
         self.xpath = CSSSelector(selector)
         self.type = spec["type"]
+        if self.type not in ["index", "name"]:
+            raise BadJSONError("unexpected selector type {}".format(self.type))
         self.value = spec["value"]
-        self.spec = spec
         self.children = children
         self.attrs = attrs
 

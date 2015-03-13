@@ -3,7 +3,7 @@ import os
 import json
 
 from collector.crawl.schema import (Schema, SimpleSchema)
-from collector.crawl.errors import BadSimpleSchemaError
+from collector.crawl.errors import BadJSONError
 
 path = os.path.join(os.getcwd(), "tests", "test_json")
 print path
@@ -29,7 +29,7 @@ class SimpleSchemaTestCase(unittest.TestCase):
     def test_bad_json(self):
         with open(os.path.join(path, "bad_simple_schema.json"), "r") as fp:
             bad_json = json.load(fp)
-        with self.assertRaises(BadSimpleSchemaError):
+        with self.assertRaises(BadJSONError):
             SimpleSchema.from_json(bad_json)
 
 if __name__ == "__main__":

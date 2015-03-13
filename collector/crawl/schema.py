@@ -1,5 +1,5 @@
 from .selector import Selector
-from .errors import BadSimpleSchemaError
+from .errors import BadJSONError
 
 
 class Schema(object):
@@ -25,7 +25,7 @@ class SimpleSchema(Schema):
         page_count = len(pages.keys())
         if page_count != 1 or not pages.get("default"):
             err = "SimpleSchema takes only one page (default), given {}"
-            raise BadSimpleSchemaError(err.format(pages.keys()))
+            raise BadJSONError(err.format(pages.keys()))
         super(SimpleSchema, self).__init__(name, urls, pages)
 
     @classmethod
@@ -36,7 +36,7 @@ class SimpleSchema(Schema):
         page_count = len(pages_json.keys())
         if page_count != 1 or not pages_json.get("default"):
             err = "SimpleSchema takes only one page (default), given {}"
-            raise BadSimpleSchemaError(err.format(pages_json.keys()))
+            raise BadJSONError(err.format(pages_json.keys()))
         pages = {key: Selector.from_json(val) for key, val
                  in schema["pages"].items()}
         return cls(name, urls, pages)
