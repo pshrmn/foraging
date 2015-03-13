@@ -1,0 +1,2 @@
+class BadSimpleSchemaError(Exception):
+    pass
