@@ -18,6 +18,9 @@ class Schema(object):
                  in schema["pages"].items()}
         return cls(name, urls, pages)
 
+    def set_cache(self, folder):
+        self.fetch.set_cache(folder)
+
 
 class SimpleSchema(Schema):
     """
