@@ -1,12 +1,12 @@
 from setuptools import setup, find_packages
 
-import collector
+#import collector
 
 packages = find_packages(exclude=['tests*'])
 
 setup(
     name="collector",
-    version=collector.__version__,
+    version="0.9.7",
     description="collect data from webpages",
     packages=packages,
     install_requires=["cssselect>=0.9.1", "requests>=2", "lxml>=3.3.1"],
