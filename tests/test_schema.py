@@ -2,8 +2,8 @@ import unittest
 import os
 import json
 
-from collector.crawl.schema import (Schema, SimpleSchema)
-from collector.crawl.errors import BadJSONError
+from collector.schema import (Schema, SimpleSchema)
+from collector.errors import BadJSONError
 
 path = os.path.join(os.getcwd(), "tests", "test_json")
 

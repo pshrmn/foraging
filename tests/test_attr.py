@@ -1,6 +1,6 @@
 import unittest
 
-from collector.crawl.attr import Attr
+from collector.attr import Attr
 
 
 class AttrTestCase(unittest.TestCase):

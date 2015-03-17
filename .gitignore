@@ -7,5 +7,5 @@ cache/
 phantomjs
 ghostdriver.log
 
-test_runner.py
+example.py
 output.json

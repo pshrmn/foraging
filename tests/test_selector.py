@@ -1,7 +1,7 @@
 import unittest
 
-from collector.crawl.selector import Selector
-from collector.crawl.attr import Attr
+from collector.selector import Selector
+from collector.attr import Attr
 
 
 class SelectorTestCase(unittest.TestCase):
