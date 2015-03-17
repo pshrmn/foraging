@@ -1,19 +1,14 @@
-##collector
+#collector
 
 Collect data from web pages. Works with schemas created by [collectJS](https://github.com/psherman/collectorjs). For the data format, refer to that project's README.
 
-Currently only works for pages with static html, but support for dynanmically loaded content will be available in the future.
-
-#####Install
+##Install
 
 Install collector using pip
 
     pip install git+git://github.com/psherman/collector.git
 
-####collector.crawl
-module used to crawl a website
-
-#####SimpleSchema
+###SimpleSchema
 
 `SimpleSchema`s are used to collect data from single pages.
 
@@ -34,3 +29,33 @@ Create a Schema from a (properly formatted) json file
 Get the data for the schema by getting `get` and providing a `url`
 
     data = s.get(url)
+
+###Fetch
+####Fetch
+Arguments:
+
+* `sleep_time`: how long to wait until the next request. (default `5`)
+* `cache`: an optional `Cache` object used to store webpages to mitigate duplicate requests (default `None)
+
+Usage:
+
+    f = Fetch()
+
+######Fetch.get(url)
+Takes a url and returns an lxml html element if the request was successful, otherwise `None`
+
+####DynamicFetch
+
+Arguments
+DynamicFetch is used to get pages where the data does not exist prior to some javascript has been run. 
+This requires PhantomJS and a Phantomjs script that logs the page's html. PhantomJS can be downloaded from its [website](http://phantomjs.org/). The code in [html_text.js](/blob/master/html_text.js) should be downloaded and placed in your project folder.
+
+Arguments:
+
+* `phantom_path` - location of phantomjs.exe (required)
+* `js_path` - location of phantomjs script (required)
+
+
+Usage:
+
+    d_f = DynamicFetch("phantomjs/phantomjs.exe", "html_text.js")

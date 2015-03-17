@@ -1,9 +1,10 @@
 *.pyc
+__pycache__
 venv
 /rules
 cache/
 
-phantomjs
+phantomjs/phantomjs.exe
 ghostdriver.log
 
 test_runner.py

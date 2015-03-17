@@ -1,14 +1,12 @@
-import requests
-from lxml import html
 import time
 import glob
 import os
-import errno
-try:
-    from urllib.parse import urlparse
-except ImportError:
-    from urlparse import urlparse
+from urllib.parse import urlparse
 import re
+import subprocess
+
+import requests
+from lxml import html
 
 
 def clean_url_filename(url):
@@ -33,11 +31,7 @@ class Cache(object):
         self._load_files()
 
     def _load_files(self):
-        try:
-            os.makedirs(self.folder)
-        except OSError as exception:
-            if exception.errno != errno.EEXIST:
-                raise
+        os.makedirs(self.folder, exist_ok=True)
 
         files = os.listdir(self.folder)
         folders = [f for f in files if is_dir(os.path.join(self.folder, f))]
@@ -72,8 +66,7 @@ class Cache(object):
         domain_folder = os.path.join(self.folder, domain)
         if domain not in self.sites:
             self.sites[domain] = {filename: True}
-            # make the folder
-            os.makedirs(domain_folder)
+            os.makedirs(domain_folder, exist_ok=True)
         with open(os.path.join(domain_folder, filename), "w") as fp:
             fp.write(text)
 
@@ -126,3 +119,41 @@ class Fetch(object):
         diff = now - self.last
         if diff < self.sleep_time:
             time.sleep(self.sleep_time - diff)
+
+
+class DynamicFetch(Fetch):
+    """
+    DynamicFetch uses PhantomJS to get web pages. This is useful for pages
+    where some of the data to be collected is loaded via javascript.
+    """
+    def __init__(self, phantom_path, js_path, sleep_time=5, cache=None):
+        self.phantom_path = phantom_path
+        if not os.path.exists(self.phantom_path):
+            err = "phantom_path ({})does not exit"
+            raise ValueError(err.format(self.phantom_path))
+        self.js_path = js_path
+        if not os.path.exists(self.js_path):
+            err = "js_path ({})does not exit"
+            raise ValueError(err.format(self.js_path))
+        super(DynamicFetch, self).__init__(sleep_time, cache)
+
+    def _phantom_get(self, url):
+        process = subprocess.Popen([self.phantom_path, self.js_path, url],
+                                   stdout=subprocess.PIPE)
+        out, err = process.communicate()
+        return out
+
+    def get(self, url):
+        text = self.get_cached(url)
+        if not text:
+            print("<web> {}".format(url))
+            self.wait()
+            text = self._phantom_get(url)
+            self.last = time.time()
+            # text will be empty binary string when get fails
+            if text == b"":
+                return
+            self.save_cached(url, text)
+        dom = html.document_fromstring(text)
+        dom.make_links_absolute(url)
+        return dom

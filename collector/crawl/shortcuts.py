@@ -1,6 +1,7 @@
 import json
 
 from .schema import SimpleSchema
+from .fetch import Fetch
 
 
 def get_url(schema_file, output_file, url):
@@ -12,6 +13,9 @@ def get_url(schema_file, output_file, url):
         schema_json = json.load(fp)
 
     s = SimpleSchema.from_json(schema_json)
+    f = Fetch()
+    s.set_fetch(f)
+
     data = s.get(url)
     with open(output_file, "w") as fp:
         json.dump(data, fp)
