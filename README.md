@@ -8,6 +8,12 @@ Install collector using pip
 
     pip install git+git://github.com/psherman/collector.git
 
+For Windows users, if installing `lxml` causes errors. Download the wheel from the [Python Extension Packages for Windows](http://www.lfd.uci.edu/~gohlke/pythonlibs/#lxml) and place the wheel in your project. Pip install that file, the try the above collector installation.
+
+Example: (the filename will vary depending on your system and python version)
+
+    pip install lxml-3.4.2-cp34-none-win32.whl
+
 ###SimpleSchema
 
 `SimpleSchema`s are used to collect data from single pages.
