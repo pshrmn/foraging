@@ -1,7 +1,31 @@
 from lxml.cssselect import CSSSelector
 
-from .attr import Attr
+from .attr import new_attr
 from .errors import BadJSONError
+
+
+def new_selector(sel):
+    selector = sel.get("selector")
+    if selector is None:
+        raise BadJSONError("selector requires selector\n{}".format(sel))
+    spec = sel.get("spec")
+    if spec is None:
+        raise BadJSONError("selector requires spec\n{}".format(sel))
+    children = []
+    for child in sel["children"]:
+        try:
+            children.append(new_selector(child))
+        except BadJSONError:
+            raise
+    try:
+        attrs = [new_attr(a) for a in sel["attrs"]]
+    except BadJSONError:
+        raise
+    # ignore if there are no attrs and no children to get data from
+    if len(children) == 0 and len(attrs) == 0:
+        raise BadJSONError("selector has no children or attrs " +
+                           "and should be removed from the schema".format(sel))
+    return Selector(selector, spec, children, attrs)
 
 
 class Selector(object):
@@ -14,22 +38,6 @@ class Selector(object):
         self.value = spec["value"]
         self.children = children
         self.attrs = attrs
-
-    @classmethod
-    def from_json(cls, sel):
-        selector = sel["selector"]
-        spec = sel["spec"]
-        children = []
-        for child in sel["children"]:
-            child_selector = Selector.from_json(child)
-            # don't add child if it returned None
-            if child_selector:
-                children.append(child_selector)
-        attrs = [Attr.from_json(a) for a in sel["attrs"]]
-        # ignore if there are no attrs and no children to get data from
-        if len(children) == 0 and len(attrs) == 0:
-            return None
-        return cls(selector, spec, children, attrs)
 
     def get(self, parent):
         elements = self.xpath(parent)
@@ -60,7 +68,7 @@ class Selector(object):
         data = {}
         for child in self.children:
             child_data = child.get(element)
-            if not child_data:
+            if child_data is None:
                 continue
             for key, val in child_data.items():
                 data[key] = val

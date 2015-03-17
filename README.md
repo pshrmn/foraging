@@ -14,50 +14,29 @@ Example: (the filename will vary depending on your system and python version)
 
     pip install lxml-3.4.2-cp34-none-win32.whl
 
-###SimpleSchema
+##Usage
 
-`SimpleSchema`s are used to collect data from single pages.
+###Fetch Classes
+`Fetch` classes are used to take a url and return the html contents of the corresponding web page. There are two types of `Fetch` classes, `Fetch` and `DynamicFetch`. `Fetch` is used for pages where all of the data to be collected is hard coded into the html. `DynamicFetch` is used for pages where some of the data to be collected isn't available until some JavaScript is run (eg populating the page from a json file).
 
-`SimpleSchema` is currently the only type of schema implemented, but more advanced ones will be available in the future.
-
-Create a Schema from a (properly formatted) json file
-
-    import json
-    from collector import SimpleSchema
-
-    with open("schema.json") as fp:
-        data = json.load(fp)
-    try:
-        s = Schema.from_json(data)
-    except BadJSONError:
-        # your schema isn't properly formatted
-
-Get the data for the schema by getting `get` and providing a `url`
-
-    data = s.get(url)
-
-###Fetch
 ####Fetch
+
 Arguments:
 
 * `sleep_time`: how long to wait until the next request. (default `5`)
-* `cache`: an optional `Cache` object used to store webpages to mitigate duplicate requests (default `None)
+* `cache`: an optional `Cache` object used to store webpages to mitigate duplicate requests (default `None`)
 
-Usage:
 
-    f = Fetch()
-
-######Fetch.get(url)
+######get(url)
 Takes a url and returns an lxml html element if the request was successful, otherwise `None`
 
 ####DynamicFetch
-
-Arguments
-DynamicFetch is used to get pages where the data does not exist prior to some javascript has been run. 
-This requires PhantomJS and a Phantomjs script that logs the page's html. PhantomJS can be downloaded from its [website](http://phantomjs.org/). The code in [html_text.js](/blob/master/html_text.js) should be downloaded and placed in your project folder.
+This requires PhantomJS and a Phantomjs script that logs the page's html. PhantomJS can be downloaded from its [website](http://phantomjs.org/). The code in [html_text.js](/html_text.js) should be downloaded and placed in your project folder.
 
 Arguments:
 
+* `sleep_time`: how long to wait until the next request. (default `5`)
+* `cache`: an optional `Cache` object used to store webpages to mitigate duplicate requests (default `None`)
 * `phantom_path` - location of phantomjs.exe (required)
 * `js_path` - location of phantomjs script (required)
 
@@ -65,3 +44,31 @@ Arguments:
 Usage:
 
     d_f = DynamicFetch("phantomjs/phantomjs.exe", "html_text.js")
+
+######get(url)
+Takes a url and returns an lxml html element if the request was successful, otherwise `None`
+
+###Schemas
+Schemas are collections of rules to collect data from elements in a web page.
+
+####SimpleSchema
+
+`SimpleSchema`s are used to collect data from single pages.
+
+`SimpleSchema` is currently the only type of schema implemented, but more advanced ones will be available in the future.
+
+Usage:
+
+    import json
+    from collector import new_simple_schema
+
+    with open("schema.json") as fp:
+        data = json.load(fp)
+    try:
+        s = new_simple_schema(data)
+    except BadJSONError:
+        # your schema isn't properly formatted
+
+Use the `Fetch` object to get the data for the schema by calling `get` with the `url` of the desired page.
+
+    data = s.get(url)

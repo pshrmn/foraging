@@ -180,7 +180,7 @@ class DynamicFetch(Fetch):
 
     def get(self, url):
         text = self.get_cached(url)
-        if not text:
+        if text is None:
             print("<web> {}".format(url))
             self.wait()
             text = self._phantom_get(url)
