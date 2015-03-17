@@ -40,7 +40,7 @@ def upload():
     manually load request.data in case content-type: application/json isn't set
     """
     try:
-        data = json.loads(request.data)
+        data = json.loads(request.data.decode())
     except ValueError:
         return jsonify({"error": True})
 
