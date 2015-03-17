@@ -10,6 +10,9 @@ from lxml import html
 
 
 def clean_url_filename(url):
+    """
+    strip illegal filename characters out of urls
+    """
     illegal_chars = re.compile(r'(\/|\\|:|\*|\?|"|\<|\>|\|)')
     return re.sub(illegal_chars, "", url)
 
@@ -31,6 +34,10 @@ class Cache(object):
         self._load_files()
 
     def _load_files(self):
+        """
+        iterates over the folders in the cache to create a
+        lookup dict to check whether a url is cached
+        """
         os.makedirs(self.folder, exist_ok=True)
 
         files = os.listdir(self.folder)
@@ -42,6 +49,9 @@ class Cache(object):
         self.sites = cache
 
     def exists(self, domain, filename):
+        """
+        returns True if the filename exists in the cache, otherwise False
+        """
         if domain not in self.sites:
             return False
         site_cache = self.sites[domain]
@@ -49,6 +59,10 @@ class Cache(object):
         return long_filename in site_cache
 
     def get(self, url):
+        """
+        returns a string of the html for a url if it has been cached,
+        otherwise None
+        """
         domain, filename = url_info(url)
         if self.exists(domain, filename):
             print("<cache> {}".format(url))
@@ -58,10 +72,17 @@ class Cache(object):
         return
 
     def set(self, folder):
+        """
+        updates the cache's folder and recreates the sites lookup dict
+        """
         self.folder = folder
         self._load_files()
 
     def save(self, url, text):
+        """
+        saves the text in the cache folder and adds the path to the
+        lookup dict
+        """
         domain, filename = url_info(url)
         domain_folder = os.path.join(self.folder, domain)
         if domain not in self.sites:
@@ -72,6 +93,13 @@ class Cache(object):
 
 
 class Fetch(object):
+    """
+    Fetch takes a url and returns an lxml html element for that web page. It
+    will sleep in between requests to limit the frequency of hits on a server.
+    The default sleep time is 5 seconds, but can be manually set. An optional
+    cache can be provided. The cache will be used to save the html of pages so
+    that subsequent requests for a url do not have to be made to the website.
+    """
     def __init__(self, sleep_time=5, cache=None):
         self.last = None
         self.sleep_time = sleep_time
@@ -92,7 +120,10 @@ class Fetch(object):
 
     def get(self, url):
         """
-
+        returns the html of the url as a string. Will check cache to see if it
+        exists and returns that string if it does. Otherwise uses requests
+        to send a get request and returns the contents of the response. If the
+        get request fails, returns None.
         """
         # if there is a cache, check if url is cached
         text = self.get_cached(url)
@@ -125,6 +156,10 @@ class DynamicFetch(Fetch):
     """
     DynamicFetch uses PhantomJS to get web pages. This is useful for pages
     where some of the data to be collected is loaded via javascript.
+
+    NOTE: This class requires PhantomJS and a PhantomJS script that logs
+    the html of a web page as a string. Without those, DynamicFetch will
+    fail to function properly
     """
     def __init__(self, phantom_path, js_path, sleep_time=5, cache=None):
         self.phantom_path = phantom_path

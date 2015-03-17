@@ -4,7 +4,7 @@ venv
 /rules
 cache/
 
-phantomjs/phantomjs.exe
+phantomjs
 ghostdriver.log
 
 test_runner.py
