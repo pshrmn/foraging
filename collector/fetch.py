@@ -4,9 +4,12 @@ import os
 from urllib.parse import urlparse
 import re
 import subprocess
+import logging
 
 import requests
 from lxml import html
+
+log = logging.getLogger(__name__)
 
 
 def clean_url_filename(url):
@@ -23,10 +26,6 @@ def url_info(url):
     return domain, filename
 
 
-def is_dir(path):
-    return os.path.isdir(path)
-
-
 class Cache(object):
     def __init__(self, folder):
         self.folder = folder
@@ -41,7 +40,8 @@ class Cache(object):
         os.makedirs(self.folder, exist_ok=True)
 
         files = os.listdir(self.folder)
-        folders = [f for f in files if is_dir(os.path.join(self.folder, f))]
+        folders = [f for f in files
+                   if os.path.isdir(os.path.join(self.folder, f))]
         cache = {}
         for f in folders:
             path = os.path.join(self.folder, f, "*.html")
@@ -65,7 +65,7 @@ class Cache(object):
         """
         domain, filename = url_info(url)
         if self.exists(domain, filename):
-            print("<cache> {}".format(url))
+            log.info("<cache> {}".format(url))
             long_filename = os.path.join(self.folder, domain, filename)
             with open(long_filename, "r") as fp:
                 return fp.read()
@@ -96,14 +96,19 @@ class Fetch(object):
     """
     Fetch takes a url and returns an lxml html element for that web page. It
     will sleep in between requests to limit the frequency of hits on a server.
-    The default sleep time is 5 seconds, but can be manually set. An optional
-    cache can be provided. The cache will be used to save the html of pages so
-    that subsequent requests for a url do not have to be made to the website.
+
+    sleep_time: time to wait between requests to the same server (default 5)
+    cache: optional Cache to store html of loaded urls to prevent re-hitting
+        the server
+    headers: headers to send with the request. It is recommended to include
+        a "User-Agent" header
     """
-    def __init__(self, sleep_time=5, cache=None):
-        self.last = None
+    def __init__(self, sleep_time=5, cache=None, headers=None):
+        self.last = {}
         self.sleep_time = sleep_time
         self.cache = cache
+        self.headers = headers
+        self.dynamic = False
 
     def set_cache(self, folder):
         self.cache = Cache(folder)
@@ -118,75 +123,77 @@ class Fetch(object):
             return
         self.cache.save(url, text)
 
-    def get(self, url):
+    def make_dynamic(self, phantom_path, js_path):
+        """
+        Allows requests to be made through PhantomJS. Raises a ValueError if
+        either path does not exist (does not actually check they will run
+        correctly)
+        """
+        if not os.path.exists(phantom_path):
+            err = "phantom_path ({}) does not exist"
+            raise ValueError(err.format(phantom_path))
+        if not os.path.exists(js_path):
+            err = "js_path ({}) does not exist"
+            raise ValueError(err.format(js_path))
+
+        self.phantom_path = phantom_path
+        self.js_path = js_path
+        self.dynamic = True
+
+    def set_wait(self, url):
+        domain = urlparse(url).netloc
+        self.last[domain] = time.time()
+
+    def wait(self, url):
+        """
+        if the necessary time hasn't elapsed, sleep until it has
+        """
+        domain = urlparse(url).netloc
+        last = self.last.get(domain)
+        if last is None:
+            return
+        diff = time.time() - last
+        if diff < self.sleep_time:
+            time.sleep(self.sleep_time - diff)
+
+    def _phantom_get(self, url):
+        """
+        use subprocess to make the request through PhantomJS.
+        """
+        commands = [self.phantom_path, self.js_path, url]
+        if self.headers and "User-Agent" in self.headers:
+            commands.append(self.headers["User-Agent"])
+        process = subprocess.Popen(commands, stdout=subprocess.PIPE)
+        out, err = process.communicate()
+        return out
+
+    def get(self, url, dynamic=False):
         """
         returns the html of the url as a string. Will check cache to see if it
         exists and returns that string if it does. Otherwise uses requests
         to send a get request and returns the contents of the response. If the
         get request fails, returns None.
+
+        if dynamic=True and self.dynamic=True, the request will be made
+            through PhantomJS
         """
-        # if there is a cache, check if url is cached
-        text = self.get_cached(url)
-        if not text:
-            print("<web> {}".format(url))
-            self.wait()
-            resp = requests.get(url)
-            self.last = time.time()
-            if not resp.ok:
-                return
-            text = resp.text
-            self.save_cached(url, text)
-        dom = html.document_fromstring(text)
-        dom.make_links_absolute(url)
-        return dom
-
-    def wait(self):
-        """
-        if the necessary time hasn't elapsed, sleep until it has
-        """
-        if not self.last:
-            return
-        now = time.time()
-        diff = now - self.last
-        if diff < self.sleep_time:
-            time.sleep(self.sleep_time - diff)
-
-
-class DynamicFetch(Fetch):
-    """
-    DynamicFetch uses PhantomJS to get web pages. This is useful for pages
-    where some of the data to be collected is loaded via javascript.
-
-    NOTE: This class requires PhantomJS and a PhantomJS script that logs
-    the html of a web page as a string. Without those, DynamicFetch will
-    fail to function properly
-    """
-    def __init__(self, phantom_path, js_path, sleep_time=5, cache=None):
-        self.phantom_path = phantom_path
-        if not os.path.exists(self.phantom_path):
-            err = "phantom_path ({})does not exit"
-            raise ValueError(err.format(self.phantom_path))
-        self.js_path = js_path
-        if not os.path.exists(self.js_path):
-            err = "js_path ({})does not exit"
-            raise ValueError(err.format(self.js_path))
-        super(DynamicFetch, self).__init__(sleep_time, cache)
-
-    def _phantom_get(self, url):
-        process = subprocess.Popen([self.phantom_path, self.js_path, url],
-                                   stdout=subprocess.PIPE)
-        out, err = process.communicate()
-        return out
-
-    def get(self, url):
         text = self.get_cached(url)
         if text is None:
-            print("<web> {}".format(url))
-            self.wait()
-            text = self._phantom_get(url)
-            self.last = time.time()
+            self.wait(url)
+            text = ""
+            # allow DynamicFetch to get static content
+            if dynamic and self.dynamic:
+                log.info("<phantomjs> {}".format(url))
+                text = self._phantom_get(url).decode()
+            else:
+                log.info("<requests> {}".format(url))
+                resp = requests.get(url, headers=self.headers)
+                if not resp.ok:
+                    return
+                text = resp.text
+            self.set_wait(url)
             # text will be empty binary string when get fails
-            if text == b"":
+            if text == "":
                 return
             self.save_cached(url, text)
         dom = html.document_fromstring(text)

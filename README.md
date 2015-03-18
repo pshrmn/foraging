@@ -16,40 +16,27 @@ Example: (the filename will vary depending on your system and python version)
 
 ##Usage
 
-###Fetch Classes
-`Fetch` classes are used to take a url and return the html contents of the corresponding web page. There are two types of `Fetch` classes, `Fetch` and `DynamicFetch`. `Fetch` is used for pages where all of the data to be collected is hard coded into the html. `DynamicFetch` is used for pages where some of the data to be collected isn't available until some JavaScript is run (eg populating the page from a json file).
-
-####Fetch
-
-Arguments:
-
-* `sleep_time`: how long to wait until the next request. (default `5`)
-* `cache`: an optional `Cache` object used to store webpages to mitigate duplicate requests (default `None`)
 
 
-######get(url)
-Takes a url and returns an lxml html element if the request was successful, otherwise `None`
-
-####DynamicFetch
-This requires PhantomJS and a Phantomjs script that logs the page's html. PhantomJS can be downloaded from its [website](http://phantomjs.org/). The code in [html_text.js](/html_text.js) should be downloaded and placed in your project folder.
+###Fetch
+A fetcher takes a url and return the html contents of the corresponding web page. Requests can either be static (default) or dynamic. In order to make dynamic requests, the `make_dynamic` function needs to be called.
 
 Arguments:
 
 * `sleep_time`: how long to wait until the next request. (default `5`)
 * `cache`: an optional `Cache` object used to store webpages to mitigate duplicate requests (default `None`)
-* `phantom_path` - location of phantomjs.exe (required)
-* `js_path` - location of phantomjs script (required)
 
 
-Usage:
-
-    d_f = DynamicFetch("phantomjs/phantomjs.exe", "html_text.js")
-
-######get(url)
+######get(url, dynamic=False)
 Takes a url and returns an lxml html element if the request was successful, otherwise `None`
+
+######make_dynamic(phantom_path, js_path)
+This requires PhantomJS and a Phantomjs script that logs the page's html. PhantomJS can be downloaded from its [website](http://phantomjs.org/). The code in [html_text.js](/html_text.js) should be downloaded and placed in your project folder. Calling this allows get requests using PhantomJS to be made. If either path does not exist, this will raise a `ValueError`. To make dynamic requests, provide `True` as the second argument in a `get` call.
+
+    f.make_dynamic("phantomjs/phantomjs.exe", "html_text.js")
 
 ###Schemas
-Schemas are collections of rules to collect data from elements in a web page.
+Schemas are collections of rules to collect data from elements in a web page. For a better explanation of the makeup of a Schema, read the README for [collectorJS](https://github.com/psherman/collectorjs)
 
 ####SimpleSchema
 

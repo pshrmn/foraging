@@ -12,10 +12,16 @@ page.settings.loadImages = false;
 page.settings.diskCache = true;
 
 var args = system.args;
-// first arg is this file's name, second is the url to get
+// first arg is this file's name, second is the url to get, third is an
+// optional user-agent string
 if ( args.length < 2 ) {
     phantom.exit();
 }
+var ua = args[2];
+if ( ua ) {
+    page.settings.userAgent = ua;
+}
+
 var url = args[1];
 var wrong_url = false;
 page.open(url, function(status){

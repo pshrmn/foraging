@@ -41,10 +41,10 @@ class SimpleSchema(Schema):
             raise BadJSONError(err.format(pages.keys()))
         super(SimpleSchema, self).__init__(name, urls, pages, fetch)
 
-    def get(self, url):
+    def get(self, url, dynamic=False):
         if not self.fetch:
             return
-        dom = self.fetch.get(url)
+        dom = self.fetch.get(url, dynamic)
         if dom is None:
             return
         return self.pages["default"].get(dom)
