@@ -44,7 +44,7 @@ class Cache(object):
                    if os.path.isdir(os.path.join(self.folder, f))]
         cache = {}
         for f in folders:
-            path = os.path.join(self.folder, f, "*.html")
+            path = os.path.join(self.folder, f, "*")
             cache[f] = {name: True for name in glob.glob(path)}
         self.sites = cache
 

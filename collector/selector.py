@@ -56,9 +56,12 @@ class Selector(object):
     def getElementData(self, element):
         data = self.attrData(element)
         child_data = self.childData(element)
-        if child_data:
+        if child_data is not None:
             for key, val in child_data.items():
                 data[key] = val
+        # if child_data does not exist, return
+        else:
+            return
         return data
 
     def attrData(self, element):
@@ -68,8 +71,9 @@ class Selector(object):
         data = {}
         for child in self.children:
             child_data = child.get(element)
+            # if a child doesn't exist, return
             if child_data is None:
-                continue
+                return
             for key, val in child_data.items():
                 data[key] = val
         return data
