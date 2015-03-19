@@ -35,7 +35,7 @@ def host_folder(host):
 @app.route('/upload', methods=['POST'])
 def upload():
     """
-    save rules json in <sitename>/<schemaname>.json
+    save rules json in <sitename>/<page_name>.json
     dangerous because on save, overwrites existing saved site
     manually load request.data in case content-type: application/json isn't set
     """
@@ -45,21 +45,21 @@ def upload():
         return jsonify({"error": True})
 
     site = data["site"]
-    name = data["schema"]["name"]
+    name = data["page"]["name"]
     folder = host_folder(site)
 
     filename = "%s.json" % (name)
     path = os.path.join(folder, filename)
     with open(path, 'w') as fp:
-        json.dump(data["schema"], fp, indent=2)
+        json.dump(data["page"], fp, indent=2)
     return jsonify({"error": False})
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Server to save schemas' +
+    parser = argparse.ArgumentParser(description='Server to save pages' +
                                      'created with collectorjs')
     parser.add_argument('--folder', '-F', dest='directory',
-                        help='folder to save schemas to')
+                        help='folder to save pages to')
     args = parser.parse_args()
     # default to current working directory
     directory = args.directory or os.path.join(os.getcwd(), 'rules')
