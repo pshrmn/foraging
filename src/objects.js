@@ -19,15 +19,16 @@ function newAttr(name, attr){
     };
 }
 
-function newSchema(name){
+function newPage(name){
     return {
         name: name,
-        urls: [],
-        pages: {
-            default: newSelector("body", {
-                type: "index",
-                value: 0
-            })
-        }
+        selector: "body",
+        spec: {
+            type: "index",
+            value: 0
+        },
+        children: [],
+        attrs: [],
+        elements: [document.body]
     };
 }

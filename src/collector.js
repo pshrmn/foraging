@@ -3,7 +3,7 @@ var controller = collectorController();
 // build the ui
 var ui = buildUI(controller);
 ui.addViews([
-    [SchemaView, "Schema", {
+    [PageView, "Page", {
         height: 200
     }, true],
     [SelectorView, "Selector"],

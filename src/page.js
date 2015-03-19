@@ -1,33 +1,27 @@
-function cleanSchemas(schemas){
+function cleanPages(pages){
     var ns = {};
-    for ( var s in schemas ) {
-        ns[s] = cleanSchema(schemas[s]);
+    for ( var p in pages ) {
+        ns[p] = cleanPage(pages[p]);
     }
     return ns;
 }
 
 // get rid of extra information before saving
-function cleanSchema(schema){
-    var ns = {
-        name: schema.name,
-        urls: schema.urls.slice(),
-        pages: {}
-    };
-
-    function clonePage(s, clone){
+function cleanPage(page){
+    function cleanSelector(s, clone){
         clone.selector = s.selector;
         clone.spec = s.spec;
         clone.attrs = s.attrs.slice();
         clone.children = s.children.map(function(child){
-            return clonePage(child, {});
+            return cleanSelector(child, {});
         });
         return clone;
     }
 
-    for ( var page in schema.pages ) {
-        ns.pages[page] = clonePage(schema.pages[page], {});
-    }
-    return ns;
+
+    var clonedPage = cleanSelector(page, {});
+    clonedPage.name = page.name;
+    return clonedPage;
 }
 
 // check if an identical selector already exists
@@ -42,8 +36,8 @@ function matchSelector(sel, parent){
     });
 }
 
-// get an array containing the names of all attrs in the schema
-function usedNames(schema){
+// get an array containing the names of all attrs in the page
+function usedNames(page){
     var names = [];
 
     function findNames(selector){
@@ -59,8 +53,8 @@ function usedNames(schema){
         });
     }
 
-    for ( var name in schema.pages ) {
-        findNames(schema.pages[name]);
+    for ( var name in page.pages ) {
+        findNames(page.pages[name]);
     }
     return names;
 }

@@ -96,6 +96,7 @@ body{
 
     .column{
         display: inline-block;
+        min-width: 125px;
     }
 
     .column.hidden{
@@ -111,9 +112,14 @@ body{
         .view{
             display: none;
             padding: 5px;
+            text-align: left;
 
             > *{
                 vertical-align: top;
+            }
+
+            .on{
+                color: $green;
             }
 
             .tag{

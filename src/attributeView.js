@@ -7,12 +7,30 @@ function AttributeView(options){
     var holder = options.holder || "body";
     var saveFn = options.save || function(){};
 
+    var events = {
+        saveAttr: function(){
+            var attr = getAttr();
+            if ( attr === undefined ) {
+                return;
+            }
+            controller.saveAttr(attr);
+            fns.reset();
+        },
+        cancelAttr: function(){
+            fns.reset();
+            ui.showView("Page");
+        }
+    };
+
     // ui
     var view = d3.select(holder);
 
     // form
     var form = view.append("div")
-        .classed({"form": true});
+        .classed({
+            "column": true,
+            "form": true
+        });
 
     var nameInput = form.append("p")
         .append("label")
@@ -28,21 +46,13 @@ function AttributeView(options){
             .attr("type", "text")
             .attr("name", "attr");
 
-    var followInput = form.append("p")
-        .append("label")
-        .text("Follow: ")
-        .append("input")
-            .attr("type", "checkbox")
-            .attr("name", "follow")
-            .property("disabled", true);
-
     var saveButton = form.append("button")
         .text("Save")
-        .on("click", controller.events.saveAttr);
+        .on("click", events.saveAttr);
 
     var cancelButton = form.append("button")
         .text("Cancel")
-        .on("click", controller.events.cancelAttr);
+        .on("click", events.cancelAttr);
 
     // attribute display
     var display = view.append("div")
@@ -88,9 +98,6 @@ function AttributeView(options){
         attrs.enter().append("div")
             .on("click", function(d){
                 attrInput.property("value", d.name);
-                followInput.property("disabled", function(){
-                    return d.name !== "href";
-                });
             });
 
         attrs.text(function(d){
@@ -115,26 +122,26 @@ function AttributeView(options){
         }
         displayElement();
     }
-    return {
+
+    function getAttr(){
+        var attr = attrInput.property("value");
+        var name = nameInput.property("value");
+        if ( name === "" || !controller.legalName(name)){
+            return;
+        }
+
+        return {
+            name: name,
+            attr: attr
+        };
+    }
+
+    var fns = {
         setElements: function(elements){
             eles = elements;
             index = 0;
             length = elements.length;
             displayElement();
-        },
-        getAttr: function(){
-            var attr = attrInput.property("value");
-            var name = nameInput.property("value");
-            var follow = followInput.property("checked") && attr === "href";
-            if ( name === "" || !controller.legalName(name)){
-                return;
-            }
-
-            return {
-                name: name,
-                attr: attr,
-                follow: follow
-            };
         },
         reset: function(){
             eles = undefined;
@@ -145,8 +152,7 @@ function AttributeView(options){
             }
             attrInput.property("value", "");
             nameInput.property("value", "");
-            followInput.property("disabled", true);
-            followInput.property("checked", false);
         }
     };
+    return fns;
 }

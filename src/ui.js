@@ -95,10 +95,6 @@ function buildUI(controller){
             document.body.style.marginBottom = initialMargin;
         },
         showView: showView,
-        setUrl: topbarFns.setUrl,
-        toggleUrl: topbarFns.toggleUrl,
-        getSchema: topbarFns.getSchema,
-        setSchemas: topbarFns.setSchemas,
         setPages: topbarFns.setPages,
         getPage: topbarFns.getPage,
     };

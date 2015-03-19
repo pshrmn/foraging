@@ -68,17 +68,108 @@ function newAttr(name, attr){
     };
 }
 
-function newSchema(name){
+function newPage(name){
     return {
         name: name,
-        urls: [],
-        pages: {
-            default: newSelector("body", {
-                type: "index",
-                value: 0
-            })
-        }
+        selector: "body",
+        spec: {
+            type: "index",
+            value: 0
+        },
+        children: [],
+        attrs: [],
+        elements: [document.body]
     };
+}
+
+// Source: src/markup.js
+/**
+functions to add classes to elements in the page to indicate they
+can be selected or match a selector
+**/
+
+function highlightElements(){
+    var className = "highlighted";
+
+    function highlight(elements){
+        elements.forEach(function(e){
+            e.classList.add(className);
+        });
+    }
+
+    highlight.remove = function(){
+        var elements = [].slice.call(document.getElementsByClassName(className));
+        elements.forEach(function(e){
+            e.classList.remove(className);
+        });
+    };
+
+    highlight.cssClass = function(name){
+        className = name;
+        return highlight;
+    };
+
+    return highlight;
+}
+
+function interactiveElements(){
+    var className = "highlighted";
+    var hovered = "hovered";
+    var clicked = function(){};
+    var mouseover = function addOption(event){
+        event.stopPropagation();
+        this.classList.add(hovered);
+    };
+    var mouseout = function removeOption(event){
+        this.classList.remove(hovered);
+    };
+
+    function highlight(elements){
+        elements.forEach(function(e){
+            e.classList.add(className);
+            e.addEventListener("mouseover", mouseover, false);
+            e.addEventListener("mouseout", mouseout, false);
+            e.addEventListener("click", clicked, false);
+        });
+    }
+
+    highlight.remove = function(){
+        var elements = [].slice.call(document.getElementsByClassName(className));
+        elements.forEach(function(e){
+            e.classList.remove(className);
+            e.classList.remove(hovered);
+            e.removeEventListener("mouseover", mouseover, false);
+            e.removeEventListener("mouseout", mouseout, false);
+            e.removeEventListener("click", clicked, false);
+        });
+    };
+
+    highlight.cssClass = function(name){
+        className = name;
+        return highlight;
+    };
+
+    highlight.hoverClass = function(name){
+        hovered = name;
+        return highlight;
+    };
+
+    highlight.clicked = function(fn){
+        clicked = fn;
+        return highlight;
+    };
+
+    highlight.mouseover = function(fn){
+        mouseover = fn;
+        return highlight;
+    };
+
+    highlight.mouseout = function(fn){
+        mouseout = fn;
+        return highlight;
+    };
+
+    return highlight;
 }
 
 // Source: src/selector.js
@@ -196,92 +287,31 @@ function elementSelector(){
     return select;
 }
 
-function elementHighlighter(){
-    var option = "collectHighlight";
-    var clicked = function(){};
-
-    function addOption(event){
-        this.classList.add(option);
-    }
-
-    function removeOption(event){
-        this.classList.remove(option);
-    }
-
-    function selectOption(event){
-        event.preventDefault();
-        event.stopPropagation();
-        var eles = [].slice.call(event.path).filter(function(ele){
-            return ele.classList && ele.classList.contains("selectableElement");
-        }).reverse();
-        clicked(eles);
-    }
-
-    function highlight(elements){
-        elements.forEach(function(ele){
-            ele.addEventListener("mouseenter", addOption, false);
-            ele.addEventListener("mouseleave", removeOption, false);
-            ele.addEventListener("click", selectOption, false);
-            ele.classList.add("selectableElement");
-        });
-    }
-
-    highlight.clicked = function(callback){
-        clicked = callback;
-        return highlight;
-    };
-
-    highlight.option = function(css){
-        option = css;
-        return highlight;
-    };
-
-    highlight.remove = function(){
-        var elements = [].slice.call(document.getElementsByClassName("selectableElement"));
-        elements.forEach(function(ele){
-            ele.removeEventListener("mouseenter", addOption);
-            ele.removeEventListener("mouseleave", removeOption);
-            ele.removeEventListener("click", selectOption);
-            ele.classList.remove("selectableElement");
-            ele.classList.remove("queryCheck");
-            ele.classList.remove("collectHighlight");
-        });
-    };
-
-    return highlight;
-}
-
-// Source: src/schema.js
-function cleanSchemas(schemas){
+// Source: src/page.js
+function cleanPages(pages){
     var ns = {};
-    for ( var s in schemas ) {
-        ns[s] = cleanSchema(schemas[s]);
+    for ( var p in pages ) {
+        ns[p] = cleanPage(pages[p]);
     }
     return ns;
 }
 
 // get rid of extra information before saving
-function cleanSchema(schema){
-    var ns = {
-        name: schema.name,
-        urls: schema.urls.slice(),
-        pages: {}
-    };
-
-    function clonePage(s, clone){
+function cleanPage(page){
+    function cleanSelector(s, clone){
         clone.selector = s.selector;
         clone.spec = s.spec;
         clone.attrs = s.attrs.slice();
         clone.children = s.children.map(function(child){
-            return clonePage(child, {});
+            return cleanSelector(child, {});
         });
         return clone;
     }
 
-    for ( var page in schema.pages ) {
-        ns.pages[page] = clonePage(schema.pages[page], {});
-    }
-    return ns;
+
+    var clonedPage = cleanSelector(page, {});
+    clonedPage.name = page.name;
+    return clonedPage;
 }
 
 // check if an identical selector already exists
@@ -296,8 +326,8 @@ function matchSelector(sel, parent){
     });
 }
 
-// get an array containing the names of all attrs in the schema
-function usedNames(schema){
+// get an array containing the names of all attrs in the page
+function usedNames(page){
     var names = [];
 
     function findNames(selector){
@@ -313,8 +343,8 @@ function usedNames(schema){
         });
     }
 
-    for ( var name in schema.pages ) {
-        findNames(schema.pages[name]);
+    for ( var name in page.pages ) {
+        findNames(page.pages[name]);
     }
     return names;
 }
@@ -338,373 +368,119 @@ function followedAttrs(page){
 
 // Source: src/controller.js
 function collectorController(){
-    var schemas;
-    var currentSchema;
-    var schema;
-    // a list of all attr names in the schema
-    var schemaAttrs = [];
-    var page;
-    // track the name of the current page
+    var pages;
     var currentPage;
+    // a list of all attr names in the page
+    var pageAttrs = [];
+    var page;
     var selector;
 
-    // sp is given an element and returns an array containing its tag
-    // and if they exist, its id and any classes
-    var sParts = selectorParts()
-        .ignoreClasses(["collectHighlight", "queryCheck", "selectableElement"]);
-
-    // es takes an array of elements and queries each to get their child elements
-    // if no selector is provided it uses the all selector (*)
-    var eSelect = elementSelector();
-
-    // element highlighter takes an array of elements and adds event listeners
-    // to give the user the ability to select an element in the page (along with
-    // vanity markup to identify which element is being selected)
-    var eHighlight = elementHighlighter()
-        .clicked(elementChoices);
-
-    function elementChoices(elements){
-        var data = elements.map(function(ele){
-            return sParts(ele);
-        });
-        fns.dispatch.Selector.setChoices(data);
-    }
-
-    // get all of the elements that match each selector
-    // and store in object.elements
-    function getMatches(selectFn){
-        function match(elements, s){
-            s.elements = selectFn(elements, s.selector, s.spec);
-            s.children.forEach(function(child){
-                match(s.elements, child);
-            });      
-        }
-
-        match([document], page);
-    }
-
-    // attach an id to each node for d3
     var idCount = 0;
-    function setupPage(){
-        function set(s){
-            s.id = idCount++;
-            s.children.forEach(function(s){
-                set(s);
-            });
-        }
-        set(page);
-        selector = page;
-        fns.dispatch.Schema.showSelector(selector);
-    }
-
-    function clonePage(){
-        function setClone(selector, clone){
-            clone.selector = selector.selector;
-            clone.id = selector.id;
-            clone.spec = selector.spec;
-            clone.attrs = selector.attrs.slice();
-            clone.elements = selector.elements.slice();
-            clone.children = selector.children.map(function(child){
-                return setClone(child, {});
-            });
-            return clone;
-        }
-        return setClone(page, {});
-    }
-
     var fns = {
-        loadSchemas: function(s){
-            schemas = s;
-            ui.setSchemas(Object.keys(schemas));
+        elements: elementSelector(),
+        loadPages: function(ps){
+            pages = ps;
+            var options = [""].concat(Object.keys(pages));
+            ui.setPages(options);
         },
-        setSchema: function(schemaName){
-            currentSchema = schemaName;
+        loadPage: function(pageName){
+            currentPage = pageName;
             idCount = 0;
-            schema = schemas[schemaName];
-
-            // use the default page when loading a schema
-            // might update if in the future this stores last used schema/page
-            fns.setPage("default");
-            ui.setPages(Object.keys(schema.pages));
+            page = pages[pageName];
+            selector = page;
+            fns.dispatch.Page.setPage(page);
+            ui.showView("Page");
         },
-        setPage: function(name){
-            currentPage = name;
-            page = schema.pages[name];
-            setupPage();
-            getMatches(eSelect);
-            fns.dispatch.Schema.drawPage(clonePage());
-            if ( name === "default" ) {
-                ui.setUrl(fns.isUrl());
-                ui.toggleUrl(true);
-            } else {
-                ui.toggleUrl(false);
+        setVals: function(newPage, newSelector){
+            currentPage = newPage.name;
+            page = newPage;
+            pages[currentPage] = page;
+            selector = newSelector;
+            chromeSave(pages);
+        },
+        addPage: function(name){
+            if ( pages[name] === undefined && legalPageName(name) ) {
+                pages[name] = newPage(name);
+                ui.setPages([""].concat(Object.keys(pages)), name);
+                fns.loadPage(name);
+                chromeSave(pages);
             }
+        },
+        removePage: function(){
+            delete pages[currentPage];
+            //fns.setPage("default");
+            ui.setPages([""].concat(Object.keys(pages)));
+            fns.dispatch.Page.reset();
+            chromeSave(pages);
 
+        },
+        nextId: function(){
+            return idCount++;
+        },
+        getSelector: function(){
+            return selector;
         },
         setSelector: function(d){
-            function find(s, lid){
-                if ( s.id === lid ) {
-                    selector = s;
-                    return true;
-                }
-                var found = s.children.some(function(child){
-                    return find(child, lid);
-                });
-                return false;
-            }
-
-            find(page, d.id);
-            fns.dispatch.Schema.showSelector(selector);
+            selector = d;
         },
-        markup: function(obj){
-            clearClass("queryCheck");
-            if ( obj.selector !== "" ) {
-                eSelect(selector.elements, obj.selector, obj.spec).forEach(function(ele){
-                    ele.classList.add("queryCheck");
-                });
-            }
+        saveSelector: function(sel){
+            selector.children.push(sel);
+            selector = sel;
+            fns.dispatch.Page.setPage(page, selector);
+
+            ui.showView("Page");
+            chromeSave(pages);
         },
         eleCount: function(obj){
-            return eSelect.count(selector.elements, obj);
+            return fns.elements.count(selector.elements, obj);
         },
         legalName: function(name){
-            // default is a reserved name
-            if ( name === "default" ) {
-                return false;
-            }
-
-            return !usedNames(schema).some(function(n){
+            return !usedNames(page).some(function(n){
                 return n === name;
             });
         },
-        getSchema: function(){
-            return schema;
+        getPage: function(){
+            return page;
         },
         isUrl: function(){
             var url = window.location.href;
-            if ( schema ) {
-                return schema.urls.some(function(curl){
+            if ( page ) {
+                return page.urls.some(function(curl){
                     return curl === url;
                 });
             } else {
                 return false;
             }
         },
+        addChild: function(){
+            var eles = fns.elements(selector.elements);
+            fns.dispatch.Selector.setup(eles);
+            ui.showView("Selector");
+        },
+        addAttr: function(){
+            fns.dispatch.Attribute.setElements(selector.elements);
+            ui.showView("Attribute");
+        },
+        saveAttr: function(attr){
+            selector.attrs.push(attr);
+            fns.dispatch.Page.setPage(page, selector);
+            chromeSave(pages);
+            ui.showView("Page");
+        },
+        save: function(){
+            chromeSave(pages);
+        },
+        upload: function(){
+            chromeUpload({
+                name: currentPage,
+                site: window.location.hostname,
+                page: page
+            });
+        },
         events: {
-            addChild: function(){
-                var eles = eSelect(selector.elements);
-                eHighlight(eles);
-
-                // switch to selector tab
-                ui.showView("Selector");
-            },
-            addAttr: function(){
-                ui.showView("Attribute");
-
-                fns.dispatch.Attribute.setElements(selector.elements);
-            },
-            saveSelector: function(){
-                var sel = fns.dispatch.Selector.getSelector();
-                if ( sel === undefined || sel.selector === "" ) {
-                    return;
-                }
-                // only save if schema doesn't match pre-existing one
-                if ( !matchSelector(sel, selector) ) {
-                    sel.id = idCount++;
-                    sel.elements = eSelect(selector.elements, sel.selector, sel.spec);
-                    selector.children.push(sel);
-                    // redraw the page
-                    fns.dispatch.Schema.drawPage(clonePage());
-                    selector = sel;
-                    fns.dispatch.Schema.showSelector(selector);
-                }
-
-                ui.showView("Schema");
-                fns.dispatch.Selector.reset();
-                eHighlight.remove();
-                chromeSave(schemas);
-            },
-            cancelSelector: function(){
-                fns.dispatch.Selector.reset();
-                eHighlight.remove();
-                ui.showView("Schema");
-            },
-            saveAttr: function(){
-                var attr = fns.dispatch.Attribute.getAttr();
-                if ( attr === undefined ) {
-                    return;
-                }
-                selector.attrs.push(attr);
-
-                // if follow=true, create a new page with the name of the attr
-                if ( attr.follow ) {
-                    schema.pages[attr.name] = newSelector("body",{
-                        type: "index",
-                        value: 0
-                    });
-                    ui.setPages(Object.keys(schema.pages));
-                }
-
-                fns.dispatch.Schema.drawPage(clonePage());
-                ui.showView("Schema");
-                fns.dispatch.Attribute.reset();
-                chromeSave(schemas);
-            },
-            cancelAttr: function(){
-                fns.dispatch.Attribute.reset();
-                ui.showView("Schema");
-            },
-            removeSelector: function(){
-                var id = selector.id;
-                // handle deleting root
-                function find(selector, lid){
-                    if ( selector.id === lid ) {
-                        return true;
-                    }
-                    var curr;
-                    for ( var i=0; i<selector.children.length; i++ ) {
-                        curr = selector.children[i];
-                        if ( find(curr, lid) ) {
-                            // remove the child and return
-                            selector.children.splice(i, 1);
-                            return;
-                        }
-                    }
-                    return false;
-                }
-                if ( page.id === id ) {
-                    page =  newSelector("body", {
-                        type: "index",
-                        value: 0
-                    });
-                    page.elements = [document.body];
-                    selector = page;
-                } else {
-                    find(page, id);
-                    selector = page;
-                }
-                // redraw the page
-                chromeSave(schemas);
-                fns.dispatch.Schema.drawPage(clonePage());
-                fns.dispatch.Schema.showSelector(selector);
-            },
-            removeAttr: function(d, i){
-                d3.event.preventDefault();
-                selector.attrs.splice(i, 1);
-                chromeSave(schemas);
-                fns.dispatch.Schema.drawPage(clonePage());
-                fns.dispatch.Schema.showSelector(selector);
-            },
-            toggleUrl: function(){
-                var url = window.location.href;
-                var index;
-                schema.urls.some(function(curl, i){
-                    if ( curl === url ) {
-                        index = i;
-                        return true;
-                    }
-                    return false;
-                });
-                // remove it
-                if ( index !== undefined ) {
-                    schema.urls.splice(index, 1);
-                    ui.setUrl(false);
-                } else {
-                    schema.urls.push(url);
-                    ui.setUrl(true);
-                }
-                chromeSave(schemas);
-            },
-            upload: function(){
-                chromeUpload({
-                    name: currentSchema,
-                    site: window.location.hostname,
-                    schema: schema
-                });
-            },
-            loadSchema: function(){
-                fns.setSchema(ui.getSchema());
-            },
-            addSchema: function(){
-                var name = prompt("Schema name");
-                if ( name !== null && name !== "" &&
-                    schemas[name] === undefined && legalSchemaName(name) ) {
-                    schemas[name] = newSchema(name);
-                    ui.setSchemas(Object.keys(schemas), name);
-                    fns.setSchema(name);
-                    chromeSave(schemas);
-                }
-            },
-            removeSchema: function(){
-                if ( currentSchema === "default" ){
-                    schemas["default"] = newSchema("default");
-                } else {
-                    delete schemas[currentSchema];
-                }
-                fns.setSchema("default");
-                ui.setSchemas(Object.keys(schemas));
-                chromeSave(schemas);
-            },
-            loadPage: function(){
-                fns.setPage(ui.getPage());
-            },
-            removePage: function(){
-                var pagesToRemove = [];
-                function findChildPages(pageName){
-                    var currPage = schema.pages[pageName];
-                    if ( currPage ) {
-                        pagesToRemove.push(pageName);
-                        pagesToRemove = pagesToRemove.concat(followedAttrs(currPage));                       
-                    }
-                }
-                function removeAttr(selector, name){
-                    var found = selector.attrs.some(function(attr, index){
-                        if ( attr.name === name ) {
-                            selector.attrs.splice(index, 1);
-                            return true;
-                        }
-                        return false;
-                    });
-                    if ( !found ) {
-                        found = selector.children.some(function(child){
-                            return removeAttr(child, name);
-                        });
-                    }
-                    return found;
-                }
-                if ( currentPage === "default" ) {
-                    // only have the new page
-                    schema.pages = {
-                        "default": newSelector("body", {
-                            type: "index",
-                            value: 0
-                        })
-                    };
-                } else {
-                    // recursively remove child pages
-                    findChildPages(currentPage);
-                    pagesToRemove.forEach(function(name){
-                        delete schema.pages[name];
-                    });
-
-                    // iterate over still existing pages and remove the attribute
-                    // from the rule with the currentPage name?
-                    var found = false;
-                    for ( var key in schema.pages ) {
-                        if ( removeAttr(schema.pages[key], currentPage) ) {
-                            break;
-                        }
-                    }
-                }
-
-
-                chromeSave(schemas);
-                ui.setPages(Object.keys(schema.pages));
-                // revert to the default page after removing a page
-                fns.setPage("default");
-            },
             close: function(){
-                eHighlight.remove();
+                fns.dispatch.Selector.reset();
+                fns.dispatch.Page.reset();
                 ui.close();
             }
         },
@@ -719,112 +495,80 @@ function topbar(options){
     options = options || {};
     var holder = options.holder || "body";
 
+    var events = {
+        loadPage: function(){
+            var pageName = fns.getPage();
+            controller.loadPage(pageName);
+        },
+        addPage: function(){
+            var name = prompt("Page name");
+            controller.addPage(name.trim());
+        },
+        removePage: function(){
+            controller.removePage();
+        },
+        upload: function(){
+            controller.upload();
+        }
+    };
+
     var bar = d3.select(holder);
-
-    // schema
-    var schemaGroup = bar.append("div")
-        .text("Schema");
-
-    var schemaSelect = schemaGroup.append("select")
-        .on("change", controller.events.loadSchema);
-
-    schemaGroup.append("button")
-        .text("add schema")
-        .on("click", controller.events.addSchema);
-
-    schemaGroup.append("button")
-        .text("remove schema")
-        .on("click", controller.events.removeSchema);
 
     // page
     var pageGroup = bar.append("div")
         .text("Page");
 
     var pageSelect = pageGroup.append("select")
-        .on("change", controller.events.loadPage);
+        .on("change", events.loadPage);
+
+    pageGroup.append("button")
+        .text("add page")
+        .on("click", events.addPage);
 
     pageGroup.append("button")
         .text("remove page")
-        .on("click", controller.events.removePage);
+        .on("click", events.removePage);
 
     // global
     bar.append("button")
         .text("upload")
-        .on("click", controller.events.upload);
+        .on("click", events.upload);
 
-    var toggleUrl = bar.append("button")
-        .text(function(){
-            return "add url";
-        })
-        .classed({
-            "on": false
-        })
-        .on("click", controller.events.toggleUrl);
-
-    return {
-        setUrl: function(on){
-            if ( on ) {
-                toggleUrl
-                    .text("remove url")
-                    .classed("on", true);
-            } else {
-                toggleUrl
-                    .text("add url")
-                    .classed("on", false);
-            }
+    var fns = {
+        getPage: function(){
+            return pageSelect.property("value");
         },
-        toggleUrl: function(on){
-            toggleUrl.classed("hidden", !on);
-        },
-        setSchemas: function(names, focus){
-            focus = focus || "default";
-            var schemas = schemaSelect.selectAll("option")
+        setPages: function(names, focus){
+            focus = focus || "-";
+            var pages = pageSelect.selectAll("option")
                 .data(names);
-            schemas.enter().append("option");
-            schemas
+            pages.enter().append("option");
+            pages
                 .text(function(d){ return d;})
                 .attr("value", function(d){ return d;})
                 .property("selected", function(d){
                     return d === focus;
                 });
-            schemas.exit().remove();
-        },
-        setPages: function(names){
-            var pages = pageSelect.selectAll("option")
-                .data(names);
-
-            pages.enter().append("option");
-            pages
-                .text(function(d){ return d;})
-                .attr("value", function(d){ return d;});
             pages.exit().remove();
-
-        },
-        getSchema: function(){
-            return schemaSelect.property("value");
-        },
-        getPage: function(){
-            return pageSelect.property("value");
         }
     };
+    return fns;
 }
 // Source: src/chrome.js
 /* functions that are related to the extension */
 
-// takes an object to save, the name of the site, and an optional schemaName
-// if schemaName is provided, obj is a schema object to be saved
-// otherwise obj is a site object
-function chromeSave(schemas){
+// save all of the pages for the site
+function chromeSave(pages){
     chrome.storage.local.get('sites', function saveSchemaChrome(storage){
         var host = window.location.hostname;
-        storage.sites[host] = cleanSchemas(schemas);
+        storage.sites[host] = cleanPages(pages);
         chrome.storage.local.set({"sites": storage.sites});
     });
 }
 
 // takes a data object to be uploaded and passes it to the background page to handle
 function chromeUpload(data){
-    data.schema = cleanSchema(data.schema);
+    data.page = cleanPage(data.page);
     chrome.runtime.sendMessage({type: 'upload', data: data});
 }
 
@@ -833,11 +577,7 @@ creates an object representing a site and saves it to chrome.storage.local
 the object is:
     host:
         site: <hostname>
-        schemas:
-            <name>:
-                name: <name>,
-                pages: {},
-                urls: {}
+        page: <page>
 
 urls is saved as an object for easier lookup, but converted to an array of the keys before uploading
 
@@ -846,16 +586,8 @@ If the site object exists for a host, load the saved rules
 function chromeLoad(){
     chrome.storage.local.get("sites", function setupHostnameChrome(storage){
         var host = window.location.hostname;
-        var siteObject = storage.sites[host];
-        var schemas = siteObject ?
-            siteObject :
-            {
-                default: newSchema("default")
-            };
-        controller.loadSchemas(schemas);
-        controller.setSchema("default");
-        // save right away (for new schemas, maybe unncessary)
-        chromeSave(schemas);
+        var pages = storage.sites[host] || {};
+        controller.loadPages(pages);
     });
 }
 
@@ -910,11 +642,12 @@ function addClass(name, eles){
 }
 
 /*
-a schema's name will be the name of the file when it is uploaded, so make sure that any characters in the name will be legal to use
+A page's name will be the name of the file when it is uploaded, so make sure that any characters
+in the name will be legal to use.
 rejects if name contains characters not allowed in filename: <, >, :, ", \, /, |, ?, *
 */
-function legalSchemaName(name){
-    if ( name === null ) {
+function legalPageName(name){
+    if ( name === null || name === "") {
         return false;
     }
     var badCharacters = /[<>:"\/\\\|\?\*]/,
@@ -932,12 +665,30 @@ function AttributeView(options){
     var holder = options.holder || "body";
     var saveFn = options.save || function(){};
 
+    var events = {
+        saveAttr: function(){
+            var attr = getAttr();
+            if ( attr === undefined ) {
+                return;
+            }
+            controller.saveAttr(attr);
+            fns.reset();
+        },
+        cancelAttr: function(){
+            fns.reset();
+            ui.showView("Page");
+        }
+    };
+
     // ui
     var view = d3.select(holder);
 
     // form
     var form = view.append("div")
-        .classed({"form": true});
+        .classed({
+            "column": true,
+            "form": true
+        });
 
     var nameInput = form.append("p")
         .append("label")
@@ -953,21 +704,13 @@ function AttributeView(options){
             .attr("type", "text")
             .attr("name", "attr");
 
-    var followInput = form.append("p")
-        .append("label")
-        .text("Follow: ")
-        .append("input")
-            .attr("type", "checkbox")
-            .attr("name", "follow")
-            .property("disabled", true);
-
     var saveButton = form.append("button")
         .text("Save")
-        .on("click", controller.events.saveAttr);
+        .on("click", events.saveAttr);
 
     var cancelButton = form.append("button")
         .text("Cancel")
-        .on("click", controller.events.cancelAttr);
+        .on("click", events.cancelAttr);
 
     // attribute display
     var display = view.append("div")
@@ -1013,9 +756,6 @@ function AttributeView(options){
         attrs.enter().append("div")
             .on("click", function(d){
                 attrInput.property("value", d.name);
-                followInput.property("disabled", function(){
-                    return d.name !== "href";
-                });
             });
 
         attrs.text(function(d){
@@ -1040,26 +780,26 @@ function AttributeView(options){
         }
         displayElement();
     }
-    return {
+
+    function getAttr(){
+        var attr = attrInput.property("value");
+        var name = nameInput.property("value");
+        if ( name === "" || !controller.legalName(name)){
+            return;
+        }
+
+        return {
+            name: name,
+            attr: attr
+        };
+    }
+
+    var fns = {
         setElements: function(elements){
             eles = elements;
             index = 0;
             length = elements.length;
             displayElement();
-        },
-        getAttr: function(){
-            var attr = attrInput.property("value");
-            var name = nameInput.property("value");
-            var follow = followInput.property("checked") && attr === "href";
-            if ( name === "" || !controller.legalName(name)){
-                return;
-            }
-
-            return {
-                name: name,
-                attr: attr,
-                follow: follow
-            };
         },
         reset: function(){
             eles = undefined;
@@ -1070,14 +810,13 @@ function AttributeView(options){
             }
             attrInput.property("value", "");
             nameInput.property("value", "");
-            followInput.property("disabled", true);
-            followInput.property("checked", false);
         }
     };
+    return fns;
 }
 
-// Source: src/schemaView.js
-function SchemaView(options){
+// Source: src/pageView.js
+function PageView(options){
     /**********
         UI
     **********/
@@ -1092,10 +831,63 @@ function SchemaView(options){
         left: 15
     };
 
+    var page;
+    var selector;
+
+    var events = {
+        removeSelector: function(){
+            var id = selector.id;
+            // handle deleting root
+            function remove(selector, lid){
+                if ( selector.id === lid ) {
+                    return true;
+                }
+                var curr;
+                for ( var i=0; i<selector.children.length; i++ ) {
+                    curr = selector.children[i];
+                    if ( remove(curr, lid) ) {
+                        // remove the child and return
+                        selector.children.splice(i, 1);
+                        return;
+                    }
+                }
+                return false;
+            }
+            if ( page.id === id ) {
+                // remove the page
+                fns.reset();
+                controller.removePage();
+            } else {
+                remove(page, id);
+                selector = page;
+                controller.setVals(page, selector);
+                drawPage();
+                showSelector();
+            }
+        },
+        addChild: function(){
+            controller.addChild();
+        },
+        addAttr: function(){
+            controller.addAttr();
+        },
+        removeAttr: function(d, i){
+            selector.attrs.splice(i, 1);
+            showSelector();
+            drawPage();
+            controller.setVals(page, selector);
+        }
+    };
+
+    /**********
+      START UI
+    **********/
     var view = d3.select(holder);
 
+    // start selector
     var form = view.append("div")
         .classed({
+            "column": true,
             "form": true,
             "hidden": true
         });
@@ -1108,20 +900,21 @@ function SchemaView(options){
 
     var remove = buttonHolder.append("button")
         .text("remove")
-        .on("click", controller.events.removeSelector);
+        .on("click", events.removeSelector);
 
     var addChild = buttonHolder.append("button")
         .text("add child")
-        .on("click", controller.events.addChild);
+        .on("click", events.addChild);
 
     var addAttr = buttonHolder.append("button")
         .text("add attr")
-        .on("click", controller.events.addAttr);
+        .on("click", events.addAttr);
 
     var selectorAttrs = form.append("ul");
     var attrs;
+    // end selector
 
-    // tree
+    // start tree
     var svg = view.append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
@@ -1132,124 +925,280 @@ function SchemaView(options){
     var diagonal = d3.svg.diagonal();
     var link;
     var node;
+    // end tree
     /**********
       END UI
     **********/
 
-    return {
-        drawPage: function(page){
-            if ( !page ) {
+    // get all of the elements that match each selector
+    // and store in object.elements
+    function getMatches(){
+        function match(elements, s){
+            if ( !s.elements ) {
+                s.elements = controller.elements(elements, s.selector, s.spec);
+            }
+            s.children.forEach(function(child){
+                match(s.elements, child);
+            });      
+        }
+
+        match([document], page);
+    }
+
+    // attach an id to each node for d3
+    function setupPage(){
+        function set(s){
+            s.id = controller.nextId();
+            s.children.forEach(function(s){
+                set(s);
+            });
+        }
+        set(page);
+        getMatches();
+        drawPage();
+        showSelector();
+    }
+
+    function clonePage(){
+        function setClone(selector, clone){
+            clone.selector = selector.selector;
+            clone.id = selector.id;
+            clone.spec = selector.spec;
+            clone.attrs = selector.attrs.slice();
+            clone.elements = selector.elements.slice();
+            clone.children = selector.children.map(function(child){
+                return setClone(child, {});
+            });
+            return clone;
+        }
+        return setClone(page, {});
+    }
+
+    function showSelector(){
+        form.classed("hidden", false);
+        selectorText.text(selector.selector + (selector.spec.type === "index" ?
+            "[" + selector.spec.value + "]" : "")
+        );
+        attrs = selectorAttrs.selectAll("li.attr")
+            .data(selector.attrs);
+        attrs.enter().append("li")
+            .classed({
+                "attr": true
+            });
+        attrs.text(function(d){
+                return d.name + ": " + d.attr;
+            });
+        attrs.append("button")
+            .text("remove")
+            .on("click", events.removeAttr);
+        attrs.exit().remove();
+    }
+
+    function clearSelector(){
+        form.classed("hidden", true);
+        selectorText.text("");
+        attrs.selectAll("*").remove();
+    }
+
+    function drawPage(){
+        if ( link ) {
+            link.remove();
+        }
+        if ( node ) {
+            node.remove();
+        }
+
+        var clone = clonePage(page);
+
+        var nodes = tree.nodes(clone);
+        var links = tree.links(nodes);
+        link = svg.selectAll(".link")
+            .data(links, function(d) { return d.source.id + "-" + d.target.id; });
+        node = svg.selectAll(".node")
+            .data(nodes, function(d) { return d.id; });
+
+            
+        link.enter().append("path")
+            .attr("class", "link");
+
+        link.attr("d", diagonal);
+        link.exit().remove();
+
+        node.enter().append("g")
+            .classed({
+                "node": true,
+                "hasAttrs": function(d){
+                    return d.attrs && d.attrs.length > 0;
+                }
+            })
+            .on("click", function(d){
+                selector = d;
+                showSelector();
+                fns.setSelector(d);
+            })
+            .on("mouseenter", function(d){
+                d.elements.forEach(function(ele){
+                    ele.classList.add("savedPreview");
+                });
+            })
+            .on("mouseleave", function(d){
+                d.elements.forEach(function(ele){
+                    ele.classList.remove("savedPreview");
+                });
+            });
+
+        node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+
+        node.append("text")                
+            .text(function(d){
+                return d.selector + (d.spec.type === "index" ? "[" + d.spec.value + "]" : "");
+            });
+
+        node.insert("rect", ":last-child")
+            .each(function(){
+                // use the bounding box of the parent to set the rect's values
+                var box = this.parentElement.getBBox();
+                this.setAttribute("height", box.height);
+                this.setAttribute("width", box.width);
+                this.setAttribute("x", box.x);
+                this.setAttribute("y", box.y);
+            });
+
+        node.exit().remove();
+    }
+
+    var fns = {
+        setPage: function(newPage, sel){
+            if ( !newPage ) {
                 return;
             }
-
-            if ( link ) {
-                link.remove();
-            }
-            if ( node ) {
-                node.remove();
-            }
-
-            var nodes = tree.nodes(page);
-            var links = tree.links(nodes);
-            link = svg.selectAll(".link")
-                .data(links, function(d) { return d.source.id + "-" + d.target.id; });
-            node = svg.selectAll(".node")
-                .data(nodes, function(d) { return d.id; });
-
-                
-            link.enter().append("path")
-                .attr("class", "link");
-
-            link.attr("d", diagonal);
-            link.exit().remove();
-
-            node.enter().append("g")
-                .classed({
-                    "node": true,
-                    "hasAttrs": function(d){
-                        return d.attrs && d.attrs.length > 0;
-                    }
-                })
-                .on("click", function(d){
-                    controller.setSelector(d);
-                })
-                .on("mouseenter", function(d){
-                    d.elements.forEach(function(ele){
-                        ele.classList.add("savedPreview");
-                    });
-                })
-                .on("mouseleave", function(d){
-                    d.elements.forEach(function(ele){
-                        ele.classList.remove("savedPreview");
-                    });
-                });
-
-            node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
-
-            node.append("text")                
-                .text(function(d){
-                    return d.selector + (d.spec.type === "index" ? "[" + d.spec.value + "]" : "");
-                });
-
-            node.insert("rect", ":last-child")
-                .each(function(){
-                    // use the bounding box of the parent to set the rect's values
-                    var box = this.parentElement.getBBox();
-                    this.setAttribute("height", box.height);
-                    this.setAttribute("width", box.width);
-                    this.setAttribute("x", box.x);
-                    this.setAttribute("y", box.y);
-                });
-
-            node.exit().remove();
+            page = newPage;
+            selector = sel ? sel : page;
+            setupPage();
         },
-        showSelector: function(selector){
-            form.classed("hidden", false);
-            selectorText.text(selector.selector + (selector.spec.type === "index" ?
-                "[" + selector.spec.value + "]" : "")
-            );
-            attrs = selectorAttrs.selectAll("li.attr")
-                .data(selector.attrs);
-            attrs.enter().append("li")
-                .classed({
-                    "attr": true
+        setSelector: function(d){
+            // find the real selector, not the cloned one
+            function find(s, lid){
+                if ( s.id === lid ) {
+                    selector = s;
+                    return true;
+                }
+                return s.children.some(function(child){
+                    return find(child, lid);
                 });
-            attrs.text(function(d){
-                    return d.name + ": " + d.attr;
-                });
-            attrs.append("button")
-                .text("remove")
-                .on("click", controller.events.removeAttr);
-            attrs.exit().remove();
+            }
+
+            if ( find(page, d.id) ) {
+                controller.setSelector(selector);
+                showSelector();
+            }
         },
         hideSelector: function(){
             form.classed("hidden", true);
+        },
+        reset: function(){
+            page = undefined;
+            selector = undefined;
+            svg.selectAll("*").remove();
+            clearSelector();
         }
     };
+    return fns;
 }
 // Source: src/selectorView.js
 function SelectorView(options){
-
+    // the view is broken into three columns:
+    //      elementChoices
+    //      selectorChoices
+    //      form
     options = options || {};
     var holder = options.holder || "body";
     var view = d3.select(holder);
 
+    var choice;
+    var choiceElement;
+    var selectorString;
 
+    var events = {
+        saveSelector: function(){
+            var sel = getSelector();
+            if ( sel === undefined || sel.selector === "" ) {
+                return;
+            }
+            var parent = controller.getSelector();
+            // only save if page doesn't have 
+            if ( !matchSelector(sel, parent) ) {
+                sel.id = controller.nextId();
+                sel.elements = controller.elements(parent.elements, sel.selector, sel.spec);
+                controller.saveSelector(sel);
+            }
+
+            fns.reset();
+            interactive.remove();
+            showcase.remove();
+        },
+        selectChoice: function(d){
+            showcase.remove();
+            viewChoice(d, this);
+            var parent = controller.getSelector();
+            showcase(controller.elements(parent.elements, d.join("")));
+        },
+        confirmElement: function(){
+            addTags();
+            showSelectorColumn();
+        },
+        confirmSelector: function(){
+
+            setupForm();
+            showFormColumn();
+        },
+        cancelSelector: function(){
+            fns.reset();
+            ui.showView("Page");
+        },
+        toggleTag: function(){
+            this.classList.toggle("on");
+            var sel = currentSelector();
+            markup(sel);
+        },
+        selectorIndex: function(){
+            var sel = currentSelector();
+            markup(sel, selectElement.property("value"));
+        }
+    };
+
+    // start elements
     var elementChoices = view.append("div")
         .classed({
             "column": true
         });
-    var choices;
+    var choiceHolder = elementChoices.append("div");
+    elementChoices.append("button")
+        .text("Confirm")
+        .on("click", events.confirmElement);
+    elementChoices.append("button")
+        .text("Cancel")
+        .on("click", events.cancelSelector);
+    // end elements
 
-
+    // start selector
     var selectorChoices = view.append("div")
         .classed({
-            "column": true
+            "column": true,
+            "hidden": true
         });
     var tags = selectorChoices.append("div");
     var parts;
 
-    // specify selector info div
+    selectorChoices.append("button")
+        .text("Confirm")
+        .on("click", events.confirmSelector);
+    selectorChoices.append("button")
+        .text("Cancel")
+        .on("click", events.cancelSelector);
+    // end selector
+
+    // start form
     var form = view.append("div")
         .classed({
             "form": true,
@@ -1291,145 +1240,202 @@ function SelectorView(options){
         .text("Index:")
         .append("select");
 
-    var buttons = view.append("div")
-        .classed({
-            "column": true
+    var buttons = form.append("div");
+
+    buttons.append("button")
+        .text("Save")
+        .on("click", events.saveSelector);
+
+
+    buttons.append("button")
+        .text("Cancel")
+        .on("click", events.cancelSelector);
+
+    // end form
+    // end ui
+
+        // apply the queryCheck class to selected elements
+    var showcase = highlightElements()
+        .cssClass("queryCheck");
+
+    var interactive = interactiveElements()
+        .cssClass("selectableElement")
+        .hoverClass("collectHighlight")
+        .clicked(function selectOption(event){
+            event.preventDefault();
+            event.stopPropagation();
+            var data = [].slice.call(event.path)
+                .filter(function(ele){
+                    return ele.classList && ele.classList.contains("selectableElement");
+                })
+                .reverse()
+                .map(function(ele){
+                    return getParts(ele);
+                });
+            setChoices(data);
         });
 
-    var saveSelector = buttons.append("button")
-        .text("Save")
-        .on("click", controller.events.saveSelector);
+    function showElementColumn(){
+        elementChoices.classed("hidden", false);
+        selectorChoices.classed("hidden", true);
+        form.classed("hidden", true);
+    }
+
+    function showSelectorColumn(){
+        elementChoices.classed("hidden", true);
+        selectorChoices.classed("hidden", false);
+        form.classed("hidden", true);
+    }
+
+    function showFormColumn(){
+        elementChoices.classed("hidden", true);
+        selectorChoices.classed("hidden", true);
+        form.classed("hidden", false);
+    }
 
 
-    var cancelSelector = buttons.append("button")
-        .text("Cancel")
-        .on("click", controller.events.cancelSelector);
+    function getSelector(){
+        var sel = [];
+        if ( !parts ) {
+            return;
+        }
+        parts.each(function(d){
+            if ( this.classList.contains("on") ) {
+                sel.push(d);
+            }
+        });
+        var spec;
+        var type;
+        inputs.each(function(){
+            if ( this.checked ) {
+                type = this.value;
+            }
+        });
+        if ( type === "single" ) {
+            var index = parseInt(selectElement.property("value"));
+            spec = {
+                type: "index",
+                value: index
+            };
+        } else {
+            var name = nameElement.property("value");
+            if ( name === "" || !controller.legalName(name)){
+                return;
+            }
+            spec = {
+                type: "name",
+                value: name
+            };
+        }
+        return newSelector(sel.join(""), spec);
+    }
+
+    // parts is given an element and returns an array containing its tag
+    // and (if they exist) its id and any classes
+    var getParts = selectorParts()
+        .ignoreClasses(["collectHighlight", "queryCheck",
+            "selectedElement", "selectableElement"]);
 
     function markup(selector, index){
         index = parseInt(index);
         index = !isNaN(index) ? index : undefined;
-        controller.markup({
+        showcase(controller.elements({
             selector: selector,
             index: index
+        }));
+    }
+
+    function setChoices(data){
+        interactive.remove();
+
+        var choices = choiceHolder.selectAll("div.choice")
+            .data(data);
+        choices.enter().append("div")
+            .classed({
+                "choice": true,
+                "noSelect": true
+            })
+            .on("click", events.selectChoice);
+        choices.text(function(d){ return d.join(""); });
+        choices.exit().remove();
+    }
+
+    function addTags(){
+        if ( !choice ) {
+            return;
+        }
+        // initialize with full selector
+        var fullSelector = choice.join("");
+        markup(fullSelector);
+        parts = tags.selectAll("p.tag")
+            .data(choice);
+        parts.enter().append("p")
+            .classed({
+                "tag": true,
+                "on": true,
+                "noSelect": true
+            })
+            .on("click", events.toggleTag);
+        
+        parts.text(function(d){ return d; });
+        parts.exit().remove();
+
+        ui.noSelect();
+        return parts;
+    }
+
+    function setupForm(){
+        selectElement.classed("hidden", false);
+        selectElement.on("change", events.selectorIndex);
+        var eles = selectElement.selectAll("option");
+        eles.remove();
+        var maxChildren = controller.eleCount({
+            selector: selectorString,
+            index: undefined
         });
+
+        eles.data(d3.range(maxChildren))
+            .enter().append("option")
+                .text(function(d){ return d;})
+                .attr("value", function(d){ return d;});
+    }
+
+    function viewChoice(d, ele){
+        if ( choiceElement ) {
+            choiceElement.classList.remove("on");
+        }
+        ele.classList.add("on");
+        choiceElement = ele;
+        choice = d;
+    }
+
+    function currentSelector(){
+        var tags = [];
+        parts.each(function(d){
+            if ( this.classList.contains("on") ) {
+                tags.push(d);
+            }
+        });
+        return tags.join("");
     }
 
     var fns = {
-        setChoices: function(data){
-            if ( choices ) {
-                choices.remove();
-            }
-            choices = elementChoices.selectAll("div.choice")
-                .data(data);
-            choices.enter().append("div")
-                .classed({
-                    "choice": true
-                })
-                .text(function(d){
-                    return d.join("");
-                })
-                .on("click", function(d){
-                    fns.addTags(d);
-                    elementChoices.classed("hidden", true);
-                    form.classed("hidden", false);
-                });
-            choices.exit().remove();
-        },
-        addTags: function(data){
-            // initialize with full selector
-            var fullSelector = data.join("");
-            markup(fullSelector);
-            parts = tags.selectAll("p.tag")
-                .data(data);
-            parts.enter().append("p")
-                .classed({
-                    "tag": true,
-                    "on": true
-                })
-                .on("click", function(){
-                    this.classList.toggle("on");
-                    var tags = [];
-                    parts.each(function(d){
-                        if ( this.classList.contains("on") ) {
-                            tags.push(d);
-                        }
-                    });
-                    markup(tags.join(""), selectElement.property("value"));
-                });
-            var maxChildren = controller.eleCount({
-                selector: fullSelector,
-                index: undefined
-            });
-            selectElement.classed("hidden", false);
-            selectElement.on("change", function(){
-                var tags = [];
-                parts.each(function(d){
-                    if ( this.classList.contains("on") ) {
-                        tags.push(d);
-                    }
-                });
-                markup(tags.join(""), selectElement.property("value"));
-            });
-            var eles = selectElement.selectAll("option");
-            eles.remove();
-            eles.data(d3.range(maxChildren))
-                .enter().append("option")
-                    .text(function(d){ return d;})
-                    .attr("value", function(d){ return d;});
-
-            ui.noSelect();
-            parts.text(function(d){ return d; });
-            parts.exit().remove();
-
-            return parts;
-        },
-        getSelector: function(){
-            var sel = [];
-            if ( !parts ) {
-                return;
-            }
-            parts.each(function(d){
-                if ( this.classList.contains("on") ) {
-                    sel.push(d);
-                }
-            });
-            var spec;
-            var type;
-            inputs.each(function(){
-                if ( this.checked ) {
-                    type = this.value;
-                }
-            });
-            if ( type === "single" ) {
-                var index = parseInt(selectElement.property("value"));
-                spec = {
-                    type: "index",
-                    value: index
-                };
-            } else {
-                var name = nameElement.property("value");
-                if ( name === "" || !controller.legalName(name)){
-                    return;
-                }
-                spec = {
-                    type: "name",
-                    value: name
-                };
-            }
-            // no index for now
-            return newSelector(sel.join(""), spec);
+        setup: function(eles){
+            interactive(eles);
         },
         reset: function(){
-            elementChoices.classed("hidden", false);
+            showElementColumn();
+            interactive.remove();
+            showcase.remove();
+            selectorString = undefined;
+            parts = undefined;
+            choice = undefined;
+            choiceElement = undefined;
 
             tags.selectAll("*").remove();
-            if ( choices ) {
-                choices.remove();
-            }
-            parts = undefined;
+            choiceHolder.selectAll("*").remove();
 
             // form
-            form.classed("hidden", true);
             inputs.property("checked", function(d, i){ return i === 0; });
             nameGroup.classed("hidden", false);
             nameElement.property("value", "");
@@ -1539,10 +1545,6 @@ function buildUI(controller){
             document.body.style.marginBottom = initialMargin;
         },
         showView: showView,
-        setUrl: topbarFns.setUrl,
-        toggleUrl: topbarFns.toggleUrl,
-        getSchema: topbarFns.getSchema,
-        setSchemas: topbarFns.setSchemas,
         setPages: topbarFns.setPages,
         getPage: topbarFns.getPage,
     };
@@ -1554,7 +1556,7 @@ var controller = collectorController();
 // build the ui
 var ui = buildUI(controller);
 ui.addViews([
-    [SchemaView, "Schema", {
+    [PageView, "Page", {
         height: 200
     }, true],
     [SelectorView, "Selector"],
