@@ -24,7 +24,7 @@ def new_selector(sel):
     # ignore if there are no attrs and no children to get data from
     if len(children) == 0 and len(attrs) == 0:
         raise BadJSONError("selector has no children or attrs " +
-                           "and should be removed from the schema".format(sel))
+                           "and should be removed from the page".format(sel))
     return Selector(selector, spec, children, attrs)
 
 
