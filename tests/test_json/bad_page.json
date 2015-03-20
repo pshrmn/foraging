@@ -1,0 +1,10 @@
+{
+    "name": "simple",
+    "selector": "body",
+    "spec": {
+        "type": "index",
+        "value": 0
+    },
+    "children": [],
+    "attrs": []
+}

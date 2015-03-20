@@ -77,3 +77,4 @@ class Selector(object):
             for key, val in child_data.items():
                 data[key] = val
         return data
+
