@@ -1,14 +1,5 @@
-from .selector import new_selector
+from .selector import Selector
 from .errors import BadJSONError
-
-
-def new_page(page, fetch):
-    name = page["name"]
-    try:
-        selector = new_selector(page)
-    except BadJSONError:
-        raise
-    return Page(name, selector, fetch)
 
 
 class Page(object):
@@ -16,6 +7,15 @@ class Page(object):
         self.name = name
         self.selector = selector
         self.fetch = fetch
+
+    @classmethod
+    def from_json(cls, page_json, fetch):
+        name = page_json["name"]
+        try:
+            selector = Selector.from_json(page_json)
+        except BadJSONError:
+            raise
+        return cls(name, selector, fetch)
 
     def get(self, url, dynamic=False):
         if not self.fetch:

@@ -45,12 +45,12 @@ Pages are collections of rules to collect data from elements in a web page. For 
 Usage:
 
     import json
-    from collector import new_page
+    from collector import Page
 
     with open("page.json") as fp:
         data = json.load(fp)
     try:
-        p = new_page(data)
+        p = Page.from_json(data)
     except BadJSONError:
         # your page json isn't properly formatted
 

@@ -1,12 +1,12 @@
 import unittest
 
-from collector.attr import new_attr, Attr
+from collector.attr import Attr
 from collector.errors import BadJSONError
 
 
 class AttrTestCase(unittest.TestCase):
 
-    def test_new_attr(self):
+    def test_from_json(self):
         attrs = [
             {
                 "name": "title",
@@ -26,7 +26,7 @@ class AttrTestCase(unittest.TestCase):
             }
         ]
         for attr_json in attrs:
-            a = new_attr(attr_json)
+            a = Attr.from_json(attr_json)
             self.assertIsInstance(a, Attr)
             self.assertEqual(a.name, attr_json["name"])
             self.assertEqual(a.attr, attr_json["attr"])
@@ -44,7 +44,7 @@ class AttrTestCase(unittest.TestCase):
         ]
         for attr_json in bad_attrs:
             with self.assertRaises(BadJSONError):
-                new_attr(attr_json)
+                Attr.from_json(attr_json)
 
 
 if __name__ == "__main__":

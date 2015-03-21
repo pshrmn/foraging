@@ -1,31 +1,7 @@
 from lxml.cssselect import CSSSelector
 
-from .attr import new_attr
+from .attr import Attr
 from .errors import BadJSONError
-
-
-def new_selector(sel):
-    selector = sel.get("selector")
-    if selector is None:
-        raise BadJSONError("selector requires selector\n{}".format(sel))
-    spec = sel.get("spec")
-    if spec is None:
-        raise BadJSONError("selector requires spec\n{}".format(sel))
-    children = []
-    for child in sel["children"]:
-        try:
-            children.append(new_selector(child))
-        except BadJSONError:
-            raise
-    try:
-        attrs = [new_attr(a) for a in sel["attrs"]]
-    except BadJSONError:
-        raise
-    # ignore if there are no attrs and no children to get data from
-    if len(children) == 0 and len(attrs) == 0:
-        raise BadJSONError("selector has no children or attrs " +
-                           "and should be removed from the page".format(sel))
-    return Selector(selector, spec, children, attrs)
 
 
 class Selector(object):
@@ -38,6 +14,33 @@ class Selector(object):
         self.value = spec["value"]
         self.children = children
         self.attrs = attrs
+
+    @classmethod
+    def from_json(cls, selector_json):
+        selector = selector_json.get("selector")
+        if selector is None:
+            msg = "selector requires selector\n{}"
+            raise BadJSONError(msg.format(selector_json))
+        spec = selector_json.get("spec")
+        if spec is None:
+            msg = "selector requires spec\n{}"
+            raise BadJSONError(msg.format(selector_json))
+        children = []
+        for child in selector_json["children"]:
+            try:
+                children.append(Selector.from_json(child))
+            except BadJSONError:
+                raise
+        try:
+            attrs = [Attr.from_json(a) for a in selector_json["attrs"]]
+        except BadJSONError:
+            raise
+        # ignore if there are no attrs and no children to get data from
+        if len(children) == 0 and len(attrs) == 0:
+            msg = """selector has no children or attrs and \
+should be removed from the page"""
+            raise BadJSONError(msg.format(selector_json))
+        return cls(selector, spec, children, attrs)
 
     def get(self, parent):
         elements = self.xpath(parent)
