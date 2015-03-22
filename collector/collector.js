@@ -1118,10 +1118,15 @@ function SelectorView(options){
     var choice;
     var choiceElement;
     var selectorString;
+    var formState = {
+        selector: "",
+        type: "all",
+        value: undefined
+    };
 
     var events = {
         saveSelector: function(){
-            var sel = getSelector();
+            var sel = makeSelector();
             if ( sel === undefined || sel.selector === "" ) {
                 return;
             }
@@ -1141,7 +1146,8 @@ function SelectorView(options){
             showcase.remove();
             viewChoice(d, this);
             var parent = controller.getSelector();
-            showcase(controller.elements(parent.elements, d.join("")));
+            formState.selector = d.join("");
+            markup();
         },
         confirmElement: function(){
             addTags();
@@ -1158,12 +1164,13 @@ function SelectorView(options){
         },
         toggleTag: function(){
             this.classList.toggle("on");
-            var sel = currentSelector();
-            markup(sel);
+            formState.selector = currentSelector();
+            markup();
         },
         selectorIndex: function(){
-            var sel = currentSelector();
-            markup(sel, selectElement.property("value"));
+            formState.selector = currentSelector();
+            formState.value = selectElement.property("value");
+            markup();
         }
     };
 
@@ -1172,6 +1179,8 @@ function SelectorView(options){
         .classed({
             "column": true
         });
+    elementChoices.append("p")
+        .text("Choose Element:");
     var choiceHolder = elementChoices.append("div");
     elementChoices.append("button")
         .text("Confirm")
@@ -1187,6 +1196,8 @@ function SelectorView(options){
             "column": true,
             "hidden": true
         });
+    selectorChoices.append("p")
+        .text("Choose Selector:");
     var tags = selectorChoices.append("div");
     var parts;
 
@@ -1205,6 +1216,8 @@ function SelectorView(options){
             "hidden": true,
             "column": true
         });
+    form.append("p")
+        .text("Choose Type:");
     var inputs = form.append("div").selectAll("label")
             .data(["all", "single"])
         .enter().append("label")
@@ -1219,12 +1232,17 @@ function SelectorView(options){
                     case "single":
                         nameGroup.classed("hidden", true);
                         selectGroup.classed("hidden", false);
+                        formState.type = "single";
+                        formState.value = parseInt(selectElement.property("value"));
                         break;
                     case "all":
                         nameGroup.classed("hidden", false);
                         selectGroup.classed("hidden", true);
+                        formState.type = "all";
+                        formState.value = undefined;
                         break;
                     }
+                    markup();
                 });
 
     var nameGroup = form.append("div");
@@ -1294,7 +1312,10 @@ function SelectorView(options){
     }
 
 
-    function getSelector(){
+    /***
+    create a new selector based on the user's choices
+    ***/
+    function makeSelector(){
         var sel = [];
         if ( !parts ) {
             return;
@@ -1304,28 +1325,20 @@ function SelectorView(options){
                 sel.push(d);
             }
         });
-        var spec;
-        var type;
-        inputs.each(function(){
-            if ( this.checked ) {
-                type = this.value;
-            }
-        });
-        if ( type === "single" ) {
-            var index = parseInt(selectElement.property("value"));
-            spec = {
-                type: "index",
-                value: index
-            };
-        } else {
+        var spec = {};
+        switch (formState.type){
+        case "single":
+            spec.type = "index";
+            spec.value = parseInt(selectElement.property("value"));
+            break;
+        case "all":
             var name = nameElement.property("value");
             if ( name === "" || !controller.legalName(name)){
                 return;
             }
-            spec = {
-                type: "name",
-                value: name
-            };
+            spec.type = "name";
+            spec.value = name;
+            break;
         }
         return newSelector(sel.join(""), spec);
     }
@@ -1336,13 +1349,20 @@ function SelectorView(options){
         .ignoreClasses(["collectHighlight", "queryCheck",
             "selectedElement", "selectableElement"]);
 
-    function markup(selector, index){
-        index = parseInt(index);
-        index = !isNaN(index) ? index : undefined;
-        showcase(controller.elements({
-            selector: selector,
-            index: index
-        }));
+    function markup(){
+        showcase.remove();
+        var sel = formState.selector;
+        var spec;
+        if ( formState.type === "single" ) {
+            spec = {
+                type: "index",
+                value: formState.value
+            };
+        } else {
+            spec = {};
+        }
+        var parent = controller.getSelector();
+        showcase(controller.elements(parent.elements, sel, spec));
     }
 
     function setChoices(data){
@@ -1364,9 +1384,8 @@ function SelectorView(options){
         if ( !choice ) {
             return;
         }
-        // initialize with full selector
-        var fullSelector = choice.join("");
-        markup(fullSelector);
+        formState.selector = choice.join("");
+        markup();
         parts = tags.selectAll("p.tag")
             .data(choice);
         parts.enter().append("p")
@@ -1437,6 +1456,11 @@ function SelectorView(options){
 
             // form
             inputs.property("checked", function(d, i){ return i === 0; });
+            formState = {
+                selector: "",
+                type: "all",
+                value: undefined
+            };
             nameGroup.classed("hidden", false);
             nameElement.property("value", "");
             selectGroup.classed("hidden", true);
