@@ -9,7 +9,6 @@ function SelectorView(options){
 
     var choice;
     var choiceElement;
-    var selectorString;
     var formState = {
         selector: "",
         type: "all",
@@ -300,10 +299,7 @@ function SelectorView(options){
         selectElement.on("change", events.selectorIndex);
         var eles = selectElement.selectAll("option");
         eles.remove();
-        var maxChildren = controller.eleCount({
-            selector: selectorString,
-            index: undefined
-        });
+        var maxChildren = controller.eleCount(formState.selector);
 
         eles.data(d3.range(maxChildren))
             .enter().append("option")
@@ -338,7 +334,6 @@ function SelectorView(options){
             showElementColumn();
             interactive.remove();
             showcase.remove();
-            selectorString = undefined;
             parts = undefined;
             choice = undefined;
             choiceElement = undefined;

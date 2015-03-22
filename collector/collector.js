@@ -262,8 +262,7 @@ function elementSelector(){
     // return the max number of children per element
     select.count = function(elements, selector, spec){
         var max = -Infinity;
-        selector = selector || {};
-        var sel = selector.selector || "*";
+        var sel = selector || "*";
         sel = sel + ":not(" + not + ")";
         var index = spec && spec.type === "index" ? spec.value : undefined;
         // index must specify only one element per parent
@@ -431,8 +430,8 @@ function collectorController(){
             ui.showView("Page");
             chromeSave(pages);
         },
-        eleCount: function(obj){
-            return fns.elements.count(selector.elements, obj);
+        eleCount: function(sel, spec){
+            return fns.elements.count(selector.elements, sel, spec);
         },
         legalName: function(name){
             return !usedNames(page).some(function(n){
@@ -1117,7 +1116,6 @@ function SelectorView(options){
 
     var choice;
     var choiceElement;
-    var selectorString;
     var formState = {
         selector: "",
         type: "all",
@@ -1408,10 +1406,7 @@ function SelectorView(options){
         selectElement.on("change", events.selectorIndex);
         var eles = selectElement.selectAll("option");
         eles.remove();
-        var maxChildren = controller.eleCount({
-            selector: selectorString,
-            index: undefined
-        });
+        var maxChildren = controller.eleCount(formState.selector);
 
         eles.data(d3.range(maxChildren))
             .enter().append("option")
@@ -1446,7 +1441,6 @@ function SelectorView(options){
             showElementColumn();
             interactive.remove();
             showcase.remove();
-            selectorString = undefined;
             parts = undefined;
             choice = undefined;
             choiceElement = undefined;

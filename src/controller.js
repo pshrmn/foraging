@@ -62,8 +62,8 @@ function collectorController(){
             ui.showView("Page");
             chromeSave(pages);
         },
-        eleCount: function(obj){
-            return fns.elements.count(selector.elements, obj);
+        eleCount: function(sel, spec){
+            return fns.elements.count(selector.elements, sel, spec);
         },
         legalName: function(name){
             return !usedNames(page).some(function(n){

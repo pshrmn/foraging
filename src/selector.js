@@ -87,8 +87,7 @@ function elementSelector(){
     // return the max number of children per element
     select.count = function(elements, selector, spec){
         var max = -Infinity;
-        selector = selector || {};
-        var sel = selector.selector || "*";
+        var sel = selector || "*";
         sel = sel + ":not(" + not + ")";
         var index = spec && spec.type === "index" ? spec.value : undefined;
         // index must specify only one element per parent
