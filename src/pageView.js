@@ -179,7 +179,7 @@ function PageView(options){
     function clearSelector(){
         form.classed("hidden", true);
         selectorText.text("");
-        attrs.selectAll("*").remove();
+        selectorAttrs.selectAll("*").remove();
     }
 
     function drawPage(){

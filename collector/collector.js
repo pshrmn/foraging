@@ -996,7 +996,7 @@ function PageView(options){
     function clearSelector(){
         form.classed("hidden", true);
         selectorText.text("");
-        attrs.selectAll("*").remove();
+        selectorAttrs.selectAll("*").remove();
     }
 
     function drawPage(){
@@ -1133,6 +1133,18 @@ function SelectorView(options){
             if ( !matchSelector(sel, parent) ) {
                 sel.id = controller.nextId();
                 sel.elements = controller.elements(parent.elements, sel.selector, sel.spec);
+                // SPECIAL CASE FOR SELECT ELEMENTS, AUTOMATICALLY ADD OPTION CHILD
+                if ( allSelects(sel.elements ) ) {
+                    var optionsName = prompt("What should the options be called?");
+                    if ( optionsName === null || optionsName.trim() === "" ) {
+                        optionsName = "options";
+                    }
+                    var optionsSelector = newSelector("option", {
+                        type: "name",
+                        value: optionsName
+                    });
+                    sel.children.push(optionsSelector);
+                }
                 controller.saveSelector(sel);
             }
 
@@ -1431,6 +1443,12 @@ function SelectorView(options){
             }
         });
         return tags.join("");
+    }
+
+    function allSelects(elements){
+        return elements.every(function(e){
+            return e.tagName === "SELECT";
+        });
     }
 
     var fns = {
