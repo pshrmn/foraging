@@ -53,11 +53,16 @@ function SelectorView(options){
             markup();
         },
         confirmElement: function(){
+            if ( formState.selector === "" ) {
+                return;
+            }
             addTags();
             showSelectorColumn();
         },
         confirmSelector: function(){
-
+            if ( formState.selector === "" ) {
+                return;
+            }
             setupForm();
             showFormColumn();
         },
@@ -255,6 +260,10 @@ function SelectorView(options){
     function markup(){
         showcase.remove();
         var sel = formState.selector;
+        // don't markup empty selector
+        if ( sel === "" ) {
+            return;
+        }
         var spec;
         if ( formState.type === "single" ) {
             spec = {

@@ -590,30 +590,6 @@ function chromeLoad(){
     });
 }
 
-/***********************
-    OPTIONS STORAGE
-***********************/
-/*
-function chromeLoadOptions(){
-    chrome.storage.local.get("options", function loadOptionsChrome(storage){
-        var input;
-        CollectOptions = storage.options;
-        for ( var key in storage.options ) {
-            if ( storage.options[key] ) {
-                input = document.getElementById(key);
-                if ( input ) {
-                    input.checked = true;
-                }
-            }
-        }
-    });
-}
-
-// override current options with passed in options
-function chromeSetOptions(options){
-    chrome.storage.local.set({"options": options});
-}
-*/
 // Source: src/utility.js
 // purge a classname from all elements with it
 function clearClass(name){
@@ -1160,11 +1136,16 @@ function SelectorView(options){
             markup();
         },
         confirmElement: function(){
+            if ( formState.selector === "" ) {
+                return;
+            }
             addTags();
             showSelectorColumn();
         },
         confirmSelector: function(){
-
+            if ( formState.selector === "" ) {
+                return;
+            }
             setupForm();
             showFormColumn();
         },
@@ -1362,6 +1343,10 @@ function SelectorView(options){
     function markup(){
         showcase.remove();
         var sel = formState.selector;
+        // don't markup empty selector
+        if ( sel === "" ) {
+            return;
+        }
         var spec;
         if ( formState.type === "single" ) {
             spec = {

@@ -33,28 +33,3 @@ function chromeLoad(){
         controller.loadPages(pages);
     });
 }
-
-/***********************
-    OPTIONS STORAGE
-***********************/
-/*
-function chromeLoadOptions(){
-    chrome.storage.local.get("options", function loadOptionsChrome(storage){
-        var input;
-        CollectOptions = storage.options;
-        for ( var key in storage.options ) {
-            if ( storage.options[key] ) {
-                input = document.getElementById(key);
-                if ( input ) {
-                    input.checked = true;
-                }
-            }
-        }
-    });
-}
-
-// override current options with passed in options
-function chromeSetOptions(options){
-    chrome.storage.local.set({"options": options});
-}
-*/
