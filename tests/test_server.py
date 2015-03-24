@@ -33,67 +33,63 @@ class CollectTestCase(unittest.TestCase):
     def test_empty_upload(self):
         headers = [('Content-Type', 'application/json')]
         resp = self.app.post('/upload', headers=headers)
-        resp_json = json.loads(resp.data)
+        resp_json = json.loads(resp.data.decode())
         self.assertTrue(resp_json["error"])
 
     def test_upload(self):
         headers = [('Content-Type', 'application/json')]
-        example_schema = {
+        example_page = {
             "name": "example",
-            "urls": [],
-            "pages": {
-                "default": {
+            "children": [
+                {
                     "children": [
                         {
                             "children": [
                                 {
-                                    "children": [
-                                        {
-                                            "children": [],
-                                            "attrs": [],
-                                            "selector": "a"
-                                        }
-                                    ],
-                                    "attrs": [],
-                                    "selector": "h2"
-                                },
-                                {
                                     "children": [],
                                     "attrs": [],
-                                    "selector": "p"
-                                },
-                                {
-                                    "children": [],
-                                    "attrs": [],
-                                    "selector": "img"
+                                    "selector": "a"
                                 }
                             ],
                             "attrs": [],
-                            "selector": "div.site"
+                            "selector": "h2"
+                        },
+                        {
+                            "children": [],
+                            "attrs": [],
+                            "selector": "p"
+                        },
+                        {
+                            "children": [],
+                            "attrs": [],
+                            "selector": "img"
                         }
                     ],
                     "attrs": [],
-                    "selector": "body"
-                    }
+                    "selector": "div.site"
                 }
-            }
+            ],
+            "attrs": [],
+            "selector": "body"
+        }
 
         upload = {
-            "schema": example_schema,
-            "site": "www.example.com"
+            "name": "example",
+            "site": "www.example.com",
+            "page": example_page,
         }
 
         resp = self.app.post('/upload', headers=headers,
                              data=json.dumps(upload))
         self.assertEqual(resp.status_code, 200)
-        resp_json = json.loads(resp.data)
+        resp_json = json.loads(resp.data.decode())
         self.assertFalse(resp_json["error"])
 
         data_folder = os.path.join(server.SITE_DIRECTORY, 'www_example_com')
         data_file = os.path.join(data_folder, 'example.json')
         with open(data_file) as fp:
             saved_rules = json.load(fp)
-        self.assertEqual(saved_rules, example_schema)
+        self.assertEqual(saved_rules, example_page)
 
         # clear out the directory
         os.remove(data_file)
