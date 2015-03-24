@@ -95,5 +95,8 @@ class CollectTestCase(unittest.TestCase):
         os.remove(data_file)
         os.rmdir(data_folder)
 
+    def test_sync(self):
+        pass
+
 if __name__ == "__main__":
     unittest.main()

@@ -61,8 +61,8 @@ def page_json(path):
         return json.load(fp)
 
 
-@app.route('/download', methods=['GET'])
-def download():
+@app.route('/sync', methods=['GET'])
+def sync():
     """
     return an object containing all of the uploaded pages for a domain
     """
