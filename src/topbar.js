@@ -16,6 +16,9 @@ function topbar(options){
         },
         upload: function(){
             controller.upload();
+        },
+        sync: function(){
+            controller.startSync();
         }
     };
 
@@ -41,12 +44,19 @@ function topbar(options){
         .text("upload")
         .on("click", events.upload);
 
+    bar.append("button")
+        .text("sync")
+        .attr("title", "Get uploaded pages for this domain from the server. " +
+                "Warning: This will override existing pages")
+        .on("click", events.sync);
+
     var fns = {
         getPage: function(){
             return pageSelect.property("value");
         },
         setPages: function(names, focus){
-            focus = focus || "-";
+            focus = focus || "";
+            names = [""].concat(names);
             var pages = pageSelect.selectAll("option")
                 .data(names);
             pages.enter().append("option");

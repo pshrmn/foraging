@@ -11,7 +11,7 @@ function collectorController(){
         elements: elementSelector(),
         loadPages: function(ps){
             pages = ps;
-            var options = [""].concat(Object.keys(pages));
+            var options = Object.keys(pages);
             ui.setPages(options);
         },
         loadPage: function(pageName){
@@ -32,7 +32,7 @@ function collectorController(){
         addPage: function(name){
             if ( pages[name] === undefined && legalPageName(name) ) {
                 pages[name] = newPage(name);
-                ui.setPages([""].concat(Object.keys(pages)), name);
+                ui.setPages(Object.keys(pages)), name;
                 fns.loadPage(name);
                 chromeSave(pages);
             }
@@ -40,10 +40,10 @@ function collectorController(){
         removePage: function(){
             delete pages[currentPage];
             //fns.setPage("default");
-            ui.setPages([""].concat(Object.keys(pages)));
+            ui.setPages(Object.keys(pages));
             fns.dispatch.Page.reset();
             chromeSave(pages);
-
+            currentPage = undefined;
         },
         nextId: function(){
             return idCount++;
@@ -107,6 +107,23 @@ function collectorController(){
                 site: window.location.hostname,
                 page: page
             });
+        },
+        startSync: function(){
+            // make a request for all saved pages for the domain
+            chromeSync(window.location.hostname);
+        },
+        finishSync: function(newPages){
+            for ( var key in newPages ) {
+                pages[key] = newPages[key];
+            }
+            // refresh the ui
+            if ( currentPage ) {
+                fns.loadPage(currentPage);
+            }
+            var options = Object.keys(pages);
+            ui.setPages(options, currentPage);
+
+            chromeSave(pages);
         },
         events: {
             close: function(){

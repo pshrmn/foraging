@@ -19,20 +19,27 @@ chrome.browserAction.onClicked.addListener(function(tab) {
     });
 });
 
+var url = "http://localhost:5000/";
+
 chrome.runtime.onMessage.addListener(function(message, sender, sendResponse){
     if ( message ) {
         switch ( message.type ) {
             case "upload":
-                xhr("POST", "http://localhost:5000/upload", JSON.stringify(message.data), sendResponse, true);
+                xhr("POST", url + "upload",
+                    JSON.stringify(message.data), sendResponse, true);
                 // return true so sendResponse does not become invalid
                 // http://developer.chrome.com/extensions/runtime.html#event-onMessage
+                return true;
+            case "sync":
+                xhr("GET", url + "sync",
+                    {"domain": message.domain}, sendResponse, false);
                 return true;
         }
     }
 });
 
 // basic ajax request that returns data from server on success, otherwise object with error=true
-function xhr(type, url, data, callback, json){
+function xhr(type, url, data, callback, isJSON){
     // url is the endpoint that you're uploading the collect rules to
     var xhr = new XMLHttpRequest();
 
@@ -45,12 +52,17 @@ function xhr(type, url, data, callback, json){
     }
 
     if ( type === "GET" ) {
-        xhr.open("GET", url + "?" + data);
+        var params = [];
+        for ( var key in data ) {
+            params.push(key + "=" + data[key]);
+        }
+
+        xhr.open("GET", url + "?" + params.join("&"));
         xhr.send();
     } else if ( type === "POST") {
         
         xhr.open("POST", url);
-        if ( json ) {
+        if ( isJSON ) {
             xhr.setRequestHeader("Content-Type", "application/json");
         }
         xhr.send(data);

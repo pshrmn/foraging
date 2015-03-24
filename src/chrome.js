@@ -15,6 +15,15 @@ function chromeUpload(data){
     chrome.runtime.sendMessage({type: 'upload', data: data});
 }
 
+function chromeSync(domain){
+    chrome.runtime.sendMessage({type: 'sync', domain: domain}, function(response){
+        if ( response.error ) {
+            return;
+        }
+        controller.finishSync(response.pages);
+    });
+}
+
 /*
 creates an object representing a site and saves it to chrome.storage.local
 the object is:

@@ -379,7 +379,7 @@ function collectorController(){
         elements: elementSelector(),
         loadPages: function(ps){
             pages = ps;
-            var options = [""].concat(Object.keys(pages));
+            var options = Object.keys(pages);
             ui.setPages(options);
         },
         loadPage: function(pageName){
@@ -400,7 +400,7 @@ function collectorController(){
         addPage: function(name){
             if ( pages[name] === undefined && legalPageName(name) ) {
                 pages[name] = newPage(name);
-                ui.setPages([""].concat(Object.keys(pages)), name);
+                ui.setPages(Object.keys(pages)), name;
                 fns.loadPage(name);
                 chromeSave(pages);
             }
@@ -408,10 +408,10 @@ function collectorController(){
         removePage: function(){
             delete pages[currentPage];
             //fns.setPage("default");
-            ui.setPages([""].concat(Object.keys(pages)));
+            ui.setPages(Object.keys(pages));
             fns.dispatch.Page.reset();
             chromeSave(pages);
-
+            currentPage = undefined;
         },
         nextId: function(){
             return idCount++;
@@ -476,6 +476,23 @@ function collectorController(){
                 page: page
             });
         },
+        startSync: function(){
+            // make a request for all saved pages for the domain
+            chromeSync(window.location.hostname);
+        },
+        finishSync: function(newPages){
+            for ( var key in newPages ) {
+                pages[key] = newPages[key];
+            }
+            // refresh the ui
+            if ( currentPage ) {
+                fns.loadPage(currentPage);
+            }
+            var options = Object.keys(pages);
+            ui.setPages(options, currentPage);
+
+            chromeSave(pages);
+        },
         events: {
             close: function(){
                 fns.dispatch.Selector.reset();
@@ -508,6 +525,9 @@ function topbar(options){
         },
         upload: function(){
             controller.upload();
+        },
+        sync: function(){
+            controller.startSync();
         }
     };
 
@@ -533,12 +553,19 @@ function topbar(options){
         .text("upload")
         .on("click", events.upload);
 
+    bar.append("button")
+        .text("sync")
+        .attr("title", "Get uploaded pages for this domain from the server. " +
+                "Warning: This will override existing pages")
+        .on("click", events.sync);
+
     var fns = {
         getPage: function(){
             return pageSelect.property("value");
         },
         setPages: function(names, focus){
-            focus = focus || "-";
+            focus = focus || "";
+            names = [""].concat(names);
             var pages = pageSelect.selectAll("option")
                 .data(names);
             pages.enter().append("option");
@@ -569,6 +596,15 @@ function chromeSave(pages){
 function chromeUpload(data){
     data.page = cleanPage(data.page);
     chrome.runtime.sendMessage({type: 'upload', data: data});
+}
+
+function chromeSync(domain){
+    chrome.runtime.sendMessage({type: 'sync', domain: domain}, function(response){
+        if ( response.error ) {
+            return;
+        }
+        controller.finishSync(response.pages);
+    });
 }
 
 /*
