@@ -1,7 +1,9 @@
-from flask import Flask, request, jsonify
 import json
 import os
 import argparse
+import glob
+
+from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 SITE_DIRECTORY = ""
@@ -10,8 +12,7 @@ SITE_DIRECTORY = ""
 def set_directory(name):
     global SITE_DIRECTORY
     SITE_DIRECTORY = name
-    if not os.path.exists(SITE_DIRECTORY):
-        os.mkdir(SITE_DIRECTORY)
+    os.makedirs(SITE_DIRECTORY, exist_ok=True)
 
 
 def underscore_host(host):
@@ -21,14 +22,14 @@ def underscore_host(host):
     return host.replace(".", "_")
 
 
-def host_folder(host):
+def host_folder(host, create=True):
     """
     determine directory name based on hostname
     create directory if it doesn't already exist
     """
     dir_name = os.path.join(SITE_DIRECTORY, underscore_host(host))
-    if not os.path.isdir(dir_name):
-        os.mkdir(dir_name)
+    if create:
+        os.makedirs(dir_name, exist_ok=True)
     return dir_name
 
 
@@ -53,6 +54,25 @@ def upload():
     with open(path, 'w') as fp:
         json.dump(data["page"], fp, indent=2)
     return jsonify({"error": False})
+
+
+def page_json(path):
+    with open(path) as fp:
+        return json.load(fp)
+
+
+@app.route('/download', methods=['GET'])
+def download():
+    """
+    return an object containing all of the uploaded pages for a domain
+    """
+    domain = request.args.get("domain")
+    if domain is None:
+        return jsonify({"error": True})
+    folder = host_folder(domain, False)
+    files = glob.glob(os.path.join(folder, "*.json"))
+    pages = {os.path.basename(f)[:-5]: page_json(f) for f in files}
+    return jsonify({"pages": pages, "error": False})
 
 
 if __name__ == "__main__":
