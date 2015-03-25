@@ -94,7 +94,7 @@ body {
       .collectjs .views .view .form label {
         display: inline-block; }
       .collectjs .views .view svg {
-        font-size: 16px; }
+        font-size: 14px; }
         .collectjs .views .view svg rect {
           fill: white; }
         .collectjs .views .view svg .link {
@@ -103,7 +103,10 @@ body {
         .collectjs .views .view svg .node {
           cursor: pointer; }
         .collectjs .views .view svg .node text {
-          text-anchor: middle; }
+          paint-order: stroke;
+          stroke: white;
+          stroke-width: 2px;
+          text-anchor: end; }
         .collectjs .views .view svg .currentSelector .shape {
           stroke: black;
           stroke-width: 2px; }

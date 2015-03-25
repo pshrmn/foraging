@@ -155,7 +155,7 @@ body{
             }
 
             svg {
-                font-size: 16px;
+                font-size: 14px;
 
                 rect{
                     fill: $white;
@@ -171,7 +171,10 @@ body{
                 }
 
                 .node text {
-                    text-anchor: middle;
+                    paint-order: stroke;
+                    stroke: white;
+                    stroke-width: 2px;
+                    text-anchor: end;
                 }
 
                 .currentSelector .shape{

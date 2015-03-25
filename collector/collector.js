@@ -837,9 +837,9 @@ function PageView(options){
     var height = options.height || 300;
     var margin = options.margin || {
         top: 15,
-        right: 15,
+        right: 25,
         bottom: 15,
-        left: 15
+        left: 100
     };
 
     var page;
@@ -903,8 +903,9 @@ function PageView(options){
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
     var tree = d3.layout.tree()
-        .size([width, height]);
-    var diagonal = d3.svg.diagonal();
+        .size([height, width]);
+    var diagonal = d3.svg.diagonal()
+        .projection(function(d) { return [d.y, d.x]; });
     var link;
     var node;
     // end tree
@@ -1069,29 +1070,37 @@ function PageView(options){
                 });
             });
 
-        node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+        node.attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; });
 
         node.append("text")
             .attr("y", 5)
             .style("fill", empty)
+            .attr("dx", -5)
             .text(function(d){
                 switch ( d.spec.type ) {
                 case "index":
-                    return d.selector + "(" + d.spec.value + ")";
+                    return d.selector + "[" + d.spec.value + "]";
                 case "name":
                     return "[" + d.selector + "]";
                 }
             });
 
-        node.insert("rect", ":first-child")
-            .each(function(){
-                // use the bounding box of the parent to set the rect's values
-                var box = this.parentElement.getBBox();
-                this.setAttribute("height", box.height);
-                this.setAttribute("width", box.width);
-                this.setAttribute("x", box.x);
-                this.setAttribute("y", box.y);
-            });
+        node.append("circle")
+            .filter(function(d){
+                return d.spec.type === "index";
+            })
+            .attr("r", 3)
+            .style("fill", empty);
+
+        node.append("rect")
+            .filter(function(d){
+                return d.spec.type === "name";
+            })
+            .attr("width", 6)
+            .attr("height", 6)
+            .attr("x", -3)
+            .attr("y", -3)
+            .style("fill", empty);
 
         node.exit().remove();
     }
