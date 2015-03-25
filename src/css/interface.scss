@@ -118,14 +118,11 @@ body{
                 vertical-align: top;
             }
 
-            .on{
-                color: $green;
-            }
-
             .tag{
                 color: $red;
             }
 
+            .on,
             .tag.on{
                 color: $green;
             }
@@ -133,7 +130,7 @@ body{
             .form{
 
                 > p {
-                    font-size: 1.25em;
+                    margin: 0;
                 }
 
                
@@ -173,12 +170,13 @@ body{
                     cursor: pointer;
                 }
 
-                .node.hasAttrs{
-                    fill: red;
-                }
-
                 .node text {
                     text-anchor: middle;
+                }
+
+                .currentSelector .shape{
+                    stroke: black;
+                    stroke-width: 2px;
                 }
             }
         }

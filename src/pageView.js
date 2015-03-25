@@ -66,6 +66,21 @@ function PageView(options){
     **********/
     var view = d3.select(holder);
 
+    // start tree
+    var svg = view.append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    var tree = d3.layout.tree()
+        .size([width, height]);
+    var diagonal = d3.svg.diagonal();
+    var link;
+    var node;
+    // end tree
+
+
     // start selector
     var form = view.append("div")
         .classed({
@@ -76,6 +91,14 @@ function PageView(options){
 
     var selectorText = form.append("p")
         .text("Selector: ")
+        .append("span");
+
+    var selectorType = form.append("p")
+        .text("Type: ")
+        .append("span");
+
+    var selectorValue = form.append("p")
+        .text("Value: ")
         .append("span");
 
     var buttonHolder = form.append("div");
@@ -95,19 +118,6 @@ function PageView(options){
     var selectorAttrs = form.append("ul");
     var attrs;
     // end selector
-
-    // start tree
-    var svg = view.append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-        .append("g")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-    var tree = d3.layout.tree()
-        .size([width, height]);
-    var diagonal = d3.svg.diagonal();
-    var link;
-    var node;
-    // end tree
     /**********
       END UI
     **********/
@@ -158,9 +168,9 @@ function PageView(options){
 
     function showSelector(){
         form.classed("hidden", false);
-        selectorText.text(selector.selector + (selector.spec.type === "index" ?
-            "[" + selector.spec.value + "]" : "")
-        );
+        selectorText.text(selector.selector);
+        selectorType.text(selector.spec.type);
+        selectorValue.text(selector.spec.value);
         attrs = selectorAttrs.selectAll("li.attr")
             .data(selector.attrs);
         attrs.enter().append("li")
@@ -179,6 +189,8 @@ function PageView(options){
     function clearSelector(){
         form.classed("hidden", true);
         selectorText.text("");
+        selectorType.text("");
+        selectorValue.text("");
         selectorAttrs.selectAll("*").remove();
     }
 
@@ -208,12 +220,11 @@ function PageView(options){
 
         node.enter().append("g")
             .classed({
-                "node": true,
-                "hasAttrs": function(d){
-                    return d.attrs && d.attrs.length > 0;
-                }
+                "node": true
             })
             .on("click", function(d){
+                clearClass("currentSelector");
+                this.classList.add("currentSelector");
                 selector = d;
                 showSelector();
                 fns.setSelector(d);
@@ -231,12 +242,19 @@ function PageView(options){
 
         node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
 
-        node.append("text")                
+        node.append("text")
+            .attr("y", 5)
+            .style("fill", empty)
             .text(function(d){
-                return d.selector + (d.spec.type === "index" ? "[" + d.spec.value + "]" : "");
+                switch ( d.spec.type ) {
+                case "index":
+                    return d.selector + "(" + d.spec.value + ")";
+                case "name":
+                    return "[" + d.selector + "]";
+                }
             });
 
-        node.insert("rect", ":last-child")
+        node.insert("rect", ":first-child")
             .each(function(){
                 // use the bounding box of the parent to set the rect's values
                 var box = this.parentElement.getBBox();
@@ -247,6 +265,12 @@ function PageView(options){
             });
 
         node.exit().remove();
+    }
+
+    function empty(sel){
+        var hasAttrs = sel.attrs.length;
+        var hasChildren = sel.children ? sel.children.length > 0 : false;
+        return hasAttrs || hasChildren ? "#21732C" : "#CF2558";
     }
 
     var fns = {

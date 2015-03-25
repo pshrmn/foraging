@@ -76,14 +76,13 @@ body {
       text-align: left; }
       .collectjs .views .view > * {
         vertical-align: top; }
-      .collectjs .views .view .on {
-        color: #489675; }
       .collectjs .views .view .tag {
         color: #c91900; }
+      .collectjs .views .view .on,
       .collectjs .views .view .tag.on {
         color: #489675; }
       .collectjs .views .view .form > p {
-        font-size: 1.25em; }
+        margin: 0; }
       .collectjs .views .view .form input.error {
         border-color: #c91900;
         border-style: solid; }
@@ -103,10 +102,11 @@ body {
           stroke: #aaa; }
         .collectjs .views .view svg .node {
           cursor: pointer; }
-        .collectjs .views .view svg .node.hasAttrs {
-          fill: red; }
         .collectjs .views .view svg .node text {
           text-anchor: middle; }
+        .collectjs .views .view svg .currentSelector .shape {
+          stroke: black;
+          stroke-width: 2px; }
     .collectjs .views .view.active {
       display: block; }
   .collectjs input {

@@ -19,8 +19,8 @@ function collectorController(){
             idCount = 0;
             page = pages[pageName];
             selector = page;
-            fns.dispatch.Page.setPage(page);
             ui.showView("Page");
+            fns.dispatch.Page.setPage(page);
         },
         setVals: function(newPage, newSelector){
             currentPage = newPage.name;
@@ -57,9 +57,9 @@ function collectorController(){
         saveSelector: function(sel){
             selector.children.push(sel);
             selector = sel;
+            ui.showView("Page");
             fns.dispatch.Page.setPage(page, selector);
 
-            ui.showView("Page");
             chromeSave(pages);
         },
         eleCount: function(sel, spec){
@@ -94,9 +94,9 @@ function collectorController(){
         },
         saveAttr: function(attr){
             selector.attrs.push(attr);
+            ui.showView("Page");
             fns.dispatch.Page.setPage(page, selector);
             chromeSave(pages);
-            ui.showView("Page");
         },
         save: function(){
             chromeSave(pages);
