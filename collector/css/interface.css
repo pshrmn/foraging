@@ -10,11 +10,12 @@ body {
   left: 0;
   bottom: 0;
   width: 100%;
-  min-width: 450px;
+  max-width: 1000px;
   min-height: 30px;
   border-top: 1px solid #444444;
+  border-right: 1px solid #444444;
   background: white;
-  font-size: 20px;
+  font-size: 16px;
   font-family: sans-serif;
   color: black;
   text-align: left;
@@ -24,8 +25,10 @@ body {
   .collectjs * {
     color: black;
     box-sizing: border-box; }
+  .collectjs .inline {
+    display: inline-block; }
   .collectjs .hidden {
-    display: none; }
+    display: none !important; }
   .collectjs ul {
     list-style: none; }
   .collectjs .tabHolder {
@@ -54,45 +57,53 @@ body {
     .collectjs .tabs .tab.set {
       background: #bddbce; }
   .collectjs .permanent {
-    font-size: 0.75em;
     border-bottom: 1px solid #cccccc;
     padding: 3px 15px;
     background: #efefef; }
     .collectjs .permanent div {
       display: inline-block;
       margin: 0 8px; }
-  .collectjs .column {
-    display: inline-block;
-    min-width: 125px; }
-  .collectjs .column.hidden {
-    display: none; }
   .collectjs .views {
     box-sizing: border-box;
-    min-height: 150px;
+    min-height: 250px;
     padding: 15px; }
     .collectjs .views .view {
       display: none;
       padding: 5px;
       text-align: left; }
       .collectjs .views .view > * {
-        vertical-align: top; }
+        vertical-align: top;
+        display: inline-block; }
       .collectjs .views .view .tag {
-        color: #c91900; }
+        background: #f296a3;
+        display: inline-block;
+        padding-top: 2px;
+        padding-right: 5px;
+        padding-bottom: 2px;
+        padding-left: 5px;
+        margin-right: 5px;
+        border: 1px solid #efefef;
+        border-radius: 5px;
+        cursor: pointer; }
       .collectjs .views .view .on,
       .collectjs .views .view .tag.on {
-        color: #489675; }
+        background: #bddbce; }
       .collectjs .views .view .form > p {
-        margin: 0; }
+        margin: 0;
+        line-height: 1.25em; }
+      .collectjs .views .view .form .workarea {
+        margin-bottom: 25px; }
       .collectjs .views .view .form input.error {
         border-color: #c91900;
         border-style: solid; }
       .collectjs .views .view .form span.error {
         border-bottom: 1px solid #c91900; }
+      .collectjs .views .view .form .radio label {
+        margin-left: 15px;
+        display: inline-block; }
       .collectjs .views .view .form input[type=text] {
         width: 150px;
         border-width: 0 0 1px; }
-      .collectjs .views .view .form label {
-        display: inline-block; }
       .collectjs .views .view svg {
         font-size: 14px; }
         .collectjs .views .view svg rect {
@@ -117,7 +128,6 @@ body {
     border-radius: 0;
     background: white;
     border: 1px solid #444444;
-    font-size: 16px;
     line-height: 1.2; }
   .collectjs input[type=text] {
     height: 20px;
@@ -126,9 +136,21 @@ body {
     padding: 2px;
     font-family: sans-serif; }
   .collectjs label {
-    font-size: 1em;
     cursor: pointer;
     font-weight: normal; }
+  .collectjs .attributes tbody tr:hover {
+    background: #cccccc;
+    cursor: pointer; }
+  .collectjs td, .collectjs th {
+    min-width: 50px;
+    height: 1.5rem;
+    border: 2px solid white;
+    text-align: center;
+    vertical-align: middle; }
+  .collectjs th {
+    background: #45aacc; }
+  .collectjs .selectedAttr, .collectjs .selectedAttr:hover {
+    background: #bddbce; }
   .collectjs button {
     background: #dddddd;
     color: black;
@@ -146,6 +168,7 @@ body {
   .collectjs select {
     display: inline-block;
     border: 1px solid #a9a9a9;
+    background: white;
     margin: 2px; }
 
 #schemaInfo div {
@@ -156,19 +179,19 @@ body {
   cursor: pointer; }
 
 .selectableElement {
-  box-shadow: inset 0 0 1px #2e829e; }
+  box-shadow: inset 0 0 2px #c91900; }
+
+img.selectableElement {
+  border: 1px dashed #c91900 !important; }
 
 .selectedElement {
   background: green; }
 
 .collectHighlight {
-  background: rgba(50, 50, 50, 0.5) !important;
-  color: #222 !important; }
-  .collectHighlight * {
-    color: #222 !important; }
+  background: rgba(46, 130, 158, 0.5) !important; }
 
 img.collectHighlight {
-  border: 1px dashed #323232 !important; }
+  opacity: 0.25; }
 
 .queryCheck {
   background: rgba(255, 215, 0, 0.25) !important;
@@ -179,13 +202,3 @@ img.collectHighlight {
 
 img.savedPreview {
   border: 1px solid rgba(255, 0, 0, 0.25) !important; }
-
-@-webkit-keyframes pulseParent {
-  0% {
-    border-color: #3c3c3c; }
-
-  50% {
-    border-color: rgba(60, 60, 60, 0.5); }
-
-  100% {
-    border-color: #3c3c3c; } }

@@ -24,11 +24,12 @@ body{
     left: 0;
     bottom: 0;
     width: 100%;
-    min-width: 450px;
+    max-width: 1000px;
     min-height: 30px;
     border-top: 1px solid $dark-gray;
+    border-right: 1px solid $dark-gray;
     background: $white;
-    font-size: 20px;
+    font-size: 16px;
     font-family: sans-serif;
     color: $black;
     text-align: left;
@@ -39,9 +40,14 @@ body{
         box-sizing: border-box;
     }
 
-    .hidden{
-        display: none;
+    .inline{
+        display: inline-block;
     }
+
+    .hidden{
+        display: none !important;
+    }
+
 
     ul{
         list-style: none;
@@ -83,7 +89,6 @@ body{
     }
 
     .permanent{
-        font-size: 0.75em;
         border-bottom: 1px solid $gray;
         padding: 3px 15px;
         background: $light-gray;
@@ -94,19 +99,10 @@ body{
         }
     }
 
-    .column{
-        display: inline-block;
-        min-width: 125px;
-    }
-
-    .column.hidden{
-        display: none;
-    }
-
     .views{
         box-sizing: border-box;        
-        min-height: 150px;
-        padding: 15px;;
+        min-height: 250px;
+        padding: 15px;
 
 
         .view{
@@ -116,23 +112,40 @@ body{
 
             > *{
                 vertical-align: top;
+                display: inline-block;
             }
 
             .tag{
-                color: $red;
+                background: $light-red;
+                display: inline-block;
+                padding-top: 2px;
+                padding-right: 5px;
+                padding-bottom: 2px;
+                padding-left: 5px;
+                margin-right: 5px;
+                border: 1px solid $light-gray;
+                border-radius: 5px;
+                cursor: pointer;
             }
 
             .on,
             .tag.on{
-                color: $green;
+                background: $light-green;
             }
 
             .form{
 
                 > p {
                     margin: 0;
+                    line-height: 1.25em;
                 }
 
+                .workarea{
+                    margin-bottom: 25px;
+                }
+
+                .buttons{
+                }
                
                 input.error{
                     border-color: $red;
@@ -143,6 +156,10 @@ body{
                     border-bottom: 1px solid $red;
                 }
 
+                .radio label{
+                    margin-left: 15px;
+                    display: inline-block;
+                }
                 
                 input[type=text]{
                     width: 150px;
@@ -150,9 +167,6 @@ body{
                 }
             }
 
-            .form label{
-                display: inline-block;
-            }
 
             svg {
                 font-size: 14px;
@@ -194,7 +208,6 @@ body{
         border-radius:0;
         background: $white;
         border: 1px solid $dark-gray;
-        font-size: 16px;
         line-height: 1.2;
     }
 
@@ -207,9 +220,29 @@ body{
     }
 
     label{
-        font-size: 1em;
         cursor: pointer;
         font-weight: normal;
+    }
+
+    .attributes tbody tr:hover{
+        background: $gray;
+        cursor: pointer;
+    }
+
+    td, th {
+        min-width: 50px;
+        height: 1.5rem;
+        border: 2px solid $white;
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    th {
+        background: $blue;
+    }
+
+    .selectedAttr, .selectedAttr:hover{
+        background: $light-green;
     }
 
     /* lots of sites like to customize how various inputs look, 
@@ -235,6 +268,7 @@ body{
     select {
         display: inline-block;
         border: 1px solid #a9a9a9;
+        background: $white;
         margin: 2px;
     }
 }

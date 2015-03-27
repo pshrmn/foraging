@@ -68,6 +68,7 @@ function PageView(options){
 
     // start tree
     var svg = view.append("svg")
+        .classed("inline", true)
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
@@ -83,41 +84,29 @@ function PageView(options){
 
 
     // start selector
-    var form = view.append("div")
-        .classed({
-            "column": true,
-            "form": true,
-            "hidden": true
-        });
+    var sf = newForm(view, true);
+    sf.form.classed("inline", true);
 
-    var selectorText = form.append("p")
+    var selectorText = sf.workarea.append("p")
         .text("Selector: ")
         .append("span");
 
-    var selectorType = form.append("p")
-        .text("Type: ")
-        .append("span");
+    var selectorType = sf.workarea.append("p");
+    var selectorAttrs = sf.workarea.append("div");
 
-    var selectorValue = form.append("p")
-        .text("Value: ")
-        .append("span");
-
-    var buttonHolder = form.append("div");
-
-    var remove = buttonHolder.append("button")
-        .text("remove")
-        .on("click", events.removeSelector);
-
-    var addChild = buttonHolder.append("button")
+    sf.buttons.append("button")
         .text("add child")
         .on("click", events.addChild);
 
-    var addAttr = buttonHolder.append("button")
+    sf.buttons.append("button")
         .text("add attr")
         .on("click", events.addAttr);
 
-    var selectorAttrs = form.append("ul");
-    var attrs;
+    sf.buttons.append("button")
+        .text("remove")
+        .on("click", events.removeSelector);
+
+    
     // end selector
     /**********
       END UI
@@ -168,30 +157,45 @@ function PageView(options){
     }
 
     function showSelector(){
-        form.classed("hidden", false);
+        sf.form.classed("hidden", false);
         selectorText.text(selector.selector);
-        selectorType.text(selector.spec.type);
-        selectorValue.text(selector.spec.value);
-        attrs = selectorAttrs.selectAll("li.attr")
-            .data(selector.attrs);
-        attrs.enter().append("li")
+        var type = selector.spec.type;
+        var typeCap = type.charAt(0).toUpperCase() + type.slice(1);
+        selectorType.text(typeCap + ": " + selector.spec.value);
+
+        showAttrs(selectorAttrs, selector.attrs);
+    }
+
+    function showAttrs(holder, attrs){
+        holder.selectAll("*").remove();
+        if ( !attrs || attrs.length === 0 ) {
+            holder.append("p").text("No Attrs");
+            return;
+        }
+        holder.append("p").text("Attrs:");
+        var table = holder.append("table");
+
+        var tb = table.append("tbody");
+        var rows = tb.selectAll("tr")
+            .data(attrs);
+        rows.enter().append("tr")
             .classed({
                 "attr": true
             });
-        attrs.text(function(d){
-                return d.name + ": " + d.attr;
-            });
-        attrs.append("button")
-            .text("remove")
-            .on("click", events.removeAttr);
-        attrs.exit().remove();
+
+        rows.append("td").text(function(d){ return d.name; });
+        rows.append("td").text(function(d){ return d.attr; });
+        rows.append("td")
+            .append("button")
+                .text("×")
+                .on("click", events.removeAttr);
+        rows.exit().remove();
     }
 
     function clearSelector(){
-        form.classed("hidden", true);
+        sf.form.classed("hidden", true);
         selectorText.text("");
         selectorType.text("");
-        selectorValue.text("");
         selectorAttrs.selectAll("*").remove();
     }
 
@@ -309,7 +313,7 @@ function PageView(options){
             }
         },
         hideSelector: function(){
-            form.classed("hidden", true);
+            sf.form.classed("hidden", true);
         },
         reset: function(){
             page = undefined;

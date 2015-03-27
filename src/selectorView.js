@@ -1,8 +1,8 @@
 function SelectorView(options){
-    // the view is broken into three columns:
+    // the view is broken into three forms:
     //      elementChoices
     //      selectorChoices
-    //      form
+    //      selectorType
     options = options || {};
     var holder = options.holder || "body";
     var view = d3.select(holder);
@@ -11,7 +11,7 @@ function SelectorView(options){
     var choiceElement;
     var formState = {
         selector: "",
-        type: "all",
+        type: "name",
         value: undefined
     };
 
@@ -57,14 +57,14 @@ function SelectorView(options){
                 return;
             }
             addTags();
-            showSelectorColumn();
+            showSelectorForm();
         },
         confirmSelector: function(){
             if ( formState.selector === "" ) {
                 return;
             }
             setupForm();
-            showFormColumn();
+            showTypeForm();
         },
         cancelSelector: function(){
             fns.reset();
@@ -79,105 +79,103 @@ function SelectorView(options){
             formState.selector = currentSelector();
             formState.value = selectElement.property("value");
             markup();
+        },
+        toggleRadio: function(){
+            switch ( this.value ) {
+            case "index":
+                nameGroup.classed("hidden", true);
+                selectGroup.classed("hidden", false);
+                formState.type = "index";
+                formState.value = parseInt(selectElement.property("value"));
+                break;
+            case "name":
+                nameGroup.classed("hidden", false);
+                selectGroup.classed("hidden", true);
+                formState.type = "name";
+                formState.value = undefined;
+                break;
+            }
+            markup();
         }
     };
 
     // start elements
-    var elementChoices = view.append("div")
-        .classed({
-            "column": true
-        });
-    elementChoices.append("p")
+    var ec = newForm(view, false);
+
+    ec.workarea.append("p")
         .text("Choose Element:");
-    var choiceHolder = elementChoices.append("div");
-    elementChoices.append("button")
+    var choiceHolder = ec.workarea.append("div");
+
+    ec.buttons.append("button")
         .text("Confirm")
         .on("click", events.confirmElement);
-    elementChoices.append("button")
+    ec.buttons.append("button")
         .text("Cancel")
         .on("click", events.cancelSelector);
     // end elements
 
     // start selector
-    var selectorChoices = view.append("div")
-        .classed({
-            "column": true,
-            "hidden": true
-        });
-    selectorChoices.append("p")
+    var sc = newForm(view, true);
+
+    sc.workarea.append("p")
         .text("Choose Selector:");
-    var tags = selectorChoices.append("div");
+    var tags = sc.workarea.append("div");
     var parts;
 
-    selectorChoices.append("button")
+    sc.buttons.append("button")
         .text("Confirm")
         .on("click", events.confirmSelector);
-    selectorChoices.append("button")
+    sc.buttons.append("button")
         .text("Cancel")
         .on("click", events.cancelSelector);
     // end selector
 
-    // start form
-    var form = view.append("div")
-        .classed({
-            "form": true,
-            "hidden": true,
-            "column": true
-        });
-    form.append("p")
-        .text("Choose Type:");
-    var inputs = form.append("div").selectAll("label")
-            .data(["all", "single"])
-        .enter().append("label")
-            .text(function(d){ return d;})
-            .append("input")
-                .attr("type", "radio")
-                .attr("name", "type")
-                .property("value", function(d){ return d;})
-                .property("checked", function(d, i){ return i === 0; })
-                .on("change", function(){
-                    switch ( this.value ) {
-                    case "single":
-                        nameGroup.classed("hidden", true);
-                        selectGroup.classed("hidden", false);
-                        formState.type = "single";
-                        formState.value = parseInt(selectElement.property("value"));
-                        break;
-                    case "all":
-                        nameGroup.classed("hidden", false);
-                        selectGroup.classed("hidden", true);
-                        formState.type = "all";
-                        formState.value = undefined;
-                        break;
-                    }
-                    markup();
-                });
+    // start selectorType
+    var st = newForm(view, true);
 
-    var nameGroup = form.append("div");
-    var nameElement = nameGroup.append("label")
+    var radioDiv = st.workarea.append("div");
+    radioDiv.append("span")
+        .text("Choose Type:");
+
+    var inputHolders = radioDiv.selectAll("span.radio")
+            .data(["name", "index"])
+        .enter().append("span")
+            .classed("radio", true);
+    inputHolders.append("label")
+        .text(function(d){ return d;})
+        .attr("for", function(d){ return "radio-" + d;});
+    
+    var radios = inputHolders.append("input")
+        .attr("type", "radio")
+        .attr("name", "type")
+        .attr("id", function(d){ return "radio-" + d;})
+        .property("value", function(d){ return d;})
+        .property("checked", function(d, i){ return i === 0; })
+        .on("change", events.toggleRadio);
+
+    var nameGroup = st.workarea.append("div");
+    var nameElement = nameGroup.append("p").append("label")
         .text("Name:")
         .append("input")
             .attr("type", "text");
 
-    var selectGroup = form.append("div")
+    var selectGroup = st.workarea.append("div")
         .classed({"hidden": true});
 
-    var selectElement = selectGroup.append("label")
+    var selectElement = selectGroup.append("p").append("label")
         .text("Index:")
         .append("select");
 
-    var buttons = form.append("div");
-
-    buttons.append("button")
+    st.buttons.append("button")
         .text("Save")
         .on("click", events.saveSelector);
 
 
-    buttons.append("button")
+    st.buttons.append("button")
         .text("Cancel")
         .on("click", events.cancelSelector);
 
-    // end form
+    // end selectorType
     // end ui
 
         // apply the queryCheck class to selected elements
@@ -201,22 +199,22 @@ function SelectorView(options){
             setChoices(data);
         });
 
-    function showElementColumn(){
-        elementChoices.classed("hidden", false);
-        selectorChoices.classed("hidden", true);
-        form.classed("hidden", true);
+    function showElementForm(){
+        ec.form.classed("hidden", false);
+        sc.form.classed("hidden", true);
+        st.form.classed("hidden", true);
     }
 
-    function showSelectorColumn(){
-        elementChoices.classed("hidden", true);
-        selectorChoices.classed("hidden", false);
-        form.classed("hidden", true);
+    function showSelectorForm(){
+        ec.form.classed("hidden", true);
+        sc.form.classed("hidden", false);
+        st.form.classed("hidden", true);
     }
 
-    function showFormColumn(){
-        elementChoices.classed("hidden", true);
-        selectorChoices.classed("hidden", true);
-        form.classed("hidden", false);
+    function showTypeForm(){
+        ec.form.classed("hidden", true);
+        sc.form.classed("hidden", true);
+        st.form.classed("hidden", false);
     }
 
 
@@ -235,11 +233,11 @@ function SelectorView(options){
         });
         var spec = {};
         switch (formState.type){
-        case "single":
+        case "index":
             spec.type = "index";
             spec.value = parseInt(selectElement.property("value"));
             break;
-        case "all":
+        case "name":
             var name = nameElement.property("value");
             if ( name === "" || !controller.legalName(name)){
                 return;
@@ -254,8 +252,7 @@ function SelectorView(options){
     // parts is given an element and returns an array containing its tag
     // and (if they exist) its id and any classes
     var getParts = selectorParts()
-        .ignoreClasses(["collectHighlight", "queryCheck",
-            "selectedElement", "selectableElement"]);
+        .ignoreClasses(["collectHighlight", "queryCheck", "selectableElement"]);
 
     function markup(){
         showcase.remove();
@@ -265,7 +262,7 @@ function SelectorView(options){
             return;
         }
         var spec;
-        if ( formState.type === "single" ) {
+        if ( formState.type === "index" ) {
             spec = {
                 type: "index",
                 value: formState.value
@@ -280,11 +277,11 @@ function SelectorView(options){
     function setChoices(data){
         interactive.remove();
 
-        var choices = choiceHolder.selectAll("div.choice")
+        var choices = choiceHolder.selectAll("div.tag")
             .data(data);
         choices.enter().append("div")
             .classed({
-                "choice": true,
+                "tag": true,
                 "noSelect": true
             })
             .on("click", events.selectChoice);
@@ -298,9 +295,9 @@ function SelectorView(options){
         }
         formState.selector = choice.join("");
         markup();
-        parts = tags.selectAll("p.tag")
+        parts = tags.selectAll("div.tag")
             .data(choice);
-        parts.enter().append("p")
+        parts.enter().append("div")
             .classed({
                 "tag": true,
                 "on": true,
@@ -358,7 +355,7 @@ function SelectorView(options){
             interactive(eles);
         },
         reset: function(){
-            showElementColumn();
+            showElementForm();
             interactive.remove();
             showcase.remove();
             parts = undefined;
@@ -369,10 +366,10 @@ function SelectorView(options){
             choiceHolder.selectAll("*").remove();
 
             // form
-            inputs.property("checked", function(d, i){ return i === 0; });
+            radios.property("checked", function(d, i){ return i === 0; });
             formState = {
                 selector: "",
-                type: "all",
+                type: "name",
                 value: undefined
             };
             nameGroup.classed("hidden", false);

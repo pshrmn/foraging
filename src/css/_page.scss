@@ -1,5 +1,9 @@
 .selectableElement{
-    box-shadow: inset 0 0 1px $dark-blue;
+    box-shadow: inset 0 0 2px $red;
+}
+
+img.selectableElement{
+    border: 1px dashed $red !important;
 }
 
 .selectedElement{
@@ -7,23 +11,18 @@
 }
 
 .collectHighlight{
-    background: rgba(50,50,50,0.5) !important;
-    color: #222 !important;
-
-    *{
-        color: #222 !important;
-    }
+    background: rgba(46,130,158,0.5) !important;
 }
 
 img.collectHighlight{
-    border: 1px dashed rgb(50,50,50) !important;
+    opacity: 0.25;
 }
 
 .queryCheck{
     background: rgba(255, 215, 0, 0.25) !important;
     box-shadow: inset 0 0 1px yellow;
-
 }
+
 
 .savedPreview{
     background: rgba(255,0,0,0.25) !important;
@@ -31,17 +30,4 @@ img.collectHighlight{
 
 img.savedPreview{
     border: 1px solid rgba(255,0,0,0.25) !important;    
-}
-
-
-@-webkit-keyframes pulseParent {
-    0% {
-        border-color:rgba(60, 60, 60, 1);
-    }
-    50% {
-        border-color:rgba(60, 60, 60, 0.5);
-    }
-    100% {
-        border-color:rgba(60, 60, 60, 1);
-    }
 }

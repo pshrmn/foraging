@@ -2,6 +2,7 @@ function AttributeView(options){
     var index = 0;
     var eles = [];
     var length = 0;
+    var formState = {};
 
     options = options || {};
     var holder = options.holder || "body";
@@ -26,42 +27,25 @@ function AttributeView(options){
     var view = d3.select(holder);
 
     // form
-    var form = view.append("div")
-        .classed({
-            "column": true,
-            "form": true
-        });
+    var form = newForm(view);
 
-    var nameInput = form.append("p")
+    var nameInput = form.workarea.append("p")
         .append("label")
         .text("Name:")
         .append("input")
             .attr("type", "text")
             .attr("name", "name");
 
-    var attrInput = form.append("p")
-        .append("label")
-        .text("Attr:")
-        .append("input")
-            .attr("type", "text")
-            .attr("name", "attr");
-
-    var saveButton = form.append("button")
-        .text("Save")
-        .on("click", events.saveAttr);
-
-    var cancelButton = form.append("button")
-        .text("Cancel")
-        .on("click", events.cancelAttr);
-
-    // attribute display
-    var display = view.append("div")
-        .classed({"display": true});
-
-    var attributeHolder = display.append("div")
+    // display the attributes in a table
+    var attributeHolder = form.workarea.append("table")
         .classed({"attributes": true});
 
-    var buttons = display.append("div");
+    var th = attributeHolder.append("thead").append("tr");
+    th.append("th").text("Attr");
+    th.append("th").text("Value");
+    var tb = attributeHolder.append("tbody");
+
+    var buttons = form.workarea.append("div");
     var previous = buttons.append("button")
         .text("<<")
         .on("click", showPrevious);
@@ -75,36 +59,48 @@ function AttributeView(options){
         .text(">>")
         .on("click", showNext);
 
-    var attrs;
+    form.buttons.append("button")
+        .text("Save")
+        .on("click", events.saveAttr);
+
+    form.buttons.append("button")
+        .text("Cancel")
+        .on("click", events.cancelAttr);
+
+    // end ui
+
+    var rows;
     function displayElement(){
         // show the index for the current element
         indexText.text(function(){
-            return index;
+            return (index+1) + "/" + (length);
         });
 
         var element = eles[index];
         var attrMap = attributes(element);
         var attrData = [];
         for ( var key in attrMap ) {
-            attrData.push({
-                name: key,
-                value: attrMap[key]
-            });
+            attrData.push([key, attrMap[key]]);
         }
 
-        attrs = attributeHolder.selectAll("div")
-            .data(attrData);
+        rows = tb.selectAll("tr")
+            .data(attrData, function(d){ return d[0]; });
 
-        attrs.enter().append("div")
+        rows.enter().append("tr")
             .on("click", function(d){
-                attrInput.property("value", d.name);
+                clearClass("selectedAttr");
+                this.classList.add("selectedAttr");
+                formState.attr = d[0];
             });
 
-        attrs.text(function(d){
-            return d.name + ": " + abbreviate(d.value, 51);
-        });
+        rows.exit().remove();
 
-        attrs.exit().remove();
+        var tds = rows.selectAll("td")
+            .data(function(d){ return d;});
+        tds.enter().append("td");
+        tds.text(function(d){ return abbreviate(d, 51); });
+        tds.exit().remove();
+
     }
 
     function showNext(){
@@ -124,7 +120,7 @@ function AttributeView(options){
     }
 
     function getAttr(){
-        var attr = attrInput.property("value");
+        var attr = formState.attr;
         var name = nameInput.property("value");
         if ( name === "" || !controller.legalName(name)){
             return;
@@ -147,10 +143,9 @@ function AttributeView(options){
             eles = undefined;
             index = 0;
             indexText.text("");
-            if ( attrs ) {
-                attrs.remove();
+            if ( rows ) {
+                rows.remove();
             }
-            attrInput.property("value", "");
             nameInput.property("value", "");
         }
     };

@@ -493,12 +493,10 @@ function collectorController(){
 
             chromeSave(pages);
         },
-        events: {
-            close: function(){
-                fns.dispatch.Selector.reset();
-                fns.dispatch.Page.reset();
-                ui.close();
-            }
+        close: function(){
+            fns.dispatch.Selector.reset();
+            fns.dispatch.Page.reset();
+            ui.close();
         },
         // used to interact with views
         dispatch: {},
@@ -666,11 +664,28 @@ function legalPageName(name){
     return ( match === null );
 }
 
+function newForm(holder, hidden){
+    var form = holder.append("div")
+        .classed({
+            "form": true,
+            "hidden": hidden
+        });
+    var work = form.append("div")
+        .classed("workarea", true);
+    var buttons = form.append("div")
+        .classed("buttons", true);
+    return {
+        form: form,
+        workarea: work,
+        buttons: buttons
+    };
+}
 // Source: src/attributeView.js
 function AttributeView(options){
     var index = 0;
     var eles = [];
     var length = 0;
+    var formState = {};
 
     options = options || {};
     var holder = options.holder || "body";
@@ -695,42 +710,25 @@ function AttributeView(options){
     var view = d3.select(holder);
 
     // form
-    var form = view.append("div")
-        .classed({
-            "column": true,
-            "form": true
-        });
+    var form = newForm(view);
 
-    var nameInput = form.append("p")
+    var nameInput = form.workarea.append("p")
         .append("label")
         .text("Name:")
         .append("input")
             .attr("type", "text")
             .attr("name", "name");
 
-    var attrInput = form.append("p")
-        .append("label")
-        .text("Attr:")
-        .append("input")
-            .attr("type", "text")
-            .attr("name", "attr");
-
-    var saveButton = form.append("button")
-        .text("Save")
-        .on("click", events.saveAttr);
-
-    var cancelButton = form.append("button")
-        .text("Cancel")
-        .on("click", events.cancelAttr);
-
-    // attribute display
-    var display = view.append("div")
-        .classed({"display": true});
-
-    var attributeHolder = display.append("div")
+    // display the attributes in a table
+    var attributeHolder = form.workarea.append("table")
         .classed({"attributes": true});
 
-    var buttons = display.append("div");
+    var th = attributeHolder.append("thead").append("tr");
+    th.append("th").text("Attr");
+    th.append("th").text("Value");
+    var tb = attributeHolder.append("tbody");
+
+    var buttons = form.workarea.append("div");
     var previous = buttons.append("button")
         .text("<<")
         .on("click", showPrevious);
@@ -744,36 +742,48 @@ function AttributeView(options){
         .text(">>")
         .on("click", showNext);
 
-    var attrs;
+    form.buttons.append("button")
+        .text("Save")
+        .on("click", events.saveAttr);
+
+    form.buttons.append("button")
+        .text("Cancel")
+        .on("click", events.cancelAttr);
+
+    // end ui
+
+    var rows;
     function displayElement(){
         // show the index for the current element
         indexText.text(function(){
-            return index;
+            return (index+1) + "/" + (length);
         });
 
         var element = eles[index];
         var attrMap = attributes(element);
         var attrData = [];
         for ( var key in attrMap ) {
-            attrData.push({
-                name: key,
-                value: attrMap[key]
-            });
+            attrData.push([key, attrMap[key]]);
         }
 
-        attrs = attributeHolder.selectAll("div")
-            .data(attrData);
+        rows = tb.selectAll("tr")
+            .data(attrData, function(d){ return d[0]; });
 
-        attrs.enter().append("div")
+        rows.enter().append("tr")
             .on("click", function(d){
-                attrInput.property("value", d.name);
+                clearClass("selectedAttr");
+                this.classList.add("selectedAttr");
+                formState.attr = d[0];
             });
 
-        attrs.text(function(d){
-            return d.name + ": " + abbreviate(d.value, 51);
-        });
+        rows.exit().remove();
 
-        attrs.exit().remove();
+        var tds = rows.selectAll("td")
+            .data(function(d){ return d;});
+        tds.enter().append("td");
+        tds.text(function(d){ return abbreviate(d, 51); });
+        tds.exit().remove();
+
     }
 
     function showNext(){
@@ -793,7 +803,7 @@ function AttributeView(options){
     }
 
     function getAttr(){
-        var attr = attrInput.property("value");
+        var attr = formState.attr;
         var name = nameInput.property("value");
         if ( name === "" || !controller.legalName(name)){
             return;
@@ -816,10 +826,9 @@ function AttributeView(options){
             eles = undefined;
             index = 0;
             indexText.text("");
-            if ( attrs ) {
-                attrs.remove();
+            if ( rows ) {
+                rows.remove();
             }
-            attrInput.property("value", "");
             nameInput.property("value", "");
         }
     };
@@ -897,6 +906,7 @@ function PageView(options){
 
     // start tree
     var svg = view.append("svg")
+        .classed("inline", true)
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
@@ -912,41 +922,29 @@ function PageView(options){
 
 
     // start selector
-    var form = view.append("div")
-        .classed({
-            "column": true,
-            "form": true,
-            "hidden": true
-        });
+    var sf = newForm(view, true);
+    sf.form.classed("inline", true);
 
-    var selectorText = form.append("p")
+    var selectorText = sf.workarea.append("p")
         .text("Selector: ")
         .append("span");
 
-    var selectorType = form.append("p")
-        .text("Type: ")
-        .append("span");
+    var selectorType = sf.workarea.append("p");
+    var selectorAttrs = sf.workarea.append("div");
 
-    var selectorValue = form.append("p")
-        .text("Value: ")
-        .append("span");
-
-    var buttonHolder = form.append("div");
-
-    var remove = buttonHolder.append("button")
-        .text("remove")
-        .on("click", events.removeSelector);
-
-    var addChild = buttonHolder.append("button")
+    sf.buttons.append("button")
         .text("add child")
         .on("click", events.addChild);
 
-    var addAttr = buttonHolder.append("button")
+    sf.buttons.append("button")
         .text("add attr")
         .on("click", events.addAttr);
 
-    var selectorAttrs = form.append("ul");
-    var attrs;
+    sf.buttons.append("button")
+        .text("remove")
+        .on("click", events.removeSelector);
+
+    
     // end selector
     /**********
       END UI
@@ -997,30 +995,45 @@ function PageView(options){
     }
 
     function showSelector(){
-        form.classed("hidden", false);
+        sf.form.classed("hidden", false);
         selectorText.text(selector.selector);
-        selectorType.text(selector.spec.type);
-        selectorValue.text(selector.spec.value);
-        attrs = selectorAttrs.selectAll("li.attr")
-            .data(selector.attrs);
-        attrs.enter().append("li")
+        var type = selector.spec.type;
+        var typeCap = type.charAt(0).toUpperCase() + type.slice(1);
+        selectorType.text(typeCap + ": " + selector.spec.value);
+
+        showAttrs(selectorAttrs, selector.attrs);
+    }
+
+    function showAttrs(holder, attrs){
+        holder.selectAll("*").remove();
+        if ( !attrs || attrs.length === 0 ) {
+            holder.append("p").text("No Attrs");
+            return;
+        }
+        holder.append("p").text("Attrs:");
+        var table = holder.append("table");
+
+        var tb = table.append("tbody");
+        var rows = tb.selectAll("tr")
+            .data(attrs);
+        rows.enter().append("tr")
             .classed({
                 "attr": true
             });
-        attrs.text(function(d){
-                return d.name + ": " + d.attr;
-            });
-        attrs.append("button")
-            .text("remove")
-            .on("click", events.removeAttr);
-        attrs.exit().remove();
+
+        rows.append("td").text(function(d){ return d.name; });
+        rows.append("td").text(function(d){ return d.attr; });
+        rows.append("td")
+            .append("button")
+                .text("×")
+                .on("click", events.removeAttr);
+        rows.exit().remove();
     }
 
     function clearSelector(){
-        form.classed("hidden", true);
+        sf.form.classed("hidden", true);
         selectorText.text("");
         selectorType.text("");
-        selectorValue.text("");
         selectorAttrs.selectAll("*").remove();
     }
 
@@ -1138,7 +1151,7 @@ function PageView(options){
             }
         },
         hideSelector: function(){
-            form.classed("hidden", true);
+            sf.form.classed("hidden", true);
         },
         reset: function(){
             page = undefined;
@@ -1151,10 +1164,10 @@ function PageView(options){
 }
 // Source: src/selectorView.js
 function SelectorView(options){
-    // the view is broken into three columns:
+    // the view is broken into three forms:
     //      elementChoices
     //      selectorChoices
-    //      form
+    //      selectorType
     options = options || {};
     var holder = options.holder || "body";
     var view = d3.select(holder);
@@ -1163,7 +1176,7 @@ function SelectorView(options){
     var choiceElement;
     var formState = {
         selector: "",
-        type: "all",
+        type: "name",
         value: undefined
     };
 
@@ -1209,14 +1222,14 @@ function SelectorView(options){
                 return;
             }
             addTags();
-            showSelectorColumn();
+            showSelectorForm();
         },
         confirmSelector: function(){
             if ( formState.selector === "" ) {
                 return;
             }
             setupForm();
-            showFormColumn();
+            showTypeForm();
         },
         cancelSelector: function(){
             fns.reset();
@@ -1231,105 +1244,103 @@ function SelectorView(options){
             formState.selector = currentSelector();
             formState.value = selectElement.property("value");
             markup();
+        },
+        toggleRadio: function(){
+            switch ( this.value ) {
+            case "index":
+                nameGroup.classed("hidden", true);
+                selectGroup.classed("hidden", false);
+                formState.type = "index";
+                formState.value = parseInt(selectElement.property("value"));
+                break;
+            case "name":
+                nameGroup.classed("hidden", false);
+                selectGroup.classed("hidden", true);
+                formState.type = "name";
+                formState.value = undefined;
+                break;
+            }
+            markup();
         }
     };
 
     // start elements
-    var elementChoices = view.append("div")
-        .classed({
-            "column": true
-        });
-    elementChoices.append("p")
+    var ec = newForm(view, false);
+
+    ec.workarea.append("p")
         .text("Choose Element:");
-    var choiceHolder = elementChoices.append("div");
-    elementChoices.append("button")
+    var choiceHolder = ec.workarea.append("div");
+
+    ec.buttons.append("button")
         .text("Confirm")
         .on("click", events.confirmElement);
-    elementChoices.append("button")
+    ec.buttons.append("button")
         .text("Cancel")
         .on("click", events.cancelSelector);
     // end elements
 
     // start selector
-    var selectorChoices = view.append("div")
-        .classed({
-            "column": true,
-            "hidden": true
-        });
-    selectorChoices.append("p")
+    var sc = newForm(view, true);
+
+    sc.workarea.append("p")
         .text("Choose Selector:");
-    var tags = selectorChoices.append("div");
+    var tags = sc.workarea.append("div");
     var parts;
 
-    selectorChoices.append("button")
+    sc.buttons.append("button")
         .text("Confirm")
         .on("click", events.confirmSelector);
-    selectorChoices.append("button")
+    sc.buttons.append("button")
         .text("Cancel")
         .on("click", events.cancelSelector);
     // end selector
 
-    // start form
-    var form = view.append("div")
-        .classed({
-            "form": true,
-            "hidden": true,
-            "column": true
-        });
-    form.append("p")
-        .text("Choose Type:");
-    var inputs = form.append("div").selectAll("label")
-            .data(["all", "single"])
-        .enter().append("label")
-            .text(function(d){ return d;})
-            .append("input")
-                .attr("type", "radio")
-                .attr("name", "type")
-                .property("value", function(d){ return d;})
-                .property("checked", function(d, i){ return i === 0; })
-                .on("change", function(){
-                    switch ( this.value ) {
-                    case "single":
-                        nameGroup.classed("hidden", true);
-                        selectGroup.classed("hidden", false);
-                        formState.type = "single";
-                        formState.value = parseInt(selectElement.property("value"));
-                        break;
-                    case "all":
-                        nameGroup.classed("hidden", false);
-                        selectGroup.classed("hidden", true);
-                        formState.type = "all";
-                        formState.value = undefined;
-                        break;
-                    }
-                    markup();
-                });
+    // start selectorType
+    var st = newForm(view, true);
 
-    var nameGroup = form.append("div");
-    var nameElement = nameGroup.append("label")
+    var radioDiv = st.workarea.append("div");
+    radioDiv.append("span")
+        .text("Choose Type:");
+
+    var inputHolders = radioDiv.selectAll("span.radio")
+            .data(["name", "index"])
+        .enter().append("span")
+            .classed("radio", true);
+    inputHolders.append("label")
+        .text(function(d){ return d;})
+        .attr("for", function(d){ return "radio-" + d;});
+    
+    var radios = inputHolders.append("input")
+        .attr("type", "radio")
+        .attr("name", "type")
+        .attr("id", function(d){ return "radio-" + d;})
+        .property("value", function(d){ return d;})
+        .property("checked", function(d, i){ return i === 0; })
+        .on("change", events.toggleRadio);
+
+    var nameGroup = st.workarea.append("div");
+    var nameElement = nameGroup.append("p").append("label")
         .text("Name:")
         .append("input")
             .attr("type", "text");
 
-    var selectGroup = form.append("div")
+    var selectGroup = st.workarea.append("div")
         .classed({"hidden": true});
 
-    var selectElement = selectGroup.append("label")
+    var selectElement = selectGroup.append("p").append("label")
         .text("Index:")
         .append("select");
 
-    var buttons = form.append("div");
-
-    buttons.append("button")
+    st.buttons.append("button")
         .text("Save")
         .on("click", events.saveSelector);
 
 
-    buttons.append("button")
+    st.buttons.append("button")
         .text("Cancel")
         .on("click", events.cancelSelector);
 
-    // end form
+    // end selectorType
     // end ui
 
         // apply the queryCheck class to selected elements
@@ -1353,22 +1364,22 @@ function SelectorView(options){
             setChoices(data);
         });
 
-    function showElementColumn(){
-        elementChoices.classed("hidden", false);
-        selectorChoices.classed("hidden", true);
-        form.classed("hidden", true);
+    function showElementForm(){
+        ec.form.classed("hidden", false);
+        sc.form.classed("hidden", true);
+        st.form.classed("hidden", true);
     }
 
-    function showSelectorColumn(){
-        elementChoices.classed("hidden", true);
-        selectorChoices.classed("hidden", false);
-        form.classed("hidden", true);
+    function showSelectorForm(){
+        ec.form.classed("hidden", true);
+        sc.form.classed("hidden", false);
+        st.form.classed("hidden", true);
     }
 
-    function showFormColumn(){
-        elementChoices.classed("hidden", true);
-        selectorChoices.classed("hidden", true);
-        form.classed("hidden", false);
+    function showTypeForm(){
+        ec.form.classed("hidden", true);
+        sc.form.classed("hidden", true);
+        st.form.classed("hidden", false);
     }
 
 
@@ -1387,11 +1398,11 @@ function SelectorView(options){
         });
         var spec = {};
         switch (formState.type){
-        case "single":
+        case "index":
             spec.type = "index";
             spec.value = parseInt(selectElement.property("value"));
             break;
-        case "all":
+        case "name":
             var name = nameElement.property("value");
             if ( name === "" || !controller.legalName(name)){
                 return;
@@ -1406,8 +1417,7 @@ function SelectorView(options){
     // parts is given an element and returns an array containing its tag
     // and (if they exist) its id and any classes
     var getParts = selectorParts()
-        .ignoreClasses(["collectHighlight", "queryCheck",
-            "selectedElement", "selectableElement"]);
+        .ignoreClasses(["collectHighlight", "queryCheck", "selectableElement"]);
 
     function markup(){
         showcase.remove();
@@ -1417,7 +1427,7 @@ function SelectorView(options){
             return;
         }
         var spec;
-        if ( formState.type === "single" ) {
+        if ( formState.type === "index" ) {
             spec = {
                 type: "index",
                 value: formState.value
@@ -1432,11 +1442,11 @@ function SelectorView(options){
     function setChoices(data){
         interactive.remove();
 
-        var choices = choiceHolder.selectAll("div.choice")
+        var choices = choiceHolder.selectAll("div.tag")
             .data(data);
         choices.enter().append("div")
             .classed({
-                "choice": true,
+                "tag": true,
                 "noSelect": true
             })
             .on("click", events.selectChoice);
@@ -1450,9 +1460,9 @@ function SelectorView(options){
         }
         formState.selector = choice.join("");
         markup();
-        parts = tags.selectAll("p.tag")
+        parts = tags.selectAll("div.tag")
             .data(choice);
-        parts.enter().append("p")
+        parts.enter().append("div")
             .classed({
                 "tag": true,
                 "on": true,
@@ -1510,7 +1520,7 @@ function SelectorView(options){
             interactive(eles);
         },
         reset: function(){
-            showElementColumn();
+            showElementForm();
             interactive.remove();
             showcase.remove();
             parts = undefined;
@@ -1521,10 +1531,10 @@ function SelectorView(options){
             choiceHolder.selectAll("*").remove();
 
             // form
-            inputs.property("checked", function(d, i){ return i === 0; });
+            radios.property("checked", function(d, i){ return i === 0; });
             formState = {
                 selector: "",
-                type: "all",
+                type: "name",
                 value: undefined
             };
             nameGroup.classed("hidden", false);
@@ -1557,6 +1567,14 @@ function buildUI(controller){
         '<div class="views"></div>';
     document.body.appendChild(holder);
 
+    var events = {
+        close: function(){
+            holder.parentElement.removeChild(holder);
+            document.body.style.marginBottom = initialMargin;
+            controller.close();
+        }
+    };
+
     var existingStyle = getComputedStyle(document.body);
     var initialMargin = existingStyle.marginBottom;
     document.body.style.marginBottom = "500px";
@@ -1566,7 +1584,7 @@ function buildUI(controller){
     });
 
     var closer = d3.select("#closeCollectjs")
-        .on("click", controller.events.close);
+        .on("click", events.close);
 
     var tabHolder = holder.querySelector(".tabs");
     var viewHolder = holder.querySelector(".views");
@@ -1588,7 +1606,7 @@ function buildUI(controller){
         activeView.classList.add("active");
     }
 
-    return {
+    var fns = {
         // make sure that all elements in the collectjs have the noSelect class
         noSelect: function(){
             var all = holder.querySelectorAll("*");
@@ -1630,14 +1648,12 @@ function buildUI(controller){
             options.holder = v;
             controller.dispatch[name] = viewFn(options);
         },
-        close: function(){
-            holder.parentElement.removeChild(holder);
-            document.body.style.marginBottom = initialMargin;
-        },
         showView: showView,
         setPages: topbarFns.setPages,
         getPage: topbarFns.getPage,
     };
+
+    return fns;
 }
 
 // Source: src/collector.js

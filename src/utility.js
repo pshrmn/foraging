@@ -36,3 +36,20 @@ function legalPageName(name){
         match = name.match(badCharacters);
     return ( match === null );
 }
+
+function newForm(holder, hidden){
+    var form = holder.append("div")
+        .classed({
+            "form": true,
+            "hidden": hidden
+        });
+    var work = form.append("div")
+        .classed("workarea", true);
+    var buttons = form.append("div")
+        .classed("buttons", true);
+    return {
+        form: form,
+        workarea: work,
+        buttons: buttons
+    };
+}

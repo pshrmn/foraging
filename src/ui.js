@@ -17,6 +17,14 @@ function buildUI(controller){
         '<div class="views"></div>';
     document.body.appendChild(holder);
 
+    var events = {
+        close: function(){
+            holder.parentElement.removeChild(holder);
+            document.body.style.marginBottom = initialMargin;
+            controller.close();
+        }
+    };
+
     var existingStyle = getComputedStyle(document.body);
     var initialMargin = existingStyle.marginBottom;
     document.body.style.marginBottom = "500px";
@@ -26,7 +34,7 @@ function buildUI(controller){
     });
 
     var closer = d3.select("#closeCollectjs")
-        .on("click", controller.events.close);
+        .on("click", events.close);
 
     var tabHolder = holder.querySelector(".tabs");
     var viewHolder = holder.querySelector(".views");
@@ -48,7 +56,7 @@ function buildUI(controller){
         activeView.classList.add("active");
     }
 
-    return {
+    var fns = {
         // make sure that all elements in the collectjs have the noSelect class
         noSelect: function(){
             var all = holder.querySelectorAll("*");
@@ -90,12 +98,10 @@ function buildUI(controller){
             options.holder = v;
             controller.dispatch[name] = viewFn(options);
         },
-        close: function(){
-            holder.parentElement.removeChild(holder);
-            document.body.style.marginBottom = initialMargin;
-        },
         showView: showView,
         setPages: topbarFns.setPages,
         getPage: topbarFns.getPage,
     };
+
+    return fns;
 }

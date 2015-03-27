@@ -125,12 +125,10 @@ function collectorController(){
 
             chromeSave(pages);
         },
-        events: {
-            close: function(){
-                fns.dispatch.Selector.reset();
-                fns.dispatch.Page.reset();
-                ui.close();
-            }
+        close: function(){
+            fns.dispatch.Selector.reset();
+            fns.dispatch.Page.reset();
+            ui.close();
         },
         // used to interact with views
         dispatch: {},
