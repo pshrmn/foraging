@@ -106,21 +106,21 @@ body {
         border-width: 0 0 1px; }
       .collectjs .views .view svg {
         font-size: 14px; }
-        .collectjs .views .view svg rect {
-          fill: white; }
         .collectjs .views .view svg .link {
           fill: none;
           stroke: #aaa; }
         .collectjs .views .view svg .node {
-          cursor: pointer; }
+          cursor: pointer;
+          fill: #21732C; }
+        .collectjs .views .view svg .empty {
+          fill: #CF2558; }
         .collectjs .views .view svg .node text {
           paint-order: stroke;
           stroke: white;
           stroke-width: 2px;
           text-anchor: end; }
-        .collectjs .views .view svg .currentSelector .shape {
-          stroke: black;
-          stroke-width: 2px; }
+        .collectjs .views .view svg .current {
+          font-weight: bold; }
     .collectjs .views .view.active {
       display: block; }
   .collectjs input {
@@ -141,6 +141,8 @@ body {
   .collectjs .attributes tbody tr:hover {
     background: #cccccc;
     cursor: pointer; }
+  .collectjs .attributes .selectedAttr, .collectjs .attributes .selectedAttr:hover {
+    background: #bddbce; }
   .collectjs td, .collectjs th {
     min-width: 50px;
     height: 1.5rem;
@@ -149,8 +151,6 @@ body {
     vertical-align: middle; }
   .collectjs th {
     background: #45aacc; }
-  .collectjs .selectedAttr, .collectjs .selectedAttr:hover {
-    background: #bddbce; }
   .collectjs button {
     background: #dddddd;
     color: black;
@@ -179,19 +179,16 @@ body {
   cursor: pointer; }
 
 .selectableElement {
-  box-shadow: inset 0 0 2px #c91900; }
+  box-shadow: inset 0 0 2px #c91900 !important; }
 
 img.selectableElement {
   border: 1px dashed #c91900 !important; }
-
-.selectedElement {
-  background: green; }
 
 .collectHighlight {
   background: rgba(46, 130, 158, 0.5) !important; }
 
 img.collectHighlight {
-  opacity: 0.25; }
+  opacity: 0.25 !important; }
 
 .queryCheck {
   background: rgba(255, 215, 0, 0.25) !important;

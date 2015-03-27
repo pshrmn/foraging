@@ -32,7 +32,7 @@ function collectorController(){
         addPage: function(name){
             if ( pages[name] === undefined && legalPageName(name) ) {
                 pages[name] = newPage(name);
-                ui.setPages(Object.keys(pages)), name;
+                ui.setPages(Object.keys(pages), name);
                 fns.loadPage(name);
                 chromeSave(pages);
             }

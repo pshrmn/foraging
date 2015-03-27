@@ -171,10 +171,6 @@ body{
             svg {
                 font-size: 14px;
 
-                rect{
-                    fill: $white;
-                }
-
                 .link {
                   fill: none;
                   stroke: #aaa;
@@ -182,6 +178,11 @@ body{
 
                 .node{
                     cursor: pointer;
+                    fill: #21732C;
+                }
+
+                .empty{
+                    fill: #CF2558;
                 }
 
                 .node text {
@@ -191,9 +192,8 @@ body{
                     text-anchor: end;
                 }
 
-                .currentSelector .shape{
-                    stroke: black;
-                    stroke-width: 2px;
+                .current{
+                    font-weight: bold;
                 }
             }
         }
@@ -224,10 +224,17 @@ body{
         font-weight: normal;
     }
 
-    .attributes tbody tr:hover{
-        background: $gray;
-        cursor: pointer;
+    .attributes {
+        tbody tr:hover{
+            background: $gray;
+            cursor: pointer;
+        }
+
+        .selectedAttr, .selectedAttr:hover{
+            background: $light-green;
+        }
     }
+
 
     td, th {
         min-width: 50px;
@@ -241,9 +248,6 @@ body{
         background: $blue;
     }
 
-    .selectedAttr, .selectedAttr:hover{
-        background: $light-green;
-    }
 
     /* lots of sites like to customize how various inputs look, 
     so this is trying to keep these close to (chrome) default css */

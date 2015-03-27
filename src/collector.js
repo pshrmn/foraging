@@ -4,6 +4,7 @@ var controller = collectorController();
 var ui = buildUI(controller);
 ui.addViews([
     [PageView, "Page", {
+        width: 500,
         height: 200
     }, true],
     [SelectorView, "Selector"],

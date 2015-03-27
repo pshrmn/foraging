@@ -1,13 +1,9 @@
 .selectableElement{
-    box-shadow: inset 0 0 2px $red;
+    box-shadow: inset 0 0 2px $red !important;
 }
 
 img.selectableElement{
     border: 1px dashed $red !important;
-}
-
-.selectedElement{
-    background: green;
 }
 
 .collectHighlight{
@@ -15,7 +11,7 @@ img.selectableElement{
 }
 
 img.collectHighlight{
-    opacity: 0.25;
+    opacity: 0.25 !important;
 }
 
 .queryCheck{

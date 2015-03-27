@@ -21,31 +21,6 @@ function attributes(element) {
     return attrMap;
 }
 
-function abbreviate(text, max) {
-    if ( text.length <= max ) {
-        return text;
-    } else if ( max <= 3 ) {
-        return "...";
-    }
-    // determine the length of the first and second halves of the text
-    var firstHalf;
-    var secondHalf;
-    var leftovers = max-3;
-    var half = leftovers/2;
-    if ( leftovers % 2 === 0 ) {
-        firstHalf = half;
-        secondHalf = half;
-    } else {
-        firstHalf = Math.ceil(half);
-        secondHalf = Math.floor(half);
-    }
-
-    // splice correct amounts of text
-    var firstText = text.slice(0, firstHalf);
-    var secondText = ( secondHalf === 0 ) ? "" : text.slice(-secondHalf);
-    return firstText + "..." + secondText;
-}
-
 // Source: src/objects.js
 /*
 selector is a string
@@ -400,7 +375,7 @@ function collectorController(){
         addPage: function(name){
             if ( pages[name] === undefined && legalPageName(name) ) {
                 pages[name] = newPage(name);
-                ui.setPages(Object.keys(pages)), name;
+                ui.setPages(Object.keys(pages), name);
                 fns.loadPage(name);
                 chromeSave(pages);
             }
@@ -680,6 +655,32 @@ function newForm(holder, hidden){
         buttons: buttons
     };
 }
+
+function abbreviate(text, max) {
+    if ( text.length <= max ) {
+        return text;
+    } else if ( max <= 3 ) {
+        return "...";
+    }
+    // determine the length of the first and second halves of the text
+    var firstHalf;
+    var secondHalf;
+    var leftovers = max-3;
+    var half = leftovers/2;
+    if ( leftovers % 2 === 0 ) {
+        firstHalf = half;
+        secondHalf = half;
+    } else {
+        firstHalf = Math.ceil(half);
+        secondHalf = Math.floor(half);
+    }
+
+    // splice correct amounts of text
+    var firstText = text.slice(0, firstHalf);
+    var secondText = ( secondHalf === 0 ) ? "" : text.slice(-secondHalf);
+    return firstText + "..." + secondText;
+}
+
 // Source: src/attributeView.js
 function AttributeView(options){
     var index = 0;
@@ -893,9 +894,24 @@ function PageView(options){
         },
         removeAttr: function(d, i){
             selector.attrs.splice(i, 1);
-            showSelector();
             drawPage();
+            showSelector();
             controller.setVals(page, selector);
+        },
+        clickNode: function(d){
+            selector = d;
+            showSelector();
+            fns.setSelector(d);
+        },
+        enterNode: function(d){
+            d.elements.forEach(function(ele){
+                ele.classList.add("savedPreview");
+            });
+        },
+        exitNode: function(d){
+            d.elements.forEach(function(ele){
+                ele.classList.remove("savedPreview");
+            });
         }
     };
 
@@ -967,15 +983,16 @@ function PageView(options){
 
     // attach an id to each node for d3
     function setupPage(){
-        function set(s){
+        function setId(s){
             s.id = controller.nextId();
             s.children.forEach(function(s){
-                set(s);
+                setId(s);
             });
         }
-        set(page);
+        setId(page);
         getMatches();
         drawPage();
+
         showSelector();
     }
 
@@ -1001,6 +1018,11 @@ function PageView(options){
         var typeCap = type.charAt(0).toUpperCase() + type.slice(1);
         selectorType.text(typeCap + ": " + selector.spec.value);
 
+        var currentId = selector.id;
+        d3.selectAll(".node").classed("current", function(d){
+            return d.id === currentId;
+        });
+
         showAttrs(selectorAttrs, selector.attrs);
     }
 
@@ -1011,23 +1033,17 @@ function PageView(options){
             return;
         }
         holder.append("p").text("Attrs:");
-        var table = holder.append("table");
+        var attrList = holder.append("ul");
+        var lis = attrList.selectAll("li")
+                .data(attrs)
+            .enter().append("li")
+                .text(function(d){
+                    return d.name + " <" + d.attr + ">";
+                });
 
-        var tb = table.append("tbody");
-        var rows = tb.selectAll("tr")
-            .data(attrs);
-        rows.enter().append("tr")
-            .classed({
-                "attr": true
-            });
-
-        rows.append("td").text(function(d){ return d.name; });
-        rows.append("td").text(function(d){ return d.attr; });
-        rows.append("td")
-            .append("button")
-                .text("×")
-                .on("click", events.removeAttr);
-        rows.exit().remove();
+        lis.append("button")
+            .text("×")
+            .on("click", events.removeAttr);
     }
 
     function clearSelector(){
@@ -1063,57 +1079,47 @@ function PageView(options){
 
         node.enter().append("g")
             .classed({
-                "node": true
+                "node": true,
+                "empty": empty
             })
-            .on("click", function(d){
-                clearClass("currentSelector");
-                this.classList.add("currentSelector");
-                selector = d;
-                showSelector();
-                fns.setSelector(d);
-            })
-            .on("mouseenter", function(d){
-                d.elements.forEach(function(ele){
-                    ele.classList.add("savedPreview");
-                });
-            })
-            .on("mouseleave", function(d){
-                d.elements.forEach(function(ele){
-                    ele.classList.remove("savedPreview");
-                });
-            });
+            .on("click", events.clickNode)
+            .on("mouseenter", events.enterNode)
+            .on("mouseleave", events.exitNode);
 
         node.attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; });
 
         node.append("text")
             .attr("y", 5)
-            .style("fill", empty)
             .attr("dx", -5)
             .text(function(d){
+                var text;
                 switch ( d.spec.type ) {
                 case "index":
-                    return d.selector + "[" + d.spec.value + "]";
+                    text = d.selector + "[" + d.spec.value + "]";
+                    break;
                 case "name":
-                    return "[" + d.selector + "]";
+                    text = "[" + d.selector + "]";
+                    break;
+                default:
+                    text = "";
                 }
+                return abbreviate(text, 15);
             });
 
         node.append("circle")
             .filter(function(d){
-                return d.spec.type === "index";
+                return d.attrs.length === 0;
             })
-            .attr("r", 3)
-            .style("fill", empty);
+            .attr("r", 3);
 
         node.append("rect")
             .filter(function(d){
-                return d.spec.type === "name";
+                return d.attrs.length > 0;
             })
             .attr("width", 6)
             .attr("height", 6)
             .attr("x", -3)
-            .attr("y", -3)
-            .style("fill", empty);
+            .attr("y", -3);
 
         node.exit().remove();
     }
@@ -1121,7 +1127,7 @@ function PageView(options){
     function empty(sel){
         var hasAttrs = sel.attrs.length;
         var hasChildren = sel.children ? sel.children.length > 0 : false;
-        return hasAttrs || hasChildren ? "#21732C" : "#CF2558";
+        return !hasAttrs && !hasChildren;
     }
 
     var fns = {
@@ -1663,6 +1669,7 @@ var controller = collectorController();
 var ui = buildUI(controller);
 ui.addViews([
     [PageView, "Page", {
+        width: 500,
         height: 200
     }, true],
     [SelectorView, "Selector"],
