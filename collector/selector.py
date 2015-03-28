@@ -1,11 +1,12 @@
 from lxml.cssselect import CSSSelector
 
-from .attr import Attr
+from .rule import Rule
 from .errors import BadJSONError
 
 
 class Selector(object):
-    def __init__(self, selector, spec, children, attrs):
+
+    def __init__(self, selector, spec, children, rules):
         self.selector = selector
         self.xpath = CSSSelector(selector)
         self.type = spec["type"]
@@ -13,7 +14,7 @@ class Selector(object):
             raise BadJSONError("unexpected selector type {}".format(self.type))
         self.value = spec["value"]
         self.children = children
-        self.attrs = attrs
+        self.rules = rules
 
     @classmethod
     def from_json(cls, selector_json):
@@ -32,15 +33,15 @@ class Selector(object):
             except BadJSONError:
                 raise
         try:
-            attrs = [Attr.from_json(a) for a in selector_json["attrs"]]
+            rules = [Rule.from_json(a) for a in selector_json["rules"]]
         except BadJSONError:
             raise
-        # ignore if there are no attrs and no children to get data from
-        if len(children) == 0 and len(attrs) == 0:
-            msg = """selector has no children or attrs and \
+        # ignore if there are no rules and no children to get data from
+        if len(children) == 0 and len(rules) == 0:
+            msg = """selector has no children or rules and \
 should be removed from the page"""
             raise BadJSONError(msg.format(selector_json))
-        return cls(selector, spec, children, attrs)
+        return cls(selector, spec, children, rules)
 
     def get(self, parent):
         elements = self.xpath(parent)
@@ -57,7 +58,7 @@ should be removed from the page"""
         pass
 
     def getElementData(self, element):
-        data = self.attrData(element)
+        data = self.ruleData(element)
         child_data = self.childData(element)
         if child_data is not None:
             for key, val in child_data.items():
@@ -67,8 +68,8 @@ should be removed from the page"""
             return
         return data
 
-    def attrData(self, element):
-        return {attr.name: attr.get(element) for attr in self.attrs}
+    def ruleData(self, element):
+        return {rule.name: rule.get(element) for rule in self.rules}
 
     def childData(self, element):
         data = {}
@@ -80,4 +81,3 @@ should be removed from the page"""
             for key, val in child_data.items():
                 data[key] = val
         return data
-
