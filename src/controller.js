@@ -49,7 +49,7 @@ function collectorController(){
             clone.selector = selector.selector;
             clone.id = selector.id;
             clone.spec = selector.spec;
-            clone.attrs = selector.attrs.slice();
+            clone.rules = selector.rules.slice();
             clone.elements = selector.elements.slice();
             clone.children = selector.children.map(function(child){
                 return setClone(child, {});
@@ -63,7 +63,7 @@ function collectorController(){
         fns.dispatch.Tree.reset();
         fns.dispatch.Page.reset();
         fns.dispatch.Selector.reset();
-        fns.dispatch.Attribute.reset();
+        fns.dispatch.Rule.reset();
     }
 
     function allSelects(elements){
@@ -223,18 +223,18 @@ function collectorController(){
             chromeSave(pages);
             return true;
         },
-        // add an Attr to the current selector
-        addAttr: function(){
-            fns.dispatch.Attribute.setElements(selector.elements);
+        // add an Rule to the current selector
+        addRule: function(){
+            fns.dispatch.Rule.setElements(selector.elements);
             fns.dispatch.Tree.turnOff();
-            ui.showView("Attribute");
+            ui.showView("Rule");
         },
-        cancelAttr: function(){
+        cancelRule: function(){
             fns.dispatch.Tree.turnOn();
             ui.showView("Page");
         },
-        saveAttr: function(attr){
-            selector.attrs.push(attr);
+        saveRule: function(rule){
+            selector.rules.push(rule);
             var clone = clonePage();
             fns.dispatch.Tree.draw(clone);
             fns.dispatch.Page.setSelector(selector);

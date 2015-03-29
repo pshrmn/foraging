@@ -5,7 +5,7 @@ var ui = buildUI(controller);
 ui.addViews([
     [PageView, "Page", {}, true],
     [SelectorView, "Selector"],
-    [AttributeView, "Attribute"]
+    [RuleView, "Rule"]
 ]);
 
 ui.addTree(TreeView, "Tree", {

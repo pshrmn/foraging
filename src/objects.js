@@ -8,11 +8,11 @@ function newSelector(selector, spec){
         selector: selector,
         spec: spec,
         children: [],
-        attrs: []
+        rules: []
     };
 }
 
-function newAttr(name, attr){
+function newRule(name, attr){
     return {
         name: name,
         attr: attr
@@ -28,7 +28,7 @@ function newPage(name){
             value: 0
         },
         children: [],
-        attrs: [],
+        rules: [],
         elements: [document.body]
     };
 }

@@ -11,7 +11,7 @@ function cleanPage(page){
     function cleanSelector(s, clone){
         clone.selector = s.selector;
         clone.spec = s.spec;
-        clone.attrs = s.attrs.slice();
+        clone.rules = s.rules.slice();
         clone.children = s.children.map(function(child){
             return cleanSelector(child, {});
         });
@@ -36,7 +36,7 @@ function matchSelector(sel, parent){
     });
 }
 
-// get an array containing the names of all attrs in the page
+// get an array containing the names of all rules in the page
 function usedNames(page){
     var names = [];
 
@@ -44,7 +44,7 @@ function usedNames(page){
         if ( selector.spec.type === "name" ) {
             names.push(selector.spec.value);
         }
-        selector.attrs.forEach(function(n){
+        selector.rules.forEach(function(n){
             names.push(n.name);
         });
 
@@ -57,21 +57,4 @@ function usedNames(page){
         findNames(page.pages[name]);
     }
     return names;
-}
-
-function followedAttrs(page){
-    var attrs = [];
-
-    function findFollowedAttrs(selector){
-        selector.attrs.forEach(function(attr){
-            if ( attr.follow ) {
-                attrs.push(attr.name);
-            }
-        });
-        selector.children.forEach(function(child){
-            findFollowedAttrs(child);
-        });
-    }
-    findFollowedAttrs(page);
-    return attrs;
 }

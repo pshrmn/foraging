@@ -1,4 +1,4 @@
-function AttributeView(options){
+function RuleView(options){
     var index = 0;
     var eles = [];
     var length = 0;
@@ -9,17 +9,17 @@ function AttributeView(options){
     var saveFn = options.save || function(){};
 
     var events = {
-        saveAttr: function(){
-            var attr = getAttr();
-            if ( attr === undefined ) {
+        saveRule: function(){
+            var rule = getRule();
+            if ( rule === undefined ) {
                 return;
             }
-            controller.saveAttr(attr);
+            controller.saveRule(rule);
             fns.reset();
         },
-        cancelAttr: function(){
+        cancelRule: function(){
             fns.reset();
-            controller.cancelAttr();
+            controller.cancelRule();
         }
     };
 
@@ -61,11 +61,11 @@ function AttributeView(options){
 
     form.buttons.append("button")
         .text("Save")
-        .on("click", events.saveAttr);
+        .on("click", events.saveRule);
 
     form.buttons.append("button")
         .text("Cancel")
-        .on("click", events.cancelAttr);
+        .on("click", events.cancelRule);
 
     // end ui
 
@@ -119,7 +119,7 @@ function AttributeView(options){
         displayElement();
     }
 
-    function getAttr(){
+    function getRule(){
         var attr = formState.attr;
         var name = nameInput.property("value");
         if ( name === "" || !controller.legalName(name)){

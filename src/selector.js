@@ -1,6 +1,5 @@
 // returns a function that takes an element and returns it's tag,
 // id, and classes in css selector form
-// include attribute selectors in the future?
 function selectorParts(){
     var skipTags = [];
     var skipClasses = [];

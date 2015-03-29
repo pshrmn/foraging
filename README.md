@@ -4,18 +4,18 @@ A Chrome extension to determine how to collect data from a page.
 
 ###Format
 
-#####Attr
+#####Rule
 
-Data is captured through `attr`s. An attr has a name and the attribute of an element to capture (or text).
+Data is captured through `rule`s. A rule has a name and the attribute of an element to capture (or text).
 
-    attr = {
+    rule = {
         name: "h1",
         attr: "title"
     }
 
 #####Selector
 
-Attrs are created on `selector`s. Selectors are made up of a css `selector`, `children` selectors, `attrs`, and an optional `index` that can be used on a selector to specify a specific element to target. (default behavior includes all matching elements. `index` is zero-based)
+Rules are created on `selector`s. Selectors are made up of a css `selector`, `children` selectors, `rules`, and an optional `index` that can be used on a selector to specify a specific element to target. (default behavior includes all matching elements. `index` is zero-based)
 
     {
         type: "index",
@@ -35,7 +35,7 @@ or
             {
                 selector: "a",
                 children: [],
-                attrs: [
+                rules: [
                     {
                         name: "url",
                         attr: "href"
@@ -43,7 +43,7 @@ or
                 ]
             }
         ],
-        attrs: [
+        rules: [
             {
                 name: "description",
                 attr: "text"
@@ -61,7 +61,7 @@ A `page` is a special type of `selector` that has a `name`. Its `selector` is th
         name: "roster",
         selector: "body",
         children: [...],
-        attrs: []
+        rules: []
     }
 
 And a site can have multiple, independent pages, each of which is uploaded individually to the server. The extension stores a `pages` object for each site (determined by the hostname)

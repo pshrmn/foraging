@@ -58,9 +58,9 @@ function TreeView(options){
     ***/
 
     function empty(sel){
-        var hasAttrs = sel.attrs.length;
+        var hasRules = sel.rules.length;
         var hasChildren = sel.children ? sel.children.length > 0 : false;
-        return !hasAttrs && !hasChildren;
+        return !hasRules && !hasChildren;
     }
 
     var fns = {
@@ -119,13 +119,13 @@ function TreeView(options){
 
             node.append("circle")
                 .filter(function(d){
-                    return d.attrs.length === 0;
+                    return d.rules.length === 0;
                 })
                 .attr("r", 3);
 
             node.append("rect")
                 .filter(function(d){
-                    return d.attrs.length > 0;
+                    return d.rules.length > 0;
                 })
                 .attr("width", 6)
                 .attr("height", 6)

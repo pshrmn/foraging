@@ -12,11 +12,11 @@ function PageView(options){
         addChild: function(){
             controller.addSelector();
         },
-        addAttr: function(){
-            controller.addAttr();
+        addRule: function(){
+            controller.addRule();
         },
-        removeAttr: function(d, i){
-            selector.attrs.splice(i, 1);
+        removeRule: function(d, i){
+            selector.rules.splice(i, 1);
             showSelector();
             controller.setSelector(selector);
         },
@@ -39,15 +39,15 @@ function PageView(options){
         .append("span");
 
     var selectorType = sf.workarea.append("p");
-    var selectorAttrs = sf.workarea.append("div");
+    var selectorRules = sf.workarea.append("div");
 
     sf.buttons.append("button")
         .text("add child")
         .on("click", events.addChild);
 
     sf.buttons.append("button")
-        .text("add attr")
-        .on("click", events.addAttr);
+        .text("add rule")
+        .on("click", events.addRule);
 
     sf.buttons.append("button")
         .text("remove")
@@ -71,19 +71,19 @@ function PageView(options){
             return d.id === currentId;
         });
 
-        showAttrs(selectorAttrs, selector.attrs);
+        showRules(selectorRules, selector.rules);
     }
 
-    function showAttrs(holder, attrs){
+    function showRules(holder, rules){
         holder.selectAll("*").remove();
-        if ( !attrs || attrs.length === 0 ) {
-            holder.append("p").text("No Attrs");
+        if ( !rules || rules.length === 0 ) {
+            holder.append("p").text("No Rules");
             return;
         }
-        holder.append("p").text("Attrs:");
-        var attrList = holder.append("ul");
-        var lis = attrList.selectAll("li")
-                .data(attrs)
+        holder.append("p").text("Rules:");
+        var ruleList = holder.append("ul");
+        var lis = ruleList.selectAll("li")
+                .data(rules)
             .enter().append("li")
                 .text(function(d){
                     return d.name + " <" + d.attr + ">";
@@ -91,14 +91,14 @@ function PageView(options){
 
         lis.append("button")
             .text("×")
-            .on("click", events.removeAttr);
+            .on("click", events.removeRule);
     }
 
     function clearSelector(){
         sf.form.classed("hidden", true);
         selectorText.text("");
         selectorType.text("");
-        selectorAttrs.selectAll("*").remove();
+        selectorRules.selectAll("*").remove();
     }
 
     var fns = {

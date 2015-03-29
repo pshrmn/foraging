@@ -28,7 +28,7 @@ module.exports = function(grunt){
                 src: ['src/attributes.js', 'src/objects.js', 'src/markup.js',
                     'src/selector.js', 'src/page.js', 'src/controller.js',
                     'src/topbar.js', 'src/chrome.js', 'src/utility.js',
-                    'src/attributeView.js', 'src/pageView.js',
+                    'src/ruleView.js', 'src/pageView.js',
                     'src/selectorView.js', 'src/treeView.js',
                     'src/ui.js', 'src/collector.js'],
                 dest: 'collector/collector.js',

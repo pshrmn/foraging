@@ -32,11 +32,11 @@ function newSelector(selector, spec){
         selector: selector,
         spec: spec,
         children: [],
-        attrs: []
+        rules: []
     };
 }
 
-function newAttr(name, attr){
+function newRule(name, attr){
     return {
         name: name,
         attr: attr
@@ -52,7 +52,7 @@ function newPage(name){
             value: 0
         },
         children: [],
-        attrs: [],
+        rules: [],
         elements: [document.body]
     };
 }
@@ -150,7 +150,6 @@ function interactiveElements(){
 // Source: src/selector.js
 // returns a function that takes an element and returns it's tag,
 // id, and classes in css selector form
-// include attribute selectors in the future?
 function selectorParts(){
     var skipTags = [];
     var skipClasses = [];
@@ -275,7 +274,7 @@ function cleanPage(page){
     function cleanSelector(s, clone){
         clone.selector = s.selector;
         clone.spec = s.spec;
-        clone.attrs = s.attrs.slice();
+        clone.rules = s.rules.slice();
         clone.children = s.children.map(function(child){
             return cleanSelector(child, {});
         });
@@ -300,7 +299,7 @@ function matchSelector(sel, parent){
     });
 }
 
-// get an array containing the names of all attrs in the page
+// get an array containing the names of all rules in the page
 function usedNames(page){
     var names = [];
 
@@ -308,7 +307,7 @@ function usedNames(page){
         if ( selector.spec.type === "name" ) {
             names.push(selector.spec.value);
         }
-        selector.attrs.forEach(function(n){
+        selector.rules.forEach(function(n){
             names.push(n.name);
         });
 
@@ -321,23 +320,6 @@ function usedNames(page){
         findNames(page.pages[name]);
     }
     return names;
-}
-
-function followedAttrs(page){
-    var attrs = [];
-
-    function findFollowedAttrs(selector){
-        selector.attrs.forEach(function(attr){
-            if ( attr.follow ) {
-                attrs.push(attr.name);
-            }
-        });
-        selector.children.forEach(function(child){
-            findFollowedAttrs(child);
-        });
-    }
-    findFollowedAttrs(page);
-    return attrs;
 }
 
 // Source: src/controller.js
@@ -392,7 +374,7 @@ function collectorController(){
             clone.selector = selector.selector;
             clone.id = selector.id;
             clone.spec = selector.spec;
-            clone.attrs = selector.attrs.slice();
+            clone.rules = selector.rules.slice();
             clone.elements = selector.elements.slice();
             clone.children = selector.children.map(function(child){
                 return setClone(child, {});
@@ -406,7 +388,7 @@ function collectorController(){
         fns.dispatch.Tree.reset();
         fns.dispatch.Page.reset();
         fns.dispatch.Selector.reset();
-        fns.dispatch.Attribute.reset();
+        fns.dispatch.Rule.reset();
     }
 
     function allSelects(elements){
@@ -566,18 +548,18 @@ function collectorController(){
             chromeSave(pages);
             return true;
         },
-        // add an Attr to the current selector
-        addAttr: function(){
-            fns.dispatch.Attribute.setElements(selector.elements);
+        // add an Rule to the current selector
+        addRule: function(){
+            fns.dispatch.Rule.setElements(selector.elements);
             fns.dispatch.Tree.turnOff();
-            ui.showView("Attribute");
+            ui.showView("Rule");
         },
-        cancelAttr: function(){
+        cancelRule: function(){
             fns.dispatch.Tree.turnOn();
             ui.showView("Page");
         },
-        saveAttr: function(attr){
-            selector.attrs.push(attr);
+        saveRule: function(rule){
+            selector.rules.push(rule);
             var clone = clonePage();
             fns.dispatch.Tree.draw(clone);
             fns.dispatch.Page.setSelector(selector);
@@ -821,8 +803,8 @@ function abbreviate(text, max) {
     return firstText + "..." + secondText;
 }
 
-// Source: src/attributeView.js
-function AttributeView(options){
+// Source: src/ruleView.js
+function RuleView(options){
     var index = 0;
     var eles = [];
     var length = 0;
@@ -833,17 +815,17 @@ function AttributeView(options){
     var saveFn = options.save || function(){};
 
     var events = {
-        saveAttr: function(){
-            var attr = getAttr();
-            if ( attr === undefined ) {
+        saveRule: function(){
+            var rule = getRule();
+            if ( rule === undefined ) {
                 return;
             }
-            controller.saveAttr(attr);
+            controller.saveRule(rule);
             fns.reset();
         },
-        cancelAttr: function(){
+        cancelRule: function(){
             fns.reset();
-            controller.cancelAttr();
+            controller.cancelRule();
         }
     };
 
@@ -885,11 +867,11 @@ function AttributeView(options){
 
     form.buttons.append("button")
         .text("Save")
-        .on("click", events.saveAttr);
+        .on("click", events.saveRule);
 
     form.buttons.append("button")
         .text("Cancel")
-        .on("click", events.cancelAttr);
+        .on("click", events.cancelRule);
 
     // end ui
 
@@ -943,7 +925,7 @@ function AttributeView(options){
         displayElement();
     }
 
-    function getAttr(){
+    function getRule(){
         var attr = formState.attr;
         var name = nameInput.property("value");
         if ( name === "" || !controller.legalName(name)){
@@ -991,11 +973,11 @@ function PageView(options){
         addChild: function(){
             controller.addSelector();
         },
-        addAttr: function(){
-            controller.addAttr();
+        addRule: function(){
+            controller.addRule();
         },
-        removeAttr: function(d, i){
-            selector.attrs.splice(i, 1);
+        removeRule: function(d, i){
+            selector.rules.splice(i, 1);
             showSelector();
             controller.setSelector(selector);
         },
@@ -1018,15 +1000,15 @@ function PageView(options){
         .append("span");
 
     var selectorType = sf.workarea.append("p");
-    var selectorAttrs = sf.workarea.append("div");
+    var selectorRules = sf.workarea.append("div");
 
     sf.buttons.append("button")
         .text("add child")
         .on("click", events.addChild);
 
     sf.buttons.append("button")
-        .text("add attr")
-        .on("click", events.addAttr);
+        .text("add rule")
+        .on("click", events.addRule);
 
     sf.buttons.append("button")
         .text("remove")
@@ -1050,19 +1032,19 @@ function PageView(options){
             return d.id === currentId;
         });
 
-        showAttrs(selectorAttrs, selector.attrs);
+        showRules(selectorRules, selector.rules);
     }
 
-    function showAttrs(holder, attrs){
+    function showRules(holder, rules){
         holder.selectAll("*").remove();
-        if ( !attrs || attrs.length === 0 ) {
-            holder.append("p").text("No Attrs");
+        if ( !rules || rules.length === 0 ) {
+            holder.append("p").text("No Rules");
             return;
         }
-        holder.append("p").text("Attrs:");
-        var attrList = holder.append("ul");
-        var lis = attrList.selectAll("li")
-                .data(attrs)
+        holder.append("p").text("Rules:");
+        var ruleList = holder.append("ul");
+        var lis = ruleList.selectAll("li")
+                .data(rules)
             .enter().append("li")
                 .text(function(d){
                     return d.name + " <" + d.attr + ">";
@@ -1070,14 +1052,14 @@ function PageView(options){
 
         lis.append("button")
             .text("×")
-            .on("click", events.removeAttr);
+            .on("click", events.removeRule);
     }
 
     function clearSelector(){
         sf.form.classed("hidden", true);
         selectorText.text("");
         selectorType.text("");
-        selectorAttrs.selectAll("*").remove();
+        selectorRules.selectAll("*").remove();
     }
 
     var fns = {
@@ -1519,9 +1501,9 @@ function TreeView(options){
     ***/
 
     function empty(sel){
-        var hasAttrs = sel.attrs.length;
+        var hasRules = sel.rules.length;
         var hasChildren = sel.children ? sel.children.length > 0 : false;
-        return !hasAttrs && !hasChildren;
+        return !hasRules && !hasChildren;
     }
 
     var fns = {
@@ -1580,13 +1562,13 @@ function TreeView(options){
 
             node.append("circle")
                 .filter(function(d){
-                    return d.attrs.length === 0;
+                    return d.rules.length === 0;
                 })
                 .attr("r", 3);
 
             node.append("rect")
                 .filter(function(d){
-                    return d.attrs.length > 0;
+                    return d.rules.length > 0;
                 })
                 .attr("width", 6)
                 .attr("height", 6)
@@ -1725,7 +1707,7 @@ var ui = buildUI(controller);
 ui.addViews([
     [PageView, "Page", {}, true],
     [SelectorView, "Selector"],
-    [AttributeView, "Attribute"]
+    [RuleView, "Rule"]
 ]);
 
 ui.addTree(TreeView, "Tree", {
