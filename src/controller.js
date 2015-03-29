@@ -3,18 +3,16 @@ function collectorController(){
     var currentPage;
     var page;
     var selector;
-    var currentSelectorId;
     var lastId;
 
     function setupPage(){
         generateIds();
         getMatches();
-        currentSelectorId = 0;
         // page is base selector, has id 0
         selector = page;
         fns.dispatch.Page.setSelector(selector);
         var clone = clonePage();
-        fns.dispatch.Tree.draw(clone, currentSelectorId);
+        fns.dispatch.Tree.draw(clone, selector.id);
     }
 
     function generateIds(){
@@ -107,7 +105,6 @@ function collectorController(){
             currentPage = undefined;
             page = undefined;
             selector = undefined;
-            currentSelectorId = undefined;
             resetAll();
             var options = Object.keys(pages);
             ui.setPages(options);
@@ -121,7 +118,6 @@ function collectorController(){
             });
         },
         setSelectorById: function(id){
-            currentSelectorId = id;
             function find(sel, id){
                 if ( sel.id === id ) {
                     selector = sel;
@@ -140,8 +136,7 @@ function collectorController(){
         setSelector: function(sel){
             selector = sel;
             var clone = clonePage();
-            fns.dispatch.Tree.draw(clone);
-            fns.dispatch.Tree.setCurrent(selector.id);
+            fns.dispatch.Tree.draw(clone, selector.id);
             chromeSave(pages);
         },
         getSelector: function(){
@@ -184,9 +179,8 @@ function collectorController(){
             } else {
                 remove(page, selector.id);
                 selector = page;
-                currentSelectorId = selector.id;
                 var clone = clonePage();
-                fns.dispatch.Tree.draw(clone);
+                fns.dispatch.Tree.draw(clone, selector.id);
                 fns.dispatch.Page.setSelector(selector);
             }
             chromeSave(pages);
@@ -213,12 +207,11 @@ function collectorController(){
                 opts.elements = fns.elements(sel.elements, opts.selector, opts.spec);
                 sel.children.push(opts);
             }
-
             selector.children.push(sel);
             selector = sel;
             ui.showView("Page");
             var clone = clonePage();
-            fns.dispatch.Tree.draw(clone);
+            fns.dispatch.Tree.draw(clone, selector.id);
             fns.dispatch.Page.setSelector(selector);
             chromeSave(pages);
             return true;
@@ -236,7 +229,7 @@ function collectorController(){
         saveRule: function(rule){
             selector.rules.push(rule);
             var clone = clonePage();
-            fns.dispatch.Tree.draw(clone);
+            fns.dispatch.Tree.draw(clone, selector.id);
             fns.dispatch.Page.setSelector(selector);
             ui.showView("Page");
             chromeSave(pages);
@@ -267,8 +260,7 @@ function collectorController(){
             chromeSave(pages);
         },
         close: function(){
-            fns.dispatch.Selector.reset();
-            fns.dispatch.Page.reset();
+            resetAll();
         },
         // used to interact with views
         dispatch: {},

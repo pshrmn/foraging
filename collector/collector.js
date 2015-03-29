@@ -328,18 +328,16 @@ function collectorController(){
     var currentPage;
     var page;
     var selector;
-    var currentSelectorId;
     var lastId;
 
     function setupPage(){
         generateIds();
         getMatches();
-        currentSelectorId = 0;
         // page is base selector, has id 0
         selector = page;
         fns.dispatch.Page.setSelector(selector);
         var clone = clonePage();
-        fns.dispatch.Tree.draw(clone, currentSelectorId);
+        fns.dispatch.Tree.draw(clone, selector.id);
     }
 
     function generateIds(){
@@ -432,7 +430,6 @@ function collectorController(){
             currentPage = undefined;
             page = undefined;
             selector = undefined;
-            currentSelectorId = undefined;
             resetAll();
             var options = Object.keys(pages);
             ui.setPages(options);
@@ -446,7 +443,6 @@ function collectorController(){
             });
         },
         setSelectorById: function(id){
-            currentSelectorId = id;
             function find(sel, id){
                 if ( sel.id === id ) {
                     selector = sel;
@@ -465,8 +461,7 @@ function collectorController(){
         setSelector: function(sel){
             selector = sel;
             var clone = clonePage();
-            fns.dispatch.Tree.draw(clone);
-            fns.dispatch.Tree.setCurrent(selector.id);
+            fns.dispatch.Tree.draw(clone, selector.id);
             chromeSave(pages);
         },
         getSelector: function(){
@@ -509,9 +504,8 @@ function collectorController(){
             } else {
                 remove(page, selector.id);
                 selector = page;
-                currentSelectorId = selector.id;
                 var clone = clonePage();
-                fns.dispatch.Tree.draw(clone);
+                fns.dispatch.Tree.draw(clone, selector.id);
                 fns.dispatch.Page.setSelector(selector);
             }
             chromeSave(pages);
@@ -538,12 +532,11 @@ function collectorController(){
                 opts.elements = fns.elements(sel.elements, opts.selector, opts.spec);
                 sel.children.push(opts);
             }
-
             selector.children.push(sel);
             selector = sel;
             ui.showView("Page");
             var clone = clonePage();
-            fns.dispatch.Tree.draw(clone);
+            fns.dispatch.Tree.draw(clone, selector.id);
             fns.dispatch.Page.setSelector(selector);
             chromeSave(pages);
             return true;
@@ -561,7 +554,7 @@ function collectorController(){
         saveRule: function(rule){
             selector.rules.push(rule);
             var clone = clonePage();
-            fns.dispatch.Tree.draw(clone);
+            fns.dispatch.Tree.draw(clone, selector.id);
             fns.dispatch.Page.setSelector(selector);
             ui.showView("Page");
             chromeSave(pages);
@@ -592,8 +585,7 @@ function collectorController(){
             chromeSave(pages);
         },
         close: function(){
-            fns.dispatch.Selector.reset();
-            fns.dispatch.Page.reset();
+            resetAll();
         },
         // used to interact with views
         dispatch: {},
@@ -1442,10 +1434,7 @@ function SelectorView(options){
 
 // Source: src/treeView.js
 function TreeView(options){
-
     var page;
-    var selector;
-    var currentSelector;
 
     options = options || {};
     var holder = options.holder || document.body;
@@ -1464,14 +1453,15 @@ function TreeView(options){
             svg.selectAll(".node").classed("current", function(d){
                 return d.id === node.id;
             });
+            highlightSelectorElements(node);
         },
-        enterNode: function(d){
-            d.elements.forEach(function(ele){
+        enterNode: function(node){
+            node.elements.forEach(function(ele){
                 ele.classList.add("saved-preview");
             });
         },
-        exitNode: function(d){
-            d.elements.forEach(function(ele){
+        exitNode: function(node){
+            node.elements.forEach(function(ele){
                 ele.classList.remove("saved-preview");
             });
         }
@@ -1506,6 +1496,13 @@ function TreeView(options){
         return !hasRules && !hasChildren;
     }
 
+    function highlightSelectorElements(sel){
+        clearClass("current-selector");
+        sel.elements.forEach(function(ele){
+            ele.classList.add("current-selector");
+        });
+    }
+
     var fns = {
         draw: function(page, currentId){
             currentId = currentId || 0;
@@ -1538,7 +1535,12 @@ function TreeView(options){
                 })
                 .on("click", events.clickNode)
                 .on("mouseenter", events.enterNode)
-                .on("mouseleave", events.exitNode);
+                .on("mouseleave", events.exitNode)
+                .each(function(d){
+                    if ( d.id === currentId ) {
+                        highlightSelectorElements(d);
+                    }
+                });
 
             node.attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; });
 
@@ -1578,11 +1580,6 @@ function TreeView(options){
             node.exit().remove();
             svg.classed("not-allowed", false);
         },
-        setCurrent: function(id){
-            svg.selectAll(".node").classed("current", function(d){
-                return d.id === id;
-            });
-        },
         turnOn: function(){
             svg.classed("not-allowed", false);
             g.selectAll(".node")
@@ -1600,6 +1597,7 @@ function TreeView(options){
         },
         reset: function(){
             g.selectAll("*").remove();
+            clearClass("current-selector");
         }
     };
     return fns;

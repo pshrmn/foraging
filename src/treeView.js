@@ -1,8 +1,5 @@
 function TreeView(options){
-
     var page;
-    var selector;
-    var currentSelector;
 
     options = options || {};
     var holder = options.holder || document.body;
@@ -21,14 +18,15 @@ function TreeView(options){
             svg.selectAll(".node").classed("current", function(d){
                 return d.id === node.id;
             });
+            highlightSelectorElements(node);
         },
-        enterNode: function(d){
-            d.elements.forEach(function(ele){
+        enterNode: function(node){
+            node.elements.forEach(function(ele){
                 ele.classList.add("saved-preview");
             });
         },
-        exitNode: function(d){
-            d.elements.forEach(function(ele){
+        exitNode: function(node){
+            node.elements.forEach(function(ele){
                 ele.classList.remove("saved-preview");
             });
         }
@@ -63,6 +61,13 @@ function TreeView(options){
         return !hasRules && !hasChildren;
     }
 
+    function highlightSelectorElements(sel){
+        clearClass("current-selector");
+        sel.elements.forEach(function(ele){
+            ele.classList.add("current-selector");
+        });
+    }
+
     var fns = {
         draw: function(page, currentId){
             currentId = currentId || 0;
@@ -95,7 +100,12 @@ function TreeView(options){
                 })
                 .on("click", events.clickNode)
                 .on("mouseenter", events.enterNode)
-                .on("mouseleave", events.exitNode);
+                .on("mouseleave", events.exitNode)
+                .each(function(d){
+                    if ( d.id === currentId ) {
+                        highlightSelectorElements(d);
+                    }
+                });
 
             node.attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; });
 
@@ -135,11 +145,6 @@ function TreeView(options){
             node.exit().remove();
             svg.classed("not-allowed", false);
         },
-        setCurrent: function(id){
-            svg.selectAll(".node").classed("current", function(d){
-                return d.id === id;
-            });
-        },
         turnOn: function(){
             svg.classed("not-allowed", false);
             g.selectAll(".node")
@@ -157,6 +162,7 @@ function TreeView(options){
         },
         reset: function(){
             g.selectAll("*").remove();
+            clearClass("current-selector");
         }
     };
     return fns;
