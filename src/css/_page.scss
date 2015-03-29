@@ -1,29 +1,29 @@
-.selectableElement{
+.selectable-element{
     box-shadow: inset 0 0 2px $red !important;
 }
 
-img.selectableElement{
+img.selectable-element{
     border: 1px dashed $red !important;
 }
 
-.collectHighlight{
+.collect-highlight{
     background: rgba(46,130,158,0.5) !important;
 }
 
-img.collectHighlight{
+img.collect-highlight{
     opacity: 0.25 !important;
 }
 
-.queryCheck{
+.query-check{
     background: rgba(255, 215, 0, 0.25) !important;
-    box-shadow: inset 0 0 1px yellow;
+    box-shadow: inset 0 0 1px $gold;
 }
 
 
-.savedPreview{
+.saved-preview{
     background: rgba(255,0,0,0.25) !important;
 }
 
-img.savedPreview{
+img.saved-preview{
     border: 1px solid rgba(255,0,0,0.25) !important;    
 }

@@ -21,29 +21,12 @@ function SelectorView(options){
             if ( sel === undefined || sel.selector === "" ) {
                 return;
             }
-            var parent = controller.getSelector();
-            // only save if page doesn't have 
-            if ( !matchSelector(sel, parent) ) {
-                sel.id = controller.nextId();
-                sel.elements = controller.elements(parent.elements, sel.selector, sel.spec);
-                // SPECIAL CASE FOR SELECT ELEMENTS, AUTOMATICALLY ADD OPTION CHILD
-                if ( allSelects(sel.elements ) ) {
-                    var optionsName = prompt("What should the options be called?");
-                    if ( optionsName === null || optionsName.trim() === "" ) {
-                        optionsName = "options";
-                    }
-                    var optionsSelector = newSelector("option", {
-                        type: "name",
-                        value: optionsName
-                    });
-                    sel.children.push(optionsSelector);
-                }
-                controller.saveSelector(sel);
+            var success = controller.saveSelector(sel);
+            if ( success ) {
+                fns.reset();
+                interactive.remove();
+                showcase.remove();
             }
-
-            fns.reset();
-            interactive.remove();
-            showcase.remove();
         },
         selectChoice: function(d){
             showcase.remove();
@@ -68,7 +51,7 @@ function SelectorView(options){
         },
         cancelSelector: function(){
             fns.reset();
-            ui.showView("Page");
+            controller.cancelSelector();
         },
         toggleTag: function(){
             this.classList.toggle("on");
@@ -178,19 +161,19 @@ function SelectorView(options){
     // end selectorType
     // end ui
 
-        // apply the queryCheck class to selected elements
+        // apply the query-check class to selected elements
     var showcase = highlightElements()
-        .cssClass("queryCheck");
+        .cssClass("query-check");
 
     var interactive = interactiveElements()
-        .cssClass("selectableElement")
-        .hoverClass("collectHighlight")
+        .cssClass("selectable-element")
+        .hoverClass("collect-highlight")
         .clicked(function selectOption(event){
             event.preventDefault();
             event.stopPropagation();
             var data = [].slice.call(event.path)
                 .filter(function(ele){
-                    return ele.classList && ele.classList.contains("selectableElement");
+                    return ele.classList && ele.classList.contains("selectable-element");
                 })
                 .reverse()
                 .map(function(ele){
@@ -252,7 +235,7 @@ function SelectorView(options){
     // parts is given an element and returns an array containing its tag
     // and (if they exist) its id and any classes
     var getParts = selectorParts()
-        .ignoreClasses(["collectHighlight", "queryCheck", "selectableElement"]);
+        .ignoreClasses(["collect-highlight", "query-check", "selectable-element"]);
 
     function markup(){
         showcase.remove();
@@ -282,7 +265,7 @@ function SelectorView(options){
         choices.enter().append("div")
             .classed({
                 "tag": true,
-                "noSelect": true
+                "no-select": true
             })
             .on("click", events.selectChoice);
         choices.text(function(d){ return d.join(""); });
@@ -301,7 +284,7 @@ function SelectorView(options){
             .classed({
                 "tag": true,
                 "on": true,
-                "noSelect": true
+                "no-select": true
             })
             .on("click", events.toggleTag);
         
@@ -342,12 +325,6 @@ function SelectorView(options){
             }
         });
         return tags.join("");
-    }
-
-    function allSelects(elements){
-        return elements.every(function(e){
-            return e.tagName === "SELECT";
-        });
     }
 
     var fns = {

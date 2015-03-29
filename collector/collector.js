@@ -211,7 +211,7 @@ function selectorParts(){
 }
 
 function elementSelector(){
-    var not = ".noSelect";
+    var not = ".no-select";
 
     function select(elements, selector, spec){
         var matches = [];
@@ -344,12 +344,77 @@ function followedAttrs(page){
 function collectorController(){
     var pages;
     var currentPage;
-    // a list of all attr names in the page
-    var pageAttrs = [];
     var page;
     var selector;
+    var currentSelectorId;
+    var lastId;
 
-    var idCount = 0;
+    function setupPage(){
+        generateIds();
+        getMatches();
+        currentSelectorId = 0;
+        // page is base selector, has id 0
+        selector = page;
+        fns.dispatch.Page.setSelector(selector);
+        var clone = clonePage();
+        fns.dispatch.Tree.draw(clone, currentSelectorId);
+    }
+
+    function generateIds(){
+        var idCount = 0;
+        function setId(sel){
+            sel.id = idCount++;
+            sel.children.forEach(function(child){
+                setId(child);
+            });
+        }
+        setId(page);
+        lastId = idCount;
+    }
+
+    // get all of the elements that match each selector
+    // and store in object.elements
+    function getMatches(){
+        function match(eles, s){
+            if ( !s.elements ) {
+                s.elements = fns.elements(eles, s.selector, s.spec);
+            }
+            s.children.forEach(function(child){
+                match(s.elements, child);
+            });      
+        }
+
+        match([document], page);
+    }
+
+    function clonePage(){
+        function setClone(selector, clone){
+            clone.selector = selector.selector;
+            clone.id = selector.id;
+            clone.spec = selector.spec;
+            clone.attrs = selector.attrs.slice();
+            clone.elements = selector.elements.slice();
+            clone.children = selector.children.map(function(child){
+                return setClone(child, {});
+            });
+            return clone;
+        }
+        return setClone(page, {});
+    }
+
+    function resetAll(){
+        fns.dispatch.Tree.reset();
+        fns.dispatch.Page.reset();
+        fns.dispatch.Selector.reset();
+        fns.dispatch.Attribute.reset();
+    }
+
+    function allSelects(elements){
+        return elements.every(function(e){
+            return e.tagName === "SELECT";
+        });
+    }
+
     var fns = {
         elements: elementSelector(),
         loadPages: function(ps){
@@ -358,51 +423,165 @@ function collectorController(){
             ui.setPages(options);
         },
         loadPage: function(pageName){
+            resetAll();
+            if ( pages[pageName] === undefined ) {
+                return;
+            }
             currentPage = pageName;
-            idCount = 0;
             page = pages[pageName];
-            selector = page;
+            setupPage();
             ui.showView("Page");
-            fns.dispatch.Page.setPage(page);
-        },
-        setVals: function(newPage, newSelector){
-            currentPage = newPage.name;
-            page = newPage;
-            pages[currentPage] = page;
-            selector = newSelector;
-            chromeSave(pages);
         },
         addPage: function(name){
             if ( pages[name] === undefined && legalPageName(name) ) {
-                pages[name] = newPage(name);
-                ui.setPages(Object.keys(pages), name);
-                fns.loadPage(name);
+                page = newPage(name);
+                currentPage = name;
+                pages[name] = page;
+                setupPage();
+                ui.showView("Page");
+                // update options after adding page to pages
+                var options = Object.keys(pages);
+                ui.setPages(options, name);
                 chromeSave(pages);
             }
         },
         removePage: function(){
             delete pages[currentPage];
-            //fns.setPage("default");
-            ui.setPages(Object.keys(pages));
-            fns.dispatch.Page.reset();
-            chromeSave(pages);
             currentPage = undefined;
+            page = undefined;
+            selector = undefined;
+            currentSelectorId = undefined;
+            resetAll();
+            var options = Object.keys(pages);
+            ui.setPages(options);
+            chromeSave(pages);
         },
-        nextId: function(){
-            return idCount++;
+        upload: function(){
+            chromeUpload({
+                name: currentPage,
+                site: window.location.hostname,
+                page: page
+            });
+        },
+        setSelectorById: function(id){
+            currentSelectorId = id;
+            function find(sel, id){
+                if ( sel.id === id ) {
+                    selector = sel;
+                    return true;
+                }
+                return sel.children.some(function(child){
+                    return find(child, id);
+                });
+            }
+            
+            if ( !find(page, id) ) {
+                selector = undefined;
+            }
+            fns.dispatch.Page.setSelector(selector);
+        },
+        setSelector: function(sel){
+            selector = sel;
+            var clone = clonePage();
+            fns.dispatch.Tree.draw(clone);
+            fns.dispatch.Tree.setCurrent(selector.id);
+            chromeSave(pages);
         },
         getSelector: function(){
             return selector;
         },
-        setSelector: function(d){
-            selector = d;
+        // add a selector as a child of the current selector
+        addSelector: function(){
+            var eles = fns.elements(selector.elements);
+            fns.dispatch.Selector.setup(eles);
+            fns.dispatch.Tree.turnOff();
+            ui.showView("Selector");
+        },
+        cancelSelector: function(){
+            fns.dispatch.Tree.turnOn();
+            ui.showView("Page");
+        },
+        // remove the current selector and set the body to the current
+        removeSelector: function(){
+
+            function remove(sel, lid){
+                if ( sel.id === lid ) {
+                    return true;
+                }
+                var curr;
+                for ( var i=0; i<sel.children.length; i++ ) {
+                    curr = sel.children[i];
+                    if ( remove(curr, lid) ) {
+                        // remove the child and return
+                        sel.children.splice(i, 1);
+                        return;
+                    }
+                }
+                return false;
+            }
+            if ( page.id === selector.id ) {
+                // remove the page
+                resetAll();
+                fns.removePage();
+                fns.dispatch.Tree.reset();
+            } else {
+                remove(page, selector.id);
+                selector = page;
+                currentSelectorId = selector.id;
+                var clone = clonePage();
+                fns.dispatch.Tree.draw(clone);
+                fns.dispatch.Page.setSelector(selector);
+            }
+            chromeSave(pages);
         },
         saveSelector: function(sel){
+            sel.id = ++lastId;
+
+            // only save if page doesn't have 
+            if ( matchSelector(sel, selector) ) {
+                return false;
+            }
+            sel.elements = fns.elements(selector.elements, sel.selector, sel.spec);
+            // SPECIAL CASE FOR SELECT ELEMENTS, AUTOMATICALLY ADD OPTION CHILD
+            if ( allSelects(sel.elements ) ) {
+                var optionsName = prompt("What should the options be called?");
+                if ( optionsName === null || optionsName.trim() === "" ) {
+                    optionsName = "options";
+                }
+                var opts = newSelector("option", {
+                    type: "name",
+                    value: optionsName
+                });
+                opts.id = ++lastId;
+                opts.elements = fns.elements(sel.elements, opts.selector, opts.spec);
+                sel.children.push(opts);
+            }
+
             selector.children.push(sel);
             selector = sel;
             ui.showView("Page");
-            fns.dispatch.Page.setPage(page, selector);
-
+            var clone = clonePage();
+            fns.dispatch.Tree.draw(clone);
+            fns.dispatch.Page.setSelector(selector);
+            chromeSave(pages);
+            return true;
+        },
+        // add an Attr to the current selector
+        addAttr: function(){
+            fns.dispatch.Attribute.setElements(selector.elements);
+            fns.dispatch.Tree.turnOff();
+            ui.showView("Attribute");
+        },
+        cancelAttr: function(){
+            fns.dispatch.Tree.turnOn();
+            ui.showView("Page");
+        },
+        saveAttr: function(attr){
+            selector.attrs.push(attr);
+            var clone = clonePage();
+            fns.dispatch.Tree.draw(clone);
+            fns.dispatch.Page.setSelector(selector);
+            ui.showView("Page");
             chromeSave(pages);
         },
         eleCount: function(sel, spec){
@@ -411,44 +590,6 @@ function collectorController(){
         legalName: function(name){
             return !usedNames(page).some(function(n){
                 return n === name;
-            });
-        },
-        getPage: function(){
-            return page;
-        },
-        isUrl: function(){
-            var url = window.location.href;
-            if ( page ) {
-                return page.urls.some(function(curl){
-                    return curl === url;
-                });
-            } else {
-                return false;
-            }
-        },
-        addChild: function(){
-            var eles = fns.elements(selector.elements);
-            fns.dispatch.Selector.setup(eles);
-            ui.showView("Selector");
-        },
-        addAttr: function(){
-            fns.dispatch.Attribute.setElements(selector.elements);
-            ui.showView("Attribute");
-        },
-        saveAttr: function(attr){
-            selector.attrs.push(attr);
-            ui.showView("Page");
-            fns.dispatch.Page.setPage(page, selector);
-            chromeSave(pages);
-        },
-        save: function(){
-            chromeSave(pages);
-        },
-        upload: function(){
-            chromeUpload({
-                name: currentPage,
-                site: window.location.hostname,
-                page: page
             });
         },
         startSync: function(){
@@ -471,7 +612,6 @@ function collectorController(){
         close: function(){
             fns.dispatch.Selector.reset();
             fns.dispatch.Page.reset();
-            ui.close();
         },
         // used to interact with views
         dispatch: {},
@@ -703,7 +843,7 @@ function AttributeView(options){
         },
         cancelAttr: function(){
             fns.reset();
-            ui.showView("Page");
+            controller.cancelAttr();
         }
     };
 
@@ -843,99 +983,31 @@ function PageView(options){
     **********/
     options = options || {};
     var holder = options.holder || document.body;
-    var width = options.width || 600;
-    var height = options.height || 300;
-    var margin = options.margin || {
-        top: 15,
-        right: 25,
-        bottom: 15,
-        left: 100
-    };
 
     var page;
     var selector;
 
     var events = {
-        removeSelector: function(){
-            var id = selector.id;
-            // handle deleting root
-            function remove(selector, lid){
-                if ( selector.id === lid ) {
-                    return true;
-                }
-                var curr;
-                for ( var i=0; i<selector.children.length; i++ ) {
-                    curr = selector.children[i];
-                    if ( remove(curr, lid) ) {
-                        // remove the child and return
-                        selector.children.splice(i, 1);
-                        return;
-                    }
-                }
-                return false;
-            }
-            if ( page.id === id ) {
-                // remove the page
-                fns.reset();
-                controller.removePage();
-            } else {
-                remove(page, id);
-                selector = page;
-                controller.setVals(page, selector);
-                drawPage();
-                showSelector();
-            }
-        },
         addChild: function(){
-            controller.addChild();
+            controller.addSelector();
         },
         addAttr: function(){
             controller.addAttr();
         },
         removeAttr: function(d, i){
             selector.attrs.splice(i, 1);
-            drawPage();
             showSelector();
-            controller.setVals(page, selector);
+            controller.setSelector(selector);
         },
-        clickNode: function(d){
-            selector = d;
-            showSelector();
-            fns.setSelector(d);
+        removeSelector: function(){
+            controller.removeSelector();
         },
-        enterNode: function(d){
-            d.elements.forEach(function(ele){
-                ele.classList.add("savedPreview");
-            });
-        },
-        exitNode: function(d){
-            d.elements.forEach(function(ele){
-                ele.classList.remove("savedPreview");
-            });
-        }
     };
 
     /**********
       START UI
     **********/
     var view = d3.select(holder);
-
-    // start tree
-    var svg = view.append("svg")
-        .classed("inline", true)
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-        .append("g")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-    var tree = d3.layout.tree()
-        .size([height, width]);
-    var diagonal = d3.svg.diagonal()
-        .projection(function(d) { return [d.y, d.x]; });
-    var link;
-    var node;
-    // end tree
-
 
     // start selector
     var sf = newForm(view, true);
@@ -965,51 +1037,6 @@ function PageView(options){
     /**********
       END UI
     **********/
-
-    // get all of the elements that match each selector
-    // and store in object.elements
-    function getMatches(){
-        function match(elements, s){
-            if ( !s.elements ) {
-                s.elements = controller.elements(elements, s.selector, s.spec);
-            }
-            s.children.forEach(function(child){
-                match(s.elements, child);
-            });      
-        }
-
-        match([document], page);
-    }
-
-    // attach an id to each node for d3
-    function setupPage(){
-        function setId(s){
-            s.id = controller.nextId();
-            s.children.forEach(function(s){
-                setId(s);
-            });
-        }
-        setId(page);
-        getMatches();
-        drawPage();
-
-        showSelector();
-    }
-
-    function clonePage(){
-        function setClone(selector, clone){
-            clone.selector = selector.selector;
-            clone.id = selector.id;
-            clone.spec = selector.spec;
-            clone.attrs = selector.attrs.slice();
-            clone.elements = selector.elements.slice();
-            clone.children = selector.children.map(function(child){
-                return setClone(child, {});
-            });
-            return clone;
-        }
-        return setClone(page, {});
-    }
 
     function showSelector(){
         sf.form.classed("hidden", false);
@@ -1053,108 +1080,10 @@ function PageView(options){
         selectorAttrs.selectAll("*").remove();
     }
 
-    function drawPage(){
-        if ( link ) {
-            link.remove();
-        }
-        if ( node ) {
-            node.remove();
-        }
-
-        var clone = clonePage(page);
-
-        var nodes = tree.nodes(clone);
-        var links = tree.links(nodes);
-        link = svg.selectAll(".link")
-            .data(links, function(d) { return d.source.id + "-" + d.target.id; });
-        node = svg.selectAll(".node")
-            .data(nodes, function(d) { return d.id; });
-
-            
-        link.enter().append("path")
-            .attr("class", "link");
-
-        link.attr("d", diagonal);
-        link.exit().remove();
-
-        node.enter().append("g")
-            .classed({
-                "node": true,
-                "empty": empty
-            })
-            .on("click", events.clickNode)
-            .on("mouseenter", events.enterNode)
-            .on("mouseleave", events.exitNode);
-
-        node.attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; });
-
-        node.append("text")
-            .attr("y", 5)
-            .attr("dx", -5)
-            .text(function(d){
-                var text;
-                switch ( d.spec.type ) {
-                case "index":
-                    text = d.selector + "[" + d.spec.value + "]";
-                    break;
-                case "name":
-                    text = "[" + d.selector + "]";
-                    break;
-                default:
-                    text = "";
-                }
-                return abbreviate(text, 15);
-            });
-
-        node.append("circle")
-            .filter(function(d){
-                return d.attrs.length === 0;
-            })
-            .attr("r", 3);
-
-        node.append("rect")
-            .filter(function(d){
-                return d.attrs.length > 0;
-            })
-            .attr("width", 6)
-            .attr("height", 6)
-            .attr("x", -3)
-            .attr("y", -3);
-
-        node.exit().remove();
-    }
-
-    function empty(sel){
-        var hasAttrs = sel.attrs.length;
-        var hasChildren = sel.children ? sel.children.length > 0 : false;
-        return !hasAttrs && !hasChildren;
-    }
-
     var fns = {
-        setPage: function(newPage, sel){
-            if ( !newPage ) {
-                return;
-            }
-            page = newPage;
-            selector = sel ? sel : page;
-            setupPage();
-        },
-        setSelector: function(d){
-            // find the real selector, not the cloned one
-            function find(s, lid){
-                if ( s.id === lid ) {
-                    selector = s;
-                    return true;
-                }
-                return s.children.some(function(child){
-                    return find(child, lid);
-                });
-            }
-
-            if ( find(page, d.id) ) {
-                controller.setSelector(selector);
-                showSelector();
-            }
+        setSelector: function(sel){
+            selector = sel;
+            showSelector();
         },
         hideSelector: function(){
             sf.form.classed("hidden", true);
@@ -1162,7 +1091,6 @@ function PageView(options){
         reset: function(){
             page = undefined;
             selector = undefined;
-            svg.selectAll("*").remove();
             clearSelector();
         }
     };
@@ -1192,29 +1120,12 @@ function SelectorView(options){
             if ( sel === undefined || sel.selector === "" ) {
                 return;
             }
-            var parent = controller.getSelector();
-            // only save if page doesn't have 
-            if ( !matchSelector(sel, parent) ) {
-                sel.id = controller.nextId();
-                sel.elements = controller.elements(parent.elements, sel.selector, sel.spec);
-                // SPECIAL CASE FOR SELECT ELEMENTS, AUTOMATICALLY ADD OPTION CHILD
-                if ( allSelects(sel.elements ) ) {
-                    var optionsName = prompt("What should the options be called?");
-                    if ( optionsName === null || optionsName.trim() === "" ) {
-                        optionsName = "options";
-                    }
-                    var optionsSelector = newSelector("option", {
-                        type: "name",
-                        value: optionsName
-                    });
-                    sel.children.push(optionsSelector);
-                }
-                controller.saveSelector(sel);
+            var success = controller.saveSelector(sel);
+            if ( success ) {
+                fns.reset();
+                interactive.remove();
+                showcase.remove();
             }
-
-            fns.reset();
-            interactive.remove();
-            showcase.remove();
         },
         selectChoice: function(d){
             showcase.remove();
@@ -1239,7 +1150,7 @@ function SelectorView(options){
         },
         cancelSelector: function(){
             fns.reset();
-            ui.showView("Page");
+            controller.cancelSelector();
         },
         toggleTag: function(){
             this.classList.toggle("on");
@@ -1349,19 +1260,19 @@ function SelectorView(options){
     // end selectorType
     // end ui
 
-        // apply the queryCheck class to selected elements
+        // apply the query-check class to selected elements
     var showcase = highlightElements()
-        .cssClass("queryCheck");
+        .cssClass("query-check");
 
     var interactive = interactiveElements()
-        .cssClass("selectableElement")
-        .hoverClass("collectHighlight")
+        .cssClass("selectable-element")
+        .hoverClass("collect-highlight")
         .clicked(function selectOption(event){
             event.preventDefault();
             event.stopPropagation();
             var data = [].slice.call(event.path)
                 .filter(function(ele){
-                    return ele.classList && ele.classList.contains("selectableElement");
+                    return ele.classList && ele.classList.contains("selectable-element");
                 })
                 .reverse()
                 .map(function(ele){
@@ -1423,7 +1334,7 @@ function SelectorView(options){
     // parts is given an element and returns an array containing its tag
     // and (if they exist) its id and any classes
     var getParts = selectorParts()
-        .ignoreClasses(["collectHighlight", "queryCheck", "selectableElement"]);
+        .ignoreClasses(["collect-highlight", "query-check", "selectable-element"]);
 
     function markup(){
         showcase.remove();
@@ -1453,7 +1364,7 @@ function SelectorView(options){
         choices.enter().append("div")
             .classed({
                 "tag": true,
-                "noSelect": true
+                "no-select": true
             })
             .on("click", events.selectChoice);
         choices.text(function(d){ return d.join(""); });
@@ -1472,7 +1383,7 @@ function SelectorView(options){
             .classed({
                 "tag": true,
                 "on": true,
-                "noSelect": true
+                "no-select": true
             })
             .on("click", events.toggleTag);
         
@@ -1515,12 +1426,6 @@ function SelectorView(options){
         return tags.join("");
     }
 
-    function allSelects(elements){
-        return elements.every(function(e){
-            return e.tagName === "SELECT";
-        });
-    }
-
     var fns = {
         setup: function(eles){
             interactive(eles);
@@ -1553,24 +1458,186 @@ function SelectorView(options){
     return fns;
 }
 
+// Source: src/treeView.js
+function TreeView(options){
+
+    var page;
+    var selector;
+    var currentSelector;
+
+    options = options || {};
+    var holder = options.holder || document.body;
+    var width = options.width || 600;
+    var height = options.height || 300;
+    var margin = options.margin || {
+        top: 25,
+        right: 25,
+        bottom: 25,
+        left: 25
+    };
+
+    var events = {
+        clickNode: function(node){
+            controller.setSelectorById(node.id);
+            svg.selectAll(".node").classed("current", function(d){
+                return d.id === node.id;
+            });
+        },
+        enterNode: function(d){
+            d.elements.forEach(function(ele){
+                ele.classList.add("saved-preview");
+            });
+        },
+        exitNode: function(d){
+            d.elements.forEach(function(ele){
+                ele.classList.remove("saved-preview");
+            });
+        }
+    };
+
+    /***
+    START UI
+    ***/
+    var view = d3.select(holder);
+
+    var svg = d3.select(".page-tree").append("svg")
+        .classed("inline", true)
+        .attr("width", width)
+        .attr("height", height);
+    var g = svg.append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    var usableWidth = width - margin.left - margin.right;
+    var usableHeight = height - margin.top - margin.bottom;
+    var tree = d3.layout.tree()
+        .size([usableHeight, usableWidth]);
+    var diagonal = d3.svg.diagonal()
+        .projection(function(d) { return [d.y, d.x]; });
+    var link;
+    var node;
+    /***
+    END UI
+    ***/
+
+    function empty(sel){
+        var hasAttrs = sel.attrs.length;
+        var hasChildren = sel.children ? sel.children.length > 0 : false;
+        return !hasAttrs && !hasChildren;
+    }
+
+    var fns = {
+        draw: function(page, currentId){
+            currentId = currentId || 0;
+            if ( link ) {
+                link.remove();
+            }
+            if ( node ) {
+                node.remove();
+            }
+
+            var nodes = tree.nodes(page);
+            var links = tree.links(nodes);
+            link = g.selectAll(".link")
+                .data(links, function(d) { return d.source.id + "-" + d.target.id; });
+            node = g.selectAll(".node")
+                .data(nodes, function(d) { return d.id; });
+
+                
+            link.enter().append("path")
+                .attr("class", "link");
+
+            link.attr("d", diagonal);
+            link.exit().remove();
+
+            node.enter().append("g")
+                .classed({
+                    "node": true,
+                    "empty": empty,
+                    "current": function(d){ return d.id === currentId; }
+                })
+                .on("click", events.clickNode)
+                .on("mouseenter", events.enterNode)
+                .on("mouseleave", events.exitNode);
+
+            node.attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; });
+
+            node.append("text")
+                .attr("y", 5)
+                .attr("dx", -5)
+                .text(function(d){
+                    var text;
+                    switch ( d.spec.type ) {
+                    case "index":
+                        text = d.selector + "[" + d.spec.value + "]";
+                        break;
+                    case "name":
+                        text = "[" + d.selector + "]";
+                        break;
+                    default:
+                        text = "";
+                    }
+                    return abbreviate(text, 15);
+                });
+
+            node.append("circle")
+                .filter(function(d){
+                    return d.attrs.length === 0;
+                })
+                .attr("r", 3);
+
+            node.append("rect")
+                .filter(function(d){
+                    return d.attrs.length > 0;
+                })
+                .attr("width", 6)
+                .attr("height", 6)
+                .attr("x", -3)
+                .attr("y", -3);
+
+            node.exit().remove();
+            svg.classed("not-allowed", false);
+        },
+        setCurrent: function(id){
+            svg.selectAll(".node").classed("current", function(d){
+                return d.id === id;
+            });
+        },
+        turnOn: function(){
+            svg.classed("not-allowed", false);
+            g.selectAll(".node")
+                .on("click", events.clickNode)
+                .on("mouseenter", events.enterNode)
+                .on("mouseleave", events.exitNode);
+        },
+        turnOff: function(){
+            svg.classed("not-allowed", true);
+            // d3 has no .off
+            g.selectAll(".node")
+                .on("click", null)
+                .on("mouseenter", null)
+                .on("mouseleave", null);
+        },
+        reset: function(){
+            g.selectAll("*").remove();
+        }
+    };
+    return fns;
+}
+
 // Source: src/ui.js
 function buildUI(controller){
     controller.dispatch = {};
 
     // ugly, might want to convert to d3 since everything else uses it, but it works
     var holder = document.createElement("div");
-    holder.classList.add("collectjs");
-    holder.classList.add("noSelect");
-    holder.innerHTML = '<div class="tabHolder">' +
-            '<div class="tabs">' +
-                '<div class="tab" id="closeCollectjs">&times;</div>' +
-            '</div>' +
-        '</div>' +
-        '<div class="permanent">' +
+    holder.classList.add("collectorjs");
+    holder.classList.add("no-select");
+    holder.innerHTML = '<div class="permanent">' +
             '<div id="schemaInfo"></div>' +
             '<div id="collectAlert"></div>' +
+            '<div id="closeCollectjs">&times;</div>' +
         '</div>' +
-        '<div class="views"></div>';
+        '<div class="views"></div>' + 
+        '<div class="page-tree"></div>';
     document.body.appendChild(holder);
 
     var events = {
@@ -1592,32 +1659,24 @@ function buildUI(controller){
     var closer = d3.select("#closeCollectjs")
         .on("click", events.close);
 
-    var tabHolder = holder.querySelector(".tabs");
     var viewHolder = holder.querySelector(".views");
-    var tabs = {};
     var views = {};
-    var activeTab;
     var activeView;
 
     function showView(name){
-        if ( activeTab ) {
-            activeTab.classList.remove("active");
-        }
         if ( activeView ) {
             activeView.classList.remove("active");
         }
-        activeTab = tabs[name];
         activeView = views[name];
-        activeTab.classList.add("active");
         activeView.classList.add("active");
     }
 
     var fns = {
-        // make sure that all elements in the collectjs have the noSelect class
+        // make sure that all elements in the collectjs have the no-select class
         noSelect: function(){
             var all = holder.querySelectorAll("*");
             for ( var i=0; i<all.length; i++ ) {
-                all[i].classList.add("noSelect");
+                all[i].classList.add("no-select");
             }
         },
         addViews: function(views){
@@ -1626,17 +1685,10 @@ function buildUI(controller){
             views.forEach(function(view){
                 fn.apply(_this, view);
             });
-            this.noSelect();
+            fns.noSelect();
         },
         addView: function(viewFn, name, options, active){
             options = options || {};
-
-            // create a new tab
-            var t = document.createElement("div");
-            t.classList.add("tab");
-            t.textContent = name;
-            tabs[name] = t;
-            tabHolder.insertBefore(t, tabHolder.lastChild);
 
             // create a new view
             var v = document.createElement("div");
@@ -1645,14 +1697,17 @@ function buildUI(controller){
             viewHolder.appendChild(v);
 
             if ( active ) {
-                t.classList.add("active");
                 v.classList.add("active");
-                activeTab = t;
                 activeView = v;
             }
 
             options.holder = v;
             controller.dispatch[name] = viewFn(options);
+        },
+        addTree: function(treeFn, name, options){
+            options = options || {};
+            controller.dispatch[name] = treeFn(options);
+
         },
         showView: showView,
         setPages: topbarFns.setPages,
@@ -1668,12 +1723,21 @@ var controller = collectorController();
 // build the ui
 var ui = buildUI(controller);
 ui.addViews([
-    [PageView, "Page", {
-        width: 500,
-        height: 200
-    }, true],
+    [PageView, "Page", {}, true],
     [SelectorView, "Selector"],
     [AttributeView, "Attribute"]
 ]);
+
+ui.addTree(TreeView, "Tree", {
+    holder: ".page-tree",
+    width: 500,
+    height: 220,
+    margin: {
+        top: 5,
+        right: 15,
+        bottom: 5,
+        left: 50
+    }
+});
 
 chromeLoad();

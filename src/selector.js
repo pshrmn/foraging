@@ -61,7 +61,7 @@ function selectorParts(){
 }
 
 function elementSelector(){
-    var not = ".noSelect";
+    var not = ".no-select";
 
     function select(elements, selector, spec){
         var matches = [];

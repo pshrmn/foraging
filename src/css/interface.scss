@@ -1,12 +1,12 @@
-$red: #C91900;
+$red: #CF2558;
 $light-red: #F296A3;
-$green: #489675;
+$green: #21732C;
 $light-green: #BDDBCE;
 $blue: #45AACC;
 $dark-blue: #2E829E;
-$light-gray: #efefef;
-$dark-gray: #444444;
-$gray: #CCCCCC;
+$light-gray: #CED1DE;
+$dark-gray: #373840;
+$gray: #898B96;
 $gold: #FFD700;
 $white: #ffffff;
 $black: #000000;
@@ -18,13 +18,11 @@ body{
 }
 
 /* Interface */
-.collectjs{
+.collectorjs{
     z-index:1000;
     position: fixed;
     left: 0;
     bottom: 0;
-    width: 100%;
-    max-width: 1000px;
     min-height: 30px;
     border-top: 1px solid $dark-gray;
     border-right: 1px solid $dark-gray;
@@ -38,6 +36,15 @@ body{
     *{
         color: $black;
         box-sizing: border-box;
+        line-height: 1.1em !important;
+    }
+
+    .not-allowed{
+        cursor: not-allowed;
+
+        * {
+            cursor: not-allowed;        
+        }
     }
 
     .inline{
@@ -53,45 +60,18 @@ body{
         list-style: none;
     }
 
-    .tabHolder{
-        position: relative;
-    }
-
-    .tabs{
-        position: absolute;
-        left: 0;
-        bottom: 0;
-        height: 30px;
-        padding: 0;
-        margin: 0;
-        word-spacing: -6px;
-        width: 100%;
-        background: transparent;
-        
-        .tab{
-            background: $gold;
-            border-top: 1px solid $dark-gray;
-            border-right: 1px solid $dark-gray;
-            word-spacing: normal;
-            display: inline-block;
-            padding: 0 5px;
-            height: 30px;
-            line-height: 30px;
-        }
-
-        .tab.active{
-            background: $light-gray;
-        }
-
-        .tab.set{
-            background: $light-green;
-        }
-    }
-
     .permanent{
-        border-bottom: 1px solid $gray;
         padding: 3px 15px;
-        background: $light-gray;
+        background: $dark-gray;
+        height: 31px;
+
+        *{
+            color: $light-gray
+        }
+
+        button, select, option {
+            color: $black;
+        }
 
         div{
             display: inline-block;
@@ -99,16 +79,34 @@ body{
         }
     }
 
+    .page-tree{
+        display: inline-block;
+        background: $dark-gray;
+        padding: 10px;
+
+        svg {
+            box-sizing: content-box;
+            background: $white;
+            padding: 15px;
+        }
+    }
+
     .views{
         box-sizing: border-box;        
-        min-height: 250px;
-        padding: 15px;
-
+        background: $dark-gray;
+        width: 500px;
+        padding: 10px;
+        display: inline-block;
+        vertical-align: top;
 
         .view{
+            height: 250px;
             display: none;
-            padding: 5px;
             text-align: left;
+            width: 100%;
+            background: $white;
+            padding: 15px;
+            overflow-y: scroll;
 
             > *{
                 vertical-align: top;
@@ -168,38 +166,39 @@ body{
             }
 
 
-            svg {
-                font-size: 14px;
-
-                .link {
-                  fill: none;
-                  stroke: #aaa;
-                }
-
-                .node{
-                    cursor: pointer;
-                    fill: #21732C;
-                }
-
-                .empty{
-                    fill: #CF2558;
-                }
-
-                .node text {
-                    paint-order: stroke;
-                    stroke: white;
-                    stroke-width: 2px;
-                    text-anchor: end;
-                }
-
-                .current{
-                    font-weight: bold;
-                }
-            }
         }
 
         .view.active{
             display: block;
+        }
+    }
+
+    svg {
+        font-size: 14px;
+
+        .link {
+          fill: none;
+          stroke: $light-gray;
+        }
+
+        .node{
+            cursor: pointer;
+            fill: $green;
+        }
+
+        .empty{
+            fill: $red;
+        }
+
+        .node text {
+            paint-order: stroke;
+            stroke: white;
+            stroke-width: 2px;
+            text-anchor: end;
+        }
+
+        .current{
+            font-weight: bold;
         }
     }
 
@@ -251,29 +250,37 @@ body{
 
     /* lots of sites like to customize how various inputs look, 
     so this is trying to keep these close to (chrome) default css */
+    input, select, option, textarea, button {
+        line-height: 1.1em !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        font-size: 1em !important;
+    }
+
     button {
-        background: #dddddd;
-        color: $black;
-        border: 2px outset #dddddd;
-        border-radius: initial;
-        box-shadow: none;
-        cursor: pointer;
-        font-weight: norma;
-        margin: 2px;
-        padding: 1px 6px;
-        min-width: initial;
+        background: $blue !important;
+        color: $black !important;
+        border-radius: 3px !important;
+        border: 2px outset $blue !important;
+        box-shadow: none !important;
+        cursor: pointer !important;
+        font-weight: normal !important;
+        margin: 2px !important;
+        padding: 1px 6px !important;
+        min-width: initial !important;
+        text-transform: capitalize !important
     }
 
     button:active{
-        border-style: inset;
-        color: $black;
+        border-style: inset !important;
+        color: $black !important;
     }
 
     select {
-        display: inline-block;
-        border: 1px solid #a9a9a9;
-        background: $white;
-        margin: 2px;
+        display: inline-block !important;
+        border: 1px solid #a9a9a9 !important;
+        background: $white !important;
+        margin: 2px !important;
     }
 }
 
@@ -282,8 +289,17 @@ body{
 }
 
 #closeCollectjs{
-    background: $light-red;
+    background: $red;
     cursor: pointer;
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 31px;
+    width: 31px;
+    font-size: 2em;
+    color: $white;
+    text-align: center;
+    margin: 0;
 }
 
 @import 'page';

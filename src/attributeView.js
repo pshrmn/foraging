@@ -19,7 +19,7 @@ function AttributeView(options){
         },
         cancelAttr: function(){
             fns.reset();
-            ui.showView("Page");
+            controller.cancelAttr();
         }
     };
 

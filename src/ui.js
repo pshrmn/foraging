@@ -3,18 +3,15 @@ function buildUI(controller){
 
     // ugly, might want to convert to d3 since everything else uses it, but it works
     var holder = document.createElement("div");
-    holder.classList.add("collectjs");
-    holder.classList.add("noSelect");
-    holder.innerHTML = '<div class="tabHolder">' +
-            '<div class="tabs">' +
-                '<div class="tab" id="closeCollectjs">&times;</div>' +
-            '</div>' +
-        '</div>' +
-        '<div class="permanent">' +
+    holder.classList.add("collectorjs");
+    holder.classList.add("no-select");
+    holder.innerHTML = '<div class="permanent">' +
             '<div id="schemaInfo"></div>' +
             '<div id="collectAlert"></div>' +
+            '<div id="closeCollectjs">&times;</div>' +
         '</div>' +
-        '<div class="views"></div>';
+        '<div class="views"></div>' + 
+        '<div class="page-tree"></div>';
     document.body.appendChild(holder);
 
     var events = {
@@ -36,32 +33,24 @@ function buildUI(controller){
     var closer = d3.select("#closeCollectjs")
         .on("click", events.close);
 
-    var tabHolder = holder.querySelector(".tabs");
     var viewHolder = holder.querySelector(".views");
-    var tabs = {};
     var views = {};
-    var activeTab;
     var activeView;
 
     function showView(name){
-        if ( activeTab ) {
-            activeTab.classList.remove("active");
-        }
         if ( activeView ) {
             activeView.classList.remove("active");
         }
-        activeTab = tabs[name];
         activeView = views[name];
-        activeTab.classList.add("active");
         activeView.classList.add("active");
     }
 
     var fns = {
-        // make sure that all elements in the collectjs have the noSelect class
+        // make sure that all elements in the collectjs have the no-select class
         noSelect: function(){
             var all = holder.querySelectorAll("*");
             for ( var i=0; i<all.length; i++ ) {
-                all[i].classList.add("noSelect");
+                all[i].classList.add("no-select");
             }
         },
         addViews: function(views){
@@ -70,17 +59,10 @@ function buildUI(controller){
             views.forEach(function(view){
                 fn.apply(_this, view);
             });
-            this.noSelect();
+            fns.noSelect();
         },
         addView: function(viewFn, name, options, active){
             options = options || {};
-
-            // create a new tab
-            var t = document.createElement("div");
-            t.classList.add("tab");
-            t.textContent = name;
-            tabs[name] = t;
-            tabHolder.insertBefore(t, tabHolder.lastChild);
 
             // create a new view
             var v = document.createElement("div");
@@ -89,14 +71,17 @@ function buildUI(controller){
             viewHolder.appendChild(v);
 
             if ( active ) {
-                t.classList.add("active");
                 v.classList.add("active");
-                activeTab = t;
                 activeView = v;
             }
 
             options.holder = v;
             controller.dispatch[name] = viewFn(options);
+        },
+        addTree: function(treeFn, name, options){
+            options = options || {};
+            controller.dispatch[name] = treeFn(options);
+
         },
         showView: showView,
         setPages: topbarFns.setPages,

@@ -4,16 +4,14 @@ body {
   margin: 0; }
 
 /* Interface */
-.collectjs {
+.collectorjs {
   z-index: 1000;
   position: fixed;
   left: 0;
   bottom: 0;
-  width: 100%;
-  max-width: 1000px;
   min-height: 30px;
-  border-top: 1px solid #444444;
-  border-right: 1px solid #444444;
+  border-top: 1px solid #373840;
+  border-right: 1px solid #373840;
   background: white;
   font-size: 16px;
   font-family: sans-serif;
@@ -22,59 +20,58 @@ body {
   box-sizing: border-box;
   /* lots of sites like to customize how various inputs look, 
   so this is trying to keep these close to (chrome) default css */ }
-  .collectjs * {
+  .collectorjs * {
     color: black;
-    box-sizing: border-box; }
-  .collectjs .inline {
+    box-sizing: border-box;
+    line-height: 1.1em !important; }
+  .collectorjs .not-allowed {
+    cursor: not-allowed; }
+    .collectorjs .not-allowed * {
+      cursor: not-allowed; }
+  .collectorjs .inline {
     display: inline-block; }
-  .collectjs .hidden {
+  .collectorjs .hidden {
     display: none !important; }
-  .collectjs ul {
+  .collectorjs ul {
     list-style: none; }
-  .collectjs .tabHolder {
-    position: relative; }
-  .collectjs .tabs {
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    height: 30px;
-    padding: 0;
-    margin: 0;
-    word-spacing: -6px;
-    width: 100%;
-    background: transparent; }
-    .collectjs .tabs .tab {
-      background: gold;
-      border-top: 1px solid #444444;
-      border-right: 1px solid #444444;
-      word-spacing: normal;
-      display: inline-block;
-      padding: 0 5px;
-      height: 30px;
-      line-height: 30px; }
-    .collectjs .tabs .tab.active {
-      background: #efefef; }
-    .collectjs .tabs .tab.set {
-      background: #bddbce; }
-  .collectjs .permanent {
-    border-bottom: 1px solid #cccccc;
+  .collectorjs .permanent {
     padding: 3px 15px;
-    background: #efefef; }
-    .collectjs .permanent div {
+    background: #373840;
+    height: 31px; }
+    .collectorjs .permanent * {
+      color: #ced1de; }
+    .collectorjs .permanent button, .collectorjs .permanent select, .collectorjs .permanent option {
+      color: black; }
+    .collectorjs .permanent div {
       display: inline-block;
       margin: 0 8px; }
-  .collectjs .views {
+  .collectorjs .page-tree {
+    display: inline-block;
+    background: #373840;
+    padding: 10px; }
+    .collectorjs .page-tree svg {
+      box-sizing: content-box;
+      background: white;
+      padding: 15px; }
+  .collectorjs .views {
     box-sizing: border-box;
-    min-height: 250px;
-    padding: 15px; }
-    .collectjs .views .view {
+    background: #373840;
+    width: 500px;
+    padding: 10px;
+    display: inline-block;
+    vertical-align: top; }
+    .collectorjs .views .view {
+      height: 250px;
       display: none;
-      padding: 5px;
-      text-align: left; }
-      .collectjs .views .view > * {
+      text-align: left;
+      width: 100%;
+      background: white;
+      padding: 15px;
+      overflow-y: scroll; }
+      .collectorjs .views .view > * {
         vertical-align: top;
         display: inline-block; }
-      .collectjs .views .view .tag {
+      .collectorjs .views .view .tag {
         background: #f296a3;
         display: inline-block;
         padding-top: 2px;
@@ -82,120 +79,135 @@ body {
         padding-bottom: 2px;
         padding-left: 5px;
         margin-right: 5px;
-        border: 1px solid #efefef;
+        border: 1px solid #ced1de;
         border-radius: 5px;
         cursor: pointer; }
-      .collectjs .views .view .on,
-      .collectjs .views .view .tag.on {
+      .collectorjs .views .view .on,
+      .collectorjs .views .view .tag.on {
         background: #bddbce; }
-      .collectjs .views .view .form > p {
+      .collectorjs .views .view .form > p {
         margin: 0;
         line-height: 1.25em; }
-      .collectjs .views .view .form .workarea {
+      .collectorjs .views .view .form .workarea {
         margin-bottom: 25px; }
-      .collectjs .views .view .form input.error {
-        border-color: #c91900;
+      .collectorjs .views .view .form input.error {
+        border-color: #cf2558;
         border-style: solid; }
-      .collectjs .views .view .form span.error {
-        border-bottom: 1px solid #c91900; }
-      .collectjs .views .view .form .radio label {
+      .collectorjs .views .view .form span.error {
+        border-bottom: 1px solid #cf2558; }
+      .collectorjs .views .view .form .radio label {
         margin-left: 15px;
         display: inline-block; }
-      .collectjs .views .view .form input[type=text] {
+      .collectorjs .views .view .form input[type=text] {
         width: 150px;
         border-width: 0 0 1px; }
-      .collectjs .views .view svg {
-        font-size: 14px; }
-        .collectjs .views .view svg .link {
-          fill: none;
-          stroke: #aaa; }
-        .collectjs .views .view svg .node {
-          cursor: pointer;
-          fill: #21732C; }
-        .collectjs .views .view svg .empty {
-          fill: #CF2558; }
-        .collectjs .views .view svg .node text {
-          paint-order: stroke;
-          stroke: white;
-          stroke-width: 2px;
-          text-anchor: end; }
-        .collectjs .views .view svg .current {
-          font-weight: bold; }
-    .collectjs .views .view.active {
+    .collectorjs .views .view.active {
       display: block; }
-  .collectjs input {
+  .collectorjs svg {
+    font-size: 14px; }
+    .collectorjs svg .link {
+      fill: none;
+      stroke: #ced1de; }
+    .collectorjs svg .node {
+      cursor: pointer;
+      fill: #21732c; }
+    .collectorjs svg .empty {
+      fill: #cf2558; }
+    .collectorjs svg .node text {
+      paint-order: stroke;
+      stroke: white;
+      stroke-width: 2px;
+      text-anchor: end; }
+    .collectorjs svg .current {
+      font-weight: bold; }
+  .collectorjs input {
     box-shadow: none;
     border-radius: 0;
     background: white;
-    border: 1px solid #444444;
+    border: 1px solid #373840;
     line-height: 1.2; }
-  .collectjs input[type=text] {
+  .collectorjs input[type=text] {
     height: 20px;
     max-height: 20px;
     min-height: 20px;
     padding: 2px;
     font-family: sans-serif; }
-  .collectjs label {
+  .collectorjs label {
     cursor: pointer;
     font-weight: normal; }
-  .collectjs .attributes tbody tr:hover {
-    background: #cccccc;
+  .collectorjs .attributes tbody tr:hover {
+    background: #898b96;
     cursor: pointer; }
-  .collectjs .attributes .selectedAttr, .collectjs .attributes .selectedAttr:hover {
+  .collectorjs .attributes .selectedAttr, .collectorjs .attributes .selectedAttr:hover {
     background: #bddbce; }
-  .collectjs td, .collectjs th {
+  .collectorjs td, .collectorjs th {
     min-width: 50px;
     height: 1.5rem;
     border: 2px solid white;
     text-align: center;
     vertical-align: middle; }
-  .collectjs th {
+  .collectorjs th {
     background: #45aacc; }
-  .collectjs button {
-    background: #dddddd;
-    color: black;
-    border: 2px outset #dddddd;
-    border-radius: initial;
-    box-shadow: none;
-    cursor: pointer;
-    font-weight: norma;
-    margin: 2px;
-    padding: 1px 6px;
-    min-width: initial; }
-  .collectjs button:active {
-    border-style: inset;
-    color: black; }
-  .collectjs select {
-    display: inline-block;
-    border: 1px solid #a9a9a9;
-    background: white;
-    margin: 2px; }
+  .collectorjs input, .collectorjs select, .collectorjs option, .collectorjs textarea, .collectorjs button {
+    line-height: 1.1em !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    font-size: 1em !important; }
+  .collectorjs button {
+    background: #45aacc !important;
+    color: black !important;
+    border-radius: 3px !important;
+    border: 2px outset #45aacc !important;
+    box-shadow: none !important;
+    cursor: pointer !important;
+    font-weight: normal !important;
+    margin: 2px !important;
+    padding: 1px 6px !important;
+    min-width: initial !important;
+    text-transform: capitalize !important; }
+  .collectorjs button:active {
+    border-style: inset !important;
+    color: black !important; }
+  .collectorjs select {
+    display: inline-block !important;
+    border: 1px solid #a9a9a9 !important;
+    background: white !important;
+    margin: 2px !important; }
 
 #schemaInfo div {
   display: inline-block; }
 
 #closeCollectjs {
-  background: #f296a3;
-  cursor: pointer; }
+  background: #cf2558;
+  cursor: pointer;
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 31px;
+  width: 31px;
+  font-size: 2em;
+  color: white;
+  text-align: center;
+  margin: 0; }
 
-.selectableElement {
-  box-shadow: inset 0 0 2px #c91900 !important; }
+.selectable-element {
+  box-shadow: inset 0 0 2px #cf2558 !important; }
 
-img.selectableElement {
-  border: 1px dashed #c91900 !important; }
+img.selectable-element {
+  border: 1px dashed #cf2558 !important; }
 
-.collectHighlight {
+.collect-highlight {
   background: rgba(46, 130, 158, 0.5) !important; }
 
-img.collectHighlight {
+img.collect-highlight {
   opacity: 0.25 !important; }
 
-.queryCheck {
+.query-check {
   background: rgba(255, 215, 0, 0.25) !important;
-  box-shadow: inset 0 0 1px yellow; }
+  box-shadow: inset 0 0 1px gold; }
 
-.savedPreview {
+.saved-preview {
   background: rgba(255, 0, 0, 0.25) !important; }
 
-img.savedPreview {
+img.saved-preview {
   border: 1px solid rgba(255, 0, 0, 0.25) !important; }
