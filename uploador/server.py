@@ -37,22 +37,20 @@ def host_folder(host, create=True):
 def upload():
     """
     save rules json in <sitename>/<page_name>.json
-    dangerous because on save, overwrites existing saved site
-    manually load request.data in case content-type: application/json isn't set
+    DANGER: overwrites existing saved page
     """
-    try:
-        data = json.loads(request.data.decode())
-    except ValueError:
+    name = request.form.get("name")
+    site = request.form.get("site")
+    page = request.form.get("page")
+    if name is None or site is None or page is None:
         return jsonify({"error": True})
 
-    site = data["site"]
-    name = data["page"]["name"]
     folder = host_folder(site)
 
     filename = "%s.json" % (name)
     path = os.path.join(folder, filename)
-    with open(path, 'w') as fp:
-        json.dump(data["page"], fp, indent=2)
+    with open(path, 'wb') as fp:
+        fp.write(page.encode("utf-8"))
     return jsonify({"error": False})
 
 
