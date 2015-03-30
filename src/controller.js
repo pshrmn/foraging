@@ -111,11 +111,13 @@ function collectorController(){
             chromeSave(pages);
         },
         upload: function(){
-            chromeUpload({
-                name: currentPage,
-                site: window.location.hostname,
-                page: page
-            });
+            if ( page ) {
+                chromeUpload({
+                    name: currentPage,
+                    site: window.location.hostname,
+                    page: page
+                });
+            }
         },
         setSelectorById: function(id){
             function find(sel, id){

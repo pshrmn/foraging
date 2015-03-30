@@ -6,9 +6,6 @@ chrome.storage.local.get(null, function(storage) {
     if ( !storage.sites ) {
         chrome.storage.local.set({"sites": {}});
     }
-    if ( !storage.options ) {
-        chrome.storage.local.set({"options": {}});
-    }
 });
 
 // inject collectjs interface when the browserAction icon is clicked
@@ -25,18 +22,24 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse){
     if ( message ) {
         switch ( message.type ) {
             case "upload":
-                xhr("POST", url + "upload",
-                    JSON.stringify(message.data), sendResponse, true);
+                xhr("POST", url + "upload", message.data, sendResponse);
                 // return true so sendResponse does not become invalid
                 // http://developer.chrome.com/extensions/runtime.html#event-onMessage
                 return true;
             case "sync":
-                xhr("GET", url + "sync",
-                    {"domain": message.domain}, sendResponse, false);
+                xhr("GET", url + "sync", {"domain": message.domain}, sendResponse);
                 return true;
         }
     }
 });
+
+function jsonToParams(obj){
+    var params = [];
+    for ( var key in obj ) {
+        params.push(key + "=" + obj[key]);
+    }
+    return params.join("&");
+}
 
 // basic ajax request that returns data from server on success, otherwise object with error=true
 function xhr(type, url, data, callback, isJSON){
@@ -51,20 +54,13 @@ function xhr(type, url, data, callback, isJSON){
         callback({"error": true});
     }
 
+    var params = jsonToParams(data);
     if ( type === "GET" ) {
-        var params = [];
-        for ( var key in data ) {
-            params.push(key + "=" + data[key]);
-        }
-
-        xhr.open("GET", url + "?" + params.join("&"));
+        xhr.open("GET", url + "?" + params);
         xhr.send();
     } else if ( type === "POST") {
-        
         xhr.open("POST", url);
-        if ( isJSON ) {
-            xhr.setRequestHeader("Content-Type", "application/json");
-        }
-        xhr.send(data);
+        xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        xhr.send(params);
     }
 }

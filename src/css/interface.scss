@@ -1,5 +1,6 @@
 $red: #CF2558;
 $light-red: #F296A3;
+$lime-green: #76B85C;
 $green: #21732C;
 $light-green: #BDDBCE;
 $blue: #45AACC;
@@ -258,10 +259,10 @@ body{
     }
 
     button {
-        background: $blue !important;
+        background: $lime-green !important;
         color: $black !important;
         border-radius: 3px !important;
-        border: 2px outset $blue !important;
+        border: 2px outset $lime-green !important;
         box-shadow: none !important;
         cursor: pointer !important;
         font-weight: normal !important;

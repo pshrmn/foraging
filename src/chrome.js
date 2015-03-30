@@ -11,7 +11,7 @@ function chromeSave(pages){
 
 // takes a data object to be uploaded and passes it to the background page to handle
 function chromeUpload(data){
-    data.page = cleanPage(data.page);
+    data.page = JSON.stringify(cleanPage(data.page));
     chrome.runtime.sendMessage({type: 'upload', data: data});
 }
 
