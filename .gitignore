@@ -1,2 +1,6 @@
+*.py[co]
+
 rules
+cache
 venv
+data
