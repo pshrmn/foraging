@@ -8,6 +8,7 @@ import logging
 
 import requests
 from lxml import html
+from lxml.html.clean import Cleaner
 
 log = logging.getLogger(__name__)
 
@@ -88,11 +89,12 @@ class Cache(object):
         if domain not in self.sites:
             self.sites[domain] = {filename: True}
             os.makedirs(domain_folder, exist_ok=True)
-        with open(os.path.join(domain_folder, filename), "w") as fp:
+        with open(os.path.join(domain_folder, filename), "wb") as fp:
             fp.write(text)
 
 
 class Fetch(object):
+
     """
     Fetch takes a url and returns an lxml html element for that web page. It
     will sleep in between requests to limit the frequency of hits on a server.
@@ -103,12 +105,15 @@ class Fetch(object):
     headers: headers to send with the request. It is recommended to include
         a "User-Agent" header
     """
+
     def __init__(self, sleep_time=5, cache=None, headers=None):
         self.last = {}
         self.sleep_time = sleep_time
         self.cache = cache
         self.headers = headers
         self.dynamic = False
+        self.cleaner = Cleaner(style=True, links=True, add_nofollow=True,
+                               page_structure=False, safe_attrs_only=False)
 
     def set_cache(self, folder):
         self.cache = Cache(folder)
@@ -178,7 +183,9 @@ class Fetch(object):
             through PhantomJS
         """
         text = self.get_cached(url)
+        save = False
         if text is None:
+            save = True
             self.wait(url)
             text = ""
             # allow DynamicFetch to get static content
@@ -192,10 +199,15 @@ class Fetch(object):
                     return
                 text = resp.text
             self.set_wait(url)
-            # text will be empty binary string when get fails
+            # text will be empty string when get fails
             if text == "":
                 return
-            self.save_cached(url, text)
         dom = html.document_fromstring(text)
+        dom = self.cleaner.clean_html(dom)
         dom.make_links_absolute(url)
+        # save after formatting
+        if save:
+            clean_html = html.tostring(dom, pretty_print=True,
+                                       include_meta_content_type=True)
+            self.save_cached(url, clean_html)
         return dom
