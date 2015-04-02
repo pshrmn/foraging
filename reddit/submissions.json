@@ -1,0 +1,113 @@
+{
+  "selector": "body",
+  "spec": {
+    "type": "index",
+    "value": 0
+  },
+  "rules": [],
+  "children": [
+    {
+      "selector": "div.thing.link",
+      "spec": {
+        "type": "name",
+        "value": "submissions"
+      },
+      "rules": [],
+      "children": [
+        {
+          "selector": "div.score",
+          "spec": {
+            "type": "index",
+            "value": 1
+          },
+          "rules": [
+            {
+              "attr": "text",
+              "name": "score"
+            }
+          ],
+          "children": []
+        },
+        {
+          "selector": "p.title",
+          "spec": {
+            "type": "index",
+            "value": 0
+          },
+          "rules": [],
+          "children": [
+            {
+              "selector": "a.title",
+              "spec": {
+                "type": "index",
+                "value": 0
+              },
+              "rules": [
+                {
+                  "attr": "href",
+                  "name": "url"
+                },
+                {
+                  "attr": "text",
+                  "name": "title"
+                }
+              ],
+              "children": []
+            },
+            {
+              "selector": ".domain",
+              "spec": {
+                "type": "index",
+                "value": 0
+              },
+              "rules": [
+                {
+                  "attr": "text",
+                  "name": "domain"
+                }
+              ],
+              "children": []
+            }
+          ]
+        },
+        {
+          "selector": "a.author",
+          "spec": {
+            "type": "index",
+            "value": 0
+          },
+          "rules": [
+            {
+              "attr": "text",
+              "name": "submitter"
+            },
+            {
+              "attr": "href",
+              "name": "submitter_url"
+            }
+          ],
+          "children": []
+        },
+        {
+          "selector": "a.comments",
+          "spec": {
+            "type": "index",
+            "value": 0
+          },
+          "rules": [
+            {
+              "attr": "text",
+              "name": "comment_count"
+            },
+            {
+              "attr": "href",
+              "name": "comments_url"
+            }
+          ],
+          "children": []
+        }
+      ]
+    }
+  ],
+  "name": "submissions"
+}
