@@ -1,12 +1,20 @@
 from setuptools import setup, find_packages
-
-from collector import __version__
+import re
 
 packages = find_packages(exclude=['tests*'])
 
+version = ""
+with open("collector/__init__.py", "r") as fp:
+    contents = fp.read()
+    version = re.search(r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]',
+                        contents, re.MULTILINE).group(1)
+
+if not version:
+    raise RuntimeError("Cannot find version information")
+
 setup(
     name="collector",
-    version=__version__,
+    version=version,
     description="collect data from webpages",
     packages=packages,
     install_requires=["cssselect>=0.9.1", "requests>=2", "lxml>=3.3.1"],

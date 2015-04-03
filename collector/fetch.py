@@ -28,6 +28,7 @@ def url_info(url):
 
 
 class Cache(object):
+
     def __init__(self, folder):
         self.folder = folder
         self.sites = {}

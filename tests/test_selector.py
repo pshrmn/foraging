@@ -77,6 +77,24 @@ class SelectorTestCase(unittest.TestCase):
         with self.assertRaises(BadJSONError):
             Selector.from_json(empty_json)
 
+    def test_optional_from_json(self):
+        simple_json = {
+            "selector": "a",
+            "children": [],
+            "rules": [
+                {
+                    "name": "link",
+                    "attr": "href"
+                }
+            ],
+            "spec": {
+                "type": "index",
+                "value": 0
+            },
+            "optional": True
+        }
+        s = Selector.from_json(simple_json)
+        self.assertTrue(s.optional)
 
 if __name__ == "__main__":
     unittest.main()

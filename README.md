@@ -16,7 +16,16 @@ Example: (the filename will vary depending on your system and python version)
 
 ##Usage
 
+###Cache
+A cache is a folder where static copies of the html for a page are stored to prevent multiple unnecessary requests to a server for a page. Currently the cache is very simple, storing a page the first time it is encountered and then subsequently always using that cached version. This is not ideal for pages where the content changes frequently (eg pages with user submitted content), so no cache should be used for pages where multiple requests to the same url will return different content.
 
+Arguments:
+
+* `folder`: folder to store the cached pages in.
+
+    from collector import Cache
+
+    cache = Cache("cache_folder")
 
 ###Fetch
 A fetcher takes a url and return the html contents of the corresponding web page. Requests can either be static (default) or dynamic. In order to make dynamic requests, the `make_dynamic` function needs to be called.
@@ -28,8 +37,14 @@ Arguments:
 * `cache`: an optional `Cache` object used to store webpages to mitigate duplicate requests (default `None`)
 
 
+    from collector import Fetch
+
+    fetch = Fetch(headers={"User-Agent": "custom-collector-user-agent"})
+
 ######get(url, dynamic=False)
 Takes a url and returns an lxml html element if the request was successful, otherwise `None`
+
+    fetch.get("http://www.example.com")
 
 ######make_dynamic(phantom_path, js_path)
 This requires PhantomJS and a Phantomjs script that logs the page's html. PhantomJS can be downloaded from its [website](http://phantomjs.org/). The code in [html_text.js](/html_text.js) should be downloaded and placed in your project folder. Calling this allows get requests using PhantomJS to be made. If either path does not exist, this will raise a `ValueError`. To make dynamic requests, provide `True` as the second argument in a `get` call.
