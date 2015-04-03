@@ -6,13 +6,11 @@ from .errors import BadJSONError
 
 class Selector(object):
 
-    def __init__(self, selector, spec, children, rules):
+    def __init__(self, selector, sel_type, value, children, rules):
         self.selector = selector
         self.xpath = CSSSelector(selector)
-        self.type = spec["type"]
-        if self.type not in ["index", "name"]:
-            raise BadJSONError("unexpected selector type {}".format(self.type))
-        self.value = spec["value"]
+        self.type = sel_type
+        self.value = value
         self.children = children
         self.rules = rules
 
@@ -22,10 +20,23 @@ class Selector(object):
         if selector is None:
             msg = "selector requires selector\n{}"
             raise BadJSONError(msg.format(selector_json))
+
+        # verify spec
         spec = selector_json.get("spec")
         if spec is None:
             msg = "selector requires spec\n{}"
             raise BadJSONError(msg.format(selector_json))
+        sel_type = spec.get("type")
+        value = spec.get("value")
+        if sel_type is None:
+            msg = "no selector spec type provided"
+            raise BadJSONError(msg)
+        elif sel_type not in ["index", "name"]:
+            msg = "unexpected selector type {}"
+            raise BadJSONError(msg.format(sel_type))
+        if value is None:
+            msg = "no selector spec value provided"
+            raise BadJSONError(msg)
         children = []
         for child in selector_json["children"]:
             try:
@@ -41,7 +52,7 @@ class Selector(object):
             msg = """selector has no children or rules and \
 should be removed from the page"""
             raise BadJSONError(msg.format(selector_json))
-        return cls(selector, spec, children, rules)
+        return cls(selector, sel_type, value, children, rules)
 
     def get(self, parent):
         elements = self.xpath(parent)

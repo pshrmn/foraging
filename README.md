@@ -24,6 +24,7 @@ A fetcher takes a url and return the html contents of the corresponding web page
 Arguments:
 
 * `sleep_time`: how long to wait until the next request. (default `5`)
+* `headers`: a dict of headers to send with the request. Your headers should include a `'User-Agent'` key to identify your collector.
 * `cache`: an optional `Cache` object used to store webpages to mitigate duplicate requests (default `None`)
 
 
