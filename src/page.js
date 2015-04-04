@@ -12,6 +12,7 @@ function cleanPage(page){
         clone.selector = s.selector;
         clone.spec = s.spec;
         clone.rules = s.rules.slice();
+        clone.optional = s.optional;
         clone.children = s.children.map(function(child){
             return cleanSelector(child, {});
         });

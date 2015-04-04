@@ -149,6 +149,11 @@ function SelectorView(options){
         .text("Index:")
         .append("select");
 
+    var optionalCheckbox = st.workarea.append("p").append("label")
+        .text("Optional")
+        .append("input")
+            .attr("type", "checkbox");
+
     st.buttons.append("button")
         .text("Save")
         .on("click", events.saveSelector);
@@ -229,7 +234,9 @@ function SelectorView(options){
             spec.value = name;
             break;
         }
-        return newSelector(sel.join(""), spec);
+        var optional = optionalCheckbox.property("checked");
+
+        return newSelector(sel.join(""), spec, optional);
     }
 
     // parts is given an element and returns an array containing its tag
@@ -344,6 +351,7 @@ function SelectorView(options){
 
             // form
             radios.property("checked", function(d, i){ return i === 0; });
+            optionalCheckbox.property("checked", false);
             formState = {
                 selector: "",
                 type: "name",

@@ -25,14 +25,17 @@ function attributes(element) {
 /*
 selector is a string
 a spec is an object with type and value keys
+optional is a boolean describing whehther or not selector has to match elements
 returns a new Selector object
 */
-function newSelector(selector, spec){
+function newSelector(selector, spec, optional){
+    optional = optional || false;
     return {
         selector: selector,
         spec: spec,
         children: [],
-        rules: []
+        rules: [],
+        optional: optional
     };
 }
 
@@ -53,6 +56,7 @@ function newPage(name){
         },
         children: [],
         rules: [],
+        optional: false,
         elements: [document.body]
     };
 }
@@ -275,6 +279,7 @@ function cleanPage(page){
         clone.selector = s.selector;
         clone.spec = s.spec;
         clone.rules = s.rules.slice();
+        clone.optional = s.optional;
         clone.children = s.children.map(function(child){
             return cleanSelector(child, {});
         });
@@ -336,8 +341,7 @@ function collectorController(){
         // page is base selector, has id 0
         selector = page;
         fns.dispatch.Page.setSelector(selector);
-        var clone = clonePage();
-        fns.dispatch.Tree.draw(clone, selector.id);
+        fns.dispatch.Tree.draw(page, selector.id);
     }
 
     function generateIds(){
@@ -365,21 +369,6 @@ function collectorController(){
         }
 
         match([document], page);
-    }
-
-    function clonePage(){
-        function setClone(selector, clone){
-            clone.selector = selector.selector;
-            clone.id = selector.id;
-            clone.spec = selector.spec;
-            clone.rules = selector.rules.slice();
-            clone.elements = selector.elements.slice();
-            clone.children = selector.children.map(function(child){
-                return setClone(child, {});
-            });
-            return clone;
-        }
-        return setClone(page, {});
     }
 
     function resetAll(){
@@ -462,8 +451,7 @@ function collectorController(){
         },
         setSelector: function(sel){
             selector = sel;
-            var clone = clonePage();
-            fns.dispatch.Tree.draw(clone, selector.id);
+            fns.dispatch.Tree.draw(page, selector.id);
             chromeSave(pages);
         },
         getSelector: function(){
@@ -506,8 +494,7 @@ function collectorController(){
             } else {
                 remove(page, selector.id);
                 selector = page;
-                var clone = clonePage();
-                fns.dispatch.Tree.draw(clone, selector.id);
+                fns.dispatch.Tree.draw(page, selector.id);
                 fns.dispatch.Page.setSelector(selector);
             }
             chromeSave(pages);
@@ -537,8 +524,7 @@ function collectorController(){
             selector.children.push(sel);
             selector = sel;
             ui.showView("Page");
-            var clone = clonePage();
-            fns.dispatch.Tree.draw(clone, selector.id);
+            fns.dispatch.Tree.draw(page, selector.id);
             fns.dispatch.Page.setSelector(selector);
             chromeSave(pages);
             return true;
@@ -555,8 +541,7 @@ function collectorController(){
         },
         saveRule: function(rule){
             selector.rules.push(rule);
-            var clone = clonePage();
-            fns.dispatch.Tree.draw(clone, selector.id);
+            fns.dispatch.Tree.draw(page, selector.id);
             fns.dispatch.Page.setSelector(selector);
             ui.showView("Page");
             chromeSave(pages);
@@ -635,6 +620,7 @@ function topbar(options){
 
     pageGroup.append("button")
         .text("remove page")
+        .classed("red", true)
         .on("click", events.removePage);
 
     // global
@@ -1224,6 +1210,11 @@ function SelectorView(options){
         .text("Index:")
         .append("select");
 
+    var optionalCheckbox = st.workarea.append("p").append("label")
+        .text("Optional")
+        .append("input")
+            .attr("type", "checkbox");
+
     st.buttons.append("button")
         .text("Save")
         .on("click", events.saveSelector);
@@ -1304,7 +1295,9 @@ function SelectorView(options){
             spec.value = name;
             break;
         }
-        return newSelector(sel.join(""), spec);
+        var optional = optionalCheckbox.property("checked");
+
+        return newSelector(sel.join(""), spec, optional);
     }
 
     // parts is given an element and returns an array containing its tag
@@ -1419,6 +1412,7 @@ function SelectorView(options){
 
             // form
             radios.property("checked", function(d, i){ return i === 0; });
+            optionalCheckbox.property("checked", false);
             formState = {
                 selector: "",
                 type: "name",
@@ -1505,8 +1499,25 @@ function TreeView(options){
         });
     }
 
+    function clonePage(page){
+        function setClone(selector, clone){
+            clone.selector = selector.selector;
+            clone.id = selector.id;
+            clone.spec = selector.spec;
+            clone.rules = selector.rules.slice();
+            clone.optional = selector.optional;
+            clone.elements = selector.elements.slice();
+            clone.children = selector.children.map(function(child){
+                return setClone(child, {});
+            });
+            return clone;
+        }
+        return setClone(page, {});
+    }
+
     var fns = {
         draw: function(page, currentId){
+            var clone = clonePage(page);
             currentId = currentId || 0;
             if ( link ) {
                 link.remove();
@@ -1515,7 +1526,7 @@ function TreeView(options){
                 node.remove();
             }
 
-            var nodes = tree.nodes(page);
+            var nodes = tree.nodes(clone);
             var links = tree.links(nodes);
             link = g.selectAll(".link")
                 .data(links, function(d) { return d.source.id + "-" + d.target.id; });

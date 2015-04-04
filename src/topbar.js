@@ -37,6 +37,7 @@ function topbar(options){
 
     pageGroup.append("button")
         .text("remove page")
+        .classed("red", true)
         .on("click", events.removePage);
 
     // global

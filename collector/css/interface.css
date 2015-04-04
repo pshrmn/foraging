@@ -152,12 +152,13 @@ body {
     line-height: 1.1em !important;
     padding: 0 !important;
     margin: 0 !important;
-    font-size: 1em !important; }
+    font-size: 1em !important;
+    float: none !important; }
   .collectorjs button {
-    background: #76b85c !important;
-    color: black !important;
-    border-radius: 3px !important;
-    border: 2px outset #76b85c !important;
+    background: #76b85c;
+    color: black;
+    border-radius: 3px;
+    border: 2px outset #76b85c;
     box-shadow: none !important;
     cursor: pointer !important;
     font-weight: normal !important;
@@ -165,6 +166,14 @@ body {
     padding: 1px 6px !important;
     min-width: initial !important;
     text-transform: capitalize !important; }
+    .collectorjs button:hover, .collectorjs button:active, .collectorjs button:focus {
+      background: #76b85c;
+      border-color: #76b85c;
+      color: black; }
+    .collectorjs button.red, .collectorjs button.red:hover, .collectorjs button.red:active, .collectorjs button.red:focus {
+      background: #cf2558;
+      border-color: #cf2558;
+      color: white; }
   .collectorjs button:active {
     border-style: inset !important;
     color: black !important; }

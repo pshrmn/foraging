@@ -68,8 +68,25 @@ function TreeView(options){
         });
     }
 
+    function clonePage(page){
+        function setClone(selector, clone){
+            clone.selector = selector.selector;
+            clone.id = selector.id;
+            clone.spec = selector.spec;
+            clone.rules = selector.rules.slice();
+            clone.optional = selector.optional;
+            clone.elements = selector.elements.slice();
+            clone.children = selector.children.map(function(child){
+                return setClone(child, {});
+            });
+            return clone;
+        }
+        return setClone(page, {});
+    }
+
     var fns = {
         draw: function(page, currentId){
+            var clone = clonePage(page);
             currentId = currentId || 0;
             if ( link ) {
                 link.remove();
@@ -78,7 +95,7 @@ function TreeView(options){
                 node.remove();
             }
 
-            var nodes = tree.nodes(page);
+            var nodes = tree.nodes(clone);
             var links = tree.links(nodes);
             link = g.selectAll(".link")
                 .data(links, function(d) { return d.source.id + "-" + d.target.id; });

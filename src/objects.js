@@ -1,14 +1,17 @@
 /*
 selector is a string
 a spec is an object with type and value keys
+optional is a boolean describing whehther or not selector has to match elements
 returns a new Selector object
 */
-function newSelector(selector, spec){
+function newSelector(selector, spec, optional){
+    optional = optional || false;
     return {
         selector: selector,
         spec: spec,
         children: [],
-        rules: []
+        rules: [],
+        optional: optional
     };
 }
 
@@ -29,6 +32,7 @@ function newPage(name){
         },
         children: [],
         rules: [],
+        optional: false,
         elements: [document.body]
     };
 }

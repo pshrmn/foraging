@@ -11,8 +11,7 @@ function collectorController(){
         // page is base selector, has id 0
         selector = page;
         fns.dispatch.Page.setSelector(selector);
-        var clone = clonePage();
-        fns.dispatch.Tree.draw(clone, selector.id);
+        fns.dispatch.Tree.draw(page, selector.id);
     }
 
     function generateIds(){
@@ -40,21 +39,6 @@ function collectorController(){
         }
 
         match([document], page);
-    }
-
-    function clonePage(){
-        function setClone(selector, clone){
-            clone.selector = selector.selector;
-            clone.id = selector.id;
-            clone.spec = selector.spec;
-            clone.rules = selector.rules.slice();
-            clone.elements = selector.elements.slice();
-            clone.children = selector.children.map(function(child){
-                return setClone(child, {});
-            });
-            return clone;
-        }
-        return setClone(page, {});
     }
 
     function resetAll(){
@@ -137,8 +121,7 @@ function collectorController(){
         },
         setSelector: function(sel){
             selector = sel;
-            var clone = clonePage();
-            fns.dispatch.Tree.draw(clone, selector.id);
+            fns.dispatch.Tree.draw(page, selector.id);
             chromeSave(pages);
         },
         getSelector: function(){
@@ -181,8 +164,7 @@ function collectorController(){
             } else {
                 remove(page, selector.id);
                 selector = page;
-                var clone = clonePage();
-                fns.dispatch.Tree.draw(clone, selector.id);
+                fns.dispatch.Tree.draw(page, selector.id);
                 fns.dispatch.Page.setSelector(selector);
             }
             chromeSave(pages);
@@ -212,8 +194,7 @@ function collectorController(){
             selector.children.push(sel);
             selector = sel;
             ui.showView("Page");
-            var clone = clonePage();
-            fns.dispatch.Tree.draw(clone, selector.id);
+            fns.dispatch.Tree.draw(page, selector.id);
             fns.dispatch.Page.setSelector(selector);
             chromeSave(pages);
             return true;
@@ -230,8 +211,7 @@ function collectorController(){
         },
         saveRule: function(rule){
             selector.rules.push(rule);
-            var clone = clonePage();
-            fns.dispatch.Tree.draw(clone, selector.id);
+            fns.dispatch.Tree.draw(page, selector.id);
             fns.dispatch.Page.setSelector(selector);
             ui.showView("Page");
             chromeSave(pages);
