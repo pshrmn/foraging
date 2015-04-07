@@ -19,6 +19,9 @@ function topbar(options){
         },
         sync: function(){
             controller.startSync();
+        },
+        preview: function(){
+            controller.preview();
         }
     };
 
@@ -50,6 +53,11 @@ function topbar(options){
         .attr("title", "Get uploaded pages for this domain from the server. " +
                 "Warning: This will override existing pages")
         .on("click", events.sync);
+
+    bar.append("button")
+        .text("preview")
+        .attr("title", "Preview will be logged in the console")
+        .on("click", events.preview);
 
     var fns = {
         getPage: function(){

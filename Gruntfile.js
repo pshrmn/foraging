@@ -26,7 +26,8 @@ module.exports = function(grunt){
         concat: {
             dist: {
                 src: ['src/attributes.js', 'src/objects.js', 'src/markup.js',
-                    'src/selector.js', 'src/page.js', 'src/controller.js',
+                    'src/selector.js', 'src/page.js', 'src/preview.js',
+                    'src/controller.js',
                     'src/topbar.js', 'src/chrome.js', 'src/utility.js',
                     'src/ruleView.js', 'src/pageView.js',
                     'src/selectorView.js', 'src/treeView.js',

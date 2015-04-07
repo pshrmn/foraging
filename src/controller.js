@@ -241,6 +241,17 @@ function collectorController(){
 
             chromeSave(pages);
         },
+        preview: function(){
+            if ( !page ) {
+                return;
+            }
+            var text = preview(page);
+            if ( !text ) {
+                console.error("failed to generate preview");
+            } else {
+                console.log(JSON.stringify(text));
+            }
+        },
         close: function(){
             resetAll();
         },
