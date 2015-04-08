@@ -249,7 +249,7 @@ function collectorController(){
             if ( !text ) {
                 console.error("failed to generate preview");
             } else {
-                console.log(JSON.stringify(text));
+                console.log(JSON.stringify(text, null, 2));
             }
         },
         close: function(){
