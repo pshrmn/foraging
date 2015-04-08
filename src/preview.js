@@ -1,5 +1,4 @@
 function preview(page) {
-    console.log(page);
     /**
      * Given a parent element, get all children that match the selector
      * Return data based on selector's type (index or name)

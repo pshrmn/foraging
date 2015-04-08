@@ -15,13 +15,6 @@ function newSelector(selector, spec, optional){
     };
 }
 
-function newRule(name, attr){
-    return {
-        name: name,
-        attr: attr
-    };
-}
-
 function newPage(name){
     return {
         name: name,

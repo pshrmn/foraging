@@ -4,6 +4,5 @@
 .sass-cache
 node_modules
 overview.txt
-tests/*.html
 docs
 docs/build

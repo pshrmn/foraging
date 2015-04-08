@@ -45,24 +45,51 @@ describe("utility functions", function(){
         });
     })
 
-    describe("legalSchemaName", function(){
+    describe("legalPageName", function(){
         it("returns true for legal filenames", function(){
             var goodNames = ["test", "good.jpg", "this is legal !"];
             for ( var i=0, len=goodNames.length; i<len; i++ ) {
-                expect(legalSchemaName(goodNames[i])).toBe(true);
+                expect(legalPageName(goodNames[i])).toBe(true);
             }
         });
 
         it("returns false for filenames that contain illegal characters", function(){
             var badNames = ["<", ">", ":", "\"", "\"", "/", "|", "?", "*"];
             for ( var i=0, len=badNames.length; i<len; i++ ) {
-                expect(legalSchemaName(badNames[i])).toBe(false);
+                expect(legalPageName(badNames[i])).toBe(false);
             }
         });
 
         it("returns false for null name", function(){
-            expect(legalSchemaName(null)).toBe(false);
+            expect(legalPageName(null)).toBe(false);
         });
     });
 
+});
+
+describe("abbreviate", function(){
+    it("returns text when length is less than max", function(){
+        var text = "characters";
+        expect(abbreviate(text, text.length)).toEqual(text);
+    });
+
+    it("returns ellipsis when max <= 3", function(){
+        [0,1,2,3].forEach(function(val){
+            expect(abbreviate("test", val)).toEqual("...");
+        });
+    });
+
+    it("returns even first and second half length when max is odd", function(){
+        var abbr = abbreviate("a string of characters", 15);
+        var halves = abbr.split("...");
+        expect(halves[0].length).toEqual(6);
+        expect(halves[1].length).toEqual(6);
+    });
+
+    it("returns longer first half when max is even", function(){
+        var abbr = abbreviate("a string of characters", 14);
+        var halves = abbr.split("...");
+        expect(halves[0].length).toEqual(6);
+        expect(halves[1].length).toEqual(5);
+    });
 });

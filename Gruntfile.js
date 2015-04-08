@@ -27,11 +27,10 @@ module.exports = function(grunt){
             dist: {
                 src: ['src/attributes.js', 'src/objects.js', 'src/markup.js',
                     'src/selector.js', 'src/page.js', 'src/preview.js',
-                    'src/controller.js',
-                    'src/topbar.js', 'src/chrome.js', 'src/utility.js',
-                    'src/ruleView.js', 'src/pageView.js',
-                    'src/selectorView.js', 'src/treeView.js',
-                    'src/ui.js', 'src/collector.js'],
+                    'src/controller.js', 'src/chrome.js', 'src/utility.js',
+                    'src/ui/topbar.js', 'src/ui/ruleView.js',
+                    'src/ui/pageView.js', 'src/ui/selectorView.js',
+                    'src/ui/treeView.js', 'src/ui/ui.js', 'src/collector.js'],
                 dest: 'collector/collector.js',
                 options: {
                     banner: "'use strict';\n",
