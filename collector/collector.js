@@ -400,6 +400,39 @@ function preview(page) {
 }
 
 
+// Source: src/ui/previewModal.js
+function previewModal(parentElement){
+    var parent = d3.select(parentElement);
+
+    function closeModal(){
+        holder.classed("hidden", true);
+    }
+
+    var holder = parent.append("div")
+        .classed({
+            "modalHolder": true,
+            "hidden": true
+        });
+
+    var background = holder.append("div")
+        .classed({"background": true})
+        .on("click", closeModal);
+
+    var modal = holder.append("div")
+        .classed({"modal": true});
+
+    var pre = modal.append("pre");
+
+    var close = modal.append("button")
+        .text("close")
+        .on("click", closeModal);
+
+    return function(text){
+        holder.classed("hidden", false);
+        pre.text(text);
+    };
+}
+
 // Source: src/controller.js
 function collectorController(){
     var pages;
@@ -456,6 +489,8 @@ function collectorController(){
             return e.tagName === "SELECT";
         });
     }
+
+    var modal = previewModal(document.body);
 
     var fns = {
         elements: elementSelector(),
@@ -652,7 +687,8 @@ function collectorController(){
             if ( !text ) {
                 console.error("failed to generate preview");
             } else {
-                console.log(JSON.stringify(text, null, 2));
+                modal(JSON.stringify(text, null, 2));
+                // console.log(JSON.stringify(text, null, 2));
             }
         },
         close: function(){

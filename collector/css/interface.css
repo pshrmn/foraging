@@ -183,6 +183,30 @@ body {
     background: white !important;
     margin: 2px !important; }
 
+.modalHolder {
+  position: absolute;
+  z-index: 10000; }
+  .modalHolder.hidden {
+    display: none !important; }
+  .modalHolder > div {
+    position: fixed; }
+  .modalHolder .background {
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    opacity: 0.5; }
+  .modalHolder .modal {
+    left: 10%;
+    top: 25%;
+    width: 80%;
+    background: white;
+    padding: 15px; }
+    .modalHolder .modal pre {
+      max-height: 300px;
+      overflow: scroll; }
+
 #schemaInfo div {
   display: inline-block; }
 

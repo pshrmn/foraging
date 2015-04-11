@@ -54,6 +54,8 @@ function collectorController(){
         });
     }
 
+    var modal = previewModal(document.body);
+
     var fns = {
         elements: elementSelector(),
         loadPages: function(ps){
@@ -249,7 +251,8 @@ function collectorController(){
             if ( !text ) {
                 console.error("failed to generate preview");
             } else {
-                console.log(JSON.stringify(text, null, 2));
+                modal(JSON.stringify(text, null, 2));
+                // console.log(JSON.stringify(text, null, 2));
             }
         },
         close: function(){

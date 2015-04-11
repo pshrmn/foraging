@@ -298,6 +298,41 @@ body{
     }
 }
 
+.modalHolder {
+    position: absolute;
+    z-index: 10000;
+
+    &.hidden{
+        display: none !important;
+    }
+
+    & > div {
+        position: fixed;
+    }
+
+    .background {
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: #000;
+        opacity: 0.5;
+    }
+
+    .modal {
+        left: 10%;
+        top: 25%;
+        width: 80%;
+        background: $white;
+        padding: 15px;
+
+        pre {
+            max-height: 300px;
+            overflow: scroll;
+        }
+    }
+}
+
 #schemaInfo div {
     display: inline-block;
 }
