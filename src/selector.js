@@ -66,7 +66,7 @@ function elementSelector(){
         var matches = [];
         var sel = selector || "*";
         sel = sel + ":not(" + not + ")";
-        var index = spec && spec.type === "index" ? spec.value : undefined;
+        var index = spec && spec.type === "single" ? spec.value : undefined;
         var eles;
         for ( var i=0; i<elements.length; i++ ) {
             eles = elements[i].querySelectorAll(sel);
@@ -88,7 +88,7 @@ function elementSelector(){
         var max = -Infinity;
         var sel = selector || "*";
         sel = sel + ":not(" + not + ")";
-        var index = spec && spec.type === "index" ? spec.value : undefined;
+        var index = spec && spec.type === "single" ? spec.value : undefined;
         // index must specify only one element per parent
         if ( index !== undefined ) {
             return 1;

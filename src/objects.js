@@ -20,7 +20,7 @@ function newPage(name){
         name: name,
         selector: "body",
         spec: {
-            type: "index",
+            type: "single",
             value: 0
         },
         children: [],

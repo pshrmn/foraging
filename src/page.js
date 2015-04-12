@@ -27,9 +27,9 @@ function cleanPage(page){
 
 // check if an identical selector already exists
 function matchSelector(sel, parent){
-    var selIndex = sel.spec.type === "index" ? sel.spec.value : undefined;
+    var selIndex = sel.spec.type === "single" ? sel.spec.value : undefined;
     return parent.children.some(function(s){
-        var index = s.spec.type === "index" ? s.spec.value : undefined;
+        var index = s.spec.type === "single" ? s.spec.value : undefined;
         if ( s.selector === sel.selector && index === selIndex ) {
             return true;
         }
@@ -42,7 +42,7 @@ function usedNames(page){
     var names = [];
 
     function findNames(selector){
-        if ( selector.spec.type === "name" ) {
+        if ( selector.spec.type === "all" ) {
             names.push(selector.spec.value);
         }
         selector.rules.forEach(function(n){

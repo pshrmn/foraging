@@ -44,7 +44,7 @@ function newPage(name){
         name: name,
         selector: "body",
         spec: {
-            type: "index",
+            type: "single",
             value: 0
         },
         children: [],
@@ -213,7 +213,7 @@ function elementSelector(){
         var matches = [];
         var sel = selector || "*";
         sel = sel + ":not(" + not + ")";
-        var index = spec && spec.type === "index" ? spec.value : undefined;
+        var index = spec && spec.type === "single" ? spec.value : undefined;
         var eles;
         for ( var i=0; i<elements.length; i++ ) {
             eles = elements[i].querySelectorAll(sel);
@@ -235,7 +235,7 @@ function elementSelector(){
         var max = -Infinity;
         var sel = selector || "*";
         sel = sel + ":not(" + not + ")";
-        var index = spec && spec.type === "index" ? spec.value : undefined;
+        var index = spec && spec.type === "single" ? spec.value : undefined;
         // index must specify only one element per parent
         if ( index !== undefined ) {
             return 1;
@@ -287,9 +287,9 @@ function cleanPage(page){
 
 // check if an identical selector already exists
 function matchSelector(sel, parent){
-    var selIndex = sel.spec.type === "index" ? sel.spec.value : undefined;
+    var selIndex = sel.spec.type === "single" ? sel.spec.value : undefined;
     return parent.children.some(function(s){
-        var index = s.spec.type === "index" ? s.spec.value : undefined;
+        var index = s.spec.type === "single" ? s.spec.value : undefined;
         if ( s.selector === sel.selector && index === selIndex ) {
             return true;
         }
@@ -302,7 +302,7 @@ function usedNames(page){
     var names = [];
 
     function findNames(selector){
-        if ( selector.spec.type === "name" ) {
+        if ( selector.spec.type === "all" ) {
             names.push(selector.spec.value);
         }
         selector.rules.forEach(function(n){
@@ -330,13 +330,13 @@ function preview(page) {
         var elements = parent.querySelectorAll(selector.selector);
         var value = selector.spec.value;
         switch ( selector.spec.type ) {
-        case "index":
+        case "single":
             var ele = elements[value];
             if ( !ele) {
                 return;
             }
             return getElementData(selector, ele);
-        case "name":
+        case "all":
             var data = Array.prototype.slice.call(elements).map(function(ele){
                 return getElementData(selector, ele);
             }).filter(function(datum){
@@ -1200,8 +1200,8 @@ function SelectorView(options){
     var choiceElement;
     var formState = {
         selector: "",
-        type: "name",
-        value: undefined
+        type: "single",
+        value: 0
     };
 
     var events = {
@@ -1254,16 +1254,16 @@ function SelectorView(options){
         },
         toggleRadio: function(){
             switch ( this.value ) {
-            case "index":
+            case "single":
                 nameGroup.classed("hidden", true);
                 selectGroup.classed("hidden", false);
-                formState.type = "index";
+                formState.type = "single";
                 formState.value = parseInt(selectElement.property("value"));
                 break;
-            case "name":
+            case "all":
                 nameGroup.classed("hidden", false);
                 selectGroup.classed("hidden", true);
-                formState.type = "name";
+                formState.type = "all";
                 formState.value = undefined;
                 break;
             }
@@ -1310,7 +1310,7 @@ function SelectorView(options){
         .text("Choose Type:");
 
     var inputHolders = radioDiv.selectAll("span.radio")
-            .data(["name", "index"])
+            .data(["single", "all"])
         .enter().append("span")
             .classed("radio", true);
     inputHolders.append("label")
@@ -1325,14 +1325,16 @@ function SelectorView(options){
         .property("checked", function(d, i){ return i === 0; })
         .on("change", events.toggleRadio);
 
-    var nameGroup = st.workarea.append("div");
+    var selectGroup = st.workarea.append("div");
+
+    var nameGroup = st.workarea.append("div")
+        .classed({"hidden": true});
+
     var nameElement = nameGroup.append("p").append("label")
         .text("Name:")
         .append("input")
             .attr("type", "text");
 
-    var selectGroup = st.workarea.append("div")
-        .classed({"hidden": true});
 
     var selectElement = selectGroup.append("p").append("label")
         .text("Index:")
@@ -1410,16 +1412,16 @@ function SelectorView(options){
         });
         var spec = {};
         switch (formState.type){
-        case "index":
-            spec.type = "index";
+        case "single":
+            spec.type = "single";
             spec.value = parseInt(selectElement.property("value"));
             break;
-        case "name":
+        case "all":
             var name = nameElement.property("value");
             if ( name === "" || !controller.legalName(name)){
                 return;
             }
-            spec.type = "name";
+            spec.type = "all";
             spec.value = name;
             break;
         }
@@ -1441,9 +1443,9 @@ function SelectorView(options){
             return;
         }
         var spec;
-        if ( formState.type === "index" ) {
+        if ( formState.type === "single" ) {
             spec = {
-                type: "index",
+                type: "single",
                 value: formState.value
             };
         } else {
@@ -1543,13 +1545,13 @@ function SelectorView(options){
             optionalCheckbox.property("checked", false);
             formState = {
                 selector: "",
-                type: "name",
-                value: undefined
+                type: "single",
+                value: 0
             };
-            nameGroup.classed("hidden", false);
-            nameElement.property("value", "");
-            selectGroup.classed("hidden", true);
+            selectGroup.classed("hidden", false);
             selectElement.selectAll("option").remove();
+            nameGroup.classed("hidden", true);
+            nameElement.property("value", "");
         }
     };
 
@@ -1691,10 +1693,10 @@ function TreeView(options){
                 .text(function(d){
                     var text;
                     switch ( d.spec.type ) {
-                    case "index":
+                    case "single":
                         text = d.selector + "[" + d.spec.value + "]";
                         break;
-                    case "name":
+                    case "all":
                         text = "[" + d.selector + "]";
                         break;
                     default:

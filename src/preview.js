@@ -7,13 +7,13 @@ function preview(page) {
         var elements = parent.querySelectorAll(selector.selector);
         var value = selector.spec.value;
         switch ( selector.spec.type ) {
-        case "index":
+        case "single":
             var ele = elements[value];
             if ( !ele) {
                 return;
             }
             return getElementData(selector, ele);
-        case "name":
+        case "all":
             var data = Array.prototype.slice.call(elements).map(function(ele){
                 return getElementData(selector, ele);
             }).filter(function(datum){

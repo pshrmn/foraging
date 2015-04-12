@@ -132,10 +132,10 @@ function TreeView(options){
                 .text(function(d){
                     var text;
                     switch ( d.spec.type ) {
-                    case "index":
+                    case "single":
                         text = d.selector + "[" + d.spec.value + "]";
                         break;
-                    case "name":
+                    case "all":
                         text = "[" + d.selector + "]";
                         break;
                     default:
