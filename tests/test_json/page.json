@@ -2,14 +2,14 @@
     "name": "simple",
     "selector": "body",
     "spec": {
-        "type": "index",
+        "type": "single",
         "value": 0
     },
     "children": [
         {
             "selector": "a",
             "spec": {
-                "type": "name",
+                "type": "all",
                 "value": "links"
             },
             "children": [],

@@ -33,7 +33,7 @@ class Selector(object):
         if sel_type is None:
             msg = "no selector spec type provided"
             raise BadJSONError(msg)
-        elif sel_type not in ["index", "name"]:
+        elif sel_type not in ["single", "all"]:
             msg = "unexpected selector type {}"
             raise BadJSONError(msg.format(sel_type))
         if value is None:
@@ -58,19 +58,19 @@ class Selector(object):
     def get(self, parent):
         """
         Given a parent element, get the child element(s) using the compiled
-        xpath for the selector. For "index" selectors, this will be a single
-        element that returns a dict. For "name" selectors, this will be all
+        xpath for the selector. For "single" selectors, this will be a single
+        element that returns a dict. For "all" selectors, this will be all
         elements and returns a list.
         """
         elements = self.xpath(parent)
-        if self.type == "index":
+        if self.type == "single":
             try:
                 element = elements[self.value]
             except IndexError:
                 # return None if element doesn't exist
                 return
             return self.getElementData(element)
-        elif self.type == "name":
+        elif self.type == "all":
             data = [self.getElementData(e) for e in elements]
             return {self.value: [d for d in data if d]}
 

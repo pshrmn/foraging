@@ -23,7 +23,7 @@ class SelectorTestCase(unittest.TestCase):
                 }
             ],
             "spec": {
-                "type": "index",
+                "type": "single",
                 "value": 0
             }
         }
@@ -31,7 +31,7 @@ class SelectorTestCase(unittest.TestCase):
         self.assertIsNotNone(s)
         self.assertEqual(len(s.rules), 2)
         self.assertIsInstance(s.rules[0], Rule)
-        self.assertEqual(s.type, "index")
+        self.assertEqual(s.type, "single")
         self.assertEqual(s.value, 0)
 
     def test_nested_from_json(self):
@@ -48,14 +48,14 @@ class SelectorTestCase(unittest.TestCase):
                         }
                     ],
                     "spec": {
-                        "type": "name",
+                        "type": "all",
                         "value": "links"
                     }
                 }
             ],
             "rules": [],
             "spec": {
-                "type": "index",
+                "type": "single",
                 "value": 0
             }
         }
@@ -70,7 +70,7 @@ class SelectorTestCase(unittest.TestCase):
             "children": [],
             "rules": [],
             "spec": {
-                "type": "index",
+                "type": "single",
                 "value": 0
             }
         }
@@ -88,7 +88,7 @@ class SelectorTestCase(unittest.TestCase):
                 }
             ],
             "spec": {
-                "type": "index",
+                "type": "single",
                 "value": 0
             },
             "optional": True

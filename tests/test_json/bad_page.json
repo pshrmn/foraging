@@ -2,7 +2,7 @@
     "name": "simple",
     "selector": "body",
     "spec": {
-        "type": "index",
+        "type": "single",
         "value": 0
     },
     "children": [],
