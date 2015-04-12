@@ -15,19 +15,23 @@ Data is captured through `rule`s. A rule has a name and the attribute of an elem
 
 #####Selector
 
-Rules are created on `selector`s. Selectors are made up of a css `selector`, `children` selectors, `rules`, and an optional `index` that can be used on a selector to specify a specific element to target. (default behavior includes all matching elements. `index` is zero-based)
+Rules are created on `selector`s. Selectors are made up of a css `selector`, `children` selectors, `rules`, a `spec`  with a `type` (`single` or `all`) and a `value` (an integer to target a specific element for `single` types and a string name to save the array as for `all` types). There is also an `optional` boolean property to handle cases where an element might not exist, but you still want to collect other data.
+
+Specs are either
 
     {
-        type: "index",
+        type: "single",
         value: <int>
     }
     
 or
 
     {
-        type: "name",
+        type: "all",
         value: <string>
     }
+
+and a selector looks like:
 
     selector = {
         selector: "p",
@@ -40,7 +44,11 @@ or
                         name: "url",
                         attr: "href"
                     }
-                ]
+                ],
+                spec: {
+                    type: "all",
+                    value: "urls"
+                }
             }
         ],
         rules: [
@@ -49,10 +57,13 @@ or
                 attr: "text"
             }
         ],
-        index: 2
+        spec: {
+            type: "single",
+            value: 2
+        }
     }
 
-The above selector will select the second `p` element in the page and capture its `textContent` as the `description`. Any `a` elements that are children of the paragraph will have their `href` attribute captured and stored in a `url` array.
+The above selector will select the second `p` element in the page and capture its `textContent` as the `description`. Any `a` elements that are children of the paragraph will have their `href` attribute captured and stored in a `urls` array.
 
 #####Page
 
