@@ -1198,11 +1198,8 @@ function SelectorView(options){
 
     var choice;
     var choiceElement;
-    var formState = {
-        selector: "",
-        type: "single",
-        value: 0
-    };
+    var selector = "";
+    var radioType = "single";
 
     var events = {
         saveSelector: function(){
@@ -1221,18 +1218,20 @@ function SelectorView(options){
             showcase.remove();
             viewChoice(d, this);
             var parent = controller.getSelector();
-            formState.selector = d.join("");
-            markup();
+            selector = d.join("");
+            markup({
+                type: "all"
+            });
         },
         confirmElement: function(){
-            if ( formState.selector === "" ) {
+            if ( selector === "" ) {
                 return;
             }
             addTags();
             showSelectorForm();
         },
         confirmSelector: function(){
-            if ( formState.selector === "" ) {
+            if ( selector === "" ) {
                 return;
             }
             setupForm();
@@ -1244,30 +1243,36 @@ function SelectorView(options){
         },
         toggleTag: function(){
             this.classList.toggle("on");
-            formState.selector = currentSelector();
-            markup();
+            selector = currentSelector();
+            markup({
+                type: "all"
+            });
         },
         selectorIndex: function(){
-            formState.selector = currentSelector();
-            formState.value = selectElement.property("value");
-            markup();
+            selector = currentSelector();
+            markup({
+                type: "single",
+                value: parseInt(selectElement.property("value"), 10)
+            });
         },
         toggleRadio: function(){
             switch ( this.value ) {
             case "single":
                 nameGroup.classed("hidden", true);
                 selectGroup.classed("hidden", false);
-                formState.type = "single";
-                formState.value = parseInt(selectElement.property("value"));
+                markup({
+                    type: "single",
+                    value: parseInt(selectElement.property("value"))
+                });
                 break;
             case "all":
                 nameGroup.classed("hidden", false);
                 selectGroup.classed("hidden", true);
-                formState.type = "all";
-                formState.value = undefined;
+                markup({
+                    type: "all"
+                });
                 break;
             }
-            markup();
         }
     };
 
@@ -1411,7 +1416,8 @@ function SelectorView(options){
             }
         });
         var spec = {};
-        switch (formState.type){
+
+        switch (radioType){
         case "single":
             spec.type = "single";
             spec.value = parseInt(selectElement.property("value"));
@@ -1435,21 +1441,12 @@ function SelectorView(options){
     var getParts = selectorParts()
         .ignoreClasses(["collect-highlight", "query-check", "selectable-element"]);
 
-    function markup(){
+    function markup(spec){
         showcase.remove();
-        var sel = formState.selector;
+        var sel = selector;
         // don't markup empty selector
         if ( sel === "" ) {
             return;
-        }
-        var spec;
-        if ( formState.type === "single" ) {
-            spec = {
-                type: "single",
-                value: formState.value
-            };
-        } else {
-            spec = {};
         }
         var parent = controller.getSelector();
         showcase(controller.elements(parent.elements, sel, spec));
@@ -1474,8 +1471,10 @@ function SelectorView(options){
         if ( !choice ) {
             return;
         }
-        formState.selector = choice.join("");
-        markup();
+        selector = choice.join("");
+        markup({
+            type: "all"
+        });
         parts = tags.selectAll("div.tag")
             .data(choice);
         parts.enter().append("div")
@@ -1498,7 +1497,7 @@ function SelectorView(options){
         selectElement.on("change", events.selectorIndex);
         var eles = selectElement.selectAll("option");
         eles.remove();
-        var maxChildren = controller.eleCount(formState.selector);
+        var maxChildren = controller.eleCount(selector);
 
         eles.data(d3.range(maxChildren))
             .enter().append("option")
@@ -1543,11 +1542,8 @@ function SelectorView(options){
             // form
             radios.property("checked", function(d, i){ return i === 0; });
             optionalCheckbox.property("checked", false);
-            formState = {
-                selector: "",
-                type: "single",
-                value: 0
-            };
+            selector = "";
+            radioType = "single";
             selectGroup.classed("hidden", false);
             selectElement.selectAll("option").remove();
             nameGroup.classed("hidden", true);
