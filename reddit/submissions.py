@@ -2,8 +2,7 @@ import os
 import json
 import argparse
 
-from collector.page import Page
-from collector.fetch import Fetch, Cache
+from collector import Page, Fetch, Cache
 
 os.makedirs("data", exist_ok=True)
 with open("submissions.json") as fp:
