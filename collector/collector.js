@@ -1260,6 +1260,7 @@ function SelectorView(options){
             case "single":
                 nameGroup.classed("hidden", true);
                 selectGroup.classed("hidden", false);
+                radioType = "single";
                 markup({
                     type: "single",
                     value: parseInt(selectElement.property("value"))
@@ -1268,6 +1269,7 @@ function SelectorView(options){
             case "all":
                 nameGroup.classed("hidden", false);
                 selectGroup.classed("hidden", true);
+                radioType = "all";
                 markup({
                     type: "all"
                 });
