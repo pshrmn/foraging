@@ -186,7 +186,7 @@ class Fetch(object):
         text = self.get_cached(url)
         save = False
         if text is None:
-            save = True
+            save = True if self.cache is not None else False
             self.wait(url)
             text = ""
             # allow DynamicFetch to get static content
@@ -204,11 +204,12 @@ class Fetch(object):
             if text == "":
                 return
         dom = html.document_fromstring(text)
-        dom = self.cleaner.clean_html(dom)
         dom.make_links_absolute(url)
         # save after formatting
         if save:
-            clean_html = html.tostring(dom, pretty_print=True,
+            # slow, only clean when saving
+            clean_dom = self.cleaner.clean_html(dom)
+            clean_html = html.tostring(clean_dom, pretty_print=True,
                                        include_meta_content_type=True)
             self.save_cached(url, clean_html)
         return dom
