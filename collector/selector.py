@@ -99,8 +99,11 @@ class Selector(object):
         data = {}
         for child in self.children:
             child_data = child.get(element)
-            if child_data is None and not child.optional:
-                return
+            if child_data is None:
+                if not child.optional:
+                    return
+                else:
+                    continue
             for key, val in child_data.items():
                 data[key] = val
         return data
