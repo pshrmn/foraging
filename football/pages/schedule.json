@@ -1,0 +1,79 @@
+{
+  "selector": "body",
+  "spec": {
+    "type": "single",
+    "value": 0
+  },
+  "rules": [],
+  "optional": false,
+  "children": [
+    {
+      "selector": "li.schedules-list-matchup",
+      "spec": {
+        "type": "all",
+        "value": "games"
+      },
+      "rules": [],
+      "optional": false,
+      "children": [
+        {
+          "selector": "span.team-name.away",
+          "spec": {
+            "type": "single",
+            "value": 0
+          },
+          "rules": [
+            {
+              "attr": "text",
+              "name": "away"
+            }
+          ],
+          "optional": false,
+          "children": []
+        },
+        {
+          "selector": "span.team-name.home",
+          "spec": {
+            "type": "single",
+            "value": 0
+          },
+          "rules": [
+            {
+              "attr": "text",
+              "name": "home"
+            }
+          ],
+          "optional": false,
+          "children": []
+        }
+      ]
+    },
+    {
+      "selector": "span.bye-team",
+      "spec": {
+        "type": "single",
+        "value": 0
+      },
+      "rules": [],
+      "optional": true,
+      "children": [
+        {
+          "selector": "a",
+          "spec": {
+            "type": "all",
+            "value": "byes"
+          },
+          "rules": [
+            {
+              "attr": "text",
+              "name": "team"
+            }
+          ],
+          "optional": false,
+          "children": []
+        }
+      ]
+    }
+  ],
+  "name": "games"
+}
