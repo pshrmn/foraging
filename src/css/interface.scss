@@ -298,7 +298,7 @@ body{
     }
 }
 
-.modalHolder {
+.modal-holder {
     position: absolute;
     z-index: 10000;
 
@@ -319,12 +319,14 @@ body{
         opacity: 0.5;
     }
 
-    .modal {
+    .cjs-modal {
         left: 10%;
         top: 25%;
         width: 80%;
         background: $white;
         padding: 15px;
+        font-size: 16px;
+        font-family: sans-serif;
 
         pre {
             max-height: 300px;

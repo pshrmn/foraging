@@ -410,7 +410,7 @@ function previewModal(parentElement){
 
     var holder = parent.append("div")
         .classed({
-            "modalHolder": true,
+            "modal-holder": true,
             "hidden": true
         });
 
@@ -419,7 +419,7 @@ function previewModal(parentElement){
         .on("click", closeModal);
 
     var modal = holder.append("div")
-        .classed({"modal": true});
+        .classed({"cjs-modal": true});
 
     var pre = modal.append("pre");
 
