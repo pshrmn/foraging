@@ -9,6 +9,9 @@ function topbar(options){
         },
         addPage: function(){
             var name = prompt("Page name");
+            if ( name === null || name === "" ) {
+                return;
+            }
             controller.addPage(name.trim());
         },
         removePage: function(){
@@ -35,11 +38,13 @@ function topbar(options){
         .on("change", events.loadPage);
 
     pageGroup.append("button")
-        .text("add page")
+        .text("+")
+        .attr("title", "add a new Page")
         .on("click", events.addPage);
 
     pageGroup.append("button")
-        .text("remove page")
+        .html("&times;")
+        .attr("title", "remove the current Page")
         .classed("red", true)
         .on("click", events.removePage);
 
