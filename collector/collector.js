@@ -416,6 +416,7 @@ function previewModal(parentElement){
 
     var background = holder.append("div")
         .classed({"background": true})
+        .attr("title", "click to close preview")
         .on("click", closeModal);
 
     var modal = holder.append("div")

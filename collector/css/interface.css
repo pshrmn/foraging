@@ -207,7 +207,9 @@ body {
     font-family: sans-serif; }
     .modal-holder .cjs-modal pre {
       max-height: 300px;
-      overflow: scroll; }
+      max-width: 100%;
+      overflow: scroll;
+      margin: 1em 0; }
 
 #schemaInfo div {
   display: inline-block; }
