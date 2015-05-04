@@ -75,7 +75,7 @@ def sync():
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Server to save pages' +
-                                     'created with collectorjs')
+                                     'created with Forager')
     parser.add_argument('--folder', '-F', dest='directory',
                         help='folder to save pages to')
     args = parser.parse_args()

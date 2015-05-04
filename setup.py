@@ -3,7 +3,6 @@ from uploador import __version__
 
 packages = find_packages(exclude=['tests*'])
 
-
 setup(
     name="uploador",
     version=__version__,
