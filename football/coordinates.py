@@ -1,7 +1,7 @@
 import re
 import json
 
-from collector import Page, Fetch, Cache
+from gatherer import Page, Fetch, Cache
 
 
 def pretty_coords(coord):

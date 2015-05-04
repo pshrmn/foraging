@@ -2,13 +2,13 @@ import os
 import json
 import argparse
 
-from collector import Page, Fetch
+from gatherer import Page, Fetch
 
 os.makedirs("data", exist_ok=True)
 with open("submissions.json") as fp:
     data = json.load(fp)
 
-f = Fetch(headers={"User-Agent": "collector"})
+f = Fetch(headers={"User-Agent": "gatherer"})
 p = Page.from_json(data, f)
 
 
@@ -25,7 +25,7 @@ def fetch_and_save(filename, subreddit=None):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('-subreddit', dest='subreddit',
-                        help='subreddit to collect data from')
+                        help='subreddit to get data from')
     parser.add_argument('-filename', dest='filename',
                         help='location to save data')
     args = parser.parse_args()

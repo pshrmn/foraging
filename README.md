@@ -1,3 +1,3 @@
-#Collector Examples
+#Gatherer Examples
 
-A collection of example projects using [Collector](https://github.com/psherman/collector)
+A collection of example projects using [gatherer](https://github.com/psherman/gatherer)

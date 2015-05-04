@@ -1,6 +1,6 @@
 import json
 
-from collector import Page, Fetch, Cache
+from gatherer import Page, Fetch, Cache
 
 with open("pages/stadiums.json") as fp:
     stadium_data = json.load(fp)

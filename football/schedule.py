@@ -1,6 +1,6 @@
 import json
 
-from collector import Page, Fetch, Cache
+from gatherer import Page, Fetch, Cache
 
 with open("pages/schedule.json") as fp:
     schedule_json = json.load(fp)
