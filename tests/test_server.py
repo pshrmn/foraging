@@ -2,7 +2,7 @@ import os
 import unittest
 import json
 
-from uploador import server
+from granary import server
 
 
 class CollectTestCase(unittest.TestCase):
