@@ -435,7 +435,7 @@ function previewModal(parentElement){
 }
 
 // Source: src/controller.js
-function collectorController(){
+function foragerController(){
     var pages;
     var currentPage;
     var page;
@@ -1376,7 +1376,7 @@ function SelectorView(options){
 
     var interactive = interactiveElements()
         .cssClass("selectable-element")
-        .hoverClass("collect-highlight")
+        .hoverClass("forager-highlight")
         .clicked(function selectOption(event){
             event.preventDefault();
             event.stopPropagation();
@@ -1447,7 +1447,7 @@ function SelectorView(options){
     // parts is given an element and returns an array containing its tag
     // and (if they exist) its id and any classes
     var getParts = selectorParts()
-        .ignoreClasses(["collect-highlight", "query-check", "selectable-element"]);
+        .ignoreClasses(["forager-highlight", "query-check", "selectable-element"]);
 
     function markup(spec){
         showcase.remove();
@@ -1756,12 +1756,12 @@ function buildUI(controller){
 
     // ugly, might want to convert to d3 since everything else uses it, but it works
     var holder = document.createElement("div");
-    holder.classList.add("collectorjs");
+    holder.classList.add("forager");
     holder.classList.add("no-select");
     holder.innerHTML = '<div class="permanent">' +
             '<div id="schemaInfo"></div>' +
-            '<div id="collectAlert"></div>' +
-            '<div id="closeCollectjs">&times;</div>' +
+            '<div id="foragerAlert"></div>' +
+            '<div id="closeForager">&times;</div>' +
         '</div>' +
         '<div class="views"></div>' + 
         '<div class="page-tree"></div>';
@@ -1783,7 +1783,7 @@ function buildUI(controller){
         holder: "#schemaInfo"
     });
 
-    var closer = d3.select("#closeCollectjs")
+    var closer = d3.select("#closeForager")
         .on("click", events.close);
 
     var viewHolder = holder.querySelector(".views");
@@ -1799,7 +1799,7 @@ function buildUI(controller){
     }
 
     var fns = {
-        // make sure that all elements in the collectjs have the no-select class
+        // make sure that all elements in the forager ui are .no-select
         noSelect: function(){
             var all = holder.querySelectorAll("*");
             for ( var i=0; i<all.length; i++ ) {
@@ -1844,8 +1844,8 @@ function buildUI(controller){
     return fns;
 }
 
-// Source: src/collector.js
-var controller = collectorController();
+// Source: src/forager.js
+var controller = foragerController();
 
 // build the ui
 var ui = buildUI(controller);

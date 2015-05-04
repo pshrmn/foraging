@@ -1,4 +1,4 @@
-var controller = collectorController();
+var controller = foragerController();
 
 // build the ui
 var ui = buildUI(controller);

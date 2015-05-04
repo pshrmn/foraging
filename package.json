@@ -1,9 +1,9 @@
 {
-  "name": "collectorJS",
-  "version": "1.8.4",
+  "name": "Forager",
+  "version": "1.9",
   "repository": {
     "type": "git",
-    "url": "git://github.com/psherman/collectorjs.git"
+    "url": "git://github.com/psherman/forager.git"
   },
   "devDependencies": {
     "grunt": "^0.4.4",

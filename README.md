@@ -1,6 +1,6 @@
-#CollectorJS
+#Forager
 
-A Chrome extension to determine how to collect data from a page. 
+A Chrome extension to determine how to gather data from a page. 
 
 ###Format
 
@@ -15,7 +15,7 @@ Data is captured through `rule`s. A rule has a name and the attribute of an elem
 
 #####Selector
 
-Rules are created on `selector`s. Selectors are made up of a css `selector`, `children` selectors, `rules`, a `spec`  with a `type` (`single` or `all`) and a `value` (an integer to target a specific element for `single` types and a string name to save the array as for `all` types). There is also an `optional` boolean property to handle cases where an element might not exist, but you still want to collect other data.
+Rules are created on `selector`s. Selectors are made up of a css `selector`, `children` selectors, `rules`, a `spec`  with a `type` (`single` or `all`) and a `value` (an integer to target a specific element for `single` types and a string name to save the array as for `all` types). There is also an `optional` boolean property to handle cases where an element might not exist, but you still want to gather other data.
 
 Specs are either
 
@@ -90,8 +90,5 @@ To pack extension and use:
 3. Open the folder where the packed extension (a .crx file) is located (that should be one folder above the extension folder)
 4. Drag the .crx file to the Chrome extensions page
 5. Accept the extension's permissions
-
-#####Extra info
-Originally project was at https://github.com/psherman/collectjs, but transitioning over to an extension from a bookmarklet for ease of use.
 
 Makes extensive use of [d3](http://d3js.org/).

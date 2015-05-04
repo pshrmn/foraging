@@ -181,7 +181,7 @@ function SelectorView(options){
 
     var interactive = interactiveElements()
         .cssClass("selectable-element")
-        .hoverClass("collect-highlight")
+        .hoverClass("forager-highlight")
         .clicked(function selectOption(event){
             event.preventDefault();
             event.stopPropagation();
@@ -252,7 +252,7 @@ function SelectorView(options){
     // parts is given an element and returns an array containing its tag
     // and (if they exist) its id and any classes
     var getParts = selectorParts()
-        .ignoreClasses(["collect-highlight", "query-check", "selectable-element"]);
+        .ignoreClasses(["forager-highlight", "query-check", "selectable-element"]);
 
     function markup(spec){
         showcase.remove();

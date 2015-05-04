@@ -1,4 +1,4 @@
-function collectorController(){
+function foragerController(){
     var pages;
     var currentPage;
     var page;

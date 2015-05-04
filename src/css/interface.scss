@@ -19,7 +19,7 @@ body{
 }
 
 /* Interface */
-.collectorjs{
+.forager{
     z-index:1000;
     position: fixed;
     left: 0;
@@ -341,7 +341,7 @@ body{
     display: inline-block;
 }
 
-#closeCollectjs{
+#closeForager{
     background: $red;
     cursor: pointer;
     position: absolute;

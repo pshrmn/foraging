@@ -3,12 +3,12 @@ function buildUI(controller){
 
     // ugly, might want to convert to d3 since everything else uses it, but it works
     var holder = document.createElement("div");
-    holder.classList.add("collectorjs");
+    holder.classList.add("forager");
     holder.classList.add("no-select");
     holder.innerHTML = '<div class="permanent">' +
             '<div id="schemaInfo"></div>' +
-            '<div id="collectAlert"></div>' +
-            '<div id="closeCollectjs">&times;</div>' +
+            '<div id="foragerAlert"></div>' +
+            '<div id="closeForager">&times;</div>' +
         '</div>' +
         '<div class="views"></div>' + 
         '<div class="page-tree"></div>';
@@ -30,7 +30,7 @@ function buildUI(controller){
         holder: "#schemaInfo"
     });
 
-    var closer = d3.select("#closeCollectjs")
+    var closer = d3.select("#closeForager")
         .on("click", events.close);
 
     var viewHolder = holder.querySelector(".views");
@@ -46,7 +46,7 @@ function buildUI(controller){
     }
 
     var fns = {
-        // make sure that all elements in the collectjs have the no-select class
+        // make sure that all elements in the forager ui are .no-select
         noSelect: function(){
             var all = holder.querySelectorAll("*");
             for ( var i=0; i<all.length; i++ ) {

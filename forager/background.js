@@ -1,5 +1,5 @@
 /*
-CollectJS background page
+Forager background page
 */
 
 chrome.storage.local.get(null, function(storage) {
@@ -8,11 +8,11 @@ chrome.storage.local.get(null, function(storage) {
     }
 });
 
-// inject collectjs interface when the browserAction icon is clicked
+// inject forager's interface when the browserAction icon is clicked
 chrome.browserAction.onClicked.addListener(function(tab) {
     chrome.tabs.insertCSS(null, {file: "css/interface.css"});
     chrome.tabs.executeScript(null, {file: "lib/d3.js"}, function(){
-        chrome.tabs.executeScript(null, {file: "collector.js"});
+        chrome.tabs.executeScript(null, {file: "forager.js"});
     });
 });
 
@@ -43,7 +43,7 @@ function jsonToParams(obj){
 
 // basic ajax request that returns data from server on success, otherwise object with error=true
 function xhr(type, url, data, callback, isJSON){
-    // url is the endpoint that you're uploading the collect rules to
+    // url is the endpoint that you're uploading the rules to
     var xhr = new XMLHttpRequest();
 
     xhr.onload = function(event){

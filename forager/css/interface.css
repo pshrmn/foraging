@@ -4,7 +4,7 @@ body {
   margin: 0; }
 
 /* Interface */
-.collectorjs {
+.forager {
   z-index: 1000;
   position: fixed;
   left: 0;
@@ -20,47 +20,47 @@ body {
   box-sizing: border-box;
   /* lots of sites like to customize how various inputs look, 
   so this is trying to keep these close to (chrome) default css */ }
-  .collectorjs * {
+  .forager * {
     color: black;
     box-sizing: border-box;
     line-height: 1.1em !important; }
-  .collectorjs .not-allowed {
+  .forager .not-allowed {
     cursor: not-allowed; }
-    .collectorjs .not-allowed * {
+    .forager .not-allowed * {
       cursor: not-allowed; }
-  .collectorjs .inline {
+  .forager .inline {
     display: inline-block; }
-  .collectorjs .hidden {
+  .forager .hidden {
     display: none !important; }
-  .collectorjs ul {
+  .forager ul {
     list-style: none; }
-  .collectorjs .permanent {
+  .forager .permanent {
     padding: 3px 15px;
     background: #373840;
     height: 31px; }
-    .collectorjs .permanent * {
+    .forager .permanent * {
       color: #ced1de; }
-    .collectorjs .permanent button, .collectorjs .permanent select, .collectorjs .permanent option {
+    .forager .permanent button, .forager .permanent select, .forager .permanent option {
       color: black; }
-    .collectorjs .permanent div {
+    .forager .permanent div {
       display: inline-block;
       margin: 0 8px; }
-  .collectorjs .page-tree {
+  .forager .page-tree {
     display: inline-block;
     background: #373840;
     padding: 10px; }
-    .collectorjs .page-tree svg {
+    .forager .page-tree svg {
       box-sizing: content-box;
       background: white;
       padding: 15px; }
-  .collectorjs .views {
+  .forager .views {
     box-sizing: border-box;
     background: #373840;
     width: 500px;
     padding: 10px;
     display: inline-block;
     vertical-align: top; }
-    .collectorjs .views .view {
+    .forager .views .view {
       height: 250px;
       display: none;
       text-align: left;
@@ -68,10 +68,10 @@ body {
       background: white;
       padding: 15px;
       overflow-y: scroll; }
-      .collectorjs .views .view > * {
+      .forager .views .view > * {
         vertical-align: top;
         display: inline-block; }
-      .collectorjs .views .view .tag {
+      .forager .views .view .tag {
         background: #f296a3;
         display: inline-block;
         padding-top: 2px;
@@ -82,79 +82,79 @@ body {
         border: 1px solid #ced1de;
         border-radius: 5px;
         cursor: pointer; }
-      .collectorjs .views .view .on,
-      .collectorjs .views .view .tag.on {
+      .forager .views .view .on,
+      .forager .views .view .tag.on {
         background: #bddbce; }
-      .collectorjs .views .view .form > p {
+      .forager .views .view .form > p {
         margin: 0;
         line-height: 1.25em; }
-      .collectorjs .views .view .form .workarea {
+      .forager .views .view .form .workarea {
         margin-bottom: 25px; }
-      .collectorjs .views .view .form input.error {
+      .forager .views .view .form input.error {
         border-color: #cf2558;
         border-style: solid; }
-      .collectorjs .views .view .form span.error {
+      .forager .views .view .form span.error {
         border-bottom: 1px solid #cf2558; }
-      .collectorjs .views .view .form .radio label {
+      .forager .views .view .form .radio label {
         margin-left: 15px;
         display: inline-block; }
-      .collectorjs .views .view .form input[type=text] {
+      .forager .views .view .form input[type=text] {
         width: 150px;
         border-width: 0 0 1px; }
-    .collectorjs .views .view.active {
+    .forager .views .view.active {
       display: block; }
-  .collectorjs svg {
+  .forager svg {
     font-size: 14px; }
-    .collectorjs svg .link {
+    .forager svg .link {
       fill: none;
       stroke: #ced1de; }
-    .collectorjs svg .node {
+    .forager svg .node {
       cursor: pointer;
       fill: #21732c; }
-    .collectorjs svg .empty {
+    .forager svg .empty {
       fill: #cf2558; }
-    .collectorjs svg .node text {
+    .forager svg .node text {
       paint-order: stroke;
       stroke: white;
       stroke-width: 2px;
       text-anchor: end; }
-    .collectorjs svg .current {
+    .forager svg .current {
       font-weight: bold; }
-  .collectorjs input {
+  .forager input {
     box-shadow: none;
     border-radius: 0;
     background: white;
     border: 1px solid #373840;
     line-height: 1.2; }
-  .collectorjs input[type=text] {
+  .forager input[type=text] {
     height: 20px;
     max-height: 20px;
     min-height: 20px;
     padding: 2px;
     font-family: sans-serif; }
-  .collectorjs label {
+  .forager label {
     cursor: pointer;
     font-weight: normal; }
-  .collectorjs .attributes tbody tr:hover {
+  .forager .attributes tbody tr:hover {
     background: #898b96;
     cursor: pointer; }
-  .collectorjs .attributes .selectedAttr, .collectorjs .attributes .selectedAttr:hover {
+  .forager .attributes .selectedAttr, .forager .attributes .selectedAttr:hover {
     background: #bddbce; }
-  .collectorjs td, .collectorjs th {
+  .forager td, .forager th {
     min-width: 50px;
     height: 1.5rem;
     border: 2px solid white;
     text-align: center;
     vertical-align: middle; }
-  .collectorjs th {
+  .forager th {
     background: #45aacc; }
-  .collectorjs input, .collectorjs select, .collectorjs option, .collectorjs textarea, .collectorjs button {
+  .forager input, .forager select, .forager option, .forager textarea, .forager button {
     line-height: 1.1em !important;
     padding: 0 !important;
     margin: 0 !important;
     font-size: 1em !important;
     float: none !important; }
-  .collectorjs button {
+  .forager button {
     background: #76b85c;
     color: black;
     border-radius: 3px;
@@ -166,18 +166,18 @@ body {
     padding: 1px 6px !important;
     min-width: initial !important;
     text-transform: capitalize !important; }
-    .collectorjs button:hover, .collectorjs button:active, .collectorjs button:focus {
+    .forager button:hover, .forager button:active, .forager button:focus {
       background: #76b85c;
       border-color: #76b85c;
       color: black; }
-    .collectorjs button.red, .collectorjs button.red:hover, .collectorjs button.red:active, .collectorjs button.red:focus {
+    .forager button.red, .forager button.red:hover, .forager button.red:active, .forager button.red:focus {
       background: #cf2558;
       border-color: #cf2558;
       color: white; }
-  .collectorjs button:active {
+  .forager button:active {
     border-style: inset !important;
     color: black !important; }
-  .collectorjs select {
+  .forager select {
     display: inline-block !important;
     border: 1px solid #a9a9a9 !important;
     background: white !important;
@@ -214,7 +214,7 @@ body {
 #schemaInfo div {
   display: inline-block; }
 
-#closeCollectjs {
+#closeForager {
   background: #cf2558;
   cursor: pointer;
   position: absolute;
@@ -233,10 +233,10 @@ body {
 img.selectable-element {
   border: 1px dashed #cf2558 !important; }
 
-.collect-highlight {
+.forager-highlight {
   background: rgba(46, 130, 158, 0.5) !important; }
 
-img.collect-highlight {
+img.forager-highlight {
   opacity: 0.25 !important; }
 
 .query-check {
