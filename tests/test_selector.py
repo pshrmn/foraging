@@ -1,8 +1,8 @@
 import unittest
 
-from collector.selector import Selector
-from collector.rule import Rule
-from collector.errors import BadJSONError
+from gatherer.selector import Selector
+from gatherer.rule import Rule
+from gatherer.errors import BadJSONError
 
 
 class SelectorTestCase(unittest.TestCase):

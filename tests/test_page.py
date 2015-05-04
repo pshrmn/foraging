@@ -2,8 +2,8 @@ import unittest
 import os
 import json
 
-from collector.page import Page
-from collector.errors import BadJSONError
+from gatherer.page import Page
+from gatherer.errors import BadJSONError
 
 path = os.path.join(os.getcwd(), "tests", "test_json")
 

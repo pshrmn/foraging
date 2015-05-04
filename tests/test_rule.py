@@ -1,7 +1,7 @@
 import unittest
 
-from collector.rule import Rule
-from collector.errors import BadJSONError
+from gatherer.rule import Rule
+from gatherer.errors import BadJSONError
 
 
 class RuleTestCase(unittest.TestCase):

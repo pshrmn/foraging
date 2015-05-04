@@ -1,14 +1,14 @@
-#collector
+#gatherer
 
-Collect data from web pages. Works with pages created by [collectJS](https://github.com/psherman/collectorjs). For the data format, refer to that project's README.
+Gather data from web pages. Works with pages created by [Forager](https://github.com/psherman/forager). For the data format, refer to that project's README.
 
 ##Install
 
-Install collector using pip
+Install gatherer using pip
 
-    pip install git+git://github.com/psherman/collector.git
+    pip install git+git://github.com/psherman/gatherer.git
 
-For Windows users, if installing `lxml` causes errors. Download the wheel from the [Python Extension Packages for Windows](http://www.lfd.uci.edu/~gohlke/pythonlibs/#lxml) and place the wheel in your project. Pip install that file, the try the above collector installation.
+For Windows users, if installing `lxml` causes errors. Download the wheel from the [Python Extension Packages for Windows](http://www.lfd.uci.edu/~gohlke/pythonlibs/#lxml) and place the wheel in your project. Pip install that file, the try the above gatherer installation.
 
 Example: (the filename will vary depending on your system and python version)
 
@@ -23,7 +23,7 @@ Arguments:
 
 * `folder`: folder to store the cached pages in.
 
-    from collector import Cache
+    from gatherer import Cache
 
     cache = Cache("cache_folder")
 
@@ -33,13 +33,13 @@ A fetcher takes a url and return the html contents of the corresponding web page
 Arguments:
 
 * `sleep_time`: how long to wait until the next request. (default `5`)
-* `headers`: a dict of headers to send with the request. Your headers should include a `'User-Agent'` key to identify your collector.
+* `headers`: a dict of headers to send with the request. Your headers should include a `'User-Agent'` key to identify your gatherer.
 * `cache`: an optional `Cache` object used to store webpages to mitigate duplicate requests (default `None`)
 
 
-    from collector import Fetch
+    from gatherer import Fetch
 
-    fetch = Fetch(headers={"User-Agent": "custom-collector-user-agent"})
+    fetch = Fetch(headers={"User-Agent": "custom-gatherer-user-agent"})
 
 ######get(url, dynamic=False)
 Takes a url and returns an lxml html element if the request was successful, otherwise `None`
@@ -52,16 +52,16 @@ This requires PhantomJS and a Phantomjs script that logs the page's html. Phanto
     f.make_dynamic("phantomjs/phantomjs.exe", "html_text.js")
 
 ###Pages
-Pages are collections of rules to collect data from elements in a web page. For a better explanation of the makeup of a Page, read the README for [collectorJS](https://github.com/psherman/collectorjs)
+Pages are collections of rules to gather data from elements in a web page. For a better explanation of the makeup of a Page, read the README for [Forager](https://github.com/psherman/forager)
 
 ####Page
 
-`Page`s are used to collect data from single pages.
+`Page`s are used to gather data from single pages.
 
 Usage:
 
     import json
-    from collector import Page
+    from gatherer import Page
 
     with open("page.json") as fp:
         data = json.load(fp)
