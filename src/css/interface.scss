@@ -20,7 +20,7 @@ body{
 
 /* Interface */
 .forager{
-    z-index:1000;
+    z-index: 2147483638;
     position: fixed;
     left: 0;
     bottom: 0;
@@ -300,7 +300,11 @@ body{
 
 .modal-holder {
     position: absolute;
-    z-index: 10000;
+    z-index: 2147483638;
+
+    * {
+        text-align: left;
+    }
 
     &.hidden{
         display: none !important;
@@ -334,6 +338,30 @@ body{
             overflow: scroll;
             margin: 1em 0;
         }
+    }
+
+    button {
+        background: buttonface;
+        border: 2px outset buttonface;
+        color: buttontext;
+        box-shadow: none !important;
+        cursor: pointer !important;
+        font-weight: normal !important;
+        margin: 2px !important;
+        padding: 1px 6px !important;
+        min-width: initial !important;
+        text-transform: capitalize !important;
+
+        &:hover, &:active, &:focus{
+            background: buttonface;
+            border-color: buttonface;
+            color: buttontext;
+        }
+    }
+
+    button:active{
+        border-style: inset !important;
+        color: buttontext !important;
     }
 }
 

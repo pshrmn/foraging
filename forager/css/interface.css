@@ -5,7 +5,7 @@ body {
 
 /* Interface */
 .forager {
-  z-index: 1000;
+  z-index: 2147483638;
   position: fixed;
   left: 0;
   bottom: 0;
@@ -185,7 +185,9 @@ body {
 
 .modal-holder {
   position: absolute;
-  z-index: 10000; }
+  z-index: 2147483638; }
+  .modal-holder * {
+    text-align: left; }
   .modal-holder.hidden {
     display: none !important; }
   .modal-holder > div {
@@ -210,6 +212,24 @@ body {
       max-width: 100%;
       overflow: scroll;
       margin: 1em 0; }
+  .modal-holder button {
+    background: buttonface;
+    border: 2px outset buttonface;
+    color: buttontext;
+    box-shadow: none !important;
+    cursor: pointer !important;
+    font-weight: normal !important;
+    margin: 2px !important;
+    padding: 1px 6px !important;
+    min-width: initial !important;
+    text-transform: capitalize !important; }
+    .modal-holder button:hover, .modal-holder button:active, .modal-holder button:focus {
+      background: buttonface;
+      border-color: buttonface;
+      color: buttontext; }
+  .modal-holder button:active {
+    border-style: inset !important;
+    color: buttontext !important; }
 
 #schemaInfo div {
   display: inline-block; }
