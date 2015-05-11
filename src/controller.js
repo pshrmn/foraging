@@ -46,6 +46,9 @@ function foragerController(){
         fns.dispatch.Page.reset();
         fns.dispatch.Selector.reset();
         fns.dispatch.Rule.reset();
+        currentPage = undefined;
+        page = undefined;
+        selector = undefined;
     }
 
     function allSelects(elements){
@@ -65,13 +68,12 @@ function foragerController(){
         },
         loadPage: function(pageName){
             resetAll();
-            if ( pages[pageName] === undefined ) {
-                return;
+            if ( pages[pageName] ) {
+                currentPage = pageName;
+                page = pages[pageName];
+                setupPage();
+                ui.showView("Page");
             }
-            currentPage = pageName;
-            page = pages[pageName];
-            setupPage();
-            ui.showView("Page");
         },
         addPage: function(name){
             if ( pages[name] === undefined && legalPageName(name) ) {
@@ -81,6 +83,23 @@ function foragerController(){
                 setupPage();
                 ui.showView("Page");
                 // update options after adding page to pages
+                var options = Object.keys(pages);
+                ui.setPages(options, name);
+                chromeSave(pages);
+            }
+        },
+        renamePage: function(){
+            if ( !currentPage ) {
+                return;
+            }
+            var name = prompt("New Page name");
+            var oldName = currentPage;
+            if ( name === oldName ) {
+                return;
+            } else if ( pages[name] === undefined && legalPageName(name) ) {
+                currentPage = name;
+                pages[name] = page;
+                delete pages[oldName];
                 var options = Object.keys(pages);
                 ui.setPages(options, name);
                 chromeSave(pages);

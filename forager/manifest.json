@@ -1,8 +1,8 @@
 {
   "manifest_version": 2,
   "name": "Forager",
-  "description": "Create rules to gather data from web pages",
-  "version": "1.9.1",
+  "description": "Hunt and gather data",
+  "version": "1.9.2",
   "permissions": [
     "activeTab",
     "storage",

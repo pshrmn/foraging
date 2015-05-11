@@ -78,6 +78,10 @@ body{
             display: inline-block;
             margin: 0 8px;
         }
+
+        select{
+            width: 100px;
+        }
     }
 
     .page-tree{
@@ -143,9 +147,6 @@ body{
                     margin-bottom: 25px;
                 }
 
-                .buttons{
-                }
-               
                 input.error{
                     border-color: $red;
                     border-style: solid;
@@ -261,7 +262,7 @@ body{
 
     button {
         background: $lime-green;
-        color: $black;
+        color: $black !important;
         border-radius: 3px;
         border: 2px outset $lime-green;
         box-shadow: none !important;
@@ -275,13 +276,13 @@ body{
         &:hover, &:active, &:focus{
             background: $lime-green;
             border-color: $lime-green;
-            color: $black;
+            color: $black !important;
         }
 
         &.red, &.red:hover, &.red:active, &.red:focus{
             background: $red;
             border-color: $red;
-            color: $white;
+            color: $white !important;
         }
     }
 

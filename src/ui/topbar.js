@@ -17,6 +17,9 @@ function topbar(options){
         removePage: function(){
             controller.removePage();
         },
+        renamePage: function(){
+            controller.renamePage();
+        },
         upload: function(){
             controller.upload();
         },
@@ -38,12 +41,17 @@ function topbar(options){
         .on("change", events.loadPage);
 
     pageGroup.append("button")
-        .text("+")
+        .text("Add")
         .attr("title", "add a new Page")
         .on("click", events.addPage);
 
     pageGroup.append("button")
-        .html("&times;")
+        .text("Rename")
+        .attr("title", "rename current Page")
+        .on("click", events.renamePage);
+
+    pageGroup.append("button")
+        .text("Delete")
         .attr("title", "remove the current Page")
         .classed("red", true)
         .on("click", events.removePage);

@@ -483,6 +483,9 @@ function foragerController(){
         fns.dispatch.Page.reset();
         fns.dispatch.Selector.reset();
         fns.dispatch.Rule.reset();
+        currentPage = undefined;
+        page = undefined;
+        selector = undefined;
     }
 
     function allSelects(elements){
@@ -502,13 +505,12 @@ function foragerController(){
         },
         loadPage: function(pageName){
             resetAll();
-            if ( pages[pageName] === undefined ) {
-                return;
+            if ( pages[pageName] ) {
+                currentPage = pageName;
+                page = pages[pageName];
+                setupPage();
+                ui.showView("Page");
             }
-            currentPage = pageName;
-            page = pages[pageName];
-            setupPage();
-            ui.showView("Page");
         },
         addPage: function(name){
             if ( pages[name] === undefined && legalPageName(name) ) {
@@ -518,6 +520,23 @@ function foragerController(){
                 setupPage();
                 ui.showView("Page");
                 // update options after adding page to pages
+                var options = Object.keys(pages);
+                ui.setPages(options, name);
+                chromeSave(pages);
+            }
+        },
+        renamePage: function(){
+            if ( !currentPage ) {
+                return;
+            }
+            var name = prompt("New Page name");
+            var oldName = currentPage;
+            if ( name === oldName ) {
+                return;
+            } else if ( pages[name] === undefined && legalPageName(name) ) {
+                currentPage = name;
+                pages[name] = page;
+                delete pages[oldName];
                 var options = Object.keys(pages);
                 ui.setPages(options, name);
                 chromeSave(pages);
@@ -849,6 +868,9 @@ function topbar(options){
         removePage: function(){
             controller.removePage();
         },
+        renamePage: function(){
+            controller.renamePage();
+        },
         upload: function(){
             controller.upload();
         },
@@ -870,12 +892,17 @@ function topbar(options){
         .on("change", events.loadPage);
 
     pageGroup.append("button")
-        .text("+")
+        .text("Add")
         .attr("title", "add a new Page")
         .on("click", events.addPage);
 
     pageGroup.append("button")
-        .html("&times;")
+        .text("Rename")
+        .attr("title", "rename current Page")
+        .on("click", events.renamePage);
+
+    pageGroup.append("button")
+        .text("Delete")
         .attr("title", "remove the current Page")
         .classed("red", true)
         .on("click", events.removePage);
