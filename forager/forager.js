@@ -1434,6 +1434,10 @@ function SelectorView(options){
         ec.form.classed("hidden", true);
         sc.form.classed("hidden", true);
         st.form.classed("hidden", false);
+        markup({
+            type: "single",
+            value: 0
+        });
     }
 
 
