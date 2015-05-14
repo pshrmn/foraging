@@ -907,21 +907,22 @@ function topbar(options){
         .classed("red", true)
         .on("click", events.removePage);
 
-    // global
-    bar.append("button")
+    pageGroup.append("button")
         .text("upload")
         .on("click", events.upload);
 
+    pageGroup.append("button")
+        .text("preview")
+        .attr("title", "Preview will be logged in the console")
+        .on("click", events.preview);
+
+    // global
     bar.append("button")
         .text("sync")
         .attr("title", "Get uploaded pages for this domain from the server. " +
                 "Warning: This will override existing pages")
         .on("click", events.sync);
 
-    bar.append("button")
-        .text("preview")
-        .attr("title", "Preview will be logged in the console")
-        .on("click", events.preview);
 
     var fns = {
         getPage: function(){
