@@ -1,22 +1,23 @@
 function buildUI(controller){
     controller.dispatch = {};
 
-    // ugly, might want to convert to d3 since everything else uses it, but it works
-    var holder = document.createElement("div");
-    holder.classList.add("forager");
-    holder.classList.add("no-select");
-    holder.innerHTML = '<div class="permanent">' +
-            '<div id="schemaInfo"></div>' +
-            '<div id="foragerAlert"></div>' +
-            '<div id="closeForager">&times;</div>' +
-        '</div>' +
-        '<div class="views"></div>' + 
-        '<div class="page-tree"></div>';
-    document.body.appendChild(holder);
+    var holder = d3.select("body").append("div")
+        .classed({
+            "forager": true,
+            "no-select": true
+        })
+        .html('<div class="permanent">' +
+                '<div id="schemaInfo"></div>' +
+                '<div id="foragerAlert"></div>' +
+                '<div id="close-forager">&times;</div>' +
+            '</div>' +
+            '<div class="views"></div>' + 
+            '<div class="page-tree"></div>'
+        );
 
     var events = {
         close: function(){
-            holder.parentElement.removeChild(holder);
+            holder.remove();
             document.body.style.marginBottom = initialMargin;
             controller.close();
         }
@@ -30,28 +31,26 @@ function buildUI(controller){
         holder: "#schemaInfo"
     });
 
-    var closer = d3.select("#closeForager")
+    var closer = d3.select("#close-forager")
         .on("click", events.close);
 
-    var viewHolder = holder.querySelector(".views");
+    var viewHolder = holder.select(".views");
     var views = {};
     var activeView;
 
     function showView(name){
         if ( activeView ) {
-            activeView.classList.remove("active");
+            activeView.classed("active", false);
         }
         activeView = views[name];
-        activeView.classList.add("active");
+        activeView.classed("active", true);
     }
 
     var fns = {
         // make sure that all elements in the forager ui are .no-select
         noSelect: function(){
-            var all = holder.querySelectorAll("*");
-            for ( var i=0; i<all.length; i++ ) {
-                all[i].classList.add("no-select");
-            }
+            holder.selectAll("*")
+                .classed("no-select", true);
         },
         addViews: function(views){
             var fn = this.addView;
@@ -65,23 +64,33 @@ function buildUI(controller){
             options = options || {};
 
             // create a new view
-            var v = document.createElement("div");
-            v.classList.add("view");
+            var v = viewHolder.append("div")
+                .classed({
+                    "view": true,
+                    "active": active
+                });
+ 
             views[name] = v;
-            viewHolder.appendChild(v);
-
             if ( active ) {
-                v.classList.add("active");
                 activeView = v;
             }
 
-            options.holder = v;
+            options.view = v;
             controller.dispatch[name] = viewFn(options);
         },
         addTree: function(treeFn, name, options){
             options = options || {};
+            options.view = d3.select(".page-tree");
+            options.width = 500;
+            options.height = 220;
+            options.margin = {
+                top: 5,
+                right: 15,
+                bottom: 5,
+                left: 50
+            };
             controller.dispatch[name] = treeFn(options);
-
+            fns.noSelect();
         },
         showView: showView,
         setPages: topbarFns.setPages,

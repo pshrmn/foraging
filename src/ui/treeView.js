@@ -2,7 +2,6 @@ function TreeView(options){
     var page;
 
     options = options || {};
-    var holder = options.holder || document.body;
     var width = options.width || 600;
     var height = options.height || 300;
     var margin = options.margin || {
@@ -35,7 +34,7 @@ function TreeView(options){
     /***
     START UI
     ***/
-    var view = d3.select(holder);
+    var view = d3.select(options.view || d3.select("body"));
 
     var svg = d3.select(".page-tree").append("svg")
         .classed("inline", true)

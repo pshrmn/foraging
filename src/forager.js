@@ -8,16 +8,6 @@ ui.addViews([
     [RuleView, "Rule"]
 ]);
 
-ui.addTree(TreeView, "Tree", {
-    holder: ".page-tree",
-    width: 500,
-    height: 220,
-    margin: {
-        top: 5,
-        right: 15,
-        bottom: 5,
-        left: 50
-    }
-});
+ui.addTree(TreeView, "Tree", {});
 
 chromeLoad();

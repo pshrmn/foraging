@@ -69,7 +69,12 @@ body {
       width: 100%;
       background: white;
       padding: 15px;
-      overflow-y: scroll; }
+      overflow-y: scroll;
+      position: relative; }
+      .forager .views .view .button-box {
+        position: absolute;
+        bottom: 0;
+        height: 20px; }
       .forager .views .view > * {
         vertical-align: top;
         display: inline-block; }
@@ -236,8 +241,8 @@ body {
 #schemaInfo div {
   display: inline-block; }
 
-#closeForager {
-  background: #cf2558;
+#close-forager {
+  background: transparent;
   cursor: pointer;
   position: absolute;
   right: 0;

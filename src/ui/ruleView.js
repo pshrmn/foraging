@@ -5,7 +5,6 @@ function RuleView(options){
     var formState = {};
 
     options = options || {};
-    var holder = options.holder || "body";
     var saveFn = options.save || function(){};
 
     var events = {
@@ -24,7 +23,7 @@ function RuleView(options){
     };
 
     // ui
-    var view = d3.select(holder);
+    var view = options.view || d3.select("body");
 
     // form
     var form = newForm(view);

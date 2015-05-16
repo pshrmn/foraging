@@ -4,8 +4,7 @@ function SelectorView(options){
     //      selectorChoices
     //      selectorType
     options = options || {};
-    var holder = options.holder || "body";
-    var view = d3.select(holder);
+    var view = options.view || d3.select("body");
 
     var choice;
     var choiceElement;

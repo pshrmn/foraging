@@ -410,23 +410,34 @@ function previewModal(parentElement){
 
     var holder = parent.append("div")
         .classed({
+            "no-select": true,
             "modal-holder": true,
             "hidden": true
         });
 
     var background = holder.append("div")
-        .classed({"background": true})
+        .classed({
+            "background": true,
+            "no-select": true
+        })
         .attr("title", "click to close preview")
         .on("click", closeModal);
 
     var modal = holder.append("div")
-        .classed({"cjs-modal": true});
+        .classed({
+            "no-select": true,
+            "cjs-modal": true
+        });
 
-    var pre = modal.append("pre");
+    var pre = modal.append("pre")
+        .classed("no-select", true);
 
     var close = modal.append("button")
+        .classed("no-select", true)
         .text("close")
         .on("click", closeModal);
+
+
 
     return function(text){
         holder.classed("hidden", false);
@@ -953,7 +964,6 @@ function RuleView(options){
     var formState = {};
 
     options = options || {};
-    var holder = options.holder || "body";
     var saveFn = options.save || function(){};
 
     var events = {
@@ -972,7 +982,7 @@ function RuleView(options){
     };
 
     // ui
-    var view = d3.select(holder);
+    var view = options.view || d3.select("body");
 
     // form
     var form = newForm(view);
@@ -1106,7 +1116,6 @@ function PageView(options){
         UI
     **********/
     options = options || {};
-    var holder = options.holder || document.body;
 
     var page;
     var selector;
@@ -1131,7 +1140,7 @@ function PageView(options){
     /**********
       START UI
     **********/
-    var view = d3.select(holder);
+    var view = options.view || d3.select("body");
 
     // start selector
     var sf = newForm(view, true);
@@ -1227,8 +1236,7 @@ function SelectorView(options){
     //      selectorChoices
     //      selectorType
     options = options || {};
-    var holder = options.holder || "body";
-    var view = d3.select(holder);
+    var view = options.view || d3.select("body");
 
     var choice;
     var choiceElement;
@@ -1599,7 +1607,6 @@ function TreeView(options){
     var page;
 
     options = options || {};
-    var holder = options.holder || document.body;
     var width = options.width || 600;
     var height = options.height || 300;
     var margin = options.margin || {
@@ -1632,7 +1639,7 @@ function TreeView(options){
     /***
     START UI
     ***/
-    var view = d3.select(holder);
+    var view = d3.select(options.view || d3.select("body"));
 
     var svg = d3.select(".page-tree").append("svg")
         .classed("inline", true)
@@ -1786,22 +1793,23 @@ function TreeView(options){
 function buildUI(controller){
     controller.dispatch = {};
 
-    // ugly, might want to convert to d3 since everything else uses it, but it works
-    var holder = document.createElement("div");
-    holder.classList.add("forager");
-    holder.classList.add("no-select");
-    holder.innerHTML = '<div class="permanent">' +
-            '<div id="schemaInfo"></div>' +
-            '<div id="foragerAlert"></div>' +
-            '<div id="closeForager">&times;</div>' +
-        '</div>' +
-        '<div class="views"></div>' + 
-        '<div class="page-tree"></div>';
-    document.body.appendChild(holder);
+    var holder = d3.select("body").append("div")
+        .classed({
+            "forager": true,
+            "no-select": true
+        })
+        .html('<div class="permanent">' +
+                '<div id="schemaInfo"></div>' +
+                '<div id="foragerAlert"></div>' +
+                '<div id="close-forager">&times;</div>' +
+            '</div>' +
+            '<div class="views"></div>' + 
+            '<div class="page-tree"></div>'
+        );
 
     var events = {
         close: function(){
-            holder.parentElement.removeChild(holder);
+            holder.remove();
             document.body.style.marginBottom = initialMargin;
             controller.close();
         }
@@ -1815,28 +1823,26 @@ function buildUI(controller){
         holder: "#schemaInfo"
     });
 
-    var closer = d3.select("#closeForager")
+    var closer = d3.select("#close-forager")
         .on("click", events.close);
 
-    var viewHolder = holder.querySelector(".views");
+    var viewHolder = holder.select(".views");
     var views = {};
     var activeView;
 
     function showView(name){
         if ( activeView ) {
-            activeView.classList.remove("active");
+            activeView.classed("active", false);
         }
         activeView = views[name];
-        activeView.classList.add("active");
+        activeView.classed("active", true);
     }
 
     var fns = {
         // make sure that all elements in the forager ui are .no-select
         noSelect: function(){
-            var all = holder.querySelectorAll("*");
-            for ( var i=0; i<all.length; i++ ) {
-                all[i].classList.add("no-select");
-            }
+            holder.selectAll("*")
+                .classed("no-select", true);
         },
         addViews: function(views){
             var fn = this.addView;
@@ -1850,23 +1856,33 @@ function buildUI(controller){
             options = options || {};
 
             // create a new view
-            var v = document.createElement("div");
-            v.classList.add("view");
+            var v = viewHolder.append("div")
+                .classed({
+                    "view": true,
+                    "active": active
+                });
+ 
             views[name] = v;
-            viewHolder.appendChild(v);
-
             if ( active ) {
-                v.classList.add("active");
                 activeView = v;
             }
 
-            options.holder = v;
+            options.view = v;
             controller.dispatch[name] = viewFn(options);
         },
         addTree: function(treeFn, name, options){
             options = options || {};
+            options.view = d3.select(".page-tree");
+            options.width = 500;
+            options.height = 220;
+            options.margin = {
+                top: 5,
+                right: 15,
+                bottom: 5,
+                left: 50
+            };
             controller.dispatch[name] = treeFn(options);
-
+            fns.noSelect();
         },
         showView: showView,
         setPages: topbarFns.setPages,
@@ -1887,16 +1903,6 @@ ui.addViews([
     [RuleView, "Rule"]
 ]);
 
-ui.addTree(TreeView, "Tree", {
-    holder: ".page-tree",
-    width: 500,
-    height: 220,
-    margin: {
-        top: 5,
-        right: 15,
-        bottom: 5,
-        left: 50
-    }
-});
+ui.addTree(TreeView, "Tree", {});
 
 chromeLoad();

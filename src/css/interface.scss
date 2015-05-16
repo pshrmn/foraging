@@ -112,6 +112,13 @@ body{
             background: $white;
             padding: 15px;
             overflow-y: scroll;
+            position: relative;
+
+            .button-box{
+                position: absolute;
+                bottom: 0;
+                height: 20px;
+            }
 
             > *{
                 vertical-align: top;
@@ -370,8 +377,8 @@ body{
     display: inline-block;
 }
 
-#closeForager{
-    background: $red;
+#close-forager{
+    background: transparent;
     cursor: pointer;
     position: absolute;
     right: 0;

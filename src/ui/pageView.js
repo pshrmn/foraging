@@ -3,7 +3,6 @@ function PageView(options){
         UI
     **********/
     options = options || {};
-    var holder = options.holder || document.body;
 
     var page;
     var selector;
@@ -28,7 +27,7 @@ function PageView(options){
     /**********
       START UI
     **********/
-    var view = d3.select(holder);
+    var view = options.view || d3.select("body");
 
     // start selector
     var sf = newForm(view, true);
