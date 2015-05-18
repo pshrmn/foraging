@@ -29,9 +29,11 @@ function SelectorView(options){
             viewChoice(d, this);
             var parent = controller.getSelector();
             selector = d.join("");
-            markup({
+            var tempSpec = {
                 type: "all"
-            });
+            };
+            count(tempSpec, elementCount);
+            markup(tempSpec);
         },
         confirmElement: function(){
             if ( selector === "" ) {
@@ -54,9 +56,11 @@ function SelectorView(options){
         toggleTag: function(){
             this.classList.toggle("on");
             selector = currentSelector();
-            markup({
+            var tempSpec = {
                 type: "all"
-            });
+            };
+            count(tempSpec, selectorCount);
+            markup(tempSpec);
         },
         selectorIndex: function(){
             selector = currentSelector();
@@ -93,7 +97,13 @@ function SelectorView(options){
 
     ec.workarea.append("p")
         .text("Choose Element:");
+
     var choiceHolder = ec.workarea.append("div");
+
+    var elementCount = ec.workarea.append("p")
+        .text("Count:")
+        .append("span")
+            .text("0");
 
     ec.buttons.append("button")
         .text("Confirm")
@@ -110,6 +120,11 @@ function SelectorView(options){
         .text("Choose Selector:");
     var tags = sc.workarea.append("div");
     var parts;
+
+    var selectorCount = sc.workarea.append("p")
+        .text("Count:")
+        .append("span")
+            .text("0");
 
     sc.buttons.append("button")
         .text("Confirm")
@@ -196,12 +211,14 @@ function SelectorView(options){
         });
 
     function showElementForm(){
+        elementCount.text("0");
         ec.form.classed("hidden", false);
         sc.form.classed("hidden", true);
         st.form.classed("hidden", true);
     }
 
     function showSelectorForm(){
+        count({"type": "all"}, selectorCount);
         ec.form.classed("hidden", true);
         sc.form.classed("hidden", false);
         st.form.classed("hidden", true);
@@ -266,6 +283,17 @@ function SelectorView(options){
         }
         var parent = controller.getSelector();
         showcase(controller.elements(parent.elements, sel, spec));
+    }
+
+    function count(spec, holder){
+        var sel = selector;
+        // don't markup empty selector
+        if ( sel === "" ) {
+            return;
+        }
+        var parent = controller.getSelector();
+        var eleCount = controller.elements.count(parent.elements, sel, spec);
+        holder.text(eleCount);
     }
 
     function setChoices(data){

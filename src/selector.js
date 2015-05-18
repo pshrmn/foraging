@@ -62,6 +62,13 @@ function selectorParts(){
 function elementSelector(){
     var not = ".no-select";
 
+    /*
+     * given an array of parent elements, return an array of child elements
+     * that match the selector. The returned array will vary based on the
+     * given spec. A spec with type=all will return all matching child elements
+     * and a spec with type=single will return the child element at the
+     * provided index for each parent elements.
+     */
     function select(elements, selector, spec){
         var matches = [];
         var sel = selector || "*";
