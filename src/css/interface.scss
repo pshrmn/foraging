@@ -1,4 +1,4 @@
-$red: #CF2558;
+$red: #E85F88;
 $light-red: #F296A3;
 $lime-green: #76B85C;
 $green: #21732C;
@@ -25,6 +25,7 @@ body{
     left: 0;
     bottom: 0;
     min-height: 30px;
+    min-width: 1051px;
     border-top: 1px solid $dark-gray;
     border-right: 1px solid $dark-gray;
     background: $white;
@@ -72,6 +73,42 @@ body{
 
         button, select, option {
             color: $black;
+        }
+
+        button {
+            background: $dark-gray;
+            color: $lime-green !important;
+            border-radius: 3px;
+            border: 1px solid $lime-green;
+            box-shadow: none !important;
+            cursor: pointer !important;
+            font-weight: normal !important;
+            margin: 2px !important;
+            padding: 1px 6px !important;
+            min-width: initial !important;
+            text-transform: capitalize !important;
+
+            &:hover, &:active, &:focus{
+                background: $lime-green;
+                border-color: $lime-green;
+                color: $dark-gray !important;
+            }
+
+            &.red, &.red:active, &.red:focus{
+                background: $dark-gray;
+                border-color: $red;
+                color: $red !important;
+            }
+
+            &.red:hover{
+                background: $red;
+                color: $dark-gray !important;
+            }
+        }
+
+        button:active{
+            border-style: inset !important;
+            color: $black !important;
         }
 
         div{
@@ -144,7 +181,9 @@ body{
             }
 
             .form{
-
+                position: relative;
+                height: 100%;
+                width: 100%;
                 > p {
                     margin: 0;
                     line-height: 1.25em;
@@ -171,6 +210,11 @@ body{
                 input[type=text]{
                     width: 150px;
                     border-width: 0 0 1px;
+                }
+
+                .buttons{
+                    position: absolute;
+                    bottom: 0;
                 }
             }
 
