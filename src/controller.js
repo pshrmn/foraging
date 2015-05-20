@@ -179,9 +179,7 @@ function foragerController(){
             }
             if ( page.id === selector.id ) {
                 // remove the page
-                resetAll();
                 fns.removePage();
-                fns.dispatch.Tree.reset();
             } else {
                 remove(page, selector.id);
                 selector = page;
