@@ -47,10 +47,14 @@ function newForm(holder, hidden){
         .classed("workarea", true);
     var buttons = form.append("div")
         .classed("buttons", true);
+    var errors = buttons.append("p")
+        .classed("errors", true);
+
     return {
         form: form,
         workarea: work,
-        buttons: buttons
+        buttons: buttons,
+        errors: errors
     };
 }
 

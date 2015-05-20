@@ -8,6 +8,14 @@ function attributes(element) {
     var curr;
     for ( var i=0; i<attrs.length; i++ ) {
         curr = attrs[i];
+        // special case for class attribute
+        if ( curr.name === "class" ) {
+            var classVal = curr.value.replace("current-selector","").trim();
+            if ( classVal !== "" ) {
+                attrMap.class = classVal;
+            }
+            continue;
+        }
         // don't include empty attrs
         if ( curr.value !== "") {
             attrMap[curr.name] = curr.value;
@@ -292,16 +300,40 @@ function cleanPage(page){
     return clonedPage;
 }
 
-// check if an identical selector already exists
+/*
+ * check if an identical selector already exists or one with the same name
+ * exists
+ */
 function matchSelector(sel, parent){
     var selIndex = sel.spec.type === "single" ? sel.spec.value : undefined;
-    return parent.children.some(function(s){
-        var index = s.spec.type === "single" ? s.spec.value : undefined;
-        if ( s.selector === sel.selector && index === selIndex ) {
-            return true;
+    var msg = "";
+    var found = parent.children.some(function(s){
+        var sameType = sel.spec.type === s.spec.type;
+        if ( !sameType ) {
+            return false;
+        }
+
+        switch ( s.spec.type ) {
+        case "single":
+            var index = s.spec.value;
+            if ( s.selector === sel.selector && index === selIndex ) {
+                msg = "a selector with the same selector and index already exists";
+                return true;
+            }
+            break;
+        case "all":
+            if ( s.spec.value === sel.spec.value ) {
+                msg = "a selector with the name '" + sel.spec.value + "' already exists";
+                return true;
+            }
+            break;
         }
         return false;
     });
+    return {
+        error: found,
+        msg: msg
+    };
 }
 
 // get an array containing the names of all rules in the page
@@ -647,8 +679,9 @@ function foragerController(){
             sel.id = ++lastId;
 
             // only save if page doesn't have 
-            if ( matchSelector(sel, selector) ) {
-                return false;
+            var collision = matchSelector(sel, selector);
+            if ( collision.error ) {
+                return collision;
             }
             sel.elements = fns.elements(selector.elements, sel.selector, sel.spec);
             // SPECIAL CASE FOR SELECT ELEMENTS, AUTOMATICALLY ADD OPTION CHILD
@@ -832,10 +865,14 @@ function newForm(holder, hidden){
         .classed("workarea", true);
     var buttons = form.append("div")
         .classed("buttons", true);
+    var errors = buttons.append("p")
+        .classed("errors", true);
+
     return {
         form: form,
         workarea: work,
-        buttons: buttons
+        buttons: buttons,
+        errors: errors
     };
 }
 
@@ -1089,7 +1126,14 @@ function RuleView(options){
     function getRule(){
         var attr = formState.attr;
         var name = nameInput.property("value");
-        if ( name === "" || !controller.legalName(name)){
+        if ( name === ""){
+            showError("Rule name is required");
+            return;
+        } else if ( !controller.legalName(name) ){
+            showError("A rule with the name '" + name + "' already exists");
+            return;
+        } else if ( attr === undefined ) {
+            showError("No attribute has been selected.");
             return;
         }
 
@@ -1099,11 +1143,20 @@ function RuleView(options){
         };
     }
 
+    function showError(msg){
+        form.errors.text(msg);
+    }
+
+    function clearErrors(){
+        form.errors.text("");
+    }
+
     var fns = {
         setElements: function(elements){
             eles = elements;
             index = 0;
             length = elements.length;
+            clearErrors();
             displayElement();
         },
         reset: function(){
@@ -1256,13 +1309,16 @@ function SelectorView(options){
         saveSelector: function(){
             var sel = makeSelector();
             if ( sel === undefined || sel.selector === "" ) {
+                showError("\"all\" selector requires a name", typeForm);
                 return;
             }
-            var success = controller.saveSelector(sel);
-            if ( success ) {
+            var resp = controller.saveSelector(sel);
+            if ( !resp.error ) {
                 fns.reset();
                 interactive.remove();
                 showcase.remove();
+            } else {
+                showError(resp.msg, typeForm);
             }
         },
         selectChoice: function(d){
@@ -1278,6 +1334,7 @@ function SelectorView(options){
         },
         confirmElement: function(){
             if ( selector === "" ) {
+                showError("No element selected", elementForm);
                 return;
             }
             addTags();
@@ -1285,6 +1342,7 @@ function SelectorView(options){
         },
         confirmSelector: function(){
             if ( selector === "" ) {
+                showError("Selector cannot be empty", selectorForm);
                 return;
             }
             setupForm();
@@ -1334,51 +1392,51 @@ function SelectorView(options){
     };
 
     // start elements
-    var ec = newForm(view, false);
+    var elementForm = newForm(view, false);
 
-    ec.workarea.append("p")
+    elementForm.workarea.append("p")
         .text("Choose Element:");
 
-    var choiceHolder = ec.workarea.append("div");
+    var choiceHolder = elementForm.workarea.append("div");
 
-    var elementCount = ec.workarea.append("p")
+    var elementCount = elementForm.workarea.append("p")
         .text("Count:")
         .append("span")
             .text("0");
 
-    ec.buttons.append("button")
+    elementForm.buttons.append("button")
         .text("Confirm")
         .on("click", events.confirmElement);
-    ec.buttons.append("button")
+    elementForm.buttons.append("button")
         .text("Cancel")
         .on("click", events.cancelSelector);
     // end elements
 
     // start selector
-    var sc = newForm(view, true);
+    var selectorForm = newForm(view, true);
 
-    sc.workarea.append("p")
+    selectorForm.workarea.append("p")
         .text("Choose Selector:");
-    var tags = sc.workarea.append("div");
+    var tags = selectorForm.workarea.append("div");
     var parts;
 
-    var selectorCount = sc.workarea.append("p")
+    var selectorCount = selectorForm.workarea.append("p")
         .text("Count:")
         .append("span")
             .text("0");
 
-    sc.buttons.append("button")
+    selectorForm.buttons.append("button")
         .text("Confirm")
         .on("click", events.confirmSelector);
-    sc.buttons.append("button")
+    selectorForm.buttons.append("button")
         .text("Cancel")
         .on("click", events.cancelSelector);
     // end selector
 
-    // start selectorType
-    var st = newForm(view, true);
+    // start typeForm
+    var typeForm = newForm(view, true);
 
-    var radioDiv = st.workarea.append("div");
+    var radioDiv = typeForm.workarea.append("div");
     radioDiv.append("span")
         .text("Choose Type:");
 
@@ -1398,9 +1456,9 @@ function SelectorView(options){
         .property("checked", function(d, i){ return i === 0; })
         .on("change", events.toggleRadio);
 
-    var selectGroup = st.workarea.append("div");
+    var selectGroup = typeForm.workarea.append("div");
 
-    var nameGroup = st.workarea.append("div")
+    var nameGroup = typeForm.workarea.append("div")
         .classed({"hidden": true});
 
     var nameElement = nameGroup.append("p").append("label")
@@ -1413,17 +1471,17 @@ function SelectorView(options){
         .text("Index:")
         .append("select");
 
-    var optionalCheckbox = st.workarea.append("p").append("label")
+    var optionalCheckbox = typeForm.workarea.append("p").append("label")
         .text("Optional")
         .append("input")
             .attr("type", "checkbox");
 
-    st.buttons.append("button")
+    typeForm.buttons.append("button")
         .text("Save")
         .on("click", events.saveSelector);
 
 
-    st.buttons.append("button")
+    typeForm.buttons.append("button")
         .text("Cancel")
         .on("click", events.cancelSelector);
 
@@ -1451,24 +1509,35 @@ function SelectorView(options){
             setChoices(data);
         });
 
+    function clearErrors(form){
+        form.errors.text("");
+    }
+
+    function showError(msg, form){
+        form.errors.text(msg);
+    }
+
     function showElementForm(){
+        clearErrors(elementForm);
         elementCount.text("0");
-        ec.form.classed("hidden", false);
-        sc.form.classed("hidden", true);
-        st.form.classed("hidden", true);
+        elementForm.form.classed("hidden", false);
+        selectorForm.form.classed("hidden", true);
+        typeForm.form.classed("hidden", true);
     }
 
     function showSelectorForm(){
+        clearErrors(selectorForm);
         count({"type": "all"}, selectorCount);
-        ec.form.classed("hidden", true);
-        sc.form.classed("hidden", false);
-        st.form.classed("hidden", true);
+        elementForm.form.classed("hidden", true);
+        selectorForm.form.classed("hidden", false);
+        typeForm.form.classed("hidden", true);
     }
 
     function showTypeForm(){
-        ec.form.classed("hidden", true);
-        sc.form.classed("hidden", true);
-        st.form.classed("hidden", false);
+        clearErrors(typeForm);
+        elementForm.form.classed("hidden", true);
+        selectorForm.form.classed("hidden", true);
+        typeForm.form.classed("hidden", false);
         markup({
             type: "single",
             value: 0
@@ -1513,7 +1582,8 @@ function SelectorView(options){
     // parts is given an element and returns an array containing its tag
     // and (if they exist) its id and any classes
     var getParts = selectorParts()
-        .ignoreClasses(["forager-highlight", "query-check", "selectable-element"]);
+        .ignoreClasses(["forager-highlight", "query-check",
+            "selectable-element", "current-selector"]);
 
     function markup(spec){
         showcase.remove();

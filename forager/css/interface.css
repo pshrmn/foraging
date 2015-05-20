@@ -118,10 +118,13 @@ body {
       padding: 15px;
       position: relative; }
       .forager .views .view .workarea {
-        height: 90%;
+        height: 80%;
         overflow-y: scroll; }
       .forager .views .view .buttons {
-        height: 10%; }
+        height: 20%; }
+        .forager .views .view .buttons .errors {
+          color: #e85f88;
+          height: 50%; }
       .forager .views .view > * {
         vertical-align: top;
         display: inline-block; }
@@ -290,10 +293,10 @@ body {
   margin: 0; }
 
 .selectable-element {
-  box-shadow: inset 0 0 2px #e85f88 !important; }
+  box-shadow: inset 0 0 2px #1e0a3f !important; }
 
 img.selectable-element {
-  border: 1px dashed #e85f88 !important; }
+  border: 1px dashed #1e0a3f !important; }
 
 .forager-highlight {
   background: rgba(46, 130, 158, 0.5) !important; }
@@ -315,7 +318,7 @@ img.saved-preview {
   border: 1px solid rgba(255, 0, 0, 0.25) !important; }
 
 .current-selector {
-  box-shadow: inset 0 0 3px #2e829e !important; }
+  box-shadow: inset 0 0 5px #2e829e !important; }
 
 img.current-selector {
   border: 1px dotted #2e829e !important; }

@@ -180,12 +180,17 @@ body{
             position: relative;
 
             .workarea{
-                height: 90%;
+                height: 80%;
                 overflow-y: scroll;
             }
 
             .buttons{
-                height: 10%;
+                height: 20%;
+
+                .errors {
+                    color: $red;
+                    height: 50%;
+                }
             }
 
             > *{

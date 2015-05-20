@@ -25,16 +25,40 @@ function cleanPage(page){
     return clonedPage;
 }
 
-// check if an identical selector already exists
+/*
+ * check if an identical selector already exists or one with the same name
+ * exists
+ */
 function matchSelector(sel, parent){
     var selIndex = sel.spec.type === "single" ? sel.spec.value : undefined;
-    return parent.children.some(function(s){
-        var index = s.spec.type === "single" ? s.spec.value : undefined;
-        if ( s.selector === sel.selector && index === selIndex ) {
-            return true;
+    var msg = "";
+    var found = parent.children.some(function(s){
+        var sameType = sel.spec.type === s.spec.type;
+        if ( !sameType ) {
+            return false;
+        }
+
+        switch ( s.spec.type ) {
+        case "single":
+            var index = s.spec.value;
+            if ( s.selector === sel.selector && index === selIndex ) {
+                msg = "a selector with the same selector and index already exists";
+                return true;
+            }
+            break;
+        case "all":
+            if ( s.spec.value === sel.spec.value ) {
+                msg = "a selector with the name '" + sel.spec.value + "' already exists";
+                return true;
+            }
+            break;
         }
         return false;
     });
+    return {
+        error: found,
+        msg: msg
+    };
 }
 
 // get an array containing the names of all rules in the page

@@ -192,8 +192,9 @@ function foragerController(){
             sel.id = ++lastId;
 
             // only save if page doesn't have 
-            if ( matchSelector(sel, selector) ) {
-                return false;
+            var collision = matchSelector(sel, selector);
+            if ( collision.error ) {
+                return collision;
             }
             sel.elements = fns.elements(selector.elements, sel.selector, sel.spec);
             // SPECIAL CASE FOR SELECT ELEMENTS, AUTOMATICALLY ADD OPTION CHILD

@@ -1,12 +1,14 @@
 $transparent-red: rgba(255, 0, 0, 0.25);
 $transparent-gold: rgba(255, 215, 0, 0.25);
+$purple: rgb(30, 10, 63);
+$transparent-purple: rgab(30, 10, 63, 0.25);
 
 .selectable-element{
-    box-shadow: inset 0 0 2px $red !important;
+    box-shadow: inset 0 0 2px $purple !important;
 }
 
 img.selectable-element{
-    border: 1px dashed $red !important;
+    border: 1px dashed $purple !important;
 }
 
 .forager-highlight{
@@ -35,7 +37,7 @@ img.saved-preview{
 }
 
 .current-selector{
-    box-shadow: inset 0 0 3px $blue !important;
+    box-shadow: inset 0 0 5px $blue !important;
 }
 
 img.current-selector{
