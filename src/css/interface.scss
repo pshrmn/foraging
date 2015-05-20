@@ -1,12 +1,9 @@
 $red: #E85F88;
-$light-red: #F296A3;
-$lime-green: #76B85C;
-$green: #21732C;
-$light-green: #BDDBCE;
-$blue: #45AACC;
-$dark-blue: #2E829E;
+$green: #76B85C;
+$dark-green: #42752E;
+$blue: #2E829E;
 $light-gray: #CED1DE;
-$dark-gray: #373840;
+$dark-gray: #323033;
 $gray: #898B96;
 $gold: #FFD700;
 $white: #ffffff;
@@ -75,11 +72,11 @@ body{
             color: $black;
         }
 
-        button {
-            background: $dark-gray;
-            color: $lime-green !important;
+        button{
+            line-height: 1.25em !important;
             border-radius: 3px;
-            border: 1px solid $lime-green;
+            border-width: 1px;
+            border-style: solid;
             box-shadow: none !important;
             cursor: pointer !important;
             font-weight: normal !important;
@@ -88,9 +85,15 @@ body{
             min-width: initial !important;
             text-transform: capitalize !important;
 
-            &:hover, &:active, &:focus{
-                background: $lime-green;
-                border-color: $lime-green;
+            &.green, &.green:active, &.green:focus{
+                background: $dark-gray;
+                color: $green !important;
+                border-color: $green;
+            }
+
+            &:hover{
+                background: $green;
+                border-color: $green;
                 color: $dark-gray !important;
             }
 
@@ -128,8 +131,34 @@ body{
 
         svg {
             box-sizing: content-box;
-            background: $white;
             padding: 15px;
+            font-size: 14px;
+            background: $white;
+
+            .link {
+              fill: none;
+              stroke: $dark-gray;
+            }
+
+            .node{
+                cursor: pointer;
+                fill: $dark-green;
+            }
+
+            .empty{
+                fill: $red;
+            }
+
+            .node text {
+                paint-order: stroke;
+                stroke: $white;
+                stroke-width: 3px;
+                text-anchor: end;
+            }
+
+            .current{
+                font-weight: bold;
+            }
         }
     }
 
@@ -148,13 +177,15 @@ body{
             width: 100%;
             background: $white;
             padding: 15px;
-            overflow-y: scroll;
             position: relative;
 
-            .button-box{
-                position: absolute;
-                bottom: 0;
-                height: 20px;
+            .workarea{
+                height: 90%;
+                overflow-y: scroll;
+            }
+
+            .buttons{
+                height: 10%;
             }
 
             > *{
@@ -163,7 +194,7 @@ body{
             }
 
             .tag{
-                background: $light-red;
+                background: $red;
                 display: inline-block;
                 padding-top: 2px;
                 padding-right: 5px;
@@ -177,7 +208,7 @@ body{
 
             .on,
             .tag.on{
-                background: $light-green;
+                background: $green;
             }
 
             .form{
@@ -187,10 +218,6 @@ body{
                 > p {
                     margin: 0;
                     line-height: 1.25em;
-                }
-
-                .workarea{
-                    margin-bottom: 25px;
                 }
 
                 input.error{
@@ -226,35 +253,6 @@ body{
         }
     }
 
-    svg {
-        font-size: 14px;
-
-        .link {
-          fill: none;
-          stroke: $light-gray;
-        }
-
-        .node{
-            cursor: pointer;
-            fill: $green;
-        }
-
-        .empty{
-            fill: $red;
-        }
-
-        .node text {
-            paint-order: stroke;
-            stroke: white;
-            stroke-width: 2px;
-            text-anchor: end;
-        }
-
-        .current{
-            font-weight: bold;
-        }
-    }
-
     input{
         box-shadow: none;
         border-radius:0;
@@ -283,7 +281,7 @@ body{
         }
 
         .selectedAttr, .selectedAttr:hover{
-            background: $light-green;
+            background: $green;
         }
     }
 
@@ -312,10 +310,10 @@ body{
     }
 
     button {
-        background: $lime-green;
+        background: $green;
         color: $black !important;
         border-radius: 3px;
-        border: 2px outset $lime-green;
+        border: 2px outset $green;
         box-shadow: none !important;
         cursor: pointer !important;
         font-weight: normal !important;
@@ -325,8 +323,8 @@ body{
         text-transform: capitalize !important;
 
         &:hover, &:active, &:focus{
-            background: $lime-green;
-            border-color: $lime-green;
+            background: $green;
+            border-color: $green;
             color: $black !important;
         }
 

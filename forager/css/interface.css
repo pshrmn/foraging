@@ -11,8 +11,8 @@ body {
   bottom: 0;
   min-height: 30px;
   min-width: 1051px;
-  border-top: 1px solid #373840;
-  border-right: 1px solid #373840;
+  border-top: 1px solid #323033;
+  border-right: 1px solid #323033;
   background: white;
   font-size: 16px;
   font-family: sans-serif;
@@ -37,17 +37,17 @@ body {
     list-style: none; }
   .forager .permanent {
     padding: 3px 15px;
-    background: #373840;
+    background: #323033;
     height: 31px; }
     .forager .permanent * {
       color: #ced1de; }
     .forager .permanent button, .forager .permanent select, .forager .permanent option {
       color: black; }
     .forager .permanent button {
-      background: #373840;
-      color: #76b85c !important;
+      line-height: 1.25em !important;
       border-radius: 3px;
-      border: 1px solid #76b85c;
+      border-width: 1px;
+      border-style: solid;
       box-shadow: none !important;
       cursor: pointer !important;
       font-weight: normal !important;
@@ -55,17 +55,21 @@ body {
       padding: 1px 6px !important;
       min-width: initial !important;
       text-transform: capitalize !important; }
-      .forager .permanent button:hover, .forager .permanent button:active, .forager .permanent button:focus {
+      .forager .permanent button.green, .forager .permanent button.green:active, .forager .permanent button.green:focus {
+        background: #323033;
+        color: #76b85c !important;
+        border-color: #76b85c; }
+      .forager .permanent button:hover {
         background: #76b85c;
         border-color: #76b85c;
-        color: #373840 !important; }
+        color: #323033 !important; }
       .forager .permanent button.red, .forager .permanent button.red:active, .forager .permanent button.red:focus {
-        background: #373840;
+        background: #323033;
         border-color: #e85f88;
         color: #e85f88 !important; }
       .forager .permanent button.red:hover {
         background: #e85f88;
-        color: #373840 !important; }
+        color: #323033 !important; }
     .forager .permanent button:active {
       border-style: inset !important;
       color: black !important; }
@@ -76,15 +80,31 @@ body {
       width: 100px; }
   .forager .page-tree {
     display: inline-block;
-    background: #373840;
+    background: #323033;
     padding: 10px; }
     .forager .page-tree svg {
       box-sizing: content-box;
-      background: white;
-      padding: 15px; }
+      padding: 15px;
+      font-size: 14px;
+      background: white; }
+      .forager .page-tree svg .link {
+        fill: none;
+        stroke: #323033; }
+      .forager .page-tree svg .node {
+        cursor: pointer;
+        fill: #42752e; }
+      .forager .page-tree svg .empty {
+        fill: #e85f88; }
+      .forager .page-tree svg .node text {
+        paint-order: stroke;
+        stroke: white;
+        stroke-width: 3px;
+        text-anchor: end; }
+      .forager .page-tree svg .current {
+        font-weight: bold; }
   .forager .views {
     box-sizing: border-box;
-    background: #373840;
+    background: #323033;
     width: 500px;
     padding: 10px;
     display: inline-block;
@@ -96,17 +116,17 @@ body {
       width: 100%;
       background: white;
       padding: 15px;
-      overflow-y: scroll;
       position: relative; }
-      .forager .views .view .button-box {
-        position: absolute;
-        bottom: 0;
-        height: 20px; }
+      .forager .views .view .workarea {
+        height: 90%;
+        overflow-y: scroll; }
+      .forager .views .view .buttons {
+        height: 10%; }
       .forager .views .view > * {
         vertical-align: top;
         display: inline-block; }
       .forager .views .view .tag {
-        background: #f296a3;
+        background: #e85f88;
         display: inline-block;
         padding-top: 2px;
         padding-right: 5px;
@@ -118,7 +138,7 @@ body {
         cursor: pointer; }
       .forager .views .view .on,
       .forager .views .view .tag.on {
-        background: #bddbce; }
+        background: #76b85c; }
       .forager .views .view .form {
         position: relative;
         height: 100%;
@@ -126,8 +146,6 @@ body {
         .forager .views .view .form > p {
           margin: 0;
           line-height: 1.25em; }
-        .forager .views .view .form .workarea {
-          margin-bottom: 25px; }
         .forager .views .view .form input.error {
           border-color: #e85f88;
           border-style: solid; }
@@ -144,28 +162,11 @@ body {
           bottom: 0; }
     .forager .views .view.active {
       display: block; }
-  .forager svg {
-    font-size: 14px; }
-    .forager svg .link {
-      fill: none;
-      stroke: #ced1de; }
-    .forager svg .node {
-      cursor: pointer;
-      fill: #21732c; }
-    .forager svg .empty {
-      fill: #e85f88; }
-    .forager svg .node text {
-      paint-order: stroke;
-      stroke: white;
-      stroke-width: 2px;
-      text-anchor: end; }
-    .forager svg .current {
-      font-weight: bold; }
   .forager input {
     box-shadow: none;
     border-radius: 0;
     background: white;
-    border: 1px solid #373840;
+    border: 1px solid #323033;
     line-height: 1.2; }
   .forager input[type=text] {
     height: 20px;
@@ -180,7 +181,7 @@ body {
     background: #898b96;
     cursor: pointer; }
   .forager .attributes .selectedAttr, .forager .attributes .selectedAttr:hover {
-    background: #bddbce; }
+    background: #76b85c; }
   .forager td, .forager th {
     min-width: 50px;
     height: 1.5rem;
@@ -188,7 +189,7 @@ body {
     text-align: center;
     vertical-align: middle; }
   .forager th {
-    background: #45aacc; }
+    background: #2e829e; }
   .forager input, .forager select, .forager option, .forager textarea, .forager button {
     line-height: 1.1em !important;
     padding: 0 !important;
@@ -304,6 +305,9 @@ img.forager-highlight {
   background: rgba(255, 215, 0, 0.25) !important;
   box-shadow: inset 0 0 1px gold; }
 
+img.query-check, a.query-check > img {
+  border: 1px solid rgba(255, 215, 0, 0.25) !important; }
+
 .saved-preview {
   background: rgba(255, 0, 0, 0.25) !important; }
 
@@ -311,7 +315,7 @@ img.saved-preview {
   border: 1px solid rgba(255, 0, 0, 0.25) !important; }
 
 .current-selector {
-  box-shadow: inset 0 0 3px #45aacc !important; }
+  box-shadow: inset 0 0 3px #2e829e !important; }
 
 img.current-selector {
-  border: 1px dotted #45aacc !important; }
+  border: 1px dotted #2e829e !important; }

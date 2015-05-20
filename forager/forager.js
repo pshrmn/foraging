@@ -902,6 +902,14 @@ function topbar(options){
 
     var bar = d3.select(holder);
 
+    // global
+    bar.append("button")
+        .text("sync")
+        .classed("green", true)
+        .attr("title", "Get uploaded pages for this domain from the server. " +
+                "Warning: This will override existing pages")
+        .on("click", events.sync);
+
     // page
     var pageGroup = bar.append("div")
         .text("Page");
@@ -911,11 +919,13 @@ function topbar(options){
 
     pageGroup.append("button")
         .text("Add")
+        .classed("green", true)
         .attr("title", "add a new Page")
         .on("click", events.addPage);
 
     pageGroup.append("button")
         .text("Rename")
+        .classed("green", true)
         .attr("title", "rename current Page")
         .on("click", events.renamePage);
 
@@ -927,20 +937,14 @@ function topbar(options){
 
     pageGroup.append("button")
         .text("upload")
+        .classed("green", true)
         .on("click", events.upload);
 
     pageGroup.append("button")
         .text("preview")
+        .classed("green", true)
         .attr("title", "Preview will be logged in the console")
         .on("click", events.preview);
-
-    // global
-    bar.append("button")
-        .text("sync")
-        .attr("title", "Get uploaded pages for this domain from the server. " +
-                "Warning: This will override existing pages")
-        .on("click", events.sync);
-
 
     var fns = {
         getPage: function(){
