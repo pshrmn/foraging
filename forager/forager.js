@@ -281,7 +281,9 @@ function cleanPages(pages){
     return ns;
 }
 
-// get rid of extra information before saving
+/*
+ * get rid of extra information before saving
+ */
 function cleanPage(page){
     function cleanSelector(s, clone){
         clone.selector = s.selector;
@@ -293,7 +295,6 @@ function cleanPage(page){
         });
         return clone;
     }
-
 
     var clonedPage = cleanSelector(page, {});
     clonedPage.name = page.name;
@@ -336,7 +337,10 @@ function matchSelector(sel, parent){
     };
 }
 
-// get an array containing the names of all rules in the page
+/*
+ * generate and return an array containing the names of all rules in the page
+ * and "all"-type selector names
+ */
 function usedNames(page){
     var names = [];
 
@@ -826,21 +830,6 @@ function clearClass(name){
     }
 }
 
-function clearClasses(names){
-    names.forEach(function(d){
-        clearClass(d);
-    });
-}
-
-// iterate over array (or converted nodelist) and add a class to each element
-function addClass(name, eles){
-    eles = Array.prototype.slice.call(eles);
-    var len = eles.length;
-    for ( var i=0; i<len; i++ ) {
-        eles[i].classList.add(name);
-    }
-}
-
 /*
 A page's name will be the name of the file when it is uploaded, so make sure that any characters
 in the name will be legal to use.
@@ -868,11 +857,20 @@ function newForm(holder, hidden){
     var errors = buttons.append("p")
         .classed("errors", true);
 
+    function clearErrors(){
+        errors.text("");
+    }
+
+    function showError(msg){
+        errors.text(msg);
+    }
+
     return {
         form: form,
         workarea: work,
         buttons: buttons,
-        errors: errors
+        clearErrors: clearErrors,
+        showError: showError
     };
 }
 
@@ -1127,13 +1125,13 @@ function RuleView(options){
         var attr = formState.attr;
         var name = nameInput.property("value");
         if ( name === ""){
-            showError("Rule name is required");
+            form.showError("Rule name is required");
             return;
         } else if ( !controller.legalName(name) ){
-            showError("A rule with the name '" + name + "' already exists");
+            form.showError("A rule with the name '" + name + "' already exists");
             return;
         } else if ( attr === undefined ) {
-            showError("No attribute has been selected.");
+            form.showError("No attribute has been selected.");
             return;
         }
 
@@ -1143,20 +1141,12 @@ function RuleView(options){
         };
     }
 
-    function showError(msg){
-        form.errors.text(msg);
-    }
-
-    function clearErrors(){
-        form.errors.text("");
-    }
-
     var fns = {
         setElements: function(elements){
             eles = elements;
             index = 0;
             length = elements.length;
-            clearErrors();
+            form.clearErrors();
             displayElement();
         },
         reset: function(){
@@ -1309,7 +1299,7 @@ function SelectorView(options){
         saveSelector: function(){
             var sel = makeSelector();
             if ( sel === undefined || sel.selector === "" ) {
-                showError("\"all\" selector requires a name", typeForm);
+                typeForm.showError("\"all\" selector requires a name");
                 return;
             }
             var resp = controller.saveSelector(sel);
@@ -1318,7 +1308,7 @@ function SelectorView(options){
                 interactive.remove();
                 showcase.remove();
             } else {
-                showError(resp.msg, typeForm);
+                typeForm.showError(resp.msg);
             }
         },
         selectChoice: function(d){
@@ -1334,7 +1324,7 @@ function SelectorView(options){
         },
         confirmElement: function(){
             if ( selector === "" ) {
-                showError("No element selected", elementForm);
+                elementForm.showError("No element selected");
                 return;
             }
             addTags();
@@ -1342,7 +1332,7 @@ function SelectorView(options){
         },
         confirmSelector: function(){
             if ( selector === "" ) {
-                showError("Selector cannot be empty", selectorForm);
+                selectorForm.showError("Selector cannot be empty");
                 return;
             }
             setupForm();
@@ -1509,16 +1499,9 @@ function SelectorView(options){
             setChoices(data);
         });
 
-    function clearErrors(form){
-        form.errors.text("");
-    }
-
-    function showError(msg, form){
-        form.errors.text(msg);
-    }
 
     function showElementForm(){
-        clearErrors(elementForm);
+        elementForm.clearErrors();
         elementCount.text("0");
         elementForm.form.classed("hidden", false);
         selectorForm.form.classed("hidden", true);
@@ -1526,7 +1509,7 @@ function SelectorView(options){
     }
 
     function showSelectorForm(){
-        clearErrors(selectorForm);
+        selectorForm.clearErrors();
         count({"type": "all"}, selectorCount);
         elementForm.form.classed("hidden", true);
         selectorForm.form.classed("hidden", false);
@@ -1534,7 +1517,7 @@ function SelectorView(options){
     }
 
     function showTypeForm(){
-        clearErrors(typeForm);
+        typeForm.clearErrors();
         elementForm.form.classed("hidden", true);
         selectorForm.form.classed("hidden", true);
         typeForm.form.classed("hidden", false);
@@ -1710,6 +1693,9 @@ function SelectorView(options){
 }
 
 // Source: src/ui/treeView.js
+/*
+ * A tree diagram representing  the current Page
+ */
 function TreeView(options){
     var page;
 
@@ -1743,9 +1729,9 @@ function TreeView(options){
         }
     };
 
-    /***
-    START UI
-    ***/
+    /*
+     * START UI
+     */
     var view = d3.select(options.view || d3.select("body"));
 
     var svg = d3.select(".page-tree").append("svg")
@@ -1762,9 +1748,9 @@ function TreeView(options){
         .projection(function(d) { return [d.y, d.x]; });
     var link;
     var node;
-    /***
-    END UI
-    ***/
+    /*
+     * END UI
+     */
 
     function empty(sel){
         var hasRules = sel.rules.length;
@@ -1799,6 +1785,7 @@ function TreeView(options){
         draw: function(page, currentId){
             var clone = clonePage(page);
             currentId = currentId || 0;
+            // clear out all current nodes and links
             if ( link ) {
                 link.remove();
             }
@@ -1806,20 +1793,24 @@ function TreeView(options){
                 node.remove();
             }
 
+            // have d3 generate the nodes and links
             var nodes = tree.nodes(clone);
             var links = tree.links(nodes);
             link = g.selectAll(".link")
-                .data(links, function(d) { return d.source.id + "-" + d.target.id; });
+                .data(links, function(d) {
+                    return d.source.id + "-" + d.target.id; }
+                );
             node = g.selectAll(".node")
                 .data(nodes, function(d) { return d.id; });
 
                 
+            // draw the links first
             link.enter().append("path")
                 .attr("class", "link");
-
             link.attr("d", diagonal);
             link.exit().remove();
 
+            // draw the nodes
             node.enter().append("g")
                 .classed({
                     "node": true,
@@ -1835,7 +1826,9 @@ function TreeView(options){
                     }
                 });
 
-            node.attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; });
+            node.attr("transform", function(d) {
+                return "translate(" + d.y + "," + d.x + ")"; }
+            );
 
             node.append("text")
                 .attr("y", 5)
@@ -1855,6 +1848,8 @@ function TreeView(options){
                     return abbreviate(text, 15);
                 });
 
+            // nodes that have no rules are denoted by circle markers
+            // and nodes that have rules are denoted by square markers
             node.append("circle")
                 .filter(function(d){
                     return d.rules.length === 0;
@@ -1871,6 +1866,7 @@ function TreeView(options){
                 .attr("y", -3);
 
             node.exit().remove();
+
             svg.classed("not-allowed", false);
         },
         turnOn: function(){
@@ -1880,6 +1876,10 @@ function TreeView(options){
                 .on("mouseenter", events.enterNode)
                 .on("mouseleave", events.exitNode);
         },
+        /*
+         * turn off interactivity when performing some tasks
+         * most useful when the current selector should not change
+         */
         turnOff: function(){
             svg.classed("not-allowed", true);
             // d3 has no .off

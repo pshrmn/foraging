@@ -15,7 +15,7 @@ function SelectorView(options){
         saveSelector: function(){
             var sel = makeSelector();
             if ( sel === undefined || sel.selector === "" ) {
-                showError("\"all\" selector requires a name", typeForm);
+                typeForm.showError("\"all\" selector requires a name");
                 return;
             }
             var resp = controller.saveSelector(sel);
@@ -24,7 +24,7 @@ function SelectorView(options){
                 interactive.remove();
                 showcase.remove();
             } else {
-                showError(resp.msg, typeForm);
+                typeForm.showError(resp.msg);
             }
         },
         selectChoice: function(d){
@@ -40,7 +40,7 @@ function SelectorView(options){
         },
         confirmElement: function(){
             if ( selector === "" ) {
-                showError("No element selected", elementForm);
+                elementForm.showError("No element selected");
                 return;
             }
             addTags();
@@ -48,7 +48,7 @@ function SelectorView(options){
         },
         confirmSelector: function(){
             if ( selector === "" ) {
-                showError("Selector cannot be empty", selectorForm);
+                selectorForm.showError("Selector cannot be empty");
                 return;
             }
             setupForm();
@@ -215,16 +215,9 @@ function SelectorView(options){
             setChoices(data);
         });
 
-    function clearErrors(form){
-        form.errors.text("");
-    }
-
-    function showError(msg, form){
-        form.errors.text(msg);
-    }
 
     function showElementForm(){
-        clearErrors(elementForm);
+        elementForm.clearErrors();
         elementCount.text("0");
         elementForm.form.classed("hidden", false);
         selectorForm.form.classed("hidden", true);
@@ -232,7 +225,7 @@ function SelectorView(options){
     }
 
     function showSelectorForm(){
-        clearErrors(selectorForm);
+        selectorForm.clearErrors();
         count({"type": "all"}, selectorCount);
         elementForm.form.classed("hidden", true);
         selectorForm.form.classed("hidden", false);
@@ -240,7 +233,7 @@ function SelectorView(options){
     }
 
     function showTypeForm(){
-        clearErrors(typeForm);
+        typeForm.clearErrors();
         elementForm.form.classed("hidden", true);
         selectorForm.form.classed("hidden", true);
         typeForm.form.classed("hidden", false);

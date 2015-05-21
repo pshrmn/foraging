@@ -39,10 +39,10 @@ body{
     }
 
     .not-allowed{
-        cursor: not-allowed;
+        cursor: no-drop;
 
         * {
-            cursor: not-allowed;        
+            cursor: no-drop;
         }
     }
 

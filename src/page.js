@@ -6,7 +6,9 @@ function cleanPages(pages){
     return ns;
 }
 
-// get rid of extra information before saving
+/*
+ * get rid of extra information before saving
+ */
 function cleanPage(page){
     function cleanSelector(s, clone){
         clone.selector = s.selector;
@@ -18,7 +20,6 @@ function cleanPage(page){
         });
         return clone;
     }
-
 
     var clonedPage = cleanSelector(page, {});
     clonedPage.name = page.name;
@@ -61,7 +62,10 @@ function matchSelector(sel, parent){
     };
 }
 
-// get an array containing the names of all rules in the page
+/*
+ * generate and return an array containing the names of all rules in the page
+ * and "all"-type selector names
+ */
 function usedNames(page){
     var names = [];
 

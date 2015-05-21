@@ -122,13 +122,13 @@ function RuleView(options){
         var attr = formState.attr;
         var name = nameInput.property("value");
         if ( name === ""){
-            showError("Rule name is required");
+            form.showError("Rule name is required");
             return;
         } else if ( !controller.legalName(name) ){
-            showError("A rule with the name '" + name + "' already exists");
+            form.showError("A rule with the name '" + name + "' already exists");
             return;
         } else if ( attr === undefined ) {
-            showError("No attribute has been selected.");
+            form.showError("No attribute has been selected.");
             return;
         }
 
@@ -138,20 +138,12 @@ function RuleView(options){
         };
     }
 
-    function showError(msg){
-        form.errors.text(msg);
-    }
-
-    function clearErrors(){
-        form.errors.text("");
-    }
-
     var fns = {
         setElements: function(elements){
             eles = elements;
             index = 0;
             length = elements.length;
-            clearErrors();
+            form.clearErrors();
             displayElement();
         },
         reset: function(){

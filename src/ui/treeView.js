@@ -1,3 +1,6 @@
+/*
+ * A tree diagram representing  the current Page
+ */
 function TreeView(options){
     var page;
 
@@ -31,9 +34,9 @@ function TreeView(options){
         }
     };
 
-    /***
-    START UI
-    ***/
+    /*
+     * START UI
+     */
     var view = d3.select(options.view || d3.select("body"));
 
     var svg = d3.select(".page-tree").append("svg")
@@ -50,9 +53,9 @@ function TreeView(options){
         .projection(function(d) { return [d.y, d.x]; });
     var link;
     var node;
-    /***
-    END UI
-    ***/
+    /*
+     * END UI
+     */
 
     function empty(sel){
         var hasRules = sel.rules.length;
@@ -87,6 +90,7 @@ function TreeView(options){
         draw: function(page, currentId){
             var clone = clonePage(page);
             currentId = currentId || 0;
+            // clear out all current nodes and links
             if ( link ) {
                 link.remove();
             }
@@ -94,20 +98,24 @@ function TreeView(options){
                 node.remove();
             }
 
+            // have d3 generate the nodes and links
             var nodes = tree.nodes(clone);
             var links = tree.links(nodes);
             link = g.selectAll(".link")
-                .data(links, function(d) { return d.source.id + "-" + d.target.id; });
+                .data(links, function(d) {
+                    return d.source.id + "-" + d.target.id; }
+                );
             node = g.selectAll(".node")
                 .data(nodes, function(d) { return d.id; });
 
                 
+            // draw the links first
             link.enter().append("path")
                 .attr("class", "link");
-
             link.attr("d", diagonal);
             link.exit().remove();
 
+            // draw the nodes
             node.enter().append("g")
                 .classed({
                     "node": true,
@@ -123,7 +131,9 @@ function TreeView(options){
                     }
                 });
 
-            node.attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; });
+            node.attr("transform", function(d) {
+                return "translate(" + d.y + "," + d.x + ")"; }
+            );
 
             node.append("text")
                 .attr("y", 5)
@@ -143,6 +153,8 @@ function TreeView(options){
                     return abbreviate(text, 15);
                 });
 
+            // nodes that have no rules are denoted by circle markers
+            // and nodes that have rules are denoted by square markers
             node.append("circle")
                 .filter(function(d){
                     return d.rules.length === 0;
@@ -159,6 +171,7 @@ function TreeView(options){
                 .attr("y", -3);
 
             node.exit().remove();
+
             svg.classed("not-allowed", false);
         },
         turnOn: function(){
@@ -168,6 +181,10 @@ function TreeView(options){
                 .on("mouseenter", events.enterNode)
                 .on("mouseleave", events.exitNode);
         },
+        /*
+         * turn off interactivity when performing some tasks
+         * most useful when the current selector should not change
+         */
         turnOff: function(){
             svg.classed("not-allowed", true);
             // d3 has no .off

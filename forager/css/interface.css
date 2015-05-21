@@ -26,9 +26,9 @@ body {
     box-sizing: border-box;
     line-height: 1.1em !important; }
   .forager .not-allowed {
-    cursor: not-allowed; }
+    cursor: no-drop; }
     .forager .not-allowed * {
-      cursor: not-allowed; }
+      cursor: no-drop; }
   .forager .inline {
     display: inline-block; }
   .forager .hidden {
