@@ -92,7 +92,7 @@ function foragerController(){
             if ( !currentPage ) {
                 return;
             }
-            var name = prompt("New Page name");
+            var name = prompt("New Page Name\nCannot contain the following characters: < > : \" \\ / | ? *");
             var oldName = currentPage;
             if ( name === oldName ) {
                 return;

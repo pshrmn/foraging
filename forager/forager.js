@@ -302,6 +302,20 @@ function cleanPage(page){
 }
 
 /*
+A page's name will be the name of the file when it is uploaded, so make sure that any characters
+in the name will be legal to use.
+rejects if name contains characters not allowed in filename: <, >, :, ", \, /, |, ?, *
+*/
+function legalPageName(name){
+    if ( name === null || name === "") {
+        return false;
+    }
+    var badCharacters = /[<>:"\/\\\|\?\*]/,
+        match = name.match(badCharacters);
+    return ( match === null );
+}
+
+/*
  * check if an identical selector already exists or one with the same name
  * exists
  */
@@ -583,7 +597,7 @@ function foragerController(){
             if ( !currentPage ) {
                 return;
             }
-            var name = prompt("New Page name");
+            var name = prompt("New Page Name\nCannot contain the following characters: < > : \" \\ / | ? *");
             var oldName = currentPage;
             if ( name === oldName ) {
                 return;
@@ -830,20 +844,6 @@ function clearClass(name){
     }
 }
 
-/*
-A page's name will be the name of the file when it is uploaded, so make sure that any characters
-in the name will be legal to use.
-rejects if name contains characters not allowed in filename: <, >, :, ", \, /, |, ?, *
-*/
-function legalPageName(name){
-    if ( name === null || name === "") {
-        return false;
-    }
-    var badCharacters = /[<>:"\/\\\|\?\*]/,
-        match = name.match(badCharacters);
-    return ( match === null );
-}
-
 function newForm(holder, hidden){
     var form = holder.append("div")
         .classed({
@@ -910,7 +910,7 @@ function topbar(options){
             controller.loadPage(pageName);
         },
         addPage: function(){
-            var name = prompt("Page name");
+            var name = prompt("Page Name\nCannot contain the following characters: < > : \" \\ / | ? *");
             if ( name === null || name === "" ) {
                 return;
             }

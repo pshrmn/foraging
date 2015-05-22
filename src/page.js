@@ -27,6 +27,20 @@ function cleanPage(page){
 }
 
 /*
+A page's name will be the name of the file when it is uploaded, so make sure that any characters
+in the name will be legal to use.
+rejects if name contains characters not allowed in filename: <, >, :, ", \, /, |, ?, *
+*/
+function legalPageName(name){
+    if ( name === null || name === "") {
+        return false;
+    }
+    var badCharacters = /[<>:"\/\\\|\?\*]/,
+        match = name.match(badCharacters);
+    return ( match === null );
+}
+
+/*
  * check if an identical selector already exists or one with the same name
  * exists
  */

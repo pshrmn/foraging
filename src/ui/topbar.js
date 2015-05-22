@@ -8,7 +8,7 @@ function topbar(options){
             controller.loadPage(pageName);
         },
         addPage: function(){
-            var name = prompt("Page name");
+            var name = prompt("Page Name\nCannot contain the following characters: < > : \" \\ / | ? *");
             if ( name === null || name === "" ) {
                 return;
             }
