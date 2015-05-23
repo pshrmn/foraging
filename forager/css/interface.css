@@ -123,6 +123,8 @@ body {
       .forager .views .view .buttons {
         height: 20%; }
         .forager .views .view .buttons .errors {
+          margin: 0;
+          padding: 0;
           color: #e85f88;
           height: 50%; }
       .forager .views .view > * {
