@@ -120,6 +120,8 @@ body {
       .forager .views .view .workarea {
         height: 80%;
         overflow-y: scroll; }
+        .forager .views .view .workarea div {
+          padding: 5px 0; }
       .forager .views .view .buttons {
         height: 20%; }
         .forager .views .view .buttons .errors {
@@ -157,7 +159,7 @@ body {
         .forager .views .view .form span.error {
           border-bottom: 1px solid #e85f88; }
         .forager .views .view .form .radio label {
-          margin-left: 15px;
+          margin: 0 5px 0 15px;
           display: inline-block; }
         .forager .views .view .form input[type=text] {
           width: 150px;

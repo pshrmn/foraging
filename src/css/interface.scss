@@ -182,6 +182,10 @@ body{
             .workarea{
                 height: 80%;
                 overflow-y: scroll;
+
+                div {
+                    padding: 5px 0;
+                }
             }
 
             .buttons{
@@ -237,7 +241,7 @@ body{
                 }
 
                 .radio label{
-                    margin-left: 15px;
+                    margin: 0 5px 0 15px;
                     display: inline-block;
                 }
                 
