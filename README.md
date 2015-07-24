@@ -8,11 +8,11 @@ Install gatherer using pip
 
     pip install git+git://github.com/psherman/gatherer.git
 
-For Windows users, if installing `lxml` causes errors. Download the wheel from the [Python Extension Packages for Windows](http://www.lfd.uci.edu/~gohlke/pythonlibs/#lxml) and place the wheel in your project. Pip install that file, the try the above gatherer installation.
+For Windows users, if installing `lxml` causes errors, download the wheel from the [Python Extension Packages for Windows](http://www.lfd.uci.edu/~gohlke/pythonlibs/#lxml) and place the wheel in your project. Pip install that file, then try the above gatherer installation.
 
 Example: (the filename will vary depending on your system and python version)
 
-    pip install lxml-3.4.2-cp34-none-win32.whl
+    pip install lxml-3.4.4-cp34-none-win_amd64.whl
 
 ##Usage
 
