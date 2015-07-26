@@ -183,8 +183,12 @@ body{
                 height: 80%;
                 overflow-y: scroll;
 
-                div {
+                > div {
                     padding: 5px 0;
+                }
+
+                p {
+                    margin: 2px 0;
                 }
             }
 

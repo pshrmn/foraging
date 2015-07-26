@@ -10,6 +10,11 @@ Click the Forager button to the right of the omnibox to open Forager
 
 When opening Forager, you will get an empty interface.
 
+Before You Get Started
+^^^^^^^^^^^^^^^^^^^^^^
+
+One thing to keep in mind is that the page that you're seeing isn't necessarily the page that `Gatherer <https://github.com/psherman/gatherer>`_ will see. :code:`Gatherer` will be receiving the html of the site as a non-logged in user, as well as having no extensions modifying the page. You should log out and disable any extensions that are running (eg. Reddit Enhancement Suite) if you want to be certain that you're seeing what :code:`Gatherer` will.
+
 Create Page
 ^^^^^^^^^^^^
 The first step is to create a new page.
