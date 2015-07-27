@@ -35,6 +35,26 @@ function RuleView(options){
             .attr("type", "text")
             .attr("name", "name");
 
+    var typeArea = form.workarea.append("p")
+        .text("Type:");
+
+    var currType = "string";
+    var typeLabels = typeArea.selectAll("label")
+        .data(["string", "int", "float"])
+        .enter().append("label")
+        .text(function(d){ return d; });
+
+    var radioTypes = typeLabels.append("input")
+        .attr("type", "radio")
+        .attr("name", "type")
+        .attr("value", function(d){ return d; })
+        .property("checked", function(d, i) {
+            return d === currType;
+        })
+        .on("change", function(){
+            currType = this.value;
+        });
+
     // display the attributes in a table
     var attributeHolder = form.workarea.append("table")
         .classed({"attributes": true});
@@ -131,10 +151,11 @@ function RuleView(options){
             form.showError("No attribute has been selected.");
             return;
         }
-
+        var type = currType;
         return {
             name: name,
-            attr: attr
+            attr: attr,
+            type: type
         };
     }
 
@@ -154,6 +175,10 @@ function RuleView(options){
                 rows.remove();
             }
             nameInput.property("value", "");
+            currType = "string";
+            radioTypes.property("checked", function(d){
+                return d === currType;
+            });
         }
     };
     return fns;

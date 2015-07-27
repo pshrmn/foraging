@@ -124,6 +124,9 @@ body {
           padding: 5px 0; }
         .forager .views .view .workarea p {
           margin: 2px 0; }
+        .forager .views .view .workarea input[type=radio] {
+          margin-right: 5px !important;
+          margin-left: 2px !important; }
       .forager .views .view .buttons {
         height: 20%; }
         .forager .views .view .buttons .errors {

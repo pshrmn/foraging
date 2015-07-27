@@ -34,8 +34,6 @@ function previewModal(parentElement){
         .text("close")
         .on("click", closeModal);
 
-
-
     return function(text){
         holder.classed("hidden", false);
         pre.text(text);

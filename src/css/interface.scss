@@ -190,6 +190,11 @@ body{
                 p {
                     margin: 2px 0;
                 }
+
+                input[type=radio] {
+                    margin-right: 5px !important;
+                    margin-left: 2px !important;
+                }
             }
 
             .buttons{

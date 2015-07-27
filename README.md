@@ -6,11 +6,12 @@ A Chrome extension to determine how to gather data from a page.
 
 #####Rule
 
-Data is captured through `rule`s. A rule has a name and the attribute of an element to capture (or text).
+Data is captured through `rule`s. A rule has a name, the attribute of an element to capture (or text), and the expected type of the attribute. By default the type is string, but it can also be int or float. A regular expression will be used to attempt to parse the value out of the text of the attribute.
 
     rule = {
         name: "h1",
-        attr: "title"
+        attr: "title",
+        type: "..."
     }
 
 #####Selector
@@ -42,7 +43,8 @@ and a selector looks like:
                 rules: [
                     {
                         name: "url",
-                        attr: "href"
+                        attr: "href",
+                        type: "string"
                     }
                 ],
                 spec: {
@@ -54,7 +56,8 @@ and a selector looks like:
         rules: [
             {
                 name: "description",
-                attr: "text"
+                attr: "text",
+                type: "string"
             }
         ],
         spec: {

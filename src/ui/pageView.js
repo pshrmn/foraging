@@ -85,7 +85,7 @@ function PageView(options){
                 .data(rules)
             .enter().append("li")
                 .text(function(d){
-                    return d.name + " <" + d.attr + ">";
+                    return d.name + " (" + d.attr + " - " + d.type + ")";
                 });
 
         lis.append("button")
