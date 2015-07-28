@@ -3,6 +3,7 @@ from .errors import BadJSONError
 
 
 class Page(object):
+
     def __init__(self, name, selector, fetch):
         self.name = name
         self.selector = selector

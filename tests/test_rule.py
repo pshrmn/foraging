@@ -1,4 +1,5 @@
 import unittest
+from lxml import html
 
 from gatherer.rule import Rule
 from gatherer.errors import BadJSONError
@@ -10,19 +11,23 @@ class RuleTestCase(unittest.TestCase):
         rules = [
             {
                 "name": "title",
-                "attr": "text"
+                "attr": "text",
+                "type": "string"
             },
             {
                 "name": "url",
-                "attr": "href"
+                "attr": "href",
+                "type": "string"
             },
             {
                 "name": "img",
-                "attr": "src"
+                "attr": "src",
+                "type": "string"
             },
             {
                 "name": "description",
-                "attr": "text"
+                "attr": "text",
+                "type": "string"
             }
         ]
         for rule_json in rules:
@@ -40,12 +45,62 @@ class RuleTestCase(unittest.TestCase):
             {
                 "attr": "bar"
             },
+            {
+                "type": "float"
+            },
             {}
         ]
         for rule_json in bad_rules:
             with self.assertRaises(BadJSONError):
                 Rule.from_json(rule_json)
 
+    def test_type_string(self):
+        example = "<a href=\"http://www.example.com\">Test</a>"
+        ele = html.fragment_fromstring(example)
+        r = Rule.from_json({
+            "name": "url",
+            "attr": "href",
+            "type": "string"
+        })
+        val = r.get(ele)
+        self.assertIsInstance(val, str)
+        self.assertEqual(val, "http://www.example.com")
+
+    def test_type_int(self):
+        examples = [
+            ("<p data-index=\"3\">Test</p>", "data-index", 3),
+            ("<p>15 miles</p>", "text", 15),
+            ("<p>The 18th of July</p>", "text", 18)
+        ]
+        for example in examples:
+            html_string, attr, expected = example
+            r = Rule.from_json({
+                "name": "url",
+                "attr": attr,
+                "type": "int"
+            })
+            ele = html.fragment_fromstring(html_string)
+            val = r.get(ele)
+            self.assertIsInstance(val, int)
+            self.assertEqual(val, expected)
+
+    def test_type_float(self):
+        examples = [
+            ("<p data-num=\"3.14159\">Test</p>", "data-num", 3.14159),
+            ("<p>26.2 miles</p>", "text", 26.2),
+            ("<p>In the 98.325th percentile</p>", "text", 98.325)
+        ]
+        for example in examples:
+            html_string, attr, expected = example
+            r = Rule.from_json({
+                "name": "url",
+                "attr": attr,
+                "type": "float"
+            })
+            ele = html.fragment_fromstring(html_string)
+            val = r.get(ele)
+            self.assertIsInstance(val, float)
+            self.assertEqual(val, expected)
 
 if __name__ == "__main__":
     unittest.main()

@@ -16,7 +16,8 @@
             "rules": [
                 {
                     "name": "link",
-                    "attr": "href"
+                    "attr": "href",
+                    "type": "string"
                 }
             ]
         }

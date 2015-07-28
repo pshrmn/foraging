@@ -15,11 +15,13 @@ class SelectorTestCase(unittest.TestCase):
             "rules": [
                 {
                     "name": "link",
-                    "attr": "href"
+                    "attr": "href",
+                    "type": "string"
                 },
                 {
                     "name": "headline",
-                    "attr": "text"
+                    "attr": "text",
+                    "type": "string"
                 }
             ],
             "spec": {
@@ -44,7 +46,8 @@ class SelectorTestCase(unittest.TestCase):
                     "rules": [
                         {
                             "name": "link",
-                            "attr": "href"
+                            "attr": "href",
+                            "type": "string"
                         }
                     ],
                     "spec": {
@@ -84,7 +87,8 @@ class SelectorTestCase(unittest.TestCase):
             "rules": [
                 {
                     "name": "link",
-                    "attr": "href"
+                    "attr": "href",
+                    "type": "string"
                 }
             ],
             "spec": {
