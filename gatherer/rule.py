@@ -40,13 +40,13 @@ class Rule(object):
     @staticmethod
     def find_int(text):
         match = re.search(r"\d+", text)
-        if match.group():
+        if match is not None:
             return int(match.group())
         return -1
 
     @staticmethod
     def find_float(text):
         match = re.search(r"\d+(\.\d+)?", text)
-        if match.group():
+        if match is not None:
             return float(match.group())
-        return -1
+        return -1.0

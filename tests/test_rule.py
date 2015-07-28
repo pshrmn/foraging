@@ -84,6 +84,19 @@ class RuleTestCase(unittest.TestCase):
             self.assertIsInstance(val, int)
             self.assertEqual(val, expected)
 
+    def test_bad_int(self):
+        # should return -1
+        r = Rule.from_json({
+            "name": "url",
+            "attr": "text",
+            "type": "int"
+        })
+        html_string = "<div>Nothing to see here</div>"
+        ele = html.fragment_fromstring(html_string)
+        val = r.get(ele)
+        self.assertIsInstance(val, int)
+        self.assertEqual(val, -1)
+
     def test_type_float(self):
         examples = [
             ("<p data-num=\"3.14159\">Test</p>", "data-num", 3.14159),
@@ -101,6 +114,19 @@ class RuleTestCase(unittest.TestCase):
             val = r.get(ele)
             self.assertIsInstance(val, float)
             self.assertEqual(val, expected)
+
+    def test_bad_float(self):
+        # should return -1.0
+        r = Rule.from_json({
+            "name": "url",
+            "attr": "text",
+            "type": "float"
+        })
+        html_string = "<div>Nothing to see here</div>"
+        ele = html.fragment_fromstring(html_string)
+        val = r.get(ele)
+        self.assertIsInstance(val, float)
+        self.assertEqual(val, -1.0)
 
 if __name__ == "__main__":
     unittest.main()
