@@ -25,7 +25,8 @@
           "rules": [
             {
               "attr": "text",
-              "name": "away"
+              "name": "away",
+              "type": "string"
             }
           ],
           "optional": false,
@@ -40,7 +41,8 @@
           "rules": [
             {
               "attr": "text",
-              "name": "home"
+              "name": "home",
+              "type": "string"
             }
           ],
           "optional": false,
@@ -66,7 +68,8 @@
           "rules": [
             {
               "attr": "text",
-              "name": "team"
+              "name": "team",
+              "type": "string"
             }
           ],
           "optional": false,

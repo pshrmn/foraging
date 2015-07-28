@@ -1,6 +1,6 @@
 cssselect==0.9.1
 Flask==0.10.1
-gatherer==0.16.0
+gatherer==1.0.1
 granary==1.4.0
 itsdangerous==0.24
 Jinja2==2.7.3

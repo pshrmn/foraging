@@ -25,7 +25,8 @@
           "rules": [
             {
               "name": "score",
-              "attr": "text"
+              "attr": "text",
+              "type": "int"
             }
           ],
           "optional": false,
@@ -40,11 +41,13 @@
           "rules": [
             {
               "name": "title",
-              "attr": "text"
+              "attr": "text",
+              "type": "string"
             },
             {
               "name": "url",
-              "attr": "href"
+              "attr": "href",
+              "type": "string"
             }
           ],
           "optional": false,
@@ -59,7 +62,8 @@
           "rules": [
             {
               "name": "domain",
-              "attr": "text"
+              "attr": "text",
+              "type": "string"
             }
           ],
           "optional": false,
@@ -74,11 +78,13 @@
           "rules": [
             {
               "name": "comments_url",
-              "attr": "href"
+              "attr": "href",
+              "type": "string"
             },
             {
               "name": "comment_count",
-              "attr": "text"
+              "attr": "text",
+              "type": "int"
             }
           ],
           "optional": false,
@@ -93,11 +99,13 @@
           "rules": [
             {
               "name": "submitter",
-              "attr": "text"
+              "attr": "text",
+              "type": "string"
             },
             {
               "name": "submitter_url",
-              "attr": "href"
+              "attr": "href",
+              "type": "string"
             }
           ],
           "optional": false,
