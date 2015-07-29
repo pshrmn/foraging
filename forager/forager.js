@@ -437,17 +437,32 @@ function preview(page) {
         return data;
     }
 
+    var intRegEx = /\d+/;
+    var floatRegEx = /\d+(\.\d+)?/;
     function getRuleData(rules, element) {
         var data = {};
         rules.forEach(function(rule){
+            var val;
+            var match;
             if ( rule.attr === "text" ) {
-                data[rule.name] = element.textContent.replace(/\s+/g, " ");
+                 val = element.textContent.replace(/\s+/g, " ");
             } else {
                 var attr = element.getAttribute(rule.attr);
                 // attributes that don't exist will return null
                 // just use empty string for now
-                data[rule.name] = attr || "";
+                val = attr || "";
             }
+            switch (rule.type) {
+            case "int":
+                match = val.match(intRegEx);
+                val = match !== null ? parseInt(match[0], 10) : -1;
+                break;
+            case "float":
+                match = val.match(floatRegEx);
+                val = match !== null ? parseFloat(match[0]) : -1.0;
+                break;
+            }
+            data[rule.name] = val;
         });
         return data;
     }
