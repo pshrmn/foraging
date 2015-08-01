@@ -34,9 +34,7 @@ function PageView(options){
     sf.form.classed("inline", true);
 
     var selectorText = sf.workarea.append("p")
-        .text("Selector: ")
-        .append("span");
-
+        .classed("selector", true);
     var selectorType = sf.workarea.append("p");
     var selectorRules = sf.workarea.append("div");
 
@@ -63,7 +61,16 @@ function PageView(options){
         selectorText.text(selector.selector);
         var type = selector.spec.type;
         var typeCap = type.charAt(0).toUpperCase() + type.slice(1);
-        selectorType.text(typeCap + ": " + selector.spec.value);
+        var desc = "";
+        switch (type){
+        case "single":
+            desc = "Select element at index " + selector.spec.value;
+            break;
+        case "all":
+            desc = "Select all elements, save as \"" + selector.spec.value + "\"";
+            break;
+        }
+        selectorType.text(desc);
 
         var currentId = selector.id;
         d3.selectAll(".node").classed("current", function(d){
@@ -83,10 +90,22 @@ function PageView(options){
         var ruleList = holder.append("ul");
         var lis = ruleList.selectAll("li")
                 .data(rules)
-            .enter().append("li")
-                .text(function(d){
-                    return d.name + " (" + d.attr + " - " + d.type + ")";
-                });
+            .enter().append("li");
+
+        lis.append("span")
+            .classed("name", true)
+            .text(function(d){
+                return d.name;
+            });
+        lis.append("span")
+            .text(function(d){
+                return "<" + d.attr + ">";
+            });
+
+        lis.append("span")
+            .text(function(d){
+                return "(" + d.type + ")";
+            });
 
         lis.append("button")
             .text("×")

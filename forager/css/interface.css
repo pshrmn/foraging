@@ -5,7 +5,7 @@ body {
 
 /* Interface */
 .forager {
-  z-index: 2147483638;
+  z-index: 2147483637;
   position: fixed;
   left: 0;
   bottom: 0;
@@ -127,6 +127,11 @@ body {
         .forager .views .view .workarea input[type=radio] {
           margin-right: 5px !important;
           margin-left: 2px !important; }
+        .forager .views .view .workarea .selector {
+          font-size: 1.25em; }
+        .forager .views .view .workarea .name {
+          font-size: 1.1em;
+          margin-right: 5px; }
       .forager .views .view .buttons {
         height: 20%; }
         .forager .views .view .buttons .errors {
