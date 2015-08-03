@@ -82,7 +82,8 @@ body {
   .forager .page-tree {
     display: inline-block;
     background: #323033;
-    padding: 10px; }
+    padding: 10px;
+    height: 270px; }
     .forager .page-tree svg {
       box-sizing: content-box;
       padding: 15px;
