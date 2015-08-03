@@ -1062,7 +1062,7 @@ function RuleView(options){
 
     var radioTypes = typeLabels.append("input")
         .attr("type", "radio")
-        .attr("name", "type")
+        .attr("name", "rule-type")
         .attr("value", function(d){ return d; })
         .property("checked", function(d, i) {
             return d === currType;
@@ -1099,6 +1099,7 @@ function RuleView(options){
         .on("click", events.saveRule);
 
     form.buttons.append("button")
+        .classed("red", true)
         .text("Cancel")
         .on("click", events.cancelRule);
 
@@ -1242,14 +1243,17 @@ function PageView(options){
     var selectorRules = sf.workarea.append("div");
 
     sf.buttons.append("button")
+        .classed("add-child", true)
         .text("add child")
         .on("click", events.addChild);
 
     sf.buttons.append("button")
+        .classed("add-rule", true)
         .text("add rule")
         .on("click", events.addRule);
 
     sf.buttons.append("button")
+        .classed("remove-selector", true)
         .text("remove")
         .on("click", events.removeSelector);
 
@@ -1311,6 +1315,7 @@ function PageView(options){
             });
 
         lis.append("button")
+            .classed("red", true)
             .text("×")
             .on("click", events.removeRule);
     }
@@ -1455,6 +1460,7 @@ function SelectorView(options){
         .text("Confirm")
         .on("click", events.confirmElement);
     elementForm.buttons.append("button")
+        .classed("red", true)
         .text("Cancel")
         .on("click", events.cancelSelector);
     // end elements
@@ -1476,6 +1482,7 @@ function SelectorView(options){
         .text("Confirm")
         .on("click", events.confirmSelector);
     selectorForm.buttons.append("button")
+        .classed("red", true)
         .text("Cancel")
         .on("click", events.cancelSelector);
     // end selector
@@ -1497,7 +1504,7 @@ function SelectorView(options){
     
     var radios = inputHolders.append("input")
         .attr("type", "radio")
-        .attr("name", "type")
+        .attr("name", "selector-type")
         .attr("id", function(d){ return "radio-" + d;})
         .property("value", function(d){ return d;})
         .property("checked", function(d, i){ return i === 0; })
@@ -1529,6 +1536,7 @@ function SelectorView(options){
 
 
     typeForm.buttons.append("button")
+        .classed("red", true)
         .text("Cancel")
         .on("click", events.cancelSelector);
 

@@ -39,14 +39,17 @@ function PageView(options){
     var selectorRules = sf.workarea.append("div");
 
     sf.buttons.append("button")
+        .classed("add-child", true)
         .text("add child")
         .on("click", events.addChild);
 
     sf.buttons.append("button")
+        .classed("add-rule", true)
         .text("add rule")
         .on("click", events.addRule);
 
     sf.buttons.append("button")
+        .classed("remove-selector", true)
         .text("remove")
         .on("click", events.removeSelector);
 
@@ -108,6 +111,7 @@ function PageView(options){
             });
 
         lis.append("button")
+            .classed("red", true)
             .text("×")
             .on("click", events.removeRule);
     }

@@ -133,13 +133,6 @@ body {
         .forager .views .view .workarea .name {
           font-size: 1.1em;
           margin-right: 5px; }
-      .forager .views .view .buttons {
-        height: 20%; }
-        .forager .views .view .buttons .errors {
-          margin: 0;
-          padding: 0;
-          color: #e85f88;
-          height: 50%; }
       .forager .views .view > * {
         vertical-align: top;
         display: inline-block; }
@@ -177,7 +170,19 @@ body {
           border-width: 0 0 1px; }
         .forager .views .view .form .buttons {
           position: absolute;
-          bottom: 0; }
+          bottom: 0;
+          height: 20%; }
+          .forager .views .view .form .buttons .errors {
+            margin: 0;
+            padding: 0;
+            color: #e85f88;
+            height: 50%; }
+        .forager .views .view .form button.add-child, .forager .views .view .form button.add-rule {
+          background: #45afcc;
+          border-color: #45afcc; }
+        .forager .views .view .form button.remove-selector {
+          background: #e85f88;
+          border-color: #e85f88; }
     .forager .views .view.active {
       display: block; }
   .forager input {
@@ -207,7 +212,7 @@ body {
     text-align: center;
     vertical-align: middle; }
   .forager th {
-    background: #2e829e; }
+    background: #45afcc; }
   .forager input, .forager select, .forager option, .forager textarea, .forager button {
     line-height: 1.1em !important;
     padding: 0 !important;
@@ -232,8 +237,7 @@ body {
       color: black !important; }
     .forager button.red, .forager button.red:hover, .forager button.red:active, .forager button.red:focus {
       background: #e85f88;
-      border-color: #e85f88;
-      color: white !important; }
+      border-color: #e85f88; }
   .forager button:active {
     border-style: inset !important;
     color: black !important; }
@@ -333,7 +337,7 @@ img.saved-preview {
   border: 1px solid rgba(255, 0, 0, 0.25) !important; }
 
 .current-selector {
-  box-shadow: inset 0 0 5px #2e829e !important; }
+  box-shadow: inset 0 0 5px #45afcc !important; }
 
 img.current-selector {
-  border: 1px dotted #2e829e !important; }
+  border: 1px dotted #45afcc !important; }

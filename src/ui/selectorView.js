@@ -114,6 +114,7 @@ function SelectorView(options){
         .text("Confirm")
         .on("click", events.confirmElement);
     elementForm.buttons.append("button")
+        .classed("red", true)
         .text("Cancel")
         .on("click", events.cancelSelector);
     // end elements
@@ -135,6 +136,7 @@ function SelectorView(options){
         .text("Confirm")
         .on("click", events.confirmSelector);
     selectorForm.buttons.append("button")
+        .classed("red", true)
         .text("Cancel")
         .on("click", events.cancelSelector);
     // end selector
@@ -156,7 +158,7 @@ function SelectorView(options){
     
     var radios = inputHolders.append("input")
         .attr("type", "radio")
-        .attr("name", "type")
+        .attr("name", "selector-type")
         .attr("id", function(d){ return "radio-" + d;})
         .property("value", function(d){ return d;})
         .property("checked", function(d, i){ return i === 0; })
@@ -188,6 +190,7 @@ function SelectorView(options){
 
 
     typeForm.buttons.append("button")
+        .classed("red", true)
         .text("Cancel")
         .on("click", events.cancelSelector);
 

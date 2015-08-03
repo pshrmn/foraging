@@ -46,7 +46,7 @@ function RuleView(options){
 
     var radioTypes = typeLabels.append("input")
         .attr("type", "radio")
-        .attr("name", "type")
+        .attr("name", "rule-type")
         .attr("value", function(d){ return d; })
         .property("checked", function(d, i) {
             return d === currType;
@@ -83,6 +83,7 @@ function RuleView(options){
         .on("click", events.saveRule);
 
     form.buttons.append("button")
+        .classed("red", true)
         .text("Cancel")
         .on("click", events.cancelRule);
 

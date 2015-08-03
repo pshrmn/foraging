@@ -1,7 +1,8 @@
 $red: #E85F88;
 $green: #76B85C;
 $dark-green: #42752E;
-$blue: #2E829E;
+$blue: #45AFCC;
+$purple: #8F56A6;
 $light-gray: #CED1DE;
 $dark-gray: #323033;
 $gray: #898B96;
@@ -207,17 +208,6 @@ body{
                 }
             }
 
-            .buttons{
-                height: 20%;
-
-                .errors {
-                    margin: 0;
-                    padding: 0;
-                    color: $red;
-                    height: 50%;
-                }
-            }
-
             > *{
                 vertical-align: top;
                 display: inline-block;
@@ -272,9 +262,27 @@ body{
                 .buttons{
                     position: absolute;
                     bottom: 0;
-                }
-            }
+                    height: 20%;
 
+                   .errors {
+                        margin: 0;
+                        padding: 0;
+                        color: $red;
+                        height: 50%;
+                    }
+                }
+
+                button.add-child, button.add-rule {
+                    background: $blue;
+                    border-color: $blue;
+                }
+
+                button.remove-selector {
+                    background: $red;
+                    border-color: $red;
+                }
+                
+            }
 
         }
 
@@ -361,7 +369,6 @@ body{
         &.red, &.red:hover, &.red:active, &.red:focus{
             background: $red;
             border-color: $red;
-            color: $white !important;
         }
     }
 
