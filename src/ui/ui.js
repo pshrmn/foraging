@@ -9,13 +9,22 @@ function buildUI(controller){
         .html('<div class="permanent">' +
                 '<div id="schemaInfo"></div>' +
                 '<div id="foragerAlert"></div>' +
-                '<div id="close-forager">&times;</div>' +
+                '<div id="ui-buttons">' +
+                    '<div id="min-forager">-</div>' +
+                    '<div id="close-forager">&times;</div>' +
+                '</div>' +
             '</div>' +
-            '<div class="views"></div>' + 
-            '<div class="page-tree"></div>'
+            '<div class="views page-divs"></div>' + 
+            '<div class="page-tree page-divs"></div>'
         );
-
+    var divs = d3.selectAll(".page-divs");
+    var hidden = false;
     var events = {
+        minMax: function() {
+            hidden = !hidden;
+            this.textContent = hidden ? "+" : "-";
+            divs.classed("hidden", hidden);
+        },
         close: function(){
             holder.remove();
             document.body.style.marginBottom = initialMargin;
@@ -30,6 +39,9 @@ function buildUI(controller){
     var topbarFns = topbar({
         holder: "#schemaInfo"
     });
+
+    var minmax = d3.select("#min-forager")
+        .on("click", events.minMax);
 
     var closer = d3.select("#close-forager")
         .on("click", events.close);

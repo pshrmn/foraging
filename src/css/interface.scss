@@ -457,12 +457,16 @@ body{
     display: inline-block;
 }
 
-#close-forager{
-    background: transparent;
-    cursor: pointer;
+#ui-buttons {
     position: absolute;
     right: 0;
     top: 0;
+    
+}
+
+#close-forager, #min-forager{
+    background: transparent;
+    cursor: pointer;
     height: 31px;
     width: 31px;
     font-size: 2em;
