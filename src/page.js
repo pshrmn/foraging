@@ -35,9 +35,9 @@ function legalPageName(name){
     if ( name === null || name === "") {
         return false;
     }
-    var badCharacters = /[<>:"\/\\\|\?\*]/,
-        match = name.match(badCharacters);
-    return ( match === null );
+    var badCharacters = /[<>:"\/\\\|\?\*]/;
+    var match = name.match(badCharacters);
+    return match === null;
 }
 
 /*
@@ -48,8 +48,7 @@ function matchSelector(sel, parent){
     var selIndex = sel.spec.type === "single" ? sel.spec.value : undefined;
     var msg = "";
     var found = parent.children.some(function(s){
-        var sameType = sel.spec.type === s.spec.type;
-        if ( !sameType ) {
+        if ( sel.spec.type !== s.spec.type ) {
             return false;
         }
 
@@ -70,6 +69,7 @@ function matchSelector(sel, parent){
         }
         return false;
     });
+
     return {
         error: found,
         msg: msg

@@ -14,16 +14,23 @@ function buildUI(controller){
                     '<div id="close-forager">&times;</div>' +
                 '</div>' +
             '</div>' +
-            '<div class="views page-divs"></div>' + 
-            '<div class="page-tree page-divs"></div>'
+            '<div class="frame pages">' +
+                '<div class="views"></div>' + 
+                '<div class="page-tree"></div>' +
+            '</div>'
         );
-    var divs = d3.selectAll(".page-divs");
+
+    var pageFrame = d3.select(".frame.pages");
     var hidden = false;
+    var existingStyle = getComputedStyle(document.body);
+    var initialMargin = existingStyle.marginBottom;
+    document.body.style.marginBottom = "500px";
+
     var events = {
         minMax: function() {
             hidden = !hidden;
             this.textContent = hidden ? "+" : "-";
-            divs.classed("hidden", hidden);
+            pageFrame.classed("hidden", hidden);
         },
         close: function(){
             holder.remove();
@@ -31,10 +38,6 @@ function buildUI(controller){
             controller.close();
         }
     };
-
-    var existingStyle = getComputedStyle(document.body);
-    var initialMargin = existingStyle.marginBottom;
-    document.body.style.marginBottom = "500px";
 
     var topbarFns = topbar({
         holder: "#schemaInfo"
@@ -102,6 +105,13 @@ function buildUI(controller){
                 left: 50
             };
             controller.dispatch[name] = treeFn(options);
+            fns.noSelect();
+        },
+        addOptions: function(optionFn, name, options){
+            options = options || {};
+            // set parent if options made as frame instead of modal
+            //options.parent = ???
+            controller.dispatch[name] = optionFn(options);
             fns.noSelect();
         },
         showView: showView,

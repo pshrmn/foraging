@@ -270,8 +270,13 @@ function foragerController(){
                 console.error("failed to generate preview");
             } else {
                 modal(JSON.stringify(text, null, 2));
-                // console.log(JSON.stringify(text, null, 2));
             }
+        },
+        setOptions: function(opts){
+            fns.dispatch.Options.setOptions(opts);
+        },
+        showOptions: function(){
+            fns.dispatch.Options.show();
         },
         close: function(){
             resetAll();

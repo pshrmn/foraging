@@ -97,7 +97,8 @@ function RuleView(options){
         });
 
         var element = eles[index];
-        var attrMap = attributes(element);
+        var ignore = controller.dispatch.Options.ignoredAttributes();
+        var attrMap = attributes(element, ignore);
         var attrData = [];
         for ( var key in attrMap ) {
             attrData.push([key, attrMap[key]]);

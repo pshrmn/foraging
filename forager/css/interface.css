@@ -314,6 +314,9 @@ body {
   text-align: center;
   margin: 0; }
 
+.options-modal label {
+  margin-right: 25px; }
+
 .selectable-element {
   box-shadow: inset 0 0 2px #1e0a3f !important; }
 

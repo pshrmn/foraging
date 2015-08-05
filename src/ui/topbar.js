@@ -28,6 +28,9 @@ function topbar(options){
         },
         preview: function(){
             controller.preview();
+        },
+        showOptions: function(){
+            controller.showOptions();
         }
     };
 
@@ -76,6 +79,11 @@ function topbar(options){
         .classed("green", true)
         .attr("title", "Preview will be logged in the console")
         .on("click", events.preview);
+
+    pageGroup.append("button")
+        .text("options")
+        .classed("green", true)
+        .on("click", events.showOptions);
 
     var fns = {
         getPage: function(){

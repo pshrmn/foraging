@@ -31,7 +31,8 @@ module.exports = function(grunt){
                     'src/controller.js', 'src/chrome.js', 'src/utility.js',
                     'src/ui/topbar.js', 'src/ui/ruleView.js', 
                     'src/ui/pageView.js', 'src/ui/selectorView.js',
-                    'src/ui/treeView.js', 'src/ui/ui.js', 'src/forager.js'],
+                    'src/ui/treeView.js', 'src/ui/optionsView.js',
+                    'src/ui/ui.js', 'src/forager.js'],
                 dest: 'forager/forager.js',
                 options: {
                     banner: "'use strict';\n",

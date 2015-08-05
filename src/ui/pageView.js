@@ -63,7 +63,6 @@ function PageView(options){
         sf.form.classed("hidden", false);
         selectorText.text(selector.selector);
         var type = selector.spec.type;
-        var typeCap = type.charAt(0).toUpperCase() + type.slice(1);
         var desc = "";
         switch (type){
         case "single":

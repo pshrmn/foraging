@@ -2,25 +2,24 @@
 // Source: src/attributes.js
 // return an object mapping attribute names to their value
 // for all attributes of an element
-function attributes(element) {
+function attributes(element, ignored) {
     var attrMap = {};
-    var attrs = element.attributes;
-    var curr;
-    for ( var i=0; i<attrs.length; i++ ) {
-        curr = attrs[i];
-        // special case for class attribute
-        if ( curr.name === "class" ) {
-            var classVal = curr.value.replace("current-selector","").trim();
-            if ( classVal !== "" ) {
-                attrMap.class = classVal;
-            }
-            continue;
+    ignored = ignored || {};
+    [].slice.call(element.attributes).forEach(function(attr) {
+        if ( ignored[attr.name] ) {
+
+            return;
+        }
+        // don't include current-selector class
+        if ( attr.name === "class" ) {
+            attr.value = attr.value.replace("current-selector","").trim();
         }
         // don't include empty attrs
-        if ( curr.value !== "") {
-            attrMap[curr.name] = curr.value;
+        if ( attr.value !== "" ) {
+            attrMap[attr.name] = attr.value;
         }
-    }
+    });
+
     // include text if it exists
     var text = element.textContent.trim();
     if ( text !== "" ) {
@@ -37,13 +36,12 @@ optional is a boolean describing whehther or not selector has to match elements
 returns a new Selector object
 */
 function newSelector(selector, spec, optional){
-    optional = optional || false;
     return {
         selector: selector,
         spec: spec,
         children: [],
         rules: [],
-        optional: optional
+        optional: optional || false
     };
 }
 
@@ -95,7 +93,9 @@ function highlightElements(){
 function interactiveElements(){
     var className = "highlighted";
     var hovered = "hovered";
-    var clicked = function(){};
+    var clicked = function(event){
+        event.preventDefault();
+    };
     var mouseover = function addOption(event){
         event.stopPropagation();
         this.classList.add(hovered);
@@ -310,9 +310,9 @@ function legalPageName(name){
     if ( name === null || name === "") {
         return false;
     }
-    var badCharacters = /[<>:"\/\\\|\?\*]/,
-        match = name.match(badCharacters);
-    return ( match === null );
+    var badCharacters = /[<>:"\/\\\|\?\*]/;
+    var match = name.match(badCharacters);
+    return match === null;
 }
 
 /*
@@ -323,8 +323,7 @@ function matchSelector(sel, parent){
     var selIndex = sel.spec.type === "single" ? sel.spec.value : undefined;
     var msg = "";
     var found = parent.children.some(function(s){
-        var sameType = sel.spec.type === s.spec.type;
-        if ( !sameType ) {
+        if ( sel.spec.type !== s.spec.type ) {
             return false;
         }
 
@@ -345,6 +344,7 @@ function matchSelector(sel, parent){
         }
         return false;
     });
+
     return {
         error: found,
         msg: msg
@@ -788,8 +788,13 @@ function foragerController(){
                 console.error("failed to generate preview");
             } else {
                 modal(JSON.stringify(text, null, 2));
-                // console.log(JSON.stringify(text, null, 2));
             }
+        },
+        setOptions: function(opts){
+            fns.dispatch.Options.setOptions(opts);
+        },
+        showOptions: function(){
+            fns.dispatch.Options.show();
         },
         close: function(){
             resetAll();
@@ -804,7 +809,7 @@ function foragerController(){
 /* functions that are related to the extension */
 
 // save all of the pages for the site
-function chromeSave(pages){
+function chromeSave(pages) {
     chrome.storage.local.get('sites', function saveSchemaChrome(storage){
         var host = window.location.hostname;
         storage.sites[host] = cleanPages(pages);
@@ -813,12 +818,12 @@ function chromeSave(pages){
 }
 
 // takes a data object to be uploaded and passes it to the background page to handle
-function chromeUpload(data){
+function chromeUpload(data) {
     data.page = JSON.stringify(cleanPage(data.page));
     chrome.runtime.sendMessage({type: 'upload', data: data});
 }
 
-function chromeSync(domain){
+function chromeSync(domain) {
     chrome.runtime.sendMessage({type: 'sync', domain: domain}, function(response){
         if ( response.error ) {
             return;
@@ -838,7 +843,7 @@ urls is saved as an object for easier lookup, but converted to an array of the k
 
 If the site object exists for a host, load the saved rules
 */
-function chromeLoad(){
+function chromeLoadPages() {
     chrome.storage.local.get("sites", function setupHostnameChrome(storage){
         var host = window.location.hostname;
         var pages = storage.sites[host] || {};
@@ -846,6 +851,15 @@ function chromeLoad(){
     });
 }
 
+function chromeLoadOptions() {
+    chrome.storage.local.get("options", function loadOptionsChrome(storage){
+        controller.setOptions(storage.options);
+    });
+}
+
+function chromeSaveOptions(opts) {
+    chrome.storage.local.set({"options": opts});
+}
 // Source: src/utility.js
 // purge a classname from all elements with it
 function clearClass(name){
@@ -943,6 +957,9 @@ function topbar(options){
         },
         preview: function(){
             controller.preview();
+        },
+        showOptions: function(){
+            controller.showOptions();
         }
     };
 
@@ -991,6 +1008,11 @@ function topbar(options){
         .classed("green", true)
         .attr("title", "Preview will be logged in the console")
         .on("click", events.preview);
+
+    pageGroup.append("button")
+        .text("options")
+        .classed("green", true)
+        .on("click", events.showOptions);
 
     var fns = {
         getPage: function(){
@@ -1113,7 +1135,8 @@ function RuleView(options){
         });
 
         var element = eles[index];
-        var attrMap = attributes(element);
+        var ignore = controller.dispatch.Options.ignoredAttributes();
+        var attrMap = attributes(element, ignore);
         var attrData = [];
         for ( var key in attrMap ) {
             attrData.push([key, attrMap[key]]);
@@ -1267,7 +1290,6 @@ function PageView(options){
         sf.form.classed("hidden", false);
         selectorText.text(selector.selector);
         var type = selector.spec.type;
-        var typeCap = type.charAt(0).toUpperCase() + type.slice(1);
         var desc = "";
         switch (type){
         case "single":
@@ -1961,6 +1983,109 @@ function TreeView(options){
     return fns;
 }
 
+// Source: src/ui/optionsView.js
+function OptionsView(options) {
+    options = options || {};
+    var ignorable = [
+        "class", "id", "src", "href", "style", "alt", "title", "target",
+        "tabindex", "type"
+    ];
+
+    var parent = d3.select(options.parent || document.body);
+
+    function closeAndSaveModal(){
+        var opts = {};
+        opts.attrs = {};
+        ignoreOptions.each(function(d, i){
+            if ( this.checked ) {
+                opts.attrs[d] = true;
+            }
+        });
+        chromeSaveOptions(opts);
+        holder.classed("hidden", true);
+    }
+
+    var holder = parent.append("div")
+        .classed({
+            "no-select": true,
+            "modal-holder": true,
+            "hidden": true
+        });
+
+    var background = holder.append("div")
+        .classed({
+            "background": true,
+            "no-select": true
+        })
+        .attr("title", "click to close preview")
+        .on("click", closeAndSaveModal);
+
+    var modal = holder.append("div")
+        .classed({
+            "no-select": true,
+            "cjs-modal": true,
+            "options-modal": true
+        });
+
+    var ignorePart = modal.append("div");
+
+    ignorePart.append("p")
+        .text("Hidden Attributes");
+    var close = modal.append("button")
+        .classed("no-select", true)
+        .text("close")
+        .on("click", closeAndSaveModal);
+
+
+    var ignoreOptions = ignorePart.selectAll("label")
+            .data(ignorable)
+        .enter().append("label")
+            .text(function(d){ return d; })
+            .append("input")
+                .attr("type", "checkbox")
+                .classed({
+                    "option-radio": true
+                })
+                .property("checked", false);
+
+    return {
+        show: function() {
+            holder.classed("hidden", false);
+        },
+        setOptions: function(opts) {
+            ignoreOptions.each(function(d, i) {
+                d3.select(this).property("checked", opts.attrs[d] !== undefined);
+            });
+        },
+        ignoredAttributes: function() {
+            // automatically ignore the on___ functions
+            var ignored = {
+                "onblur": true,
+                "onchange": true,
+                "onclick": true,
+                "onfocus": true,
+                "onkeydown": true,
+                "onkeypress": true,
+                "onkeyup": true,
+                "onload": true,
+                "onmousedown": true,
+                "onmouseout": true,
+                "onmouseover": true,
+                "onmouseup": true,
+                "onreset": true,
+                "onselect": true,
+                "onsubmit": true,
+                "onunload": true
+            };
+            ignoreOptions.each(function(d){
+                if ( this.checked ) {
+                    ignored[d] = true;
+                }
+            });
+            return ignored;
+        }
+    };
+}
 // Source: src/ui/ui.js
 function buildUI(controller){
     controller.dispatch = {};
@@ -1978,16 +2103,23 @@ function buildUI(controller){
                     '<div id="close-forager">&times;</div>' +
                 '</div>' +
             '</div>' +
-            '<div class="views page-divs"></div>' + 
-            '<div class="page-tree page-divs"></div>'
+            '<div class="frame pages">' +
+                '<div class="views"></div>' + 
+                '<div class="page-tree"></div>' +
+            '</div>'
         );
-    var divs = d3.selectAll(".page-divs");
+
+    var pageFrame = d3.select(".frame.pages");
     var hidden = false;
+    var existingStyle = getComputedStyle(document.body);
+    var initialMargin = existingStyle.marginBottom;
+    document.body.style.marginBottom = "500px";
+
     var events = {
         minMax: function() {
             hidden = !hidden;
             this.textContent = hidden ? "+" : "-";
-            divs.classed("hidden", hidden);
+            pageFrame.classed("hidden", hidden);
         },
         close: function(){
             holder.remove();
@@ -1995,10 +2127,6 @@ function buildUI(controller){
             controller.close();
         }
     };
-
-    var existingStyle = getComputedStyle(document.body);
-    var initialMargin = existingStyle.marginBottom;
-    document.body.style.marginBottom = "500px";
 
     var topbarFns = topbar({
         holder: "#schemaInfo"
@@ -2068,6 +2196,13 @@ function buildUI(controller){
             controller.dispatch[name] = treeFn(options);
             fns.noSelect();
         },
+        addOptions: function(optionFn, name, options){
+            options = options || {};
+            // set parent if options made as frame instead of modal
+            //options.parent = ???
+            controller.dispatch[name] = optionFn(options);
+            fns.noSelect();
+        },
         showView: showView,
         setPages: topbarFns.setPages,
         getPage: topbarFns.getPage,
@@ -2088,5 +2223,6 @@ ui.addViews([
 ]);
 
 ui.addTree(TreeView, "Tree", {});
-
-chromeLoad();
+ui.addOptions(OptionsView, "Options", {});
+chromeLoadPages();
+chromeLoadOptions();

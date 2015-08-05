@@ -6,6 +6,9 @@ chrome.storage.local.get(null, function(storage) {
     if ( !storage.sites ) {
         chrome.storage.local.set({"sites": {}});
     }
+    if ( !storage.options ) {
+        chrome.storage.local.set({"options": {}});
+    }
 });
 
 // inject forager's interface when the browserAction icon is clicked

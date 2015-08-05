@@ -30,7 +30,9 @@ function highlightElements(){
 function interactiveElements(){
     var className = "highlighted";
     var hovered = "hovered";
-    var clicked = function(){};
+    var clicked = function(event){
+        event.preventDefault();
+    };
     var mouseover = function addOption(event){
         event.stopPropagation();
         this.classList.add(hovered);

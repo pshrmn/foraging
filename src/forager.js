@@ -9,5 +9,6 @@ ui.addViews([
 ]);
 
 ui.addTree(TreeView, "Tree", {});
-
-chromeLoad();
+ui.addOptions(OptionsView, "Options", {});
+chromeLoadPages();
+chromeLoadOptions();
