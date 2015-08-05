@@ -48,7 +48,7 @@ function OptionsView(options) {
             "background": true,
             "no-select": true
         })
-        .attr("title", "click to close preview")
+        .attr("title", "click to save and close options")
         .on("click", closeAndSaveModal);
 
     var modal = holder.append("div")
@@ -57,6 +57,13 @@ function OptionsView(options) {
             "cjs-modal": true,
             "options-modal": true
         });
+
+    modal.append("h2")
+        .text("Options");
+
+    modal.append("p")
+        .classed("note", true)
+        .text("Options will be saved automatically when you click Close");
 
     var ignorePart = modal.append("div");
     var baseAttrs = ignorePart.append("div");
@@ -77,15 +84,20 @@ function OptionsView(options) {
                 .property("checked", false);
 
     groupAttrs.append("h3")
-        .text("Hide Similar Groups of Attributes");
+        .text("Hide Related Groups of Attributes");
+    groupAttrs.append("p")
+        .classed("note", true)
+        .text("Hover over checkbox to see affected attributes");
 
-    var tableCheckbox = groupAttrs.append("p").append("label")
+    var tableCheckbox = groupAttrs.append("div").append("label")
         .text("Table Attributes")
+        .attr("title", tableAttrs.join(", "))
         .append("input")
             .attr("type","checkbox");
 
-    var styleCheckbox = groupAttrs.append("p").append("label")
+    var styleCheckbox = groupAttrs.append("div").append("label")
         .text("Style Attributes")
+        .attr("title", styleAttrs.join(", "))
         .append("input")
             .attr("type","checkbox");
 

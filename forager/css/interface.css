@@ -314,8 +314,23 @@ body {
   text-align: center;
   margin: 0; }
 
-.options-modal label {
-  margin-right: 25px; }
+.options-modal {
+  color: #323033; }
+  .options-modal h2 {
+    margin: 5px 0;
+    font-size: 1.25em; }
+  .options-modal h3 {
+    margin: 5px 0;
+    font-size: 1.1em; }
+  .options-modal .note {
+    font-style: italic;
+    font-size: 0.9em;
+    margin: 3px 0; }
+  .options-modal label {
+    font-weight: normal;
+    margin-right: 25px; }
+    .options-modal label input[type=checkbox] {
+      margin-left: 5px; }
 
 .selectable-element {
   box-shadow: inset 0 0 2px #1e0a3f !important; }
