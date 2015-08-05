@@ -1,20 +1,37 @@
 function OptionsView(options) {
     options = options || {};
     var ignorable = [
-        "class", "id", "src", "href", "style", "alt", "title", "target",
-        "tabindex", "type"
+        "class", "id", "src", "href", "style", "alt", "title", "value",
+        "target", "tabindex", "type"
+    ];
+    var eventAttrs = [
+        "onblur", "onchange", "onclick", "onfocus", "onkeydown", "onkeypress",
+        "onkeyup", "onload", "onmousedown", "onmouseout", "onmouseover",
+        "onmouseup", "onreset", "onselect", "onsubmit", "onunload"
+    ];
+    var tableAttrs = [
+        "axis", "cellpadding", "cellspacing", "char", "charoff", "colspan",
+        "frame", "headers", "nowrap", "rowspan", "rule", "scope", "valign"
+    ];
+    var styleAttrs = [
+        "align", "background", "bgcolor", "border", "color", "frameborder",
+        "height", "marginheight", "marginwidth", "maxlength", "width"
     ];
 
     var parent = d3.select(options.parent || document.body);
 
     function closeAndSaveModal(){
         var opts = {};
+        // ignored attributes
         opts.attrs = {};
         ignoreOptions.each(function(d, i){
             if ( this.checked ) {
                 opts.attrs[d] = true;
             }
         });
+        // ignore table and style attrs?
+        opts.table = tableCheckbox.property("checked");
+        opts.style = styleCheckbox.property("checked");
         chromeSaveOptions(opts);
         holder.classed("hidden", true);
     }
@@ -42,16 +59,13 @@ function OptionsView(options) {
         });
 
     var ignorePart = modal.append("div");
+    var baseAttrs = ignorePart.append("div");
+    var groupAttrs = ignorePart.append("div");
 
-    ignorePart.append("p")
+    baseAttrs.append("h3")
         .text("Hidden Attributes");
-    var close = modal.append("button")
-        .classed("no-select", true)
-        .text("close")
-        .on("click", closeAndSaveModal);
 
-
-    var ignoreOptions = ignorePart.selectAll("label")
+    var ignoreOptions = baseAttrs.selectAll("label")
             .data(ignorable)
         .enter().append("label")
             .text(function(d){ return d; })
@@ -62,6 +76,24 @@ function OptionsView(options) {
                 })
                 .property("checked", false);
 
+    groupAttrs.append("h3")
+        .text("Hide Similar Groups of Attributes");
+
+    var tableCheckbox = groupAttrs.append("p").append("label")
+        .text("Table Attributes")
+        .append("input")
+            .attr("type","checkbox");
+
+    var styleCheckbox = groupAttrs.append("p").append("label")
+        .text("Style Attributes")
+        .append("input")
+            .attr("type","checkbox");
+
+    var close = modal.append("button")
+        .classed("no-select", true)
+        .text("close")
+        .on("click", closeAndSaveModal);
+
     return {
         show: function() {
             holder.classed("hidden", false);
@@ -70,32 +102,34 @@ function OptionsView(options) {
             ignoreOptions.each(function(d, i) {
                 d3.select(this).property("checked", opts.attrs[d] !== undefined);
             });
+            if ( opts.table ) {
+                tableCheckbox.property("checked", true);
+            }
+            if ( opts.style ) {
+                styleCheckbox.property("checked", true);
+            }
         },
         ignoredAttributes: function() {
             // automatically ignore the on___ functions
-            var ignored = {
-                "onblur": true,
-                "onchange": true,
-                "onclick": true,
-                "onfocus": true,
-                "onkeydown": true,
-                "onkeypress": true,
-                "onkeyup": true,
-                "onload": true,
-                "onmousedown": true,
-                "onmouseout": true,
-                "onmouseover": true,
-                "onmouseup": true,
-                "onreset": true,
-                "onselect": true,
-                "onsubmit": true,
-                "onunload": true
-            };
+            var ignored = {};
+            eventAttrs.forEach(function(attr){
+                ignored[attr] = true;
+            });
             ignoreOptions.each(function(d){
                 if ( this.checked ) {
                     ignored[d] = true;
                 }
             });
+            if ( tableCheckbox.property("checked") ) {
+                tableAttrs.forEach(function(attr){
+                    ignored[attr] = true;
+                });
+            }
+            if ( styleCheckbox.property("checked") ) {
+                styleAttrs.forEach(function(attr){
+                    ignored[attr] = true;
+                });
+            }
             return ignored;
         }
     };
