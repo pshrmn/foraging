@@ -62,7 +62,7 @@ function matchSelector(sel, parent){
             break;
         case "all":
             if ( s.spec.value === sel.spec.value ) {
-                msg = "a selector with the name '" + sel.spec.value + "' already exists";
+                msg = `a selector with the name "${sel.spec.value}" already exists`;
                 return true;
             }
             break;

@@ -246,7 +246,6 @@ function SelectorView(options){
         });
     }
 
-
     /***
     create a new selector based on the user's choices
     ***/

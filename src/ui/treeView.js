@@ -44,7 +44,7 @@ function TreeView(options){
         .attr("width", width)
         .attr("height", height);
     var g = svg.append("g")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+        .attr("transform", `translate(${margin.left},${margin.top})`);
     var usableWidth = width - margin.left - margin.right;
     var usableHeight = height - margin.top - margin.bottom;
     var tree = d3.layout.tree()
@@ -132,7 +132,7 @@ function TreeView(options){
                 });
 
             node.attr("transform", function(d) {
-                return "translate(" + d.y + "," + d.x + ")"; }
+                return `translate(${d.y},${d.x})`; }
             );
 
             node.append("text")

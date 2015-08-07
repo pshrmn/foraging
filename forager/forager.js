@@ -337,7 +337,7 @@ function matchSelector(sel, parent){
             break;
         case "all":
             if ( s.spec.value === sel.spec.value ) {
-                msg = "a selector with the name '" + sel.spec.value + "' already exists";
+                msg = `a selector with the name "${sel.spec.value}" already exists`;
                 return true;
             }
             break;
@@ -1293,10 +1293,10 @@ function PageView(options){
         var desc = "";
         switch (type){
         case "single":
-            desc = "Select element at index " + selector.spec.value;
+            desc = `Select element at index ${selector.spec.value}`;
             break;
         case "all":
-            desc = "Select all elements, save as \"" + selector.spec.value + "\"";
+            desc = `Select all elements, save as "${selector.spec.value}"`;
             break;
         }
         selectorType.text(desc);
@@ -1614,7 +1614,6 @@ function SelectorView(options){
         });
     }
 
-
     /***
     create a new selector based on the user's choices
     ***/
@@ -1826,7 +1825,7 @@ function TreeView(options){
         .attr("width", width)
         .attr("height", height);
     var g = svg.append("g")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+        .attr("transform", `translate(${margin.left},${margin.top})`);
     var usableWidth = width - margin.left - margin.right;
     var usableHeight = height - margin.top - margin.bottom;
     var tree = d3.layout.tree()
@@ -1914,7 +1913,7 @@ function TreeView(options){
                 });
 
             node.attr("transform", function(d) {
-                return "translate(" + d.y + "," + d.x + ")"; }
+                return `translate(${d.y},${d.x})`; }
             );
 
             node.append("text")
@@ -2175,18 +2174,18 @@ function buildUI(controller){
             "forager": true,
             "no-select": true
         })
-        .html('<div class="permanent">' +
-                '<div id="schemaInfo"></div>' +
-                '<div id="foragerAlert"></div>' +
-                '<div id="ui-buttons">' +
-                    '<div id="min-forager">-</div>' +
-                    '<div id="close-forager">&times;</div>' +
-                '</div>' +
-            '</div>' +
-            '<div class="frame pages">' +
-                '<div class="views"></div>' + 
-                '<div class="page-tree"></div>' +
-            '</div>'
+        .html(`<div class="permanent">
+                <div id="schemaInfo"></div>
+                <div id="foragerAlert"></div>
+                <div id="ui-buttons">
+                    <div id="min-forager">-</div>
+                    <div id="close-forager">&times;</div>
+                </div>
+            </div>
+            <div class="frame pages">
+                <div class="views"></div>
+                <div class="page-tree"></div>
+            </div>`
         );
 
     var pageFrame = d3.select(".frame.pages");

@@ -12,7 +12,8 @@ module.exports = function(grunt){
                     d3: true
                 },
                 devel: true,
-                expr: true
+                expr: true,
+                esnext: true
             },
             all: ['forager/forager.js']
         },

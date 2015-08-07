@@ -66,10 +66,10 @@ function PageView(options){
         var desc = "";
         switch (type){
         case "single":
-            desc = "Select element at index " + selector.spec.value;
+            desc = `Select element at index ${selector.spec.value}`;
             break;
         case "all":
-            desc = "Select all elements, save as \"" + selector.spec.value + "\"";
+            desc = `Select all elements, save as "${selector.spec.value}"`;
             break;
         }
         selectorType.text(desc);

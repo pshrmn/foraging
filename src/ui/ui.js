@@ -6,18 +6,18 @@ function buildUI(controller){
             "forager": true,
             "no-select": true
         })
-        .html('<div class="permanent">' +
-                '<div id="schemaInfo"></div>' +
-                '<div id="foragerAlert"></div>' +
-                '<div id="ui-buttons">' +
-                    '<div id="min-forager">-</div>' +
-                    '<div id="close-forager">&times;</div>' +
-                '</div>' +
-            '</div>' +
-            '<div class="frame pages">' +
-                '<div class="views"></div>' + 
-                '<div class="page-tree"></div>' +
-            '</div>'
+        .html(`<div class="permanent">
+                <div id="schemaInfo"></div>
+                <div id="foragerAlert"></div>
+                <div id="ui-buttons">
+                    <div id="min-forager">-</div>
+                    <div id="close-forager">&times;</div>
+                </div>
+            </div>
+            <div class="frame pages">
+                <div class="views"></div>
+                <div class="page-tree"></div>
+            </div>`
         );
 
     var pageFrame = d3.select(".frame.pages");
