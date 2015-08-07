@@ -1,5 +1,5 @@
-function previewModal(parentElement){
-    var parent = d3.select(parentElement);
+function PreviewView(options){
+    var parent = d3.select(options.parent || document.body);
 
     function closeModal(){
         holder.classed("hidden", true);
@@ -34,8 +34,10 @@ function previewModal(parentElement){
         .text("close")
         .on("click", closeModal);
 
-    return function(text){
-        holder.classed("hidden", false);
-        pre.text(text);
+    return {
+        show: function(text){
+            holder.classed("hidden", false);
+            pre.text(text);
+        }
     };
 }

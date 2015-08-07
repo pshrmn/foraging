@@ -151,6 +151,9 @@ function OptionsView(options) {
         .text("close")
         .on("click", closeAndSaveModal);
 
+    holder.selectAll("*")
+        .classed("no-select", true);
+
     return {
         show: function() {
             holder.classed("hidden", false);

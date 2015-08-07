@@ -14,6 +14,9 @@ function foragerController(){
         fns.dispatch.Tree.draw(page, selector.id);
     }
 
+    /*
+     * generate an id for each selector for lookup
+     */
     function generateIds(){
         var idCount = 0;
         function setId(sel){
@@ -26,8 +29,9 @@ function foragerController(){
         lastId = idCount;
     }
 
-    // get all of the elements that match each selector
-    // and store in object.elements
+    /*
+     * cache elements that are matched by the selectors in a page
+     */
     function getMatches(){
         function match(eles, s){
             if ( !s.elements ) {
@@ -41,6 +45,9 @@ function foragerController(){
         match([document], page);
     }
 
+    /*
+     * reset everything
+     */
     function resetAll(){
         fns.dispatch.Tree.reset();
         fns.dispatch.Page.reset();
@@ -56,8 +63,6 @@ function foragerController(){
             return e.tagName === "SELECT";
         });
     }
-
-    var modal = previewModal(document.body);
 
     var fns = {
         elements: elementSelector(),
@@ -269,7 +274,7 @@ function foragerController(){
             if ( !text ) {
                 console.error("failed to generate preview");
             } else {
-                modal(JSON.stringify(text, null, 2));
+                fns.dispatch.Preview.show(JSON.stringify(text, null, 2));
             }
         },
         setOptions: function(opts){

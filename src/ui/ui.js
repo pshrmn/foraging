@@ -7,12 +7,8 @@ function buildUI(controller){
             "no-select": true
         })
         .html(`<div class="permanent">
-                <div id="schemaInfo"></div>
-                <div id="foragerAlert"></div>
-                <div id="ui-buttons">
-                    <div id="min-forager">-</div>
-                    <div id="close-forager">&times;</div>
-                </div>
+                <div id="pageInfo"></div>
+                <div id="ui-buttons"></div>
             </div>
             <div class="frame pages">
                 <div class="views"></div>
@@ -20,34 +16,12 @@ function buildUI(controller){
             </div>`
         );
 
-    var pageFrame = d3.select(".frame.pages");
-    var hidden = false;
-    var existingStyle = getComputedStyle(document.body);
-    var initialMargin = existingStyle.marginBottom;
-    document.body.style.marginBottom = "500px";
-
-    var events = {
-        minMax: function() {
-            hidden = !hidden;
-            this.textContent = hidden ? "+" : "-";
-            pageFrame.classed("hidden", hidden);
-        },
-        close: function(){
-            holder.remove();
-            document.body.style.marginBottom = initialMargin;
-            controller.close();
-        }
-    };
-
     var topbarFns = topbar({
-        holder: "#schemaInfo"
+        page: "#pageInfo",
+        control: "#ui-buttons"
     });
 
-    var minmax = d3.select("#min-forager")
-        .on("click", events.minMax);
-
-    var closer = d3.select("#close-forager")
-        .on("click", events.close);
+    
 
     var viewHolder = holder.select(".views");
     var views = {};
@@ -113,6 +87,10 @@ function buildUI(controller){
             //options.parent = ???
             controller.dispatch[name] = optionFn(options);
             fns.noSelect();
+        },
+        addPreview: function(previewFn, name, options){
+            options = options || {};
+            controller.dispatch[name] = previewFn(options);
         },
         showView: showView,
         setPages: topbarFns.setPages,

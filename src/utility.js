@@ -60,5 +60,5 @@ function abbreviate(text, max) {
     // splice correct amounts of text
     var firstText = text.slice(0, firstHalf);
     var secondText = ( secondHalf === 0 ) ? "" : text.slice(-secondHalf);
-    return firstText + "..." + secondText;
+    return `${firstText}...${secondText}`;
 }

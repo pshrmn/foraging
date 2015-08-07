@@ -1,7 +1,10 @@
 function topbar(options){
     options = options || {};
-    var holder = options.holder || "body";
+    var pageHolder = options.page || "body";
+    var controlsHolder = options.control || "body";
 
+    var hidden = false;
+    var pageFrame = d3.select(".frame.pages");
     var events = {
         loadPage: function(){
             var pageName = fns.getPage();
@@ -23,29 +26,32 @@ function topbar(options){
         upload: function(){
             controller.upload();
         },
-        sync: function(){
-            controller.startSync();
-        },
         preview: function(){
             controller.preview();
         },
+        sync: function(){
+            controller.startSync();
+        },
         showOptions: function(){
             controller.showOptions();
+        },
+        minMax: function() {
+            hidden = !hidden;
+            this.textContent = hidden ? "+" : "-";
+            pageFrame.classed("hidden", hidden);
+        },
+        close: function(){
+            d3.select(".forager").remove();
+            d3.selectAll(".modal-holder").remove();
+            controller.close();
         }
     };
 
-    var bar = d3.select(holder);
+    /*
+     * UI
+     */
 
-    // global
-    bar.append("button")
-        .text("sync")
-        .classed("green", true)
-        .attr("title", "Get uploaded pages for this domain from the server. " +
-                "Warning: This will override existing pages")
-        .on("click", events.sync);
-
-    // page
-    var pageGroup = bar.append("div")
+    var pageGroup = d3.select(pageHolder)
         .text("Page");
 
     var pageSelect = pageGroup.append("select")
@@ -80,10 +86,40 @@ function topbar(options){
         .attr("title", "Preview will be logged in the console")
         .on("click", events.preview);
 
-    pageGroup.append("button")
-        .text("options")
-        .classed("green", true)
+    var controlButtons = d3.select(controlsHolder);
+
+    controlButtons.append("button")
+        .text("sync")
+        .attr("title", "Get uploaded pages for this domain from the server. " +
+                "Warning: This will override existing pages")
+        .classed({
+            "control": true
+        })
+        .on("click", events.sync);
+
+    controlButtons.append("button")
+        .text("Options")
+        .attr("title", "options")
+        .classed({
+            "control": true
+        })
         .on("click", events.showOptions);
+
+    controlButtons.append("button")
+        .text("-")
+        .attr("title", "minimize/restore the Forager UI")
+        .classed({
+            "control": true
+        })
+        .on("click", events.minMax);
+
+    controlButtons.append("button")
+        .text("×")
+        .attr("title", "Close Forager")
+        .classed({
+            "control": true
+        })
+        .on("click", events.close);
 
     var fns = {
         getPage: function(){

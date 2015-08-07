@@ -24,14 +24,12 @@ body{
     left: 0;
     bottom: 0;
     min-height: 30px;
-    min-width: 1051px;
-    border-top: 1px solid $dark-gray;
-    border-right: 1px solid $dark-gray;
-    background: $white;
+    background: $dark-gray;
     font-size: 16px;
     font-family: sans-serif;
     color: $black;
     text-align: left;
+    border: 10px solid $dark-gray;
     box-sizing: border-box;
 
     *{
@@ -62,9 +60,9 @@ body{
     }
 
     .permanent{
-        padding: 3px 15px;
         background: $dark-gray;
         height: 31px;
+        margin-bottom: 10px;
 
         *{
             color: $light-gray
@@ -118,7 +116,6 @@ body{
 
         div{
             display: inline-block;
-            margin: 0 8px;
         }
 
         select{
@@ -129,11 +126,18 @@ body{
         }
     }
 
+    .frame {
+        display: flex;
+
+        > div:first-child {
+            margin-right: 10px;
+        }
+    }
+
     .page-tree{
         display: inline-block;
         background: $dark-gray;
-        padding: 10px;
-        height: 270px;
+        padding: 0;
 
         svg {
             box-sizing: content-box;
@@ -172,7 +176,7 @@ body{
         box-sizing: border-box;        
         background: $dark-gray;
         width: 500px;
-        padding: 10px;
+        padding: 0;
         display: inline-block;
         vertical-align: top;
 
@@ -456,7 +460,7 @@ body{
     }
 }
 
-#schemaInfo div {
+#pageInfo {
     display: inline-block;
 }
 
@@ -465,17 +469,19 @@ body{
     right: 0;
     top: 0;
     
-}
+    button.control, button.control:hover {
+        background: transparent !important;
+        cursor: pointer !important;
+        color: $white !important;
+        text-align: center !important;
+        margin: 0 !important;
+        border: 0 !important;
+        font-weight: bold !important;
+    }
 
-#close-forager, #min-forager{
-    background: transparent;
-    cursor: pointer;
-    height: 31px;
-    width: 31px;
-    font-size: 2em;
-    color: $white;
-    text-align: center;
-    margin: 0;
+    button.control:hover {
+        background: $black !important;
+    }
 }
 
 .options-modal {

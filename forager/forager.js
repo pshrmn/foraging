@@ -472,9 +472,9 @@ function preview(page) {
 }
 
 
-// Source: src/ui/previewModal.js
-function previewModal(parentElement){
-    var parent = d3.select(parentElement);
+// Source: src/ui/previewView.js
+function PreviewView(options){
+    var parent = d3.select(options.parent || document.body);
 
     function closeModal(){
         holder.classed("hidden", true);
@@ -509,9 +509,11 @@ function previewModal(parentElement){
         .text("close")
         .on("click", closeModal);
 
-    return function(text){
-        holder.classed("hidden", false);
-        pre.text(text);
+    return {
+        show: function(text){
+            holder.classed("hidden", false);
+            pre.text(text);
+        }
     };
 }
 
@@ -532,6 +534,9 @@ function foragerController(){
         fns.dispatch.Tree.draw(page, selector.id);
     }
 
+    /*
+     * generate an id for each selector for lookup
+     */
     function generateIds(){
         var idCount = 0;
         function setId(sel){
@@ -544,8 +549,9 @@ function foragerController(){
         lastId = idCount;
     }
 
-    // get all of the elements that match each selector
-    // and store in object.elements
+    /*
+     * cache elements that are matched by the selectors in a page
+     */
     function getMatches(){
         function match(eles, s){
             if ( !s.elements ) {
@@ -559,6 +565,9 @@ function foragerController(){
         match([document], page);
     }
 
+    /*
+     * reset everything
+     */
     function resetAll(){
         fns.dispatch.Tree.reset();
         fns.dispatch.Page.reset();
@@ -574,8 +583,6 @@ function foragerController(){
             return e.tagName === "SELECT";
         });
     }
-
-    var modal = previewModal(document.body);
 
     var fns = {
         elements: elementSelector(),
@@ -787,7 +794,7 @@ function foragerController(){
             if ( !text ) {
                 console.error("failed to generate preview");
             } else {
-                modal(JSON.stringify(text, null, 2));
+                fns.dispatch.Preview.show(JSON.stringify(text, null, 2));
             }
         },
         setOptions: function(opts){
@@ -923,14 +930,17 @@ function abbreviate(text, max) {
     // splice correct amounts of text
     var firstText = text.slice(0, firstHalf);
     var secondText = ( secondHalf === 0 ) ? "" : text.slice(-secondHalf);
-    return firstText + "..." + secondText;
+    return `${firstText}...${secondText}`;
 }
 
 // Source: src/ui/topbar.js
 function topbar(options){
     options = options || {};
-    var holder = options.holder || "body";
+    var pageHolder = options.page || "body";
+    var controlsHolder = options.control || "body";
 
+    var hidden = false;
+    var pageFrame = d3.select(".frame.pages");
     var events = {
         loadPage: function(){
             var pageName = fns.getPage();
@@ -952,29 +962,32 @@ function topbar(options){
         upload: function(){
             controller.upload();
         },
-        sync: function(){
-            controller.startSync();
-        },
         preview: function(){
             controller.preview();
         },
+        sync: function(){
+            controller.startSync();
+        },
         showOptions: function(){
             controller.showOptions();
+        },
+        minMax: function() {
+            hidden = !hidden;
+            this.textContent = hidden ? "+" : "-";
+            pageFrame.classed("hidden", hidden);
+        },
+        close: function(){
+            d3.select(".forager").remove();
+            d3.selectAll(".modal-holder").remove();
+            controller.close();
         }
     };
 
-    var bar = d3.select(holder);
+    /*
+     * UI
+     */
 
-    // global
-    bar.append("button")
-        .text("sync")
-        .classed("green", true)
-        .attr("title", "Get uploaded pages for this domain from the server. " +
-                "Warning: This will override existing pages")
-        .on("click", events.sync);
-
-    // page
-    var pageGroup = bar.append("div")
+    var pageGroup = d3.select(pageHolder)
         .text("Page");
 
     var pageSelect = pageGroup.append("select")
@@ -1009,10 +1022,40 @@ function topbar(options){
         .attr("title", "Preview will be logged in the console")
         .on("click", events.preview);
 
-    pageGroup.append("button")
-        .text("options")
-        .classed("green", true)
+    var controlButtons = d3.select(controlsHolder);
+
+    controlButtons.append("button")
+        .text("sync")
+        .attr("title", "Get uploaded pages for this domain from the server. " +
+                "Warning: This will override existing pages")
+        .classed({
+            "control": true
+        })
+        .on("click", events.sync);
+
+    controlButtons.append("button")
+        .text("Options")
+        .attr("title", "options")
+        .classed({
+            "control": true
+        })
         .on("click", events.showOptions);
+
+    controlButtons.append("button")
+        .text("-")
+        .attr("title", "minimize/restore the Forager UI")
+        .classed({
+            "control": true
+        })
+        .on("click", events.minMax);
+
+    controlButtons.append("button")
+        .text("×")
+        .attr("title", "Close Forager")
+        .classed({
+            "control": true
+        })
+        .on("click", events.close);
 
     var fns = {
         getPage: function(){
@@ -2136,6 +2179,9 @@ function OptionsView(options) {
         .text("close")
         .on("click", closeAndSaveModal);
 
+    holder.selectAll("*")
+        .classed("no-select", true);
+
     return {
         show: function() {
             holder.classed("hidden", false);
@@ -2175,12 +2221,8 @@ function buildUI(controller){
             "no-select": true
         })
         .html(`<div class="permanent">
-                <div id="schemaInfo"></div>
-                <div id="foragerAlert"></div>
-                <div id="ui-buttons">
-                    <div id="min-forager">-</div>
-                    <div id="close-forager">&times;</div>
-                </div>
+                <div id="pageInfo"></div>
+                <div id="ui-buttons"></div>
             </div>
             <div class="frame pages">
                 <div class="views"></div>
@@ -2188,34 +2230,12 @@ function buildUI(controller){
             </div>`
         );
 
-    var pageFrame = d3.select(".frame.pages");
-    var hidden = false;
-    var existingStyle = getComputedStyle(document.body);
-    var initialMargin = existingStyle.marginBottom;
-    document.body.style.marginBottom = "500px";
-
-    var events = {
-        minMax: function() {
-            hidden = !hidden;
-            this.textContent = hidden ? "+" : "-";
-            pageFrame.classed("hidden", hidden);
-        },
-        close: function(){
-            holder.remove();
-            document.body.style.marginBottom = initialMargin;
-            controller.close();
-        }
-    };
-
     var topbarFns = topbar({
-        holder: "#schemaInfo"
+        page: "#pageInfo",
+        control: "#ui-buttons"
     });
 
-    var minmax = d3.select("#min-forager")
-        .on("click", events.minMax);
-
-    var closer = d3.select("#close-forager")
-        .on("click", events.close);
+    
 
     var viewHolder = holder.select(".views");
     var views = {};
@@ -2282,6 +2302,10 @@ function buildUI(controller){
             controller.dispatch[name] = optionFn(options);
             fns.noSelect();
         },
+        addPreview: function(previewFn, name, options){
+            options = options || {};
+            controller.dispatch[name] = previewFn(options);
+        },
         showView: showView,
         setPages: topbarFns.setPages,
         getPage: topbarFns.getPage,
@@ -2303,5 +2327,6 @@ ui.addViews([
 
 ui.addTree(TreeView, "Tree", {});
 ui.addOptions(OptionsView, "Options", {});
+ui.addPreview(PreviewView, "Preview", {});
 chromeLoadPages();
 chromeLoadOptions();

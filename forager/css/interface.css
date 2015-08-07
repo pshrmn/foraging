@@ -11,14 +11,12 @@ body {
   left: 0;
   bottom: 0;
   min-height: 30px;
-  min-width: 1051px;
-  border-top: 1px solid #323033;
-  border-right: 1px solid #323033;
-  background: white;
+  background: #323033;
   font-size: 16px;
   font-family: sans-serif;
   color: black;
   text-align: left;
+  border: 10px solid #323033;
   box-sizing: border-box;
   /* lots of sites like to customize how various inputs look, 
   so this is trying to keep these close to (chrome) default css */ }
@@ -37,9 +35,9 @@ body {
   .forager ul {
     list-style: none; }
   .forager .permanent {
-    padding: 3px 15px;
     background: #323033;
-    height: 31px; }
+    height: 31px;
+    margin-bottom: 10px; }
     .forager .permanent * {
       color: #ced1de; }
     .forager .permanent button, .forager .permanent select, .forager .permanent option {
@@ -75,18 +73,20 @@ body {
       border-style: inset !important;
       color: black !important; }
     .forager .permanent div {
-      display: inline-block;
-      margin: 0 8px; }
+      display: inline-block; }
     .forager .permanent select {
       width: 100px;
       min-height: 22px;
       height: 22px;
       border-radius: 2px; }
+  .forager .frame {
+    display: flex; }
+    .forager .frame > div:first-child {
+      margin-right: 10px; }
   .forager .page-tree {
     display: inline-block;
     background: #323033;
-    padding: 10px;
-    height: 270px; }
+    padding: 0; }
     .forager .page-tree svg {
       box-sizing: content-box;
       padding: 15px;
@@ -111,7 +111,7 @@ body {
     box-sizing: border-box;
     background: #323033;
     width: 500px;
-    padding: 10px;
+    padding: 0;
     display: inline-block;
     vertical-align: top; }
     .forager .views .view {
@@ -299,23 +299,23 @@ body {
     border-style: inset !important;
     color: buttontext !important; }
 
-#schemaInfo div {
+#pageInfo {
   display: inline-block; }
 
 #ui-buttons {
   position: absolute;
   right: 0;
   top: 0; }
-
-#close-forager, #min-forager {
-  background: transparent;
-  cursor: pointer;
-  height: 31px;
-  width: 31px;
-  font-size: 2em;
-  color: white;
-  text-align: center;
-  margin: 0; }
+  #ui-buttons button.control, #ui-buttons button.control:hover {
+    background: transparent !important;
+    cursor: pointer !important;
+    color: white !important;
+    text-align: center !important;
+    margin: 0 !important;
+    border: 0 !important;
+    font-weight: bold !important; }
+  #ui-buttons button.control:hover {
+    background: black !important; }
 
 .options-modal {
   color: #323033; }
