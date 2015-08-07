@@ -78,7 +78,10 @@ body {
       display: inline-block;
       margin: 0 8px; }
     .forager .permanent select {
-      width: 100px; }
+      width: 100px;
+      min-height: 22px;
+      height: 22px;
+      border-radius: 2px; }
   .forager .page-tree {
     display: inline-block;
     background: #323033;

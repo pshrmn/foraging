@@ -1986,25 +1986,61 @@ function TreeView(options){
 // Source: src/ui/optionsView.js
 function OptionsView(options) {
     options = options || {};
+    // list of attributes that can be individually ignored. class, id, and type
+    // can most likely be checked. src and href probably shouldn't be ignored
+    // but perhaps there could be a reason to ignore them, so the are included
     var ignorable = [
         "class", "id", "src", "href", "style", "alt", "title", "value",
         "target", "tabindex", "type"
     ];
+    // list of event related attributes. These are always ignored
     var eventAttrs = [
         "onblur", "onchange", "onclick", "onfocus", "onkeydown", "onkeypress",
         "onkeyup", "onload", "onmousedown", "onmouseout", "onmouseover",
         "onmouseup", "onreset", "onselect", "onsubmit", "onunload"
     ];
+    // list of table attributes that can be ignored en masse
     var tableAttrs = [
         "axis", "cellpadding", "cellspacing", "char", "charoff", "colspan",
         "frame", "headers", "nowrap", "rowspan", "rule", "scope", "valign"
     ];
+    // list of style attributes that can be ignored en masse
     var styleAttrs = [
         "align", "background", "bgcolor", "border", "color", "frameborder",
         "height", "marginheight", "marginwidth", "maxlength", "width"
     ];
 
-    var parent = d3.select(options.parent || document.body);
+    /*
+     * currentIgnored is an object of string-boolean key-value pairs
+     * where the string is the name of an attribute, and if it is true
+     * that attribute should be ignored
+     * the object is updated whenever the radio buttons are toggled
+     */
+    var currentIgnored = {};
+    eventAttrs.forEach(function(attr){
+        currentIgnored[attr] = true;
+    });
+
+    /*
+     * events
+     */
+    function toggleIgnore(d, i){
+        currentIgnored[d] = !currentIgnored[d];
+    }
+
+    function toggleTable(){
+        var on = tableCheckbox.property("checked");
+        tableAttrs.forEach(function(attr){
+            currentIgnored[attr] = on;
+        });
+    }
+
+    function toggleStyle(){
+        var on = styleCheckbox.property("checked");
+        styleAttrs.forEach(function(attr){
+            currentIgnored[attr] = on;
+        });
+    }
 
     function closeAndSaveModal(){
         var opts = {};
@@ -2021,6 +2057,12 @@ function OptionsView(options) {
         chromeSaveOptions(opts);
         holder.classed("hidden", true);
     }
+
+    /*
+     * UI
+     */
+    var parent = d3.select(options.parent || document.body);
+
 
     var holder = parent.append("div")
         .classed({
@@ -2067,7 +2109,8 @@ function OptionsView(options) {
                 .classed({
                     "option-radio": true
                 })
-                .property("checked", false);
+                .property("checked", false)
+                .on("change", toggleIgnore);
 
     groupAttrs.append("h3")
         .text("Hide Related Groups of Attributes");
@@ -2079,13 +2122,15 @@ function OptionsView(options) {
         .text("Table Attributes")
         .attr("title", tableAttrs.join(", "))
         .append("input")
-            .attr("type","checkbox");
+            .attr("type","checkbox")
+            .on("change", toggleTable);
 
     var styleCheckbox = groupAttrs.append("div").append("label")
         .text("Style Attributes")
         .attr("title", styleAttrs.join(", "))
         .append("input")
-            .attr("type","checkbox");
+            .attr("type","checkbox")
+            .on("change", toggleStyle);
 
     var close = modal.append("button")
         .classed("no-select", true)
@@ -2100,35 +2145,24 @@ function OptionsView(options) {
             ignoreOptions.each(function(d, i) {
                 d3.select(this).property("checked", opts.attrs[d] !== undefined);
             });
+            for ( var key in opts.attrs) {
+                currentIgnored[key] = true;
+            }
             if ( opts.table ) {
                 tableCheckbox.property("checked", true);
+                tableAttrs.forEach(function(attr){
+                    currentIgnored[attr] = true;
+                });
             }
             if ( opts.style ) {
                 styleCheckbox.property("checked", true);
+                styleAttrs.forEach(function(attr){
+                    currentIgnored[attr] = true;
+                });
             }
         },
         ignoredAttributes: function() {
-            // automatically ignore the on___ functions
-            var ignored = {};
-            eventAttrs.forEach(function(attr){
-                ignored[attr] = true;
-            });
-            ignoreOptions.each(function(d){
-                if ( this.checked ) {
-                    ignored[d] = true;
-                }
-            });
-            if ( tableCheckbox.property("checked") ) {
-                tableAttrs.forEach(function(attr){
-                    ignored[attr] = true;
-                });
-            }
-            if ( styleCheckbox.property("checked") ) {
-                styleAttrs.forEach(function(attr){
-                    ignored[attr] = true;
-                });
-            }
-            return ignored;
+            return currentIgnored;
         }
     };
 }
