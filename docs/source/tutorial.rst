@@ -1,7 +1,7 @@
 Tutorial
 ========
 
-The following tutorial shows how to get a list of submissions on a subreddit homepage on reddit.com.
+The following tutorial shows how to get a list of submissions on a subreddit homepage on reddit.com. This is purely for demonstration since the `PRAW <https://praw.readthedocs.org/en/v3.1.0/>`_ Python library exists and is much more ideal for accessing data from reddit.
 
 Click the Forager button to the right of the omnibox to open Forager
 
@@ -13,7 +13,7 @@ When opening Forager, you will get an empty interface.
 Before You Get Started
 ^^^^^^^^^^^^^^^^^^^^^^
 
-One thing to keep in mind is that the page that you're seeing isn't necessarily the page that `Gatherer <https://github.com/psherman/gatherer>`_ will see. :code:`Gatherer` will be receiving the html of the site as a non-logged in user, as well as having no extensions modifying the page. You should log out and disable any extensions that are running (eg. Reddit Enhancement Suite) if you want to see what :code:`Gatherer` will.
+One thing to keep in mind is that the page that you're seeing isn't necessarily the page that `Gatherer <https://github.com/psherman/gatherer>`_ (the library used to gather data using the rules we are creating) will see. :code:`Gatherer` will be receiving the html of the site as a non-logged in user, as well as having no extensions modifying the page. You should log out and disable any extensions that are running (eg. Reddit Enhancement Suite) if you want to see what :code:`Gatherer` will.
 
 Create Page
 ^^^^^^^^^^^^
