@@ -28,7 +28,7 @@ Arguments:
     cache = Cache("cache_folder")
 
 ###Fetch
-A fetcher takes a url and return the html contents of the corresponding web page. Requests can either be static (default) or dynamic. In order to make dynamic requests, the `make_dynamic` function needs to be called.
+A fetcher takes a url and return the DOM (as parsed by `lxml`) of the corresponding web page. Requests can either be static (default) or dynamic. In order to make dynamic requests, the `make_dynamic` function needs to be called on the fetcher.
 
 Arguments:
 
@@ -42,12 +42,12 @@ Arguments:
     fetch = Fetch(headers={"User-Agent": "custom-gatherer-user-agent"})
 
 ######get(url, dynamic=False)
-Takes a url and returns an lxml html element if the request was successful, otherwise `None`
+Takes a url and if the request was successful it returns an lxml html element, otherwise it returns `None`
 
     fetch.get("http://www.example.com")
 
 ######make_dynamic(phantom_path, js_path)
-This requires PhantomJS and a Phantomjs script that logs the page's html. PhantomJS can be downloaded from its [website](http://phantomjs.org/). The code in [html_text.js](/html_text.js) should be downloaded and placed in your project folder. Calling this allows get requests using PhantomJS to be made. If either path does not exist, this will raise a `ValueError`. To make dynamic requests, provide `True` as the second argument in a `get` call.
+`make_dynamic` sets up the fetcher to be able to make requests to pages that have data you want to collect that is dynamically loaded. This requires PhantomJS and a Phantomjs script that logs the page's html. PhantomJS can be downloaded from its [website](http://phantomjs.org/). The code in [html_text.js](/html_text.js) should be downloaded and placed in your project folder. Calling this allows get requests using PhantomJS to be made by passing a `dynamic=True` argument in your `get` calls. If either path does not exist, this will raise a `ValueError`.
 
     f.make_dynamic("phantomjs/phantomjs.exe", "html_text.js")
 
@@ -61,8 +61,9 @@ Pages are collections of rules to gather data from elements in a web page. For a
 Usage:
 
     import json
-    from gatherer import Page
+    from gatherer import Page, Fetch
 
+    f = Fetch()
     with open("page.json") as fp:
         data = json.load(fp)
     try:
@@ -72,4 +73,7 @@ Usage:
 
 Use the `Fetch` object to get the data for the page by calling `get` with the `url` of the desired page.
 
-    data = p.get(url)
+    from gatherer import Fetch
+    f = Fetch()
+    dom = f.get(url)
+    data = p.gather(dom)

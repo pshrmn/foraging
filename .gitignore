@@ -4,6 +4,9 @@ venv
 /rules
 cache/
 docs/build
+built
+dist
+gatherer.egg-info
 
 phantomjs
 ghostdriver.log
