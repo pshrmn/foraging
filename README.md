@@ -2,6 +2,8 @@
 
 A Chrome extension to determine how to gather data from a page. 
 
+##[Tutorial](http://www.pshrmn.com/tutorials/forager/)
+
 ###Format
 
 #####Rule
