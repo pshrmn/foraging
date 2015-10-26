@@ -29,20 +29,22 @@ f = Fetch(cache=c)
 
 with open("pages/stadiums.json") as fp:
     stadium_json = json.load(fp)
-    stadiums = Page.from_json(stadium_json, f)
+    stadiums = Page.from_json(stadium_json)
 
 with open("pages/coordinates.json") as fp:
     coord_json = json.load(fp)
-    coords = Page.from_json(coord_json, f)
+    coords = Page.from_json(coord_json)
 
 
 # get the basic stadium data
-stadium_data = stadiums.get('http://en.wikipedia.org/wiki/List_of_current_National_Football_League_stadiums')
+stadium_dom = f.get("http://en.wikipedia.org/wiki/List_of_current_National_Football_League_stadiums")
+stadium_data = stadiums.gather(stadium_dom)
 
 stadium_coords = {}
 
 for stadium in stadium_data['stadiums']:
-    c = coords.get(stadium['url'])
+    dom = f.get(stadium["url"])
+    c = coords.gather(dom)
     c_dict = {key: pretty_coords(val) for key, val in c.items()}
     for team in stadium['teams']:
         name = team['name'].split(" ")[-1].lower()

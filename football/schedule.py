@@ -8,12 +8,12 @@ with open("pages/schedule.json") as fp:
 c = Cache("cache")
 f = Fetch(cache=c)
 
-schedule = Page.from_json(schedule_json, f)
+schedule = Page.from_json(schedule_json)
 
 BASE_URL = "http://www.nfl.com/schedules/2015/REG{}"
 
 for week in range(1, 18):
-    url = BASE_URL.format(week)
-    s = schedule.get(url)
+    dom = f.get(BASE_URL.format(week))
+    s = schedule.gather(dom)
     with open("data/week{}.json".format(week), "w") as fp:
         json.dump(s, fp, indent=2)

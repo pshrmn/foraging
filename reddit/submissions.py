@@ -6,10 +6,10 @@ from gatherer import Page, Fetch
 
 os.makedirs("data", exist_ok=True)
 with open("submissions.json") as fp:
-    data = json.load(fp)
+    sub_json = json.load(fp)
 
 f = Fetch(headers={"User-Agent": "gatherer"})
-p = Page.from_json(data, f)
+p = Page.from_json(sub_json)
 
 
 def fetch_and_save(filename, subreddit=None):
@@ -17,10 +17,12 @@ def fetch_and_save(filename, subreddit=None):
         url = "http://www.reddit.com"
     else:
         url = "http://www.reddit.com/r/{}".format(subreddit)
-    data = p.get(url)
-    path = "data/{}".format(filename)
-    with open(path, "w") as fp:
-        json.dump(data, fp)
+    dom = f.get(url)
+    if dom is not None:
+        data = p.gather(dom)
+        path = "data/{}".format(filename)
+        with open(path, "w") as fp:
+            json.dump(data, fp)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
