@@ -209,9 +209,9 @@ function foragerController(){
                     optionsName = "options";
                 }
                 var opts = newSelector("option", {
-                    type: "name",
+                    type: "all",
                     value: optionsName
-                });
+                }, false);
                 opts.id = ++lastId;
                 opts.elements = fns.elements(sel.elements, opts.selector, opts.spec);
                 sel.children.push(opts);
