@@ -1,5 +1,5 @@
-describe("attributes", function(){
-    it("returns an object representing an element's attributes", function(){
+describe("attributes", () => {
+    it("returns an object representing an element's attributes", () => {
         var ele = document.createElement("img");
         var attrs = {
             "class": "link",
@@ -15,7 +15,7 @@ describe("attributes", function(){
         }
     });
 
-    it("includes text if non-empty", function(){
+    it("includes text if non-empty", () => {
         var ele = document.createElement("a");
         var text = "this is a test";
         ele.textContent = text;
@@ -23,7 +23,7 @@ describe("attributes", function(){
         expect(mappedAttr.text).toEqual(text);
     });
 
-    it("does not include empty text", function(){
+    it("does not include empty text", () => {
         var ele = document.createElement("a");
         var mappedAttr = attributes(ele);
         expect(mappedAttr.text).toBeUndefined();

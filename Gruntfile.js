@@ -64,8 +64,7 @@ module.exports = function(grunt){
     grunt.loadNpmTasks('grunt-contrib-sass');
     grunt.loadNpmTasks('grunt-contrib-jasmine');
     grunt.loadNpmTasks('grunt-contrib-concat');
-    
-    grunt.registerTask('default', ['sass', 'concat', 'jshint']);
 
+    grunt.registerTask('default', ['sass', 'concat', 'jshint']);
     grunt.registerTask('test', ['jasmine']);
 }

@@ -130,7 +130,7 @@ body {
           padding: 5px 0; }
         .forager .views .view .workarea p {
           margin: 2px 0; }
-        .forager .views .view .workarea input[type=radio] {
+        .forager .views .view .workarea input[type=radio], .forager .views .view .workarea input[type=checkbox] {
           margin-right: 5px !important;
           margin-left: 2px !important; }
         .forager .views .view .workarea .selector {
@@ -151,7 +151,8 @@ body {
         margin-right: 5px;
         border: 1px solid #ced1de;
         border-radius: 5px;
-        cursor: pointer; }
+        cursor: pointer;
+        text-transform: none; }
       .forager .views .view .on,
       .forager .views .view .tag.on {
         background: #76b85c; }
@@ -172,7 +173,9 @@ body {
           display: inline-block; }
         .forager .views .view .form input[type=text] {
           width: 150px;
-          border-width: 0 0 1px; }
+          border-width: 0 0 1px;
+          border-style: solid;
+          border-color: #323033; }
         .forager .views .view .form .buttons {
           position: absolute;
           bottom: 0;
