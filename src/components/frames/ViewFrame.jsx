@@ -3,6 +3,15 @@ import React from "react";
 import { PosButton, NegButton } from "../Inputs";
 
 export default React.createClass({
+  addChild: function(event) {
+    console.error("not yet implemented");
+  },
+  addRule: function(event) {
+    console.error("not yet implemented");
+  },
+  remove: function(event) {
+    console.error("not yet implemented");
+  },
   render: function() {
     let { page } = this.props;
     if ( page === undefined ) {
@@ -30,6 +39,10 @@ export default React.createClass({
           <h2>{selector}</h2>
           <p>{description}</p>
           {rulesList}
+
+          <PosButton text="Add Child" click={this.addChild} />
+          <PosButton text="Add Rule" click={this.addRule} />
+          <NegButton text="Remove" click={this.remove} />
         </div>
       </div>
     );

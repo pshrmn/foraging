@@ -1,4 +1,4 @@
-describe("utility functions", function(){
+/*describe("utility functions", function(){
     describe("clearClass", function(){
         it("removes class from all elements with it", function(){
             var holder = document.createElement("div"),
@@ -46,3 +46,4 @@ describe("utility functions", function(){
 
 });
 
+*/

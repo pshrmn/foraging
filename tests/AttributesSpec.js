@@ -1,4 +1,4 @@
-describe("attributes", function(){
+/*describe("attributes", function(){
     it("returns an object representing an element's attributes", function(){
         var ele = document.createElement("img");
         var attrs = {
@@ -29,3 +29,4 @@ describe("attributes", function(){
         expect(mappedAttr.text).toBeUndefined();
     });
 });
+*/

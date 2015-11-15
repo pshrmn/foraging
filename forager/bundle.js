@@ -609,6 +609,15 @@
 	exports.default = _react2.default.createClass({
 	  displayName: "ViewFrame",
 
+	  addChild: function addChild(event) {
+	    console.error("not yet implemented");
+	  },
+	  addRule: function addRule(event) {
+	    console.error("not yet implemented");
+	  },
+	  remove: function remove(event) {
+	    console.error("not yet implemented");
+	  },
 	  render: function render() {
 	    var page = this.props.page;
 
@@ -652,7 +661,10 @@
 	          null,
 	          description
 	        ),
-	        rulesList
+	        rulesList,
+	        _react2.default.createElement(_Inputs.PosButton, { text: "Add Child", click: this.addChild }),
+	        _react2.default.createElement(_Inputs.PosButton, { text: "Add Rule", click: this.addRule }),
+	        _react2.default.createElement(_Inputs.NegButton, { text: "Remove", click: this.remove })
 	      )
 	    );
 	  }
