@@ -23,6 +23,7 @@ body{
     position: fixed;
     left: 0;
     bottom: 0;
+    min-width: 700px;
     min-height: 30px;
     background: $dark-gray;
     font-size: 16px;
@@ -59,7 +60,7 @@ body{
         list-style: none;
     }
 
-    .permanent{
+    .controls{
         background: $dark-gray;
         height: 31px;
         margin-bottom: 10px;
@@ -86,7 +87,7 @@ body{
             min-width: initial !important;
             text-transform: capitalize !important;
 
-            &.green, &.green:active, &.green:focus{
+            &.pos, &.pos:active, &.pos:focus{
                 background: $dark-gray;
                 color: $green !important;
                 border-color: $green;
@@ -98,13 +99,13 @@ body{
                 color: $dark-gray !important;
             }
 
-            &.red, &.red:active, &.red:focus{
+            &.neg, &.neg:active, &.neg:focus{
                 background: $dark-gray;
                 border-color: $red;
                 color: $red !important;
             }
 
-            &.red:hover{
+            &.neg:hover{
                 background: $red;
                 color: $dark-gray !important;
             }
@@ -127,18 +128,18 @@ body{
         }
     }
 
-    .frame {
+    .workspace {
         display: flex;
-
-        > div:first-child {
-            margin-right: 10px;
-        }
     }
 
-    .page-tree{
-        display: inline-block;
-        background: $dark-gray;
-        padding: 0;
+    .frames, .graph {
+        background: $white;
+        box-sizing: border-box;
+        margin-right: 3px;
+        padding: 5px;
+    }
+
+    .graph {
 
         svg {
             box-sizing: content-box;
@@ -173,130 +174,16 @@ body{
         }
     }
 
-    .views{
-        box-sizing: border-box;        
-        background: $dark-gray;
-        width: 500px;
-        padding: 0;
-        display: inline-block;
+    .frames {
+        width: 400px;
         vertical-align: top;
 
-        .view{
-            height: 250px;
-            display: none;
+        .frame {
             text-align: left;
             width: 100%;
             background: $white;
-            padding: 15px;
+            padding: 5px;
             position: relative;
-
-            .workarea{
-                height: 80%;
-                overflow-y: scroll;
-
-                > div {
-                    padding: 5px 0;
-                }
-
-                p {
-                    margin: 2px 0;
-                }
-
-                input[type=radio] {
-                    margin-right: 5px !important;
-                    margin-left: 2px !important;
-                }
-
-                .selector {
-                    font-size: 1.25em;
-                }
-
-                .name {
-                    font-size: 1.1em;
-                    margin-right: 5px;
-                }
-            }
-
-            > *{
-                vertical-align: top;
-                display: inline-block;
-            }
-
-            .tag{
-                background: $red;
-                display: inline-block;
-                padding-top: 2px;
-                padding-right: 5px;
-                padding-bottom: 2px;
-                padding-left: 5px;
-                margin-right: 5px;
-                border: 1px solid $light-gray;
-                border-radius: 5px;
-                cursor: pointer;
-            }
-
-            .on,
-            .tag.on{
-                background: $green;
-            }
-
-            .form{
-                position: relative;
-                height: 100%;
-                width: 100%;
-                > p {
-                    margin: 0;
-                    line-height: 1.25em;
-                }
-
-                input.error{
-                    border-color: $red;
-                    border-style: solid;
-                }
-
-                span.error{
-                    border-bottom: 1px solid $red;
-                }
-
-                .radio label{
-                    margin: 0 5px 0 15px;
-                    display: inline-block;
-                }
-                
-                input[type=text]{
-                    width: 150px;
-                    border-width: 0 0 1px;
-                }
-
-                .buttons{
-                    position: absolute;
-                    bottom: 0;
-                    height: 20%;
-
-                   .errors {
-                        margin: 0;
-                        padding: 0;
-                        color: $red;
-                        height: 50%;
-                    }
-                }
-
-                button.add-child, button.add-rule {
-                    background: $blue;
-                    border-color: $blue;
-                }
-
-                button.remove-selector {
-                    background: $red;
-                    border-color: $red;
-                }
-                
-            }
-
-        }
-
-        .view.active{
-            display: block;
         }
     }
 
@@ -357,10 +244,10 @@ body{
     }
 
     button {
-        background: $green;
+        background: $light-gray;
         color: $black !important;
         border-radius: 3px;
-        border: 2px outset $green;
+        border: 2px outset $light-gray;
         box-shadow: none !important;
         cursor: pointer !important;
         font-weight: normal !important;
@@ -370,8 +257,8 @@ body{
         text-transform: capitalize !important;
 
         &:hover, &:active, &:focus{
-            background: $green;
-            border-color: $green;
+            background: $light-gray;
+            border-color: $light-gray;
             color: $black !important;
         }
 
@@ -391,6 +278,31 @@ body{
         border: 1px solid #a9a9a9 !important;
         background: $white !important;
         margin: 2px !important;
+    }
+
+    
+    .page-controls {
+        display: inline-block;
+    }
+
+    .app-controls {
+        position: absolute;
+        right: 0;
+        top: 0;
+        
+        button, button:hover {
+            background: transparent !important;
+            cursor: pointer !important;
+            color: $white !important;
+            text-align: center !important;
+            margin: 0 !important;
+            border: 0 !important;
+            font-weight: bold !important;
+        }
+
+        button:hover {
+            background: $black !important;
+        }
     }
 }
 
@@ -458,30 +370,6 @@ body{
     button:active{
         border-style: inset !important;
         color: buttontext !important;
-    }
-}
-
-#pageInfo {
-    display: inline-block;
-}
-
-#ui-buttons {
-    position: absolute;
-    right: 0;
-    top: 0;
-    
-    button.control, button.control:hover {
-        background: transparent !important;
-        cursor: pointer !important;
-        color: $white !important;
-        text-align: center !important;
-        margin: 0 !important;
-        border: 0 !important;
-        font-weight: bold !important;
-    }
-
-    button.control:hover {
-        background: $black !important;
     }
 }
 

@@ -1,9 +1,9 @@
-function preview(page) {
-    /**
+export const preview = page => {
+    /*
      * Given a parent element, get all children that match the selector
      * Return data based on selector's type (index or name)
      */
-    function getElement(selector, parent) {
+    let getElement = (selector, parent) => {
         var elements = parent.querySelectorAll(selector.selector);
         var value = selector.spec.value;
         switch ( selector.spec.type ) {
@@ -25,11 +25,11 @@ function preview(page) {
         }
     }
 
-    /**
+    /*
      * Get data for each rule and each child. Merge the child data into the
      * rule data.
      */
-    function getElementData(selector, element){
+    let getElementData = (selector, element) => {
         var data = getRuleData(selector.rules, element);
         var childData = getChildData(selector.children, element);
         if ( !childData ) {
@@ -41,7 +41,7 @@ function preview(page) {
         return data;
     }
 
-    function getChildData(children, element) {
+    let getChildData = (children, element) => {
         var data = {};
         children.some(function(child){
             var childData = getElement(child, element);
@@ -59,7 +59,7 @@ function preview(page) {
 
     var intRegEx = /\d+/;
     var floatRegEx = /\d+(\.\d+)?/;
-    function getRuleData(rules, element) {
+    let getRuleData = (rules, element) => {
         var data = {};
         rules.forEach(function(rule){
             var val;

@@ -1,0 +1,107 @@
+import React from "react";
+
+import { PosButton, NegButton, NeutralButton } from "./Inputs";
+
+import { legalName } from "../helpers";
+import { createPage } from "../business/page";
+
+export default React.createClass({
+  render: function() {
+    let { pages, index, loadPage, addPage, removePage, renamePage } = this.props;
+    return (
+      <div className="controls">
+        <PageControls pages={pages}
+                      index={index}
+                      loadPage={loadPage}
+                      addPage={addPage}
+                      removePage={removePage}
+                      renamePage={renamePage} />
+        <GeneralControls />
+      </div>
+    );
+  }
+});
+
+let PageControls = React.createClass({
+  getName: function() {
+    let name = window.prompt("Page Name:\nCannot contain the following characters: < > : \" \ / | ? * ");
+    if ( !legalName(name) ) {
+      console.error("bad name", name);
+      return;
+    }
+    return name;
+  },
+  addHandler: function(event) {
+    event.preventDefault();
+    let name = this.getName();
+    if ( name !== undefined ) {
+      // report the new name
+      let newPage = createPage(name);
+      this.props.addPage(newPage);
+    }
+  },
+  renameHandler: function(event) {
+    event.preventDefault();
+    let curr = this.props.pages[this.props.index];
+    let name = this.getName();
+    if ( name !== undefined && name !== curr.name) {
+      // set the new name
+      this.props.renamePage(name);
+    }
+  },
+  deleteHandler: function(event) {
+    event.preventDefault();
+    // report the current page index
+    this.props.removePage();
+  },
+  uploadHandler: function(event) {
+    event.preventDefault();
+    console.error("not yet implemented");
+  },
+  previewHandler: function(event) {
+    event.preventDefault();
+    console.error("not yet implemented");
+  },
+  loadPage: function(event) {
+    this.props.loadPage(event.target.value);
+  },
+  render: function() {
+    let { pages, index } = this.props;
+    let options = pages.map((p, i) => {
+      let text = p === undefined ? "" : p.name;
+      return (
+        <option key={i} value={i}>{text}</option>
+      );
+    });
+    return (
+      <div className="page-controls">
+        Page: <select value={index}
+                      onChange={this.loadPage}>{
+                options}
+              </select>
+        <PosButton click={this.addHandler} text="Add" />
+        <PosButton click={this.renameHandler} text="Rename" />
+        <NegButton click={this.deleteHandler} text="Delete" />
+        <PosButton click={this.uploadHandler} text="Upload" />
+        <PosButton click={this.previewHandler} text="Preview" />
+      </div>
+    );
+  }
+});
+
+let GeneralControls = React.createClass({
+  handle: function(event){
+    // do nothing
+    event.preventDefault();
+    console.error("not yet implemented");
+  },
+  render: function() {
+    return (
+      <div className="app-controls">
+        <NeutralButton click={this.handle} text="Sync" />
+        <NeutralButton click={this.handle} text="Options" />
+        <NeutralButton click={this.handle} text={String.fromCharCode(215)} />
+      </div>
+    );
+  }
+});

@@ -1,7 +1,7 @@
 /* functions that are related to the extension */
 
 // save all of the pages for the site
-function chromeSave(pages) {
+export const chromeSave = pages => {
     chrome.storage.local.get('sites', function saveSchemaChrome(storage){
         var host = window.location.hostname;
         storage.sites[host] = cleanPages(pages);
@@ -10,12 +10,12 @@ function chromeSave(pages) {
 }
 
 // takes a data object to be uploaded and passes it to the background page to handle
-function chromeUpload(data) {
+export const chromeUpload = data => {
     data.page = JSON.stringify(cleanPage(data.page));
     chrome.runtime.sendMessage({type: 'upload', data: data});
 }
 
-function chromeSync(domain) {
+export const chromeSync = domain => {
     chrome.runtime.sendMessage({type: 'sync', domain: domain}, function(response){
         if ( response.error ) {
             return;
@@ -35,7 +35,7 @@ urls is saved as an object for easier lookup, but converted to an array of the k
 
 If the site object exists for a host, load the saved rules
 */
-function chromeLoadPages() {
+export const chromeLoadPages = () => {
     chrome.storage.local.get("sites", function setupHostnameChrome(storage){
         var host = window.location.hostname;
         var pages = storage.sites[host] || {};
@@ -43,12 +43,12 @@ function chromeLoadPages() {
     });
 }
 
-function chromeLoadOptions() {
+export const chromeLoadOptions = () => {
     chrome.storage.local.get("options", function loadOptionsChrome(storage){
         controller.setOptions(storage.options);
     });
 }
 
-function chromeSaveOptions(opts) {
+export const chromeSaveOptions = opts => {
     chrome.storage.local.set({"options": opts});
 }

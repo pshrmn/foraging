@@ -1,6 +1,6 @@
 /*
-Forager background page
-*/
+ * Forager background page
+ */
 
 chrome.storage.local.get(null, function(storage) {
     if ( !storage.sites ) {
@@ -14,8 +14,8 @@ chrome.storage.local.get(null, function(storage) {
 // inject forager's interface when the browserAction icon is clicked
 chrome.browserAction.onClicked.addListener(function(tab) {
     chrome.tabs.insertCSS(null, {file: "css/interface.css"});
-    chrome.tabs.executeScript(null, {file: "lib/d3.js"}, function(){
-        chrome.tabs.executeScript(null, {file: "forager.js"});
+    chrome.tabs.executeScript(null, {file: "lib/libs.js"}, function(){
+        chrome.tabs.executeScript(null, {file: "bundle.js"});
     });
 });
 
