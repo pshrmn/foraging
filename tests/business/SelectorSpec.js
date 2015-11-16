@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { jsdom } from "jsdom";
 
-import { select, count, parts } from "../src/business/selector";
+import { select, count, parts } from "../../src/business/selector";
 
 let doc = jsdom(`<!doctype html>
   <html>
@@ -22,6 +22,7 @@ global.document = doc;
 global.window = win;
 
 describe("selector", () => {
+
   describe("select", () => {
     it("matches all child elements, ignores .no-select elements", () => {
       let divs = document.querySelectorAll("div");
@@ -68,8 +69,5 @@ describe("selector", () => {
       let tags= parts(element);
       expect(tags).to.eql(["span"]);
     });
-
-
-
   });
 });

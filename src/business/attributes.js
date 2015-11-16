@@ -1,12 +1,17 @@
 // return an object mapping attribute names to their value
 // for all attributes of an element
-function attributes(element, ignored) {
-    var attrMap = {};
-    ignored = ignored || {};
-    [].slice.call(element.attributes).forEach(function(attr) {
-        if ( ignored[attr.name] ) {
+export const attributes = (element, ignored = {}) => {
+    let attrMap = {};
 
-            return;
+    // include text if it exists
+    let text = element.textContent.trim();
+    if ( text !== "" ) {
+        attrMap.text = text;
+    }
+
+    return [].slice.call(element.attributes).reduce((stored, attr) => {
+        if ( ignored[attr.name] ) {
+            return stored;
         }
         // don't include current-selector class
         if ( attr.name === "class" ) {
@@ -14,14 +19,8 @@ function attributes(element, ignored) {
         }
         // don't include empty attrs
         if ( attr.value !== "" ) {
-            attrMap[attr.name] = attr.value;
+            stored[attr.name] = attr.value
         }
-    });
-
-    // include text if it exists
-    var text = element.textContent.trim();
-    if ( text !== "" ) {
-        attrMap.text = text;
-    }
-    return attrMap;
+        return stored;
+    }, attrMap);
 }

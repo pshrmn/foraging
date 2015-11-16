@@ -1,6 +1,6 @@
 {
   "name": "Forager",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "license": "MIT",
   "author": "Paul Sherman",
   "repository": {
@@ -12,7 +12,7 @@
     "build": "npm run webpack & npm run css",
     "css": "npm run sass & npm run autoprefix",
     "sass": "node-sass scss/** -o forager/css/**",
-    "test": "mocha tests --compilers js:babel-core/register",
+    "test": "mocha tests --compilers js:babel-core/register --recursive",
     "webpack": "webpack & webpack --config=webpack.config.min.js"
   },
   "devDependencies": {

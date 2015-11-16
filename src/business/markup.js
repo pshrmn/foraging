@@ -1,90 +1,61 @@
-/**
-functions to add classes to elements in the page to indicate they
-can be selected or match a selector
-**/
+/*
+ * highlight
+ * ---------
+ *
+ * @param elements - an array of elements
+ * @param className - the class added to the elements
+ */
+export const highlight = (elements, className) => {
+  [].slice.call(elements).forEach(e => {
+    e.classList.add(className);
+  });
+};
 
-function highlightElements(){
-    var className = "highlighted";
-
-    function highlight(elements){
-        elements.forEach(function(e){
-            e.classList.add(className);
-        });
-    }
-
-    highlight.remove = function(){
-        var elements = [].slice.call(document.getElementsByClassName(className));
-        elements.forEach(function(e){
-            e.classList.remove(className);
-        });
-    };
-
-    highlight.cssClass = function(name){
-        className = name;
-        return highlight;
-    };
-
-    return highlight;
+/*
+ * unhighlight
+ * -----------
+ *
+ * @param className - the className to remove from all elements that have it
+ */
+export const unhighlight = className => {
+  [].slice.call(document.getElementsByClassName((className))).forEach(e => {
+    e.classList.remove(className);
+  });
 }
 
-function interactiveElements(){
-    var className = "highlighted";
-    var hovered = "hovered";
-    var clicked = function(event){
-        event.preventDefault();
-    };
-    var mouseover = function addOption(event){
-        event.stopPropagation();
-        this.classList.add(hovered);
-    };
-    var mouseout = function removeOption(event){
-        this.classList.remove(hovered);
-    };
+/*
+ * iHighlight
+ * ---------
+ *
+ * @param elements - an array of elements
+ * @param className - the class added to the elements
+ * @param over - the function to call on mouseover
+ * @param out - the function to call on mouseout
+ * @param click - the function to call when an element is clicked
+ */
+export const iHighlight = (elements, className, over, out, click) => {
+  [].slice.call(elements).forEach(e => {
+    e.classList.add(className);
+    e.addEventListener("mouseover", over, false);
+    e.addEventListener("mouseout", out, false);
+    e.addEventListener("click", click, false);
+  });
+};
 
-    function highlight(elements){
-        elements.forEach(function(e){
-            e.classList.add(className);
-            e.addEventListener("mouseover", mouseover, false);
-            e.addEventListener("mouseout", mouseout, false);
-            e.addEventListener("click", clicked, false);
-        });
-    }
-
-    highlight.remove = function(){
-        var elements = [].slice.call(document.getElementsByClassName(className));
-        elements.forEach(function(e){
-            e.classList.remove(className);
-            e.classList.remove(hovered);
-            e.removeEventListener("mouseover", mouseover, false);
-            e.removeEventListener("mouseout", mouseout, false);
-            e.removeEventListener("click", clicked, false);
-        });
-    };
-
-    highlight.cssClass = function(name){
-        className = name;
-        return highlight;
-    };
-
-    highlight.hoverClass = function(name){
-        hovered = name;
-        return highlight;
-    };
-
-    highlight.clicked = function(fn){
-        clicked = fn;
-        return highlight;
-    };
-
-    highlight.mouseover = function(fn){
-        mouseover = fn;
-        return highlight;
-    };
-
-    highlight.mouseout = function(fn){
-        mouseout = fn;
-        return highlight;
-    };
-
-    return highlight;
-}
+/*
+ * iUnhighlight
+ * ---------
+ *
+ * @param className - the className to remove from all elements that have it
+ * @param over - mouseover function to remove
+ * @param out - mouseout function to remove
+ * @param click - click function to remove
+ */
+export const iUnhighlight = (className, over, out, click) => {
+  [].slice.call(document.getElementsByClassName((className))).forEach(e => {
+    e.classList.remove(className);
+    e.removeEventListener("mouseover", over, false);
+    e.removeEventListener("mouseout", out, false);
+    e.removeEventListener("click", click, false);
+  });   
+};

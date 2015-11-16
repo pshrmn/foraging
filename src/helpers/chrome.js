@@ -1,4 +1,4 @@
-/* functions that are related to the extension */
+// TODO: this has not yet been updated to work with the new version
 
 // save all of the pages for the site
 export const chromeSave = pages => {

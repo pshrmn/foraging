@@ -447,42 +447,6 @@
 	    return name.match(badCharacters) === null;
 	};
 
-	/*
-	 * check if an identical selector already exists or one with the same name
-	 * exists
-	 */
-	var matchSelector = exports.matchSelector = function matchSelector(sel, parent) {
-	    var selIndex = sel.spec.type === "single" ? sel.spec.value : undefined;
-	    var msg = "";
-	    var found = parent.children.some(function (s) {
-	        if (sel.spec.type !== s.spec.type) {
-	            return false;
-	        }
-
-	        switch (s.spec.type) {
-	            case "single":
-	                var index = s.spec.value;
-	                if (s.selector === sel.selector && index === selIndex) {
-	                    msg = "a selector with the same selector and index already exists";
-	                    return true;
-	                }
-	                break;
-	            case "all":
-	                if (s.spec.value === sel.spec.value) {
-	                    msg = "a selector with the name \"" + sel.spec.value + "\" already exists";
-	                    return true;
-	                }
-	                break;
-	        }
-	        return false;
-	    });
-
-	    return {
-	        error: found,
-	        msg: msg
-	    };
-	};
-
 	var abbreviate = exports.abbreviate = function abbreviate(text, max) {
 	    if (text.length <= max) {
 	        return text;
