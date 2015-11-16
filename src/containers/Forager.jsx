@@ -10,11 +10,15 @@ import Graph from "../components/Graph";
 
 let Forager = React.createClass({
   render: function() {
-    let { pages, pageIndex, dispatch } = this.props;
+    let { pages, pageIndex, show, dispatch } = this.props;
     let page = pages[pageIndex];
     const actions = bindActionCreators(ForagerActions, dispatch);
+    let classNames = ["forager", "no-select"];
+    if ( !show ) {
+      classNames.push("hidden");
+    }
     return (
-      <div className="forager no-select" ref="app">
+      <div className={classNames.join(" ")} ref="app">
         <Controls pages={pages}
                   index={pageIndex}
                   actions={actions} />
@@ -53,6 +57,7 @@ let Forager = React.createClass({
 
 function mapStateToProps(state) {
   return {
+    show: state.show,
     pages: state.pages,
     pageIndex: state.pageIndex
   };

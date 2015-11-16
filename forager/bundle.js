@@ -64,46 +64,63 @@
 
 	var _reducers2 = _interopRequireDefault(_reducers);
 
+	var _ActionTypes = __webpack_require__(24);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	//import { SetupStorage } from "./helpers";
-	var store = (0, _redux.createStore)(_reducers2.default, {
-	  pages: [undefined, {
-	    name: "example 1",
-	    selector: "body",
-	    spec: {
-	      type: "single",
-	      value: 0
-	    },
-	    children: [],
-	    rules: [{
-	      name: "test",
-	      attr: "text",
-	      type: "string"
-	    }]
-	  }, {
-	    name: "example 2",
-	    selector: "body",
-	    spec: {
-	      type: "single",
-	      value: 0
-	    },
-	    children: [],
-	    rules: []
-	  }],
-	  pageIndex: 0
-	});
+	/*
+	 * check if the forager holder exists. If it doesn't, mount the app. If it does,
+	 * check if the app is hidden. If it is hidden, show it.
+	 */
+	var holder = document.querySelector(".forager-holder");
+	if (!holder) {
+	  var _store = (0, _redux.createStore)(_reducers2.default, {
+	    show: true,
+	    pages: [undefined, {
+	      name: "example 1",
+	      selector: "body",
+	      spec: {
+	        type: "single",
+	        value: 0
+	      },
+	      children: [],
+	      rules: [{
+	        name: "test",
+	        attr: "text",
+	        type: "string"
+	      }]
+	    }, {
+	      name: "example 2",
+	      selector: "body",
+	      spec: {
+	        type: "single",
+	        value: 0
+	      },
+	      children: [],
+	      rules: []
+	    }],
+	    pageIndex: 0
+	  });
+	  // create an element to attach Forager to
+	  var _holder = document.createElement("div");
+	  _holder.classList.add("forager-holder");
+	  document.body.appendChild(_holder);
 
-	// create an element to attach Forager to
-	var holder = document.createElement("div");
-	holder.classList.add("forager-holder");
-	document.body.appendChild(holder);
+	  (0, _reactDom.render)(_react2.default.createElement(
+	    _reactRedux.Provider,
+	    { store: _store },
+	    _react2.default.createElement(_Forager2.default, null)
+	  ), _holder);
 
-	(0, _reactDom.render)(_react2.default.createElement(
-	  _reactRedux.Provider,
-	  { store: store },
-	  _react2.default.createElement(_Forager2.default, null)
-	), holder);
+	  window.store = _store;
+	} else {
+	  var currentState = store.getState();
+	  if (!currentState.show) {
+	    store.dispatch({
+	      type: _ActionTypes.SHOW_FORAGER
+	    });
+	  }
+	}
 
 /***/ },
 /* 1 */
@@ -1412,13 +1429,18 @@
 	    var _props = this.props;
 	    var pages = _props.pages;
 	    var pageIndex = _props.pageIndex;
+	    var show = _props.show;
 	    var dispatch = _props.dispatch;
 
 	    var page = pages[pageIndex];
 	    var actions = (0, _redux.bindActionCreators)(ForagerActions, dispatch);
+	    var classNames = ["forager", "no-select"];
+	    if (!show) {
+	      classNames.push("hidden");
+	    }
 	    return _react2.default.createElement(
 	      "div",
-	      { className: "forager no-select", ref: "app" },
+	      { className: classNames.join(" "), ref: "app" },
 	      _react2.default.createElement(_Controls2.default, { pages: pages,
 	        index: pageIndex,
 	        actions: actions }),
@@ -1457,6 +1479,7 @@
 
 	function mapStateToProps(state) {
 	  return {
+	    show: state.show,
 	    pages: state.pages,
 	    pageIndex: state.pageIndex
 	  };
@@ -1473,7 +1496,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.renamePage = exports.removePage = exports.addPage = exports.loadPage = undefined;
+	exports.closeForager = exports.showRuleFrame = exports.showSelectorFrame = exports.renamePage = exports.removePage = exports.addPage = exports.loadPage = undefined;
 
 	var _ActionTypes = __webpack_require__(24);
 
@@ -1481,6 +1504,9 @@
 
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
+	/*
+	 * PAGE ACTIONS
+	 */
 	var loadPage = exports.loadPage = function loadPage(index) {
 	  return {
 	    type: types.LOAD_PAGE,
@@ -1508,6 +1534,31 @@
 	  };
 	};
 
+	/*
+	 * SELECTOR ACTIONS
+	 */
+
+	var showSelectorFrame = exports.showSelectorFrame = function showSelectorFrame() {
+	  return {
+	    type: types.SHOW_SELECTOR_FRAME
+	  };
+	};
+
+	var showRuleFrame = exports.showRuleFrame = function showRuleFrame() {
+	  return {
+	    type: types.SHOW_RULE_FRAME
+	  };
+	};
+
+	/*
+	 * GENERAL ACTIONS
+	 */
+	var closeForager = exports.closeForager = function closeForager() {
+	  return {
+	    type: types.CLOSE_FORAGER
+	  };
+	};
+
 /***/ },
 /* 24 */
 /***/ function(module, exports) {
@@ -1521,6 +1572,12 @@
 	var ADD_PAGE = exports.ADD_PAGE = "ADD_PAGE";
 	var REMOVE_PAGE = exports.REMOVE_PAGE = "REMOVE_PAGE";
 	var RENAME_PAGE = exports.RENAME_PAGE = "RENAME_PAGE";
+
+	var SHOW_SELECTOR_FRAME = exports.SHOW_SELECTOR_FRAME = "SHOW_SELECTOR_FRAME";
+	var SHOW_RULE_FRAME = exports.SHOW_RULE_FRAME = "SHOW_RULE_FRAME";
+
+	var CLOSE_FORAGER = exports.CLOSE_FORAGER = "CLOSE_FORAGER";
+	var SHOW_FORAGER = exports.SHOW_FORAGER = "SHOW_FORAGER";
 
 /***/ },
 /* 25 */
@@ -1559,7 +1616,7 @@
 	      _react2.default.createElement(PageControls, { pages: pages,
 	        index: index,
 	        actions: actions }),
-	      _react2.default.createElement(GeneralControls, null)
+	      _react2.default.createElement(GeneralControls, { actions: actions })
 	    );
 	  }
 	});
@@ -1653,13 +1710,19 @@
 	    event.preventDefault();
 	    console.error("not yet implemented");
 	  },
+	  handleClose: function handleClose(event) {
+	    this.props.actions.closeForager();
+	  },
 	  render: function render() {
+	    /*
+	      no need to render these until their features have been implemented
+	      <NeutralButton click={this.handle} text="Sync" />
+	      <NeutralButton click={this.handle} text="Options" />
+	    */
 	    return _react2.default.createElement(
 	      "div",
 	      { className: "app-controls" },
-	      _react2.default.createElement(_Inputs.NeutralButton, { click: this.handle, text: "Sync" }),
-	      _react2.default.createElement(_Inputs.NeutralButton, { click: this.handle, text: "Options" }),
-	      _react2.default.createElement(_Inputs.NeutralButton, { click: this.handle, text: String.fromCharCode(215) })
+	      _react2.default.createElement(_Inputs.NeutralButton, { click: this.handleClose, text: String.fromCharCode(215) })
 	    );
 	  }
 	});
@@ -2283,7 +2346,10 @@
 
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
+	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
 	var initialState = {
+	  show: true,
 	  pages: [undefined],
 	  pageIndex: 0
 	};
@@ -2298,14 +2364,21 @@
 
 	  switch (action.type) {
 	    case types.LOAD_PAGE:
+	      /*
+	       * if the index is out of the bounds of state.pages, set to 0
+	       */
+	      var max = state.pages.length;
+	      var index = action.index;
+	      if (index < 0 || index >= max) {
+	        index = 0;
+	      }
 	      return Object.assign({}, state, {
-	        pageIndex: action.index
+	        pageIndex: index
 	      });
 	    case types.ADD_PAGE:
 	      var pages = state.pages;
-	      pages.push(action.page);
 	      return Object.assign({}, state, {
-	        pages: pages,
+	        pages: [].concat(_toConsumableArray(pages), [action.page]),
 	        pageIndex: pages.length - 1
 	      });
 	    case types.REMOVE_PAGE:
@@ -2313,11 +2386,11 @@
 	      var pageIndex = state.pageIndex;
 	      // don't remove the undefined page
 
-	      if (pageIndex !== 0) {
-	        pages.splice(pageIndex, 1);
+	      if (pageIndex === 0) {
+	        return state;
 	      }
 	      return Object.assign({}, state, {
-	        pages: pages,
+	        pages: [].concat(_toConsumableArray(pages.slice(0, pageIndex)), _toConsumableArray(pages.slice(pageIndex + 1))),
 	        pageIndex: 0
 	      });
 	    case types.RENAME_PAGE:
@@ -2334,6 +2407,14 @@
 	      });
 	      return Object.assign({}, state, {
 	        pages: newPages
+	      });
+	    case types.CLOSE_FORAGER:
+	      return Object.assign({}, state, {
+	        show: false
+	      });
+	    case types.SHOW_FORAGER:
+	      return Object.assign({}, state, {
+	        show: true
 	      });
 	    default:
 	      return state;

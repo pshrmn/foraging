@@ -13,7 +13,7 @@ export default React.createClass({
         <PageControls pages={pages}
                       index={index}
                       actions={actions} />
-        <GeneralControls />
+        <GeneralControls actions={actions}/>
       </div>
     );
   }
@@ -96,12 +96,18 @@ let GeneralControls = React.createClass({
     event.preventDefault();
     console.error("not yet implemented");
   },
+  handleClose: function(event){
+    this.props.actions.closeForager();
+  },
   render: function() {
+    /*
+      no need to render these until their features have been implemented
+      <NeutralButton click={this.handle} text="Sync" />
+      <NeutralButton click={this.handle} text="Options" />
+    */
     return (
       <div className="app-controls">
-        <NeutralButton click={this.handle} text="Sync" />
-        <NeutralButton click={this.handle} text="Options" />
-        <NeutralButton click={this.handle} text={String.fromCharCode(215)} />
+        <NeutralButton click={this.handleClose} text={String.fromCharCode(215)} />
       </div>
     );
   }

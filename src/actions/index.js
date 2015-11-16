@@ -1,5 +1,8 @@
 import * as types from "../constants/ActionTypes";
 
+/*
+ * PAGE ACTIONS
+ */
 export const loadPage = index => {
   return {
     type: types.LOAD_PAGE,
@@ -24,5 +27,30 @@ export const renamePage = name => {
   return {
     type: types.RENAME_PAGE,
     name: name
+  };
+};
+
+/*
+ * SELECTOR ACTIONS
+ */
+
+export const showSelectorFrame = () => {
+  return {
+    type: types.SHOW_SELECTOR_FRAME
+  };
+};
+
+export const showRuleFrame = () => {
+  return {
+    type: types.SHOW_RULE_FRAME
   }
 }
+
+/*
+ * GENERAL ACTIONS
+ */
+export const closeForager = () => {
+  return {
+    type: types.CLOSE_FORAGER
+  };
+};

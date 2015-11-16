@@ -21,6 +21,8 @@ body {
   box-sizing: border-box;
   /* lots of sites like to customize how various inputs look, 
     so this is trying to keep these close to (chrome) default css */ }
+  .forager.hidden {
+    display: none !important; }
   .forager * {
     color: #000000;
     box-sizing: border-box;

@@ -1,6 +1,7 @@
 import * as types from "../constants/ActionTypes";
 
 const initialState = {
+  show: true,
   pages: [
     undefined
   ],
@@ -27,19 +28,20 @@ function reducer(state = initialState, action) {
     });
   case types.ADD_PAGE:
     var pages = state.pages;
-    pages.push(action.page);
     return Object.assign({}, state, {
-      pages: pages,
+      pages: [...pages, action.page],
       pageIndex: pages.length - 1
     });
   case types.REMOVE_PAGE:
     var { pages, pageIndex } = state;
     // don't remove the undefined page
-    if ( pageIndex !== 0 ) {
-      pages.splice(pageIndex, 1);
+    if ( pageIndex === 0 ) {
+      return state;
     }
     return Object.assign({}, state, {
-      pages: pages,
+      pages: [
+        ...pages.slice(0, pageIndex), ...pages.slice(pageIndex+1)
+      ],
       pageIndex: 0
     });
   case types.RENAME_PAGE:
@@ -54,6 +56,14 @@ function reducer(state = initialState, action) {
     });
     return Object.assign({}, state, {
       pages: newPages
+    });
+  case types.CLOSE_FORAGER:
+    return Object.assign({}, state, {
+      show: false
+    });
+  case types.SHOW_FORAGER:
+    return Object.assign({}, state, {
+      show: true
     });
   default:
     return state;

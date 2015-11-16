@@ -33,6 +33,10 @@ body{
     border: 10px solid $dark-gray;
     box-sizing: border-box;
 
+    &.hidden {
+        display: none !important;
+    }
+
     *{
         color: $black;
         box-sizing: border-box;
