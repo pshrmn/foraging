@@ -14,8 +14,16 @@ const initialState = {
 function reducer(state = initialState, action) {
   switch ( action.type ) {
   case types.LOAD_PAGE:
+    /*
+     * if the index is out of the bounds of state.pages, set to 0
+     */
+    var max = state.pages.length;
+    var index = action.index;
+    if ( index < 0 || index >= max ) {
+      index = 0;
+    }
     return Object.assign({}, state, {
-      pageIndex: action.index
+      pageIndex: index
     });
   case types.ADD_PAGE:
     var pages = state.pages;
