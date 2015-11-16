@@ -7,15 +7,12 @@ import { createPage } from "../business/page";
 
 export default React.createClass({
   render: function() {
-    let { pages, index, loadPage, addPage, removePage, renamePage } = this.props;
+    let { pages, index, actions } = this.props;
     return (
       <div className="controls">
         <PageControls pages={pages}
                       index={index}
-                      loadPage={loadPage}
-                      addPage={addPage}
-                      removePage={removePage}
-                      renamePage={renamePage} />
+                      actions={actions} />
         <GeneralControls />
       </div>
     );
@@ -37,22 +34,26 @@ let PageControls = React.createClass({
     if ( name !== undefined ) {
       // report the new name
       let newPage = createPage(name);
-      this.props.addPage(newPage);
+      this.props.actions.addPage(newPage);
     }
   },
   renameHandler: function(event) {
     event.preventDefault();
+    // don't do anything for the undefined option
+    if ( curr === undefined ) {
+      return;
+    }
     let curr = this.props.pages[this.props.index];
     let name = this.getName();
     if ( name !== undefined && name !== curr.name) {
       // set the new name
-      this.props.renamePage(name);
+      this.props.actions.renamePage(name);
     }
   },
   deleteHandler: function(event) {
     event.preventDefault();
     // report the current page index
-    this.props.removePage();
+    this.props.actions.removePage();
   },
   uploadHandler: function(event) {
     event.preventDefault();
@@ -63,7 +64,7 @@ let PageControls = React.createClass({
     console.error("not yet implemented");
   },
   loadPage: function(event) {
-    this.props.loadPage(event.target.value);
+    this.props.actions.loadPage(event.target.value);
   },
   render: function() {
     let { pages, index } = this.props;
