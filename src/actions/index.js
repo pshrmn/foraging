@@ -31,7 +31,7 @@ export const renamePage = name => {
 };
 
 /*
- * SELECTOR ACTIONS
+ * FRAME ACTIONS
  */
 
 export const showSelectorFrame = () => {
@@ -40,11 +40,32 @@ export const showSelectorFrame = () => {
   };
 };
 
-export const showRuleFrame = () => {
+export const showRuleFrame = selector => {
   return {
-    type: types.SHOW_RULE_FRAME
-  }
-}
+    type: types.SHOW_RULE_FRAME,
+    selector: selector
+  };
+};
+
+export const showElementFrame = () => {
+  return {
+    type: types.SHOW_ELEMENT_FRAME
+  };
+};
+
+export const showPartsFrame = parts => {
+  return {
+    type: types.SHOW_PARTS_FRAME,
+    parts: parts
+  };
+};
+
+export const showSpecFrame = css => {
+  return {
+    type: types.SHOW_SPEC_FRAME,
+    css: css
+  };
+};
 
 /*
  * GENERAL ACTIONS
@@ -52,5 +73,23 @@ export const showRuleFrame = () => {
 export const closeForager = () => {
   return {
     type: types.CLOSE_FORAGER
+  };
+};
+
+/*
+ *
+ */
+
+export const selectSelector = selectorID => {
+  return {
+    type: types.SELECT_SELECTOR,
+    selectorID: selectorID
+  };
+};
+
+export const saveSelector = selector => {
+  return {
+    type: types.SAVE_SELECTOR,
+    selector: selector
   };
 };

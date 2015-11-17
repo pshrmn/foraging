@@ -1,8 +1,9 @@
 import { expect } from "chai";
 
-import { legalName, abbreviate } from "../src/helpers";
+import { legalName, abbreviate } from "../../src/helpers/text";
 
-describe("utility functions", () => {
+describe("text", () => {
+
   describe("legalName", () => {
     it("returns true for legal names", () => {
       let allGood = [

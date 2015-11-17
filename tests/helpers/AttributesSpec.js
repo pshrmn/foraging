@@ -1,6 +1,6 @@
 import { expect } from "chai";
 
-import { attributes } from "../../src/business/attributes";
+import { attributes } from "../../src/helpers/attributes";
 
 describe("attribute", () => {
 

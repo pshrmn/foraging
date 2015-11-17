@@ -9,10 +9,10 @@
  * @param spec - how to select the child element or elements of a parent element
  */
 export const select = (parents, selector, spec) => {
-  var sel = (selector || "*") + ":not(.no-select)";
-  var index = spec && spec.type === "single" ? spec.value : undefined;
+  let sel = (selector || "*") + ":not(.no-select)";
+  let index = spec && spec.type === "single" ? spec.value : undefined;
 
-  var specElements = elements => {
+  let specElements = elements => {
     if ( index !== undefined ) {
       return elements[index] !== undefined ? [elements[index]] : [];
     } else {
@@ -21,7 +21,7 @@ export const select = (parents, selector, spec) => {
   }
 
   return [].slice.call(parents).reduce((arr, p) => {
-    var eles = p.querySelectorAll(sel);
+    let eles = p.querySelectorAll(sel);
     return arr.concat(specElements(eles));
   }, []);
 }
@@ -37,10 +37,10 @@ export const select = (parents, selector, spec) => {
  * @param spec - how to select the child element or elements of a parent element
  */
 export const count = (parents, selector, spec) => {
-  var sel = (selector || "*") + ":not(.no-select)";
-  var index = spec && spec.type === "single" ? spec.value : undefined;
+  let sel = (selector || "*") + ":not(.no-select)";
+  let index = spec && spec.type === "single" ? spec.value : undefined;
 
-  var specElements = elements => {
+  let specElements = elements => {
     if ( index !== undefined ) {
       return elements[index] !== undefined ? 1 :0;
     } else {
@@ -49,8 +49,8 @@ export const count = (parents, selector, spec) => {
   }
 
   return [].slice.call(parents).reduce((top, p) => {
-    var eles = p.querySelectorAll(sel);
-    var count = specElements(eles);
+    let eles = p.querySelectorAll(sel);
+    let count = specElements(eles);
     return top > count ? top : count;
   }, 0);
 }
@@ -64,20 +64,20 @@ export const count = (parents, selector, spec) => {
  *
  * @param element - the element to analyze
  */
-export const parts = (element) =>{
-  var skipTags = [];
-  var skipClasses = ["forager-highlight", "query-check", "selectable-element", "current-selector"];
+export const parts = element =>{
+  let skipTags = [];
+  let skipClasses = ["forager-highlight", "query-check", "selectable-element", "current-selector"];
 
-  var tagAllowed = tag => {
+  let tagAllowed = tag => {
     return !skipTags.some(st => st === tag);
   }
 
-  var classAllowed = c => {
+  let classAllowed = c => {
     return !skipClasses.some(sc => sc === c);
   }
 
-  var pieces = [];
-  var tag = element.tagName.toLowerCase();
+  let pieces = [];
+  let tag = element.tagName.toLowerCase();
   if ( tagAllowed(tag) ) {
     pieces.push(tag);
   } else {
@@ -97,5 +97,13 @@ export const parts = (element) =>{
     }  
   });
   return pieces;
-}
+};
 
+/*
+ * check if all elements matched by the selector are "select" elements
+ */
+export const allSelect = (parents, selector, spec) => {
+  return select(parents, selector, spec).every(ele => {
+    return ele.tagName === "SELECT";
+  });
+};

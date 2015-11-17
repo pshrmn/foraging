@@ -2,8 +2,7 @@ import React from "react";
 
 import { PosButton, NegButton, NeutralButton } from "./Inputs";
 
-import { legalName } from "../helpers";
-import { createPage } from "../business/page";
+import { legalName, createPage } from "../helpers";
 
 export default React.createClass({
   render: function() {

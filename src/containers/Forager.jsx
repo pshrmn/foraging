@@ -10,7 +10,7 @@ import Graph from "../components/Graph";
 
 let Forager = React.createClass({
   render: function() {
-    let { pages, pageIndex, show, dispatch } = this.props;
+    let { pages, pageIndex, show, dispatch, frame, selector } = this.props;
     let page = pages[pageIndex];
     const actions = bindActionCreators(ForagerActions, dispatch);
     let classNames = ["forager", "no-select"];
@@ -23,7 +23,8 @@ let Forager = React.createClass({
                   index={pageIndex}
                   actions={actions} />
         <div className="workspace">
-          <Frames page={page}
+          <Frames selector={selector}
+                  frame={frame}
                   actions={actions} />
           <Graph page={page}
                  actions={actions} />
@@ -56,10 +57,14 @@ let Forager = React.createClass({
 
 
 function mapStateToProps(state) {
+  // while pages and pageIndex are stored under page in the store,
+  // destructure them in the app
   return {
     show: state.show,
-    pages: state.pages,
-    pageIndex: state.pageIndex
+    frame: state.frame,
+    pages: state.page.pages,
+    pageIndex: state.page.pageIndex,
+    selector: state.selector
   };
 }
 

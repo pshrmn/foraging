@@ -60,11 +60,15 @@
 
 	var _Forager2 = _interopRequireDefault(_Forager);
 
-	var _reducers = __webpack_require__(36);
+	var _reducers = __webpack_require__(41);
 
 	var _reducers2 = _interopRequireDefault(_reducers);
 
 	var _ActionTypes = __webpack_require__(24);
+
+	var _findSelector = __webpack_require__(46);
+
+	var _helpers = __webpack_require__(27);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -74,36 +78,59 @@
 	 */
 	var holder = document.querySelector(".forager-holder");
 	if (!holder) {
-	  var _store = (0, _redux.createStore)(_reducers2.default, {
+	  var initialState = {
 	    show: true,
-	    pages: [undefined, {
-	      name: "example 1",
-	      selector: "body",
-	      spec: {
-	        type: "single",
-	        value: 0
-	      },
-	      children: [],
-	      rules: [{
-	        name: "test",
-	        attr: "text",
-	        type: "string"
-	      }]
-	    }, {
-	      name: "example 2",
-	      selector: "body",
-	      spec: {
-	        type: "single",
-	        value: 0
-	      },
-	      children: [],
-	      rules: []
-	    }],
-	    pageIndex: 0
+	    selector: undefined,
+	    page: {
+	      pages: [undefined, {
+	        id: 0,
+	        name: "example 1",
+	        selector: "body",
+	        spec: {
+	          type: "single",
+	          value: 0
+	        },
+	        children: [{
+	          id: 1,
+	          selector: "div",
+	          spec: {
+	            type: "all",
+	            value: "divs"
+	          },
+	          children: [],
+	          rules: []
+	        }],
+	        rules: [{
+	          name: "test",
+	          attr: "text",
+	          type: "string"
+	        }]
+	      }, {
+	        id: 0,
+	        name: "example 2",
+	        selector: "body",
+	        spec: {
+	          type: "single",
+	          value: 0
+	        },
+	        children: [],
+	        rules: []
+	      }],
+	      pageIndex: 0
+	    },
+	    frame: {
+	      name: "selector",
+	      data: {}
+	    }
+	  };
+	  initialState.page.pages.forEach(function (p) {
+	    (0, _helpers.pageElements)(p);
 	  });
+	  var _store = (0, _redux.applyMiddleware)(_findSelector.findSelector)(_redux.createStore)(_reducers2.default, initialState);
 	  // create an element to attach Forager to
 	  var _holder = document.createElement("div");
 	  _holder.classList.add("forager-holder");
+	  _holder.classList.add("no-select");
 	  document.body.appendChild(_holder);
 
 	  (0, _reactDom.render)(_react2.default.createElement(
@@ -1410,11 +1437,11 @@
 
 	var _Controls2 = _interopRequireDefault(_Controls);
 
-	var _Frames = __webpack_require__(29);
+	var _Frames = __webpack_require__(33);
 
 	var _Frames2 = _interopRequireDefault(_Frames);
 
-	var _Graph = __webpack_require__(34);
+	var _Graph = __webpack_require__(39);
 
 	var _Graph2 = _interopRequireDefault(_Graph);
 
@@ -1431,6 +1458,8 @@
 	    var pageIndex = _props.pageIndex;
 	    var show = _props.show;
 	    var dispatch = _props.dispatch;
+	    var frame = _props.frame;
+	    var selector = _props.selector;
 
 	    var page = pages[pageIndex];
 	    var actions = (0, _redux.bindActionCreators)(ForagerActions, dispatch);
@@ -1447,7 +1476,8 @@
 	      _react2.default.createElement(
 	        "div",
 	        { className: "workspace" },
-	        _react2.default.createElement(_Frames2.default, { page: page,
+	        _react2.default.createElement(_Frames2.default, { selector: selector,
+	          frame: frame,
 	          actions: actions }),
 	        _react2.default.createElement(_Graph2.default, { page: page,
 	          actions: actions })
@@ -1478,10 +1508,14 @@
 	});
 
 	function mapStateToProps(state) {
+	  // while pages and pageIndex are stored under page in the store,
+	  // destructure them in the app
 	  return {
 	    show: state.show,
-	    pages: state.pages,
-	    pageIndex: state.pageIndex
+	    frame: state.frame,
+	    pages: state.page.pages,
+	    pageIndex: state.page.pageIndex,
+	    selector: state.selector
 	  };
 	}
 
@@ -1496,7 +1530,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.closeForager = exports.showRuleFrame = exports.showSelectorFrame = exports.renamePage = exports.removePage = exports.addPage = exports.loadPage = undefined;
+	exports.saveSelector = exports.selectSelector = exports.closeForager = exports.showSpecFrame = exports.showPartsFrame = exports.showElementFrame = exports.showRuleFrame = exports.showSelectorFrame = exports.renamePage = exports.removePage = exports.addPage = exports.loadPage = undefined;
 
 	var _ActionTypes = __webpack_require__(24);
 
@@ -1535,7 +1569,7 @@
 	};
 
 	/*
-	 * SELECTOR ACTIONS
+	 * FRAME ACTIONS
 	 */
 
 	var showSelectorFrame = exports.showSelectorFrame = function showSelectorFrame() {
@@ -1544,9 +1578,30 @@
 	  };
 	};
 
-	var showRuleFrame = exports.showRuleFrame = function showRuleFrame() {
+	var showRuleFrame = exports.showRuleFrame = function showRuleFrame(selector) {
 	  return {
-	    type: types.SHOW_RULE_FRAME
+	    type: types.SHOW_RULE_FRAME,
+	    selector: selector
+	  };
+	};
+
+	var showElementFrame = exports.showElementFrame = function showElementFrame() {
+	  return {
+	    type: types.SHOW_ELEMENT_FRAME
+	  };
+	};
+
+	var showPartsFrame = exports.showPartsFrame = function showPartsFrame(parts) {
+	  return {
+	    type: types.SHOW_PARTS_FRAME,
+	    parts: parts
+	  };
+	};
+
+	var showSpecFrame = exports.showSpecFrame = function showSpecFrame(css) {
+	  return {
+	    type: types.SHOW_SPEC_FRAME,
+	    css: css
 	  };
 	};
 
@@ -1556,6 +1611,24 @@
 	var closeForager = exports.closeForager = function closeForager() {
 	  return {
 	    type: types.CLOSE_FORAGER
+	  };
+	};
+
+	/*
+	 *
+	 */
+
+	var selectSelector = exports.selectSelector = function selectSelector(selectorID) {
+	  return {
+	    type: types.SELECT_SELECTOR,
+	    selectorID: selectorID
+	  };
+	};
+
+	var saveSelector = exports.saveSelector = function saveSelector(selector) {
+	  return {
+	    type: types.SAVE_SELECTOR,
+	    selector: selector
 	  };
 	};
 
@@ -1575,9 +1648,15 @@
 
 	var SHOW_SELECTOR_FRAME = exports.SHOW_SELECTOR_FRAME = "SHOW_SELECTOR_FRAME";
 	var SHOW_RULE_FRAME = exports.SHOW_RULE_FRAME = "SHOW_RULE_FRAME";
+	var SHOW_ELEMENT_FRAME = exports.SHOW_ELEMENT_FRAME = "SHOW_ELEMENT_FRAME";
+	var SHOW_PARTS_FRAME = exports.SHOW_PARTS_FRAME = "SHOW_PARTS_FRAME";
+	var SHOW_SPEC_FRAME = exports.SHOW_SPEC_FRAME = "SHOW_SPEC_FRAME";
 
 	var CLOSE_FORAGER = exports.CLOSE_FORAGER = "CLOSE_FORAGER";
 	var SHOW_FORAGER = exports.SHOW_FORAGER = "SHOW_FORAGER";
+
+	var SELECT_SELECTOR = exports.SELECT_SELECTOR = "SELECT_SELECTOR";
+	var SAVE_SELECTOR = exports.SAVE_SELECTOR = "SAVE_SELECTOR";
 
 /***/ },
 /* 25 */
@@ -1596,8 +1675,6 @@
 	var _Inputs = __webpack_require__(26);
 
 	var _helpers = __webpack_require__(27);
-
-	var _page = __webpack_require__(28);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -1637,7 +1714,7 @@
 	    var name = this.getName();
 	    if (name !== undefined) {
 	      // report the new name
-	      var newPage = (0, _page.createPage)(name);
+	      var newPage = (0, _helpers.createPage)(name);
 	      this.props.actions.addPage(newPage);
 	    }
 	  },
@@ -1790,6 +1867,115 @@
 
 /***/ },
 /* 27 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _text = __webpack_require__(28);
+
+	Object.defineProperty(exports, "legalName", {
+	  enumerable: true,
+	  get: function get() {
+	    return _text.legalName;
+	  }
+	});
+	Object.defineProperty(exports, "abbreviate", {
+	  enumerable: true,
+	  get: function get() {
+	    return _text.abbreviate;
+	  }
+	});
+
+	var _attributes = __webpack_require__(29);
+
+	Object.defineProperty(exports, "attributes", {
+	  enumerable: true,
+	  get: function get() {
+	    return _attributes.attributes;
+	  }
+	});
+
+	var _markup = __webpack_require__(30);
+
+	Object.defineProperty(exports, "highlight", {
+	  enumerable: true,
+	  get: function get() {
+	    return _markup.highlight;
+	  }
+	});
+	Object.defineProperty(exports, "unhighlight", {
+	  enumerable: true,
+	  get: function get() {
+	    return _markup.unhighlight;
+	  }
+	});
+	Object.defineProperty(exports, "iHighlight", {
+	  enumerable: true,
+	  get: function get() {
+	    return _markup.iHighlight;
+	  }
+	});
+	Object.defineProperty(exports, "iUnhighlight", {
+	  enumerable: true,
+	  get: function get() {
+	    return _markup.iUnhighlight;
+	  }
+	});
+
+	var _page = __webpack_require__(31);
+
+	Object.defineProperty(exports, "createPage", {
+	  enumerable: true,
+	  get: function get() {
+	    return _page.createPage;
+	  }
+	});
+	Object.defineProperty(exports, "createSelector", {
+	  enumerable: true,
+	  get: function get() {
+	    return _page.createSelector;
+	  }
+	});
+	Object.defineProperty(exports, "pageElements", {
+	  enumerable: true,
+	  get: function get() {
+	    return _page.pageElements;
+	  }
+	});
+
+	var _selection = __webpack_require__(32);
+
+	Object.defineProperty(exports, "select", {
+	  enumerable: true,
+	  get: function get() {
+	    return _selection.select;
+	  }
+	});
+	Object.defineProperty(exports, "count", {
+	  enumerable: true,
+	  get: function get() {
+	    return _selection.count;
+	  }
+	});
+	Object.defineProperty(exports, "parts", {
+	  enumerable: true,
+	  get: function get() {
+	    return _selection.parts;
+	  }
+	});
+	Object.defineProperty(exports, "allSelect", {
+	  enumerable: true,
+	  get: function get() {
+	    return _selection.allSelect;
+	  }
+	});
+
+/***/ },
+/* 28 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -1831,7 +2017,45 @@
 	};
 
 /***/ },
-/* 28 */
+/* 29 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	// return an object mapping attribute names to their value
+	// for all attributes of an element
+	var attributes = exports.attributes = function attributes(element) {
+	    var ignored = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+
+	    var attrMap = {};
+
+	    // include text if it exists
+	    var text = element.textContent.trim();
+	    if (text !== "") {
+	        attrMap.text = text;
+	    }
+
+	    return [].slice.call(element.attributes).reduce(function (stored, attr) {
+	        if (ignored[attr.name]) {
+	            return stored;
+	        }
+	        // don't include current-selector class
+	        if (attr.name === "class") {
+	            attr.value = attr.value.replace("current-selector", "").trim();
+	        }
+	        // don't include empty attrs
+	        if (attr.value !== "") {
+	            stored[attr.name] = attr.value;
+	        }
+	        return stored;
+	    }, attrMap);
+	};
+
+/***/ },
+/* 30 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -1839,6 +2063,81 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
+	/*
+	 * highlight
+	 * ---------
+	 *
+	 * @param elements - an array of elements
+	 * @param className - the class added to the elements
+	 */
+	var highlight = exports.highlight = function highlight(elements, className) {
+	  [].slice.call(elements).forEach(function (e) {
+	    e.classList.add(className);
+	  });
+	};
+
+	/*
+	 * unhighlight
+	 * -----------
+	 *
+	 * @param className - the className to remove from all elements that have it
+	 */
+	var unhighlight = exports.unhighlight = function unhighlight(className) {
+	  [].slice.call(document.getElementsByClassName(className)).forEach(function (e) {
+	    e.classList.remove(className);
+	  });
+	};
+
+	/*
+	 * iHighlight
+	 * ---------
+	 *
+	 * @param elements - an array of elements
+	 * @param className - the class added to the elements
+	 * @param over - the function to call on mouseover
+	 * @param out - the function to call on mouseout
+	 * @param click - the function to call when an element is clicked
+	 */
+	var iHighlight = exports.iHighlight = function iHighlight(elements, className, over, out, click) {
+	  [].slice.call(elements).forEach(function (e) {
+	    e.classList.add(className);
+	    e.addEventListener("mouseover", over, false);
+	    e.addEventListener("mouseout", out, false);
+	    e.addEventListener("click", click, false);
+	  });
+	};
+
+	/*
+	 * iUnhighlight
+	 * ---------
+	 *
+	 * @param className - the className to remove from all elements that have it
+	 * @param over - mouseover function to remove
+	 * @param out - mouseout function to remove
+	 * @param click - click function to remove
+	 */
+	var iUnhighlight = exports.iUnhighlight = function iUnhighlight(className, over, out, click) {
+	  [].slice.call(document.getElementsByClassName(className)).forEach(function (e) {
+	    e.classList.remove(className);
+	    e.removeEventListener("mouseover", over, false);
+	    e.removeEventListener("mouseout", out, false);
+	    e.removeEventListener("click", click, false);
+	  });
+	};
+
+/***/ },
+/* 31 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.pageElements = exports.createSelector = exports.createPage = undefined;
+
+	var _selection = __webpack_require__(32);
+
 	var createPage = exports.createPage = function createPage(name) {
 	  return {
 	    name: name,
@@ -1852,8 +2151,168 @@
 	  };
 	};
 
+	var createSelector = exports.createSelector = function createSelector(selector) {
+	  var type = arguments.length <= 1 || arguments[1] === undefined ? "single" : arguments[1];
+	  var value = arguments.length <= 2 || arguments[2] === undefined ? 0 : arguments[2];
+	  var optional = arguments.length <= 3 || arguments[3] === undefined ? false : arguments[3];
+
+	  return {
+	    selector: selector,
+	    spec: {
+	      type: type,
+	      value: value
+	    },
+	    children: [],
+	    rules: [],
+	    optional: optional
+	  };
+	};
+
+	/*
+	 * iterate through the page tree and add an "elements" property to each selector
+	 * which is an array containing all elements in the page that that selector
+	 * matches
+	 */
+	var pageElements = exports.pageElements = function pageElements(page) {
+	  if (page === undefined) {
+	    return;
+	  }
+	  var elements = [document];
+	  var attach = function attach(selector) {
+	    elements = (0, _selection.select)(elements, selector.selector);
+	    selector["elements"] = elements;
+	    selector.children.forEach(function (child) {
+	      attach(child);
+	    });
+	  };
+
+	  attach(page);
+	};
+
 /***/ },
-/* 29 */
+/* 32 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	/*
+	 * select
+	 * ------
+	 * Returns an array of elements that are children of the parent elements and
+	 * match the selector.
+	 *
+	 * @param parents - an array of parent elements to search using the selector
+	 * @param selector - the selector to use to match children of the parent elements
+	 * @param spec - how to select the child element or elements of a parent element
+	 */
+	var select = exports.select = function select(parents, selector, spec) {
+	  var sel = (selector || "*") + ":not(.no-select)";
+	  var index = spec && spec.type === "single" ? spec.value : undefined;
+
+	  var specElements = function specElements(elements) {
+	    if (index !== undefined) {
+	      return elements[index] !== undefined ? [elements[index]] : [];
+	    } else {
+	      return [].slice.call(elements);
+	    }
+	  };
+
+	  return [].slice.call(parents).reduce(function (arr, p) {
+	    var eles = p.querySelectorAll(sel);
+	    return arr.concat(specElements(eles));
+	  }, []);
+	};
+
+	/*
+	 * count
+	 * ------
+	 * Returns the max number of child elements that the selector matches per parent
+	 *
+	 * @param parents - an array of parent elements to search using the selector
+	 * @param selector - the selector to use to match children of the parent elements
+	 * @param spec - how to select the child element or elements of a parent element
+	 */
+	var count = exports.count = function count(parents, selector, spec) {
+	  var sel = (selector || "*") + ":not(.no-select)";
+	  var index = spec && spec.type === "single" ? spec.value : undefined;
+
+	  var specElements = function specElements(elements) {
+	    if (index !== undefined) {
+	      return elements[index] !== undefined ? 1 : 0;
+	    } else {
+	      return elements.length;
+	    }
+	  };
+
+	  return [].slice.call(parents).reduce(function (top, p) {
+	    var eles = p.querySelectorAll(sel);
+	    var count = specElements(eles);
+	    return top > count ? top : count;
+	  }, 0);
+	};
+
+	/*
+	 * parts
+	 * -------------
+	 * Returns an array of strings that can be used as CSS selectors to select the element.
+	 * Element tags are converted to lowercase, ids are preceded by a "#" and classes are
+	 * preceded by a "."
+	 *
+	 * @param element - the element to analyze
+	 */
+	var parts = exports.parts = function parts(element) {
+	  var skipTags = [];
+	  var skipClasses = ["forager-highlight", "query-check", "selectable-element", "current-selector"];
+
+	  var tagAllowed = function tagAllowed(tag) {
+	    return !skipTags.some(function (st) {
+	      return st === tag;
+	    });
+	  };
+
+	  var classAllowed = function classAllowed(c) {
+	    return !skipClasses.some(function (sc) {
+	      return sc === c;
+	    });
+	  };
+
+	  var pieces = [];
+	  var tag = element.tagName.toLowerCase();
+	  if (tagAllowed(tag)) {
+	    pieces.push(tag);
+	  } else {
+	    // if the tag isn't allowed, return an empty array
+	    return [];
+	  }
+
+	  // id
+	  if (element.id !== "") {
+	    pieces.push("#" + element.id);
+	  }
+
+	  // classes
+	  [].slice.call(element.classList).forEach(function (c) {
+	    if (classAllowed(c)) {
+	      pieces.push("." + c);
+	    }
+	  });
+	  return pieces;
+	};
+
+	/*
+	 * check if all elements matched by the selector are "select" elements
+	 */
+	var allSelect = exports.allSelect = function allSelect(parents, selector, spec) {
+	  return select(parents, selector, spec).every(function (ele) {
+	    return ele.tagName === "SELECT";
+	  });
+	};
+
+/***/ },
+/* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -1866,19 +2325,23 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _ViewFrame = __webpack_require__(30);
-
-	var _ViewFrame2 = _interopRequireDefault(_ViewFrame);
-
-	var _ElementFrame = __webpack_require__(31);
-
-	var _ElementFrame2 = _interopRequireDefault(_ElementFrame);
-
-	var _SelectorFrame = __webpack_require__(32);
+	var _SelectorFrame = __webpack_require__(34);
 
 	var _SelectorFrame2 = _interopRequireDefault(_SelectorFrame);
 
-	var _SpecFrame = __webpack_require__(33);
+	var _RuleFrame = __webpack_require__(35);
+
+	var _RuleFrame2 = _interopRequireDefault(_RuleFrame);
+
+	var _ElementFrame = __webpack_require__(36);
+
+	var _ElementFrame2 = _interopRequireDefault(_ElementFrame);
+
+	var _PartsFrame = __webpack_require__(37);
+
+	var _PartsFrame2 = _interopRequireDefault(_PartsFrame);
+
+	var _SpecFrame = __webpack_require__(38);
 
 	var _SpecFrame2 = _interopRequireDefault(_SpecFrame);
 
@@ -1887,29 +2350,48 @@
 	exports.default = _react2.default.createClass({
 	  displayName: "Frames",
 
-	  render: function render() {
+	  _selectFrame: function _selectFrame() {
 	    var _props = this.props;
-	    var form = _props.form;
-	    var page = _props.page;
+	    var frame = _props.frame;
+	    var selector = _props.selector;
+	    var actions = _props.actions;
 
-	    var frame = null;
-	    switch (form) {
+	    switch (frame.name) {
 	      case "selector":
+	        return _react2.default.createElement(_SelectorFrame2.default, { selector: selector,
+	          data: frame.data,
+	          actions: actions });
+	      case "rule":
+	        return _react2.default.createElement(_RuleFrame2.default, { selector: selector,
+	          data: frame.data,
+	          actions: actions });
+	      case "element":
+	        return _react2.default.createElement(_ElementFrame2.default, { selector: selector,
+	          data: frame.data,
+	          actions: actions });
+	      case "parts":
+	        return _react2.default.createElement(_PartsFrame2.default, { selector: selector,
+	          data: frame.data,
+	          actions: actions });
+	      case "spec":
+	        return _react2.default.createElement(_SpecFrame2.default, { selector: selector,
+	          data: frame.data,
+	          actions: actions });
 	      default:
-	        frame = _react2.default.createElement(_ViewFrame2.default, { page: page });
-	        break;
+	        return null;
 	    }
-
+	  },
+	  render: function render() {
 	    return _react2.default.createElement(
 	      "div",
 	      { className: "frames" },
-	      frame
+	      this._selectFrame()
 	    );
 	  }
 	});
 
 /***/ },
-/* 30 */
+/* 34 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -1929,28 +2411,28 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	exports.default = _react2.default.createClass({
-	  displayName: "ViewFrame",
+	  displayName: "SelectorFrame",
 
 	  addChild: function addChild(event) {
-	    console.error("not yet implemented");
+	    this.props.actions.showElementFrame();
 	  },
 	  addRule: function addRule(event) {
 	    console.error("not yet implemented");
+	    this.props.actions.showRuleFrame();
 	  },
 	  remove: function remove(event) {
 	    console.error("not yet implemented");
 	  },
 	  render: function render() {
-	    var page = this.props.page;
-
-	    if (page === undefined) {
+	    if (this.props.selector === undefined) {
 	      return null;
 	    }
 
-	    var selector = page.selector;
-	    var children = page.children;
-	    var rules = page.rules;
-	    var spec = page.spec;
+	    var _props$selector = this.props.selector;
+	    var selector = _props$selector.selector;
+	    var children = _props$selector.children;
+	    var rules = _props$selector.rules;
+	    var spec = _props$selector.spec;
 	    var type = spec.type;
 	    var value = spec.value;
 
@@ -1969,7 +2451,8 @@
 
 	    return _react2.default.createElement(
 	      "div",
-	      { className: "frame selector-form" },
+	      { className: "frame" },
+	      "Selector Frame",
 	      _react2.default.createElement(
 	        "div",
 	        null,
@@ -2045,7 +2528,7 @@
 	});
 
 /***/ },
-/* 31 */
+/* 35 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -2060,29 +2543,178 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+	exports.default = _react2.default.createClass({
+	  displayName: "RuleFrame",
+
+	  render: function render() {
+	    return _react2.default.createElement("div", { className: "frame rule-form" });
+	  }
+	});
+
+/***/ },
+/* 36 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _Inputs = __webpack_require__(26);
+
+	var _helpers = __webpack_require__(27);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	/*
+	 * ElementFrame
+	 * ------------
+	 *
+	 * This frame is used select an element within the page. An elements props is
+	 * passed to the frame, which is used when the frame is mounted/updated to attach
+	 * an event listener all child elements of the elements. When one of those elements
+	 * is clicked, an array of css selector options (from the clicked element to the
+	 * parent) will be rendered.
+	 */
 	exports.default = _react2.default.createClass({
 	  displayName: "ElementFrame",
 
+	  highlight: "selectable-element",
+	  events: {
+	    over: function over(event) {
+	      event.target.classList.add("forager-highlight");
+	    },
+	    out: function out(event) {
+	      event.target.classList.remove("forager-highlight");
+	    },
+	    click: function click(event) {
+	      event.preventDefault();
+	      event.stopPropagation();
+	      var data = [].slice.call(event.path).filter(function (ele) {
+	        return ele.classList && ele.classList.contains("selectable-element");
+	      }).reverse().map(function (ele) {
+	        return (0, _helpers.parts)(ele);
+	      });
+	      this.setState({
+	        selectors: data
+	      });
+	    }
+	  },
+	  getInitialState: function getInitialState() {
+	    return {
+	      checked: undefined,
+	      selectors: []
+	    };
+	  },
+	  setRadio: function setRadio(i) {
+	    this.setState({
+	      checked: i
+	    });
+	  },
+	  saveHandler: function saveHandler(event) {
+	    event.preventDefault();
+	    var selector = this.state.selectors[this.state.checked];
+	    this.props.actions.showPartsFrame(selector);
+	  },
+	  cancelHandler: function cancelHandler(event) {
+	    event.preventDefault();
+	    this.props.actions.showSelectorFrame();
+	  },
 	  render: function render() {
+	    var _this = this;
+
+	    var _props = this.props;
+	    var selector = _props.selector;
+	    var data = _props.data;
+	    var _state = this.state;
+	    var selectors = _state.selectors;
+	    var checked = _state.checked;
+
+	    var opts = selectors.map(function (s, i) {
+	      return _react2.default.createElement(SelectorRadio, { key: i,
+	        selector: s,
+	        index: i,
+	        checked: i === checked,
+	        select: _this.setRadio });
+	    });
 	    return _react2.default.createElement(
 	      "div",
 	      { className: "frame element-form" },
 	      _react2.default.createElement(
-	        "h2",
-	        null,
-	        selector
+	        "div",
+	        { className: "element-selectors" },
+	        opts
 	      ),
 	      _react2.default.createElement(
-	        "p",
-	        null,
-	        description
+	        "div",
+	        { className: "buttons" },
+	        _react2.default.createElement(_Inputs.PosButton, { text: "Save", click: this.saveHandler }),
+	        _react2.default.createElement(_Inputs.NegButton, { text: "Cancel", click: this.cancelHandler })
 	      )
+	    );
+	  },
+	  /*
+	   * below here are the functions for interacting with the non-Forager part of the page
+	   */
+	  componentWillMount: function componentWillMount() {
+	    var selector = this.props.selector;
+
+	    this._setupPageEvents(selector.elements);
+	  },
+	  componentWillReceiveNewProps: function componentWillReceiveNewProps(nextProps) {
+	    var selector = nextProps.selector;
+
+	    this._setupPageEvents(selector.elements);
+	  },
+	  componentWillUnmount: function componentWillUnmount() {
+	    this._removePageEvents();
+	  },
+	  _setupPageEvents: function _setupPageEvents(parents) {
+	    var elements = (0, _helpers.select)(parents);
+	    // need to bind this, but also cache the function
+	    // for removal
+	    var boundClick = this.events.click.bind(this);
+	    this.boundClick = boundClick;
+	    (0, _helpers.iHighlight)(elements, this.highlight, this.events.over, this.events.out, boundClick);
+	  },
+	  _removePageEvents: function _removePageEvents() {
+	    (0, _helpers.iUnhighlight)(this.highlight, this.events.over, this.events.out, this.boundClick);
+	    delete this.boundClick;
+	  }
+	});
+
+	var SelectorRadio = _react2.default.createClass({
+	  displayName: "SelectorRadio",
+
+	  setRadio: function setRadio(event) {
+	    // do not call event.preventDefault() here or the checked dot will fail to render
+	    this.props.select(this.props.index);
+	  },
+	  render: function render() {
+	    var _props2 = this.props;
+	    var selector = _props2.selector;
+	    var checked = _props2.checked;
+
+	    var labelClass = checked ? "selected" : "";
+	    return _react2.default.createElement(
+	      "label",
+	      { className: labelClass },
+	      selector,
+	      _react2.default.createElement("input", { type: "radio",
+	        name: "css-selector",
+	        checked: checked,
+	        onChange: this.setRadio })
 	    );
 	  }
 	});
 
 /***/ },
-/* 32 */
+/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -2094,32 +2726,123 @@
 	var _react = __webpack_require__(1);
 
 	var _react2 = _interopRequireDefault(_react);
+
+	var _Inputs = __webpack_require__(26);
+
+	var _helpers = __webpack_require__(27);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	exports.default = _react2.default.createClass({
-	  displayName: "SelectorFrame",
+	  displayName: "PartsFrame",
 
+	  previewClass: "query-check",
+	  parentClass: "current-selector",
+	  getInitialState: function getInitialState() {
+	    return {
+	      parts: [],
+	      selector: ""
+	    };
+	  },
+	  saveHandler: function saveHandler(event) {
+	    event.preventDefault();
+	    var selector = this.state.selector;
+
+	    if (selector !== "") {
+	      this.props.actions.showSpecFrame(selector);
+	    }
+	  },
+	  cancelHander: function cancelHander(event) {
+	    event.preventDefault();
+	    this.props.actions.showSelectorFrame();
+	  },
+	  toggleRadio: function toggleRadio(event) {
+	    // don't prevent default
+	    var index = event.target.value;
+	    var parts = this.state.parts;
+	    parts[index].checked = !parts[index].checked;
+	    var fullSelector = parts.reduce(function (str, curr) {
+	      if (curr.checked) {
+	        str += curr.name;
+	      }
+	      return str;
+	    }, "");
+	    this._setupHighlights(fullSelector);
+	    this.setState({
+	      parts: parts,
+	      selector: fullSelector
+	    });
+	  },
+	  componentWillMount: function componentWillMount() {
+	    (0, _helpers.highlight)(this.props.selector.elements, this.parentClass);
+	    this._partsArray(this.props.data.parts);
+	  },
+	  componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
+	    (0, _helpers.highlight)(this.props.selector.elements, this.parentClass);
+	    this._partsArray(nextProps.data.parts);
+	  },
+	  componentWillUnmount: function componentWillUnmount() {
+	    this._removeHighlights();
+	  },
+	  _partsArray: function _partsArray(names) {
+	    var parts = names.map(function (name) {
+	      return {
+	        name: name,
+	        checked: true
+	      };
+	    });
+	    var fullSelector = names.join("");
+	    this._setupHighlights(fullSelector);
+	    this.setState({
+	      parts: parts,
+	      selector: fullSelector
+	    });
+	  },
 	  render: function render() {
+	    var _this = this;
+
+	    var parts = this.state.parts.map(function (part, index) {
+	      var name = part.name;
+	      var checked = part.checked;
+
+	      return _react2.default.createElement(
+	        "label",
+	        { key: index },
+	        name,
+	        _react2.default.createElement("input", { type: "checkbox",
+	          name: "selector-part",
+	          value: index,
+	          checked: checked,
+	          onChange: _this.toggleRadio })
+	      );
+	    });
 	    return _react2.default.createElement(
 	      "div",
-	      { className: "frame element-form" },
+	      { className: "frame parts-form" },
+	      parts,
 	      _react2.default.createElement(
-	        "h2",
-	        null,
-	        selector
-	      ),
-	      _react2.default.createElement(
-	        "p",
-	        null,
-	        description
+	        "div",
+	        { className: "buttons" },
+	        _react2.default.createElement(_Inputs.PosButton, { text: "Save", click: this.saveHandler }),
+	        _react2.default.createElement(_Inputs.NegButton, { text: "Cancel", click: this.cancelHander })
 	      )
 	    );
+	  },
+	  _setupHighlights: function _setupHighlights(cssSelector) {
+	    (0, _helpers.unhighlight)(this.previewClass);
+	    if (cssSelector !== "") {
+	      var elements = (0, _helpers.select)(this.props.selector.elements, cssSelector);
+	      (0, _helpers.highlight)(elements, this.previewClass);
+	    }
+	  },
+	  _removeHighlights: function _removeHighlights() {
+	    (0, _helpers.unhighlight)(this.previewClass);
+	    (0, _helpers.unhighlight)(this.parentClass);
 	  }
 	});
 
 /***/ },
-/* 33 */
+/* 38 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -2131,32 +2854,167 @@
 	var _react = __webpack_require__(1);
 
 	var _react2 = _interopRequireDefault(_react);
+
+	var _Inputs = __webpack_require__(26);
+
+	var _helpers = __webpack_require__(27);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	exports.default = _react2.default.createClass({
 	  displayName: "SpecFrame",
 
+	  getInitialState: function getInitialState() {
+	    return {
+	      type: "single",
+	      value: 0
+	    };
+	  },
+	  saveHandler: function saveHandler(event) {
+	    event.preventDefault();
+	    var sel = (0, _helpers.createSelector)(this.props.data.css, this.state.type, this.state.value);
+	    // if saving a selector that selects "select" elements, add a child selector
+	    // to match option elements
+	    if ((0, _helpers.allSelect)(this.props.selector.elements, sel.selector, sel.spec)) {
+	      sel.children.push((0, _helpers.createSelector)("option", "all", "option"));
+	    }
+	    console.log(sel);
+	    //this.props.actions.saveSelector(selector);
+	  },
+	  cancelHandler: function cancelHandler(event) {
+	    event.preventDefault();
+	    this.props.actions.showSelectorFrame();
+	  },
+	  setSpec: function setSpec(type, value) {
+	    this.setState({
+	      type: type,
+	      value: value
+	    });
+	  },
 	  render: function render() {
+	    var _props = this.props;
+	    var selector = _props.selector;
+	    var data = _props.data;
+	    var css = data.css;
+
+	    var elementCount = (0, _helpers.count)(selector.elements, css);
 	    return _react2.default.createElement(
 	      "div",
-	      { className: "frame element-form" },
+	      { className: "frame spec-form" },
+	      css,
+	      _react2.default.createElement(SpecForm, { count: elementCount,
+	        setSpec: this.setSpec }),
 	      _react2.default.createElement(
-	        "h2",
-	        null,
-	        selector
-	      ),
-	      _react2.default.createElement(
-	        "p",
-	        null,
-	        description
+	        "div",
+	        { className: "buttons" },
+	        _react2.default.createElement(_Inputs.PosButton, { text: "Save", click: this.saveHandler }),
+	        _react2.default.createElement(_Inputs.NegButton, { text: "Cancel", click: this.cancelHandler })
 	      )
 	    );
 	  }
 	});
 
+	var SpecForm = _react2.default.createClass({
+	  displayName: "SpecForm",
+
+	  getInitialState: function getInitialState() {
+	    return {
+	      type: "single",
+	      value: 0
+	    };
+	  },
+	  setType: function setType(event) {
+	    var type = event.target.value;
+	    var value = undefined;
+	    if (type === "single") {
+	      value = 0;
+	    } else if (type === "all") {
+	      value = "";
+	    }
+	    this.props.setSpec(type, value);
+	    this.setState({
+	      type: type,
+	      value: value
+	    });
+	  },
+	  setValue: function setValue(event) {
+	    var value = event.target.value;
+	    if (this.state.type === "single") {
+	      value = parseInt(value, 10);
+	    }
+	    this.setSpec(this.state.type, value);
+	    this.setState({
+	      value: value
+	    });
+	  },
+	  setSpec: function setSpec(type, value) {
+	    this.props.setSpec(type, value);
+	  },
+	  _singleValue: function _singleValue() {
+	    var value = this.state.value;
+
+	    var options = [];
+	    for (var i = 0; i < this.props.count; i++) {
+	      options.push(_react2.default.createElement(
+	        "option",
+	        { key: i, value: i },
+	        i
+	      ));
+	    }
+	    return _react2.default.createElement(
+	      "select",
+	      { value: value,
+	        onChange: this.setValue },
+	      options
+	    );
+	  },
+	  _allValue: function _allValue() {
+	    return _react2.default.createElement(
+	      "div",
+	      null,
+	      "Name: ",
+	      _react2.default.createElement("input", { type: "text",
+	        value: this.state.value,
+	        onChange: this.setValue })
+	    );
+	  },
+	  render: function render() {
+	    var valueChooser = this.state.type === "single" ? this._singleValue() : this._allValue();
+	    return _react2.default.createElement(
+	      "div",
+	      null,
+	      _react2.default.createElement(
+	        "div",
+	        null,
+	        "Choose Type:",
+	        _react2.default.createElement(
+	          "label",
+	          null,
+	          "single ",
+	          _react2.default.createElement("input", { type: "radio",
+	            name: "type",
+	            value: "single",
+	            checked: this.state.type === "single",
+	            onChange: this.setType })
+	        ),
+	        _react2.default.createElement(
+	          "label",
+	          null,
+	          "all ",
+	          _react2.default.createElement("input", { type: "radio",
+	            name: "type",
+	            value: "all",
+	            checked: this.state.type === "all",
+	            onChange: this.setType })
+	        )
+	      ),
+	      valueChooser
+	    );
+	  }
+	});
+
 /***/ },
-/* 34 */
+/* 39 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -2171,7 +3029,7 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _d = __webpack_require__(35);
+	var _d = __webpack_require__(40);
 
 	var _d2 = _interopRequireDefault(_d);
 
@@ -2223,8 +3081,13 @@
 	      tree: tree
 	    });
 	  },
-	  _makeNodes: function _makeNodes(page) {
+	  _makeNodes: function _makeNodes() {
 	    // don't draw anything when there isn't a page
+	    var _props = this.props;
+	    var page = _props.page;
+	    var actions = _props.actions;
+	    var selectSelector = actions.selectSelector;
+
 	    if (page === undefined) {
 	      return null;
 	    }
@@ -2238,11 +3101,15 @@
 	    var nodes = tree.nodes(page);
 	    var links = tree.links(nodes);
 	    var paths = links.map(function (l, i) {
-	      return _react2.default.createElement("path", { className: "link", d: diagonal(l) });
+	      return _react2.default.createElement("path", { key: i,
+	        className: "link",
+	        d: diagonal(l) });
 	    });
 
 	    var selectors = nodes.map(function (n, i) {
-	      return _react2.default.createElement(Node, _extends({ key: i }, n));
+	      return _react2.default.createElement(Node, _extends({ key: i,
+	        select: selectSelector
+	      }, n));
 	    });
 
 	    return _react2.default.createElement(
@@ -2253,13 +3120,12 @@
 	    );
 	  },
 	  render: function render() {
-	    var _props = this.props;
-	    var page = _props.page;
-	    var width = _props.width;
-	    var height = _props.height;
-	    var margin = _props.margin;
+	    var _props2 = this.props;
+	    var width = _props2.width;
+	    var height = _props2.height;
+	    var margin = _props2.margin;
 
-	    var nodes = this._makeNodes(page);
+	    var nodes = this._makeNodes();
 
 	    return _react2.default.createElement(
 	      "div",
@@ -2283,7 +3149,7 @@
 
 	  handleClick: function handleClick(event) {
 	    event.preventDefault();
-	    console.log("You are selecting a selector");
+	    this.props.select(this.props.id);
 	  },
 	  specText: function specText(spec, selector) {
 	    var text = "";
@@ -2301,12 +3167,12 @@
 	    return (0, _helpers.abbreviate)(text, 15);
 	  },
 	  render: function render() {
-	    var _props2 = this.props;
-	    var selector = _props2.selector;
-	    var spec = _props2.spec;
-	    var rules = _props2.rules;
-	    var x = _props2.x;
-	    var y = _props2.y;
+	    var _props3 = this.props;
+	    var selector = _props3.selector;
+	    var spec = _props3.spec;
+	    var rules = _props3.rules;
+	    var x = _props3.x;
+	    var y = _props3.y;
 
 	    var text = this.specText(spec, selector);
 	    var marker = rules && rules.length ? _react2.default.createElement("rect", { width: "6", height: "6", x: "-3", y: "-3" }) : _react2.default.createElement("circle", { r: "3" });
@@ -2325,13 +3191,13 @@
 	});
 
 /***/ },
-/* 35 */
+/* 40 */
 /***/ function(module, exports) {
 
 	module.exports = d3;
 
 /***/ },
-/* 36 */
+/* 41 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -2339,6 +3205,160 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
+
+	var _frame = __webpack_require__(42);
+
+	var _frame2 = _interopRequireDefault(_frame);
+
+	var _show = __webpack_require__(43);
+
+	var _show2 = _interopRequireDefault(_show);
+
+	var _page = __webpack_require__(44);
+
+	var _page2 = _interopRequireDefault(_page);
+
+	var _selector = __webpack_require__(45);
+
+	var _selector2 = _interopRequireDefault(_selector);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var initialState = {
+	  show: true,
+	  page: {
+	    pages: [undefined],
+	    pageIndex: 0
+	  },
+	  frame: {
+	    name: "selector",
+	    data: {}
+	  },
+	  selector: undefined
+	};
+
+	/*
+	 * Forager reducer
+	 */
+	function reducer() {
+	  var state = arguments.length <= 0 || arguments[0] === undefined ? initialState : arguments[0];
+	  var action = arguments[1];
+
+	  switch (action.type) {
+	    default:
+	      return {
+	        frame: (0, _frame2.default)(state.frame, action),
+	        show: (0, _show2.default)(state.show, action),
+	        page: (0, _page2.default)(state.page, action),
+	        selector: (0, _selector2.default)(state.selector, action)
+	      };
+	  }
+	}
+
+	exports.default = reducer;
+
+/***/ },
+/* 42 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = frame;
+
+	var _ActionTypes = __webpack_require__(24);
+
+	var types = _interopRequireWildcard(_ActionTypes);
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+	function frame() {
+	  var state = arguments.length <= 0 || arguments[0] === undefined ? "" : arguments[0];
+	  var action = arguments[1];
+
+	  switch (action.type) {
+	    case types.LOAD_PAGE:
+	      return Object.assign({}, state, {
+	        name: "selector",
+	        data: {}
+	      });
+	    case types.SHOW_SELECTOR_FRAME:
+	      return Object.assign({}, state, {
+	        name: "selector",
+	        data: {}
+	      });
+	    case types.SHOW_RULE_FRAME:
+	      return Object.assign({}, state, {
+	        name: "rule",
+	        data: {}
+	      });
+	    case types.SHOW_ELEMENT_FRAME:
+	      return Object.assign({}, state, {
+	        name: "element",
+	        data: {}
+	      });
+	    case types.SHOW_PARTS_FRAME:
+	      return Object.assign({}, state, {
+	        name: "parts",
+	        data: {
+	          parts: action.parts
+	        }
+	      });
+	    case types.SHOW_SPEC_FRAME:
+	      return Object.assign({}, state, {
+	        name: "spec",
+	        data: {
+	          css: action.css
+	        }
+	      });
+	    default:
+	      return state;
+	  }
+	}
+
+/***/ },
+/* 43 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = show;
+
+	var _ActionTypes = __webpack_require__(24);
+
+	var types = _interopRequireWildcard(_ActionTypes);
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+	function show() {
+	  var state = arguments.length <= 0 || arguments[0] === undefined ? true : arguments[0];
+	  var action = arguments[1];
+
+	  switch (action.type) {
+	    case types.CLOSE_FORAGER:
+	      return false;
+	    case types.SHOW_FORAGER:
+	      return true;
+	    default:
+	      return state;
+	  }
+	}
+
+/***/ },
+/* 44 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = page;
 
 	var _ActionTypes = __webpack_require__(24);
 
@@ -2348,18 +3368,8 @@
 
 	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
-	var initialState = {
-	  show: true,
-	  pages: [undefined],
-	  pageIndex: 0
-	};
-
-	/*
-	 * Forager reducer
-	 * One big function for the time being
-	 */
-	function reducer() {
-	  var state = arguments.length <= 0 || arguments[0] === undefined ? initialState : arguments[0];
+	function page() {
+	  var state = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 	  var action = arguments[1];
 
 	  switch (action.type) {
@@ -2377,9 +3387,10 @@
 	      });
 	    case types.ADD_PAGE:
 	      var pages = state.pages;
+	      var newPages = [].concat(_toConsumableArray(pages), [action.page]);
 	      return Object.assign({}, state, {
-	        pages: [].concat(_toConsumableArray(pages), [action.page]),
-	        pageIndex: pages.length - 1
+	        pages: newPages,
+	        pageIndex: newPages.length - 1
 	      });
 	    case types.REMOVE_PAGE:
 	      var pages = state.pages;
@@ -2408,20 +3419,90 @@
 	      return Object.assign({}, state, {
 	        pages: newPages
 	      });
-	    case types.CLOSE_FORAGER:
-	      return Object.assign({}, state, {
-	        show: false
-	      });
-	    case types.SHOW_FORAGER:
-	      return Object.assign({}, state, {
-	        show: true
-	      });
 	    default:
 	      return state;
 	  }
 	}
 
-	exports.default = reducer;
+/***/ },
+/* 45 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = selector;
+
+	var _ActionTypes = __webpack_require__(24);
+
+	var types = _interopRequireWildcard(_ActionTypes);
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+	function selector(state, action) {
+	  switch (action.type) {
+	    case types.SELECT_SELECTOR:
+	      return action.selector;
+	    case types.LOAD_PAGE:
+	      // when switching pages, no selector should be selected
+	      return undefined;
+	    default:
+	      return state;
+	  }
+	}
+
+/***/ },
+/* 46 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.findSelector = undefined;
+
+	var _ActionTypes = __webpack_require__(24);
+
+	var ActionTypes = _interopRequireWildcard(_ActionTypes);
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+	var findSelector = exports.findSelector = function findSelector(state) {
+	  return function (next) {
+	    return function (action) {
+	      switch (action.type) {
+	        case ActionTypes.SELECT_SELECTOR:
+	          var current = state.getState();
+	          var id = action.selectorID;
+	          var page = current.page.pages[current.page.pageIndex];
+	          var selector = find(page, id);
+	          action.selector = selector;
+	          break;
+	      }
+	      return next(action);
+	    };
+	  };
+	};
+
+	var find = function find(page, id) {
+	  if (page.id === id) {
+	    return page;
+	  } else {
+	    var sel = undefined;
+	    page.children.some(function (child) {
+	      var val = find(child, id);
+	      if (val !== undefined) {
+	        sel = child;
+	        return true;
+	      }
+	      return false;
+	    });
+	    return sel;
+	  }
+	};
 
 /***/ }
 /******/ ]);

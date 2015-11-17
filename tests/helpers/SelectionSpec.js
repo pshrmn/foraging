@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { jsdom } from "jsdom";
 
-import { select, count, parts } from "../../src/business/selector";
+import { select, count, parts } from "../../src/helpers/selection";
 
 let doc = jsdom(`<!doctype html>
   <html>

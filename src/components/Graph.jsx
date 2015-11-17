@@ -42,8 +42,10 @@ export default React.createClass({
       tree: tree
     });
   },
-  _makeNodes: function(page) {
+  _makeNodes: function() {
     // don't draw anything when there isn't a page
+    let { page, actions } = this.props;
+    let { selectSelector } = actions;
     if ( page === undefined ) {
       return null;
     }
@@ -54,11 +56,15 @@ export default React.createClass({
     let nodes = tree.nodes(page);
     let links = tree.links(nodes);
     let paths = links.map((l, i) => {
-      return <path className="link" d={diagonal(l)} />
+      return <path key={i}
+                   className="link"
+                   d={diagonal(l)} />
     });
 
     let selectors = nodes.map((n, i) => {
-      return <Node key={i} {...n} />
+      return <Node key={i} 
+                   select={selectSelector}
+                   {...n} />
     });
 
     return (
@@ -69,9 +75,8 @@ export default React.createClass({
     );
   },
   render: function() {
-    let { page, width, height, margin } = this.props;
-
-    let nodes = this._makeNodes(page)
+    let { width, height, margin } = this.props;
+    let nodes = this._makeNodes();
 
     return (
       <div className="graph">
@@ -89,7 +94,7 @@ export default React.createClass({
 let Node = React.createClass({
   handleClick: function(event) {
     event.preventDefault();
-    console.log("You are selecting a selector");
+    this.props.select(this.props.id);
   },
   specText: function(spec, selector) {
     let text = "";

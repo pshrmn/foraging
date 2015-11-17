@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { jsdom } from "jsdom";
 
-import { highlight, unhighlight, iHighlight, iUnhighlight } from "../../src/business/markup";
+import { highlight, unhighlight, iHighlight, iUnhighlight } from "../../src/helpers/markup";
 
 let doc = jsdom(`<!doctype html>
   <html>
