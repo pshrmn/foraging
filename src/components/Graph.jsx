@@ -1,7 +1,7 @@
 import React from "react";
 import d3 from "d3";
 
-import { abbreviate } from "../helpers";
+import { abbreviate, clone, highlight, unhighlight } from "../helpers";
 
 /*
  * A tree rendering of the page, used to show the current page, the current
@@ -44,16 +44,17 @@ export default React.createClass({
   },
   _makeNodes: function() {
     // don't draw anything when there isn't a page
-    let { page, actions } = this.props;
-    let { selectSelector } = actions;
+    let { page, selector, selectSelector } = this.props;
     if ( page === undefined ) {
       return null;
     }
 
     let { tree, diagonal } = this.state;
 
+    let clonedPage = clone(page);
+
     // generate the tree's nodes and links
-    let nodes = tree.nodes(page);
+    let nodes = tree.nodes(clonedPage);
     let links = tree.links(nodes);
     let paths = links.map((l, i) => {
       return <path key={i}
@@ -62,7 +63,12 @@ export default React.createClass({
     });
 
     let selectors = nodes.map((n, i) => {
+      let current = false;
+      if ( selector && n.id === selector.id ) {
+        current = true;
+      }
       return <Node key={i} 
+                   current={current}
                    select={selectSelector}
                    {...n} />
     });
@@ -92,11 +98,19 @@ export default React.createClass({
 });
 
 let Node = React.createClass({
+  hoverClass: "saved-preview",
   handleClick: function(event) {
     event.preventDefault();
     this.props.select(this.props.id);
   },
-  specText: function(spec, selector) {
+  handleMouseover: function(event) {
+    highlight(this.props.elements, this.hoverClass);
+  },
+  handleMouseout: function(event) {
+    unhighlight(this.hoverClass);
+  },
+  specText: function() {
+    let { selector, spec } = this.props;
     let text = "";
     if ( !spec ) {
       return text;
@@ -112,16 +126,28 @@ let Node = React.createClass({
     return abbreviate(text, 15);
   },
   render: function() {
-    let { selector, spec, rules, x, y } = this.props;
-    let text = this.specText(spec, selector);
+    let { rules, children } = this.props;
+    let hasChildren = children && children.length;
+    let hasRules = rules && rules.length;
+    let text = this.specText();
     let marker = rules && rules.length ? (
       <rect width="6" height="6" x="-3" y="-3"></rect>
     ) : (
       <circle r="3"></circle>
     );
-
+    let classNames = ["node"];
+    if ( this.props.current ) {
+      classNames.push("current");
+    }
+    if ( !hasRules && !hasChildren ) {
+      classNames.push("empty");
+    }
     return (
-      <g className="node" onClick={this.handleClick} transform={`translate(${y},${x})`}>
+      <g className={classNames.join(" ")}
+         transform={`translate(${this.props.y},${this.props.x})`}
+         onClick={this.handleClick}
+         onMouseOver={this.handleMouseover}
+         onMouseOut={this.handleMouseout} >
         <text y="5" dx="-5">{text}</text>
         {marker}
       </g>

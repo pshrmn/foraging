@@ -17,6 +17,8 @@ let Forager = React.createClass({
     if ( !show ) {
       classNames.push("hidden");
     }
+    // only let the graph update the current selector when 
+    let selectSelector = frame.name === "selector" ? actions.selectSelector : () => {};
     return (
       <div className={classNames.join(" ")} ref="app">
         <Controls pages={pages}
@@ -27,7 +29,8 @@ let Forager = React.createClass({
                   frame={frame}
                   actions={actions} />
           <Graph page={page}
-                 actions={actions} />
+                 selector={selector}
+                 selectSelector={selectSelector} />
         </div>
       </div>
     );

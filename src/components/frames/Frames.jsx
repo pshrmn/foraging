@@ -6,7 +6,10 @@ import ElementFrame from "./ElementFrame";
 import PartsFrame from "./PartsFrame";
 import SpecFrame from "./SpecFrame";
 
+import { highlight, unhighlight } from "../../helpers";
+
 export default React.createClass({
+  cssSelector: "current-selector",
   _selectFrame: function() {
     let { frame, selector, actions } = this.props;
     switch ( frame.name ) {
@@ -33,6 +36,23 @@ export default React.createClass({
     default:
       return null;
     }
+  },
+  componentWillMount: function() {
+    if ( this.props.selector ) {
+      this._highlightParents(this.props.selector.elements);
+    }
+  },
+  componentWillReceiveProps: function(nextProps) {
+    if ( nextProps.selector !== undefined && nextProps.selector !== this.props.selector ) {
+      this._highlightParents(nextProps.selector.elements);
+    }
+  },
+  componentWillUnmount: function() {
+    unhighlight(this.cssSelector);
+  },
+  _highlightParents: function(elements) {
+    unhighlight(this.cssSelector);
+    highlight(elements, this.cssSelector);
   },
   render: function() {
     return (

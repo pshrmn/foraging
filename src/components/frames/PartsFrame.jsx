@@ -5,7 +5,6 @@ import { select, highlight, unhighlight} from "../../helpers";
 
 export default React.createClass({
   previewClass: "query-check",
-  parentClass: "current-selector",
   getInitialState: function() {
     return {
       parts: [],
@@ -42,11 +41,9 @@ export default React.createClass({
     });
   },
   componentWillMount: function() {
-    highlight(this.props.selector.elements, this.parentClass);
     this._partsArray(this.props.data.parts);
   },
   componentWillReceiveProps: function(nextProps) {
-    highlight(this.props.selector.elements, this.parentClass);
     this._partsArray(nextProps.data.parts);
   },
   componentWillUnmount: function() {
@@ -99,6 +96,5 @@ export default React.createClass({
   },
   _removeHighlights: function() {
     unhighlight(this.previewClass);
-    unhighlight(this.parentClass);
   }
 });

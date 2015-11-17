@@ -1467,6 +1467,8 @@
 	    if (!show) {
 	      classNames.push("hidden");
 	    }
+	    // only let the graph update the current selector when
+	    var selectSelector = frame.name === "selector" ? actions.selectSelector : function () {};
 	    return _react2.default.createElement(
 	      "div",
 	      { className: classNames.join(" "), ref: "app" },
@@ -1480,7 +1482,8 @@
 	          frame: frame,
 	          actions: actions }),
 	        _react2.default.createElement(_Graph2.default, { page: page,
-	          actions: actions })
+	          selector: selector,
+	          selectSelector: selectSelector })
 	      )
 	    );
 	  },
@@ -1946,6 +1949,12 @@
 	    return _page.pageElements;
 	  }
 	});
+	Object.defineProperty(exports, "clone", {
+	  enumerable: true,
+	  get: function get() {
+	    return _page.clone;
+	  }
+	});
 
 	var _selection = __webpack_require__(32);
 
@@ -2134,7 +2143,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.pageElements = exports.createSelector = exports.createPage = undefined;
+	exports.addChild = exports.clone = exports.pageElements = exports.createSelector = exports.createPage = undefined;
 
 	var _selection = __webpack_require__(32);
 
@@ -2187,6 +2196,41 @@
 	  };
 
 	  attach(page);
+	};
+
+	/*
+	 * clone a page (useful with the graph because that adds unnecessary properties
+	 * to each selector) does not include the page's name
+	 */
+	var clone = exports.clone = function clone(selector) {
+	  return Object.assign({}, {
+	    id: selector.id,
+	    selector: selector.selector,
+	    spec: Object.assign({}, selector.spec),
+	    children: selector.children.map(function (child) {
+	      return clone(child);
+	    }),
+	    rules: selector.rules.map(function (r) {
+	      return Object.assign({}, r);
+	    }),
+	    elements: selector.elements || []
+	  });
+	};
+
+	/*
+	 * iterate over the tree looking for selector matching id, and when found
+	 * append the newChild to its array of children
+	 */
+	var addChild = exports.addChild = function addChild(selector, id, newChild) {
+	  if (selector.id === id) {
+	    selector.children.push(newChild);
+	    return true;
+	  } else {
+	    var found = selector.children.some(function (child) {
+	      addChild(child, id, newChild);
+	    });
+	    return found;
+	  }
 	};
 
 /***/ },
@@ -2345,11 +2389,14 @@
 
 	var _SpecFrame2 = _interopRequireDefault(_SpecFrame);
 
+	var _helpers = __webpack_require__(27);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	exports.default = _react2.default.createClass({
 	  displayName: "Frames",
 
+	  cssSelector: "current-selector",
 	  _selectFrame: function _selectFrame() {
 	    var _props = this.props;
 	    var frame = _props.frame;
@@ -2380,6 +2427,23 @@
 	      default:
 	        return null;
 	    }
+	  },
+	  componentWillMount: function componentWillMount() {
+	    if (this.props.selector) {
+	      this._highlightParents(this.props.selector.elements);
+	    }
+	  },
+	  componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
+	    if (nextProps.selector !== undefined && nextProps.selector !== this.props.selector) {
+	      this._highlightParents(nextProps.selector.elements);
+	    }
+	  },
+	  componentWillUnmount: function componentWillUnmount() {
+	    (0, _helpers.unhighlight)(this.cssSelector);
+	  },
+	  _highlightParents: function _highlightParents(elements) {
+	    (0, _helpers.unhighlight)(this.cssSelector);
+	    (0, _helpers.highlight)(elements, this.cssSelector);
 	  },
 	  render: function render() {
 	    return _react2.default.createElement(
@@ -2737,7 +2801,6 @@
 	  displayName: "PartsFrame",
 
 	  previewClass: "query-check",
-	  parentClass: "current-selector",
 	  getInitialState: function getInitialState() {
 	    return {
 	      parts: [],
@@ -2774,11 +2837,9 @@
 	    });
 	  },
 	  componentWillMount: function componentWillMount() {
-	    (0, _helpers.highlight)(this.props.selector.elements, this.parentClass);
 	    this._partsArray(this.props.data.parts);
 	  },
 	  componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
-	    (0, _helpers.highlight)(this.props.selector.elements, this.parentClass);
 	    this._partsArray(nextProps.data.parts);
 	  },
 	  componentWillUnmount: function componentWillUnmount() {
@@ -2837,7 +2898,6 @@
 	  },
 	  _removeHighlights: function _removeHighlights() {
 	    (0, _helpers.unhighlight)(this.previewClass);
-	    (0, _helpers.unhighlight)(this.parentClass);
 	  }
 	});
 
@@ -3085,8 +3145,8 @@
 	    // don't draw anything when there isn't a page
 	    var _props = this.props;
 	    var page = _props.page;
-	    var actions = _props.actions;
-	    var selectSelector = actions.selectSelector;
+	    var selector = _props.selector;
+	    var selectSelector = _props.selectSelector;
 
 	    if (page === undefined) {
 	      return null;
@@ -3096,9 +3156,10 @@
 	    var tree = _state.tree;
 	    var diagonal = _state.diagonal;
 
-	    // generate the tree's nodes and links
+	    var clonedPage = (0, _helpers.clone)(page);
 
-	    var nodes = tree.nodes(page);
+	    // generate the tree's nodes and links
+	    var nodes = tree.nodes(clonedPage);
 	    var links = tree.links(nodes);
 	    var paths = links.map(function (l, i) {
 	      return _react2.default.createElement("path", { key: i,
@@ -3107,7 +3168,12 @@
 	    });
 
 	    var selectors = nodes.map(function (n, i) {
+	      var current = false;
+	      if (selector && n.id === selector.id) {
+	        current = true;
+	      }
 	      return _react2.default.createElement(Node, _extends({ key: i,
+	        current: current,
 	        select: selectSelector
 	      }, n));
 	    });
@@ -3147,11 +3213,22 @@
 	var Node = _react2.default.createClass({
 	  displayName: "Node",
 
+	  hoverClass: "saved-preview",
 	  handleClick: function handleClick(event) {
 	    event.preventDefault();
 	    this.props.select(this.props.id);
 	  },
-	  specText: function specText(spec, selector) {
+	  handleMouseover: function handleMouseover(event) {
+	    (0, _helpers.highlight)(this.props.elements, this.hoverClass);
+	  },
+	  handleMouseout: function handleMouseout(event) {
+	    (0, _helpers.unhighlight)(this.hoverClass);
+	  },
+	  specText: function specText() {
+	    var _props3 = this.props;
+	    var selector = _props3.selector;
+	    var spec = _props3.spec;
+
 	    var text = "";
 	    if (!spec) {
 	      return text;
@@ -3167,19 +3244,28 @@
 	    return (0, _helpers.abbreviate)(text, 15);
 	  },
 	  render: function render() {
-	    var _props3 = this.props;
-	    var selector = _props3.selector;
-	    var spec = _props3.spec;
-	    var rules = _props3.rules;
-	    var x = _props3.x;
-	    var y = _props3.y;
+	    var _props4 = this.props;
+	    var rules = _props4.rules;
+	    var children = _props4.children;
 
-	    var text = this.specText(spec, selector);
+	    var hasChildren = children && children.length;
+	    var hasRules = rules && rules.length;
+	    var text = this.specText();
 	    var marker = rules && rules.length ? _react2.default.createElement("rect", { width: "6", height: "6", x: "-3", y: "-3" }) : _react2.default.createElement("circle", { r: "3" });
-
+	    var classNames = ["node"];
+	    if (this.props.current) {
+	      classNames.push("current");
+	    }
+	    if (!hasRules && !hasChildren) {
+	      classNames.push("empty");
+	    }
 	    return _react2.default.createElement(
 	      "g",
-	      { className: "node", onClick: this.handleClick, transform: "translate(" + y + "," + x + ")" },
+	      { className: classNames.join(" "),
+	        transform: "translate(" + this.props.y + "," + this.props.x + ")",
+	        onClick: this.handleClick,
+	        onMouseOver: this.handleMouseover,
+	        onMouseOut: this.handleMouseout },
 	      _react2.default.createElement(
 	        "text",
 	        { y: "5", dx: "-5" },
