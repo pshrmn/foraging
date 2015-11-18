@@ -68,9 +68,11 @@
 
 	var _findSelector = __webpack_require__(46);
 
-	var _helpers = __webpack_require__(27);
+	var _chrome = __webpack_require__(47);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 	/*
 	 * check if the forager holder exists. If it doesn't, mount the app. If it does,
@@ -78,68 +80,45 @@
 	 */
 	var holder = document.querySelector(".forager-holder");
 	if (!holder) {
-	  var initialState = {
-	    show: true,
-	    selector: undefined,
-	    page: {
-	      pages: [undefined, {
-	        id: 0,
-	        name: "example 1",
-	        selector: "body",
-	        spec: {
-	          type: "single",
-	          value: 0
-	        },
-	        children: [{
-	          id: 1,
-	          selector: "div",
-	          spec: {
-	            type: "all",
-	            value: "divs"
-	          },
-	          children: [],
-	          rules: []
-	        }],
-	        rules: [{
-	          name: "test",
-	          attr: "text",
-	          type: "string"
-	        }]
-	      }, {
-	        id: 0,
-	        name: "example 2",
-	        selector: "body",
-	        spec: {
-	          type: "single",
-	          value: 0
-	        },
-	        children: [],
-	        rules: []
-	      }],
-	      pageIndex: 0
-	    },
-	    frame: {
-	      name: "selector",
-	      data: {}
-	    }
-	  };
-	  initialState.page.pages.forEach(function (p) {
-	    (0, _helpers.pageElements)(p);
+	  (0, _chrome.chromeLoad)(function (pages) {
+	    var initialState = {
+	      show: true,
+	      selector: undefined,
+	      page: {
+	        pages: [undefined].concat(_toConsumableArray(pages)),
+	        pageIndex: 0
+	      },
+	      frame: {
+	        name: "selector",
+	        data: {}
+	      }
+	    };
+
+	    var store = (0, _redux.applyMiddleware)(_findSelector.findSelector)(_redux.createStore)(_reducers2.default, initialState);
+
+	    var oldPages = {};
+	    store.subscribe(function () {
+	      var state = store.getState();
+	      var pages = state.page.pages;
+	      if (pages !== oldPages) {
+	        (0, _chrome.chromeSave)(pages);
+	        oldPages = pages;
+	      }
+	    });
+	    // create an element to attach Forager to
+	    var holder = document.createElement("div");
+	    holder.classList.add("forager-holder");
+	    holder.classList.add("no-select");
+	    document.body.appendChild(holder);
+
+	    (0, _reactDom.render)(_react2.default.createElement(
+	      _reactRedux.Provider,
+	      { store: store },
+	      _react2.default.createElement(_Forager2.default, null)
+	    ), holder);
+
+	    window.store = store;
 	  });
-	  var _store = (0, _redux.applyMiddleware)(_findSelector.findSelector)(_redux.createStore)(_reducers2.default, initialState);
-	  // create an element to attach Forager to
-	  var _holder = document.createElement("div");
-	  _holder.classList.add("forager-holder");
-	  _holder.classList.add("no-select");
-	  document.body.appendChild(_holder);
-
-	  (0, _reactDom.render)(_react2.default.createElement(
-	    _reactRedux.Provider,
-	    { store: _store },
-	    _react2.default.createElement(_Forager2.default, null)
-	  ), _holder);
-
-	  window.store = _store;
 	} else {
 	  var currentState = store.getState();
 	  if (!currentState.show) {
@@ -1628,10 +1607,11 @@
 	  };
 	};
 
-	var saveSelector = exports.saveSelector = function saveSelector(selector) {
+	var saveSelector = exports.saveSelector = function saveSelector(selector, parentID) {
 	  return {
 	    type: types.SAVE_SELECTOR,
-	    selector: selector
+	    selector: selector,
+	    parentID: parentID
 	  };
 	};
 
@@ -1718,16 +1698,17 @@
 	    if (name !== undefined) {
 	      // report the new name
 	      var newPage = (0, _helpers.createPage)(name);
+	      (0, _helpers.setupPage)(newPage);
 	      this.props.actions.addPage(newPage);
 	    }
 	  },
 	  renameHandler: function renameHandler(event) {
 	    event.preventDefault();
+	    var curr = this.props.pages[this.props.index];
 	    // don't do anything for the undefined option
 	    if (curr === undefined) {
 	      return;
 	    }
-	    var curr = this.props.pages[this.props.index];
 	    var name = this.getName();
 	    if (name !== undefined && name !== curr.name) {
 	      // set the new name
@@ -1943,16 +1924,16 @@
 	    return _page.createSelector;
 	  }
 	});
-	Object.defineProperty(exports, "pageElements", {
-	  enumerable: true,
-	  get: function get() {
-	    return _page.pageElements;
-	  }
-	});
 	Object.defineProperty(exports, "clone", {
 	  enumerable: true,
 	  get: function get() {
 	    return _page.clone;
+	  }
+	});
+	Object.defineProperty(exports, "setupPage", {
+	  enumerable: true,
+	  get: function get() {
+	    return _page.setupPage;
 	  }
 	});
 
@@ -2143,7 +2124,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.addChild = exports.clone = exports.pageElements = exports.createSelector = exports.createPage = undefined;
+	exports.setupPage = exports.addChild = exports.clone = exports.createSelector = exports.createPage = undefined;
 
 	var _selection = __webpack_require__(32);
 
@@ -2175,27 +2156,6 @@
 	    rules: [],
 	    optional: optional
 	  };
-	};
-
-	/*
-	 * iterate through the page tree and add an "elements" property to each selector
-	 * which is an array containing all elements in the page that that selector
-	 * matches
-	 */
-	var pageElements = exports.pageElements = function pageElements(page) {
-	  if (page === undefined) {
-	    return;
-	  }
-	  var elements = [document];
-	  var attach = function attach(selector) {
-	    elements = (0, _selection.select)(elements, selector.selector);
-	    selector["elements"] = elements;
-	    selector.children.forEach(function (child) {
-	      attach(child);
-	    });
-	  };
-
-	  attach(page);
 	};
 
 	/*
@@ -2231,6 +2191,26 @@
 	    });
 	    return found;
 	  }
+	};
+
+	/*
+	 * set an id on each selector and determine the elements that each selector matches
+	 */
+	var setupPage = exports.setupPage = function setupPage(page) {
+	  if (page === undefined) {
+	    return;
+	  }
+	  var id = 0;
+	  var setup = function setup(selector, parentElements) {
+	    selector.id = id++;
+	    selector.elements = (0, _selection.select)(parentElements, selector.selector, selector.spec);
+	    selector.children.forEach(function (child) {
+	      setup(child, selector.elements);
+	    });
+	  };
+
+	  setup(page, [document]);
+	  page.nextID = id;
 	};
 
 /***/ },
@@ -2349,8 +2329,8 @@
 	/*
 	 * check if all elements matched by the selector are "select" elements
 	 */
-	var allSelect = exports.allSelect = function allSelect(parents, selector, spec) {
-	  return select(parents, selector, spec).every(function (ele) {
+	var allSelect = exports.allSelect = function allSelect(selection) {
+	  return selection.every(function (ele) {
 	    return ele.tagName === "SELECT";
 	  });
 	};
@@ -2739,6 +2719,7 @@
 	    this._removePageEvents();
 	  },
 	  _setupPageEvents: function _setupPageEvents(parents) {
+	    // get all child elemetns of the parents
 	    var elements = (0, _helpers.select)(parents);
 	    // need to bind this, but also cache the function
 	    // for removal
@@ -2933,13 +2914,17 @@
 	  saveHandler: function saveHandler(event) {
 	    event.preventDefault();
 	    var sel = (0, _helpers.createSelector)(this.props.data.css, this.state.type, this.state.value);
+	    // generate the list of elements right away
+	    sel.elements = (0, _helpers.select)(this.props.selector.elements, sel.selector, sel.spec);
 	    // if saving a selector that selects "select" elements, add a child selector
 	    // to match option elements
-	    if ((0, _helpers.allSelect)(this.props.selector.elements, sel.selector, sel.spec)) {
-	      sel.children.push((0, _helpers.createSelector)("option", "all", "option"));
+	    if ((0, _helpers.allSelect)(sel.elements)) {
+	      var optionsChild = (0, _helpers.createSelector)("option", "all", "option");
+	      optionsChild.elements = (0, _helpers.select)(sel.elements, optionsChild.selector, optionsChild.spec);
+	      sel.children.push(optionsChild);
 	    }
-	    console.log(sel);
-	    //this.props.actions.saveSelector(selector);
+	    // send the new selector and the parent
+	    this.props.actions.saveSelector(sel, this.props.selector.id);
 	  },
 	  cancelHandler: function cancelHandler(event) {
 	    event.preventDefault();
@@ -3399,6 +3384,11 @@
 	          css: action.css
 	        }
 	      });
+	    case types.SAVE_SELECTOR:
+	      return Object.assign({}, state, {
+	        name: "selector",
+	        data: {}
+	      });
 	    default:
 	      return state;
 	  }
@@ -3505,6 +3495,42 @@
 	      return Object.assign({}, state, {
 	        pages: newPages
 	      });
+	    case types.SAVE_SELECTOR:
+	      var pages = state.pages;
+	      var pageIndex = state.pageIndex;
+
+	      var page = pages[pageIndex];
+	      var selector = action.selector;
+	      var parentID = action.parentID;
+
+	      // assign the id of the new selector
+
+	      selector.id = page.nextID++;
+	      page.nextID++;
+	      // and assign the id of the options selector if there is one
+	      if (selector.children.length !== 0) {
+	        selector.children.forEach(function (child) {
+	          child.id = page.nextID++;
+	        });
+	      }
+
+	      var find = function find(s) {
+	        if (s.id === parentID) {
+	          s.children.push(selector);
+	          return true;
+	        } else {
+	          var found = s.children.some(function (child) {
+	            return find(child);
+	          });
+	          return found;
+	        }
+	      };
+	      find(page);
+
+	      return Object.assign({}, state, {
+	        pages: [].concat(_toConsumableArray(pages.slice(0, pageIndex)), [page], _toConsumableArray(pages.slice(pageIndex + 1)))
+	      });
+
 	    default:
 	      return state;
 	  }
@@ -3534,6 +3560,8 @@
 	    case types.LOAD_PAGE:
 	      // when switching pages, no selector should be selected
 	      return undefined;
+	    case types.SAVE_SELECTOR:
+	      return action.selector;
 	    default:
 	      return state;
 	  }
@@ -3574,21 +3602,118 @@
 	};
 
 	var find = function find(page, id) {
-	  if (page.id === id) {
-	    return page;
-	  } else {
-	    var sel = undefined;
-	    page.children.some(function (child) {
-	      var val = find(child, id);
-	      if (val !== undefined) {
-	        sel = child;
-	        return true;
-	      }
-	      return false;
-	    });
-	    return sel;
-	  }
+
+	  var sel = undefined;
+
+	  var search = function search(selector) {
+	    if (selector.id === id) {
+	      sel = selector;
+	      return true;
+	    } else {
+	      return selector.children.some(function (child) {
+	        return search(child);
+	      });
+	    }
+	  };
+	  search(page);
+	  return sel;
 	};
+
+/***/ },
+/* 47 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.chromeLoad = exports.chromeSave = undefined;
+
+	var _helpers = __webpack_require__(27);
+
+	/*
+	 * TODO: this will load pages and options from and save them to
+	 * chrome.storage.local
+	 * Pages are saved on a hostname basis, while options are global.
+	 *
+	 */
+
+	/*
+	 * any time that the page is updated, the new value should be saved
+	 */
+	var chromeSave = exports.chromeSave = function chromeSave(pages) {
+	  var cleaned = cleanPages(pages);
+	  chrome.storage.local.get("sites", function saveSchemaChrome(storage) {
+	    var host = window.location.hostname;
+	    storage.sites[host] = cleaned;
+	    chrome.storage.local.set({ "sites": storage.sites });
+	  });
+	};
+
+	var cleanPages = function cleanPages(pages) {
+	  return pages.filter(function (p) {
+	    return p !== undefined;
+	  }).map(function (page) {
+	    return clean(page);
+	  });
+	};
+
+	var clean = function clean(page) {
+	  return Object.assign({}, {
+	    name: page.name
+	  }, cleanSelector(page));
+	};
+
+	var cleanSelector = function cleanSelector(s) {
+	  return Object.assign({}, {
+	    selector: s.selector,
+	    spec: Object.assign({}, s.spec),
+	    children: s.children.map(function (c) {
+	      return cleanSelector(c);
+	    }),
+	    rules: s.rules.map(function (r) {
+	      return Object.assign({}, r);
+	    })
+	  });
+	};
+
+	/*
+	creates an object representing a site and saves it to chrome.storage.local
+	the object is:
+	    host:
+	        site: <hostname>
+	        page: <page>
+
+	urls is saved as an object for easier lookup, but converted to an array of the keys before uploading
+
+	If the site object exists for a host, load the saved rules
+	*/
+	var chromeLoad = exports.chromeLoad = function chromeLoad(callback) {
+	  chrome.storage.local.get("sites", function setupHostnameChrome(storage) {
+	    var host = window.location.hostname;
+	    var pages = storage.sites[host] || [];
+	    pages.forEach(function (p) {
+	      return (0, _helpers.setupPage)(p);
+	    });
+	    callback(pages);
+	  });
+	};
+
+	// takes a data object to be uploaded and passes it to the background page to handle
+	function chromeUpload(data) {
+	  data.page = JSON.stringify(cleanPage(data.page));
+	  chrome.runtime.sendMessage({ type: 'upload', data: data });
+	}
+
+	function chromeSync(domain) {
+	  chrome.runtime.sendMessage({ type: 'sync', domain: domain }, function (response) {
+	    if (response.error) {
+	      return;
+	    }
+	    controller.finishSync(response.pages);
+	  });
+	}
 
 /***/ }
 /******/ ]);

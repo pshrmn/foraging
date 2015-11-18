@@ -2,7 +2,7 @@ import React from "react";
 
 import { PosButton, NegButton, NeutralButton } from "./Inputs";
 
-import { legalName, createPage } from "../helpers";
+import { legalName, createPage, setupPage } from "../helpers";
 
 export default React.createClass({
   render: function() {
@@ -33,16 +33,17 @@ let PageControls = React.createClass({
     if ( name !== undefined ) {
       // report the new name
       let newPage = createPage(name);
+      setupPage(newPage);
       this.props.actions.addPage(newPage);
     }
   },
   renameHandler: function(event) {
     event.preventDefault();
+    let curr = this.props.pages[this.props.index];
     // don't do anything for the undefined option
     if ( curr === undefined ) {
       return;
     }
-    let curr = this.props.pages[this.props.index];
     let name = this.getName();
     if ( name !== undefined && name !== curr.name) {
       // set the new name

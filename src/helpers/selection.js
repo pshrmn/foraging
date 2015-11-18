@@ -102,8 +102,8 @@ export const parts = element =>{
 /*
  * check if all elements matched by the selector are "select" elements
  */
-export const allSelect = (parents, selector, spec) => {
-  return select(parents, selector, spec).every(ele => {
+export const allSelect = selection => {
+  return selection.every(ele => {
     return ele.tagName === "SELECT";
   });
 };

@@ -26,26 +26,6 @@ export const createSelector = (selector, type = "single", value = 0, optional = 
   };
 };
 
-/*
- * iterate through the page tree and add an "elements" property to each selector
- * which is an array containing all elements in the page that that selector
- * matches
- */
-export const pageElements = page => {
-  if ( page === undefined ) {
-    return;
-  }
-  let elements = [document];
-  let attach = selector => {
-    elements = select(elements, selector.selector);
-    selector["elements"] = elements;
-    selector.children.forEach(child => {
-      attach(child)
-    });
-  }
-
-  attach(page);
-};
 
 /*
  * clone a page (useful with the graph because that adds unnecessary properties
@@ -77,3 +57,23 @@ export const addChild = (selector, id, newChild) => {
     return found;
   }
 };
+
+/*
+ * set an id on each selector and determine the elements that each selector matches
+ */
+export const setupPage = page => {
+  if ( page === undefined ) {
+    return;
+  }
+  let id = 0;
+  let setup = (selector, parentElements) => {
+    selector.id = id++;
+    selector.elements = select(parentElements, selector.selector, selector.spec);
+    selector.children.forEach(child => {
+      setup(child, selector.elements);
+    });
+  }
+
+  setup(page, [document]);
+  page.nextID = id;
+}

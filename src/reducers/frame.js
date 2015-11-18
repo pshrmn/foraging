@@ -36,6 +36,11 @@ export default function frame(state = "", action) {
         css: action.css
       }
     });
+  case types.SAVE_SELECTOR:
+    return Object.assign({}, state, {
+      name: "selector",
+      data: {}
+    });
   default:
     return state;
   }

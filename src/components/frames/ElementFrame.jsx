@@ -96,6 +96,7 @@ export default React.createClass({
     this._removePageEvents();
   },
   _setupPageEvents: function(parents) {
+    // get all child elemetns of the parents
     let elements = select(parents);
     // need to bind this, but also cache the function
     // for removal

@@ -7,6 +7,8 @@ export default function selector(state, action) {
   case types.LOAD_PAGE:
     // when switching pages, no selector should be selected
     return undefined;
+  case types.SAVE_SELECTOR:
+    return action.selector;
   default:
     return state;
   }

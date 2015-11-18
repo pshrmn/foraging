@@ -14,18 +14,19 @@ export const findSelector = state => next => action => {
 };
 
 let find = (page, id) => {
-  if ( page.id === id ) {
-    return page;
-  } else {
-    let sel;
-    page.children.some(child => {
-      let val = find(child, id);
-      if ( val !== undefined ) {
-        sel = child;
-        return true;
-      }
-      return false;
-    });
-    return sel;
+
+  let sel;
+
+  let search = selector => {
+    if ( selector.id === id ) {
+      sel = selector;
+      return true;
+    } else {
+      return selector.children.some(child => {
+        return search(child);
+      })
+    }
   }
+  search(page);
+  return sel;
 }

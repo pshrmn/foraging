@@ -87,9 +87,10 @@ export const selectSelector = selectorID => {
   };
 };
 
-export const saveSelector = selector => {
+export const saveSelector = (selector, parentID) => {
   return {
     type: types.SAVE_SELECTOR,
-    selector: selector
+    selector: selector,
+    parentID: parentID
   };
 };

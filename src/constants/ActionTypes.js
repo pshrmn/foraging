@@ -14,3 +14,4 @@ export const SHOW_FORAGER = "SHOW_FORAGER";
 
 export const SELECT_SELECTOR = "SELECT_SELECTOR";
 export const SAVE_SELECTOR = "SAVE_SELECTOR";
+

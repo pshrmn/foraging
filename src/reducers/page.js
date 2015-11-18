@@ -46,6 +46,38 @@ export default function page(state = {}, action) {
     return Object.assign({}, state, {
       pages: newPages
     });
+  case types.SAVE_SELECTOR:
+    var { pages, pageIndex } = state;
+    var page = pages[pageIndex];
+    var { selector, parentID } = action;
+
+    // assign the id of the new selector
+    selector.id = page.nextID++;
+    page.nextID++
+    // and assign the id of the options selector if there is one
+    if ( selector.children.length !== 0 ) {
+      selector.children.forEach(child => {
+        child.id = page.nextID++;
+      });
+    }
+
+    let find = s => {
+      if ( s.id === parentID ) {
+        s.children.push(selector);
+        return true;
+      } else {
+        let found = s.children.some(child => {
+          return find(child);
+        });
+        return found;
+      }
+    }
+    find(page);
+
+    return Object.assign({}, state, {
+      pages: [...pages.slice(0, pageIndex), page, ...pages.slice(pageIndex+1)]
+    });
+
   default:
     return state;
   }

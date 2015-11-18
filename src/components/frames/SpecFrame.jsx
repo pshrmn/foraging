@@ -1,7 +1,7 @@
 import React from "react";
 
 import { PosButton, NegButton } from "../Inputs";
-import { createSelector, allSelect, count } from "../../helpers";
+import { createSelector, allSelect, count, select } from "../../helpers";
 
 export default React.createClass({
   getInitialState: function() {
@@ -13,13 +13,17 @@ export default React.createClass({
   saveHandler: function(event) {
     event.preventDefault();
     let sel = createSelector(this.props.data.css, this.state.type, this.state.value);
+    // generate the list of elements right away
+    sel.elements = select(this.props.selector.elements, sel.selector, sel.spec);
     // if saving a selector that selects "select" elements, add a child selector
     // to match option elements
-    if ( allSelect(this.props.selector.elements, sel.selector, sel.spec) ) {
-      sel.children.push(createSelector("option", "all", "option"));
+    if ( allSelect(sel.elements) ) {
+      let optionsChild = createSelector("option", "all", "option")
+      optionsChild.elements = select(sel.elements, optionsChild.selector, optionsChild.spec);
+      sel.children.push(optionsChild);
     }
-    console.log(sel);
-    //this.props.actions.saveSelector(selector);
+    // send the new selector and the parent
+    this.props.actions.saveSelector(sel, this.props.selector.id);
   },
   cancelHandler: function(event) {
     event.preventDefault();
