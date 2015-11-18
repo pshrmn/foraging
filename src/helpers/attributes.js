@@ -1,15 +1,8 @@
 // return an object mapping attribute names to their value
 // for all attributes of an element
 export const attributes = (element, ignored = {}) => {
-    let attrMap = {};
 
-    // include text if it exists
-    let text = element.textContent.trim();
-    if ( text !== "" ) {
-        attrMap.text = text;
-    }
-
-    return [].slice.call(element.attributes).reduce((stored, attr) => {
+    let attrs = Array.from(element.attributes).reduce((stored, attr) => {
         if ( ignored[attr.name] ) {
             return stored;
         }
@@ -19,8 +12,16 @@ export const attributes = (element, ignored = {}) => {
         }
         // don't include empty attrs
         if ( attr.value !== "" ) {
-            stored[attr.name] = attr.value
+            stored.push({name: attr.name, value: attr.value});
         }
         return stored;
-    }, attrMap);
+    }, []);
+
+    // include text if it exists
+    let text = element.textContent.trim();
+    if ( text !== "" ) {
+        attrs.push({name: "text", value: text});
+    }
+
+    return attrs;
 }

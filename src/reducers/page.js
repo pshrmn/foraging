@@ -104,7 +104,15 @@ export default function page(state = {}, action) {
 
     return Object.assign({}, state, {
       pages: [...pages.slice(0, pageIndex), page, ...pages.slice(pageIndex+1)]
-    })
+    });
+  case types.SAVE_RULE:
+  case types.REMOVE_RULE:
+    // attempting to trigger a save
+    var { pages, pageIndex } = state;
+    var page = pages[pageIndex];
+    return Object.assign({}, state, {
+      pages: [...pages.slice(0, pageIndex), page, ...pages.slice(pageIndex+1)]
+    });
   default:
     return state;
   }

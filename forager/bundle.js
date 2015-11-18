@@ -1539,7 +1539,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.removeSelector = exports.saveSelector = exports.selectSelector = exports.closeForager = exports.showSpecFrame = exports.showPartsFrame = exports.showElementFrame = exports.showRuleFrame = exports.showSelectorFrame = exports.hidePreview = exports.showPreview = exports.uploadPage = exports.renamePage = exports.removePage = exports.addPage = exports.loadPage = undefined;
+	exports.removeRule = exports.saveRule = exports.removeSelector = exports.saveSelector = exports.selectSelector = exports.closeForager = exports.showSpecFrame = exports.showPartsFrame = exports.showElementFrame = exports.showRuleFrame = exports.showSelectorFrame = exports.hidePreview = exports.showPreview = exports.uploadPage = exports.renamePage = exports.removePage = exports.addPage = exports.loadPage = undefined;
 
 	var _ActionTypes = __webpack_require__(24);
 
@@ -1642,7 +1642,7 @@
 	};
 
 	/*
-	 *
+	 * SELECTOR/RULE ACTIONS
 	 */
 
 	var selectSelector = exports.selectSelector = function selectSelector(selectorID) {
@@ -1664,6 +1664,20 @@
 	  return {
 	    type: types.REMOVE_SELECTOR,
 	    selectorID: selectorID
+	  };
+	};
+
+	var saveRule = exports.saveRule = function saveRule(rule) {
+	  return {
+	    type: types.SAVE_RULE,
+	    rule: rule
+	  };
+	};
+
+	var removeRule = exports.removeRule = function removeRule(index) {
+	  return {
+	    type: types.REMOVE_RULE,
+	    index: index
 	  };
 	};
 
@@ -1696,6 +1710,8 @@
 	var SELECT_SELECTOR = exports.SELECT_SELECTOR = "SELECT_SELECTOR";
 	var SAVE_SELECTOR = exports.SAVE_SELECTOR = "SAVE_SELECTOR";
 	var REMOVE_SELECTOR = exports.REMOVE_SELECTOR = "REMOVE_SELECTOR";
+	var SAVE_RULE = exports.SAVE_RULE = "SAVE_RULE";
+	var REMOVE_RULE = exports.REMOVE_RULE = "REMOVE_RULE";
 
 /***/ },
 /* 25 */
@@ -1822,11 +1838,6 @@
 	var GeneralControls = _react2.default.createClass({
 	  displayName: "GeneralControls",
 
-	  handle: function handle(event) {
-	    // do nothing
-	    event.preventDefault();
-	    console.error("not yet implemented");
-	  },
 	  handleClose: function handleClose(event) {
 	    this.props.actions.closeForager();
 	  },
@@ -2091,15 +2102,7 @@
 	var attributes = exports.attributes = function attributes(element) {
 	    var ignored = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
-	    var attrMap = {};
-
-	    // include text if it exists
-	    var text = element.textContent.trim();
-	    if (text !== "") {
-	        attrMap.text = text;
-	    }
-
-	    return [].slice.call(element.attributes).reduce(function (stored, attr) {
+	    var attrs = Array.from(element.attributes).reduce(function (stored, attr) {
 	        if (ignored[attr.name]) {
 	            return stored;
 	        }
@@ -2109,10 +2112,18 @@
 	        }
 	        // don't include empty attrs
 	        if (attr.value !== "") {
-	            stored[attr.name] = attr.value;
+	            stored.push({ name: attr.name, value: attr.value });
 	        }
 	        return stored;
-	    }, attrMap);
+	    }, []);
+
+	    // include text if it exists
+	    var text = element.textContent.trim();
+	    if (text !== "") {
+	        attrs.push({ name: "text", value: text });
+	    }
+
+	    return attrs;
 	};
 
 /***/ },
@@ -2652,7 +2663,6 @@
 	    this.props.actions.showElementFrame();
 	  },
 	  addRule: function addRule(event) {
-	    console.error("not yet implemented");
 	    this.props.actions.showRuleFrame();
 	  },
 	  remove: function remove(event) {
@@ -2678,7 +2688,8 @@
 	      description = "Select all elements, save as \"" + value + "\"";
 	    }
 
-	    var rulesList = rules.length ? _react2.default.createElement(RuleList, { rules: rules }) : _react2.default.createElement(
+	    var rulesList = rules.length ? _react2.default.createElement(RuleList, { rules: rules,
+	      actions: this.props.actions }) : _react2.default.createElement(
 	      "p",
 	      null,
 	      "No Rules"
@@ -2714,10 +2725,13 @@
 	  displayName: "RuleList",
 
 	  render: function render() {
-	    var rules = this.props.rules;
+	    var _props = this.props;
+	    var rules = _props.rules;
+	    var actions = _props.actions;
+	    var removeRule = actions.removeRule;
 
 	    var list = rules.map(function (r, i) {
-	      return _react2.default.createElement(Rule, _extends({ key: i }, r));
+	      return _react2.default.createElement(Rule, _extends({ key: i, index: i, remove: removeRule }, r));
 	    });
 
 	    return _react2.default.createElement(
@@ -2732,13 +2746,14 @@
 	  displayName: "Rule",
 
 	  handleClick: function handleClick(event) {
-	    console.error("not yet implemented");
+	    event.preventDefault();
+	    this.props.remove(this.props.index);
 	  },
 	  render: function render() {
-	    var _props = this.props;
-	    var name = _props.name;
-	    var attr = _props.attr;
-	    var type = _props.type;
+	    var _props2 = this.props;
+	    var name = _props2.name;
+	    var attr = _props2.attr;
+	    var type = _props2.type;
 
 	    return _react2.default.createElement(
 	      "li",
@@ -2776,13 +2791,159 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
+	var _Inputs = __webpack_require__(26);
+
+	var _helpers = __webpack_require__(27);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	exports.default = _react2.default.createClass({
 	  displayName: "RuleFrame",
 
+	  getInitialState: function getInitialState() {
+	    return {
+	      name: "",
+	      type: "string",
+	      attr: "",
+	      elementIndex: 0
+	    };
+	  },
+	  setName: function setName(event) {
+	    this.setState({
+	      name: event.target.value
+	    });
+	  },
+	  setType: function setType(event) {
+	    this.setState({
+	      type: event.target.value
+	    });
+	  },
+	  setAttr: function setAttr(attr) {
+	    this.setState({
+	      attr: attr
+	    });
+	  },
+	  saveHandler: function saveHandler(event) {
+	    event.preventDefault();
+	    var _state = this.state;
+	    var name = _state.name;
+	    var type = _state.type;
+	    var attr = _state.attr;
+	    // basic validation
+
+	    if (name !== "" && attr !== "") {
+	      this.props.actions.saveRule({
+	        name: name,
+	        type: type,
+	        attr: attr
+	      });
+	    }
+	  },
+	  cancelHandler: function cancelHandler(event) {
+	    event.preventDefault();
+	    this.props.actions.showSelectorFrame();
+	  },
 	  render: function render() {
-	    return _react2.default.createElement("div", { className: "frame rule-form" });
+	    var _this = this;
+
+	    var _props = this.props;
+	    var selector = _props.selector;
+	    var actions = _props.actions;
+
+	    var typeRadios = ["string", "int", "float"].map(function (t, i) {
+	      return _react2.default.createElement(
+	        "label",
+	        { key: i },
+	        t,
+	        ": ",
+	        _react2.default.createElement("input", { type: "radio",
+	          name: "rule-type",
+	          value: t,
+	          checked: t === _this.state.type,
+	          onChange: _this.setType })
+	      );
+	    });
+
+	    return _react2.default.createElement(
+	      "div",
+	      { className: "frame rule-form" },
+	      _react2.default.createElement(
+	        "div",
+	        null,
+	        _react2.default.createElement(
+	          "label",
+	          null,
+	          "Name: ",
+	          _react2.default.createElement("input", { type: "text",
+	            value: this.state.name,
+	            onChange: this.setName })
+	        )
+	      ),
+	      _react2.default.createElement(
+	        "div",
+	        null,
+	        "Type: ",
+	        typeRadios
+	      ),
+	      _react2.default.createElement(AttrChoices, { elements: selector.elements,
+	        attr: this.state.attr,
+	        setAttr: this.setAttr }),
+	      _react2.default.createElement(
+	        "div",
+	        { className: "button" },
+	        _react2.default.createElement(_Inputs.PosButton, { text: "Save", click: this.saveHandler }),
+	        _react2.default.createElement(_Inputs.NegButton, { text: "Cancel", click: this.cancelHandler })
+	      )
+	    );
+	  }
+	});
+
+	var AttrChoices = _react2.default.createClass({
+	  displayName: "AttrChoices",
+
+	  getInitialState: function getInitialState() {
+	    return {
+	      index: 0
+	    };
+	  },
+	  selectAttr: function selectAttr(event) {
+	    this.props.setAttr(event.target.value);
+	  },
+	  elementAttributes: function elementAttributes(element) {
+	    var _this2 = this;
+
+	    var attr = this.props.attr;
+
+	    return (0, _helpers.attributes)(element).map(function (a, i) {
+	      return _react2.default.createElement(
+	        "li",
+	        { key: i },
+	        _react2.default.createElement(
+	          "label",
+	          null,
+	          _react2.default.createElement("input", { type: "radio",
+	            name: "rule-attr",
+	            value: a.name,
+	            checked: a.name === attr,
+	            onChange: _this2.selectAttr }),
+	          a.name,
+	          " - ",
+	          a.value
+	        )
+	      );
+	    });
+	  },
+	  render: function render() {
+	    var _props2 = this.props;
+	    var elements = _props2.elements;
+	    var attr = _props2.attr;
+
+	    var attrs = this.elementAttributes(elements[this.state.index]);
+	    return _react2.default.createElement(
+	      "ul",
+	      null,
+	      attrs
+	    );
 	  }
 	});
 
@@ -3099,18 +3260,24 @@
 	  getInitialState: function getInitialState() {
 	    return {
 	      type: "single",
-	      value: 0
+	      value: 0,
+	      optional: false
 	    };
 	  },
 	  saveHandler: function saveHandler(event) {
 	    event.preventDefault();
-	    var sel = (0, _helpers.createSelector)(this.props.data.css, this.state.type, this.state.value);
+	    var _state = this.state;
+	    var type = _state.type;
+	    var value = _state.value;
+	    var optional = _state.optional;
+
+	    var sel = (0, _helpers.createSelector)(this.props.data.css, type, value, optional);
 	    // generate the list of elements right away
 	    sel.elements = (0, _helpers.select)(this.props.selector.elements, sel.selector, sel.spec);
 	    // if saving a selector that selects "select" elements, add a child selector
 	    // to match option elements
 	    if ((0, _helpers.allSelect)(sel.elements)) {
-	      var optionsChild = (0, _helpers.createSelector)("option", "all", "option");
+	      var optionsChild = (0, _helpers.createSelector)("option", "all", "option", false);
 	      optionsChild.elements = (0, _helpers.select)(sel.elements, optionsChild.selector, optionsChild.spec);
 	      sel.children.push(optionsChild);
 	    }
@@ -3127,6 +3294,11 @@
 	      value: value
 	    });
 	  },
+	  toggleOptional: function toggleOptional(event) {
+	    this.setState({
+	      optional: event.target.checked
+	    });
+	  },
 	  render: function render() {
 	    var _props = this.props;
 	    var selector = _props.selector;
@@ -3140,6 +3312,18 @@
 	      css,
 	      _react2.default.createElement(SpecForm, { count: elementCount,
 	        setSpec: this.setSpec }),
+	      _react2.default.createElement(
+	        "div",
+	        null,
+	        _react2.default.createElement(
+	          "label",
+	          null,
+	          "Optional: ",
+	          _react2.default.createElement("input", { type: "checkbox",
+	            checked: this.state.optional,
+	            onChange: this.toggleOptional })
+	        )
+	      ),
 	      _react2.default.createElement(
 	        "div",
 	        { className: "buttons" },
@@ -3558,6 +3742,12 @@
 	/*
 	 * Forager reducer
 	 */
+	/*import * as types from "../constants/ActionTypes";
+	  case types.REMOVE_RULE:
+	    return Object.assign({}, state, {
+
+	    });
+	*/
 	function reducer() {
 	  var state = arguments.length <= 0 || arguments[0] === undefined ? initialState : arguments[0];
 	  var action = arguments[1];
@@ -3601,6 +3791,8 @@
 	    case types.LOAD_PAGE:
 	    case types.REMOVE_SELECTOR:
 	    case types.SAVE_SELECTOR:
+	    case types.SAVE_RULE:
+	    case types.REMOVE_RULE:
 	    case types.SHOW_SELECTOR_FRAME:
 	      return Object.assign({}, state, {
 	        name: "selector",
@@ -3798,6 +3990,16 @@
 	      return Object.assign({}, state, {
 	        pages: [].concat(_toConsumableArray(pages.slice(0, pageIndex)), [page], _toConsumableArray(pages.slice(pageIndex + 1)))
 	      });
+	    case types.SAVE_RULE:
+	    case types.REMOVE_RULE:
+	      // attempting to trigger a save
+	      var pages = state.pages;
+	      var pageIndex = state.pageIndex;
+
+	      var page = pages[pageIndex];
+	      return Object.assign({}, state, {
+	        pages: [].concat(_toConsumableArray(pages.slice(0, pageIndex)), [page], _toConsumableArray(pages.slice(pageIndex + 1)))
+	      });
 	    default:
 	      return state;
 	  }
@@ -3820,6 +4022,11 @@
 
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
+	/*
+	 * reducer for the selector. Never create a new selector, always just mutate
+	 * the current one so that the changes are reflected in the page that contains
+	 * the selector.
+	 */
 	function selector(state, action) {
 	  switch (action.type) {
 	    case types.SELECT_SELECTOR:
@@ -3830,6 +4037,13 @@
 	    case types.ADD_PAGE:
 	    case types.REMOVE_PAGE:
 	      return undefined;
+	    case types.SAVE_RULE:
+	      state.rules.push(action.rule);
+	      return state;
+	    case types.REMOVE_RULE:
+	      var rules = state.rules;
+	      state.rules.splice(action.index, 1);
+	      return state;
 	    default:
 	      return state;
 	  }

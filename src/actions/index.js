@@ -96,7 +96,7 @@ export const closeForager = () => {
 };
 
 /*
- *
+ * SELECTOR/RULE ACTIONS
  */
 
 export const selectSelector = selectorID => {
@@ -118,5 +118,19 @@ export const removeSelector = selectorID => {
   return {
     type: types.REMOVE_SELECTOR,
     selectorID: selectorID
+  };
+};
+
+export const saveRule = rule => {
+  return {
+    type: types.SAVE_RULE,
+    rule: rule
+  };
+};
+
+export const removeRule = index => {
+  return {
+    type: types.REMOVE_RULE,
+    index: index
   };
 };

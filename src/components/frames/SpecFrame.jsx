@@ -7,18 +7,20 @@ export default React.createClass({
   getInitialState: function() {
     return {
       type: "single",
-      value: 0
+      value: 0,
+      optional: false
     };
   },
   saveHandler: function(event) {
     event.preventDefault();
-    let sel = createSelector(this.props.data.css, this.state.type, this.state.value);
+    let { type, value, optional } = this.state;
+    let sel = createSelector(this.props.data.css, type, value, optional);
     // generate the list of elements right away
     sel.elements = select(this.props.selector.elements, sel.selector, sel.spec);
     // if saving a selector that selects "select" elements, add a child selector
     // to match option elements
     if ( allSelect(sel.elements) ) {
-      let optionsChild = createSelector("option", "all", "option")
+      let optionsChild = createSelector("option", "all", "option", false);
       optionsChild.elements = select(sel.elements, optionsChild.selector, optionsChild.spec);
       sel.children.push(optionsChild);
     }
@@ -35,6 +37,11 @@ export default React.createClass({
       value: value
     });
   },
+  toggleOptional: function(event) {
+    this.setState({
+      optional: event.target.checked
+    });
+  },
   render: function() {
     let { selector, data } = this.props;
     let { css } = data;
@@ -44,6 +51,13 @@ export default React.createClass({
         {css}
         <SpecForm count={elementCount}
                   setSpec={this.setSpec}/>
+        <div>
+          <label>
+            Optional: <input type="checkbox"
+                             checked={this.state.optional}
+                             onChange={this.toggleOptional} />
+          </label>
+        </div>
         <div className="buttons">
           <PosButton text="Save" click={this.saveHandler} />
           <NegButton text="Cancel" click={this.cancelHandler} />

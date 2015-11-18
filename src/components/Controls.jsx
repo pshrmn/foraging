@@ -91,11 +91,6 @@ let PageControls = React.createClass({
 });
 
 let GeneralControls = React.createClass({
-  handle: function(event){
-    // do nothing
-    event.preventDefault();
-    console.error("not yet implemented");
-  },
   handleClose: function(event){
     this.props.actions.closeForager();
   },

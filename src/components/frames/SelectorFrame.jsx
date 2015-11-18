@@ -7,7 +7,6 @@ export default React.createClass({
     this.props.actions.showElementFrame();
   },
   addRule: function(event) {
-    console.error("not yet implemented");
     this.props.actions.showRuleFrame();
   },
   remove: function(event) {
@@ -28,7 +27,8 @@ export default React.createClass({
     }
 
     let rulesList = rules.length ? (
-      <RuleList rules={rules} />
+      <RuleList rules={rules}
+                actions={this.props.actions} />
     ) : (
       <p>No Rules</p>
     );
@@ -52,9 +52,10 @@ export default React.createClass({
 
 let RuleList = React.createClass({
   render: function() {
-    let { rules } = this.props;
+    let { rules, actions } = this.props;
+    let { removeRule } = actions;
     let list = rules.map((r,i) => {
-      return <Rule key={i} {...r}/>;
+      return <Rule key={i} index={i} remove={removeRule} {...r}/>;
     });
 
     return (
@@ -67,7 +68,8 @@ let RuleList = React.createClass({
 
 let Rule = React.createClass({
   handleClick: function(event) {
-    console.error("not yet implemented");
+    event.preventDefault();
+    this.props.remove(this.props.index);
   },
   render: function() {
     let { name, attr, type } = this.props;
