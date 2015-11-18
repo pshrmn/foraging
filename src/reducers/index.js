@@ -2,6 +2,7 @@ import frame from "./frame";
 import show from "./show";
 import page from "./page";
 import selector from "./selector";
+import preview from "./preview";
 
 const initialState = {
   show: true,
@@ -14,6 +15,9 @@ const initialState = {
   frame: {
     name: "selector",
     data: {}
+  },
+  preview: {
+    visible: false
   },
   selector: undefined
 };
@@ -28,7 +32,8 @@ function reducer(state = initialState, action) {
       frame: frame(state.frame, action),
       show: show(state.show, action),
       page: page(state.page, action),
-      selector: selector(state.selector, action)
+      selector: selector(state.selector, action),
+      preview: preview(state.preview, action)
     };
   }
 }

@@ -61,7 +61,7 @@ export default function page(state = {}, action) {
       });
     }
 
-    let find = s => {
+    var find = s => {
       if ( s.id === parentID ) {
         s.children.push(selector);
         return true;
@@ -73,11 +73,38 @@ export default function page(state = {}, action) {
       }
     }
     find(page);
-
     return Object.assign({}, state, {
       pages: [...pages.slice(0, pageIndex), page, ...pages.slice(pageIndex+1)]
     });
+  case types.REMOVE_SELECTOR:
+    var { pages, pageIndex } = state;
+    var page = pages[pageIndex];
 
+    var find = s => {
+      let count = s.children.length;
+      s.children = s.children.filter(child => {
+        return child.id !== action.selectorID;
+      });
+      return s.children.length < count ? true : (
+        s.children.some(child => {
+          return find(child);
+        })
+      );
+    }
+
+    if ( action.selectorID === 0 ) {
+      // special case for the root body selector,
+      // just replace the page with a new one
+      page.children = [];
+      page.rules = [];
+    } else {
+      find(page);
+    }
+
+
+    return Object.assign({}, state, {
+      pages: [...pages.slice(0, pageIndex), page, ...pages.slice(pageIndex+1)]
+    })
   default:
     return state;
   }

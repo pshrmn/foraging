@@ -61,7 +61,7 @@ let PageControls = React.createClass({
   },
   previewHandler: function(event) {
     event.preventDefault();
-    console.error("not yet implemented");
+    this.props.actions.showPreview();
   },
   loadPage: function(event) {
     this.props.actions.loadPage(event.target.value);

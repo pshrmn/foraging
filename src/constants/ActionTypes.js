@@ -3,6 +3,8 @@ export const ADD_PAGE = "ADD_PAGE";
 export const REMOVE_PAGE = "REMOVE_PAGE";
 export const RENAME_PAGE = "RENAME_PAGE";
 export const UPLOAD_PAGE = "UPLOAD_PAGE";
+export const SHOW_PREVIEW = "SHOW_PREVIEW";
+export const HIDE_PREVIEW = "HIDE_PREVIEW";
 
 export const SHOW_SELECTOR_FRAME = "SHOW_SELECTOR_FRAME";
 export const SHOW_RULE_FRAME = "SHOW_RULE_FRAME";
@@ -15,4 +17,4 @@ export const SHOW_FORAGER = "SHOW_FORAGER";
 
 export const SELECT_SELECTOR = "SELECT_SELECTOR";
 export const SAVE_SELECTOR = "SAVE_SELECTOR";
-
+export const REMOVE_SELECTOR = "REMOVE_SELECTOR";

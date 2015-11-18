@@ -36,6 +36,19 @@ export const uploadPage = () => {
   };
 };
 
+
+export const showPreview = () => {
+  return {
+    type: types.SHOW_PREVIEW
+  };
+};
+
+export const hidePreview = () => {
+  return {
+    type: types.HIDE_PREVIEW
+  };
+};
+
 /*
  * FRAME ACTIONS
  */
@@ -98,5 +111,12 @@ export const saveSelector = (selector, parentID) => {
     type: types.SAVE_SELECTOR,
     selector: selector,
     parentID: parentID
+  };
+};
+
+export const removeSelector = selectorID => {
+  return {
+    type: types.REMOVE_SELECTOR,
+    selectorID: selectorID
   };
 };

@@ -7,16 +7,22 @@ import * as ForagerActions from "../actions";
 import Controls from "../components/Controls";
 import Frames from "../components/frames/Frames";
 import Graph from "../components/Graph";
+import Preview from "../components/Preview";
 
 let Forager = React.createClass({
   render: function() {
-    let { pages, pageIndex, show, dispatch, frame, selector } = this.props;
+    let { pages, pageIndex, show, dispatch, frame, selector, preview } = this.props;
     let page = pages[pageIndex];
     const actions = bindActionCreators(ForagerActions, dispatch);
     let classNames = ["forager", "no-select"];
     if ( !show ) {
       classNames.push("hidden");
     }
+
+    let previewModal = preview.visible ? (
+      <Preview page={page} close={actions.hidePreview} />
+    ) : null;
+
     // only let the graph update the current selector when 
     let selectSelector = frame.name === "selector" ? actions.selectSelector : () => {};
     return (
@@ -32,6 +38,7 @@ let Forager = React.createClass({
                  selector={selector}
                  selectSelector={selectSelector} />
         </div>
+        {previewModal}
       </div>
     );
   },
@@ -67,7 +74,8 @@ function mapStateToProps(state) {
     frame: state.frame,
     pages: state.page.pages,
     pageIndex: state.page.pageIndex,
-    selector: state.selector
+    selector: state.selector,
+    preview: state.preview
   };
 }
 

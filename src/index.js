@@ -34,9 +34,11 @@ if ( !holder ) {
       frame: {
         name: "selector",
         data: {}
+      },
+      preview: {
+        visible: false
       }
     };
-
     let store = applyMiddleware(
         findSelector,
         chromeBackground

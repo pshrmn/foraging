@@ -14,7 +14,7 @@ export const preview = page => {
             }
             return getElementData(selector, ele);
         case "all":
-            var data = Array.prototype.slice.call(elements).map(function(ele){
+            var data = Array.from(elements).map(function(ele){
                 return getElementData(selector, ele);
             }).filter(function(datum){
                 return datum !== undefined;
@@ -87,7 +87,6 @@ export const preview = page => {
         return data;
     }
 
-
-    return getElement(page, document);
+    return page === undefined ? "" : getElement(page, document);
 }
 

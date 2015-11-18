@@ -13,7 +13,6 @@ export default state => next => action => {
       site: window.location.hostname,
       page: JSON.stringify(clean(page))
     }
-    console.log(uploadData);
     chrome.runtime.sendMessage({type: 'upload', data: uploadData}); 
   }
   return next(action);

@@ -3,10 +3,8 @@ import * as types from "../constants/ActionTypes";
 export default function frame(state = "", action) {
   switch ( action.type ) {
   case types.LOAD_PAGE:
-    return Object.assign({}, state, {
-      name: "selector",
-      data: {}
-    });
+  case types.REMOVE_SELECTOR:
+  case types.SAVE_SELECTOR:
   case types.SHOW_SELECTOR_FRAME:
     return Object.assign({}, state, {
       name: "selector",
@@ -35,11 +33,6 @@ export default function frame(state = "", action) {
       data: {
         css: action.css
       }
-    });
-  case types.SAVE_SELECTOR:
-    return Object.assign({}, state, {
-      name: "selector",
-      data: {}
     });
   default:
     return state;

@@ -11,7 +11,7 @@ export default React.createClass({
     this.props.actions.showRuleFrame();
   },
   remove: function(event) {
-    console.error("not yet implemented");
+    this.props.actions.removeSelector(this.props.selector.id);
   },
   render: function() {
     if ( this.props.selector === undefined ) {
