@@ -7,7 +7,7 @@ export default function page(state = {}, action) {
      * if the index is out of the bounds of state.pages, set to 0
      */
     var max = state.pages.length;
-    var index = action.index;
+    var index = parseInt(action.index, 10);
     if ( index < 0 || index >= max ) {
       index = 0;
     }

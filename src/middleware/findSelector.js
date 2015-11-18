@@ -1,6 +1,6 @@
 import * as ActionTypes from "../constants/ActionTypes";
 
-export const findSelector = state => next => action => {
+export default state => next => action => {
   switch ( action.type ) {
   case ActionTypes.SELECT_SELECTOR:
     let current = state.getState();

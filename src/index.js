@@ -9,7 +9,8 @@ import reducer from './reducers';
 
 
 import { SHOW_FORAGER } from "./constants/ActionTypes";
-import { findSelector } from "./middleware/findSelector";
+import findSelector from "./middleware/findSelector";
+import chromeBackground from "./middleware/chromeBackground";
 
 import { chromeSave, chromeLoad } from "./chrome";
 
@@ -20,6 +21,9 @@ import { chromeSave, chromeLoad } from "./chrome";
 let holder = document.querySelector(".forager-holder");
 if ( !holder ) {
   chromeLoad(pages => {
+    /*
+     * initialState uses the pages loaded by chrome
+     */
     let initialState = {
       show: true,
       selector: undefined,
@@ -34,9 +38,13 @@ if ( !holder ) {
     };
 
     let store = applyMiddleware(
-        findSelector
+        findSelector,
+        chromeBackground
       )(createStore)(reducer, initialState);
 
+    /*
+     * subscribe to the store and save the pages any time that they change
+     */
     let oldPages = {};
     store.subscribe(() => {
       let state = store.getState();
@@ -46,7 +54,10 @@ if ( !holder ) {
         oldPages = pages;
       }
     });
-    // create an element to attach Forager to
+
+    /*
+     * actually render Forager
+     */
     let holder = document.createElement("div");
     holder.classList.add("forager-holder");
     holder.classList.add("no-select");

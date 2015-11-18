@@ -42,6 +42,23 @@ export const clone = selector => {
   });
 };
 
+
+export const clean = page => {
+  return Object.assign({}, {
+    name: page.name
+  }, cleanSelector(page));
+};
+
+
+const cleanSelector = s => {
+  return Object.assign({}, {
+    selector: s.selector,
+    spec: Object.assign({}, s.spec),
+    children: s.children.map(c => cleanSelector(c)),
+    rules: s.rules.map(r => Object.assign({}, r))
+  });
+};
+
 /*
  * iterate over the tree looking for selector matching id, and when found
  * append the newChild to its array of children

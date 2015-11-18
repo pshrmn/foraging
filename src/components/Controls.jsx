@@ -57,7 +57,7 @@ let PageControls = React.createClass({
   },
   uploadHandler: function(event) {
     event.preventDefault();
-    console.error("not yet implemented");
+    this.props.actions.uploadPage();
   },
   previewHandler: function(event) {
     event.preventDefault();

@@ -30,6 +30,12 @@ export const renamePage = name => {
   };
 };
 
+export const uploadPage = () => {
+  return {
+    type: types.UPLOAD_PAGE
+  };
+};
+
 /*
  * FRAME ACTIONS
  */

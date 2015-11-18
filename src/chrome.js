@@ -1,4 +1,4 @@
-import { select, setupPage } from "./helpers";
+import { select, setupPage, clean } from "./helpers";
 
 /*
  * TODO: this will load pages and options from and save them to
@@ -22,21 +22,6 @@ export const chromeSave = pages => {
 const cleanPages = pages => {
   return pages.filter(p => p !== undefined).map(page => clean(page));
 }
-
-const clean = page => {
-  return Object.assign({}, {
-    name: page.name
-  }, cleanSelector(page));
-}
-
-const cleanSelector = s => {
-  return Object.assign({}, {
-    selector: s.selector,
-    spec: Object.assign({}, s.spec),
-    children: s.children.map(c => cleanSelector(c)),
-    rules: s.rules.map(r => Object.assign({}, r))
-  });
-};
 
 /*
 creates an object representing a site and saves it to chrome.storage.local

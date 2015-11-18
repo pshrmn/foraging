@@ -68,7 +68,13 @@
 
 	var _findSelector = __webpack_require__(46);
 
-	var _chrome = __webpack_require__(47);
+	var _findSelector2 = _interopRequireDefault(_findSelector);
+
+	var _chromeBackground = __webpack_require__(47);
+
+	var _chromeBackground2 = _interopRequireDefault(_chromeBackground);
+
+	var _chrome = __webpack_require__(48);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -81,6 +87,9 @@
 	var holder = document.querySelector(".forager-holder");
 	if (!holder) {
 	  (0, _chrome.chromeLoad)(function (pages) {
+	    /*
+	     * initialState uses the pages loaded by chrome
+	     */
 	    var initialState = {
 	      show: true,
 	      selector: undefined,
@@ -94,8 +103,11 @@
 	      }
 	    };
 
-	    var store = (0, _redux.applyMiddleware)(_findSelector.findSelector)(_redux.createStore)(_reducers2.default, initialState);
+	    var store = (0, _redux.applyMiddleware)(_findSelector2.default, _chromeBackground2.default)(_redux.createStore)(_reducers2.default, initialState);
 
+	    /*
+	     * subscribe to the store and save the pages any time that they change
+	     */
 	    var oldPages = {};
 	    store.subscribe(function () {
 	      var state = store.getState();
@@ -105,7 +117,10 @@
 	        oldPages = pages;
 	      }
 	    });
-	    // create an element to attach Forager to
+
+	    /*
+	     * actually render Forager
+	     */
 	    var holder = document.createElement("div");
 	    holder.classList.add("forager-holder");
 	    holder.classList.add("no-select");
@@ -1512,7 +1527,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.saveSelector = exports.selectSelector = exports.closeForager = exports.showSpecFrame = exports.showPartsFrame = exports.showElementFrame = exports.showRuleFrame = exports.showSelectorFrame = exports.renamePage = exports.removePage = exports.addPage = exports.loadPage = undefined;
+	exports.saveSelector = exports.selectSelector = exports.closeForager = exports.showSpecFrame = exports.showPartsFrame = exports.showElementFrame = exports.showRuleFrame = exports.showSelectorFrame = exports.uploadPage = exports.renamePage = exports.removePage = exports.addPage = exports.loadPage = undefined;
 
 	var _ActionTypes = __webpack_require__(24);
 
@@ -1547,6 +1562,12 @@
 	  return {
 	    type: types.RENAME_PAGE,
 	    name: name
+	  };
+	};
+
+	var uploadPage = exports.uploadPage = function uploadPage() {
+	  return {
+	    type: types.UPLOAD_PAGE
 	  };
 	};
 
@@ -1628,6 +1649,7 @@
 	var ADD_PAGE = exports.ADD_PAGE = "ADD_PAGE";
 	var REMOVE_PAGE = exports.REMOVE_PAGE = "REMOVE_PAGE";
 	var RENAME_PAGE = exports.RENAME_PAGE = "RENAME_PAGE";
+	var UPLOAD_PAGE = exports.UPLOAD_PAGE = "UPLOAD_PAGE";
 
 	var SHOW_SELECTOR_FRAME = exports.SHOW_SELECTOR_FRAME = "SHOW_SELECTOR_FRAME";
 	var SHOW_RULE_FRAME = exports.SHOW_RULE_FRAME = "SHOW_RULE_FRAME";
@@ -1722,7 +1744,7 @@
 	  },
 	  uploadHandler: function uploadHandler(event) {
 	    event.preventDefault();
-	    console.error("not yet implemented");
+	    this.props.actions.uploadPage();
 	  },
 	  previewHandler: function previewHandler(event) {
 	    event.preventDefault();
@@ -1930,6 +1952,12 @@
 	    return _page.clone;
 	  }
 	});
+	Object.defineProperty(exports, "clean", {
+	  enumerable: true,
+	  get: function get() {
+	    return _page.clean;
+	  }
+	});
 	Object.defineProperty(exports, "setupPage", {
 	  enumerable: true,
 	  get: function get() {
@@ -2124,7 +2152,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.setupPage = exports.addChild = exports.clone = exports.createSelector = exports.createPage = undefined;
+	exports.setupPage = exports.addChild = exports.clean = exports.clone = exports.createSelector = exports.createPage = undefined;
 
 	var _selection = __webpack_require__(32);
 
@@ -2174,6 +2202,25 @@
 	      return Object.assign({}, r);
 	    }),
 	    elements: selector.elements || []
+	  });
+	};
+
+	var clean = exports.clean = function clean(page) {
+	  return Object.assign({}, {
+	    name: page.name
+	  }, cleanSelector(page));
+	};
+
+	var cleanSelector = function cleanSelector(s) {
+	  return Object.assign({}, {
+	    selector: s.selector,
+	    spec: Object.assign({}, s.spec),
+	    children: s.children.map(function (c) {
+	      return cleanSelector(c);
+	    }),
+	    rules: s.rules.map(function (r) {
+	      return Object.assign({}, r);
+	    })
 	  });
 	};
 
@@ -3454,7 +3501,7 @@
 	       * if the index is out of the bounds of state.pages, set to 0
 	       */
 	      var max = state.pages.length;
-	      var index = action.index;
+	      var index = parseInt(action.index, 10);
 	      if (index < 0 || index >= max) {
 	        index = 0;
 	      }
@@ -3576,7 +3623,6 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.findSelector = undefined;
 
 	var _ActionTypes = __webpack_require__(24);
 
@@ -3584,7 +3630,7 @@
 
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-	var findSelector = exports.findSelector = function findSelector(state) {
+	exports.default = function (state) {
 	  return function (next) {
 	    return function (action) {
 	      switch (action.type) {
@@ -3628,6 +3674,49 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
+
+	var _ActionTypes = __webpack_require__(24);
+
+	var ActionTypes = _interopRequireWildcard(_ActionTypes);
+
+	var _helpers = __webpack_require__(27);
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+	exports.default = function (state) {
+	  return function (next) {
+	    return function (action) {
+	      switch (action.type) {
+	        case ActionTypes.UPLOAD_PAGE:
+	          var current = state.getState();
+	          var _current$page = current.page;
+	          var pages = _current$page.pages;
+	          var pageIndex = _current$page.pageIndex;
+
+	          var page = pages[pageIndex];
+
+	          var uploadData = {
+	            name: page.name,
+	            site: window.location.hostname,
+	            page: JSON.stringify((0, _helpers.clean)(page))
+	          };
+	          console.log(uploadData);
+	          chrome.runtime.sendMessage({ type: 'upload', data: uploadData });
+	      }
+	      return next(action);
+	    };
+	  };
+	};
+
+/***/ },
+/* 48 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
 	exports.chromeLoad = exports.chromeSave = undefined;
 
 	var _helpers = __webpack_require__(27);
@@ -3655,26 +3744,7 @@
 	  return pages.filter(function (p) {
 	    return p !== undefined;
 	  }).map(function (page) {
-	    return clean(page);
-	  });
-	};
-
-	var clean = function clean(page) {
-	  return Object.assign({}, {
-	    name: page.name
-	  }, cleanSelector(page));
-	};
-
-	var cleanSelector = function cleanSelector(s) {
-	  return Object.assign({}, {
-	    selector: s.selector,
-	    spec: Object.assign({}, s.spec),
-	    children: s.children.map(function (c) {
-	      return cleanSelector(c);
-	    }),
-	    rules: s.rules.map(function (r) {
-	      return Object.assign({}, r);
-	    })
+	    return (0, _helpers.clean)(page);
 	  });
 	};
 
