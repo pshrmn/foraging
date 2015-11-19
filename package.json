@@ -13,7 +13,7 @@
     "css": "npm run sass & npm run autoprefix",
     "sass": "node-sass scss/** -o forager/css/**",
     "test": "mocha tests --compilers js:babel-core/register --recursive",
-    "webpack": "webpack & webpack --config=webpack.config.min.js"
+    "webpack": "webpack"
   },
   "devDependencies": {
     "autoprefixer": "^6.1.0",
