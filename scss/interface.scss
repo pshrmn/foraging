@@ -1,0 +1,384 @@
+$red: #E85F88;
+$green: #76B85C;
+$dark-green: #42752E;
+$blue: #45AFCC;
+$purple: #8F56A6;
+$light-gray: #CED1DE;
+$dark-gray: #323033;
+$gray: #898B96;
+$gold: #FFD700;
+$white: #ffffff;
+$black: #000000;
+
+/* general */
+body{
+    /* can break some sites' layouts */
+    margin: 0;
+}
+
+/* Interface */
+.forager{
+    word-wrap: normal;
+    z-index: 2147483637;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    min-width: 700px;
+    min-height: 30px;
+    background: $dark-gray;
+    font-size: 16px;
+    font-family: sans-serif;
+    color: $black;
+    text-align: left;
+    border: 10px solid $dark-gray;
+    box-sizing: border-box;
+
+    &.hidden {
+        display: none !important;
+    }
+
+    *{
+        color: $black;
+        box-sizing: border-box;
+        line-height: 1.1em !important;
+    }
+
+    .not-allowed{
+        cursor: no-drop;
+
+        * {
+            cursor: no-drop;
+        }
+    }
+
+    .inline{
+        display: inline-block;
+    }
+
+    .hidden{
+        display: none !important;
+    }
+
+
+    ul{
+        list-style: none;
+    }
+
+    .controls{
+        background: $dark-gray;
+        height: 31px;
+        margin-bottom: 10px;
+        min-width: 650px;
+
+        *{
+            color: $light-gray
+        }
+
+        button, select, option {
+            color: $black;
+        }
+
+        button{
+            line-height: 1.25em !important;
+            border-radius: 3px;
+            border-width: 1px;
+            border-style: solid;
+            box-shadow: none !important;
+            cursor: pointer !important;
+            font-weight: normal !important;
+            margin: 2px !important;
+            padding: 1px 6px !important;
+            min-width: initial !important;
+            text-transform: capitalize !important;
+
+            &.pos, &.pos:active, &.pos:focus{
+                background: $dark-gray;
+                color: $green !important;
+                border-color: $green;
+            }
+
+            &:hover{
+                background: $green;
+                border-color: $green;
+                color: $dark-gray !important;
+            }
+
+            &.neg, &.neg:active, &.neg:focus{
+                background: $dark-gray;
+                border-color: $red;
+                color: $red !important;
+            }
+
+            &.neg:hover{
+                background: $red;
+                color: $dark-gray !important;
+            }
+        }
+
+        button:active{
+            border-style: inset !important;
+            color: $black !important;
+        }
+
+        div{
+            display: inline-block;
+        }
+
+        select{
+            width: 100px;
+            min-height: 22px;
+            height: 22px;
+            border-radius: 2px;
+        }
+    }
+
+    .workspace {
+        display: flex;
+    }
+
+    .frames, .graph {
+        background: $white;
+        box-sizing: border-box;
+        margin-right: 3px;
+        padding: 5px;
+    }
+
+    .graph {
+
+        svg {
+            box-sizing: content-box;
+            padding: 15px;
+            font-size: 14px;
+            background: $white;
+
+            .link {
+              fill: none;
+              stroke: $dark-gray;
+            }
+
+            .node{
+                cursor: pointer;
+                fill: $dark-green;
+            }
+
+            .empty{
+                fill: $red;
+            }
+
+            .node text {
+                paint-order: stroke;
+                stroke: $white;
+                stroke-width: 3px;
+                text-anchor: end;
+            }
+
+            .current{
+                font-weight: bold;
+            }
+        }
+    }
+
+    .frames {
+        width: 400px;
+        vertical-align: top;
+
+        .frame {
+            text-align: left;
+            width: 100%;
+            background: $white;
+            padding: 5px;
+            position: relative;
+
+            .radios {
+                display: flex;
+                flex-wrap: wrap;
+            }
+
+            label {
+                margin-right: 15px;
+            }
+        }
+    }
+
+    input{
+        box-shadow: none;
+        border-radius:0;
+        background: $white;
+        border: 1px solid $dark-gray;
+        line-height: 1.2;
+    }
+
+    input[type=text]{
+        height: 20px;
+        max-height: 20px;
+        min-height: 20px;
+        padding: 2px;
+        font-family: sans-serif;
+    }
+
+    label{
+        cursor: pointer;
+        font-weight: normal;
+    }
+
+    .attributes {
+        tbody tr:hover{
+            background: $gray;
+            cursor: pointer;
+        }
+
+        .selectedAttr, .selectedAttr:hover{
+            background: $green;
+        }
+    }
+
+
+    td, th {
+        min-width: 50px;
+        height: 1.5rem;
+        border: 2px solid $white;
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    th {
+        background: $blue;
+    }
+
+
+    /* lots of sites like to customize how various inputs look, 
+    so this is trying to keep these close to (chrome) default css */
+    input, select, option, textarea, button {
+        line-height: 1.1em !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        font-size: 1em !important;
+        float: none !important
+    }
+
+    button {
+        background: $light-gray;
+        color: $black !important;
+        border-radius: 3px;
+        border: 2px outset $light-gray;
+        box-shadow: none !important;
+        cursor: pointer !important;
+        font-weight: normal !important;
+        margin: 2px !important;
+        padding: 1px 6px !important;
+        min-width: initial !important;
+        text-transform: capitalize !important;
+
+        &:hover, &:active, &:focus{
+            background: $light-gray;
+            border-color: $light-gray;
+            color: $black !important;
+        }
+
+        &.red, &.red:hover, &.red:active, &.red:focus{
+            background: $red;
+            border-color: $red;
+        }
+    }
+
+    button:active{
+        border-style: inset !important;
+        color: $black !important;
+    }
+
+    select {
+        display: inline-block !important;
+        border: 1px solid #a9a9a9 !important;
+        background: $white !important;
+        margin: 2px !important;
+    }
+
+    
+    .page-controls {
+        display: inline-block;
+    }
+
+    .app-controls {
+        position: absolute;
+        right: 0;
+        top: 0;
+        
+        button, button:hover {
+            background: transparent !important;
+            cursor: pointer !important;
+            color: $white !important;
+            text-align: center !important;
+            margin: 0 !important;
+            border: 0 !important;
+            font-weight: bold !important;
+        }
+
+        button:hover {
+            background: $black !important;
+        }
+    }
+}
+
+.preview-holder {
+    z-index: 2147483638;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+
+    .preview-bg {
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.2);
+    }
+
+    .preview {
+        position: absolute;
+        left: 10%;
+        top: 25%;
+        width: 80%;
+        background: $white;
+        padding: 15px;
+        font-size: 16px;
+        font-family: sans-serif;
+
+        pre {
+            max-height: 300px;
+            max-width: 100%;
+            overflow: scroll;
+            margin: 1em 0;
+        }
+
+    }
+}
+
+.options-modal {
+    color: $dark-gray;
+
+    h2 {
+        margin: 5px 0;
+        font-size: 1.25em;
+    }
+    h3 {
+        margin: 5px 0;
+        font-size: 1.1em;
+    }
+
+    .note {
+        font-style: italic;
+        font-size: 0.9em;
+        margin: 3px 0;
+    }
+
+    label {
+        font-weight: normal;
+        margin-right: 25px;
+
+        input[type=checkbox]{
+            margin-left: 5px;
+        }
+    }
+}
+
+@import 'page';

@@ -1,0 +1,109 @@
+/*
+ * select
+ * ------
+ * Returns an array of elements that are children of the parent elements and
+ * match the selector.
+ *
+ * @param parents - an array of parent elements to search using the selector
+ * @param selector - the selector to use to match children of the parent elements
+ * @param spec - how to select the child element or elements of a parent element
+ */
+export const select = (parents, selector, spec) => {
+  let sel = (selector || "*") + ":not(.no-select)";
+  let index = spec && spec.type === "single" ? spec.value : undefined;
+
+  let specElements = elements => {
+    if ( index !== undefined ) {
+      return elements[index] !== undefined ? [elements[index]] : [];
+    } else {
+      return [].slice.call(elements);
+    }
+  }
+
+  return [].slice.call(parents).reduce((arr, p) => {
+    let eles = p.querySelectorAll(sel);
+    return arr.concat(specElements(eles));
+  }, []);
+}
+
+
+/*
+ * count
+ * ------
+ * Returns the max number of child elements that the selector matches per parent
+ *
+ * @param parents - an array of parent elements to search using the selector
+ * @param selector - the selector to use to match children of the parent elements
+ * @param spec - how to select the child element or elements of a parent element
+ */
+export const count = (parents, selector, spec) => {
+  let sel = (selector || "*") + ":not(.no-select)";
+  let index = spec && spec.type === "single" ? spec.value : undefined;
+
+  let specElements = elements => {
+    if ( index !== undefined ) {
+      return elements[index] !== undefined ? 1 :0;
+    } else {
+      return elements.length;
+    }
+  }
+
+  return [].slice.call(parents).reduce((top, p) => {
+    let eles = p.querySelectorAll(sel);
+    let count = specElements(eles);
+    return top > count ? top : count;
+  }, 0);
+}
+
+/*
+ * parts
+ * -------------
+ * Returns an array of strings that can be used as CSS selectors to select the element.
+ * Element tags are converted to lowercase, ids are preceded by a "#" and classes are
+ * preceded by a "."
+ *
+ * @param element - the element to analyze
+ */
+export const parts = element =>{
+  let skipTags = [];
+  let skipClasses = ["forager-highlight", "query-check", "selectable-element", "current-selector"];
+
+  let tagAllowed = tag => {
+    return !skipTags.some(st => st === tag);
+  }
+
+  let classAllowed = c => {
+    return !skipClasses.some(sc => sc === c);
+  }
+
+  let pieces = [];
+  let tag = element.tagName.toLowerCase();
+  if ( tagAllowed(tag) ) {
+    pieces.push(tag);
+  } else {
+    // if the tag isn't allowed, return an empty array
+    return [];
+  }
+
+  // id
+  if ( element.id !== "" ) {
+    pieces.push("#" + element.id);
+  }
+
+  // classes
+  [].slice.call(element.classList).forEach(c => {
+    if ( classAllowed(c) ) {
+      pieces.push(`.${c}`);
+    }  
+  });
+  return pieces;
+};
+
+/*
+ * check if all elements matched by the selector are "select" elements
+ */
+export const allSelect = selection => {
+  return selection.every(ele => {
+    return ele.tagName === "SELECT";
+  });
+};

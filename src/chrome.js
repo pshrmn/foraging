@@ -1,27 +1,26 @@
-/* functions that are related to the extension */
+import { select, setupPage, clean } from "./helpers";
 
-// save all of the pages for the site
-function chromeSave(pages) {
-    chrome.storage.local.get('sites', function saveSchemaChrome(storage){
-        var host = window.location.hostname;
-        storage.sites[host] = cleanPages(pages);
-        chrome.storage.local.set({"sites": storage.sites});
-    });
+/*
+ * TODO: this will load pages and options from and save them to
+ * chrome.storage.local
+ * Pages are saved on a hostname basis, while options are global.
+ *
+ */
+
+/*
+ * any time that the page is updated, the new value should be saved
+ */
+export const chromeSave = pages => {
+  let cleaned = cleanPages(pages);
+  chrome.storage.local.get("sites", function saveSchemaChrome(storage){
+    let host = window.location.hostname;
+    storage.sites[host] = cleaned;
+    chrome.storage.local.set({"sites": storage.sites});
+  });
 }
 
-// takes a data object to be uploaded and passes it to the background page to handle
-function chromeUpload(data) {
-    data.page = JSON.stringify(cleanPage(data.page));
-    chrome.runtime.sendMessage({type: 'upload', data: data});
-}
-
-function chromeSync(domain) {
-    chrome.runtime.sendMessage({type: 'sync', domain: domain}, function(response){
-        if ( response.error ) {
-            return;
-        }
-        controller.finishSync(response.pages);
-    });
+const cleanPages = pages => {
+  return pages.filter(p => p !== undefined).map(page => clean(page));
 }
 
 /*
@@ -35,20 +34,26 @@ urls is saved as an object for easier lookup, but converted to an array of the k
 
 If the site object exists for a host, load the saved rules
 */
-function chromeLoadPages() {
-    chrome.storage.local.get("sites", function setupHostnameChrome(storage){
-        var host = window.location.hostname;
-        var pages = storage.sites[host] || {};
-        controller.loadPages(pages);
-    });
+export const chromeLoad = callback => {
+  chrome.storage.local.get("sites", function setupHostnameChrome(storage){
+    let host = window.location.hostname;
+    let pages = storage.sites[host] || [];
+    pages.forEach(p => setupPage(p));
+    callback(pages);
+  });
+};
+
+// takes a data object to be uploaded and passes it to the background page to handle
+function chromeUpload(data) {
+  data.page = JSON.stringify(cleanPage(data.page));
+  chrome.runtime.sendMessage({type: 'upload', data: data});
 }
 
-function chromeLoadOptions() {
-    chrome.storage.local.get("options", function loadOptionsChrome(storage){
-        controller.setOptions(storage.options);
-    });
-}
-
-function chromeSaveOptions(opts) {
-    chrome.storage.local.set({"options": opts});
+function chromeSync(domain) {
+  chrome.runtime.sendMessage({type: 'sync', domain: domain}, function(response){
+    if ( response.error ) {
+      return;
+    }
+    controller.finishSync(response.pages);
+  });
 }
