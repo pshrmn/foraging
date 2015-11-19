@@ -17,7 +17,7 @@ setup(
     version=version,
     description="collect data from webpages",
     packages=packages,
-    install_requires=["cssselect>=0.9.1", "requests>=2", "lxml>=3.3.1"],
+    install_requires=["cssselect>=0.9.1", "requests>=2", "lxml>=3.5.0"],
     url="https://github.com/psherman/gatherer",
     license="MIT",
     author="Paul Sherman",
