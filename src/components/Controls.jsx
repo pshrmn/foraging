@@ -92,6 +92,7 @@ let PageControls = React.createClass({
 
 let GeneralControls = React.createClass({
   handleClose: function(event){
+    document.body.classList.remove("foraging");
     this.props.actions.closeForager();
   },
   render: function() {

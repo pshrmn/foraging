@@ -85,6 +85,7 @@
 	 * check if the app is hidden. If it is hidden, show it.
 	 */
 	var holder = document.querySelector(".forager-holder");
+	document.body.classList.add("foraging");
 	if (!holder) {
 	  (0, _chrome.chromeLoad)(function (pages) {
 	    /*
@@ -137,6 +138,7 @@
 	    window.store = store;
 	  });
 	} else {
+	  document.body.classList.add("foraging");
 	  var currentState = store.getState();
 	  if (!currentState.show) {
 	    store.dispatch({
@@ -1839,6 +1841,7 @@
 	  displayName: "GeneralControls",
 
 	  handleClose: function handleClose(event) {
+	    document.body.classList.remove("foraging");
 	    this.props.actions.closeForager();
 	  },
 	  render: function render() {
@@ -3053,7 +3056,7 @@
 	      { className: "frame element-form" },
 	      _react2.default.createElement(
 	        "div",
-	        { className: "radios" },
+	        { className: "choices" },
 	        opts
 	      ),
 	      _react2.default.createElement(
@@ -3125,7 +3128,7 @@
 	        name: "css-selector",
 	        checked: checked,
 	        onChange: this.setRadio }),
-	      selector
+	      selector.join("")
 	    );
 	  }
 	});
@@ -3219,9 +3222,11 @@
 	      var name = part.name;
 	      var checked = part.checked;
 
+	      var labelClass = checked ? "selected" : "";
 	      return _react2.default.createElement(
 	        "label",
-	        { key: index },
+	        { key: index,
+	          className: labelClass },
 	        name,
 	        _react2.default.createElement("input", { type: "checkbox",
 	          name: "selector-part",
@@ -3233,7 +3238,11 @@
 	    return _react2.default.createElement(
 	      "div",
 	      { className: "frame parts-form" },
-	      parts,
+	      _react2.default.createElement(
+	        "div",
+	        { className: "choices" },
+	        parts
+	      ),
 	      _react2.default.createElement(
 	        "div",
 	        { className: "buttons" },

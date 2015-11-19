@@ -72,7 +72,7 @@ export default React.createClass({
     });
     return (
       <div className="frame element-form">
-        <div className="radios">
+        <div className="choices">
           {opts}
         </div>
         <div className="buttons">
@@ -137,7 +137,7 @@ let SelectorRadio = React.createClass({
                name="css-selector"
                checked={checked}
                onChange={this.setRadio} />
-        {selector}
+        {selector.join("")}
       </label>
     );
   }

@@ -19,6 +19,7 @@ import { chromeSave, chromeLoad } from "./chrome";
  * check if the app is hidden. If it is hidden, show it.
  */
 let holder = document.querySelector(".forager-holder");
+document.body.classList.add("foraging");
 if ( !holder ) {
   chromeLoad(pages => {
     /*
@@ -76,6 +77,7 @@ if ( !holder ) {
 
   })
 } else {
+  document.body.classList.add("foraging");
   let currentState = store.getState();
   if ( !currentState.show ) {
     store.dispatch({

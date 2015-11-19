@@ -66,8 +66,10 @@ export default React.createClass({
   render: function() {
     let parts = this.state.parts.map((part, index) => {
       let { name, checked } = part;
+      let labelClass = checked ? "selected" : "";
       return (
-        <label key={index}>
+        <label key={index}
+               className={labelClass} >
           {name}
           <input type="checkbox"
                  name="selector-part"
@@ -79,7 +81,9 @@ export default React.createClass({
     });
     return (
       <div className="frame parts-form">
-        {parts}
+        <div className="choices">
+          {parts}
+        </div>
         <div className="buttons">
           <PosButton text="Save" click={this.saveHandler} />
           <NegButton text="Cancel" click={this.cancelHander} />
