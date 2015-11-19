@@ -188,6 +188,15 @@ body{
             background: $white;
             padding: 5px;
             position: relative;
+
+            .radios {
+                display: flex;
+                flex-wrap: wrap;
+            }
+
+            label {
+                margin-right: 15px;
+            }
         }
     }
 

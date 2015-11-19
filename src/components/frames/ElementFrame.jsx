@@ -15,7 +15,8 @@ import { parts, select,
  * parent) will be rendered.
  */
 export default React.createClass({
-  highlight: "selectable-element",
+  potentialSelector: "selectable-element",
+  currentSelector: "query-check",
   events: {
     over: function(event) {
       event.target.classList.add("forager-highlight");
@@ -26,7 +27,7 @@ export default React.createClass({
     click: function(event) {
       event.preventDefault();
       event.stopPropagation();
-      var data = [].slice.call(event.path)
+      let selectors = Array.from(event.path)
         .filter(function(ele){
             return ele.classList && ele.classList.contains("selectable-element");
         })
@@ -35,8 +36,8 @@ export default React.createClass({
             return parts(ele);
         });
       this.setState({
-        selectors: data
-      })
+        selectors: selectors
+      });
     }
   },
   getInitialState: function() {
@@ -71,7 +72,7 @@ export default React.createClass({
     });
     return (
       <div className="frame element-form">
-        <div className="element-selectors">
+        <div className="radios">
           {opts}
         </div>
         <div className="buttons">
@@ -85,28 +86,40 @@ export default React.createClass({
    * below here are the functions for interacting with the non-Forager part of the page
    */
   componentWillMount: function() {
-    let { selector } = this.props;
-    this._setupPageEvents(selector.elements);
+    this._setupPageEvents(this.props.selector.elements);
   },
   componentWillReceiveNewProps: function(nextProps) {
-    let { selector } = nextProps;
-    this._setupPageEvents(selector.elements);
+    this._setupPageEvents(nextProps.selector.elements);
   },
+  /*
+   * when a selector possibility is chosen, add a class to all matching elements
+   * to show what that selector could match
+   */
+  componentWillUpdate: function(nextProps, nextState) {
+    // remove any highlights from a previously selected selector
+    unhighlight(this.currentSelector);
+    let clickedSelector = nextState.selectors[nextState.checked];
+    if ( clickedSelector !== undefined ) {
+      let fullSelector = clickedSelector.join("");
+      let elements = select(nextProps.selector.elements, fullSelector);
+      highlight(elements, this.currentSelector);
+    }
+  },
+  /*
+   * remove any classes and event listeners from the page when the frame is unmounted
+   */
   componentWillUnmount: function() {
-    this._removePageEvents();
-  },
-  _setupPageEvents: function(parents) {
-    // get all child elemetns of the parents
-    let elements = select(parents);
-    // need to bind this, but also cache the function
-    // for removal
-    let boundClick = this.events.click.bind(this);
-    this.boundClick = boundClick;
-    iHighlight(elements, this.highlight, this.events.over, this.events.out, boundClick);
-  },
-  _removePageEvents: function() {
-    iUnhighlight(this.highlight, this.events.over, this.events.out, this.boundClick);
+    unhighlight(this.currentSelector);
+    iUnhighlight(this.potentialSelector, this.events.over, this.events.out, this.boundClick);
     delete this.boundClick;
+  },
+  /*
+   * attach a class and events to all child elements of the current selector
+   */
+  _setupPageEvents: function(parents) {
+    let elements = select(parents);
+    this.boundClick = this.events.click.bind(this);
+    iHighlight(elements, this.potentialSelector, this.events.over, this.events.out, this.boundClick);
   }
 });
 
@@ -120,11 +133,11 @@ let SelectorRadio = React.createClass({
     let labelClass = checked ? "selected" : "";
     return (
       <label className={labelClass}>
-        {selector}
         <input type="radio"
                name="css-selector"
                checked={checked}
                onChange={this.setRadio} />
+        {selector}
       </label>
     );
   }

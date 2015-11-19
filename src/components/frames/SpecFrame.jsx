@@ -1,9 +1,10 @@
 import React from "react";
 
 import { PosButton, NegButton } from "../Inputs";
-import { createSelector, allSelect, count, select } from "../../helpers";
+import { createSelector, allSelect, count, select, highlight, unhighlight } from "../../helpers";
 
 export default React.createClass({
+  highlight: "query-check",
   getInitialState: function() {
     return {
       type: "single",
@@ -14,6 +15,10 @@ export default React.createClass({
   saveHandler: function(event) {
     event.preventDefault();
     let { type, value, optional } = this.state;
+    // all value must be set
+    if ( type === "all" && value === "" ) {
+      return;
+    }
     let sel = createSelector(this.props.data.css, type, value, optional);
     // generate the list of elements right away
     sel.elements = select(this.props.selector.elements, sel.selector, sel.spec);
@@ -64,6 +69,30 @@ export default React.createClass({
         </div>
       </div>
     );
+  },
+  componentWillMount: function() {
+    let parentElements = this.props.selector.elements;
+    let cssSelector = this.props.data.css;
+    let spec = {
+      type: this.state.type,
+      value: this.state.value
+    };
+    let elements = select(parentElements, cssSelector, spec);
+    highlight(elements, this.highlight);
+  },
+  componentWillUpdate: function(nextProps, nextState) {
+    let parentElements = nextProps.selector.elements;
+    let cssSelector = nextProps.data.css;
+    let spec = {
+      type: nextState.type,
+      value: nextState.value
+    };
+    unhighlight(this.highlight);
+    let elements = select(parentElements, cssSelector, spec);
+    highlight(elements, this.highlight);
+  },
+  componentWillUnmount: function() {
+    unhighlight(this.highlight);
   }
 });
 

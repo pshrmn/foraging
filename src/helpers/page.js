@@ -36,6 +36,7 @@ export const clone = selector => {
     id: selector.id,
     selector: selector.selector,
     spec: Object.assign({}, selector.spec),
+    optional: selector.optional,
     children: selector.children.map(child => clone(child)),
     rules: selector.rules.map(r => Object.assign({}, r)),
     elements: selector.elements || []
@@ -55,7 +56,8 @@ const cleanSelector = s => {
     selector: s.selector,
     spec: Object.assign({}, s.spec),
     children: s.children.map(c => cleanSelector(c)),
-    rules: s.rules.map(r => Object.assign({}, r))
+    rules: s.rules.map(r => Object.assign({}, r)),
+    optional: s.optional
   });
 };
 

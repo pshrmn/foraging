@@ -2249,6 +2249,7 @@
 	    id: selector.id,
 	    selector: selector.selector,
 	    spec: Object.assign({}, selector.spec),
+	    optional: selector.optional,
 	    children: selector.children.map(function (child) {
 	      return clone(child);
 	    }),
@@ -2274,7 +2275,8 @@
 	    }),
 	    rules: s.rules.map(function (r) {
 	      return Object.assign({}, r);
-	    })
+	    }),
+	    optional: s.optional
 	  });
 	};
 
@@ -2980,7 +2982,8 @@
 	exports.default = _react2.default.createClass({
 	  displayName: "ElementFrame",
 
-	  highlight: "selectable-element",
+	  potentialSelector: "selectable-element",
+	  currentSelector: "query-check",
 	  events: {
 	    over: function over(event) {
 	      event.target.classList.add("forager-highlight");
@@ -2991,13 +2994,13 @@
 	    click: function click(event) {
 	      event.preventDefault();
 	      event.stopPropagation();
-	      var data = [].slice.call(event.path).filter(function (ele) {
+	      var selectors = Array.from(event.path).filter(function (ele) {
 	        return ele.classList && ele.classList.contains("selectable-element");
 	      }).reverse().map(function (ele) {
 	        return (0, _helpers.parts)(ele);
 	      });
 	      this.setState({
-	        selectors: data
+	        selectors: selectors
 	      });
 	    }
 	  },
@@ -3043,7 +3046,7 @@
 	      { className: "frame element-form" },
 	      _react2.default.createElement(
 	        "div",
-	        { className: "element-selectors" },
+	        { className: "radios" },
 	        opts
 	      ),
 	      _react2.default.createElement(
@@ -3058,30 +3061,40 @@
 	   * below here are the functions for interacting with the non-Forager part of the page
 	   */
 	  componentWillMount: function componentWillMount() {
-	    var selector = this.props.selector;
-
-	    this._setupPageEvents(selector.elements);
+	    this._setupPageEvents(this.props.selector.elements);
 	  },
 	  componentWillReceiveNewProps: function componentWillReceiveNewProps(nextProps) {
-	    var selector = nextProps.selector;
-
-	    this._setupPageEvents(selector.elements);
+	    this._setupPageEvents(nextProps.selector.elements);
 	  },
+	  /*
+	   * when a selector possibility is chosen, add a class to all matching elements
+	   * to show what that selector could match
+	   */
+	  componentWillUpdate: function componentWillUpdate(nextProps, nextState) {
+	    // remove any highlights from a previously selected selector
+	    (0, _helpers.unhighlight)(this.currentSelector);
+	    var clickedSelector = nextState.selectors[nextState.checked];
+	    if (clickedSelector !== undefined) {
+	      var fullSelector = clickedSelector.join("");
+	      var elements = (0, _helpers.select)(nextProps.selector.elements, fullSelector);
+	      (0, _helpers.highlight)(elements, this.currentSelector);
+	    }
+	  },
+	  /*
+	   * remove any classes and event listeners from the page when the frame is unmounted
+	   */
 	  componentWillUnmount: function componentWillUnmount() {
-	    this._removePageEvents();
-	  },
-	  _setupPageEvents: function _setupPageEvents(parents) {
-	    // get all child elemetns of the parents
-	    var elements = (0, _helpers.select)(parents);
-	    // need to bind this, but also cache the function
-	    // for removal
-	    var boundClick = this.events.click.bind(this);
-	    this.boundClick = boundClick;
-	    (0, _helpers.iHighlight)(elements, this.highlight, this.events.over, this.events.out, boundClick);
-	  },
-	  _removePageEvents: function _removePageEvents() {
-	    (0, _helpers.iUnhighlight)(this.highlight, this.events.over, this.events.out, this.boundClick);
+	    (0, _helpers.unhighlight)(this.currentSelector);
+	    (0, _helpers.iUnhighlight)(this.potentialSelector, this.events.over, this.events.out, this.boundClick);
 	    delete this.boundClick;
+	  },
+	  /*
+	   * attach a class and events to all child elements of the current selector
+	   */
+	  _setupPageEvents: function _setupPageEvents(parents) {
+	    var elements = (0, _helpers.select)(parents);
+	    this.boundClick = this.events.click.bind(this);
+	    (0, _helpers.iHighlight)(elements, this.potentialSelector, this.events.over, this.events.out, this.boundClick);
 	  }
 	});
 
@@ -3101,11 +3114,11 @@
 	    return _react2.default.createElement(
 	      "label",
 	      { className: labelClass },
-	      selector,
 	      _react2.default.createElement("input", { type: "radio",
 	        name: "css-selector",
 	        checked: checked,
-	        onChange: this.setRadio })
+	        onChange: this.setRadio }),
+	      selector
 	    );
 	  }
 	});
@@ -3257,6 +3270,7 @@
 	exports.default = _react2.default.createClass({
 	  displayName: "SpecFrame",
 
+	  highlight: "query-check",
 	  getInitialState: function getInitialState() {
 	    return {
 	      type: "single",
@@ -3270,7 +3284,11 @@
 	    var type = _state.type;
 	    var value = _state.value;
 	    var optional = _state.optional;
+	    // all value must be set
 
+	    if (type === "all" && value === "") {
+	      return;
+	    }
 	    var sel = (0, _helpers.createSelector)(this.props.data.css, type, value, optional);
 	    // generate the list of elements right away
 	    sel.elements = (0, _helpers.select)(this.props.selector.elements, sel.selector, sel.spec);
@@ -3331,6 +3349,30 @@
 	        _react2.default.createElement(_Inputs.NegButton, { text: "Cancel", click: this.cancelHandler })
 	      )
 	    );
+	  },
+	  componentWillMount: function componentWillMount() {
+	    var parentElements = this.props.selector.elements;
+	    var cssSelector = this.props.data.css;
+	    var spec = {
+	      type: this.state.type,
+	      value: this.state.value
+	    };
+	    var elements = (0, _helpers.select)(parentElements, cssSelector, spec);
+	    (0, _helpers.highlight)(elements, this.highlight);
+	  },
+	  componentWillUpdate: function componentWillUpdate(nextProps, nextState) {
+	    var parentElements = nextProps.selector.elements;
+	    var cssSelector = nextProps.data.css;
+	    var spec = {
+	      type: nextState.type,
+	      value: nextState.value
+	    };
+	    (0, _helpers.unhighlight)(this.highlight);
+	    var elements = (0, _helpers.select)(parentElements, cssSelector, spec);
+	    (0, _helpers.highlight)(elements, this.highlight);
+	  },
+	  componentWillUnmount: function componentWillUnmount() {
+	    (0, _helpers.unhighlight)(this.highlight);
 	  }
 	});
 
@@ -4118,9 +4160,7 @@
 	};
 
 	var find = function find(page, id) {
-
 	  var sel = undefined;
-
 	  var search = function search(selector) {
 	    if (selector.id === id) {
 	      sel = selector;

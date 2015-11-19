@@ -14,9 +14,7 @@ export default state => next => action => {
 };
 
 let find = (page, id) => {
-
   let sel;
-
   let search = selector => {
     if ( selector.id === id ) {
       sel = selector;

@@ -121,6 +121,15 @@ body {
       background: #ffffff;
       padding: 5px;
       position: relative; }
+      .forager .frames .frame .radios {
+        display: -webkit-flex;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-flex-wrap: wrap;
+            -ms-flex-wrap: wrap;
+                flex-wrap: wrap; }
+      .forager .frames .frame label {
+        margin-right: 15px; }
   .forager input {
     box-shadow: none;
     border-radius: 0;
