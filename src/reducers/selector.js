@@ -14,6 +14,7 @@ export default function selector(state, action) {
   case types.LOAD_PAGE:
   case types.ADD_PAGE:
   case types.REMOVE_PAGE:
+  case types.CLOSE_FORAGER:
     return undefined;
   case types.SAVE_RULE:
     state.rules.push(action.rule);

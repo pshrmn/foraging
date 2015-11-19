@@ -7,6 +7,7 @@ export default function frame(state = "", action) {
   case types.SAVE_SELECTOR:
   case types.SAVE_RULE:
   case types.REMOVE_RULE:
+  case types.CLOSE_FORAGER:
   case types.SHOW_SELECTOR_FRAME:
     return Object.assign({}, state, {
       name: "selector",

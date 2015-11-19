@@ -73,6 +73,8 @@ if ( !holder ) {
       ), holder
     );
 
+    // window here is the extension's context, so it is not reachable by code
+    // outside of the extension.
     window.store = store;
 
   })

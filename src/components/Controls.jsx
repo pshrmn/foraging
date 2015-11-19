@@ -2,7 +2,7 @@ import React from "react";
 
 import { PosButton, NegButton, NeutralButton } from "./Inputs";
 
-import { legalName, createPage, setupPage } from "../helpers";
+import { legalName, createPage, setupPage, unhighlight } from "../helpers";
 
 export default React.createClass({
   render: function() {
@@ -92,7 +92,11 @@ let PageControls = React.createClass({
 
 let GeneralControls = React.createClass({
   handleClose: function(event){
-    document.body.classList.remove("foraging");
+    // remove any classes that would have been added to the page
+    ["foraging", "query-check", "current-selector",
+       "selectable-element", "saved-preview"].forEach(css => {
+      unhighlight(css);
+    });
     this.props.actions.closeForager();
   },
   render: function() {

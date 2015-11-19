@@ -135,6 +135,8 @@
 	      _react2.default.createElement(_Forager2.default, null)
 	    ), holder);
 
+	    // window here is the extension's context, so it is not reachable by code
+	    // outside of the extension.
 	    window.store = store;
 	  });
 	} else {
@@ -1841,7 +1843,10 @@
 	  displayName: "GeneralControls",
 
 	  handleClose: function handleClose(event) {
-	    document.body.classList.remove("foraging");
+	    // remove any classes that would have been added to the page
+	    ["foraging", "query-check", "current-selector", "selectable-element", "saved-preview"].forEach(function (css) {
+	      (0, _helpers.unhighlight)(css);
+	    });
 	    this.props.actions.closeForager();
 	  },
 	  render: function render() {
@@ -3851,6 +3856,7 @@
 	    case types.SAVE_SELECTOR:
 	    case types.SAVE_RULE:
 	    case types.REMOVE_RULE:
+	    case types.CLOSE_FORAGER:
 	    case types.SHOW_SELECTOR_FRAME:
 	      return Object.assign({}, state, {
 	        name: "selector",
@@ -4094,6 +4100,7 @@
 	    case types.LOAD_PAGE:
 	    case types.ADD_PAGE:
 	    case types.REMOVE_PAGE:
+	    case types.CLOSE_FORAGER:
 	      return undefined;
 	    case types.SAVE_RULE:
 	      state.rules.push(action.rule);
