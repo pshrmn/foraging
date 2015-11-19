@@ -17,7 +17,7 @@ export default React.createClass({
       return null;
     }
 
-    let { selector, children, rules, spec } = this.props.selector;
+    let { selector, children, rules, spec, optional } = this.props.selector;
     let { type, value } = spec;
     let description = "";
     if ( type === "single" ) {
@@ -32,15 +32,16 @@ export default React.createClass({
     ) : (
       <p>No Rules</p>
     );
-
+    let optionalText = optional ? "(optional)" : "";
     return (
       <div className="frame">
-        Selector Frame
         <div>
           <h2>{selector}</h2>
-          <p>{description}</p>
-          {rulesList}
-
+          <p>{description} {optionalText}</p>
+          <div>
+            Rules:
+            {rulesList}
+          </div>
           <PosButton text="Add Child" click={this.addChild} />
           <PosButton text="Add Rule" click={this.addRule} />
           <NegButton text="Remove" click={this.remove} />

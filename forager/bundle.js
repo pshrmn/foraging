@@ -2680,6 +2680,7 @@
 	    var children = _props$selector.children;
 	    var rules = _props$selector.rules;
 	    var spec = _props$selector.spec;
+	    var optional = _props$selector.optional;
 	    var type = spec.type;
 	    var value = spec.value;
 
@@ -2696,11 +2697,10 @@
 	      null,
 	      "No Rules"
 	    );
-
+	    var optionalText = optional ? "(optional)" : "";
 	    return _react2.default.createElement(
 	      "div",
 	      { className: "frame" },
-	      "Selector Frame",
 	      _react2.default.createElement(
 	        "div",
 	        null,
@@ -2712,9 +2712,16 @@
 	        _react2.default.createElement(
 	          "p",
 	          null,
-	          description
+	          description,
+	          " ",
+	          optionalText
 	        ),
-	        rulesList,
+	        _react2.default.createElement(
+	          "div",
+	          null,
+	          "Rules:",
+	          rulesList
+	        ),
 	        _react2.default.createElement(_Inputs.PosButton, { text: "Add Child", click: this.addChild }),
 	        _react2.default.createElement(_Inputs.PosButton, { text: "Add Rule", click: this.addRule }),
 	        _react2.default.createElement(_Inputs.NegButton, { text: "Remove", click: this.remove })

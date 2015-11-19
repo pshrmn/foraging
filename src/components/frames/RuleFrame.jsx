@@ -60,7 +60,6 @@ export default React.createClass({
  
     return (
       <div className="frame rule-form">
-
         <div>
           <label>
             Name: <input type="text"

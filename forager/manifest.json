@@ -1,8 +1,8 @@
 {
   "manifest_version": 2,
-  "name": "Forager (React)",
+  "name": "Forager",
   "description": "Hunt and gather data",
-  "version": "2.0.9",
+  "version": "2.1.0",
   "permissions": [
     "activeTab",
     "storage",
