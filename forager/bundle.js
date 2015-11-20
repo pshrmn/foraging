@@ -3022,12 +3022,16 @@
 	  getInitialState: function getInitialState() {
 	    return {
 	      checked: undefined,
-	      selectors: []
+	      selectors: [],
+	      eleCount: 0
 	    };
 	  },
 	  setRadio: function setRadio(i) {
+	    var selector = this.state.selectors[i].join("");
+	    var eleCount = (0, _helpers.count)(this.props.selector.elements, selector);
 	    this.setState({
-	      checked: i
+	      checked: i,
+	      eleCount: eleCount
 	    });
 	  },
 	  saveHandler: function saveHandler(event) {
@@ -3048,6 +3052,7 @@
 	    var _state = this.state;
 	    var selectors = _state.selectors;
 	    var checked = _state.checked;
+	    var eleCount = _state.eleCount;
 
 	    var opts = selectors.map(function (s, i) {
 	      return _react2.default.createElement(SelectorRadio, { key: i,
@@ -3060,9 +3065,20 @@
 	      "div",
 	      { className: "frame element-form" },
 	      _react2.default.createElement(
+	        "h3",
+	        null,
+	        "Selectors:"
+	      ),
+	      _react2.default.createElement(
 	        "div",
 	        { className: "choices" },
 	        opts
+	      ),
+	      _react2.default.createElement(
+	        "h5",
+	        null,
+	        "Count: ",
+	        eleCount
 	      ),
 	      _react2.default.createElement(
 	        "div",
@@ -3165,13 +3181,19 @@
 	  getInitialState: function getInitialState() {
 	    return {
 	      parts: [],
-	      selector: ""
+	      eleCount: 0
 	    };
 	  },
 	  saveHandler: function saveHandler(event) {
 	    event.preventDefault();
-	    var selector = this.state.selector;
+	    var parts = this.state.parts;
 
+	    var selector = parts.reduce(function (str, curr) {
+	      if (curr.checked) {
+	        str += curr.name;
+	      }
+	      return str;
+	    }, "");
 	    if (selector !== "") {
 	      this.props.actions.showSpecFrame(selector);
 	    }
@@ -3191,22 +3213,16 @@
 	      }
 	      return str;
 	    }, "");
+
+	    var eleCount = fullSelector === "" ? 0 : (0, _helpers.count)(this.props.selector.elements, fullSelector);
 	    this._setupHighlights(fullSelector);
 	    this.setState({
 	      parts: parts,
-	      selector: fullSelector
+	      eleCount: eleCount
 	    });
 	  },
 	  componentWillMount: function componentWillMount() {
-	    this._partsArray(this.props.data.parts);
-	  },
-	  componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
-	    this._partsArray(nextProps.data.parts);
-	  },
-	  componentWillUnmount: function componentWillUnmount() {
-	    this._removeHighlights();
-	  },
-	  _partsArray: function _partsArray(names) {
+	    var names = this.props.data.parts;
 	    var parts = names.map(function (name) {
 	      return {
 	        name: name,
@@ -3214,16 +3230,24 @@
 	      };
 	    });
 	    var fullSelector = names.join("");
+	    var eleCount = (0, _helpers.count)(this.props.selector.elements, fullSelector);
 	    this._setupHighlights(fullSelector);
 	    this.setState({
 	      parts: parts,
-	      selector: fullSelector
+	      eleCount: eleCount
 	    });
+	  },
+	  componentWillUnmount: function componentWillUnmount() {
+	    this._removeHighlights();
 	  },
 	  render: function render() {
 	    var _this = this;
 
-	    var parts = this.state.parts.map(function (part, index) {
+	    var _state = this.state;
+	    var parts = _state.parts;
+	    var eleCount = _state.eleCount;
+
+	    var opts = parts.map(function (part, index) {
 	      var name = part.name;
 	      var checked = part.checked;
 
@@ -3244,9 +3268,20 @@
 	      "div",
 	      { className: "frame parts-form" },
 	      _react2.default.createElement(
+	        "h3",
+	        null,
+	        "Parts:"
+	      ),
+	      _react2.default.createElement(
 	        "div",
 	        { className: "choices" },
-	        parts
+	        opts
+	      ),
+	      _react2.default.createElement(
+	        "h5",
+	        null,
+	        "Count: ",
+	        this.state.eleCount
 	      ),
 	      _react2.default.createElement(
 	        "div",
@@ -3664,19 +3699,21 @@
 	        text = "[" + selector + "]";
 	        break;
 	    }
-	    return (0, _helpers.abbreviate)(text, 15);
+	    return (0, _helpers.abbreviate)(text, 10);
 	  },
 	  render: function render() {
 	    var _props4 = this.props;
 	    var rules = _props4.rules;
 	    var children = _props4.children;
+	    var current = _props4.current;
+	    var depth = _props4.depth;
 
 	    var hasChildren = children && children.length;
 	    var hasRules = rules && rules.length;
 	    var text = this.specText();
 	    var marker = rules && rules.length ? _react2.default.createElement("rect", { width: "6", height: "6", x: "-3", y: "-3" }) : _react2.default.createElement("circle", { r: "3" });
 	    var classNames = ["node"];
-	    if (this.props.current) {
+	    if (current) {
 	      classNames.push("current");
 	    }
 	    if (!hasRules && !hasChildren) {
@@ -3691,7 +3728,7 @@
 	        onMouseOut: this.handleMouseout },
 	      _react2.default.createElement(
 	        "text",
-	        { y: "5", dx: "-5" },
+	        { y: "-10" },
 	        text
 	      ),
 	      marker

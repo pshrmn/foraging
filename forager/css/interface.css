@@ -45,6 +45,14 @@ body.foraging {
   .forager h1, .forager h2, .forager h3, .forager h4, .forager h5, .forager h6, .forager p {
     margin: 2px 0;
     padding: 0; }
+  .forager h1 {
+    font-size: 1.5em; }
+  .forager h2 {
+    font-size: 1.25em; }
+  .forager h3 {
+    font-size: 1.2em; }
+  .forager h4, .forager h5, .forager h6 {
+    font-size: 1.1em; }
   .forager .controls {
     background: #323033;
     height: 31px;
@@ -117,9 +125,10 @@ body.foraging {
       paint-order: stroke;
       stroke: #ffffff;
       stroke-width: 3px;
-      text-anchor: end; }
+      text-anchor: middle; }
     .forager .graph svg .current {
-      font-weight: bold; }
+      font-weight: bold;
+      fill: #323033; }
   .forager .frames {
     width: 400px;
     vertical-align: top; }

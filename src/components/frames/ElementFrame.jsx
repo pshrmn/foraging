@@ -1,7 +1,7 @@
 import React from "react";
 
 import { PosButton, NegButton } from "../Inputs";
-import { parts, select,
+import { parts, select, count,
   highlight, unhighlight, iHighlight, iUnhighlight } from "../../helpers";
 
 /*
@@ -43,12 +43,16 @@ export default React.createClass({
   getInitialState: function() {
     return {
       checked: undefined,
-      selectors: []
+      selectors: [],
+      eleCount: 0
     };
   },
   setRadio: function(i) {
+    let selector = this.state.selectors[i].join("");
+    let eleCount = count(this.props.selector.elements, selector);
     this.setState({
-      checked: i
+      checked: i,
+      eleCount: eleCount
     });
   },
   saveHandler: function(event) {
@@ -62,7 +66,7 @@ export default React.createClass({
   },
   render: function() {
     let { selector, data } = this.props;
-    let { selectors, checked } = this.state;
+    let { selectors, checked, eleCount } = this.state;
     let opts = selectors.map((s, i) => {
       return <SelectorRadio key={i}
                             selector={s}
@@ -72,9 +76,11 @@ export default React.createClass({
     });
     return (
       <div className="frame element-form">
+        <h3>Selectors:</h3>
         <div className="choices">
           {opts}
         </div>
+        <h5>Count: {eleCount}</h5>
         <div className="buttons">
           <PosButton text="Save" click={this.saveHandler} />
           <NegButton text="Cancel" click={this.cancelHandler} />

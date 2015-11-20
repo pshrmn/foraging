@@ -123,10 +123,10 @@ let Node = React.createClass({
         text = `[${selector}]`;
         break;
     }
-    return abbreviate(text, 15);
+    return abbreviate(text, 10);
   },
   render: function() {
-    let { rules, children } = this.props;
+    let { rules, children, current, depth } = this.props;
     let hasChildren = children && children.length;
     let hasRules = rules && rules.length;
     let text = this.specText();
@@ -136,7 +136,7 @@ let Node = React.createClass({
       <circle r="3"></circle>
     );
     let classNames = ["node"];
-    if ( this.props.current ) {
+    if ( current ) {
       classNames.push("current");
     }
     if ( !hasRules && !hasChildren ) {
@@ -148,7 +148,7 @@ let Node = React.createClass({
          onClick={this.handleClick}
          onMouseOver={this.handleMouseover}
          onMouseOut={this.handleMouseout} >
-        <text y="5" dx="-5">{text}</text>
+        <text y="-10" >{text}</text>
         {marker}
       </g>
     );

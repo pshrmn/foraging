@@ -73,6 +73,22 @@ body.foraging {
         padding: 0
     }
 
+    h1 {
+        font-size: 1.5em;
+    }
+
+    h2 {
+        font-size: 1.25em;
+    }
+
+    h3 {
+        font-size: 1.2em;
+    }
+
+    h4, h5, h6 {
+        font-size: 1.1em;
+    }
+
     .controls{
         background: $dark-gray;
         height: 31px;
@@ -178,11 +194,12 @@ body.foraging {
                 paint-order: stroke;
                 stroke: $white;
                 stroke-width: 3px;
-                text-anchor: end;
+                text-anchor: middle;
             }
 
             .current{
                 font-weight: bold;
+                fill: $dark-gray;
             }
         }
     }

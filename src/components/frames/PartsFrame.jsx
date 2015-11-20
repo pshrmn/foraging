@@ -1,20 +1,25 @@
 import React from "react";
 
 import { PosButton, NegButton } from "../Inputs";
-import { select, highlight, unhighlight} from "../../helpers";
+import { select, count, highlight, unhighlight} from "../../helpers";
 
 export default React.createClass({
   previewClass: "query-check",
   getInitialState: function() {
     return {
       parts: [],
-      selector: ""
+      eleCount: 0
     };
   },
   saveHandler: function(event) {
     event.preventDefault();
-    let { selector } = this.state;
-    
+    let { parts } = this.state;
+    let selector = parts.reduce((str, curr) => {
+      if ( curr.checked ) {
+        str += curr.name;
+      }
+      return str;
+    }, "");
     if ( selector !== "" ) {
       this.props.actions.showSpecFrame(selector);
     }
@@ -34,22 +39,16 @@ export default React.createClass({
       }
       return str;
     }, "");
+
+    let eleCount = fullSelector === "" ? 0 : count(this.props.selector.elements, fullSelector);
     this._setupHighlights(fullSelector);
     this.setState({
       parts: parts,
-      selector: fullSelector
+      eleCount: eleCount
     });
   },
   componentWillMount: function() {
-    this._partsArray(this.props.data.parts);
-  },
-  componentWillReceiveProps: function(nextProps) {
-    this._partsArray(nextProps.data.parts);
-  },
-  componentWillUnmount: function() {
-    this._removeHighlights();
-  },
-  _partsArray: function(names) {
+    let names = this.props.data.parts;
     let parts = names.map(name => {
       return {
         name: name,
@@ -57,14 +56,19 @@ export default React.createClass({
       }
     });
     let fullSelector = names.join("");
+    let eleCount = count(this.props.selector.elements, fullSelector);
     this._setupHighlights(fullSelector);
     this.setState({
       parts: parts,
-      selector: fullSelector
+      eleCount: eleCount
     });
   },
+  componentWillUnmount: function() {
+    this._removeHighlights();
+  },
   render: function() {
-    let parts = this.state.parts.map((part, index) => {
+    let { parts, eleCount } = this.state;
+    let opts = parts.map((part, index) => {
       let { name, checked } = part;
       let labelClass = checked ? "selected" : "";
       return (
@@ -81,9 +85,11 @@ export default React.createClass({
     });
     return (
       <div className="frame parts-form">
+        <h3>Parts:</h3>
         <div className="choices">
-          {parts}
+          {opts}
         </div>
+        <h5>Count: {this.state.eleCount}</h5>
         <div className="buttons">
           <PosButton text="Save" click={this.saveHandler} />
           <NegButton text="Cancel" click={this.cancelHander} />
