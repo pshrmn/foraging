@@ -42,6 +42,8 @@ body.foraging {
     display: none !important; }
   .forager ul {
     list-style: none; }
+    .forager ul li {
+      margin: 0; }
   .forager h1, .forager h2, .forager h3, .forager h4, .forager h5, .forager h6, .forager p {
     margin: 2px 0;
     padding: 0; }
@@ -139,7 +141,7 @@ body.foraging {
       padding: 5px;
       position: relative; }
       .forager .frames .frame ul {
-        overflow: scroll;
+        overflow-x: scroll;
         padding: 0; }
       .forager .frames .frame .choices {
         display: -webkit-flex;
@@ -165,7 +167,8 @@ body.foraging {
     max-height: 20px;
     min-height: 20px;
     padding: 2px;
-    font-family: sans-serif; }
+    font-family: sans-serif;
+    border: 1px solid #323033; }
   .forager label {
     cursor: pointer;
     font-weight: normal; }

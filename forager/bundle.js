@@ -2111,16 +2111,19 @@
 	    var ignored = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
 	    var attrs = Array.from(element.attributes).reduce(function (stored, attr) {
-	        if (ignored[attr.name]) {
+	        var name = attr.name;
+	        var value = attr.value;
+
+	        if (ignored[name]) {
 	            return stored;
 	        }
 	        // don't include current-selector class
-	        if (attr.name === "class") {
-	            attr.value = attr.value.replace("current-selector", "").trim();
+	        if (name === "class") {
+	            value = value.replace("current-selector", "").trim();
 	        }
 	        // don't include empty attrs
-	        if (attr.value !== "") {
-	            stored.push({ name: attr.name, value: attr.value });
+	        if (value !== "") {
+	            stored.push({ name: name, value: value });
 	        }
 	        return stored;
 	    }, []);
@@ -2923,6 +2926,22 @@
 	      index: 0
 	    };
 	  },
+	  nextElement: function nextElement(event) {
+	    var index = this.state.index;
+
+	    var eleCount = this.props.elements.length;
+	    this.setState({
+	      index: (index + 1) % eleCount
+	    });
+	  },
+	  prevElement: function prevElement(event) {
+	    var index = this.state.index;
+
+	    var eleCount = this.props.elements.length;
+	    this.setState({
+	      index: (index - 1 + eleCount) % eleCount
+	    });
+	  },
 	  selectAttr: function selectAttr(event) {
 	    this.props.setAttr(event.target.value);
 	  },
@@ -2954,12 +2973,28 @@
 	    var _props2 = this.props;
 	    var elements = _props2.elements;
 	    var attr = _props2.attr;
+	    var index = this.state.index;
 
-	    var attrs = this.elementAttributes(elements[this.state.index]);
+	    var eleCount = elements.length;
 	    return _react2.default.createElement(
-	      "ul",
-	      null,
-	      attrs
+	      "div",
+	      { className: "element-attributes" },
+	      _react2.default.createElement(
+	        "div",
+	        null,
+	        _react2.default.createElement(_Inputs.PosButton, { text: "<<", click: this.prevElement }),
+	        " ",
+	        index,
+	        "/",
+	        eleCount - 1,
+	        " ",
+	        _react2.default.createElement(_Inputs.PosButton, { text: ">>", click: this.nextElement })
+	      ),
+	      _react2.default.createElement(
+	        "ul",
+	        null,
+	        this.elementAttributes(elements[index])
+	      )
 	    );
 	  }
 	});

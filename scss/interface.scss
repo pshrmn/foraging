@@ -66,6 +66,10 @@ body.foraging {
 
     ul{
         list-style: none;
+
+        li {
+            margin: 0;
+        }
     }
 
     h1, h2, h3, h4, h5, h6, p {
@@ -216,7 +220,7 @@ body.foraging {
             position: relative;
 
             ul {
-                overflow: scroll;
+                overflow-x: scroll;
                 padding: 0;
             }
 
@@ -251,6 +255,7 @@ body.foraging {
         min-height: 20px;
         padding: 2px;
         font-family: sans-serif;
+        border: 1px solid $dark-gray;
     }
 
     label{

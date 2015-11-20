@@ -88,6 +88,20 @@ let AttrChoices = React.createClass({
       index: 0
     };
   },
+  nextElement: function(event) {
+    let { index } = this.state;
+    let eleCount = this.props.elements.length;
+    this.setState({
+      index: (index+1) % eleCount
+    });
+  },
+  prevElement: function(event) {
+    let { index } = this.state;
+    let eleCount = this.props.elements.length;
+    this.setState({
+      index: ((index-1)+eleCount) % eleCount
+    });
+  },
   selectAttr: function(event) {
     this.props.setAttr(event.target.value);
   },
@@ -110,11 +124,19 @@ let AttrChoices = React.createClass({
   },
   render: function() {
     let { elements, attr } = this.props;
-    let attrs = this.elementAttributes(elements[this.state.index]);
+    let { index } = this.state;
+    let eleCount = elements.length;
     return (
-      <ul>
-        {attrs}
-      </ul>
+      <div className="element-attributes">
+        <div>
+          <PosButton text="<<" click={this.prevElement} />
+          {" "}{index}/{eleCount-1}{" "}
+          <PosButton text=">>" click={this.nextElement} />
+        </div>
+        <ul>
+          {this.elementAttributes(elements[index])}
+        </ul>
+      </div>
     );
   }
 });
