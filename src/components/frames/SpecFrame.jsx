@@ -53,7 +53,9 @@ export default React.createClass({
     let elementCount = count(selector.elements, css);
     return (
       <div className="frame spec-form">
-        {css}
+        <div>
+          Selector: {css}
+        </div>
         <SpecForm count={elementCount}
                   setSpec={this.setSpec}/>
         <div>
@@ -159,7 +161,7 @@ let SpecForm = React.createClass({
     return (
       <div>
         <div>
-          Choose Type:
+          Type:
           <label>single <input type="radio"
                                name="type"
                                value="single"

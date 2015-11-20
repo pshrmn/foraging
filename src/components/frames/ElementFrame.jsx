@@ -57,8 +57,11 @@ export default React.createClass({
   },
   saveHandler: function(event) {
     event.preventDefault();
-    let selector = this.state.selectors[this.state.checked];
-    this.props.actions.showPartsFrame(selector);
+    let { checked, selectors } = this.state;
+    let s = selectors[checked];
+    if ( checked !== undefined && s !== undefined ) {
+      this.props.actions.showPartsFrame(s);
+    }
   },
   cancelHandler: function(event) {
     event.preventDefault();

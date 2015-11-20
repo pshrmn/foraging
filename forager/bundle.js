@@ -2945,7 +2945,7 @@
 	            onChange: _this2.selectAttr }),
 	          a.name,
 	          " - ",
-	          a.value
+	          (0, _helpers.abbreviate)(a.value, 100)
 	        )
 	      );
 	    });
@@ -3036,8 +3036,14 @@
 	  },
 	  saveHandler: function saveHandler(event) {
 	    event.preventDefault();
-	    var selector = this.state.selectors[this.state.checked];
-	    this.props.actions.showPartsFrame(selector);
+	    var _state = this.state;
+	    var checked = _state.checked;
+	    var selectors = _state.selectors;
+
+	    var s = selectors[checked];
+	    if (checked !== undefined && s !== undefined) {
+	      this.props.actions.showPartsFrame(s);
+	    }
 	  },
 	  cancelHandler: function cancelHandler(event) {
 	    event.preventDefault();
@@ -3049,10 +3055,10 @@
 	    var _props = this.props;
 	    var selector = _props.selector;
 	    var data = _props.data;
-	    var _state = this.state;
-	    var selectors = _state.selectors;
-	    var checked = _state.checked;
-	    var eleCount = _state.eleCount;
+	    var _state2 = this.state;
+	    var selectors = _state2.selectors;
+	    var checked = _state2.checked;
+	    var eleCount = _state2.eleCount;
 
 	    var opts = selectors.map(function (s, i) {
 	      return _react2.default.createElement(SelectorRadio, { key: i,
@@ -3383,7 +3389,12 @@
 	    return _react2.default.createElement(
 	      "div",
 	      { className: "frame spec-form" },
-	      css,
+	      _react2.default.createElement(
+	        "div",
+	        null,
+	        "Selector: ",
+	        css
+	      ),
 	      _react2.default.createElement(SpecForm, { count: elementCount,
 	        setSpec: this.setSpec }),
 	      _react2.default.createElement(
@@ -3504,7 +3515,7 @@
 	      _react2.default.createElement(
 	        "div",
 	        null,
-	        "Choose Type:",
+	        "Type:",
 	        _react2.default.createElement(
 	          "label",
 	          null,

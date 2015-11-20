@@ -1,7 +1,7 @@
 import React from "react";
 
 import { PosButton, NegButton } from "../Inputs";
-import { attributes } from "../../helpers";
+import { attributes, abbreviate } from "../../helpers";
 
 export default React.createClass({
   getInitialState: function() {
@@ -102,7 +102,7 @@ let AttrChoices = React.createClass({
                    value={a.name}
                    checked={a.name === attr }
                    onChange={this.selectAttr} />
-            {a.name} - {a.value}
+            {a.name} - {abbreviate(a.value, 100)}
           </label>
         </li>
       );
