@@ -1,4 +1,5 @@
 $red: #E85F88;
+$dark-red: #D02357;
 $green: #76B85C;
 $dark-green: #42752E;
 $blue: #45AFCC;
@@ -21,7 +22,7 @@ body.foraging {
 }
 
 /* Interface */
-.forager{
+#forager{
     word-wrap: normal;
     z-index: 2147483637;
     position: fixed;
@@ -63,6 +64,114 @@ body.foraging {
         display: none !important;
     }
 
+    /*
+     * input elements are the source of the biggest style
+     * issues, so !important is used quite liberally
+     */
+
+    input, select, option, textarea, button {
+        line-height: 1.1em !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        font-size: 1em !important;
+        float: none !important;
+        color: $black !important;
+    }
+
+    label{
+        cursor: pointer;
+        font-weight: normal;
+    }
+    
+    input{
+        box-shadow: none;
+        border-radius:0;
+        background: $white;
+        border: 1px solid $dark-gray;
+        line-height: 1.2;
+    }
+
+    input[type=text]{
+        height: 20px;
+        max-height: 20px;
+        min-height: 20px;
+        padding: 2px;
+        font-family: sans-serif;
+        border: 1px solid $dark-gray;
+    }
+
+    select {
+        display: inline-block !important;
+        border: 1px solid #a9a9a9 !important;
+        background: $white !important;
+        margin: 2px !important;
+    }
+
+    button {
+        text-align: center;
+        background: $light-gray;
+        color: $black !important;
+        border-radius: 3px;
+        border: 2px outset $light-gray;
+        box-shadow: none !important;
+        cursor: pointer !important;
+        font-weight: normal !important;
+        margin: 2px !important;
+        padding: 1px 6px !important;
+        min-width: initial !important;
+        text-transform: capitalize !important;
+
+        &:active {
+            border-style: inset !important;
+            color: $black !important;
+        }
+
+        &:hover, &:active, &:focus{
+            background: $light-gray;
+            border-color: $light-gray;
+            color: $black !important;
+        }
+
+        /*
+         * some classes to customize the look of buttons
+         */
+        &.transparent {
+            background: transparent !important;
+            border: 0 !important;
+            font-weight: bold !important;
+
+            &:hover {
+                background: transparent !important;            
+            }
+        }
+
+        &.neg, &.neg:hover, &.neg:active, &.neg:focus{
+            background: $red !important;
+            border-color: $red !important;
+        }
+
+        &.pos, &.pos:hover, &.pos:active, &.pos:focus{
+            background: $green !important;
+            border-color: $green !important;
+        }
+
+        &.neg.transparent {
+            background: transparent !important;
+            color: $dark-red !important;
+
+            &:hover , &:active, &:focus {
+                color: $red !important;
+            }
+        }
+    }
+
+    .big {
+        font-size: 1.25em;
+    }
+
+    .bold {
+        font-weight: bold;
+    }
 
     ul{
         list-style: none;
@@ -98,13 +207,10 @@ body.foraging {
         height: 31px;
         margin-bottom: 10px;
         min-width: 650px;
+        display: flex;
 
-        *{
+        span {
             color: $light-gray
-        }
-
-        button, select, option {
-            color: $black;
         }
 
         button{
@@ -112,34 +218,27 @@ body.foraging {
             border-radius: 3px;
             border-width: 1px;
             border-style: solid;
-            box-shadow: none !important;
-            cursor: pointer !important;
-            font-weight: normal !important;
-            margin: 2px !important;
-            padding: 1px 6px !important;
-            min-width: initial !important;
-            text-transform: capitalize !important;
+            
+            background: $dark-gray !important;
 
             &.pos, &.pos:active, &.pos:focus{
-                background: $dark-gray;
                 color: $green !important;
-                border-color: $green;
+                border-color: $green !important;
             }
 
             &:hover{
-                background: $green;
-                border-color: $green;
+                background: $green !important;
+                border-color: $green !important;
                 color: $dark-gray !important;
             }
 
             &.neg, &.neg:active, &.neg:focus{
-                background: $dark-gray;
-                border-color: $red;
+                border-color: $red !important;
                 color: $red !important;
             }
 
             &.neg:hover{
-                background: $red;
+                background: $red !important;
                 color: $dark-gray !important;
             }
         }
@@ -220,8 +319,8 @@ body.foraging {
             position: relative;
 
             ul {
-                overflow-x: scroll;
                 padding: 0;
+                overflow-wrap: break-word;
             }
 
             .choices {
@@ -232,6 +331,7 @@ body.foraging {
                     margin-right: 15px;
                     padding: 2px 3px;
                     border-radius: 3px;
+                    word-break: break-all;
                 }
 
                 label.selected {
@@ -239,28 +339,26 @@ body.foraging {
                 }
             }
         }
-    }
 
-    input{
-        box-shadow: none;
-        border-radius:0;
-        background: $white;
-        border: 1px solid $dark-gray;
-        line-height: 1.2;
-    }
+        .buttons {
+            margin: 5px 0;
+        }
 
-    input[type=text]{
-        height: 20px;
-        max-height: 20px;
-        min-height: 20px;
-        padding: 2px;
-        font-family: sans-serif;
-        border: 1px solid $dark-gray;
-    }
+        .rules {
+            margin: 5px 0;
+            .rule {
 
-    label{
-        cursor: pointer;
-        font-weight: normal;
+                display: flex;
+
+                .name {
+                    font-weight: bold;
+                }
+
+                button {
+                    margin-left: auto;
+                }
+            }
+        }
     }
 
     .attributes {
@@ -285,80 +383,26 @@ body.foraging {
     th {
         background: $blue;
     }
-
-    /*
-     * lots of sites like to customize how various inputs look, 
-     * so this is trying to keep these close to (chrome) default css
-     */
-    input, select, option, textarea, button {
-        line-height: 1.1em !important;
-        padding: 0 !important;
-        margin: 0 !important;
-        font-size: 1em !important;
-        float: none !important
-    }
-
-    button {
-        background: $light-gray;
-        color: $black !important;
-        border-radius: 3px;
-        border: 2px outset $light-gray;
-        box-shadow: none !important;
-        cursor: pointer !important;
-        font-weight: normal !important;
-        margin: 2px !important;
-        padding: 1px 6px !important;
-        min-width: initial !important;
-        text-transform: capitalize !important;
-
-        &:hover, &:active, &:focus{
-            background: $light-gray;
-            border-color: $light-gray;
-            color: $black !important;
-        }
-
-        &.red, &.red:hover, &.red:active, &.red:focus{
-            background: $red;
-            border-color: $red;
-        }
-    }
-
-    button:active {
-        border-style: inset !important;
-        color: $black !important;
-    }
-
-    select {
-        display: inline-block !important;
-        border: 1px solid #a9a9a9 !important;
-        background: $white !important;
-        margin: 2px !important;
-    }
-
     
     .page-controls {
         display: inline-block;
     }
 
     .app-controls {
-        position: absolute;
-        right: 0;
-        top: 0;
+        display: inline-block;
+        /* this pushes the .app-controls to the right edge */
+        margin-left: auto;
         
-        button, button:hover {
-            background: transparent !important;
-            cursor: pointer !important;
+        button {
             color: $white !important;
-            text-align: center !important;
             margin: 0 !important;
-            border: 0 !important;
-            font-weight: bold !important;
-        }
 
-        button:hover {
-            background: $black !important;
+            &:hover {
+                background: $black !important;
+            }
         }
     }
+
 }
 
 .preview-holder {

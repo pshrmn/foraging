@@ -14,7 +14,7 @@ let Forager = React.createClass({
     let { pages, pageIndex, show, dispatch, frame, selector, preview } = this.props;
     let page = pages[pageIndex];
     const actions = bindActionCreators(ForagerActions, dispatch);
-    let classNames = ["forager", "no-select"];
+    let classNames = ["no-select"];
     if ( !show ) {
       classNames.push("hidden");
     }
@@ -26,7 +26,7 @@ let Forager = React.createClass({
     // only let the graph update the current selector when 
     let selectSelector = frame.name === "selector" ? actions.selectSelector : () => {};
     return (
-      <div className={classNames.join(" ")} ref="app">
+      <div id="forager" className={classNames.join(" ")} ref="app">
         <Controls pages={pages}
                   index={pageIndex}
                   actions={actions} />

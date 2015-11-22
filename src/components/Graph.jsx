@@ -11,7 +11,7 @@ export default React.createClass({
   getDefaultProps: function() {
     return {
       selectPage: () => {},
-      width: 300,
+      width: 500,
       height: 150,
       margin: {
         top: 25,

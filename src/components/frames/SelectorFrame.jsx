@@ -21,30 +21,34 @@ export default React.createClass({
     let { type, value } = spec;
     let description = "";
     if ( type === "single" ) {
-      description = `Select element at index ${value}`;
+      description = `Element at index ${value}`;
     } else if ( type === "all" ) {
-      description = `Select all elements, save as "${value}"`;
+      description = `All elements, saved in "${value}" array`;
     }
-
-    let rulesList = rules.length ? (
-      <RuleList rules={rules}
-                actions={this.props.actions} />
-    ) : (
-      <p>No Rules</p>
-    );
-    let optionalText = optional ? "(optional)" : "";
+    // include spaces since this is text
+    let optionalText = optional ? " (optional)" : "";
     return (
       <div className="frame">
         <div>
-          <h2>{selector}</h2>
-          <p>{description} {optionalText}</p>
           <div>
-            Rules:
-            {rulesList}
+            <span className="big bold">{selector}</span>
+            {optionalText}
+            <NegButton text={String.fromCharCode(215)}
+                       classes={["transparent"]}
+                       title="Remove Selector"
+                       click={this.remove} />
           </div>
-          <PosButton text="Add Child" click={this.addChild} />
-          <PosButton text="Add Rule" click={this.addRule} />
-          <NegButton text="Remove" click={this.remove} />
+          <div>
+            {description}
+          </div>
+          <div className="buttons">
+            <PosButton text="Add Child"
+                       click={this.addChild} />
+            <PosButton text="Add Rule"
+                       click={this.addRule} />
+          </div>
+          <RuleList rules={rules}
+                    actions={this.props.actions} />
         </div>
       </div>
     );
@@ -55,14 +59,16 @@ let RuleList = React.createClass({
   render: function() {
     let { rules, actions } = this.props;
     let { removeRule } = actions;
-    let list = rules.map((r,i) => {
+    let list = rules.length ? rules.map((r,i) => {
       return <Rule key={i} index={i} remove={removeRule} {...r}/>;
-    });
-
+    }) : (<li>No Rules</li>);
     return (
-      <ul>
-        {list}
-      </ul>
+      <div className="rules">
+        Rules:
+        <ul>
+          {list}
+        </ul>
+      </div>
     );
   }
 })
@@ -75,9 +81,11 @@ let Rule = React.createClass({
   render: function() {
     let { name, attr, type } = this.props;
     return (
-      <li>
+      <li className="rule">
         <span className="name">{name}</span> &lt;{attr}&gt; ({type})
-        <button onClick={this.handleClick}>{String.fromCharCode(215)}</button>
+        <NegButton text={String.fromCharCode(215)}
+                   classes={["transparent"]}
+                   click={this.handleClick} />
       </li>
     );
   }

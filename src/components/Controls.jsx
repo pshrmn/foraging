@@ -107,7 +107,9 @@ let GeneralControls = React.createClass({
     */
     return (
       <div className="app-controls">
-        <NeutralButton click={this.handleClose} text={String.fromCharCode(215)} />
+        <NeutralButton text={String.fromCharCode(215)}
+                       classes={["transparent"]}
+                       click={this.handleClose} />
       </div>
     );
   }

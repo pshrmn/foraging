@@ -1468,7 +1468,7 @@
 
 	    var page = pages[pageIndex];
 	    var actions = (0, _redux.bindActionCreators)(ForagerActions, dispatch);
-	    var classNames = ["forager", "no-select"];
+	    var classNames = ["no-select"];
 	    if (!show) {
 	      classNames.push("hidden");
 	    }
@@ -1479,7 +1479,7 @@
 	    var selectSelector = frame.name === "selector" ? actions.selectSelector : function () {};
 	    return _react2.default.createElement(
 	      "div",
-	      { className: classNames.join(" "), ref: "app" },
+	      { id: "forager", className: classNames.join(" "), ref: "app" },
 	      _react2.default.createElement(_Controls2.default, { pages: pages,
 	        index: pageIndex,
 	        actions: actions }),
@@ -1858,7 +1858,9 @@
 	    return _react2.default.createElement(
 	      "div",
 	      { className: "app-controls" },
-	      _react2.default.createElement(_Inputs.NeutralButton, { click: this.handleClose, text: String.fromCharCode(215) })
+	      _react2.default.createElement(_Inputs.NeutralButton, { text: String.fromCharCode(215),
+	        classes: ["transparent"],
+	        click: this.handleClose })
 	    );
 	  }
 	});
@@ -1869,9 +1871,14 @@
 
 	"use strict";
 
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
+
+	function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
+
 	/*
 	 * Forager app specific input/form elements
 	 */
@@ -1881,14 +1888,12 @@
 
 	  render: function render() {
 	    var _props = this.props;
-	    var text = _props.text;
-	    var click = _props.click;
+	    var classes = _props.classes;
 
-	    return React.createElement(
-	      "button",
-	      { className: "pos", onClick: click },
-	      text
-	    );
+	    var rest = _objectWithoutProperties(_props, ["classes"]);
+
+	    return React.createElement(NeutralButton, _extends({}, rest, {
+	      classes: ["pos"].concat(classes) }));
 	  }
 	});
 
@@ -1897,28 +1902,38 @@
 
 	  render: function render() {
 	    var _props2 = this.props;
-	    var text = _props2.text;
-	    var click = _props2.click;
+	    var classes = _props2.classes;
 
-	    return React.createElement(
-	      "button",
-	      { className: "neg", onClick: click },
-	      text
-	    );
+	    var rest = _objectWithoutProperties(_props2, ["classes"]);
+
+	    return React.createElement(NeutralButton, _extends({}, rest, {
+	      classes: ["neg"].concat(classes) }));
 	  }
 	});
 
 	var NeutralButton = exports.NeutralButton = React.createClass({
 	  displayName: "NeutralButton",
 
+	  getDefaultProps: function getDefaultProps() {
+	    return {
+	      text: "",
+	      click: function click() {},
+	      title: "",
+	      classes: []
+	    };
+	  },
 	  render: function render() {
 	    var _props3 = this.props;
 	    var text = _props3.text;
 	    var click = _props3.click;
+	    var classes = _props3.classes;
+	    var title = _props3.title;
 
 	    return React.createElement(
 	      "button",
-	      { className: "neutral", onClick: click },
+	      { className: classes.join(" "),
+	        title: title,
+	        onClick: click },
 	      text
 	    );
 	  }
@@ -2697,18 +2712,12 @@
 
 	    var description = "";
 	    if (type === "single") {
-	      description = "Select element at index " + value;
+	      description = "Element at index " + value;
 	    } else if (type === "all") {
-	      description = "Select all elements, save as \"" + value + "\"";
+	      description = "All elements, saved in \"" + value + "\" array";
 	    }
-
-	    var rulesList = rules.length ? _react2.default.createElement(RuleList, { rules: rules,
-	      actions: this.props.actions }) : _react2.default.createElement(
-	      "p",
-	      null,
-	      "No Rules"
-	    );
-	    var optionalText = optional ? "(optional)" : "";
+	    // include spaces since this is text
+	    var optionalText = optional ? " (optional)" : "";
 	    return _react2.default.createElement(
 	      "div",
 	      { className: "frame" },
@@ -2716,26 +2725,34 @@
 	        "div",
 	        null,
 	        _react2.default.createElement(
-	          "h2",
+	          "div",
 	          null,
-	          selector
-	        ),
-	        _react2.default.createElement(
-	          "p",
-	          null,
-	          description,
-	          " ",
-	          optionalText
+	          _react2.default.createElement(
+	            "span",
+	            { className: "big bold" },
+	            selector
+	          ),
+	          optionalText,
+	          _react2.default.createElement(_Inputs.NegButton, { text: String.fromCharCode(215),
+	            classes: ["transparent"],
+	            title: "Remove Selector",
+	            click: this.remove })
 	        ),
 	        _react2.default.createElement(
 	          "div",
 	          null,
-	          "Rules:",
-	          rulesList
+	          description
 	        ),
-	        _react2.default.createElement(_Inputs.PosButton, { text: "Add Child", click: this.addChild }),
-	        _react2.default.createElement(_Inputs.PosButton, { text: "Add Rule", click: this.addRule }),
-	        _react2.default.createElement(_Inputs.NegButton, { text: "Remove", click: this.remove })
+	        _react2.default.createElement(
+	          "div",
+	          { className: "buttons" },
+	          _react2.default.createElement(_Inputs.PosButton, { text: "Add Child",
+	            click: this.addChild }),
+	          _react2.default.createElement(_Inputs.PosButton, { text: "Add Rule",
+	            click: this.addRule })
+	        ),
+	        _react2.default.createElement(RuleList, { rules: rules,
+	          actions: this.props.actions })
 	      )
 	    );
 	  }
@@ -2750,14 +2767,22 @@
 	    var actions = _props.actions;
 	    var removeRule = actions.removeRule;
 
-	    var list = rules.map(function (r, i) {
+	    var list = rules.length ? rules.map(function (r, i) {
 	      return _react2.default.createElement(Rule, _extends({ key: i, index: i, remove: removeRule }, r));
-	    });
-
-	    return _react2.default.createElement(
-	      "ul",
+	    }) : _react2.default.createElement(
+	      "li",
 	      null,
-	      list
+	      "No Rules"
+	    );
+	    return _react2.default.createElement(
+	      "div",
+	      { className: "rules" },
+	      "Rules:",
+	      _react2.default.createElement(
+	        "ul",
+	        null,
+	        list
+	      )
 	    );
 	  }
 	});
@@ -2777,7 +2802,7 @@
 
 	    return _react2.default.createElement(
 	      "li",
-	      null,
+	      { className: "rule" },
 	      _react2.default.createElement(
 	        "span",
 	        { className: "name" },
@@ -2788,11 +2813,9 @@
 	      "> (",
 	      type,
 	      ")",
-	      _react2.default.createElement(
-	        "button",
-	        { onClick: this.handleClick },
-	        String.fromCharCode(215)
-	      )
+	      _react2.default.createElement(_Inputs.NegButton, { text: String.fromCharCode(215),
+	        classes: ["transparent"],
+	        click: this.handleClick })
 	    );
 	  }
 	});
@@ -3611,7 +3634,7 @@
 	  getDefaultProps: function getDefaultProps() {
 	    return {
 	      selectPage: function selectPage() {},
-	      width: 300,
+	      width: 500,
 	      height: 150,
 	      margin: {
 	        top: 25,

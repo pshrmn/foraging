@@ -4,27 +4,41 @@
 
 export const PosButton = React.createClass({
   render: function() {
-    let { text, click } = this.props;
+    let { classes, ...rest } = this.props;
     return (
-      <button className="pos" onClick={click}>{text}</button>
+      <NeutralButton {...rest}
+                     classes={["pos"].concat(classes)} />
     );
   }
 });
 
 export const NegButton = React.createClass({
   render: function() {
-    let { text, click } = this.props;
+    let { classes, ...rest } = this.props;
     return (
-      <button className="neg" onClick={click}>{text}</button>
+      <NeutralButton {...rest}
+                     classes={["neg"].concat(classes)} />
     );
   }
 });
 
 export const NeutralButton = React.createClass({
+  getDefaultProps: function() {
+    return {
+      text: "",
+      click: () => {},
+      title: "",
+      classes: []
+    };
+  },
   render: function() {
-    let { text, click } = this.props;
+    let { text, click, classes, title } = this.props;
     return (
-      <button className="neutral" onClick={click}>{text}</button>
+      <button className={classes.join(" ")}
+              title={title}
+              onClick={click} >
+        {text}
+      </button>
     );
   }
 });

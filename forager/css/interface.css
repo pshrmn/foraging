@@ -7,7 +7,7 @@ body.foraging {
   margin-bottom: 350px; }
 
 /* Interface */
-.forager {
+#forager {
   word-wrap: normal;
   z-index: 2147483637;
   position: fixed;
@@ -23,175 +23,53 @@ body.foraging {
   border: 10px solid #323033;
   box-sizing: border-box;
   /*
-     * lots of sites like to customize how various inputs look, 
-     * so this is trying to keep these close to (chrome) default css
+     * input elements are the source of the biggest style
+     * issues, so !important is used quite liberally
      */ }
-  .forager.hidden {
+  #forager.hidden {
     display: none !important; }
-  .forager * {
+  #forager * {
     color: #000000;
     box-sizing: border-box;
     line-height: 1.1em !important; }
-  .forager .not-allowed {
+  #forager .not-allowed {
     cursor: no-drop; }
-    .forager .not-allowed * {
+    #forager .not-allowed * {
       cursor: no-drop; }
-  .forager .inline {
+  #forager .inline {
     display: inline-block; }
-  .forager .hidden {
+  #forager .hidden {
     display: none !important; }
-  .forager ul {
-    list-style: none; }
-    .forager ul li {
-      margin: 0; }
-  .forager h1, .forager h2, .forager h3, .forager h4, .forager h5, .forager h6, .forager p {
-    margin: 2px 0;
-    padding: 0; }
-  .forager h1 {
-    font-size: 1.5em; }
-  .forager h2 {
-    font-size: 1.25em; }
-  .forager h3 {
-    font-size: 1.2em; }
-  .forager h4, .forager h5, .forager h6 {
-    font-size: 1.1em; }
-  .forager .controls {
-    background: #323033;
-    height: 31px;
-    margin-bottom: 10px;
-    min-width: 650px; }
-    .forager .controls * {
-      color: #CED1DE; }
-    .forager .controls button, .forager .controls select, .forager .controls option {
-      color: #000000; }
-    .forager .controls button {
-      line-height: 1.25em !important;
-      border-radius: 3px;
-      border-width: 1px;
-      border-style: solid;
-      box-shadow: none !important;
-      cursor: pointer !important;
-      font-weight: normal !important;
-      margin: 2px !important;
-      padding: 1px 6px !important;
-      min-width: initial !important;
-      text-transform: capitalize !important; }
-      .forager .controls button.pos, .forager .controls button.pos:active, .forager .controls button.pos:focus {
-        background: #323033;
-        color: #76B85C !important;
-        border-color: #76B85C; }
-      .forager .controls button:hover {
-        background: #76B85C;
-        border-color: #76B85C;
-        color: #323033 !important; }
-      .forager .controls button.neg, .forager .controls button.neg:active, .forager .controls button.neg:focus {
-        background: #323033;
-        border-color: #E85F88;
-        color: #E85F88 !important; }
-      .forager .controls button.neg:hover {
-        background: #E85F88;
-        color: #323033 !important; }
-    .forager .controls button:active {
-      border-style: inset !important;
-      color: #000000 !important; }
-    .forager .controls div {
-      display: inline-block; }
-    .forager .controls select {
-      width: 100px;
-      min-height: 22px;
-      height: 22px;
-      border-radius: 2px; }
-  .forager .workspace {
-    display: -webkit-flex;
-    display: -ms-flexbox;
-    display: flex; }
-  .forager .frames, .forager .graph {
-    background: #ffffff;
-    box-sizing: border-box;
-    margin-right: 3px;
-    padding: 5px; }
-  .forager .graph svg {
-    box-sizing: content-box;
-    padding: 15px;
-    font-size: 14px;
-    background: #ffffff; }
-    .forager .graph svg .link {
-      fill: none;
-      stroke: #323033; }
-    .forager .graph svg .node {
-      cursor: pointer;
-      fill: #42752E; }
-    .forager .graph svg .empty {
-      fill: #E85F88; }
-    .forager .graph svg .node text {
-      paint-order: stroke;
-      stroke: #ffffff;
-      stroke-width: 3px;
-      text-anchor: middle; }
-    .forager .graph svg .current {
-      font-weight: bold;
-      fill: #323033; }
-  .forager .frames {
-    width: 400px;
-    vertical-align: top; }
-    .forager .frames .frame {
-      text-align: left;
-      width: 100%;
-      background: #ffffff;
-      padding: 5px;
-      position: relative; }
-      .forager .frames .frame ul {
-        overflow-x: scroll;
-        padding: 0; }
-      .forager .frames .frame .choices {
-        display: -webkit-flex;
-        display: -ms-flexbox;
-        display: flex;
-        -webkit-flex-wrap: wrap;
-            -ms-flex-wrap: wrap;
-                flex-wrap: wrap; }
-        .forager .frames .frame .choices label {
-          margin-right: 15px;
-          padding: 2px 3px;
-          border-radius: 3px; }
-        .forager .frames .frame .choices label.selected {
-          background: #76B85C; }
-  .forager input {
+  #forager input, #forager select, #forager option, #forager textarea, #forager button {
+    line-height: 1.1em !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    font-size: 1em !important;
+    float: none !important;
+    color: #000000 !important; }
+  #forager label {
+    cursor: pointer;
+    font-weight: normal; }
+  #forager input {
     box-shadow: none;
     border-radius: 0;
     background: #ffffff;
     border: 1px solid #323033;
     line-height: 1.2; }
-  .forager input[type=text] {
+  #forager input[type=text] {
     height: 20px;
     max-height: 20px;
     min-height: 20px;
     padding: 2px;
     font-family: sans-serif;
     border: 1px solid #323033; }
-  .forager label {
-    cursor: pointer;
-    font-weight: normal; }
-  .forager .attributes tbody tr:hover {
-    background: #898B96;
-    cursor: pointer; }
-  .forager .attributes .selectedAttr, .forager .attributes .selectedAttr:hover {
-    background: #76B85C; }
-  .forager td, .forager th {
-    min-width: 50px;
-    height: 1.5rem;
-    border: 2px solid #ffffff;
+  #forager select {
+    display: inline-block !important;
+    border: 1px solid #a9a9a9 !important;
+    background: #ffffff !important;
+    margin: 2px !important; }
+  #forager button {
     text-align: center;
-    vertical-align: middle; }
-  .forager th {
-    background: #45AFCC; }
-  .forager input, .forager select, .forager option, .forager textarea, .forager button {
-    line-height: 1.1em !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    font-size: 1em !important;
-    float: none !important; }
-  .forager button {
     background: #CED1DE;
     color: #000000 !important;
     border-radius: 3px;
@@ -202,38 +80,184 @@ body.foraging {
     margin: 2px !important;
     padding: 1px 6px !important;
     min-width: initial !important;
-    text-transform: capitalize !important; }
-    .forager button:hover, .forager button:active, .forager button:focus {
+    text-transform: capitalize !important;
+    /*
+         * some classes to customize the look of buttons
+         */ }
+    #forager button:active {
+      border-style: inset !important;
+      color: #000000 !important; }
+    #forager button:hover, #forager button:active, #forager button:focus {
       background: #CED1DE;
       border-color: #CED1DE;
       color: #000000 !important; }
-    .forager button.red, .forager button.red:hover, .forager button.red:active, .forager button.red:focus {
-      background: #E85F88;
-      border-color: #E85F88; }
-  .forager button:active {
-    border-style: inset !important;
-    color: #000000 !important; }
-  .forager select {
-    display: inline-block !important;
-    border: 1px solid #a9a9a9 !important;
-    background: #ffffff !important;
-    margin: 2px !important; }
-  .forager .page-controls {
-    display: inline-block; }
-  .forager .app-controls {
-    position: absolute;
-    right: 0;
-    top: 0; }
-    .forager .app-controls button, .forager .app-controls button:hover {
+    #forager button.transparent {
       background: transparent !important;
-      cursor: pointer !important;
-      color: #ffffff !important;
-      text-align: center !important;
-      margin: 0 !important;
       border: 0 !important;
       font-weight: bold !important; }
-    .forager .app-controls button:hover {
-      background: #000000 !important; }
+      #forager button.transparent:hover {
+        background: transparent !important; }
+    #forager button.neg, #forager button.neg:hover, #forager button.neg:active, #forager button.neg:focus {
+      background: #E85F88 !important;
+      border-color: #E85F88 !important; }
+    #forager button.pos, #forager button.pos:hover, #forager button.pos:active, #forager button.pos:focus {
+      background: #76B85C !important;
+      border-color: #76B85C !important; }
+    #forager button.neg.transparent {
+      background: transparent !important;
+      color: #D02357 !important; }
+      #forager button.neg.transparent:hover, #forager button.neg.transparent:active, #forager button.neg.transparent:focus {
+        color: #E85F88 !important; }
+  #forager .big {
+    font-size: 1.25em; }
+  #forager .bold {
+    font-weight: bold; }
+  #forager ul {
+    list-style: none; }
+    #forager ul li {
+      margin: 0; }
+  #forager h1, #forager h2, #forager h3, #forager h4, #forager h5, #forager h6, #forager p {
+    margin: 2px 0;
+    padding: 0; }
+  #forager h1 {
+    font-size: 1.5em; }
+  #forager h2 {
+    font-size: 1.25em; }
+  #forager h3 {
+    font-size: 1.2em; }
+  #forager h4, #forager h5, #forager h6 {
+    font-size: 1.1em; }
+  #forager .controls {
+    background: #323033;
+    height: 31px;
+    margin-bottom: 10px;
+    min-width: 650px;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex; }
+    #forager .controls span {
+      color: #CED1DE; }
+    #forager .controls button {
+      line-height: 1.25em !important;
+      border-radius: 3px;
+      border-width: 1px;
+      border-style: solid;
+      background: #323033 !important; }
+      #forager .controls button.pos, #forager .controls button.pos:active, #forager .controls button.pos:focus {
+        color: #76B85C !important;
+        border-color: #76B85C !important; }
+      #forager .controls button:hover {
+        background: #76B85C !important;
+        border-color: #76B85C !important;
+        color: #323033 !important; }
+      #forager .controls button.neg, #forager .controls button.neg:active, #forager .controls button.neg:focus {
+        border-color: #E85F88 !important;
+        color: #E85F88 !important; }
+      #forager .controls button.neg:hover {
+        background: #E85F88 !important;
+        color: #323033 !important; }
+    #forager .controls button:active {
+      border-style: inset !important;
+      color: #000000 !important; }
+    #forager .controls div {
+      display: inline-block; }
+    #forager .controls select {
+      width: 100px;
+      min-height: 22px;
+      height: 22px;
+      border-radius: 2px; }
+  #forager .workspace {
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex; }
+  #forager .frames, #forager .graph {
+    background: #ffffff;
+    box-sizing: border-box;
+    margin-right: 3px;
+    padding: 5px; }
+  #forager .graph svg {
+    box-sizing: content-box;
+    padding: 15px;
+    font-size: 14px;
+    background: #ffffff; }
+    #forager .graph svg .link {
+      fill: none;
+      stroke: #323033; }
+    #forager .graph svg .node {
+      cursor: pointer;
+      fill: #42752E; }
+    #forager .graph svg .empty {
+      fill: #E85F88; }
+    #forager .graph svg .node text {
+      paint-order: stroke;
+      stroke: #ffffff;
+      stroke-width: 3px;
+      text-anchor: middle; }
+    #forager .graph svg .current {
+      font-weight: bold;
+      fill: #323033; }
+  #forager .frames {
+    width: 400px;
+    vertical-align: top; }
+    #forager .frames .frame {
+      text-align: left;
+      width: 100%;
+      background: #ffffff;
+      padding: 5px;
+      position: relative; }
+      #forager .frames .frame ul {
+        padding: 0;
+        overflow-wrap: break-word; }
+      #forager .frames .frame .choices {
+        display: -webkit-flex;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-flex-wrap: wrap;
+            -ms-flex-wrap: wrap;
+                flex-wrap: wrap; }
+        #forager .frames .frame .choices label {
+          margin-right: 15px;
+          padding: 2px 3px;
+          border-radius: 3px;
+          word-break: break-all; }
+        #forager .frames .frame .choices label.selected {
+          background: #76B85C; }
+    #forager .frames .buttons {
+      margin: 5px 0; }
+    #forager .frames .rules {
+      margin: 5px 0; }
+      #forager .frames .rules .rule {
+        display: -webkit-flex;
+        display: -ms-flexbox;
+        display: flex; }
+        #forager .frames .rules .rule .name {
+          font-weight: bold; }
+        #forager .frames .rules .rule button {
+          margin-left: auto; }
+  #forager .attributes tbody tr:hover {
+    background: #898B96;
+    cursor: pointer; }
+  #forager .attributes .selectedAttr, #forager .attributes .selectedAttr:hover {
+    background: #76B85C; }
+  #forager td, #forager th {
+    min-width: 50px;
+    height: 1.5rem;
+    border: 2px solid #ffffff;
+    text-align: center;
+    vertical-align: middle; }
+  #forager th {
+    background: #45AFCC; }
+  #forager .page-controls {
+    display: inline-block; }
+  #forager .app-controls {
+    display: inline-block;
+    /* this pushes the .app-controls to the right edge */
+    margin-left: auto; }
+    #forager .app-controls button {
+      color: #ffffff !important;
+      margin: 0 !important; }
+      #forager .app-controls button:hover {
+        background: #000000 !important; }
 
 .preview-holder {
   z-index: 2147483638;
