@@ -53,17 +53,19 @@ export default React.createClass({
     let elementCount = count(selector.elements, css);
     return (
       <div className="frame spec-form">
-        <div>
-          Selector: {css}
-        </div>
-        <SpecForm count={elementCount}
-                  setSpec={this.setSpec}/>
-        <div>
-          <label>
-            Optional: <input type="checkbox"
-                             checked={this.state.optional}
-                             onChange={this.toggleOptional} />
-          </label>
+        <div className="info">
+          <div>
+            Selector: {css}
+          </div>
+          <SpecForm count={elementCount}
+                    setSpec={this.setSpec}/>
+          <div>
+            <label>
+              Optional: <input type="checkbox"
+                               checked={this.state.optional}
+                               onChange={this.toggleOptional} />
+            </label>
+          </div>
         </div>
         <div className="buttons">
           <PosButton text="Save" click={this.saveHandler} />

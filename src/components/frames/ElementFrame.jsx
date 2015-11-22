@@ -79,11 +79,13 @@ export default React.createClass({
     });
     return (
       <div className="frame element-form">
-        <h3>Selectors:</h3>
-        <div className="choices">
-          {opts}
+        <div className="info">
+          <h3>Selectors:</h3>
+          <div className="choices">
+            {opts}
+          </div>
+          <h5>Count: {eleCount}</h5>
         </div>
-        <h5>Count: {eleCount}</h5>
         <div className="buttons">
           <PosButton text="Save" click={this.saveHandler} />
           <NegButton text="Cancel" click={this.cancelHandler} />

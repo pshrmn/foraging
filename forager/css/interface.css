@@ -109,7 +109,7 @@ body.foraging {
       #forager button.neg.transparent:hover, #forager button.neg.transparent:active, #forager button.neg.transparent:focus {
         color: #E85F88 !important; }
   #forager .big {
-    font-size: 1.25em; }
+    font-size: 1.1em; }
   #forager .bold {
     font-weight: bold; }
   #forager ul {
@@ -204,7 +204,25 @@ body.foraging {
       width: 100%;
       background: #ffffff;
       padding: 5px;
-      position: relative; }
+      display: -webkit-flex;
+      display: -ms-flexbox;
+      display: flex;
+      -webkit-flex-direction: column;
+          -ms-flex-direction: column;
+              flex-direction: column;
+      /*
+             * frames are broken down into two parts, the .info section and
+             * the .buttons section
+             */ }
+      #forager .frames .frame .buttons {
+        margin-top: auto;
+        display: -webkit-flex;
+        display: -ms-flexbox;
+        display: flex; }
+        #forager .frames .frame .buttons button {
+          -webkit-flex-grow: 1;
+              -ms-flex-positive: 1;
+                  flex-grow: 1; }
       #forager .frames .frame ul {
         padding: 0;
         overflow-wrap: break-word; }

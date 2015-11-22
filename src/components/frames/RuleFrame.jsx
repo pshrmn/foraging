@@ -60,20 +60,22 @@ export default React.createClass({
  
     return (
       <div className="frame rule-form">
-        <div>
-          <label>
-            Name: <input type="text"
-                   value={this.state.name}
-                   onChange={this.setName} />
-          </label>
+        <div className="info">
+          <div>
+            <label>
+              Name: <input type="text"
+                     value={this.state.name}
+                     onChange={this.setName} />
+            </label>
+          </div>
+          <div>
+            Type: {typeRadios}
+          </div>
+          <AttrChoices elements={selector.elements}
+                       attr={this.state.attr}
+                       setAttr={this.setAttr} />
         </div>
-        <div>
-          Type: {typeRadios}
-        </div>
-        <AttrChoices elements={selector.elements}
-                     attr={this.state.attr}
-                     setAttr={this.setAttr} />
-        <div className="button">
+        <div className="buttons">
           <PosButton text="Save" click={this.saveHandler} />
           <NegButton text="Cancel" click={this.cancelHandler} />
         </div>

@@ -21,34 +21,32 @@ export default React.createClass({
     let { type, value } = spec;
     let description = "";
     if ( type === "single" ) {
-      description = `Element at index ${value}`;
+      description = `element at index ${value}`;
     } else if ( type === "all" ) {
-      description = `All elements, saved in "${value}" array`;
+      description = `all elements, stores them as "${value}"`;
     }
     // include spaces since this is text
     let optionalText = optional ? " (optional)" : "";
     return (
       <div className="frame">
-        <div>
+        <div className="info">
           <div>
-            <span className="big bold">{selector}</span>
-            {optionalText}
-            <NegButton text={String.fromCharCode(215)}
-                       classes={["transparent"]}
-                       title="Remove Selector"
-                       click={this.remove} />
+            Selector: <span className="big bold">{selector}</span> {optionalText}
           </div>
           <div>
-            {description}
-          </div>
-          <div className="buttons">
-            <PosButton text="Add Child"
-                       click={this.addChild} />
-            <PosButton text="Add Rule"
-                       click={this.addRule} />
+            Captures: {description}
           </div>
           <RuleList rules={rules}
                     actions={this.props.actions} />
+        </div>
+        <div className="buttons">
+          <PosButton text="Add Child"
+                     click={this.addChild} />
+          <PosButton text="Add Rule"
+                     click={this.addRule} />
+          <NegButton text="Remove"
+                     title="Remove Selector"
+                     click={this.remove} />
         </div>
       </div>
     );

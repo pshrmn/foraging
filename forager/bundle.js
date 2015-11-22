@@ -2712,9 +2712,9 @@
 
 	    var description = "";
 	    if (type === "single") {
-	      description = "Element at index " + value;
+	      description = "element at index " + value;
 	    } else if (type === "all") {
-	      description = "All elements, saved in \"" + value + "\" array";
+	      description = "all elements, stores them as \"" + value + "\"";
 	    }
 	    // include spaces since this is text
 	    var optionalText = optional ? " (optional)" : "";
@@ -2723,36 +2723,38 @@
 	      { className: "frame" },
 	      _react2.default.createElement(
 	        "div",
-	        null,
+	        { className: "info" },
 	        _react2.default.createElement(
 	          "div",
 	          null,
+	          "Selector: ",
 	          _react2.default.createElement(
 	            "span",
 	            { className: "big bold" },
 	            selector
 	          ),
-	          optionalText,
-	          _react2.default.createElement(_Inputs.NegButton, { text: String.fromCharCode(215),
-	            classes: ["transparent"],
-	            title: "Remove Selector",
-	            click: this.remove })
+	          " ",
+	          optionalText
 	        ),
 	        _react2.default.createElement(
 	          "div",
 	          null,
+	          "Captures: ",
 	          description
-	        ),
-	        _react2.default.createElement(
-	          "div",
-	          { className: "buttons" },
-	          _react2.default.createElement(_Inputs.PosButton, { text: "Add Child",
-	            click: this.addChild }),
-	          _react2.default.createElement(_Inputs.PosButton, { text: "Add Rule",
-	            click: this.addRule })
 	        ),
 	        _react2.default.createElement(RuleList, { rules: rules,
 	          actions: this.props.actions })
+	      ),
+	      _react2.default.createElement(
+	        "div",
+	        { className: "buttons" },
+	        _react2.default.createElement(_Inputs.PosButton, { text: "Add Child",
+	          click: this.addChild }),
+	        _react2.default.createElement(_Inputs.PosButton, { text: "Add Rule",
+	          click: this.addRule }),
+	        _react2.default.createElement(_Inputs.NegButton, { text: "Remove",
+	          title: "Remove Selector",
+	          click: this.remove })
 	      )
 	    );
 	  }
@@ -2912,28 +2914,32 @@
 	      { className: "frame rule-form" },
 	      _react2.default.createElement(
 	        "div",
-	        null,
+	        { className: "info" },
 	        _react2.default.createElement(
-	          "label",
+	          "div",
 	          null,
-	          "Name: ",
-	          _react2.default.createElement("input", { type: "text",
-	            value: this.state.name,
-	            onChange: this.setName })
-	        )
+	          _react2.default.createElement(
+	            "label",
+	            null,
+	            "Name: ",
+	            _react2.default.createElement("input", { type: "text",
+	              value: this.state.name,
+	              onChange: this.setName })
+	          )
+	        ),
+	        _react2.default.createElement(
+	          "div",
+	          null,
+	          "Type: ",
+	          typeRadios
+	        ),
+	        _react2.default.createElement(AttrChoices, { elements: selector.elements,
+	          attr: this.state.attr,
+	          setAttr: this.setAttr })
 	      ),
 	      _react2.default.createElement(
 	        "div",
-	        null,
-	        "Type: ",
-	        typeRadios
-	      ),
-	      _react2.default.createElement(AttrChoices, { elements: selector.elements,
-	        attr: this.state.attr,
-	        setAttr: this.setAttr }),
-	      _react2.default.createElement(
-	        "div",
-	        { className: "button" },
+	        { className: "buttons" },
 	        _react2.default.createElement(_Inputs.PosButton, { text: "Save", click: this.saveHandler }),
 	        _react2.default.createElement(_Inputs.NegButton, { text: "Cancel", click: this.cancelHandler })
 	      )
@@ -3129,20 +3135,24 @@
 	      "div",
 	      { className: "frame element-form" },
 	      _react2.default.createElement(
-	        "h3",
-	        null,
-	        "Selectors:"
-	      ),
-	      _react2.default.createElement(
 	        "div",
-	        { className: "choices" },
-	        opts
-	      ),
-	      _react2.default.createElement(
-	        "h5",
-	        null,
-	        "Count: ",
-	        eleCount
+	        { className: "info" },
+	        _react2.default.createElement(
+	          "h3",
+	          null,
+	          "Selectors:"
+	        ),
+	        _react2.default.createElement(
+	          "div",
+	          { className: "choices" },
+	          opts
+	        ),
+	        _react2.default.createElement(
+	          "h5",
+	          null,
+	          "Count: ",
+	          eleCount
+	        )
 	      ),
 	      _react2.default.createElement(
 	        "div",
@@ -3332,20 +3342,24 @@
 	      "div",
 	      { className: "frame parts-form" },
 	      _react2.default.createElement(
-	        "h3",
-	        null,
-	        "Parts:"
-	      ),
-	      _react2.default.createElement(
 	        "div",
-	        { className: "choices" },
-	        opts
-	      ),
-	      _react2.default.createElement(
-	        "h5",
-	        null,
-	        "Count: ",
-	        this.state.eleCount
+	        { className: "info" },
+	        _react2.default.createElement(
+	          "h3",
+	          null,
+	          "Parts:"
+	        ),
+	        _react2.default.createElement(
+	          "div",
+	          { className: "choices" },
+	          opts
+	        ),
+	        _react2.default.createElement(
+	          "h5",
+	          null,
+	          "Count: ",
+	          this.state.eleCount
+	        )
 	      ),
 	      _react2.default.createElement(
 	        "div",
@@ -3449,22 +3463,26 @@
 	      { className: "frame spec-form" },
 	      _react2.default.createElement(
 	        "div",
-	        null,
-	        "Selector: ",
-	        css
-	      ),
-	      _react2.default.createElement(SpecForm, { count: elementCount,
-	        setSpec: this.setSpec }),
-	      _react2.default.createElement(
-	        "div",
-	        null,
+	        { className: "info" },
 	        _react2.default.createElement(
-	          "label",
+	          "div",
 	          null,
-	          "Optional: ",
-	          _react2.default.createElement("input", { type: "checkbox",
-	            checked: this.state.optional,
-	            onChange: this.toggleOptional })
+	          "Selector: ",
+	          css
+	        ),
+	        _react2.default.createElement(SpecForm, { count: elementCount,
+	          setSpec: this.setSpec }),
+	        _react2.default.createElement(
+	          "div",
+	          null,
+	          _react2.default.createElement(
+	            "label",
+	            null,
+	            "Optional: ",
+	            _react2.default.createElement("input", { type: "checkbox",
+	              checked: this.state.optional,
+	              onChange: this.toggleOptional })
+	          )
 	        )
 	      ),
 	      _react2.default.createElement(

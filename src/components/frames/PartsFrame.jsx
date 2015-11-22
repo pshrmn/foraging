@@ -85,11 +85,13 @@ export default React.createClass({
     });
     return (
       <div className="frame parts-form">
-        <h3>Parts:</h3>
-        <div className="choices">
-          {opts}
+        <div className="info">
+          <h3>Parts:</h3>
+          <div className="choices">
+            {opts}
+          </div>
+          <h5>Count: {this.state.eleCount}</h5>
         </div>
-        <h5>Count: {this.state.eleCount}</h5>
         <div className="buttons">
           <PosButton text="Save" click={this.saveHandler} />
           <NegButton text="Cancel" click={this.cancelHander} />

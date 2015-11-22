@@ -166,7 +166,7 @@ body.foraging {
     }
 
     .big {
-        font-size: 1.25em;
+        font-size: 1.1em;
     }
 
     .bold {
@@ -316,7 +316,25 @@ body.foraging {
             width: 100%;
             background: $white;
             padding: 5px;
-            position: relative;
+            display: flex;
+            flex-direction: column;
+
+            /*
+             * frames are broken down into two parts, the .info section and
+             * the .buttons section
+             */
+            .info {
+
+            }
+
+            .buttons {
+                margin-top: auto;
+                display: flex;
+
+                button {
+                    flex-grow: 1;
+                }
+            }
 
             ul {
                 padding: 0;
