@@ -1,25 +1,27 @@
-/***
-Small script to get a page, evaluate its javascript, and log the raw html
-of the current state of the page. If the requested page cannot be loaded,
-log nothing.
-***/
+/*
+ * Small script to get a page, evaluate its javascript, and log the raw html
+ * of the current state of the page. If the requested page cannot be loaded,
+ * log nothing.
+ */
 
 var webpage = require("webpage");
 var system = require("system");
 
-var page = webpage.create();
-page.settings.loadImages = false;
-page.settings.diskCache = true;
-
 var args = system.args;
-// first arg is this file's name, second is the url to get, third is an
-// optional user-agent string
+/*
+ * args[0] - this file's name
+ * args[1] - url to get
+ * args[2] - user-agent string (optional)
+ */
 if ( args.length < 2 ) {
     phantom.exit();
 }
-var ua = args[2];
-if ( ua ) {
-    page.settings.userAgent = ua;
+
+var page = webpage.create();
+page.settings.loadImages = false;
+page.settings.diskCache = true;
+if ( args[2] ) {
+    page.settings.userAgent = args[2];
 }
 
 var url = args[1];
@@ -40,6 +42,7 @@ page.onResourceRequested = function(requestData, request) {
 };
 
 page.onResourceReceived = function(response){
+    // this is a very basic script so when a redirect is detected, it just fails
     if ( response.url === url && response.status !== 200 ) {
         wrong_url = true;
     }

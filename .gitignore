@@ -9,6 +9,7 @@ dist
 gatherer.egg-info
 
 phantomjs
+phantomjs.exe
 ghostdriver.log
 
 example.py

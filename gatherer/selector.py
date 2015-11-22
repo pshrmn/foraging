@@ -87,6 +87,8 @@ class Selector(object):
     def ruleData(self, element):
         """
         Return the data associated with each attribute for each Rule.
+        If the element does not have the attribute for a rule, the get call
+        will return None
         """
         return {rule.name: rule.get(element) for rule in self.rules}
 
