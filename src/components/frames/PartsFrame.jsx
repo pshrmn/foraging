@@ -63,9 +63,6 @@ export default React.createClass({
       eleCount: eleCount
     });
   },
-  componentWillUnmount: function() {
-    this._removeHighlights();
-  },
   render: function() {
     let { parts, eleCount } = this.state;
     let opts = parts.map((part, index) => {
@@ -99,14 +96,14 @@ export default React.createClass({
       </div>
     );
   },
+  componentWillUnmount: function() {
+    unhighlight(this.previewClass);
+  },
   _setupHighlights: function(cssSelector) {
     unhighlight(this.previewClass);
     if ( cssSelector !== "" ) {
       let elements = select(this.props.selector.elements, cssSelector);
       highlight(elements, this.previewClass);
     }
-  },
-  _removeHighlights: function() {
-    unhighlight(this.previewClass);
   }
 });

@@ -113,6 +113,10 @@ export default function page(state = {}, action) {
     return Object.assign({}, state, {
       pages: [...pages.slice(0, pageIndex), page, ...pages.slice(pageIndex+1)]
     });
+  case types.CLOSE_FORAGER:
+    return Object.assign({}, state, {
+      pageIndex: 0
+    });
   default:
     return state;
   }

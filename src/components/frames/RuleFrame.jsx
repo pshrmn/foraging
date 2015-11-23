@@ -100,8 +100,9 @@ let AttrChoices = React.createClass({
   prevElement: function(event) {
     let { index } = this.state;
     let eleCount = this.props.elements.length;
+    // JavaScript's modulo of negative numbers stay negative
     this.setState({
-      index: ((index-1)+eleCount) % eleCount
+      index: (((index-1) % eleCount) + eleCount) % eleCount
     });
   },
   selectAttr: function(event) {

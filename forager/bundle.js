@@ -1441,9 +1441,9 @@
 
 	var _Frames2 = _interopRequireDefault(_Frames);
 
-	var _Graph = __webpack_require__(40);
+	var _Tree = __webpack_require__(40);
 
-	var _Graph2 = _interopRequireDefault(_Graph);
+	var _Tree2 = _interopRequireDefault(_Tree);
 
 	var _Preview = __webpack_require__(42);
 
@@ -1475,8 +1475,6 @@
 
 	    var previewModal = preview.visible ? _react2.default.createElement(_Preview2.default, { page: page, close: actions.hidePreview }) : null;
 
-	    // only let the graph update the current selector when
-	    var selectSelector = frame.name === "selector" ? actions.selectSelector : function () {};
 	    return _react2.default.createElement(
 	      "div",
 	      { id: "forager", className: classNames.join(" "), ref: "app" },
@@ -1489,9 +1487,10 @@
 	        _react2.default.createElement(_Frames2.default, { selector: selector,
 	          frame: frame,
 	          actions: actions }),
-	        _react2.default.createElement(_Graph2.default, { page: page,
+	        _react2.default.createElement(_Tree2.default, { page: page,
 	          selector: selector,
-	          selectSelector: selectSelector })
+	          selectSelector: actions.selectSelector,
+	          active: frame.name === "selector" })
 	      ),
 	      previewModal
 	    );
@@ -1761,7 +1760,7 @@
 	  displayName: "PageControls",
 
 	  getName: function getName() {
-	    var name = window.prompt("Page Name:\nCannot contain the following characters: < > : \" \ / | ? * ");
+	    var name = window.prompt("Page Name:\nCannot contain the following characters: < > : \" \\ / | ? * ");
 	    if (!(0, _helpers.legalName)(name)) {
 	      console.error("bad name", name);
 	      return;
@@ -1843,17 +1842,16 @@
 	  displayName: "GeneralControls",
 
 	  handleClose: function handleClose(event) {
-	    // remove any classes that would have been added to the page
-	    ["foraging", "query-check", "current-selector", "selectable-element", "saved-preview"].forEach(function (css) {
-	      (0, _helpers.unhighlight)(css);
-	    });
+	    (0, _helpers.unhighlight)("foraging");
 	    this.props.actions.closeForager();
 	  },
 	  render: function render() {
 	    /*
 	      no need to render these until their features have been implemented
-	      <NeutralButton click={this.handle} text="Sync" />
-	      <NeutralButton click={this.handle} text="Options" />
+	      <NeutralButton text="Sync"
+	                     click={this.handle} />
+	      <NeutralButton text="Options"
+	                     click={this.handle} />
 	    */
 	    return _react2.default.createElement(
 	      "div",
@@ -2169,7 +2167,7 @@
 	 * @param className - the class added to the elements
 	 */
 	var highlight = exports.highlight = function highlight(elements, className) {
-	  [].slice.call(elements).forEach(function (e) {
+	  Array.from(elements).forEach(function (e) {
 	    e.classList.add(className);
 	  });
 	};
@@ -2181,7 +2179,7 @@
 	 * @param className - the className to remove from all elements that have it
 	 */
 	var unhighlight = exports.unhighlight = function unhighlight(className) {
-	  [].slice.call(document.getElementsByClassName(className)).forEach(function (e) {
+	  Array.from(document.getElementsByClassName(className)).forEach(function (e) {
 	    e.classList.remove(className);
 	  });
 	};
@@ -2197,7 +2195,7 @@
 	 * @param click - the function to call when an element is clicked
 	 */
 	var iHighlight = exports.iHighlight = function iHighlight(elements, className, over, out, click) {
-	  [].slice.call(elements).forEach(function (e) {
+	  Array.from(elements).forEach(function (e) {
 	    e.classList.add(className);
 	    e.addEventListener("mouseover", over, false);
 	    e.addEventListener("mouseout", out, false);
@@ -2215,7 +2213,7 @@
 	 * @param click - click function to remove
 	 */
 	var iUnhighlight = exports.iUnhighlight = function iUnhighlight(className, over, out, click) {
-	  [].slice.call(document.getElementsByClassName(className)).forEach(function (e) {
+	  Array.from(document.getElementsByClassName(className)).forEach(function (e) {
 	    e.classList.remove(className);
 	    e.removeEventListener("mouseover", over, false);
 	    e.removeEventListener("mouseout", out, false);
@@ -2267,7 +2265,7 @@
 	};
 
 	/*
-	 * clone a page (useful with the graph because that adds unnecessary properties
+	 * clone a page (useful with the tree because that adds unnecessary properties
 	 * to each selector) does not include the page's name
 	 */
 	var clone = exports.clone = function clone(selector) {
@@ -2639,21 +2637,16 @@
 	    }
 	  },
 	  componentWillMount: function componentWillMount() {
+	    (0, _helpers.unhighlight)(this.cssSelector);
 	    if (this.props.selector) {
-	      this._highlightParents(this.props.selector.elements);
+	      (0, _helpers.highlight)(this.props.selector.elements, this.cssSelector);
 	    }
 	  },
 	  componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
+	    (0, _helpers.unhighlight)(this.cssSelector);
 	    if (nextProps.selector !== undefined && nextProps.selector !== this.props.selector) {
-	      this._highlightParents(nextProps.selector.elements);
+	      (0, _helpers.highlight)(nextProps.selector.elements, this.cssSelector);
 	    }
-	  },
-	  componentWillUnmount: function componentWillUnmount() {
-	    (0, _helpers.unhighlight)(this.cssSelector);
-	  },
-	  _highlightParents: function _highlightParents(elements) {
-	    (0, _helpers.unhighlight)(this.cssSelector);
-	    (0, _helpers.highlight)(elements, this.cssSelector);
 	  },
 	  render: function render() {
 	    return _react2.default.createElement(
@@ -2661,6 +2654,9 @@
 	      { className: "frames" },
 	      this._selectFrame()
 	    );
+	  },
+	  componentWillUnmount: function componentWillUnmount() {
+	    (0, _helpers.unhighlight)(this.cssSelector);
 	  }
 	});
 
@@ -2967,8 +2963,9 @@
 	    var index = this.state.index;
 
 	    var eleCount = this.props.elements.length;
+	    // JavaScript's modulo of negative numbers stay negative
 	    this.setState({
-	      index: (index - 1 + eleCount) % eleCount
+	      index: ((index - 1) % eleCount + eleCount) % eleCount
 	    });
 	  },
 	  selectAttr: function selectAttr(event) {
@@ -3311,9 +3308,6 @@
 	      eleCount: eleCount
 	    });
 	  },
-	  componentWillUnmount: function componentWillUnmount() {
-	    this._removeHighlights();
-	  },
 	  render: function render() {
 	    var _this = this;
 
@@ -3369,15 +3363,15 @@
 	      )
 	    );
 	  },
+	  componentWillUnmount: function componentWillUnmount() {
+	    (0, _helpers.unhighlight)(this.previewClass);
+	  },
 	  _setupHighlights: function _setupHighlights(cssSelector) {
 	    (0, _helpers.unhighlight)(this.previewClass);
 	    if (cssSelector !== "") {
 	      var elements = (0, _helpers.select)(this.props.selector.elements, cssSelector);
 	      (0, _helpers.highlight)(elements, this.previewClass);
 	    }
-	  },
-	  _removeHighlights: function _removeHighlights() {
-	    (0, _helpers.unhighlight)(this.previewClass);
 	  }
 	});
 
@@ -3647,7 +3641,7 @@
 	 * selector, and to select a selector (for editing, adding children, or rules)
 	 */
 	exports.default = _react2.default.createClass({
-	  displayName: "Graph",
+	  displayName: "Tree",
 
 	  getDefaultProps: function getDefaultProps() {
 	    return {
@@ -3691,6 +3685,7 @@
 	    var _props = this.props;
 	    var page = _props.page;
 	    var selector = _props.selector;
+	    var active = _props.active;
 	    var selectSelector = _props.selectSelector;
 
 	    if (page === undefined) {
@@ -3719,7 +3714,8 @@
 	      }
 	      return _react2.default.createElement(Node, _extends({ key: i,
 	        current: current,
-	        select: selectSelector
+	        select: selectSelector,
+	        active: active
 	      }, n));
 	    });
 
@@ -3794,6 +3790,7 @@
 	    var children = _props4.children;
 	    var current = _props4.current;
 	    var depth = _props4.depth;
+	    var active = _props4.active;
 
 	    var hasChildren = children && children.length;
 	    var hasRules = rules && rules.length;
@@ -3806,13 +3803,17 @@
 	    if (!hasRules && !hasChildren) {
 	      classNames.push("empty");
 	    }
+	    // only apply events when the node is "active"
+	    var events = active ? {
+	      onClick: this.handleClick,
+	      onMouseOver: this.handleMouseover,
+	      onMouseOut: this.handleMouseout
+	    } : {};
 	    return _react2.default.createElement(
 	      "g",
-	      { className: classNames.join(" "),
-	        transform: "translate(" + this.props.y + "," + this.props.x + ")",
-	        onClick: this.handleClick,
-	        onMouseOver: this.handleMouseover,
-	        onMouseOut: this.handleMouseout },
+	      _extends({ className: classNames.join(" "),
+	        transform: "translate(" + this.props.y + "," + this.props.x + ")"
+	      }, events),
 	      _react2.default.createElement(
 	        "text",
 	        { y: "-10" },
@@ -3820,6 +3821,9 @@
 	      ),
 	      marker
 	    );
+	  },
+	  componentWillUnmount: function componentWillUnmount() {
+	    (0, _helpers.unhighlight)(this.hoverClass);
 	  }
 	});
 
@@ -4187,6 +4191,10 @@
 	      var page = pages[pageIndex];
 	      return Object.assign({}, state, {
 	        pages: [].concat(_toConsumableArray(pages.slice(0, pageIndex)), [page], _toConsumableArray(pages.slice(pageIndex + 1)))
+	      });
+	    case types.CLOSE_FORAGER:
+	      return Object.assign({}, state, {
+	        pageIndex: 0
 	      });
 	    default:
 	      return state;

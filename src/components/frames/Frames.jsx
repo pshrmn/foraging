@@ -38,21 +38,16 @@ export default React.createClass({
     }
   },
   componentWillMount: function() {
+    unhighlight(this.cssSelector);
     if ( this.props.selector ) {
-      this._highlightParents(this.props.selector.elements);
+      highlight(this.props.selector.elements, this.cssSelector);
     }
   },
   componentWillReceiveProps: function(nextProps) {
+    unhighlight(this.cssSelector);
     if ( nextProps.selector !== undefined && nextProps.selector !== this.props.selector ) {
-      this._highlightParents(nextProps.selector.elements);
+      highlight(nextProps.selector.elements, this.cssSelector);
     }
-  },
-  componentWillUnmount: function() {
-    unhighlight(this.cssSelector);
-  },
-  _highlightParents: function(elements) {
-    unhighlight(this.cssSelector);
-    highlight(elements, this.cssSelector);
   },
   render: function() {
     return (
@@ -60,5 +55,8 @@ export default React.createClass({
         {this._selectFrame()}
       </div>
     );
+  },
+  componentWillUnmount: function() {
+    unhighlight(this.cssSelector);
   }
 });

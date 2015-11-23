@@ -20,7 +20,7 @@ export default React.createClass({
 
 let PageControls = React.createClass({
   getName: function() {
-    let name = window.prompt("Page Name:\nCannot contain the following characters: < > : \" \ / | ? * ");
+    let name = window.prompt("Page Name:\nCannot contain the following characters: < > : \" \\ / | ? * ");
     if ( !legalName(name) ) {
       console.error("bad name", name);
       return;
@@ -92,18 +92,16 @@ let PageControls = React.createClass({
 
 let GeneralControls = React.createClass({
   handleClose: function(event){
-    // remove any classes that would have been added to the page
-    ["foraging", "query-check", "current-selector",
-       "selectable-element", "saved-preview"].forEach(css => {
-      unhighlight(css);
-    });
+    unhighlight("foraging");
     this.props.actions.closeForager();
   },
   render: function() {
     /*
       no need to render these until their features have been implemented
-      <NeutralButton click={this.handle} text="Sync" />
-      <NeutralButton click={this.handle} text="Options" />
+      <NeutralButton text="Sync"
+                     click={this.handle} />
+      <NeutralButton text="Options"
+                     click={this.handle} />
     */
     return (
       <div className="app-controls">

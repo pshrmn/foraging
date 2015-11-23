@@ -28,7 +28,7 @@ export const createSelector = (selector, type = "single", value = 0, optional = 
 
 
 /*
- * clone a page (useful with the graph because that adds unnecessary properties
+ * clone a page (useful with the tree because that adds unnecessary properties
  * to each selector) does not include the page's name
  */
 export const clone = selector => {

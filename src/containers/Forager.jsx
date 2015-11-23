@@ -6,7 +6,7 @@ import * as ForagerActions from "../actions";
 
 import Controls from "../components/Controls";
 import Frames from "../components/frames/Frames";
-import Graph from "../components/Graph";
+import Tree from "../components/Tree";
 import Preview from "../components/Preview";
 
 let Forager = React.createClass({
@@ -23,8 +23,6 @@ let Forager = React.createClass({
       <Preview page={page} close={actions.hidePreview} />
     ) : null;
 
-    // only let the graph update the current selector when 
-    let selectSelector = frame.name === "selector" ? actions.selectSelector : () => {};
     return (
       <div id="forager" className={classNames.join(" ")} ref="app">
         <Controls pages={pages}
@@ -34,9 +32,10 @@ let Forager = React.createClass({
           <Frames selector={selector}
                   frame={frame}
                   actions={actions} />
-          <Graph page={page}
-                 selector={selector}
-                 selectSelector={selectSelector} />
+          <Tree page={page}
+                selector={selector}
+                selectSelector={actions.selectSelector}
+                active={frame.name === "selector"}/>
         </div>
         {previewModal}
       </div>

@@ -44,7 +44,7 @@ export default React.createClass({
   },
   _makeNodes: function() {
     // don't draw anything when there isn't a page
-    let { page, selector, selectSelector } = this.props;
+    let { page, selector, active, selectSelector } = this.props;
     if ( page === undefined ) {
       return null;
     }
@@ -70,6 +70,7 @@ export default React.createClass({
       return <Node key={i} 
                    current={current}
                    select={selectSelector}
+                   active={active}
                    {...n} />
     });
 
@@ -126,7 +127,7 @@ let Node = React.createClass({
     return abbreviate(text, 10);
   },
   render: function() {
-    let { rules, children, current, depth } = this.props;
+    let { rules, children, current, depth, active } = this.props;
     let hasChildren = children && children.length;
     let hasRules = rules && rules.length;
     let text = this.specText();
@@ -142,15 +143,22 @@ let Node = React.createClass({
     if ( !hasRules && !hasChildren ) {
       classNames.push("empty");
     }
+    // only apply events when the node is "active"
+    let events = active ? {
+      onClick: this.handleClick,
+      onMouseOver: this.handleMouseover,
+      onMouseOut: this.handleMouseout
+    } : {};
     return (
       <g className={classNames.join(" ")}
          transform={`translate(${this.props.y},${this.props.x})`}
-         onClick={this.handleClick}
-         onMouseOver={this.handleMouseover}
-         onMouseOut={this.handleMouseout} >
+         {...events} >
         <text y="-10" >{text}</text>
         {marker}
       </g>
     );
+  },
+  componentWillUnmount: function() {
+    unhighlight(this.hoverClass);
   }
 });
