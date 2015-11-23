@@ -1,6 +1,25 @@
 import { expect } from "chai";
+import { jsdom } from "jsdom";
 
-import { attributes } from "../../src/helpers/attributes";
+import { attributes, stripEvents } from "../../src/helpers/attributes";
+
+let doc = jsdom(`<!doctype html>
+  <html>
+  <body>
+    <div>
+      <p>One</p>
+      <p>Two</p>
+    </div>
+    <div></div>
+    <div>
+      <p>Three</p>
+      <p class='no-select'>Ignore</p>
+    </div>
+  </body>
+</html>`);
+let win = doc.defaultView;
+global.document = doc;
+global.window = win;
 
 describe("attribute", () => {
 
@@ -67,4 +86,26 @@ describe("attribute", () => {
     });
   });
 
+  describe("stripEvents", () => {
+    it("returns element if it has no on* attributes", () => {
+      let ele = document.createElement("button");
+      document.body.appendChild(ele);
+      ele.setAttribute("class", "button-class");
+      ele.setAttribute("id", "button-id");
+      let stripped = stripEvents(ele);
+      expect(stripped).to.equal(ele);
+    });
+
+    it("remove any on* attributes from an element and return clone", () => {
+      let ele = document.createElement("button");
+      document.body.appendChild(ele);
+      ele.setAttribute("onclick", () => { return false; });
+      let beforeEvents = Array.from(ele.attributes).some(a =>  a.name.startsWith("on"))
+      expect(beforeEvents).to.be.true;
+      let stripped = stripEvents(ele);
+      let afterEvents = Array.from(stripped.attributes).some(a => { a.name.startsWith("on"); });
+      expect(afterEvents).to.be.false;
+      expect(stripped).to.not.equal(ele);
+    });
+  });
 });

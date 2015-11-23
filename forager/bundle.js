@@ -1970,6 +1970,18 @@
 	    return _attributes.attributes;
 	  }
 	});
+	Object.defineProperty(exports, "eventlessElements", {
+	  enumerable: true,
+	  get: function get() {
+	    return _attributes.eventlessElements;
+	  }
+	});
+	Object.defineProperty(exports, "stripEvents", {
+	  enumerable: true,
+	  get: function get() {
+	    return _attributes.stripEvents;
+	  }
+	});
 
 	var _markup = __webpack_require__(30);
 
@@ -2116,38 +2128,64 @@
 	"use strict";
 
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	// return an object mapping attribute names to their value
 	// for all attributes of an element
 	var attributes = exports.attributes = function attributes(element) {
-	    var ignored = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+	  var ignored = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
-	    var attrs = Array.from(element.attributes).reduce(function (stored, attr) {
-	        var name = attr.name;
-	        var value = attr.value;
+	  var attrs = Array.from(element.attributes).reduce(function (stored, attr) {
+	    var name = attr.name;
+	    var value = attr.value;
 
-	        if (ignored[name]) {
-	            return stored;
-	        }
-	        // don't include current-selector class
-	        if (name === "class") {
-	            value = value.replace("current-selector", "").trim();
-	        }
-	        // don't include empty attrs
-	        if (value !== "") {
-	            stored.push({ name: name, value: value });
-	        }
-	        return stored;
-	    }, []);
-
-	    // include text if it exists
-	    var text = element.textContent.trim();
-	    if (text !== "") {
-	        attrs.push({ name: "text", value: text });
+	    if (ignored[name]) {
+	      return stored;
 	    }
+	    // don't include current-selector class
+	    if (name === "class") {
+	      value = value.replace("current-selector", "").trim();
+	    }
+	    // don't include empty attrs
+	    if (value !== "") {
+	      stored.push({ name: name, value: value });
+	    }
+	    return stored;
+	  }, []);
 
-	    return attrs;
+	  // include text if it exists
+	  var text = element.textContent.trim();
+	  if (text !== "") {
+	    attrs.push({ name: "text", value: text });
+	  }
+
+	  return attrs;
+	};
+
+	/*
+	 * stripEvents
+	 * -----------
+	 * If an element has no on* attributes, it is returned. Otherwise, all on* attrs
+	 * are removed from the element and a clone is made. The element is replaced in
+	 * the dom by the clone and the clone is returned.
+	 */
+	var stripEvents = exports.stripEvents = function stripEvents(element) {
+	  var attrs = Array.from(element.attributes);
+	  if (attrs.some(function (a) {
+	    return a.name.startsWith("on");
+	  })) {
+	    attrs.forEach(function (attr) {
+	      var name = attr.name;
+	      if (name.startsWith("on")) {
+	        element.removeAttribute(name);
+	      }
+	    });
+	    var clone = element.cloneNode(true);
+	    element.parentNode.replaceChild(clone, element);
+	    return clone;
+	  } else {
+	    return element;
+	  }
 	};
 
 /***/ },
@@ -3195,6 +3233,9 @@
 	   */
 	  _setupPageEvents: function _setupPageEvents(parents) {
 	    var elements = (0, _helpers.select)(parents);
+	    elements = elements.map(function (ele) {
+	      return (0, _helpers.stripEvents)(ele);
+	    });
 	    this.boundClick = this.events.click.bind(this);
 	    (0, _helpers.iHighlight)(elements, this.potentialSelector, this.events.over, this.events.out, this.boundClick);
 	  }

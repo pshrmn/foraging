@@ -1,7 +1,7 @@
 import React from "react";
 
 import { PosButton, NegButton } from "../Inputs";
-import { parts, select, count,
+import { parts, select, count, stripEvents,
   highlight, unhighlight, iHighlight, iUnhighlight } from "../../helpers";
 
 /*
@@ -129,6 +129,7 @@ export default React.createClass({
    */
   _setupPageEvents: function(parents) {
     let elements = select(parents);
+    elements = elements.map(ele => stripEvents(ele));
     this.boundClick = this.events.click.bind(this);
     iHighlight(elements, this.potentialSelector, this.events.over, this.events.out, this.boundClick);
   }
