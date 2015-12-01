@@ -222,26 +222,28 @@ body.foraging {
             
             background: $dark-gray !important;
 
-            &.pos, &.pos:active, &.pos:focus{
+            &.pos, &.pos:active, &.pos:focus {
                 color: $green !important;
                 border-color: $green !important;
+                background: $dark-gray !important;
             }
 
-            &:hover{
+            &.pos:hover {
                 background: $green !important;
-                border-color: $green !important;
                 color: $dark-gray !important;
             }
 
             &.neg, &.neg:active, &.neg:focus{
                 border-color: $red !important;
                 color: $red !important;
+                background: $dark-gray !important;
             }
 
-            &.neg:hover{
+            &.neg:hover {
                 background: $red !important;
-                color: $dark-gray !important;
+                color: $dark-gray !important;            
             }
+
         }
 
         button:active{

@@ -7,7 +7,6 @@ import { Provider } from "react-redux";
 import Forager from "./containers/Forager";
 import reducer from './reducers';
 
-
 import { SHOW_FORAGER } from "./constants/ActionTypes";
 import findSelector from "./middleware/findSelector";
 import chromeBackground from "./middleware/chromeBackground";

@@ -1970,12 +1970,6 @@
 	    return _attributes.attributes;
 	  }
 	});
-	Object.defineProperty(exports, "eventlessElements", {
-	  enumerable: true,
-	  get: function get() {
-	    return _attributes.eventlessElements;
-	  }
-	});
 	Object.defineProperty(exports, "stripEvents", {
 	  enumerable: true,
 	  get: function get() {
@@ -3897,9 +3891,17 @@
 	exports.default = _react2.default.createClass({
 	  displayName: "Preview",
 
-	  clickHandler: function clickHandler(event) {
+	  closeHandler: function closeHandler(event) {
 	    event.preventDefault();
 	    this.props.close();
+	  },
+	  logHandler: function logHandler(event) {
+	    event.preventDefault();
+	    console.log(JSON.stringify((0, _helpers.preview)(this.props.page)));
+	  },
+	  prettyLogHandler: function prettyLogHandler(event) {
+	    event.preventDefault();
+	    console.log(JSON.stringify((0, _helpers.preview)(this.props.page), null, 2));
 	  },
 	  render: function render() {
 	    var page = this.props.page;
@@ -3917,7 +3919,9 @@
 	          null,
 	          previewText
 	        ),
-	        _react2.default.createElement(_Inputs.NeutralButton, { text: "Close", click: this.clickHandler })
+	        _react2.default.createElement(_Inputs.PosButton, { text: "Log", click: this.logHandler }),
+	        _react2.default.createElement(_Inputs.PosButton, { text: "Pretty Log", click: this.prettyLogHandler }),
+	        _react2.default.createElement(_Inputs.NeutralButton, { text: "Close", click: this.closeHandler })
 	      )
 	    );
 	  }

@@ -146,14 +146,15 @@ body.foraging {
       background: #323033 !important; }
       #forager .controls button.pos, #forager .controls button.pos:active, #forager .controls button.pos:focus {
         color: #76B85C !important;
-        border-color: #76B85C !important; }
-      #forager .controls button:hover {
-        background: #76B85C !important;
         border-color: #76B85C !important;
+        background: #323033 !important; }
+      #forager .controls button.pos:hover {
+        background: #76B85C !important;
         color: #323033 !important; }
       #forager .controls button.neg, #forager .controls button.neg:active, #forager .controls button.neg:focus {
         border-color: #E85F88 !important;
-        color: #E85F88 !important; }
+        color: #E85F88 !important;
+        background: #323033 !important; }
       #forager .controls button.neg:hover {
         background: #E85F88 !important;
         color: #323033 !important; }

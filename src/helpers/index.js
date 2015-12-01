@@ -3,7 +3,7 @@
  * "helpers/<filename>";
  */
 export { legalName, abbreviate } from "./text";
-export { attributes, eventlessElements, stripEvents } from "./attributes";
+export { attributes, stripEvents } from "./attributes";
 export { highlight, unhighlight, iHighlight, iUnhighlight } from "./markup";
 export { createPage, createSelector, clone, clean, setupPage } from "./page";
 export { select, count, parts, allSelect } from "./selection";
