@@ -2601,6 +2601,8 @@
 
 	"use strict";
 
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
@@ -2633,6 +2635,19 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+	/*
+	 * Frames
+	 * ------
+	 *
+	 * The main way for a user to interact with Forager is through the Frames. There
+	 * are a number of different frames associated with different states of viewing
+	 * and creating selectors.
+	 *
+	 * Through its props, each frame is given any pertinent actions that, relevant
+	 * parts of the current selector (referred to as the parent when creating a 
+	 * new seletcor), and the destructured parts of a data object containing any
+	 * extra data for that frame.
+	 */
 	exports.default = _react2.default.createClass({
 	  displayName: "Frames",
 
@@ -2646,24 +2661,29 @@
 	    switch (frame.name) {
 	      case "selector":
 	        return _react2.default.createElement(_SelectorFrame2.default, { selector: selector,
-	          data: frame.data,
-	          actions: actions });
+	          showElementFrame: actions.showElementFrame,
+	          showRuleFrame: actions.showRuleFrame,
+	          removeSelector: actions.removeSelector,
+	          removeRule: actions.removeRule });
 	      case "rule":
 	        return _react2.default.createElement(_RuleFrame2.default, { selector: selector,
-	          data: frame.data,
-	          actions: actions });
+	          save: actions.saveRule,
+	          cancel: actions.showSelectorFrame });
 	      case "element":
-	        return _react2.default.createElement(_ElementFrame2.default, { selector: selector,
-	          data: frame.data,
-	          actions: actions });
+	        return _react2.default.createElement(_ElementFrame2.default, { parentElements: selector.elements,
+	          next: actions.showPartsFrame,
+	          cancel: actions.showSelectorFrame });
 	      case "parts":
-	        return _react2.default.createElement(_PartsFrame2.default, { selector: selector,
-	          data: frame.data,
-	          actions: actions });
+	        return _react2.default.createElement(_PartsFrame2.default, _extends({ parentElements: selector.elements,
+	          next: actions.showSpecFrame,
+	          cancel: actions.showSelectorFrame
+	        }, frame.data));
 	      case "spec":
-	        return _react2.default.createElement(_SpecFrame2.default, { selector: selector,
-	          data: frame.data,
-	          actions: actions });
+	        return _react2.default.createElement(_SpecFrame2.default, _extends({ parentElements: selector.elements,
+	          parentID: selector.id,
+	          save: actions.saveSelector,
+	          cancel: actions.showSelectorFrame
+	        }, frame.data));
 	      default:
 	        return null;
 	    }
@@ -2716,13 +2736,13 @@
 	  displayName: "SelectorFrame",
 
 	  addChild: function addChild(event) {
-	    this.props.actions.showElementFrame();
+	    this.props.showElementFrame();
 	  },
 	  addRule: function addRule(event) {
-	    this.props.actions.showRuleFrame();
+	    this.props.showRuleFrame();
 	  },
 	  remove: function remove(event) {
-	    this.props.actions.removeSelector(this.props.selector.id);
+	    this.props.removeSelector(this.props.selector.id);
 	  },
 	  render: function render() {
 	    if (this.props.selector === undefined) {
@@ -2771,7 +2791,7 @@
 	          description
 	        ),
 	        _react2.default.createElement(RuleList, { rules: rules,
-	          actions: this.props.actions })
+	          remove: this.props.removeRule })
 	      ),
 	      _react2.default.createElement(
 	        "div",
@@ -2794,11 +2814,10 @@
 	  render: function render() {
 	    var _props = this.props;
 	    var rules = _props.rules;
-	    var actions = _props.actions;
-	    var removeRule = actions.removeRule;
+	    var remove = _props.remove;
 
 	    var list = rules.length ? rules.map(function (r, i) {
-	      return _react2.default.createElement(Rule, _extends({ key: i, index: i, remove: removeRule }, r));
+	      return _react2.default.createElement(Rule, _extends({ key: i, index: i, remove: remove }, r));
 	    }) : _react2.default.createElement(
 	      "li",
 	      null,
@@ -2905,7 +2924,7 @@
 	    // basic validation
 
 	    if (name !== "" && attr !== "") {
-	      this.props.actions.saveRule({
+	      this.props.save({
 	        name: name,
 	        type: type,
 	        attr: attr
@@ -2914,14 +2933,16 @@
 	  },
 	  cancelHandler: function cancelHandler(event) {
 	    event.preventDefault();
-	    this.props.actions.showSelectorFrame();
+	    this.props.cancel();
 	  },
 	  render: function render() {
 	    var _this = this;
 
-	    var _props = this.props;
-	    var selector = _props.selector;
-	    var actions = _props.actions;
+	    var selector = this.props.selector;
+	    var _state2 = this.state;
+	    var name = _state2.name;
+	    var type = _state2.type;
+	    var attr = _state2.attr;
 
 	    var typeRadios = ["string", "int", "float"].map(function (t, i) {
 	      return _react2.default.createElement(
@@ -2932,7 +2953,7 @@
 	        _react2.default.createElement("input", { type: "radio",
 	          name: "rule-type",
 	          value: t,
-	          checked: t === _this.state.type,
+	          checked: t === type,
 	          onChange: _this.setType })
 	      );
 	    });
@@ -2951,7 +2972,7 @@
 	            null,
 	            "Name: ",
 	            _react2.default.createElement("input", { type: "text",
-	              value: this.state.name,
+	              value: name,
 	              onChange: this.setName })
 	          )
 	        ),
@@ -2962,7 +2983,7 @@
 	          typeRadios
 	        ),
 	        _react2.default.createElement(AttrChoices, { elements: selector.elements,
-	          attr: this.state.attr,
+	          attr: attr,
 	          setAttr: this.setAttr })
 	      ),
 	      _react2.default.createElement(
@@ -3028,9 +3049,9 @@
 	    });
 	  },
 	  render: function render() {
-	    var _props2 = this.props;
-	    var elements = _props2.elements;
-	    var attr = _props2.attr;
+	    var _props = this.props;
+	    var elements = _props.elements;
+	    var attr = _props.attr;
 	    var index = this.state.index;
 
 	    var eleCount = elements.length;
@@ -3121,13 +3142,13 @@
 	  },
 	  setRadio: function setRadio(i) {
 	    var selector = this.state.selectors[i].join("");
-	    var eleCount = (0, _helpers.count)(this.props.selector.elements, selector);
+	    var eleCount = (0, _helpers.count)(this.props.parentElements, selector);
 	    this.setState({
 	      checked: i,
 	      eleCount: eleCount
 	    });
 	  },
-	  saveHandler: function saveHandler(event) {
+	  nextHandler: function nextHandler(event) {
 	    event.preventDefault();
 	    var _state = this.state;
 	    var checked = _state.checked;
@@ -3135,19 +3156,16 @@
 
 	    var s = selectors[checked];
 	    if (checked !== undefined && s !== undefined) {
-	      this.props.actions.showPartsFrame(s);
+	      this.props.next(s);
 	    }
 	  },
 	  cancelHandler: function cancelHandler(event) {
 	    event.preventDefault();
-	    this.props.actions.showSelectorFrame();
+	    this.props.cancel();
 	  },
 	  render: function render() {
 	    var _this = this;
 
-	    var _props = this.props;
-	    var selector = _props.selector;
-	    var data = _props.data;
 	    var _state2 = this.state;
 	    var selectors = _state2.selectors;
 	    var checked = _state2.checked;
@@ -3169,7 +3187,7 @@
 	        _react2.default.createElement(
 	          "h3",
 	          null,
-	          "Selectors:"
+	          "Select Relevant Element(s)"
 	        ),
 	        _react2.default.createElement(
 	          "div",
@@ -3186,7 +3204,7 @@
 	      _react2.default.createElement(
 	        "div",
 	        { className: "buttons" },
-	        _react2.default.createElement(_Inputs.PosButton, { text: "Save", click: this.saveHandler }),
+	        _react2.default.createElement(_Inputs.PosButton, { text: "Next", click: this.nextHandler }),
 	        _react2.default.createElement(_Inputs.NegButton, { text: "Cancel", click: this.cancelHandler })
 	      )
 	    );
@@ -3195,10 +3213,10 @@
 	   * below here are the functions for interacting with the non-Forager part of the page
 	   */
 	  componentWillMount: function componentWillMount() {
-	    this._setupPageEvents(this.props.selector.elements);
+	    this._setupPageEvents(this.props.parentElements);
 	  },
 	  componentWillReceiveNewProps: function componentWillReceiveNewProps(nextProps) {
-	    this._setupPageEvents(nextProps.selector.elements);
+	    this._setupPageEvents(nextProps.parentElements);
 	  },
 	  /*
 	   * when a selector possibility is chosen, add a class to all matching elements
@@ -3210,7 +3228,7 @@
 	    var clickedSelector = nextState.selectors[nextState.checked];
 	    if (clickedSelector !== undefined) {
 	      var fullSelector = clickedSelector.join("");
-	      var elements = (0, _helpers.select)(nextProps.selector.elements, fullSelector);
+	      var elements = (0, _helpers.select)(nextProps.parentElements, fullSelector);
 	      (0, _helpers.highlight)(elements, this.currentSelector);
 	    }
 	  },
@@ -3243,9 +3261,9 @@
 	    this.props.select(this.props.index);
 	  },
 	  render: function render() {
-	    var _props2 = this.props;
-	    var selector = _props2.selector;
-	    var checked = _props2.checked;
+	    var _props = this.props;
+	    var selector = _props.selector;
+	    var checked = _props.checked;
 
 	    var labelClass = checked ? "selected" : "";
 	    return _react2.default.createElement(
@@ -3290,45 +3308,44 @@
 	      eleCount: 0
 	    };
 	  },
-	  saveHandler: function saveHandler(event) {
+	  nextHandler: function nextHandler(event) {
 	    event.preventDefault();
 	    var parts = this.state.parts;
 
-	    var selector = parts.reduce(function (str, curr) {
-	      if (curr.checked) {
-	        str += curr.name;
-	      }
-	      return str;
-	    }, "");
+	    var selector = this.joinParts(parts);
 	    if (selector !== "") {
-	      this.props.actions.showSpecFrame(selector);
+	      this.props.next(selector);
 	    }
 	  },
 	  cancelHander: function cancelHander(event) {
 	    event.preventDefault();
-	    this.props.actions.showSelectorFrame();
+	    this.props.cancel();
 	  },
 	  toggleRadio: function toggleRadio(event) {
 	    // don't prevent default
 	    var index = event.target.value;
 	    var parts = this.state.parts;
 	    parts[index].checked = !parts[index].checked;
-	    var fullSelector = parts.reduce(function (str, curr) {
-	      if (curr.checked) {
-	        str += curr.name;
-	      }
-	      return str;
-	    }, "");
+	    var fullSelector = this.joinParts(parts);
 
-	    var eleCount = fullSelector === "" ? 0 : (0, _helpers.count)(this.props.selector.elements, fullSelector);
+	    var eleCount = fullSelector === "" ? 0 : (0, _helpers.count)(this.props.parentElements, fullSelector);
 	    this._setupHighlights(fullSelector);
 	    this.setState({
 	      parts: parts,
 	      eleCount: eleCount
 	    });
 	  },
+	  joinParts: function joinParts(parts) {
+	    return parts.reduce(function (str, curr) {
+	      if (curr.checked) {
+	        str += curr.name;
+	      }
+	      return str;
+	    }, "");
+	  },
 	  componentWillMount: function componentWillMount() {
-	    var names = this.props.data.parts;
+	    var names = this.props.parts;
+	    // by default, each css selector part should be checked
 	    var parts = names.map(function (name) {
 	      return {
 	        name: name,
@@ -3336,7 +3353,7 @@
 	      };
 	    });
 	    var fullSelector = names.join("");
-	    var eleCount = (0, _helpers.count)(this.props.selector.elements, fullSelector);
+	    var eleCount = (0, _helpers.count)(this.props.parentElements, fullSelector);
 	    this._setupHighlights(fullSelector);
 	    this.setState({
 	      parts: parts,
@@ -3376,7 +3393,7 @@
 	        _react2.default.createElement(
 	          "h3",
 	          null,
-	          "Parts:"
+	          "Select Relevant Parts of the CSS selector"
 	        ),
 	        _react2.default.createElement(
 	          "div",
@@ -3393,7 +3410,7 @@
 	      _react2.default.createElement(
 	        "div",
 	        { className: "buttons" },
-	        _react2.default.createElement(_Inputs.PosButton, { text: "Save", click: this.saveHandler }),
+	        _react2.default.createElement(_Inputs.PosButton, { text: "Next", click: this.nextHandler }),
 	        _react2.default.createElement(_Inputs.NegButton, { text: "Cancel", click: this.cancelHander })
 	      )
 	    );
@@ -3404,7 +3421,7 @@
 	  _setupHighlights: function _setupHighlights(cssSelector) {
 	    (0, _helpers.unhighlight)(this.previewClass);
 	    if (cssSelector !== "") {
-	      var elements = (0, _helpers.select)(this.props.selector.elements, cssSelector);
+	      var elements = (0, _helpers.select)(this.props.parentElements, cssSelector);
 	      (0, _helpers.highlight)(elements, this.previewClass);
 	    }
 	  }
@@ -3447,14 +3464,17 @@
 	    var type = _state.type;
 	    var value = _state.value;
 	    var optional = _state.optional;
+	    var _props = this.props;
+	    var css = _props.css;
+	    var parentElements = _props.parentElements;
 	    // all value must be set
 
 	    if (type === "all" && value === "") {
 	      return;
 	    }
-	    var sel = (0, _helpers.createSelector)(this.props.data.css, type, value, optional);
-	    // generate the list of elements right away
-	    sel.elements = (0, _helpers.select)(this.props.selector.elements, sel.selector, sel.spec);
+	    var sel = (0, _helpers.createSelector)(css, type, value, optional);
+	    // generate the list of elements for the new selector
+	    sel.elements = (0, _helpers.select)(parentElements, sel.selector, sel.spec);
 	    // if saving a selector that selects "select" elements, add a child selector
 	    // to match option elements
 	    if ((0, _helpers.allSelect)(sel.elements)) {
@@ -3463,11 +3483,11 @@
 	      sel.children.push(optionsChild);
 	    }
 	    // send the new selector and the parent
-	    this.props.actions.saveSelector(sel, this.props.selector.id);
+	    this.props.save(sel, this.props.parentID);
 	  },
 	  cancelHandler: function cancelHandler(event) {
 	    event.preventDefault();
-	    this.props.actions.showSelectorFrame();
+	    this.props.cancel();
 	  },
 	  setSpec: function setSpec(type, value) {
 	    this.setState({
@@ -3481,12 +3501,11 @@
 	    });
 	  },
 	  render: function render() {
-	    var _props = this.props;
-	    var selector = _props.selector;
-	    var data = _props.data;
-	    var css = data.css;
+	    var _props2 = this.props;
+	    var parentElements = _props2.parentElements;
+	    var css = _props2.css;
 
-	    var elementCount = (0, _helpers.count)(selector.elements, css);
+	    var elementCount = (0, _helpers.count)(parentElements, css);
 	    return _react2.default.createElement(
 	      "div",
 	      { className: "frame spec-form" },
@@ -3523,8 +3542,8 @@
 	    );
 	  },
 	  componentWillMount: function componentWillMount() {
-	    var parentElements = this.props.selector.elements;
-	    var cssSelector = this.props.data.css;
+	    var parentElements = this.props.parentElements;
+	    var cssSelector = this.props.css;
 	    var spec = {
 	      type: this.state.type,
 	      value: this.state.value
@@ -3533,8 +3552,8 @@
 	    (0, _helpers.highlight)(elements, this.highlight);
 	  },
 	  componentWillUpdate: function componentWillUpdate(nextProps, nextState) {
-	    var parentElements = nextProps.selector.elements;
-	    var cssSelector = nextProps.data.css;
+	    var parentElements = nextProps.parentElements;
+	    var cssSelector = nextProps.css;
 	    var spec = {
 	      type: nextState.type,
 	      value: nextState.value
@@ -3978,12 +3997,6 @@
 	/*
 	 * Forager reducer
 	 */
-	/*import * as types from "../constants/ActionTypes";
-	  case types.REMOVE_RULE:
-	    return Object.assign({}, state, {
-
-	    });
-	*/
 	function reducer() {
 	  var state = arguments.length <= 0 || arguments[0] === undefined ? initialState : arguments[0];
 	  var action = arguments[1];
@@ -4019,6 +4032,13 @@
 
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
+	/*
+	 * frame
+	 * -----
+	 *
+	 * Which frame to show. In the majority of cases, the "selector" frame should
+	 * be shown.
+	 */
 	function frame() {
 	  var state = arguments.length <= 0 || arguments[0] === undefined ? "" : arguments[0];
 	  var action = arguments[1];
@@ -4081,6 +4101,13 @@
 
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
+	/*
+	 * show
+	 * ----
+	 *
+	 * Determines whether or not the Forager UI is shown. When show=false, the
+	 * extension can be considered off.
+	 */
 	function show() {
 	  var state = arguments.length <= 0 || arguments[0] === undefined ? true : arguments[0];
 	  var action = arguments[1];
@@ -4114,23 +4141,36 @@
 
 	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
+	/*
+	 * page
+	 * ----
+	 *
+	 * a page is made up of an array of pages and a pageIndex to indicate the current
+	 * page within the array. pages[0] is an undefined page.
+	 */
 	function page() {
 	  var state = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 	  var action = arguments[1];
 
 	  switch (action.type) {
+	    /*
+	     * sets the pageIndex, specifying that the page in the pages array at that
+	     * index is the "current" page. If the index is out of the bounds of the
+	     * state.pages array, set to 0.
+	     */
 	    case types.LOAD_PAGE:
-	      /*
-	       * if the index is out of the bounds of state.pages, set to 0
-	       */
-	      var max = state.pages.length;
 	      var index = parseInt(action.index, 10);
-	      if (index < 0 || index >= max) {
+	      if (isNaN(index) || index < 0 || index >= state.pages.length) {
 	        index = 0;
 	      }
 	      return Object.assign({}, state, {
 	        pageIndex: index
 	      });
+
+	    /*
+	     * add a page to the pages array. Multiple pages with the same name can be created
+	     * so care needs to be taken when uploading.
+	     */
 	    case types.ADD_PAGE:
 	      var pages = state.pages;
 	      var newPages = [].concat(_toConsumableArray(pages), [action.page]);
@@ -4138,6 +4178,10 @@
 	        pages: newPages,
 	        pageIndex: newPages.length - 1
 	      });
+
+	    /*
+	     * remove the page from the pages array
+	     */
 	    case types.REMOVE_PAGE:
 	      var pages = state.pages;
 	      var pageIndex = state.pageIndex;
@@ -4150,6 +4194,11 @@
 	        pages: [].concat(_toConsumableArray(pages.slice(0, pageIndex)), _toConsumableArray(pages.slice(pageIndex + 1))),
 	        pageIndex: 0
 	      });
+
+	    /*
+	     * update the name of the page. Because pages[0] is an undefined page
+	     * used to have no page selected, there is a special case for it.
+	     */
 	    case types.RENAME_PAGE:
 	      var pages = state.pages;
 	      var pageIndex = state.pageIndex;
@@ -4165,6 +4214,11 @@
 	      return Object.assign({}, state, {
 	        pages: newPages
 	      });
+
+	    /*
+	     * find the current selector in the page and add the selector being saved
+	     * to its children array
+	     */
 	    case types.SAVE_SELECTOR:
 	      var pages = state.pages;
 	      var pageIndex = state.pageIndex;
@@ -4183,35 +4237,42 @@
 	          child.id = page.nextID++;
 	        });
 	      }
-
-	      var find = function find(s) {
+	      // find the parent and add the new selector to its children array
+	      var appendTo = function appendTo(s) {
 	        if (s.id === parentID) {
 	          s.children.push(selector);
 	          return true;
 	        } else {
 	          var found = s.children.some(function (child) {
-	            return find(child);
+	            return appendTo(child);
 	          });
 	          return found;
 	        }
 	      };
-	      find(page);
+	      appendTo(page);
 	      return Object.assign({}, state, {
 	        pages: [].concat(_toConsumableArray(pages.slice(0, pageIndex)), [page], _toConsumableArray(pages.slice(pageIndex + 1)))
 	      });
+
+	    /*
+	     * filter out the child selector being remove from the parent
+	     */
 	    case types.REMOVE_SELECTOR:
 	      var pages = state.pages;
 	      var pageIndex = state.pageIndex;
 
 	      var page = pages[pageIndex];
 
-	      var find = function find(s) {
+	      var removeFrom = function removeFrom(s) {
 	        var count = s.children.length;
 	        s.children = s.children.filter(function (child) {
 	          return child.id !== action.selectorID;
 	        });
+	        // if the new length is less than the old, we know that
+	        // the selector was filtered out and can stop, otherwise
+	        // keep checking children
 	        return s.children.length < count ? true : s.children.some(function (child) {
-	          return find(child);
+	          return removeFrom(child);
 	        });
 	      };
 
@@ -4221,15 +4282,19 @@
 	        page.children = [];
 	        page.rules = [];
 	      } else {
-	        find(page);
+	        removeFrom(page);
 	      }
 
 	      return Object.assign({}, state, {
 	        pages: [].concat(_toConsumableArray(pages.slice(0, pageIndex)), [page], _toConsumableArray(pages.slice(pageIndex + 1)))
 	      });
+
+	    /*
+	     * create a new array of pages to trigger an update when adding a rule to or
+	     * removing a rule from a selector
+	     */
 	    case types.SAVE_RULE:
 	    case types.REMOVE_RULE:
-	      // attempting to trigger a save
 	      var pages = state.pages;
 	      var pageIndex = state.pageIndex;
 
@@ -4237,10 +4302,12 @@
 	      return Object.assign({}, state, {
 	        pages: [].concat(_toConsumableArray(pages.slice(0, pageIndex)), [page], _toConsumableArray(pages.slice(pageIndex + 1)))
 	      });
+
 	    case types.CLOSE_FORAGER:
 	      return Object.assign({}, state, {
 	        pageIndex: 0
 	      });
+
 	    default:
 	      return state;
 	  }
@@ -4264,9 +4331,11 @@
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 	/*
-	 * reducer for the selector. Never create a new selector, always just mutate
-	 * the current one so that the changes are reflected in the page that contains
-	 * the selector.
+	 * selector
+	 * ---------
+	 *
+	 * Never create a new selector, always just mutate the current one so that
+	 * the changes are reflected in the page that contains the selector.
 	 */
 	function selector(state, action) {
 	  switch (action.type) {
@@ -4308,6 +4377,12 @@
 
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
+	/* 
+	 * preview
+	 * -------
+	 *
+	 * preview modal is shown when true, hidden when false
+	 */
 	function preview() {
 	  var state = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 	  var action = arguments[1];
@@ -4431,13 +4506,6 @@
 	var _helpers = __webpack_require__(27);
 
 	/*
-	 * TODO: this will load pages and options from and save them to
-	 * chrome.storage.local
-	 * Pages are saved on a hostname basis, while options are global.
-	 *
-	 */
-
-	/*
 	 * any time that the page is updated, the new value should be saved
 	 */
 	var chromeSave = exports.chromeSave = function chromeSave(pages) {
@@ -4479,12 +4547,6 @@
 	  });
 	};
 
-	// takes a data object to be uploaded and passes it to the background page to handle
-	function chromeUpload(data) {
-	  data.page = JSON.stringify(cleanPage(data.page));
-	  chrome.runtime.sendMessage({ type: 'upload', data: data });
-	}
-
 	function chromeSync(domain) {
 	  chrome.runtime.sendMessage({ type: 'sync', domain: domain }, function (response) {
 	    if (response.error) {
@@ -4493,6 +4555,10 @@
 	    controller.finishSync(response.pages);
 	  });
 	}
+
+	/*
+	 * TODO: this will load options from and save them to chrome.storage.local
+	 */
 
 /***/ }
 /******/ ]);

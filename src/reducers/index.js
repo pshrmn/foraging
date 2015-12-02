@@ -1,9 +1,3 @@
-/*import * as types from "../constants/ActionTypes";
-  case types.REMOVE_RULE:
-    return Object.assign({}, state, {
-
-    });
-*/
 import frame from "./frame";
 import show from "./show";
 import page from "./page";

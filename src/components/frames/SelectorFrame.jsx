@@ -4,13 +4,13 @@ import { PosButton, NegButton } from "../Inputs";
 
 export default React.createClass({
   addChild: function(event) {
-    this.props.actions.showElementFrame();
+    this.props.showElementFrame();
   },
   addRule: function(event) {
-    this.props.actions.showRuleFrame();
+    this.props.showRuleFrame();
   },
   remove: function(event) {
-    this.props.actions.removeSelector(this.props.selector.id);
+    this.props.removeSelector(this.props.selector.id);
   },
   render: function() {
     if ( this.props.selector === undefined ) {
@@ -37,7 +37,7 @@ export default React.createClass({
             Captures: {description}
           </div>
           <RuleList rules={rules}
-                    actions={this.props.actions} />
+                    remove={this.props.removeRule} />
         </div>
         <div className="buttons">
           <PosButton text="Add Child"
@@ -55,10 +55,9 @@ export default React.createClass({
 
 let RuleList = React.createClass({
   render: function() {
-    let { rules, actions } = this.props;
-    let { removeRule } = actions;
+    let { rules, remove } = this.props;
     let list = rules.length ? rules.map((r,i) => {
-      return <Rule key={i} index={i} remove={removeRule} {...r}/>;
+      return <Rule key={i} index={i} remove={remove} {...r}/>;
     }) : (<li>No Rules</li>);
     return (
       <div className="rules">

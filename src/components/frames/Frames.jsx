@@ -8,6 +8,19 @@ import SpecFrame from "./SpecFrame";
 
 import { highlight, unhighlight } from "../../helpers";
 
+/*
+ * Frames
+ * ------
+ *
+ * The main way for a user to interact with Forager is through the Frames. There
+ * are a number of different frames associated with different states of viewing
+ * and creating selectors.
+ *
+ * Through its props, each frame is given any pertinent actions that, relevant
+ * parts of the current selector (referred to as the parent when creating a 
+ * new seletcor), and the destructured parts of a data object containing any
+ * extra data for that frame.
+ */
 export default React.createClass({
   cssSelector: "current-selector",
   _selectFrame: function() {
@@ -15,24 +28,29 @@ export default React.createClass({
     switch ( frame.name ) {
     case "selector":
       return <SelectorFrame selector={selector}
-                            data={frame.data}
-                            actions={actions} />
+                            showElementFrame={actions.showElementFrame}
+                            showRuleFrame={actions.showRuleFrame}
+                            removeSelector={actions.removeSelector}
+                            removeRule={actions.removeRule} />
     case "rule":
       return <RuleFrame selector={selector}
-                        data={frame.data}
-                        actions={actions} />
+                        save={actions.saveRule}
+                        cancel={actions.showSelectorFrame} />
     case "element":
-      return <ElementFrame selector={selector}
-                           data={frame.data}
-                           actions={actions} />
+      return <ElementFrame parentElements={selector.elements}
+                           next={actions.showPartsFrame}
+                           cancel={actions.showSelectorFrame} />
     case "parts":
-      return <PartsFrame selector={selector}
-                         data={frame.data}
-                         actions={actions} />
+      return <PartsFrame parentElements={selector.elements}
+                         next={actions.showSpecFrame}
+                         cancel={actions.showSelectorFrame}
+                         {...frame.data} />
     case "spec":
-      return <SpecFrame selector={selector}
-                        data={frame.data}
-                        actions={actions} />
+      return <SpecFrame parentElements={selector.elements}
+                        parentID={selector.id}
+                        save={actions.saveSelector}
+                        cancel={actions.showSelectorFrame}
+                        {...frame.data} />
     default:
       return null;
     }

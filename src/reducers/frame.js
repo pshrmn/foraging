@@ -1,5 +1,12 @@
 import * as types from "../constants/ActionTypes";
 
+/*
+ * frame
+ * -----
+ *
+ * Which frame to show. In the majority of cases, the "selector" frame should
+ * be shown.
+ */
 export default function frame(state = "", action) {
   switch ( action.type ) {
   case types.LOAD_PAGE:

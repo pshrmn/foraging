@@ -1,9 +1,11 @@
 import * as types from "../constants/ActionTypes";
 
 /*
- * reducer for the selector. Never create a new selector, always just mutate
- * the current one so that the changes are reflected in the page that contains
- * the selector.
+ * selector
+ * ---------
+ *
+ * Never create a new selector, always just mutate the current one so that
+ * the changes are reflected in the page that contains the selector.
  */
 export default function selector(state, action) {
   switch ( action.type ) {

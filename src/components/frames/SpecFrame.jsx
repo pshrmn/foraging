@@ -15,13 +15,14 @@ export default React.createClass({
   saveHandler: function(event) {
     event.preventDefault();
     let { type, value, optional } = this.state;
+    let { css, parentElements } = this.props;
     // all value must be set
     if ( type === "all" && value === "" ) {
       return;
     }
-    let sel = createSelector(this.props.data.css, type, value, optional);
-    // generate the list of elements right away
-    sel.elements = select(this.props.selector.elements, sel.selector, sel.spec);
+    let sel = createSelector(css, type, value, optional);
+    // generate the list of elements for the new selector
+    sel.elements = select(parentElements, sel.selector, sel.spec);
     // if saving a selector that selects "select" elements, add a child selector
     // to match option elements
     if ( allSelect(sel.elements) ) {
@@ -30,11 +31,11 @@ export default React.createClass({
       sel.children.push(optionsChild);
     }
     // send the new selector and the parent
-    this.props.actions.saveSelector(sel, this.props.selector.id);
+    this.props.save(sel, this.props.parentID);
   },
   cancelHandler: function(event) {
     event.preventDefault();
-    this.props.actions.showSelectorFrame();
+    this.props.cancel();
   },
   setSpec: function(type, value) {
     this.setState({
@@ -48,9 +49,8 @@ export default React.createClass({
     });
   },
   render: function() {
-    let { selector, data } = this.props;
-    let { css } = data;
-    let elementCount = count(selector.elements, css);
+    let { parentElements, css } = this.props;
+    let elementCount = count(parentElements, css);
     return (
       <div className="frame spec-form">
         <div className="info">
@@ -75,8 +75,8 @@ export default React.createClass({
     );
   },
   componentWillMount: function() {
-    let parentElements = this.props.selector.elements;
-    let cssSelector = this.props.data.css;
+    let parentElements = this.props.parentElements;
+    let cssSelector = this.props.css;
     let spec = {
       type: this.state.type,
       value: this.state.value
@@ -85,8 +85,8 @@ export default React.createClass({
     highlight(elements, this.highlight);
   },
   componentWillUpdate: function(nextProps, nextState) {
-    let parentElements = nextProps.selector.elements;
-    let cssSelector = nextProps.data.css;
+    let parentElements = nextProps.parentElements;
+    let cssSelector = nextProps.css;
     let spec = {
       type: nextState.type,
       value: nextState.value

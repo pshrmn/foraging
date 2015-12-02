@@ -11,44 +11,43 @@ export default React.createClass({
       eleCount: 0
     };
   },
-  saveHandler: function(event) {
+  nextHandler: function(event) {
     event.preventDefault();
     let { parts } = this.state;
-    let selector = parts.reduce((str, curr) => {
-      if ( curr.checked ) {
-        str += curr.name;
-      }
-      return str;
-    }, "");
+    let selector = this.joinParts(parts);
     if ( selector !== "" ) {
-      this.props.actions.showSpecFrame(selector);
+      this.props.next(selector);
     }
   },
   cancelHander: function(event) {
     event.preventDefault();
-    this.props.actions.showSelectorFrame();
+    this.props.cancel();
   },
   toggleRadio: function(event) {
     // don't prevent default
     let index = event.target.value;
     let parts = this.state.parts;
     parts[index].checked = !parts[index].checked;
-    let fullSelector = parts.reduce((str, curr) => {
-      if ( curr.checked ) {
-        str += curr.name;
-      }
-      return str;
-    }, "");
+    let fullSelector = this.joinParts(parts);
 
-    let eleCount = fullSelector === "" ? 0 : count(this.props.selector.elements, fullSelector);
+    let eleCount = fullSelector === "" ? 0 : count(this.props.parentElements, fullSelector);
     this._setupHighlights(fullSelector);
     this.setState({
       parts: parts,
       eleCount: eleCount
     });
   },
+  joinParts: parts => {
+    return parts.reduce((str, curr) => {
+      if ( curr.checked ) {
+        str += curr.name;
+      }
+      return str;
+    }, "");
+  },
   componentWillMount: function() {
-    let names = this.props.data.parts;
+    let names = this.props.parts;
+    // by default, each css selector part should be checked
     let parts = names.map(name => {
       return {
         name: name,
@@ -56,7 +55,7 @@ export default React.createClass({
       }
     });
     let fullSelector = names.join("");
-    let eleCount = count(this.props.selector.elements, fullSelector);
+    let eleCount = count(this.props.parentElements, fullSelector);
     this._setupHighlights(fullSelector);
     this.setState({
       parts: parts,
@@ -83,14 +82,14 @@ export default React.createClass({
     return (
       <div className="frame parts-form">
         <div className="info">
-          <h3>Parts:</h3>
+          <h3>Select Relevant Parts of the CSS selector</h3>
           <div className="choices">
             {opts}
           </div>
           <h5>Count: {this.state.eleCount}</h5>
         </div>
         <div className="buttons">
-          <PosButton text="Save" click={this.saveHandler} />
+          <PosButton text="Next" click={this.nextHandler} />
           <NegButton text="Cancel" click={this.cancelHander} />
         </div>
       </div>
@@ -102,7 +101,7 @@ export default React.createClass({
   _setupHighlights: function(cssSelector) {
     unhighlight(this.previewClass);
     if ( cssSelector !== "" ) {
-      let elements = select(this.props.selector.elements, cssSelector);
+      let elements = select(this.props.parentElements, cssSelector);
       highlight(elements, this.previewClass);
     }
   }

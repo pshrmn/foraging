@@ -32,7 +32,7 @@ export default React.createClass({
     let { name, type, attr } = this.state;
     // basic validation
     if ( name !== "" && attr !== "" ) {
-      this.props.actions.saveRule({
+      this.props.save({
         name: name,
         type: type,
         attr: attr
@@ -41,18 +41,18 @@ export default React.createClass({
   },
   cancelHandler: function(event) {
     event.preventDefault();
-    this.props.actions.showSelectorFrame();
+    this.props.cancel();
   },
   render: function() {
-    let { selector, actions } = this.props;
-
+    let { selector } = this.props;
+    let { name, type, attr } = this.state;
     let typeRadios = ["string", "int", "float"].map((t,i) => {
       return (
         <label key={i}>
           {t}: <input type="radio"
                       name="rule-type"
                       value={t}
-                      checked={t === this.state.type}
+                      checked={t === type}
                       onChange={this.setType} />
         </label>
       );
@@ -64,7 +64,7 @@ export default React.createClass({
           <div>
             <label>
               Name: <input type="text"
-                     value={this.state.name}
+                     value={name}
                      onChange={this.setName} />
             </label>
           </div>
@@ -72,7 +72,7 @@ export default React.createClass({
             Type: {typeRadios}
           </div>
           <AttrChoices elements={selector.elements}
-                       attr={this.state.attr}
+                       attr={attr}
                        setAttr={this.setAttr} />
         </div>
         <div className="buttons">

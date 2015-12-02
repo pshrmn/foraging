@@ -1,13 +1,6 @@
 import { select, setupPage, clean } from "./helpers";
 
 /*
- * TODO: this will load pages and options from and save them to
- * chrome.storage.local
- * Pages are saved on a hostname basis, while options are global.
- *
- */
-
-/*
  * any time that the page is updated, the new value should be saved
  */
 export const chromeSave = pages => {
@@ -43,12 +36,6 @@ export const chromeLoad = callback => {
   });
 };
 
-// takes a data object to be uploaded and passes it to the background page to handle
-function chromeUpload(data) {
-  data.page = JSON.stringify(cleanPage(data.page));
-  chrome.runtime.sendMessage({type: 'upload', data: data});
-}
-
 function chromeSync(domain) {
   chrome.runtime.sendMessage({type: 'sync', domain: domain}, function(response){
     if ( response.error ) {
@@ -57,3 +44,8 @@ function chromeSync(domain) {
     controller.finishSync(response.pages);
   });
 }
+
+/*
+ * TODO: this will load options from and save them to chrome.storage.local
+ */
+

@@ -49,26 +49,25 @@ export default React.createClass({
   },
   setRadio: function(i) {
     let selector = this.state.selectors[i].join("");
-    let eleCount = count(this.props.selector.elements, selector);
+    let eleCount = count(this.props.parentElements, selector);
     this.setState({
       checked: i,
       eleCount: eleCount
     });
   },
-  saveHandler: function(event) {
+  nextHandler: function(event) {
     event.preventDefault();
     let { checked, selectors } = this.state;
     let s = selectors[checked];
     if ( checked !== undefined && s !== undefined ) {
-      this.props.actions.showPartsFrame(s);
+      this.props.next(s);
     }
   },
   cancelHandler: function(event) {
     event.preventDefault();
-    this.props.actions.showSelectorFrame();
+    this.props.cancel();
   },
   render: function() {
-    let { selector, data } = this.props;
     let { selectors, checked, eleCount } = this.state;
     let opts = selectors.map((s, i) => {
       return <SelectorRadio key={i}
@@ -80,14 +79,14 @@ export default React.createClass({
     return (
       <div className="frame element-form">
         <div className="info">
-          <h3>Selectors:</h3>
+          <h3>Select Relevant Element(s)</h3>
           <div className="choices">
             {opts}
           </div>
           <h5>Count: {eleCount}</h5>
         </div>
         <div className="buttons">
-          <PosButton text="Save" click={this.saveHandler} />
+          <PosButton text="Next" click={this.nextHandler} />
           <NegButton text="Cancel" click={this.cancelHandler} />
         </div>
       </div>
@@ -97,10 +96,10 @@ export default React.createClass({
    * below here are the functions for interacting with the non-Forager part of the page
    */
   componentWillMount: function() {
-    this._setupPageEvents(this.props.selector.elements);
+    this._setupPageEvents(this.props.parentElements);
   },
   componentWillReceiveNewProps: function(nextProps) {
-    this._setupPageEvents(nextProps.selector.elements);
+    this._setupPageEvents(nextProps.parentElements);
   },
   /*
    * when a selector possibility is chosen, add a class to all matching elements
@@ -112,7 +111,7 @@ export default React.createClass({
     let clickedSelector = nextState.selectors[nextState.checked];
     if ( clickedSelector !== undefined ) {
       let fullSelector = clickedSelector.join("");
-      let elements = select(nextProps.selector.elements, fullSelector);
+      let elements = select(nextProps.parentElements, fullSelector);
       highlight(elements, this.currentSelector);
     }
   },
