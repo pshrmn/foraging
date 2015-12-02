@@ -98,7 +98,6 @@ export const closeForager = () => {
 /*
  * SELECTOR/RULE ACTIONS
  */
-
 export const selectSelector = selector => {
   return {
     type: types.SELECT_SELECTOR,
@@ -110,6 +109,12 @@ export const saveSelector = selector => {
   return {
     type: types.SAVE_SELECTOR,
     selector: selector
+  };
+};
+
+export const renameSelector =  () => {
+  return {
+    type: types.RENAME_SELECTOR
   };
 };
 

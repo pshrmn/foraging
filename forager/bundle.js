@@ -1468,7 +1468,6 @@
 	    if (!show) {
 	      classNames.push("hidden");
 	    }
-	    console.log(selector);
 	    var previewModal = preview.visible ? _react2.default.createElement(_Preview2.default, { page: page, close: actions.hidePreview }) : null;
 
 	    return _react2.default.createElement(
@@ -1538,7 +1537,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.removeRule = exports.saveRule = exports.removeSelector = exports.saveSelector = exports.selectSelector = exports.closeForager = exports.showSpecFrame = exports.showPartsFrame = exports.showElementFrame = exports.showRuleFrame = exports.showSelectorFrame = exports.hidePreview = exports.showPreview = exports.uploadPage = exports.renamePage = exports.removePage = exports.addPage = exports.loadPage = undefined;
+	exports.removeRule = exports.saveRule = exports.removeSelector = exports.renameSelector = exports.saveSelector = exports.selectSelector = exports.closeForager = exports.showSpecFrame = exports.showPartsFrame = exports.showElementFrame = exports.showRuleFrame = exports.showSelectorFrame = exports.hidePreview = exports.showPreview = exports.uploadPage = exports.renamePage = exports.removePage = exports.addPage = exports.loadPage = undefined;
 
 	var _ActionTypes = __webpack_require__(24);
 
@@ -1643,7 +1642,6 @@
 	/*
 	 * SELECTOR/RULE ACTIONS
 	 */
-
 	var selectSelector = exports.selectSelector = function selectSelector(selector) {
 	  return {
 	    type: types.SELECT_SELECTOR,
@@ -1655,6 +1653,12 @@
 	  return {
 	    type: types.SAVE_SELECTOR,
 	    selector: selector
+	  };
+	};
+
+	var renameSelector = exports.renameSelector = function renameSelector() {
+	  return {
+	    type: types.RENAME_SELECTOR
 	  };
 	};
 
@@ -1707,6 +1711,7 @@
 	var SELECT_SELECTOR = exports.SELECT_SELECTOR = "SELECT_SELECTOR";
 	var SAVE_SELECTOR = exports.SAVE_SELECTOR = "SAVE_SELECTOR";
 	var REMOVE_SELECTOR = exports.REMOVE_SELECTOR = "REMOVE_SELECTOR";
+	var RENAME_SELECTOR = exports.RENAME_SELECTOR = "RENAME_SELECTOR";
 	var SAVE_RULE = exports.SAVE_RULE = "SAVE_RULE";
 	var REMOVE_RULE = exports.REMOVE_RULE = "REMOVE_RULE";
 
@@ -2637,8 +2642,9 @@
 	      case "selector":
 	        return _react2.default.createElement(_SelectorFrame2.default, { selector: selector,
 	          createSelector: actions.showElementFrame,
-	          createRule: actions.showRuleFrame,
 	          removeSelector: actions.removeSelector,
+	          renameSelector: actions.renameSelector,
+	          createRule: actions.showRuleFrame,
 	          removeRule: actions.removeRule });
 	      case "rule":
 	        return _react2.default.createElement(_RuleFrame2.default, { selector: selector,
@@ -2730,6 +2736,14 @@
 	    }
 	    this.props.removeSelector();
 	  },
+	  rename: function rename(event) {
+	    var newName = window.prompt("New name to save selector's array as:");
+	    if (newName === null || newName === "") {
+	      return;
+	    }
+	    this.props.selector.spec.value = newName;
+	    this.props.renameSelector();
+	  },
 	  render: function render() {
 	    if (this.props.selector === undefined) {
 	      return null;
@@ -2749,6 +2763,7 @@
 	    } else if (type === "all") {
 	      description = "all elements, stores them as \"" + value + "\"";
 	    }
+	    var renameButton = type === "all" ? _react2.default.createElement(_Inputs.NeutralButton, { text: "Rename", click: this.rename }) : null;
 	    // include spaces since this is text
 	    var optionalText = optional ? " (optional)" : "";
 	    return _react2.default.createElement(
@@ -2787,7 +2802,8 @@
 	          click: this.addRule }),
 	        _react2.default.createElement(_Inputs.NegButton, { text: "Remove",
 	          title: "Remove Selector",
-	          click: this.remove })
+	          click: this.remove }),
+	        renameButton
 	      )
 	    );
 	  }
@@ -4208,6 +4224,7 @@
 	     */
 	    case types.SAVE_SELECTOR:
 	    case types.REMOVE_SELECTOR:
+	    case types.RENAME_SELECTOR:
 	    case types.SAVE_RULE:
 	    case types.REMOVE_RULE:
 	      var pages = state.pages;

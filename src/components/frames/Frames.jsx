@@ -29,8 +29,9 @@ export default React.createClass({
     case "selector":
       return <SelectorFrame selector={selector}
                             createSelector={actions.showElementFrame}
-                            createRule={actions.showRuleFrame}
                             removeSelector={actions.removeSelector}
+                            renameSelector={actions.renameSelector} 
+                            createRule={actions.showRuleFrame}
                             removeRule={actions.removeRule} />
     case "rule":
       return <RuleFrame selector={selector}

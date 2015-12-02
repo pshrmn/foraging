@@ -1,6 +1,6 @@
 import React from "react";
 
-import { PosButton, NegButton } from "../Inputs";
+import { PosButton, NegButton, NeutralButton } from "../Inputs";
 
 export default React.createClass({
   addChild: function(event) {
@@ -23,6 +23,14 @@ export default React.createClass({
     }
     this.props.removeSelector();
   },
+  rename: function(event) {
+    let newName = window.prompt("New name to save selector's array as:");
+    if ( newName === null || newName === "" ) {
+      return;
+    }
+    this.props.selector.spec.value = newName;
+    this.props.renameSelector();
+  },
   render: function() {
     if ( this.props.selector === undefined ) {
       return null;
@@ -35,7 +43,9 @@ export default React.createClass({
       description = `element at index ${value}`;
     } else if ( type === "all" ) {
       description = `all elements, stores them as "${value}"`;
+      
     }
+    let renameButton = type === "all" ? <NeutralButton text="Rename" click={this.rename} /> : null;
     // include spaces since this is text
     let optionalText = optional ? " (optional)" : "";
     return (
@@ -58,6 +68,7 @@ export default React.createClass({
           <NegButton text="Remove"
                      title="Remove Selector"
                      click={this.remove} />
+          {renameButton}
         </div>
       </div>
     );

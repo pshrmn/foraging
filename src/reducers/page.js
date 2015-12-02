@@ -81,6 +81,7 @@ export default function page(state = {}, action) {
    */
   case types.SAVE_SELECTOR:
   case types.REMOVE_SELECTOR:
+  case types.RENAME_SELECTOR:
   case types.SAVE_RULE:
   case types.REMOVE_RULE:
     var { pages, pageIndex } = state;

@@ -18,5 +18,6 @@ export const SHOW_FORAGER = "SHOW_FORAGER";
 export const SELECT_SELECTOR = "SELECT_SELECTOR";
 export const SAVE_SELECTOR = "SAVE_SELECTOR";
 export const REMOVE_SELECTOR = "REMOVE_SELECTOR";
+export const RENAME_SELECTOR = "RENAME_SELECTOR";
 export const SAVE_RULE = "SAVE_RULE";
 export const REMOVE_RULE = "REMOVE_RULE";
