@@ -70,79 +70,17 @@ export default function page(state = {}, action) {
     });
 
   /*
-   * find the current selector in the page and add the selector being saved
-   * to its children array
+   * all of the updating is done in the components, which is not very redux-y,
+   * but since the data is tree-like and the tree's nodes are passed by
+   * reference throughout the app, it is simpler to do that than to keep ids
+   * on the nodes and make changes in here. Since the changes have already been
+   * made, all this does is create a new array of pages to trigger an update
+   * when adding a rule to or removing a rule from a selector so that the UI
+   * can reflect 
+   *
    */
   case types.SAVE_SELECTOR:
-    var { pages, pageIndex } = state;
-    var page = pages[pageIndex];
-    var { selector, parentID } = action;
-
-    // assign the id of the new selector
-    selector.id = page.nextID++;
-    page.nextID++
-    // and assign the id of the options selector if there is one
-    if ( selector.children.length !== 0 ) {
-      selector.children.forEach(child => {
-        child.id = page.nextID++;
-      });
-    }
-    // find the parent and add the new selector to its children array
-    var appendTo = s => {
-      if ( s.id === parentID ) {
-        s.children.push(selector);
-        return true;
-      } else {
-        let found = s.children.some(child => {
-          return appendTo(child);
-        });
-        return found;
-      }
-    }
-    appendTo(page);
-    return Object.assign({}, state, {
-      pages: [...pages.slice(0, pageIndex), page, ...pages.slice(pageIndex+1)]
-    });
-
-  /*
-   * filter out the child selector being remove from the parent
-   */
   case types.REMOVE_SELECTOR:
-    var { pages, pageIndex } = state;
-    var page = pages[pageIndex];
-
-    var removeFrom = s => {
-      let count = s.children.length;
-      s.children = s.children.filter(child => {
-        return child.id !== action.selectorID;
-      });
-      // if the new length is less than the old, we know that
-      // the selector was filtered out and can stop, otherwise
-      // keep checking children
-      return s.children.length < count ? true : (
-        s.children.some(child => {
-          return removeFrom(child);
-        })
-      );
-    }
-
-    if ( action.selectorID === 0 ) {
-      // special case for the root body selector,
-      // just replace the page with a new one
-      page.children = [];
-      page.rules = [];
-    } else {
-      removeFrom(page);
-    }
-
-    return Object.assign({}, state, {
-      pages: [...pages.slice(0, pageIndex), page, ...pages.slice(pageIndex+1)]
-    });
-
-  /*
-   * create a new array of pages to trigger an update when adding a rule to or
-   * removing a rule from a selector
-   */
   case types.SAVE_RULE:
   case types.REMOVE_RULE:
     var { pages, pageIndex } = state;

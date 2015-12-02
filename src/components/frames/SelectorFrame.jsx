@@ -4,20 +4,31 @@ import { PosButton, NegButton } from "../Inputs";
 
 export default React.createClass({
   addChild: function(event) {
-    this.props.showElementFrame();
+    this.props.createSelector();
   },
   addRule: function(event) {
-    this.props.showRuleFrame();
+    this.props.createRule();
   },
   remove: function(event) {
-    this.props.removeSelector(this.props.selector.id);
+    let { selector } = this.props;
+    let parent = selector.parent;
+    if ( parent === null ) {
+      // root "body" selector
+      selector.children = [];
+      selector.rules = [];
+    } else {
+      parent.children = parent.children.filter(child => {
+        return child !== selector;
+      });
+    }
+    this.props.removeSelector();
   },
   render: function() {
     if ( this.props.selector === undefined ) {
       return null;
     }
 
-    let { selector, children, rules, spec, optional } = this.props.selector;
+    let { selector, rules, spec, optional } = this.props.selector;
     let { type, value } = spec;
     let description = "";
     if ( type === "single" ) {

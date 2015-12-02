@@ -64,7 +64,7 @@ export default React.createClass({
 
     let selectors = nodes.map((n, i) => {
       let current = false;
-      if ( selector && n.id === selector.id ) {
+      if ( selector && n.original === selector ) {
         current = true;
       }
       return <Node key={i} 
@@ -102,7 +102,7 @@ let Node = React.createClass({
   hoverClass: "saved-preview",
   handleClick: function(event) {
     event.preventDefault();
-    this.props.select(this.props.id);
+    this.props.select(this.props.original);
   },
   handleMouseover: function(event) {
     highlight(this.props.elements, this.hoverClass);
@@ -127,11 +127,11 @@ let Node = React.createClass({
     return abbreviate(text, 10);
   },
   render: function() {
-    let { rules, children, current, depth, active } = this.props;
+    let { current, depth, hasRules, children, active } = this.props;
     let hasChildren = children && children.length;
-    let hasRules = rules && rules.length;
+    let empty = !hasRules && !hasChildren;
     let text = this.specText();
-    let marker = rules && rules.length ? (
+    let marker = hasRules ? (
       <rect width="6" height="6" x="-3" y="-3"></rect>
     ) : (
       <circle r="3"></circle>
@@ -140,7 +140,7 @@ let Node = React.createClass({
     if ( current ) {
       classNames.push("current");
     }
-    if ( !hasRules && !hasChildren ) {
+    if ( empty ) {
       classNames.push("empty");
     }
     // only apply events when the node is "active"

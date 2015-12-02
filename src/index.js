@@ -8,7 +8,6 @@ import Forager from "./containers/Forager";
 import reducer from './reducers';
 
 import { SHOW_FORAGER } from "./constants/ActionTypes";
-import findSelector from "./middleware/findSelector";
 import chromeBackground from "./middleware/chromeBackground";
 
 import { chromeSave, chromeLoad } from "./chrome";
@@ -40,7 +39,6 @@ if ( !holder ) {
       }
     };
     let store = applyMiddleware(
-        findSelector,
         chromeBackground
       )(createStore)(reducer, initialState);
 

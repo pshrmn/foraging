@@ -15,23 +15,25 @@ export default React.createClass({
   saveHandler: function(event) {
     event.preventDefault();
     let { type, value, optional } = this.state;
-    let { css, parentElements } = this.props;
+    let { css, parent } = this.props;
     // all value must be set
     if ( type === "all" && value === "" ) {
       return;
     }
     let sel = createSelector(css, type, value, optional);
     // generate the list of elements for the new selector
-    sel.elements = select(parentElements, sel.selector, sel.spec);
+    sel.elements = select(parent.elements, sel.selector, sel.spec);
+    sel.parent = parent;
+    parent.children.push(sel);
     // if saving a selector that selects "select" elements, add a child selector
     // to match option elements
     if ( allSelect(sel.elements) ) {
       let optionsChild = createSelector("option", "all", "option", false);
       optionsChild.elements = select(sel.elements, optionsChild.selector, optionsChild.spec);
+      optionsChild.parent = sel;
       sel.children.push(optionsChild);
     }
-    // send the new selector and the parent
-    this.props.save(sel, this.props.parentID);
+    this.props.save(sel);
   },
   cancelHandler: function(event) {
     event.preventDefault();
@@ -49,8 +51,8 @@ export default React.createClass({
     });
   },
   render: function() {
-    let { parentElements, css } = this.props;
-    let elementCount = count(parentElements, css);
+    let { parent, css } = this.props;
+    let elementCount = count(parent.elements, css);
     return (
       <div className="frame spec-form">
         <div className="info">
@@ -75,24 +77,22 @@ export default React.createClass({
     );
   },
   componentWillMount: function() {
-    let parentElements = this.props.parentElements;
-    let cssSelector = this.props.css;
-    let spec = {
+    let elements = select(
+      this.props.parent.elements,
+      this.props.css, {
       type: this.state.type,
       value: this.state.value
-    };
-    let elements = select(parentElements, cssSelector, spec);
+    });
     highlight(elements, this.highlight);
   },
   componentWillUpdate: function(nextProps, nextState) {
-    let parentElements = nextProps.parentElements;
-    let cssSelector = nextProps.css;
-    let spec = {
+    unhighlight(this.highlight);
+    let elements = select(
+      nextProps.parent.elements,
+      nextProps.css, {
       type: nextState.type,
       value: nextState.value
-    };
-    unhighlight(this.highlight);
-    let elements = select(parentElements, cssSelector, spec);
+    });
     highlight(elements, this.highlight);
   },
   componentWillUnmount: function() {

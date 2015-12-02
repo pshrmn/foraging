@@ -66,15 +66,11 @@
 
 	var _ActionTypes = __webpack_require__(24);
 
-	var _findSelector = __webpack_require__(49);
-
-	var _findSelector2 = _interopRequireDefault(_findSelector);
-
-	var _chromeBackground = __webpack_require__(50);
+	var _chromeBackground = __webpack_require__(49);
 
 	var _chromeBackground2 = _interopRequireDefault(_chromeBackground);
 
-	var _chrome = __webpack_require__(51);
+	var _chrome = __webpack_require__(50);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -106,7 +102,7 @@
 	        visible: false
 	      }
 	    };
-	    var store = (0, _redux.applyMiddleware)(_findSelector2.default, _chromeBackground2.default)(_redux.createStore)(_reducers2.default, initialState);
+	    var store = (0, _redux.applyMiddleware)(_chromeBackground2.default)(_redux.createStore)(_reducers2.default, initialState);
 
 	    /*
 	     * subscribe to the store and save the pages any time that they change
@@ -1472,7 +1468,7 @@
 	    if (!show) {
 	      classNames.push("hidden");
 	    }
-
+	    console.log(selector);
 	    var previewModal = preview.visible ? _react2.default.createElement(_Preview2.default, { page: page, close: actions.hidePreview }) : null;
 
 	    return _react2.default.createElement(
@@ -1648,25 +1644,23 @@
 	 * SELECTOR/RULE ACTIONS
 	 */
 
-	var selectSelector = exports.selectSelector = function selectSelector(selectorID) {
+	var selectSelector = exports.selectSelector = function selectSelector(selector) {
 	  return {
 	    type: types.SELECT_SELECTOR,
-	    selectorID: selectorID
+	    selector: selector
 	  };
 	};
 
-	var saveSelector = exports.saveSelector = function saveSelector(selector, parentID) {
+	var saveSelector = exports.saveSelector = function saveSelector(selector) {
 	  return {
 	    type: types.SAVE_SELECTOR,
-	    selector: selector,
-	    parentID: parentID
+	    selector: selector
 	  };
 	};
 
-	var removeSelector = exports.removeSelector = function removeSelector(selectorID) {
+	var removeSelector = exports.removeSelector = function removeSelector() {
 	  return {
-	    type: types.REMOVE_SELECTOR,
-	    selectorID: selectorID
+	    type: types.REMOVE_SELECTOR
 	  };
 	};
 
@@ -2262,7 +2256,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.setupPage = exports.addChild = exports.clean = exports.clone = exports.createSelector = exports.createPage = undefined;
+	exports.setupPage = exports.clean = exports.clone = exports.createSelector = exports.createPage = undefined;
 
 	var _selection = __webpack_require__(32);
 
@@ -2302,17 +2296,14 @@
 	 */
 	var clone = exports.clone = function clone(selector) {
 	  return Object.assign({}, {
-	    id: selector.id,
 	    selector: selector.selector,
-	    spec: Object.assign({}, selector.spec),
-	    optional: selector.optional,
+	    spec: selector.spec,
 	    children: selector.children.map(function (child) {
 	      return clone(child);
 	    }),
-	    rules: selector.rules.map(function (r) {
-	      return Object.assign({}, r);
-	    }),
-	    elements: selector.elements || []
+	    hasRules: selector.rules.length,
+	    elements: selector.elements || [],
+	    original: selector
 	  });
 	};
 
@@ -2337,22 +2328,6 @@
 	};
 
 	/*
-	 * iterate over the tree looking for selector matching id, and when found
-	 * append the newChild to its array of children
-	 */
-	var addChild = exports.addChild = function addChild(selector, id, newChild) {
-	  if (selector.id === id) {
-	    selector.children.push(newChild);
-	    return true;
-	  } else {
-	    var found = selector.children.some(function (child) {
-	      addChild(child, id, newChild);
-	    });
-	    return found;
-	  }
-	};
-
-	/*
 	 * set an id on each selector and determine the elements that each selector matches
 	 */
 	var setupPage = exports.setupPage = function setupPage(page) {
@@ -2360,16 +2335,16 @@
 	    return;
 	  }
 	  var id = 0;
-	  var setup = function setup(selector, parentElements) {
+	  var setup = function setup(selector, parentElements, parent) {
 	    selector.id = id++;
+	    selector.parent = parent;
 	    selector.elements = (0, _selection.select)(parentElements, selector.selector, selector.spec);
 	    selector.children.forEach(function (child) {
-	      setup(child, selector.elements);
+	      setup(child, selector.elements, selector);
 	    });
 	  };
 
-	  setup(page, [document]);
-	  page.nextID = id;
+	  setup(page, [document], null);
 	};
 
 /***/ },
@@ -2661,8 +2636,8 @@
 	    switch (frame.name) {
 	      case "selector":
 	        return _react2.default.createElement(_SelectorFrame2.default, { selector: selector,
-	          showElementFrame: actions.showElementFrame,
-	          showRuleFrame: actions.showRuleFrame,
+	          createSelector: actions.showElementFrame,
+	          createRule: actions.showRuleFrame,
 	          removeSelector: actions.removeSelector,
 	          removeRule: actions.removeRule });
 	      case "rule":
@@ -2679,8 +2654,7 @@
 	          cancel: actions.showSelectorFrame
 	        }, frame.data));
 	      case "spec":
-	        return _react2.default.createElement(_SpecFrame2.default, _extends({ parentElements: selector.elements,
-	          parentID: selector.id,
+	        return _react2.default.createElement(_SpecFrame2.default, _extends({ parent: selector,
 	          save: actions.saveSelector,
 	          cancel: actions.showSelectorFrame
 	        }, frame.data));
@@ -2736,13 +2710,25 @@
 	  displayName: "SelectorFrame",
 
 	  addChild: function addChild(event) {
-	    this.props.showElementFrame();
+	    this.props.createSelector();
 	  },
 	  addRule: function addRule(event) {
-	    this.props.showRuleFrame();
+	    this.props.createRule();
 	  },
 	  remove: function remove(event) {
-	    this.props.removeSelector(this.props.selector.id);
+	    var selector = this.props.selector;
+
+	    var parent = selector.parent;
+	    if (parent === null) {
+	      // root "body" selector
+	      selector.children = [];
+	      selector.rules = [];
+	    } else {
+	      parent.children = parent.children.filter(function (child) {
+	        return child !== selector;
+	      });
+	    }
+	    this.props.removeSelector();
 	  },
 	  render: function render() {
 	    if (this.props.selector === undefined) {
@@ -2751,7 +2737,6 @@
 
 	    var _props$selector = this.props.selector;
 	    var selector = _props$selector.selector;
-	    var children = _props$selector.children;
 	    var rules = _props$selector.rules;
 	    var spec = _props$selector.spec;
 	    var optional = _props$selector.optional;
@@ -3466,7 +3451,7 @@
 	    var optional = _state.optional;
 	    var _props = this.props;
 	    var css = _props.css;
-	    var parentElements = _props.parentElements;
+	    var parent = _props.parent;
 	    // all value must be set
 
 	    if (type === "all" && value === "") {
@@ -3474,16 +3459,18 @@
 	    }
 	    var sel = (0, _helpers.createSelector)(css, type, value, optional);
 	    // generate the list of elements for the new selector
-	    sel.elements = (0, _helpers.select)(parentElements, sel.selector, sel.spec);
+	    sel.elements = (0, _helpers.select)(parent.elements, sel.selector, sel.spec);
+	    sel.parent = parent;
+	    parent.children.push(sel);
 	    // if saving a selector that selects "select" elements, add a child selector
 	    // to match option elements
 	    if ((0, _helpers.allSelect)(sel.elements)) {
 	      var optionsChild = (0, _helpers.createSelector)("option", "all", "option", false);
 	      optionsChild.elements = (0, _helpers.select)(sel.elements, optionsChild.selector, optionsChild.spec);
+	      optionsChild.parent = sel;
 	      sel.children.push(optionsChild);
 	    }
-	    // send the new selector and the parent
-	    this.props.save(sel, this.props.parentID);
+	    this.props.save(sel);
 	  },
 	  cancelHandler: function cancelHandler(event) {
 	    event.preventDefault();
@@ -3502,10 +3489,10 @@
 	  },
 	  render: function render() {
 	    var _props2 = this.props;
-	    var parentElements = _props2.parentElements;
+	    var parent = _props2.parent;
 	    var css = _props2.css;
 
-	    var elementCount = (0, _helpers.count)(parentElements, css);
+	    var elementCount = (0, _helpers.count)(parent.elements, css);
 	    return _react2.default.createElement(
 	      "div",
 	      { className: "frame spec-form" },
@@ -3542,24 +3529,18 @@
 	    );
 	  },
 	  componentWillMount: function componentWillMount() {
-	    var parentElements = this.props.parentElements;
-	    var cssSelector = this.props.css;
-	    var spec = {
+	    var elements = (0, _helpers.select)(this.props.parent.elements, this.props.css, {
 	      type: this.state.type,
 	      value: this.state.value
-	    };
-	    var elements = (0, _helpers.select)(parentElements, cssSelector, spec);
+	    });
 	    (0, _helpers.highlight)(elements, this.highlight);
 	  },
 	  componentWillUpdate: function componentWillUpdate(nextProps, nextState) {
-	    var parentElements = nextProps.parentElements;
-	    var cssSelector = nextProps.css;
-	    var spec = {
+	    (0, _helpers.unhighlight)(this.highlight);
+	    var elements = (0, _helpers.select)(nextProps.parent.elements, nextProps.css, {
 	      type: nextState.type,
 	      value: nextState.value
-	    };
-	    (0, _helpers.unhighlight)(this.highlight);
-	    var elements = (0, _helpers.select)(parentElements, cssSelector, spec);
+	    });
 	    (0, _helpers.highlight)(elements, this.highlight);
 	  },
 	  componentWillUnmount: function componentWillUnmount() {
@@ -3763,7 +3744,7 @@
 
 	    var selectors = nodes.map(function (n, i) {
 	      var current = false;
-	      if (selector && n.id === selector.id) {
+	      if (selector && n.original === selector) {
 	        current = true;
 	      }
 	      return _react2.default.createElement(Node, _extends({ key: i,
@@ -3811,7 +3792,7 @@
 	  hoverClass: "saved-preview",
 	  handleClick: function handleClick(event) {
 	    event.preventDefault();
-	    this.props.select(this.props.id);
+	    this.props.select(this.props.original);
 	  },
 	  handleMouseover: function handleMouseover(event) {
 	    (0, _helpers.highlight)(this.props.elements, this.hoverClass);
@@ -3840,21 +3821,21 @@
 	  },
 	  render: function render() {
 	    var _props4 = this.props;
-	    var rules = _props4.rules;
-	    var children = _props4.children;
 	    var current = _props4.current;
 	    var depth = _props4.depth;
+	    var hasRules = _props4.hasRules;
+	    var children = _props4.children;
 	    var active = _props4.active;
 
 	    var hasChildren = children && children.length;
-	    var hasRules = rules && rules.length;
+	    var empty = !hasRules && !hasChildren;
 	    var text = this.specText();
-	    var marker = rules && rules.length ? _react2.default.createElement("rect", { width: "6", height: "6", x: "-3", y: "-3" }) : _react2.default.createElement("circle", { r: "3" });
+	    var marker = hasRules ? _react2.default.createElement("rect", { width: "6", height: "6", x: "-3", y: "-3" }) : _react2.default.createElement("circle", { r: "3" });
 	    var classNames = ["node"];
 	    if (current) {
 	      classNames.push("current");
 	    }
-	    if (!hasRules && !hasChildren) {
+	    if (empty) {
 	      classNames.push("empty");
 	    }
 	    // only apply events when the node is "active"
@@ -3929,7 +3910,7 @@
 	    return _react2.default.createElement(
 	      "div",
 	      { className: "preview-holder" },
-	      _react2.default.createElement("div", { className: "preview-bg", onClick: this.clickHandler }),
+	      _react2.default.createElement("div", { className: "preview-bg", onClick: this.closeHandler }),
 	      _react2.default.createElement(
 	        "div",
 	        { className: "preview" },
@@ -4216,83 +4197,17 @@
 	      });
 
 	    /*
-	     * find the current selector in the page and add the selector being saved
-	     * to its children array
+	     * all of the updating is done in the components, which is not very redux-y,
+	     * but since the data is tree-like and the tree's nodes are passed by
+	     * reference throughout the app, it is simpler to do that than to keep ids
+	     * on the nodes and make changes in here. Since the changes have already been
+	     * made, all this does is create a new array of pages to trigger an update
+	     * when adding a rule to or removing a rule from a selector so that the UI
+	     * can reflect 
+	     *
 	     */
 	    case types.SAVE_SELECTOR:
-	      var pages = state.pages;
-	      var pageIndex = state.pageIndex;
-
-	      var page = pages[pageIndex];
-	      var selector = action.selector;
-	      var parentID = action.parentID;
-
-	      // assign the id of the new selector
-
-	      selector.id = page.nextID++;
-	      page.nextID++;
-	      // and assign the id of the options selector if there is one
-	      if (selector.children.length !== 0) {
-	        selector.children.forEach(function (child) {
-	          child.id = page.nextID++;
-	        });
-	      }
-	      // find the parent and add the new selector to its children array
-	      var appendTo = function appendTo(s) {
-	        if (s.id === parentID) {
-	          s.children.push(selector);
-	          return true;
-	        } else {
-	          var found = s.children.some(function (child) {
-	            return appendTo(child);
-	          });
-	          return found;
-	        }
-	      };
-	      appendTo(page);
-	      return Object.assign({}, state, {
-	        pages: [].concat(_toConsumableArray(pages.slice(0, pageIndex)), [page], _toConsumableArray(pages.slice(pageIndex + 1)))
-	      });
-
-	    /*
-	     * filter out the child selector being remove from the parent
-	     */
 	    case types.REMOVE_SELECTOR:
-	      var pages = state.pages;
-	      var pageIndex = state.pageIndex;
-
-	      var page = pages[pageIndex];
-
-	      var removeFrom = function removeFrom(s) {
-	        var count = s.children.length;
-	        s.children = s.children.filter(function (child) {
-	          return child.id !== action.selectorID;
-	        });
-	        // if the new length is less than the old, we know that
-	        // the selector was filtered out and can stop, otherwise
-	        // keep checking children
-	        return s.children.length < count ? true : s.children.some(function (child) {
-	          return removeFrom(child);
-	        });
-	      };
-
-	      if (action.selectorID === 0) {
-	        // special case for the root body selector,
-	        // just replace the page with a new one
-	        page.children = [];
-	        page.rules = [];
-	      } else {
-	        removeFrom(page);
-	      }
-
-	      return Object.assign({}, state, {
-	        pages: [].concat(_toConsumableArray(pages.slice(0, pageIndex)), [page], _toConsumableArray(pages.slice(pageIndex + 1)))
-	      });
-
-	    /*
-	     * create a new array of pages to trigger an update when adding a rule to or
-	     * removing a rule from a selector
-	     */
 	    case types.SAVE_RULE:
 	    case types.REMOVE_RULE:
 	      var pages = state.pages;
@@ -4415,55 +4330,6 @@
 
 	var ActionTypes = _interopRequireWildcard(_ActionTypes);
 
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-	exports.default = function (state) {
-	  return function (next) {
-	    return function (action) {
-	      switch (action.type) {
-	        case ActionTypes.SELECT_SELECTOR:
-	          var current = state.getState();
-	          var id = action.selectorID;
-	          var page = current.page.pages[current.page.pageIndex];
-	          var selector = find(page, id);
-	          action.selector = selector;
-	          break;
-	      }
-	      return next(action);
-	    };
-	  };
-	};
-
-	var find = function find(page, id) {
-	  var sel = undefined;
-	  var search = function search(selector) {
-	    if (selector.id === id) {
-	      sel = selector;
-	      return true;
-	    } else {
-	      return selector.children.some(function (child) {
-	        return search(child);
-	      });
-	    }
-	  };
-	  search(page);
-	  return sel;
-	};
-
-/***/ },
-/* 50 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-
-	var _ActionTypes = __webpack_require__(24);
-
-	var ActionTypes = _interopRequireWildcard(_ActionTypes);
-
 	var _helpers = __webpack_require__(27);
 
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
@@ -4493,7 +4359,7 @@
 	};
 
 /***/ },
-/* 51 */
+/* 50 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";

@@ -33,13 +33,12 @@ export const createSelector = (selector, type = "single", value = 0, optional = 
  */
 export const clone = selector => {
   return Object.assign({}, {
-    id: selector.id,
     selector: selector.selector,
-    spec: Object.assign({}, selector.spec),
-    optional: selector.optional,
+    spec: selector.spec,
     children: selector.children.map(child => clone(child)),
-    rules: selector.rules.map(r => Object.assign({}, r)),
-    elements: selector.elements || []
+    hasRules: selector.rules.length,
+    elements: selector.elements || [],
+    original: selector
   });
 };
 
@@ -62,22 +61,6 @@ const cleanSelector = s => {
 };
 
 /*
- * iterate over the tree looking for selector matching id, and when found
- * append the newChild to its array of children
- */
-export const addChild = (selector, id, newChild) => {
-  if ( selector.id === id ) {
-    selector.children.push(newChild);
-    return true;
-  } else {
-    var found = selector.children.some(child => {
-      addChild(child, id, newChild);
-    });
-    return found;
-  }
-};
-
-/*
  * set an id on each selector and determine the elements that each selector matches
  */
 export const setupPage = page => {
@@ -85,14 +68,14 @@ export const setupPage = page => {
     return;
   }
   let id = 0;
-  let setup = (selector, parentElements) => {
+  let setup = (selector, parentElements, parent) => {
     selector.id = id++;
+    selector.parent = parent;
     selector.elements = select(parentElements, selector.selector, selector.spec);
     selector.children.forEach(child => {
-      setup(child, selector.elements);
+      setup(child, selector.elements, selector);
     });
   }
 
-  setup(page, [document]);
-  page.nextID = id;
+  setup(page, [document], null);
 }

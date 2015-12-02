@@ -28,8 +28,8 @@ export default React.createClass({
     switch ( frame.name ) {
     case "selector":
       return <SelectorFrame selector={selector}
-                            showElementFrame={actions.showElementFrame}
-                            showRuleFrame={actions.showRuleFrame}
+                            createSelector={actions.showElementFrame}
+                            createRule={actions.showRuleFrame}
                             removeSelector={actions.removeSelector}
                             removeRule={actions.removeRule} />
     case "rule":
@@ -46,8 +46,7 @@ export default React.createClass({
                          cancel={actions.showSelectorFrame}
                          {...frame.data} />
     case "spec":
-      return <SpecFrame parentElements={selector.elements}
-                        parentID={selector.id}
+      return <SpecFrame parent={selector}
                         save={actions.saveSelector}
                         cancel={actions.showSelectorFrame}
                         {...frame.data} />

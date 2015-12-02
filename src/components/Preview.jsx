@@ -22,7 +22,7 @@ export default React.createClass({
     let previewText = JSON.stringify(preview(page), null, 2);
     return (
       <div className="preview-holder">
-        <div className="preview-bg" onClick={this.clickHandler} ></div>
+        <div className="preview-bg" onClick={this.closeHandler} ></div>
         <div className="preview">
         <pre>
           {previewText}

@@ -18,7 +18,7 @@ let Forager = React.createClass({
     if ( !show ) {
       classNames.push("hidden");
     }
-
+    console.log(selector);
     let previewModal = preview.visible ? (
       <Preview page={page} close={actions.hidePreview} />
     ) : null;
