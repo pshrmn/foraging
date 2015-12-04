@@ -11,11 +11,10 @@ export const loadPage = (index, selector) => {
   };
 };
 
-export const addPage = page => {
+export const addPage = name => {
   return {
     type: types.ADD_PAGE,
-    page: page,
-    selector: page
+    name: name
   };
 };
 

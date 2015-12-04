@@ -28,6 +28,9 @@ export default function page(state = {}, action) {
    * so care needs to be taken when uploading.
    */
   case types.ADD_PAGE:
+    if ( action.error ) {
+      return state;
+    }
     var pages = state.pages;
     var newPages = [...pages, action.page];
     return Object.assign({}, state, {
@@ -52,24 +55,6 @@ export default function page(state = {}, action) {
     });
 
   /*
-   * update the name of the page. Because pages[0] is an undefined page
-   * used to have no page selected, there is a special case for it.
-   */
-  case types.RENAME_PAGE:
-    var { pages, pageIndex } = state;
-    // can't rename the empty page
-    if ( pageIndex === 0 ) {
-      return state;
-    }
-    var newPages = pages.slice();
-    newPages[pageIndex] = Object.assign({}, newPages[pageIndex], {
-      name: action.name
-    });
-    return Object.assign({}, state, {
-      pages: newPages
-    });
-
-  /*
    * all of the updating is done in the components, which is not very redux-y,
    * but since the data is tree-like and the tree's nodes are passed by
    * reference throughout the app, it is simpler to do that than to keep ids
@@ -79,6 +64,7 @@ export default function page(state = {}, action) {
    * can reflect 
    *
    */
+  case types.RENAME_PAGE:
   case types.SAVE_SELECTOR:
   case types.REMOVE_SELECTOR:
   case types.RENAME_SELECTOR:

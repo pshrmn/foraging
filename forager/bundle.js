@@ -70,7 +70,11 @@
 
 	var _chromeBackground2 = _interopRequireDefault(_chromeBackground);
 
-	var _chrome = __webpack_require__(52);
+	var _pageMiddleware = __webpack_require__(52);
+
+	var _pageMiddleware2 = _interopRequireDefault(_pageMiddleware);
+
+	var _chrome = __webpack_require__(53);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -106,7 +110,7 @@
 	        fade: undefined
 	      }
 	    };
-	    var store = (0, _redux.applyMiddleware)(_chromeBackground2.default)(_redux.createStore)(_reducers2.default, initialState);
+	    var store = (0, _redux.applyMiddleware)(_chromeBackground2.default, _pageMiddleware2.default)(_redux.createStore)(_reducers2.default, initialState);
 
 	    /*
 	     * subscribe to the store and save the pages any time that they change
@@ -1437,13 +1441,13 @@
 
 	var _Controls2 = _interopRequireDefault(_Controls);
 
-	var _Frames = __webpack_require__(35);
+	var _Frames = __webpack_require__(28);
 
 	var _Frames2 = _interopRequireDefault(_Frames);
 
-	var _Tree = __webpack_require__(41);
+	var _PageTree = __webpack_require__(41);
 
-	var _Tree2 = _interopRequireDefault(_Tree);
+	var _PageTree2 = _interopRequireDefault(_PageTree);
 
 	var _Preview = __webpack_require__(43);
 
@@ -1485,13 +1489,13 @@
 	      _react2.default.createElement(
 	        "div",
 	        { className: "workspace" },
+	        _react2.default.createElement(_PageTree2.default, { page: page,
+	          selector: selector,
+	          actions: actions,
+	          active: frame.name === "selector" }),
 	        _react2.default.createElement(_Frames2.default, { selector: selector,
 	          frame: frame,
-	          actions: actions }),
-	        _react2.default.createElement(_Tree2.default, { page: page,
-	          selector: selector,
-	          selectSelector: actions.selectSelector,
-	          active: frame.name === "selector" })
+	          actions: actions })
 	      ),
 	      previewModal
 	    );
@@ -1563,11 +1567,10 @@
 	  };
 	};
 
-	var addPage = exports.addPage = function addPage(page) {
+	var addPage = exports.addPage = function addPage(name) {
 	  return {
 	    type: types.ADD_PAGE,
-	    page: page,
-	    selector: page
+	    name: name
 	  };
 	};
 
@@ -1754,118 +1757,36 @@
 
 	var _Message2 = _interopRequireDefault(_Message);
 
-	var _helpers = __webpack_require__(28);
-
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	exports.default = _react2.default.createClass({
 	  displayName: "Controls",
 
+	  addHandler: function addHandler(event) {
+	    event.preventDefault();
+	    var name = window.prompt("Page Name:\nCannot contain the following characters: < > : \" \\ / | ? * ");
+	    // don't bother sending an action if the user cancels or does not enter a name
+	    if (name === null || name === "") {
+	      return;
+	    }
+	    this.props.actions.addPage(name);
+	  },
+	  loadHandler: function loadHandler(event) {
+	    var nextPage = parseInt(event.target.value, 10);
+	    // the initial selector is the root selector of the page
+	    var selector = this.props.pages[nextPage];
+	    this.props.actions.loadPage(nextPage, selector);
+	  },
+	  closeHandler: function closeHandler(event) {
+	    document.body.classList.remove("foraging");
+	    this.props.actions.closeForager();
+	  },
 	  render: function render() {
 	    var _props = this.props;
 	    var pages = _props.pages;
 	    var index = _props.index;
 	    var message = _props.message;
 	    var actions = _props.actions;
-
-	    return _react2.default.createElement(
-	      "div",
-	      { className: "topbar" },
-	      _react2.default.createElement(
-	        "div",
-	        { className: "controls" },
-	        _react2.default.createElement(PageControls, { pages: pages,
-	          index: index,
-	          actions: actions }),
-	        _react2.default.createElement(GeneralControls, { actions: actions })
-	      ),
-	      _react2.default.createElement(_Message2.default, message)
-	    );
-	  }
-	});
-
-	var PageControls = _react2.default.createClass({
-	  displayName: "PageControls",
-
-	  getName: function getName() {
-	    var name = window.prompt("Page Name:\nCannot contain the following characters: < > : \" \\ / | ? * ");
-	    if (!(0, _helpers.legalName)(name)) {
-	      console.error("bad name", name);
-	      return;
-	    }
-	    return name;
-	  },
-	  checkName: function checkName(name) {
-	    // if the name contains illegal characters, let the user know
-	    if (!(0, _helpers.legalName)(name)) {
-	      var msg = "Name \"" + name + "\" contains one or more illegal characters (< > : \" \\ / | ? *)";
-	      this.props.actions.showMessage(msg, 5000);
-	      return false;
-	    }
-	    // if a page with the name already exists, let the user know
-	    var exists = this.props.pages.some(function (curr) {
-	      return curr === undefined ? false : name === curr.name;
-	    });
-	    if (exists) {
-	      this.props.actions.showMessage("A page with the name \"" + name + "\" already exists", 5000);
-	      return false;
-	    }
-	    return true;
-	  },
-	  addHandler: function addHandler(event) {
-	    event.preventDefault();
-	    var name = window.prompt("Page Name:\nCannot contain the following characters: < > : \" \\ / | ? * ");
-	    // do nothing if the user cancels or does not enter a name
-	    if (name === null || name === "") {
-	      return;
-	    }
-	    var good = this.checkName(name);
-	    if (good) {
-	      var newPage = (0, _helpers.createPage)(name);
-	      (0, _helpers.setupPage)(newPage);
-	      this.props.actions.addPage(newPage);
-	    }
-	  },
-	  renameHandler: function renameHandler(event) {
-	    event.preventDefault();
-	    var curr = this.props.pages[this.props.index];
-	    // don't do anything for the undefined option
-	    if (curr === undefined) {
-	      return;
-	    }
-	    var name = window.prompt("Page Name:\nCannot contain the following characters: < > : \" \\ / | ? * ");
-	    // do nothing if the user cancels, does not enter a name, or enter the same name as the current one
-	    if (name === null || name === "" || name === curr.name) {
-	      return;
-	    }
-	    var good = this.checkName(name);
-	    if (good) {
-	      this.props.actions.renamePage(name);
-	    }
-	  },
-	  deleteHandler: function deleteHandler(event) {
-	    event.preventDefault();
-	    // report the current page index
-	    this.props.actions.removePage();
-	  },
-	  uploadHandler: function uploadHandler(event) {
-	    event.preventDefault();
-	    this.props.actions.uploadPage();
-	  },
-	  previewHandler: function previewHandler(event) {
-	    event.preventDefault();
-	    this.props.actions.showPreview();
-	  },
-	  loadPage: function loadPage(event) {
-	    var nextPage = parseInt(event.target.value, 10);
-	    // the initial selector is the root selector of the page
-	    var selector = this.props.pages[nextPage];
-	    this.props.actions.loadPage(nextPage, selector);
-	  },
-	  render: function render() {
-	    var _props2 = this.props;
-	    var pages = _props2.pages;
-	    var index = _props2.index;
 
 	    var options = pages.map(function (p, i) {
 	      var text = p === undefined ? "" : p.name;
@@ -1877,44 +1798,32 @@
 	    });
 	    return _react2.default.createElement(
 	      "div",
-	      { className: "page-controls" },
-	      "Page: ",
+	      { className: "topbar" },
 	      _react2.default.createElement(
-	        "select",
-	        { value: index,
-	          onChange: this.loadPage },
-	        options
+	        "div",
+	        { className: "controls" },
+	        _react2.default.createElement(
+	          "div",
+	          { className: "page-controls" },
+	          "Page:",
+	          _react2.default.createElement(
+	            "select",
+	            { value: index,
+	              onChange: this.loadHandler },
+	            options
+	          ),
+	          _react2.default.createElement(_Inputs.PosButton, { text: "Add Page",
+	            click: this.addHandler })
+	        ),
+	        _react2.default.createElement(
+	          "div",
+	          { className: "app-controls" },
+	          _react2.default.createElement(_Inputs.NeutralButton, { text: String.fromCharCode(215),
+	            classes: ["transparent"],
+	            click: this.closeHandler })
+	        )
 	      ),
-	      _react2.default.createElement(_Inputs.PosButton, { click: this.addHandler, text: "Add" }),
-	      _react2.default.createElement(_Inputs.PosButton, { click: this.renameHandler, text: "Rename" }),
-	      _react2.default.createElement(_Inputs.NegButton, { click: this.deleteHandler, text: "Delete" }),
-	      _react2.default.createElement(_Inputs.PosButton, { click: this.uploadHandler, text: "Upload" }),
-	      _react2.default.createElement(_Inputs.PosButton, { click: this.previewHandler, text: "Preview" })
-	    );
-	  }
-	});
-
-	var GeneralControls = _react2.default.createClass({
-	  displayName: "GeneralControls",
-
-	  handleClose: function handleClose(event) {
-	    document.body.classList.remove("foraging");
-	    this.props.actions.closeForager();
-	  },
-	  render: function render() {
-	    /*
-	      no need to render these until their features have been implemented
-	      <NeutralButton text="Sync"
-	                     click={this.handle} />
-	      <NeutralButton text="Options"
-	                     click={this.handle} />
-	    */
-	    return _react2.default.createElement(
-	      "div",
-	      { className: "app-controls" },
-	      _react2.default.createElement(_Inputs.NeutralButton, { text: String.fromCharCode(215),
-	        classes: ["transparent"],
-	        click: this.handleClose })
+	      _react2.default.createElement(_Message2.default, message)
 	    );
 	  }
 	});
@@ -2076,645 +1985,6 @@
 
 	"use strict";
 
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-
-	var _text = __webpack_require__(29);
-
-	Object.defineProperty(exports, "legalName", {
-	  enumerable: true,
-	  get: function get() {
-	    return _text.legalName;
-	  }
-	});
-	Object.defineProperty(exports, "abbreviate", {
-	  enumerable: true,
-	  get: function get() {
-	    return _text.abbreviate;
-	  }
-	});
-
-	var _attributes = __webpack_require__(30);
-
-	Object.defineProperty(exports, "attributes", {
-	  enumerable: true,
-	  get: function get() {
-	    return _attributes.attributes;
-	  }
-	});
-	Object.defineProperty(exports, "stripEvents", {
-	  enumerable: true,
-	  get: function get() {
-	    return _attributes.stripEvents;
-	  }
-	});
-
-	var _markup = __webpack_require__(31);
-
-	Object.defineProperty(exports, "highlight", {
-	  enumerable: true,
-	  get: function get() {
-	    return _markup.highlight;
-	  }
-	});
-	Object.defineProperty(exports, "unhighlight", {
-	  enumerable: true,
-	  get: function get() {
-	    return _markup.unhighlight;
-	  }
-	});
-	Object.defineProperty(exports, "iHighlight", {
-	  enumerable: true,
-	  get: function get() {
-	    return _markup.iHighlight;
-	  }
-	});
-	Object.defineProperty(exports, "iUnhighlight", {
-	  enumerable: true,
-	  get: function get() {
-	    return _markup.iUnhighlight;
-	  }
-	});
-
-	var _page = __webpack_require__(32);
-
-	Object.defineProperty(exports, "createPage", {
-	  enumerable: true,
-	  get: function get() {
-	    return _page.createPage;
-	  }
-	});
-	Object.defineProperty(exports, "createSelector", {
-	  enumerable: true,
-	  get: function get() {
-	    return _page.createSelector;
-	  }
-	});
-	Object.defineProperty(exports, "clone", {
-	  enumerable: true,
-	  get: function get() {
-	    return _page.clone;
-	  }
-	});
-	Object.defineProperty(exports, "clean", {
-	  enumerable: true,
-	  get: function get() {
-	    return _page.clean;
-	  }
-	});
-	Object.defineProperty(exports, "setupPage", {
-	  enumerable: true,
-	  get: function get() {
-	    return _page.setupPage;
-	  }
-	});
-
-	var _selection = __webpack_require__(33);
-
-	Object.defineProperty(exports, "select", {
-	  enumerable: true,
-	  get: function get() {
-	    return _selection.select;
-	  }
-	});
-	Object.defineProperty(exports, "count", {
-	  enumerable: true,
-	  get: function get() {
-	    return _selection.count;
-	  }
-	});
-	Object.defineProperty(exports, "parts", {
-	  enumerable: true,
-	  get: function get() {
-	    return _selection.parts;
-	  }
-	});
-	Object.defineProperty(exports, "allSelect", {
-	  enumerable: true,
-	  get: function get() {
-	    return _selection.allSelect;
-	  }
-	});
-
-	var _preview = __webpack_require__(34);
-
-	Object.defineProperty(exports, "preview", {
-	  enumerable: true,
-	  get: function get() {
-	    return _preview.preview;
-	  }
-	});
-
-/***/ },
-/* 29 */
-/***/ function(module, exports) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	var legalName = exports.legalName = function legalName(name) {
-	    if (name === null || name === "") {
-	        return false;
-	    }
-	    var badCharacters = /[<>:"\/\\\|\?\*]/;
-	    return name.match(badCharacters) === null;
-	};
-
-	var abbreviate = exports.abbreviate = function abbreviate(text, max) {
-	    if (text.length <= max) {
-	        return text;
-	    } else if (max <= 3) {
-	        return "...";
-	    }
-	    // determine the length of the first and second halves of the text
-	    var firstHalf;
-	    var secondHalf;
-	    var leftovers = max - 3;
-	    var half = leftovers / 2;
-	    if (leftovers % 2 === 0) {
-	        firstHalf = half;
-	        secondHalf = half;
-	    } else {
-	        firstHalf = Math.ceil(half);
-	        secondHalf = Math.floor(half);
-	    }
-
-	    // splice correct amounts of text
-	    var firstText = text.slice(0, firstHalf);
-	    var secondText = secondHalf === 0 ? "" : text.slice(-secondHalf);
-	    return firstText + "..." + secondText;
-	};
-
-/***/ },
-/* 30 */
-/***/ function(module, exports) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	// return an object mapping attribute names to their value
-	// for all attributes of an element
-	var attributes = exports.attributes = function attributes(element) {
-	  var ignored = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-
-	  var attrs = Array.from(element.attributes).reduce(function (stored, attr) {
-	    var name = attr.name;
-	    var value = attr.value;
-
-	    if (ignored[name]) {
-	      return stored;
-	    }
-	    // don't include current-selector class
-	    if (name === "class") {
-	      value = value.replace("current-selector", "").trim();
-	    }
-	    // don't include empty attrs
-	    if (value !== "") {
-	      stored.push({ name: name, value: value });
-	    }
-	    return stored;
-	  }, []);
-
-	  // include text if it exists
-	  var text = element.textContent.trim();
-	  if (text !== "") {
-	    attrs.push({ name: "text", value: text });
-	  }
-
-	  return attrs;
-	};
-
-	/*
-	 * stripEvents
-	 * -----------
-	 * If an element has no on* attributes, it is returned. Otherwise, all on* attrs
-	 * are removed from the element and a clone is made. The element is replaced in
-	 * the dom by the clone and the clone is returned.
-	 */
-	var stripEvents = exports.stripEvents = function stripEvents(element) {
-	  var attrs = Array.from(element.attributes);
-	  if (attrs.some(function (a) {
-	    return a.name.startsWith("on");
-	  })) {
-	    attrs.forEach(function (attr) {
-	      var name = attr.name;
-	      if (name.startsWith("on")) {
-	        element.removeAttribute(name);
-	      }
-	    });
-	    var clone = element.cloneNode(true);
-	    element.parentNode.replaceChild(clone, element);
-	    return clone;
-	  } else {
-	    return element;
-	  }
-	};
-
-/***/ },
-/* 31 */
-/***/ function(module, exports) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	/*
-	 * highlight
-	 * ---------
-	 *
-	 * @param elements - an array of elements
-	 * @param className - the class added to the elements
-	 */
-	var highlight = exports.highlight = function highlight(elements, className) {
-	  Array.from(elements).forEach(function (e) {
-	    e.classList.add(className);
-	  });
-	};
-
-	/*
-	 * unhighlight
-	 * -----------
-	 *
-	 * @param className - the className to remove from all elements that have it
-	 */
-	var unhighlight = exports.unhighlight = function unhighlight(className) {
-	  Array.from(document.getElementsByClassName(className)).forEach(function (e) {
-	    e.classList.remove(className);
-	  });
-	};
-
-	/*
-	 * iHighlight
-	 * ---------
-	 *
-	 * @param elements - an array of elements
-	 * @param className - the class added to the elements
-	 * @param over - the function to call on mouseover
-	 * @param out - the function to call on mouseout
-	 * @param click - the function to call when an element is clicked
-	 */
-	var iHighlight = exports.iHighlight = function iHighlight(elements, className, over, out, click) {
-	  Array.from(elements).forEach(function (e) {
-	    e.classList.add(className);
-	    e.addEventListener("mouseover", over, false);
-	    e.addEventListener("mouseout", out, false);
-	    e.addEventListener("click", click, false);
-	  });
-	};
-
-	/*
-	 * iUnhighlight
-	 * ---------
-	 *
-	 * @param className - the className to remove from all elements that have it
-	 * @param over - mouseover function to remove
-	 * @param out - mouseout function to remove
-	 * @param click - click function to remove
-	 */
-	var iUnhighlight = exports.iUnhighlight = function iUnhighlight(className, over, out, click) {
-	  Array.from(document.getElementsByClassName(className)).forEach(function (e) {
-	    e.classList.remove(className);
-	    e.removeEventListener("mouseover", over, false);
-	    e.removeEventListener("mouseout", out, false);
-	    e.removeEventListener("click", click, false);
-	  });
-	};
-
-/***/ },
-/* 32 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.setupPage = exports.clean = exports.clone = exports.createSelector = exports.createPage = undefined;
-
-	var _selection = __webpack_require__(33);
-
-	var createPage = exports.createPage = function createPage(name) {
-	  return {
-	    name: name,
-	    selector: "body",
-	    spec: {
-	      type: "single",
-	      value: 0
-	    },
-	    children: [],
-	    rules: []
-	  };
-	};
-
-	var createSelector = exports.createSelector = function createSelector(selector) {
-	  var type = arguments.length <= 1 || arguments[1] === undefined ? "single" : arguments[1];
-	  var value = arguments.length <= 2 || arguments[2] === undefined ? 0 : arguments[2];
-	  var optional = arguments.length <= 3 || arguments[3] === undefined ? false : arguments[3];
-
-	  return {
-	    selector: selector,
-	    spec: {
-	      type: type,
-	      value: value
-	    },
-	    children: [],
-	    rules: [],
-	    optional: optional
-	  };
-	};
-
-	/*
-	 * clone a page (useful with the tree because that adds unnecessary properties
-	 * to each selector) does not include the page's name
-	 */
-	var clone = exports.clone = function clone(selector) {
-	  return Object.assign({}, {
-	    selector: selector.selector,
-	    spec: selector.spec,
-	    children: selector.children.map(function (child) {
-	      return clone(child);
-	    }),
-	    hasRules: selector.rules.length,
-	    elements: selector.elements || [],
-	    original: selector
-	  });
-	};
-
-	var clean = exports.clean = function clean(page) {
-	  return Object.assign({}, {
-	    name: page.name
-	  }, cleanSelector(page));
-	};
-
-	var cleanSelector = function cleanSelector(s) {
-	  return Object.assign({}, {
-	    selector: s.selector,
-	    spec: Object.assign({}, s.spec),
-	    children: s.children.map(function (c) {
-	      return cleanSelector(c);
-	    }),
-	    rules: s.rules.map(function (r) {
-	      return Object.assign({}, r);
-	    }),
-	    optional: s.optional
-	  });
-	};
-
-	/*
-	 * set an id on each selector and determine the elements that each selector matches
-	 */
-	var setupPage = exports.setupPage = function setupPage(page) {
-	  if (page === undefined) {
-	    return;
-	  }
-	  var id = 0;
-	  var setup = function setup(selector, parentElements, parent) {
-	    selector.id = id++;
-	    selector.parent = parent;
-	    selector.elements = (0, _selection.select)(parentElements, selector.selector, selector.spec);
-	    selector.children.forEach(function (child) {
-	      setup(child, selector.elements, selector);
-	    });
-	  };
-
-	  setup(page, [document], null);
-	};
-
-/***/ },
-/* 33 */
-/***/ function(module, exports) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	/*
-	 * select
-	 * ------
-	 * Returns an array of elements that are children of the parent elements and
-	 * match the selector.
-	 *
-	 * @param parents - an array of parent elements to search using the selector
-	 * @param selector - the selector to use to match children of the parent elements
-	 * @param spec - how to select the child element or elements of a parent element
-	 */
-	var select = exports.select = function select(parents, selector, spec) {
-	  var sel = (selector || "*") + ":not(.no-select)";
-	  var index = spec && spec.type === "single" ? spec.value : undefined;
-
-	  var specElements = function specElements(elements) {
-	    if (index !== undefined) {
-	      return elements[index] !== undefined ? [elements[index]] : [];
-	    } else {
-	      return [].slice.call(elements);
-	    }
-	  };
-
-	  return [].slice.call(parents).reduce(function (arr, p) {
-	    var eles = p.querySelectorAll(sel);
-	    return arr.concat(specElements(eles));
-	  }, []);
-	};
-
-	/*
-	 * count
-	 * ------
-	 * Returns the max number of child elements that the selector matches per parent
-	 *
-	 * @param parents - an array of parent elements to search using the selector
-	 * @param selector - the selector to use to match children of the parent elements
-	 * @param spec - how to select the child element or elements of a parent element
-	 */
-	var count = exports.count = function count(parents, selector, spec) {
-	  var sel = (selector || "*") + ":not(.no-select)";
-	  var index = spec && spec.type === "single" ? spec.value : undefined;
-
-	  var specElements = function specElements(elements) {
-	    if (index !== undefined) {
-	      return elements[index] !== undefined ? 1 : 0;
-	    } else {
-	      return elements.length;
-	    }
-	  };
-
-	  return [].slice.call(parents).reduce(function (top, p) {
-	    var eles = p.querySelectorAll(sel);
-	    var count = specElements(eles);
-	    return top > count ? top : count;
-	  }, 0);
-	};
-
-	/*
-	 * parts
-	 * -------------
-	 * Returns an array of strings that can be used as CSS selectors to select the element.
-	 * Element tags are converted to lowercase, ids are preceded by a "#" and classes are
-	 * preceded by a "."
-	 *
-	 * @param element - the element to analyze
-	 */
-	var parts = exports.parts = function parts(element) {
-	  var skipTags = [];
-	  var skipClasses = ["forager-highlight", "query-check", "selectable-element", "current-selector"];
-
-	  var tagAllowed = function tagAllowed(tag) {
-	    return !skipTags.some(function (st) {
-	      return st === tag;
-	    });
-	  };
-
-	  var classAllowed = function classAllowed(c) {
-	    return !skipClasses.some(function (sc) {
-	      return sc === c;
-	    });
-	  };
-
-	  var pieces = [];
-	  var tag = element.tagName.toLowerCase();
-	  if (tagAllowed(tag)) {
-	    pieces.push(tag);
-	  } else {
-	    // if the tag isn't allowed, return an empty array
-	    return [];
-	  }
-
-	  // id
-	  if (element.id !== "") {
-	    pieces.push("#" + element.id);
-	  }
-
-	  // classes
-	  [].slice.call(element.classList).forEach(function (c) {
-	    if (classAllowed(c)) {
-	      pieces.push("." + c);
-	    }
-	  });
-	  return pieces;
-	};
-
-	/*
-	 * check if all elements matched by the selector are "select" elements
-	 */
-	var allSelect = exports.allSelect = function allSelect(selection) {
-	  return selection.every(function (ele) {
-	    return ele.tagName === "SELECT";
-	  });
-	};
-
-/***/ },
-/* 34 */
-/***/ function(module, exports) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	var preview = exports.preview = function preview(page) {
-	    /*
-	     * Given a parent element, get all children that match the selector
-	     * Return data based on selector's type (index or name)
-	     */
-	    var getElement = function getElement(selector, parent) {
-	        var elements = parent.querySelectorAll(selector.selector);
-	        var value = selector.spec.value;
-	        switch (selector.spec.type) {
-	            case "single":
-	                var ele = elements[value];
-	                if (!ele) {
-	                    return;
-	                }
-	                return getElementData(selector, ele);
-	            case "all":
-	                var data = Array.from(elements).map(function (ele) {
-	                    return getElementData(selector, ele);
-	                }).filter(function (datum) {
-	                    return datum !== undefined;
-	                });
-	                var obj = {};
-	                obj[value] = data;
-	                return obj;
-	        }
-	    };
-
-	    /*
-	     * Get data for each rule and each child. Merge the child data into the
-	     * rule data.
-	     */
-	    var getElementData = function getElementData(selector, element) {
-	        var data = getRuleData(selector.rules, element);
-	        var childData = getChildData(selector.children, element);
-	        if (!childData) {
-	            return;
-	        }
-	        for (var key in childData) {
-	            data[key] = childData[key];
-	        }
-	        return data;
-	    };
-
-	    var getChildData = function getChildData(children, element) {
-	        var data = {};
-	        children.some(function (child) {
-	            var childData = getElement(child, element);
-	            if (!childData && !child.optional) {
-	                data = undefined;
-	                return true;
-	            }
-	            for (var key in childData) {
-	                data[key] = childData[key];
-	            }
-	            return false;
-	        });
-	        return data;
-	    };
-
-	    var intRegEx = /\d+/;
-	    var floatRegEx = /\d+(\.\d+)?/;
-	    var getRuleData = function getRuleData(rules, element) {
-	        var data = {};
-	        rules.forEach(function (rule) {
-	            var val;
-	            var match;
-	            if (rule.attr === "text") {
-	                val = element.textContent.replace(/\s+/g, " ");
-	            } else {
-	                var attr = element.getAttribute(rule.attr);
-	                // attributes that don't exist will return null
-	                // just use empty string for now
-	                val = attr || "";
-	            }
-	            switch (rule.type) {
-	                case "int":
-	                    match = val.match(intRegEx);
-	                    val = match !== null ? parseInt(match[0], 10) : -1;
-	                    break;
-	                case "float":
-	                    match = val.match(floatRegEx);
-	                    val = match !== null ? parseFloat(match[0]) : -1.0;
-	                    break;
-	            }
-	            data[rule.name] = val;
-	        });
-	        return data;
-	    };
-
-	    return page === undefined ? "" : getElement(page, document);
-	};
-
-/***/ },
-/* 35 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 	Object.defineProperty(exports, "__esModule", {
@@ -2725,11 +1995,11 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _SelectorFrame = __webpack_require__(36);
+	var _SelectorFrame = __webpack_require__(29);
 
 	var _SelectorFrame2 = _interopRequireDefault(_SelectorFrame);
 
-	var _RuleFrame = __webpack_require__(37);
+	var _RuleFrame = __webpack_require__(30);
 
 	var _RuleFrame2 = _interopRequireDefault(_RuleFrame);
 
@@ -2745,7 +2015,7 @@
 
 	var _SpecFrame2 = _interopRequireDefault(_SpecFrame);
 
-	var _helpers = __webpack_require__(28);
+	var _helpers = __webpack_require__(31);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -2830,7 +2100,7 @@
 	});
 
 /***/ },
-/* 36 */
+/* 29 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -3008,7 +2278,7 @@
 	});
 
 /***/ },
-/* 37 */
+/* 30 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -3023,7 +2293,7 @@
 
 	var _Inputs = __webpack_require__(26);
 
-	var _helpers = __webpack_require__(28);
+	var _helpers = __webpack_require__(31);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -3217,6 +2487,645 @@
 	});
 
 /***/ },
+/* 31 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _text = __webpack_require__(32);
+
+	Object.defineProperty(exports, "legalName", {
+	  enumerable: true,
+	  get: function get() {
+	    return _text.legalName;
+	  }
+	});
+	Object.defineProperty(exports, "abbreviate", {
+	  enumerable: true,
+	  get: function get() {
+	    return _text.abbreviate;
+	  }
+	});
+
+	var _attributes = __webpack_require__(33);
+
+	Object.defineProperty(exports, "attributes", {
+	  enumerable: true,
+	  get: function get() {
+	    return _attributes.attributes;
+	  }
+	});
+	Object.defineProperty(exports, "stripEvents", {
+	  enumerable: true,
+	  get: function get() {
+	    return _attributes.stripEvents;
+	  }
+	});
+
+	var _markup = __webpack_require__(34);
+
+	Object.defineProperty(exports, "highlight", {
+	  enumerable: true,
+	  get: function get() {
+	    return _markup.highlight;
+	  }
+	});
+	Object.defineProperty(exports, "unhighlight", {
+	  enumerable: true,
+	  get: function get() {
+	    return _markup.unhighlight;
+	  }
+	});
+	Object.defineProperty(exports, "iHighlight", {
+	  enumerable: true,
+	  get: function get() {
+	    return _markup.iHighlight;
+	  }
+	});
+	Object.defineProperty(exports, "iUnhighlight", {
+	  enumerable: true,
+	  get: function get() {
+	    return _markup.iUnhighlight;
+	  }
+	});
+
+	var _page = __webpack_require__(35);
+
+	Object.defineProperty(exports, "createPage", {
+	  enumerable: true,
+	  get: function get() {
+	    return _page.createPage;
+	  }
+	});
+	Object.defineProperty(exports, "createSelector", {
+	  enumerable: true,
+	  get: function get() {
+	    return _page.createSelector;
+	  }
+	});
+	Object.defineProperty(exports, "clone", {
+	  enumerable: true,
+	  get: function get() {
+	    return _page.clone;
+	  }
+	});
+	Object.defineProperty(exports, "clean", {
+	  enumerable: true,
+	  get: function get() {
+	    return _page.clean;
+	  }
+	});
+	Object.defineProperty(exports, "setupPage", {
+	  enumerable: true,
+	  get: function get() {
+	    return _page.setupPage;
+	  }
+	});
+
+	var _selection = __webpack_require__(36);
+
+	Object.defineProperty(exports, "select", {
+	  enumerable: true,
+	  get: function get() {
+	    return _selection.select;
+	  }
+	});
+	Object.defineProperty(exports, "count", {
+	  enumerable: true,
+	  get: function get() {
+	    return _selection.count;
+	  }
+	});
+	Object.defineProperty(exports, "parts", {
+	  enumerable: true,
+	  get: function get() {
+	    return _selection.parts;
+	  }
+	});
+	Object.defineProperty(exports, "allSelect", {
+	  enumerable: true,
+	  get: function get() {
+	    return _selection.allSelect;
+	  }
+	});
+
+	var _preview = __webpack_require__(37);
+
+	Object.defineProperty(exports, "preview", {
+	  enumerable: true,
+	  get: function get() {
+	    return _preview.preview;
+	  }
+	});
+
+/***/ },
+/* 32 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	var legalName = exports.legalName = function legalName(name) {
+	    if (name === null || name === "") {
+	        return false;
+	    }
+	    var badCharacters = /[<>:"\/\\\|\?\*]/;
+	    return name.match(badCharacters) === null;
+	};
+
+	var abbreviate = exports.abbreviate = function abbreviate(text, max) {
+	    if (text.length <= max) {
+	        return text;
+	    } else if (max <= 3) {
+	        return "...";
+	    }
+	    // determine the length of the first and second halves of the text
+	    var firstHalf;
+	    var secondHalf;
+	    var leftovers = max - 3;
+	    var half = leftovers / 2;
+	    if (leftovers % 2 === 0) {
+	        firstHalf = half;
+	        secondHalf = half;
+	    } else {
+	        firstHalf = Math.ceil(half);
+	        secondHalf = Math.floor(half);
+	    }
+
+	    // splice correct amounts of text
+	    var firstText = text.slice(0, firstHalf);
+	    var secondText = secondHalf === 0 ? "" : text.slice(-secondHalf);
+	    return firstText + "..." + secondText;
+	};
+
+/***/ },
+/* 33 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	// return an object mapping attribute names to their value
+	// for all attributes of an element
+	var attributes = exports.attributes = function attributes(element) {
+	  var ignored = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+
+	  var attrs = Array.from(element.attributes).reduce(function (stored, attr) {
+	    var name = attr.name;
+	    var value = attr.value;
+
+	    if (ignored[name]) {
+	      return stored;
+	    }
+	    // don't include current-selector class
+	    if (name === "class") {
+	      value = value.replace("current-selector", "").trim();
+	    }
+	    // don't include empty attrs
+	    if (value !== "") {
+	      stored.push({ name: name, value: value });
+	    }
+	    return stored;
+	  }, []);
+
+	  // include text if it exists
+	  var text = element.textContent.trim();
+	  if (text !== "") {
+	    attrs.push({ name: "text", value: text });
+	  }
+
+	  return attrs;
+	};
+
+	/*
+	 * stripEvents
+	 * -----------
+	 * If an element has no on* attributes, it is returned. Otherwise, all on* attrs
+	 * are removed from the element and a clone is made. The element is replaced in
+	 * the dom by the clone and the clone is returned.
+	 */
+	var stripEvents = exports.stripEvents = function stripEvents(element) {
+	  var attrs = Array.from(element.attributes);
+	  if (attrs.some(function (a) {
+	    return a.name.startsWith("on");
+	  })) {
+	    attrs.forEach(function (attr) {
+	      var name = attr.name;
+	      if (name.startsWith("on")) {
+	        element.removeAttribute(name);
+	      }
+	    });
+	    var clone = element.cloneNode(true);
+	    element.parentNode.replaceChild(clone, element);
+	    return clone;
+	  } else {
+	    return element;
+	  }
+	};
+
+/***/ },
+/* 34 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	/*
+	 * highlight
+	 * ---------
+	 *
+	 * @param elements - an array of elements
+	 * @param className - the class added to the elements
+	 */
+	var highlight = exports.highlight = function highlight(elements, className) {
+	  Array.from(elements).forEach(function (e) {
+	    e.classList.add(className);
+	  });
+	};
+
+	/*
+	 * unhighlight
+	 * -----------
+	 *
+	 * @param className - the className to remove from all elements that have it
+	 */
+	var unhighlight = exports.unhighlight = function unhighlight(className) {
+	  Array.from(document.getElementsByClassName(className)).forEach(function (e) {
+	    e.classList.remove(className);
+	  });
+	};
+
+	/*
+	 * iHighlight
+	 * ---------
+	 *
+	 * @param elements - an array of elements
+	 * @param className - the class added to the elements
+	 * @param over - the function to call on mouseover
+	 * @param out - the function to call on mouseout
+	 * @param click - the function to call when an element is clicked
+	 */
+	var iHighlight = exports.iHighlight = function iHighlight(elements, className, over, out, click) {
+	  Array.from(elements).forEach(function (e) {
+	    e.classList.add(className);
+	    e.addEventListener("mouseover", over, false);
+	    e.addEventListener("mouseout", out, false);
+	    e.addEventListener("click", click, false);
+	  });
+	};
+
+	/*
+	 * iUnhighlight
+	 * ---------
+	 *
+	 * @param className - the className to remove from all elements that have it
+	 * @param over - mouseover function to remove
+	 * @param out - mouseout function to remove
+	 * @param click - click function to remove
+	 */
+	var iUnhighlight = exports.iUnhighlight = function iUnhighlight(className, over, out, click) {
+	  Array.from(document.getElementsByClassName(className)).forEach(function (e) {
+	    e.classList.remove(className);
+	    e.removeEventListener("mouseover", over, false);
+	    e.removeEventListener("mouseout", out, false);
+	    e.removeEventListener("click", click, false);
+	  });
+	};
+
+/***/ },
+/* 35 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.setupPage = exports.clean = exports.clone = exports.createSelector = exports.createPage = undefined;
+
+	var _selection = __webpack_require__(36);
+
+	var createPage = exports.createPage = function createPage(name) {
+	  return {
+	    name: name,
+	    selector: "body",
+	    spec: {
+	      type: "single",
+	      value: 0
+	    },
+	    children: [],
+	    rules: []
+	  };
+	};
+
+	var createSelector = exports.createSelector = function createSelector(selector) {
+	  var type = arguments.length <= 1 || arguments[1] === undefined ? "single" : arguments[1];
+	  var value = arguments.length <= 2 || arguments[2] === undefined ? 0 : arguments[2];
+	  var optional = arguments.length <= 3 || arguments[3] === undefined ? false : arguments[3];
+
+	  return {
+	    selector: selector,
+	    spec: {
+	      type: type,
+	      value: value
+	    },
+	    children: [],
+	    rules: [],
+	    optional: optional
+	  };
+	};
+
+	/*
+	 * clone a page (useful with the tree because that adds unnecessary properties
+	 * to each selector) does not include the page's name
+	 */
+	var clone = exports.clone = function clone(selector) {
+	  return Object.assign({}, {
+	    selector: selector.selector,
+	    spec: selector.spec,
+	    children: selector.children.map(function (child) {
+	      return clone(child);
+	    }),
+	    hasRules: selector.rules.length,
+	    elements: selector.elements || [],
+	    original: selector
+	  });
+	};
+
+	var clean = exports.clean = function clean(page) {
+	  return Object.assign({}, {
+	    name: page.name
+	  }, cleanSelector(page));
+	};
+
+	var cleanSelector = function cleanSelector(s) {
+	  return Object.assign({}, {
+	    selector: s.selector,
+	    spec: Object.assign({}, s.spec),
+	    children: s.children.map(function (c) {
+	      return cleanSelector(c);
+	    }),
+	    rules: s.rules.map(function (r) {
+	      return Object.assign({}, r);
+	    }),
+	    optional: s.optional
+	  });
+	};
+
+	/*
+	 * set an id on each selector and determine the elements that each selector matches
+	 */
+	var setupPage = exports.setupPage = function setupPage(page) {
+	  if (page === undefined) {
+	    return;
+	  }
+	  var id = 0;
+	  var setup = function setup(selector, parentElements, parent) {
+	    selector.id = id++;
+	    selector.parent = parent;
+	    selector.elements = (0, _selection.select)(parentElements, selector.selector, selector.spec);
+	    selector.children.forEach(function (child) {
+	      setup(child, selector.elements, selector);
+	    });
+	  };
+
+	  setup(page, [document], null);
+	};
+
+/***/ },
+/* 36 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	/*
+	 * select
+	 * ------
+	 * Returns an array of elements that are children of the parent elements and
+	 * match the selector.
+	 *
+	 * @param parents - an array of parent elements to search using the selector
+	 * @param selector - the selector to use to match children of the parent elements
+	 * @param spec - how to select the child element or elements of a parent element
+	 */
+	var select = exports.select = function select(parents, selector, spec) {
+	  var sel = (selector || "*") + ":not(.no-select)";
+	  var index = spec && spec.type === "single" ? spec.value : undefined;
+
+	  var specElements = function specElements(elements) {
+	    if (index !== undefined) {
+	      return elements[index] !== undefined ? [elements[index]] : [];
+	    } else {
+	      return [].slice.call(elements);
+	    }
+	  };
+
+	  return [].slice.call(parents).reduce(function (arr, p) {
+	    var eles = p.querySelectorAll(sel);
+	    return arr.concat(specElements(eles));
+	  }, []);
+	};
+
+	/*
+	 * count
+	 * ------
+	 * Returns the max number of child elements that the selector matches per parent
+	 *
+	 * @param parents - an array of parent elements to search using the selector
+	 * @param selector - the selector to use to match children of the parent elements
+	 * @param spec - how to select the child element or elements of a parent element
+	 */
+	var count = exports.count = function count(parents, selector, spec) {
+	  var sel = (selector || "*") + ":not(.no-select)";
+	  var index = spec && spec.type === "single" ? spec.value : undefined;
+
+	  var specElements = function specElements(elements) {
+	    if (index !== undefined) {
+	      return elements[index] !== undefined ? 1 : 0;
+	    } else {
+	      return elements.length;
+	    }
+	  };
+
+	  return [].slice.call(parents).reduce(function (top, p) {
+	    var eles = p.querySelectorAll(sel);
+	    var count = specElements(eles);
+	    return top > count ? top : count;
+	  }, 0);
+	};
+
+	/*
+	 * parts
+	 * -------------
+	 * Returns an array of strings that can be used as CSS selectors to select the element.
+	 * Element tags are converted to lowercase, ids are preceded by a "#" and classes are
+	 * preceded by a "."
+	 *
+	 * @param element - the element to analyze
+	 */
+	var parts = exports.parts = function parts(element) {
+	  var skipTags = [];
+	  var skipClasses = ["forager-highlight", "query-check", "selectable-element", "current-selector"];
+
+	  var tagAllowed = function tagAllowed(tag) {
+	    return !skipTags.some(function (st) {
+	      return st === tag;
+	    });
+	  };
+
+	  var classAllowed = function classAllowed(c) {
+	    return !skipClasses.some(function (sc) {
+	      return sc === c;
+	    });
+	  };
+
+	  var pieces = [];
+	  var tag = element.tagName.toLowerCase();
+	  if (tagAllowed(tag)) {
+	    pieces.push(tag);
+	  } else {
+	    // if the tag isn't allowed, return an empty array
+	    return [];
+	  }
+
+	  // id
+	  if (element.id !== "") {
+	    pieces.push("#" + element.id);
+	  }
+
+	  // classes
+	  [].slice.call(element.classList).forEach(function (c) {
+	    if (classAllowed(c)) {
+	      pieces.push("." + c);
+	    }
+	  });
+	  return pieces;
+	};
+
+	/*
+	 * check if all elements matched by the selector are "select" elements
+	 */
+	var allSelect = exports.allSelect = function allSelect(selection) {
+	  return selection.every(function (ele) {
+	    return ele.tagName === "SELECT";
+	  });
+	};
+
+/***/ },
+/* 37 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	var preview = exports.preview = function preview(page) {
+	    /*
+	     * Given a parent element, get all children that match the selector
+	     * Return data based on selector's type (index or name)
+	     */
+	    var getElement = function getElement(selector, parent) {
+	        var elements = parent.querySelectorAll(selector.selector);
+	        var value = selector.spec.value;
+	        switch (selector.spec.type) {
+	            case "single":
+	                var ele = elements[value];
+	                if (!ele) {
+	                    return;
+	                }
+	                return getElementData(selector, ele);
+	            case "all":
+	                var data = Array.from(elements).map(function (ele) {
+	                    return getElementData(selector, ele);
+	                }).filter(function (datum) {
+	                    return datum !== undefined;
+	                });
+	                var obj = {};
+	                obj[value] = data;
+	                return obj;
+	        }
+	    };
+
+	    /*
+	     * Get data for each rule and each child. Merge the child data into the
+	     * rule data.
+	     */
+	    var getElementData = function getElementData(selector, element) {
+	        var data = getRuleData(selector.rules, element);
+	        var childData = getChildData(selector.children, element);
+	        if (!childData) {
+	            return;
+	        }
+	        for (var key in childData) {
+	            data[key] = childData[key];
+	        }
+	        return data;
+	    };
+
+	    var getChildData = function getChildData(children, element) {
+	        var data = {};
+	        children.some(function (child) {
+	            var childData = getElement(child, element);
+	            if (!childData && !child.optional) {
+	                data = undefined;
+	                return true;
+	            }
+	            for (var key in childData) {
+	                data[key] = childData[key];
+	            }
+	            return false;
+	        });
+	        return data;
+	    };
+
+	    var intRegEx = /\d+/;
+	    var floatRegEx = /\d+(\.\d+)?/;
+	    var getRuleData = function getRuleData(rules, element) {
+	        var data = {};
+	        rules.forEach(function (rule) {
+	            var val;
+	            var match;
+	            if (rule.attr === "text") {
+	                val = element.textContent.replace(/\s+/g, " ");
+	            } else {
+	                var attr = element.getAttribute(rule.attr);
+	                // attributes that don't exist will return null
+	                // just use empty string for now
+	                val = attr || "";
+	            }
+	            switch (rule.type) {
+	                case "int":
+	                    match = val.match(intRegEx);
+	                    val = match !== null ? parseInt(match[0], 10) : -1;
+	                    break;
+	                case "float":
+	                    match = val.match(floatRegEx);
+	                    val = match !== null ? parseFloat(match[0]) : -1.0;
+	                    break;
+	            }
+	            data[rule.name] = val;
+	        });
+	        return data;
+	    };
+
+	    return page === undefined ? "" : getElement(page, document);
+	};
+
+/***/ },
 /* 38 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -3232,7 +3141,7 @@
 
 	var _Inputs = __webpack_require__(26);
 
-	var _helpers = __webpack_require__(28);
+	var _helpers = __webpack_require__(31);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -3437,7 +3346,7 @@
 
 	var _Inputs = __webpack_require__(26);
 
-	var _helpers = __webpack_require__(28);
+	var _helpers = __webpack_require__(31);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -3588,7 +3497,7 @@
 
 	var _Inputs = __webpack_require__(26);
 
-	var _helpers = __webpack_require__(28);
+	var _helpers = __webpack_require__(31);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -3828,7 +3737,9 @@
 
 	var _d2 = _interopRequireDefault(_d);
 
-	var _helpers = __webpack_require__(28);
+	var _Inputs = __webpack_require__(26);
+
+	var _helpers = __webpack_require__(31);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -3837,7 +3748,7 @@
 	 * selector, and to select a selector (for editing, adding children, or rules)
 	 */
 	exports.default = _react2.default.createClass({
-	  displayName: "Tree",
+	  displayName: "PageTree",
 
 	  getDefaultProps: function getDefaultProps() {
 	    return {
@@ -3882,7 +3793,7 @@
 	    var page = _props.page;
 	    var selector = _props.selector;
 	    var active = _props.active;
-	    var selectSelector = _props.selectSelector;
+	    var actions = _props.actions;
 
 	    if (page === undefined) {
 	      return null;
@@ -3910,7 +3821,7 @@
 	      }
 	      return _react2.default.createElement(Node, _extends({ key: i,
 	        current: current,
-	        select: selectSelector,
+	        select: actions.selectSelector,
 	        active: active
 	      }, n));
 	    });
@@ -3924,15 +3835,28 @@
 	  },
 	  render: function render() {
 	    var _props2 = this.props;
+	    var page = _props2.page;
+	    var actions = _props2.actions;
 	    var width = _props2.width;
 	    var height = _props2.height;
 	    var margin = _props2.margin;
 
 	    var nodes = this._makeNodes();
-
+	    var pageInfo = page === undefined ? null : _react2.default.createElement(
+	      "div",
+	      null,
+	      _react2.default.createElement(
+	        "h2",
+	        null,
+	        page.name
+	      ),
+	      _react2.default.createElement(PageControls, _extends({ actions: actions
+	      }, page))
+	    );
 	    return _react2.default.createElement(
 	      "div",
 	      { className: "graph" },
+	      pageInfo,
 	      _react2.default.createElement(
 	        "svg",
 	        { width: margin.left + width + margin.right,
@@ -4023,6 +3947,43 @@
 	  }
 	});
 
+	var PageControls = _react2.default.createClass({
+	  displayName: "PageControls",
+
+	  renameHandler: function renameHandler(event) {
+	    event.preventDefault();
+	    var name = window.prompt("Page Name:\nCannot contain the following characters: < > : \" \\ / | ? * ");
+	    // do nothing if the user cancels, does not enter a name, or enter the same name as the current one
+	    if (name === null || name === "" || name === this.props.name) {
+	      return;
+	    }
+	    this.props.actions.renamePage(name);
+	  },
+	  deleteHandler: function deleteHandler(event) {
+	    event.preventDefault();
+	    // report the current page index
+	    this.props.actions.removePage();
+	  },
+	  uploadHandler: function uploadHandler(event) {
+	    event.preventDefault();
+	    this.props.actions.uploadPage();
+	  },
+	  previewHandler: function previewHandler(event) {
+	    event.preventDefault();
+	    this.props.actions.showPreview();
+	  },
+	  render: function render() {
+	    return _react2.default.createElement(
+	      "div",
+	      null,
+	      _react2.default.createElement(_Inputs.PosButton, { click: this.renameHandler, text: "Rename" }),
+	      _react2.default.createElement(_Inputs.NegButton, { click: this.deleteHandler, text: "Delete" }),
+	      _react2.default.createElement(_Inputs.PosButton, { click: this.uploadHandler, text: "Upload" }),
+	      _react2.default.createElement(_Inputs.PosButton, { click: this.previewHandler, text: "Preview" })
+	    );
+	  }
+	});
+
 /***/ },
 /* 42 */
 /***/ function(module, exports) {
@@ -4045,7 +4006,7 @@
 
 	var _Inputs = __webpack_require__(26);
 
-	var _helpers = __webpack_require__(28);
+	var _helpers = __webpack_require__(31);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -4323,6 +4284,9 @@
 	     * so care needs to be taken when uploading.
 	     */
 	    case types.ADD_PAGE:
+	      if (action.error) {
+	        return state;
+	      }
 	      var pages = state.pages;
 	      var newPages = [].concat(_toConsumableArray(pages), [action.page]);
 	      return Object.assign({}, state, {
@@ -4347,26 +4311,6 @@
 	      });
 
 	    /*
-	     * update the name of the page. Because pages[0] is an undefined page
-	     * used to have no page selected, there is a special case for it.
-	     */
-	    case types.RENAME_PAGE:
-	      var pages = state.pages;
-	      var pageIndex = state.pageIndex;
-	      // can't rename the empty page
-
-	      if (pageIndex === 0) {
-	        return state;
-	      }
-	      var newPages = pages.slice();
-	      newPages[pageIndex] = Object.assign({}, newPages[pageIndex], {
-	        name: action.name
-	      });
-	      return Object.assign({}, state, {
-	        pages: newPages
-	      });
-
-	    /*
 	     * all of the updating is done in the components, which is not very redux-y,
 	     * but since the data is tree-like and the tree's nodes are passed by
 	     * reference throughout the app, it is simpler to do that than to keep ids
@@ -4376,6 +4320,7 @@
 	     * can reflect 
 	     *
 	     */
+	    case types.RENAME_PAGE:
 	    case types.SAVE_SELECTOR:
 	    case types.REMOVE_SELECTOR:
 	    case types.RENAME_SELECTOR:
@@ -4427,6 +4372,7 @@
 	  switch (action.type) {
 	    case types.ADD_PAGE:
 	    case types.LOAD_PAGE:
+	    case types.RENAME_PAGE:
 	    case types.SELECT_SELECTOR:
 	    case types.SAVE_SELECTOR:
 	      return action.selector;
@@ -4516,6 +4462,8 @@
 
 	  switch (action.type) {
 	    case types.SHOW_MESSAGE:
+	    case types.ADD_PAGE:
+	    case types.RENAME_PAGE:
 	      return Object.assign({}, {
 	        text: action.text,
 	        fade: action.fade
@@ -4542,7 +4490,7 @@
 
 	var ActionTypes = _interopRequireWildcard(_ActionTypes);
 
-	var _helpers = __webpack_require__(28);
+	var _helpers = __webpack_require__(31);
 
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -4579,9 +4527,76 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
+
+	var _ActionTypes = __webpack_require__(24);
+
+	var types = _interopRequireWildcard(_ActionTypes);
+
+	var _helpers = __webpack_require__(31);
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+	exports.default = function (state) {
+	  return function (next) {
+	    return function (action) {
+	      var fadeTime = 5000;
+	      if (action.type === types.ADD_PAGE || action.type === types.RENAME_PAGE) {
+	        (function () {
+	          action.error = false;
+	          var current = state.getState();
+	          var _current$page = current.page;
+	          var pages = _current$page.pages;
+	          var pageIndex = _current$page.pageIndex;
+
+	          var name = action.name;
+	          // verify that the name contains no illegal characters
+	          if (!(0, _helpers.legalName)(name)) {
+	            action.text = "Name \"" + name + "\" contains one or more illegal characters (< > : \" \\ / | ? *)";
+	            action.fade = fadeTime;
+	            action.error = true;
+	          }
+	          // verify that a page with the given name does not already exist
+	          var exists = pages.some(function (curr) {
+	            return curr === undefined ? false : name === curr.name;
+	          });
+	          if (exists) {
+	            action.text = "A page with the name \"" + name + "\" already exists";
+	            action.fade = fadeTime;
+	            action.error = true;
+	          }
+	          action.selector = current.selector;
+	          // need to actually create the page for ADD_PAGE
+	          if (!action.error) {
+	            if (action.type === types.ADD_PAGE) {
+	              var newPage = (0, _helpers.createPage)(name);
+	              (0, _helpers.setupPage)(newPage);
+	              action.page = newPage;
+	              action.selector = newPage;
+	            } else {
+	              //
+	              var currentPage = pages[pageIndex];
+	              currentPage.name = name;
+	            }
+	          }
+	        })();
+	      }
+	      return next(action);
+	    };
+	  };
+	};
+
+/***/ },
+/* 53 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
 	exports.chromeLoad = exports.chromeSave = undefined;
 
-	var _helpers = __webpack_require__(28);
+	var _helpers = __webpack_require__(31);
 
 	/*
 	 * any time that the page is updated, the new value should be saved

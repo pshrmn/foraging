@@ -1,6 +1,7 @@
 import React from "react";
 import d3 from "d3";
 
+import { PosButton, NegButton, NeutralButton } from "./Inputs";
 import { abbreviate, clone, highlight, unhighlight } from "../helpers";
 
 /*
@@ -44,7 +45,7 @@ export default React.createClass({
   },
   _makeNodes: function() {
     // don't draw anything when there isn't a page
-    let { page, selector, active, selectSelector } = this.props;
+    let { page, selector, active, actions } = this.props;
     if ( page === undefined ) {
       return null;
     }
@@ -69,7 +70,7 @@ export default React.createClass({
       }
       return <Node key={i} 
                    current={current}
-                   select={selectSelector}
+                   select={actions.selectSelector}
                    active={active}
                    {...n} />
     });
@@ -82,11 +83,19 @@ export default React.createClass({
     );
   },
   render: function() {
-    let { width, height, margin } = this.props;
+    let { page, actions,
+          width, height, margin } = this.props;
     let nodes = this._makeNodes();
-
+    let pageInfo = page === undefined ? null : (
+      <div>
+        <h2>{page.name}</h2>
+        <PageControls actions={actions}
+                      {...page} />
+      </div>
+    );
     return (
       <div className="graph">
+        {pageInfo}    
         <svg width={margin.left+width+margin.right}
              height={margin.top+height+margin.bottom}>
           <g transform={`translate(${margin.left},${margin.top})`} >
@@ -162,3 +171,38 @@ let Node = React.createClass({
     unhighlight(this.hoverClass);
   }
 });
+
+let PageControls = React.createClass({
+  renameHandler: function(event) {
+    event.preventDefault();
+    let name = window.prompt("Page Name:\nCannot contain the following characters: < > : \" \\ / | ? * ");
+    // do nothing if the user cancels, does not enter a name, or enter the same name as the current one
+    if ( name === null || name === "" || name === this.props.name) {
+      return;
+    }
+    this.props.actions.renamePage(name);
+  },
+  deleteHandler: function(event) {
+    event.preventDefault();
+    // report the current page index
+    this.props.actions.removePage();
+  },
+  uploadHandler: function(event) {
+    event.preventDefault();
+    this.props.actions.uploadPage();
+  },
+  previewHandler: function(event) {
+    event.preventDefault();
+    this.props.actions.showPreview();
+  },
+  render: function() {
+    return (
+      <div>
+        <PosButton click={this.renameHandler} text="Rename" />
+        <NegButton click={this.deleteHandler} text="Delete" />
+        <PosButton click={this.uploadHandler} text="Upload" />
+        <PosButton click={this.previewHandler} text="Preview" />
+      </div>
+    );
+  }
+})

@@ -9,6 +9,7 @@ import reducer from './reducers';
 
 import { SHOW_FORAGER } from "./constants/ActionTypes";
 import chromeBackground from "./middleware/chromeBackground";
+import pageMiddleware from "./middleware/pageMiddleware";
 
 import { chromeSave, chromeLoad } from "./chrome";
 
@@ -43,7 +44,8 @@ if ( !holder ) {
       }
     };
     let store = applyMiddleware(
-        chromeBackground
+        chromeBackground,
+        pageMiddleware
       )(createStore)(reducer, initialState);
 
     /*

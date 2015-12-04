@@ -6,7 +6,7 @@ import * as ForagerActions from "../actions";
 
 import Controls from "../components/Controls";
 import Frames from "../components/frames/Frames";
-import Tree from "../components/Tree";
+import PageTree from "../components/PageTree";
 import Preview from "../components/Preview";
 
 let Forager = React.createClass({
@@ -30,13 +30,13 @@ let Forager = React.createClass({
                   message={message}
                   actions={actions} />
         <div className="workspace">
+          <PageTree page={page}
+                    selector={selector}
+                    actions={actions}
+                    active={frame.name === "selector"}/>
           <Frames selector={selector}
                   frame={frame}
                   actions={actions} />
-          <Tree page={page}
-                selector={selector}
-                selectSelector={actions.selectSelector}
-                active={frame.name === "selector"}/>
         </div>
         {previewModal}
       </div>
