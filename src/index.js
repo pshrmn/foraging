@@ -36,6 +36,10 @@ if ( !holder ) {
       },
       preview: {
         visible: false
+      },
+      message: {
+        text: "",
+        fade: undefined
       }
     };
     let store = applyMiddleware(

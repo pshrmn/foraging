@@ -1,18 +1,22 @@
 import React from "react";
 
 import { PosButton, NegButton, NeutralButton } from "./Inputs";
+import Message from "./Message";
 
-import { legalName, createPage, setupPage, unhighlight } from "../helpers";
+import { legalName, createPage, setupPage } from "../helpers";
 
 export default React.createClass({
   render: function() {
-    let { pages, index, actions } = this.props;
+    let { pages, index, message, actions } = this.props;
     return (
-      <div className="controls">
-        <PageControls pages={pages}
-                      index={index}
-                      actions={actions} />
-        <GeneralControls actions={actions}/>
+      <div className="topbar">
+        <div className="controls">
+          <PageControls pages={pages}
+                        index={index}
+                        actions={actions} />
+          <GeneralControls actions={actions}/>
+        </div>
+        <Message {...message} />
       </div>
     );
   }
@@ -27,11 +31,30 @@ let PageControls = React.createClass({
     }
     return name;
   },
+  checkName: function(name) {
+    // if the name contains illegal characters, let the user know
+    if ( !legalName(name) ) {
+      let msg = `Name "${name}" contains one or more illegal characters (< > : \" \\ / | ? *)`;
+      this.props.actions.showMessage(msg, 5000);
+      return false;
+    }
+    // if a page with the name already exists, let the user know
+    let exists = this.props.pages.some(curr => curr === undefined ? false : name === curr.name);
+    if ( exists ) {
+      this.props.actions.showMessage(`A page with the name "${name}" already exists`, 5000);
+      return false;
+    }
+    return true;
+  },
   addHandler: function(event) {
     event.preventDefault();
-    let name = this.getName();
-    if ( name !== undefined ) {
-      // report the new name
+    let name = window.prompt("Page Name:\nCannot contain the following characters: < > : \" \\ / | ? * ");
+    // do nothing if the user cancels or does not enter a name
+    if ( name === null || name === "" ) {
+      return;
+    }
+    let good = this.checkName(name);
+    if ( good ) {
       let newPage = createPage(name);
       setupPage(newPage);
       this.props.actions.addPage(newPage);
@@ -44,9 +67,13 @@ let PageControls = React.createClass({
     if ( curr === undefined ) {
       return;
     }
-    let name = this.getName();
-    if ( name !== undefined && name !== curr.name) {
-      // set the new name
+    let name = window.prompt("Page Name:\nCannot contain the following characters: < > : \" \\ / | ? * ");
+    // do nothing if the user cancels, does not enter a name, or enter the same name as the current one
+    if ( name === null || name === "" || name === curr.name) {
+      return;
+    }
+    let good = this.checkName(name);
+    if ( good ) {
       this.props.actions.renamePage(name);
     }
   },
@@ -95,7 +122,7 @@ let PageControls = React.createClass({
 
 let GeneralControls = React.createClass({
   handleClose: function(event){
-    unhighlight("foraging");
+    document.body.classList.remove("foraging");
     this.props.actions.closeForager();
   },
   render: function() {

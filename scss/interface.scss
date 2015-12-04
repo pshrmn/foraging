@@ -202,15 +202,22 @@ body.foraging {
         font-size: 1.1em;
     }
 
-    .controls{
+    .topbar{
         background: $dark-gray;
-        height: 31px;
+        min-height: 31px;
         margin-bottom: 10px;
         min-width: 650px;
-        display: flex;
 
         span {
             color: $light-gray
+        }
+
+        .controls {
+            display: flex;
+        }
+
+        .message {
+            color: $red;
         }
 
         button{
@@ -249,10 +256,6 @@ body.foraging {
         button:active{
             border-style: inset !important;
             color: $black !important;
-        }
-
-        div{
-            display: inline-block;
         }
 
         select{

@@ -51,6 +51,14 @@ export const hidePreview = () => {
   };
 };
 
+export const showMessage = (text, fade) => {
+  return {
+    type: types.SHOW_MESSAGE,
+    text: text,
+    fade: fade
+  };
+};
+
 /*
  * FRAME ACTIONS
  */

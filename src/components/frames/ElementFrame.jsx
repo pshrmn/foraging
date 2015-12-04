@@ -42,8 +42,11 @@ export default React.createClass({
   },
   getInitialState: function() {
     return {
+      // the index of the selected selector
       checked: undefined,
+      // the array of possible selectors
       selectors: [],
+      // the number of elements the currently selected selector matches
       eleCount: 0
     };
   },
@@ -61,6 +64,8 @@ export default React.createClass({
     let s = selectors[checked];
     if ( checked !== undefined && s !== undefined ) {
       this.props.next(s);
+    } else {
+      this.props.message("No selector selected");
     }
   },
   cancelHandler: function(event) {

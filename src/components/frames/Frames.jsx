@@ -40,16 +40,19 @@ export default React.createClass({
     case "element":
       return <ElementFrame parentElements={selector.elements}
                            next={actions.showPartsFrame}
-                           cancel={actions.showSelectorFrame} />
+                           cancel={actions.showSelectorFrame}
+                           message={actions.showMessage} />
     case "parts":
       return <PartsFrame parentElements={selector.elements}
                          next={actions.showSpecFrame}
                          cancel={actions.showSelectorFrame}
+                         message={actions.showMessage}
                          {...frame.data} />
     case "spec":
       return <SpecFrame parent={selector}
                         save={actions.saveSelector}
                         cancel={actions.showSelectorFrame}
+                        message={actions.showMessage} 
                         {...frame.data} />
     default:
       return null;

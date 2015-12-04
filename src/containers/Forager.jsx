@@ -11,7 +11,8 @@ import Preview from "../components/Preview";
 
 let Forager = React.createClass({
   render: function() {
-    let { pages, pageIndex, show, dispatch, frame, selector, preview } = this.props;
+    let { pages, pageIndex, selector, show,
+          dispatch, frame, preview, message } = this.props;
     let page = pages[pageIndex];
     const actions = bindActionCreators(ForagerActions, dispatch);
     let classNames = ["no-select"];
@@ -26,6 +27,7 @@ let Forager = React.createClass({
       <div id="forager" className={classNames.join(" ")} ref="app">
         <Controls pages={pages}
                   index={pageIndex}
+                  message={message}
                   actions={actions} />
         <div className="workspace">
           <Frames selector={selector}
@@ -73,7 +75,8 @@ function mapStateToProps(state) {
     pages: state.page.pages,
     pageIndex: state.page.pageIndex,
     selector: state.selector,
-    preview: state.preview
+    preview: state.preview,
+    message: state.message
   };
 }
 

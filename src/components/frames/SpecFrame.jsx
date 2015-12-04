@@ -18,6 +18,7 @@ export default React.createClass({
     let { css, parent } = this.props;
     // all value must be set
     if ( type === "all" && value === "" ) {
+      this.props.message("Name for type \"all\" selectors cannot be empty");
       return;
     }
     let sel = createSelector(css, type, value, optional);

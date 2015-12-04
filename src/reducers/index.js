@@ -3,6 +3,7 @@ import show from "./show";
 import page from "./page";
 import selector from "./selector";
 import preview from "./preview";
+import message from "./message";
 
 const initialState = {
   show: true,
@@ -19,7 +20,11 @@ const initialState = {
   preview: {
     visible: false
   },
-  selector: undefined
+  selector: undefined,
+  messages: {
+    text: "",
+    fade: undefined
+  }
 };
 
 /*
@@ -33,7 +38,8 @@ function reducer(state = initialState, action) {
       show: show(state.show, action),
       page: page(state.page, action),
       selector: selector(state.selector, action),
-      preview: preview(state.preview, action)
+      preview: preview(state.preview, action),
+      message: message(state.message, action)
     };
   }
 }

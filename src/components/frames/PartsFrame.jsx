@@ -17,6 +17,8 @@ export default React.createClass({
     let selector = this.joinParts(parts);
     if ( selector !== "" ) {
       this.props.next(selector);
+    } else {
+      this.props.message("No selectors parts selected");
     }
   },
   cancelHander: function(event) {

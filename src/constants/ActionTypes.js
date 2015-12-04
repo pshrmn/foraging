@@ -6,6 +6,8 @@ export const UPLOAD_PAGE = "UPLOAD_PAGE";
 export const SHOW_PREVIEW = "SHOW_PREVIEW";
 export const HIDE_PREVIEW = "HIDE_PREVIEW";
 
+export const SHOW_MESSAGE = "SHOW_MESSAGE";
+
 export const SHOW_SELECTOR_FRAME = "SHOW_SELECTOR_FRAME";
 export const SHOW_RULE_FRAME = "SHOW_RULE_FRAME";
 export const SHOW_ELEMENT_FRAME = "SHOW_ELEMENT_FRAME";
