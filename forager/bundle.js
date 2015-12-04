@@ -1548,17 +1548,19 @@
 	/*
 	 * PAGE ACTIONS
 	 */
-	var loadPage = exports.loadPage = function loadPage(index) {
+	var loadPage = exports.loadPage = function loadPage(index, selector) {
 	  return {
 	    type: types.LOAD_PAGE,
-	    index: index
+	    index: index,
+	    selector: selector
 	  };
 	};
 
 	var addPage = exports.addPage = function addPage(page) {
 	  return {
 	    type: types.ADD_PAGE,
-	    page: page
+	    page: page,
+	    selector: page
 	  };
 	};
 
@@ -1803,7 +1805,10 @@
 	    this.props.actions.showPreview();
 	  },
 	  loadPage: function loadPage(event) {
-	    this.props.actions.loadPage(event.target.value);
+	    var nextPage = parseInt(event.target.value, 10);
+	    // the initial selector is the root selector of the page
+	    var selector = this.props.pages[nextPage];
+	    this.props.actions.loadPage(nextPage, selector);
 	  },
 	  render: function render() {
 	    var _props2 = this.props;
@@ -4271,12 +4276,12 @@
 	 */
 	function selector(state, action) {
 	  switch (action.type) {
+	    case types.ADD_PAGE:
+	    case types.LOAD_PAGE:
 	    case types.SELECT_SELECTOR:
 	    case types.SAVE_SELECTOR:
 	      return action.selector;
 	    case types.REMOVE_SELECTOR:
-	    case types.LOAD_PAGE:
-	    case types.ADD_PAGE:
 	    case types.REMOVE_PAGE:
 	    case types.CLOSE_FORAGER:
 	      return undefined;

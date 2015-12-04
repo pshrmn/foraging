@@ -3,17 +3,19 @@ import * as types from "../constants/ActionTypes";
 /*
  * PAGE ACTIONS
  */
-export const loadPage = index => {
+export const loadPage = (index, selector) => {
   return {
     type: types.LOAD_PAGE,
-    index: index
+    index: index,
+    selector: selector
   };
 };
 
 export const addPage = page => {
   return {
     type: types.ADD_PAGE,
-    page: page
+    page: page,
+    selector: page
   };
 };
 

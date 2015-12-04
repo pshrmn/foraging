@@ -64,7 +64,10 @@ let PageControls = React.createClass({
     this.props.actions.showPreview();
   },
   loadPage: function(event) {
-    this.props.actions.loadPage(event.target.value);
+    let nextPage = parseInt(event.target.value, 10);
+    // the initial selector is the root selector of the page
+    let selector = this.props.pages[nextPage];
+    this.props.actions.loadPage(nextPage, selector);
   },
   render: function() {
     let { pages, index } = this.props;

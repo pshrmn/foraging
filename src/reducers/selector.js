@@ -9,12 +9,12 @@ import * as types from "../constants/ActionTypes";
  */
 export default function selector(state, action) {
   switch ( action.type ) {
+  case types.ADD_PAGE:
+  case types.LOAD_PAGE:
   case types.SELECT_SELECTOR:
   case types.SAVE_SELECTOR:
     return action.selector;
   case types.REMOVE_SELECTOR:
-  case types.LOAD_PAGE:
-  case types.ADD_PAGE:
   case types.REMOVE_PAGE:
   case types.CLOSE_FORAGER:
     return undefined;
