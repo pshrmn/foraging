@@ -134,6 +134,8 @@ body.foraging {
     #forager .topbar span {
       color: #CED1DE; }
     #forager .topbar .controls {
+      display: -webkit-flex;
+      display: -ms-flexbox;
       display: flex; }
     #forager .topbar .message {
       color: #E85F88; }
@@ -167,6 +169,8 @@ body.foraging {
       height: 22px;
       border-radius: 2px; }
   #forager .workspace {
+    display: -webkit-flex;
+    display: -ms-flexbox;
     display: flex; }
   #forager .frames, #forager .graph {
     background: #ffffff;
@@ -202,23 +206,35 @@ body.foraging {
       width: 100%;
       background: #ffffff;
       padding: 5px;
+      display: -webkit-flex;
+      display: -ms-flexbox;
       display: flex;
-      flex-direction: column;
+      -webkit-flex-direction: column;
+          -ms-flex-direction: column;
+              flex-direction: column;
       /*
              * frames are broken down into two parts, the .info section and
              * the .buttons section
              */ }
       #forager .frames .frame .buttons {
         margin-top: auto;
+        display: -webkit-flex;
+        display: -ms-flexbox;
         display: flex; }
         #forager .frames .frame .buttons button {
-          flex-grow: 1; }
+          -webkit-flex-grow: 1;
+              -ms-flex-positive: 1;
+                  flex-grow: 1; }
       #forager .frames .frame ul {
         padding: 0;
         overflow-wrap: break-word; }
       #forager .frames .frame .choices {
+        display: -webkit-flex;
+        display: -ms-flexbox;
         display: flex;
-        flex-wrap: wrap; }
+        -webkit-flex-wrap: wrap;
+            -ms-flex-wrap: wrap;
+                flex-wrap: wrap; }
         #forager .frames .frame .choices label {
           margin-right: 15px;
           padding: 2px 3px;
@@ -231,6 +247,8 @@ body.foraging {
     #forager .frames .rules {
       margin: 5px 0; }
       #forager .frames .rules .rule {
+        display: -webkit-flex;
+        display: -ms-flexbox;
         display: flex; }
         #forager .frames .rules .rule .name {
           font-weight: bold; }

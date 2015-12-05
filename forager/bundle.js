@@ -2300,6 +2300,7 @@
 	exports.default = _react2.default.createClass({
 	  displayName: "RuleFrame",
 
+	  highlight: "current-selector",
 	  getInitialState: function getInitialState() {
 	    return {
 	      name: "",
@@ -2401,6 +2402,20 @@
 	        _react2.default.createElement(_Inputs.NegButton, { text: "Cancel", click: this.cancelHandler })
 	      )
 	    );
+	  },
+	  componentWillMount: function componentWillMount() {
+	    var elements = this.props.selector.elements;
+
+	    (0, _helpers.highlight)(elements, this.highlight);
+	  },
+	  componentWillUpdate: function componentWillUpdate(nextProps, nextState) {
+	    (0, _helpers.unhighlight)(this.highlight);
+	    var elements = nextProps.selector.elements;
+
+	    (0, _helpers.highlight)(elements, this.highlight);
+	  },
+	  componentWillUnmount: function componentWillUnmount() {
+	    (0, _helpers.unhighlight)(this.highlight);
 	  }
 	});
 

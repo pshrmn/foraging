@@ -1,9 +1,10 @@
 import React from "react";
 
 import { PosButton, NegButton } from "../Inputs";
-import { attributes, abbreviate } from "../../helpers";
+import { attributes, abbreviate, select, highlight, unhighlight } from "../../helpers";
 
 export default React.createClass({
+  highlight: "current-selector",
   getInitialState: function() {
     return {
       name: "",
@@ -81,6 +82,18 @@ export default React.createClass({
         </div>
       </div>
     );
+  },
+  componentWillMount: function() {
+    let { elements } = this.props.selector;
+    highlight(elements, this.highlight);
+  },
+  componentWillUpdate: function(nextProps, nextState) {
+    unhighlight(this.highlight);
+    let { elements } = nextProps.selector;
+    highlight(elements, this.highlight);
+  },
+  componentWillUnmount: function() {
+    unhighlight(this.highlight);
   }
 });
 
