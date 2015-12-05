@@ -2,7 +2,8 @@ $red: #E85F88;
 $dark-red: #D02357;
 $green: #76B85C;
 $dark-green: #42752E;
-$blue: #45AFCC;
+$blue: #225683;
+$dark-blue: #222233;
 $purple: #8F56A6;
 $light-gray: #CED1DE;
 $dark-gray: #323033;
@@ -30,12 +31,12 @@ body.foraging {
     bottom: 0;
     min-width: 700px;
     min-height: 30px;
-    background: $dark-gray;
+    background: $dark-blue;
     font-size: 16px;
     font-family: sans-serif;
     color: $black;
     text-align: left;
-    border: 10px solid $dark-gray;
+    border: 10px solid $dark-blue;
     box-sizing: border-box;
 
     &.hidden {
@@ -111,24 +112,23 @@ body.foraging {
         text-align: center;
         background: $light-gray;
         color: $black !important;
-        border-radius: 3px;
-        border: 2px outset $light-gray;
-        box-shadow: none !important;
-        cursor: pointer !important;
         font-weight: normal !important;
-        margin: 2px !important;
-        padding: 1px 6px !important;
-        min-width: initial !important;
         text-transform: capitalize !important;
 
-        &:active {
-            border-style: inset !important;
-            color: $black !important;
-        }
+        border-radius: 0px;
+        border-width: 0 0 4px 0;
+        border-style: solid;
+        border-color: $dark-gray;
+        box-shadow: none !important;
+
+        cursor: pointer !important;
+        margin: 2px !important;
+        padding: 3px 6px !important;
+        
+        min-width: initial !important;
 
         &:hover, &:active, &:focus{
-            background: $light-gray;
-            border-color: $light-gray;
+            border-color: $gray;
             color: $black !important;
         }
 
@@ -145,15 +145,22 @@ body.foraging {
             }
         }
 
-        &.neg, &.neg:hover, &.neg:active, &.neg:focus{
-            background: $red !important;
-            border-color: $red !important;
+        &.neg {
+            border-color: $dark-red !important;
+
+            &:hover, &:active, &:focus {
+                border-color: $red !important;   
+            }
         }
 
-        &.pos, &.pos:hover, &.pos:active, &.pos:focus{
-            background: $green !important;
-            border-color: $green !important;
+        &.pos {
+            border-color: $dark-green !important;
+
+            &:hover, &:active, &:focus {
+                border-color: $green !important;   
+            }
         }
+
 
         &.neg.transparent {
             background: transparent !important;
@@ -203,7 +210,6 @@ body.foraging {
     }
 
     .topbar{
-        background: $dark-gray;
         min-height: 31px;
         margin-bottom: 10px;
         min-width: 650px;
@@ -227,28 +233,28 @@ body.foraging {
             border-width: 1px;
             border-style: solid;
             
-            background: $dark-gray !important;
+            background: $dark-blue !important;
 
             &.pos, &.pos:active, &.pos:focus {
                 color: $green !important;
                 border-color: $green !important;
-                background: $dark-gray !important;
+                background: $dark-blue !important;
             }
 
             &.pos:hover {
                 background: $green !important;
-                color: $dark-gray !important;
+                color: $dark-blue !important;
             }
 
             &.neg, &.neg:active, &.neg:focus{
                 border-color: $red !important;
                 color: $red !important;
-                background: $dark-gray !important;
+                background: $dark-blue !important;
             }
 
             &.neg:hover {
                 background: $red !important;
-                color: $dark-gray !important;            
+                color: $dark-blue !important;            
             }
 
         }
@@ -281,7 +287,6 @@ body.foraging {
 
         svg {
             box-sizing: content-box;
-            padding: 15px;
             font-size: 14px;
             background: $white;
 
@@ -304,10 +309,11 @@ body.foraging {
                 stroke: $white;
                 stroke-width: 3px;
                 text-anchor: middle;
+                font-weight: bold;
             }
 
             .current{
-                font-weight: bold;
+                font-style: italic;
                 fill: $dark-gray;
             }
         }
@@ -385,29 +391,6 @@ body.foraging {
         }
     }
 
-    .attributes {
-        tbody tr:hover{
-            background: $gray;
-            cursor: pointer;
-        }
-
-        .selectedAttr, .selectedAttr:hover{
-            background: $green;
-        }
-    }
-
-    td, th {
-        min-width: 50px;
-        height: 1.5rem;
-        border: 2px solid $white;
-        text-align: center;
-        vertical-align: middle;
-    }
-
-    th {
-        background: $blue;
-    }
-    
     .page-controls {
         display: inline-block;
     }

@@ -27,7 +27,7 @@ export default React.createClass({
         <pre>
           {previewText}
         </pre>
-        <PosButton text="Log" click={this.logHandler} />
+        <PosButton text="Log to Console" click={this.logHandler} />
         <PosButton text="Pretty Log" click={this.prettyLogHandler} />
         <NeutralButton text="Close" click={this.closeHandler} />
         </div>

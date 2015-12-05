@@ -15,12 +15,12 @@ body.foraging {
   bottom: 0;
   min-width: 700px;
   min-height: 30px;
-  background: #323033;
+  background: #222233;
   font-size: 16px;
   font-family: sans-serif;
   color: #000000;
   text-align: left;
-  border: 10px solid #323033;
+  border: 10px solid #222233;
   box-sizing: border-box;
   /*
      * input elements are the source of the biggest style
@@ -72,24 +72,22 @@ body.foraging {
     text-align: center;
     background: #CED1DE;
     color: #000000 !important;
-    border-radius: 3px;
-    border: 2px outset #CED1DE;
+    font-weight: normal !important;
+    text-transform: capitalize !important;
+    border-radius: 0px;
+    border-width: 0 0 4px 0;
+    border-style: solid;
+    border-color: #323033;
     box-shadow: none !important;
     cursor: pointer !important;
-    font-weight: normal !important;
     margin: 2px !important;
-    padding: 1px 6px !important;
+    padding: 3px 6px !important;
     min-width: initial !important;
-    text-transform: capitalize !important;
     /*
          * some classes to customize the look of buttons
          */ }
-    #forager button:active {
-      border-style: inset !important;
-      color: #000000 !important; }
     #forager button:hover, #forager button:active, #forager button:focus {
-      background: #CED1DE;
-      border-color: #CED1DE;
+      border-color: #898B96;
       color: #000000 !important; }
     #forager button.transparent {
       background: transparent !important;
@@ -97,12 +95,14 @@ body.foraging {
       font-weight: bold !important; }
       #forager button.transparent:hover {
         background: transparent !important; }
-    #forager button.neg, #forager button.neg:hover, #forager button.neg:active, #forager button.neg:focus {
-      background: #E85F88 !important;
-      border-color: #E85F88 !important; }
-    #forager button.pos, #forager button.pos:hover, #forager button.pos:active, #forager button.pos:focus {
-      background: #76B85C !important;
-      border-color: #76B85C !important; }
+    #forager button.neg {
+      border-color: #D02357 !important; }
+      #forager button.neg:hover, #forager button.neg:active, #forager button.neg:focus {
+        border-color: #E85F88 !important; }
+    #forager button.pos {
+      border-color: #42752E !important; }
+      #forager button.pos:hover, #forager button.pos:active, #forager button.pos:focus {
+        border-color: #76B85C !important; }
     #forager button.neg.transparent {
       background: transparent !important;
       color: #D02357 !important; }
@@ -128,15 +128,12 @@ body.foraging {
   #forager h4, #forager h5, #forager h6 {
     font-size: 1.1em; }
   #forager .topbar {
-    background: #323033;
     min-height: 31px;
     margin-bottom: 10px;
     min-width: 650px; }
     #forager .topbar span {
       color: #CED1DE; }
     #forager .topbar .controls {
-      display: -webkit-flex;
-      display: -ms-flexbox;
       display: flex; }
     #forager .topbar .message {
       color: #E85F88; }
@@ -146,21 +143,21 @@ body.foraging {
       border-radius: 3px;
       border-width: 1px;
       border-style: solid;
-      background: #323033 !important; }
+      background: #222233 !important; }
       #forager .topbar button.pos, #forager .topbar button.pos:active, #forager .topbar button.pos:focus {
         color: #76B85C !important;
         border-color: #76B85C !important;
-        background: #323033 !important; }
+        background: #222233 !important; }
       #forager .topbar button.pos:hover {
         background: #76B85C !important;
-        color: #323033 !important; }
+        color: #222233 !important; }
       #forager .topbar button.neg, #forager .topbar button.neg:active, #forager .topbar button.neg:focus {
         border-color: #E85F88 !important;
         color: #E85F88 !important;
-        background: #323033 !important; }
+        background: #222233 !important; }
       #forager .topbar button.neg:hover {
         background: #E85F88 !important;
-        color: #323033 !important; }
+        color: #222233 !important; }
     #forager .topbar button:active {
       border-style: inset !important;
       color: #000000 !important; }
@@ -170,8 +167,6 @@ body.foraging {
       height: 22px;
       border-radius: 2px; }
   #forager .workspace {
-    display: -webkit-flex;
-    display: -ms-flexbox;
     display: flex; }
   #forager .frames, #forager .graph {
     background: #ffffff;
@@ -180,7 +175,6 @@ body.foraging {
     padding: 5px; }
   #forager .graph svg {
     box-sizing: content-box;
-    padding: 15px;
     font-size: 14px;
     background: #ffffff; }
     #forager .graph svg .link {
@@ -195,9 +189,10 @@ body.foraging {
       paint-order: stroke;
       stroke: #ffffff;
       stroke-width: 3px;
-      text-anchor: middle; }
+      text-anchor: middle;
+      font-weight: bold; }
     #forager .graph svg .current {
-      font-weight: bold;
+      font-style: italic;
       fill: #323033; }
   #forager .frames {
     width: 400px;
@@ -207,35 +202,23 @@ body.foraging {
       width: 100%;
       background: #ffffff;
       padding: 5px;
-      display: -webkit-flex;
-      display: -ms-flexbox;
       display: flex;
-      -webkit-flex-direction: column;
-          -ms-flex-direction: column;
-              flex-direction: column;
+      flex-direction: column;
       /*
              * frames are broken down into two parts, the .info section and
              * the .buttons section
              */ }
       #forager .frames .frame .buttons {
         margin-top: auto;
-        display: -webkit-flex;
-        display: -ms-flexbox;
         display: flex; }
         #forager .frames .frame .buttons button {
-          -webkit-flex-grow: 1;
-              -ms-flex-positive: 1;
-                  flex-grow: 1; }
+          flex-grow: 1; }
       #forager .frames .frame ul {
         padding: 0;
         overflow-wrap: break-word; }
       #forager .frames .frame .choices {
-        display: -webkit-flex;
-        display: -ms-flexbox;
         display: flex;
-        -webkit-flex-wrap: wrap;
-            -ms-flex-wrap: wrap;
-                flex-wrap: wrap; }
+        flex-wrap: wrap; }
         #forager .frames .frame .choices label {
           margin-right: 15px;
           padding: 2px 3px;
@@ -248,26 +231,11 @@ body.foraging {
     #forager .frames .rules {
       margin: 5px 0; }
       #forager .frames .rules .rule {
-        display: -webkit-flex;
-        display: -ms-flexbox;
         display: flex; }
         #forager .frames .rules .rule .name {
           font-weight: bold; }
         #forager .frames .rules .rule button {
           margin-left: auto; }
-  #forager .attributes tbody tr:hover {
-    background: #898B96;
-    cursor: pointer; }
-  #forager .attributes .selectedAttr, #forager .attributes .selectedAttr:hover {
-    background: #76B85C; }
-  #forager td, #forager th {
-    min-width: 50px;
-    height: 1.5rem;
-    border: 2px solid #ffffff;
-    text-align: center;
-    vertical-align: middle; }
-  #forager th {
-    background: #45AFCC; }
   #forager .page-controls {
     display: inline-block; }
   #forager .app-controls {
@@ -376,4 +344,4 @@ img.saved-preview {
   background: rgba(69, 175, 204, 0.25) !important; }
 
 img.current-selector {
-  border: 1px dotted #45AFCC !important; }
+  border: 1px dotted #225683 !important; }

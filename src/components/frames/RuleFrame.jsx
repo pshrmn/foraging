@@ -132,9 +132,13 @@ let AttrChoices = React.createClass({
     return (
       <div className="element-attributes">
         <div>
-          <PosButton text="<<" click={this.prevElement} />
-          {" "}{index}/{eleCount-1}{" "}
-          <PosButton text=">>" click={this.nextElement} />
+          <PosButton text="<<"
+                     classes={["transparent"]}
+                     click={this.prevElement} />
+          {" "}{index+1}/{eleCount}{" "}
+          <PosButton text=">>"
+                     classes={["transparent"]}
+                     click={this.nextElement} />
         </div>
         <ul>
           {this.elementAttributes(elements[index])}

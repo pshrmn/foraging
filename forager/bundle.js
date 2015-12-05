@@ -2469,13 +2469,17 @@
 	      _react2.default.createElement(
 	        "div",
 	        null,
-	        _react2.default.createElement(_Inputs.PosButton, { text: "<<", click: this.prevElement }),
+	        _react2.default.createElement(_Inputs.PosButton, { text: "<<",
+	          classes: ["transparent"],
+	          click: this.prevElement }),
 	        " ",
-	        index,
+	        index + 1,
 	        "/",
-	        eleCount - 1,
+	        eleCount,
 	        " ",
-	        _react2.default.createElement(_Inputs.PosButton, { text: ">>", click: this.nextElement })
+	        _react2.default.createElement(_Inputs.PosButton, { text: ">>",
+	          classes: ["transparent"],
+	          click: this.nextElement })
 	      ),
 	      _react2.default.createElement(
 	        "ul",
@@ -3976,10 +3980,10 @@
 	    return _react2.default.createElement(
 	      "div",
 	      null,
-	      _react2.default.createElement(_Inputs.PosButton, { click: this.renameHandler, text: "Rename" }),
-	      _react2.default.createElement(_Inputs.NegButton, { click: this.deleteHandler, text: "Delete" }),
 	      _react2.default.createElement(_Inputs.PosButton, { click: this.uploadHandler, text: "Upload" }),
-	      _react2.default.createElement(_Inputs.PosButton, { click: this.previewHandler, text: "Preview" })
+	      _react2.default.createElement(_Inputs.PosButton, { click: this.previewHandler, text: "Preview" }),
+	      _react2.default.createElement(_Inputs.PosButton, { click: this.renameHandler, text: "Rename" }),
+	      _react2.default.createElement(_Inputs.NegButton, { click: this.deleteHandler, text: "Delete" })
 	    );
 	  }
 	});
@@ -4041,7 +4045,7 @@
 	          null,
 	          previewText
 	        ),
-	        _react2.default.createElement(_Inputs.PosButton, { text: "Log", click: this.logHandler }),
+	        _react2.default.createElement(_Inputs.PosButton, { text: "Log to Console", click: this.logHandler }),
 	        _react2.default.createElement(_Inputs.PosButton, { text: "Pretty Log", click: this.prettyLogHandler }),
 	        _react2.default.createElement(_Inputs.NeutralButton, { text: "Close", click: this.closeHandler })
 	      )

@@ -198,10 +198,10 @@ let PageControls = React.createClass({
   render: function() {
     return (
       <div>
-        <PosButton click={this.renameHandler} text="Rename" />
-        <NegButton click={this.deleteHandler} text="Delete" />
         <PosButton click={this.uploadHandler} text="Upload" />
         <PosButton click={this.previewHandler} text="Preview" />
+        <PosButton click={this.renameHandler} text="Rename" />
+        <NegButton click={this.deleteHandler} text="Delete" />
       </div>
     );
   }
