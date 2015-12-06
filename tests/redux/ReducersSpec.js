@@ -203,43 +203,8 @@ describe("redux reducers", () => {
       });
     });
 
-    describe("RENAME_PAGE", () => {
-      it("renames the page at pageIndex", () => {
-        let state = {
-          pages: [
-            undefined,
-            {name: "1"},
-            {name: "2"}
-          ],
-          pageIndex: 1
-        };
-        let action = {
-          type: ActionTypes.RENAME_PAGE,
-          name: "Foo"
-        };
-        let result = page(state, action);
-        expect(result.pages[result.pageIndex].name).to.equal("Foo");
-      });
-
-      it("does nothing when pageIndex === 0", () => {
-        let state = {
-          pages: [
-            undefined,
-            {name: "1"},
-            {name: "2"}
-          ],
-          pageIndex: 0
-        };
-        let action = {
-          type: ActionTypes.RENAME_PAGE,
-          name: "Foo"
-        };
-        // because pages[0] is undefined, normally trying to set the name property
-        // on it would throw an error, so this expects no error to be thrown
-        // if handled properly
-        expect(page.bind(null, state, action)).to.not.throw();
-      });
-    });
+    // this isn't actually used since middleware is handling the renaming
+    describe("RENAME_PAGE", () => {});
 
   });
 

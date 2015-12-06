@@ -11,32 +11,17 @@ import { abbreviate, clone, highlight, unhighlight } from "../helpers";
 export default React.createClass({
   getDefaultProps: function() {
     return {
-      selectPage: () => {},
       width: 500,
-      height: 150,
-      margin: {
-        top: 25,
-        right: 25,
-        bottom: 25,
-        left: 50
-      }
+      height: 150
     };
   },
   getInitialState: function() {
     return {
-      diagonal: d3.svg.diagonal().projection(d => { return [d.y, d.x]; })
+      diagonal: d3.svg.diagonal().projection(d => [d.y, d.x])
     };
   },
   componentWillMount: function() {
-    this._makeTreeLayout(this.props.width, this.props.height);
-  },
-  componentWillReceiveProps: function(nextProps) {
-    let { width, height } = nextProps;
-    if ( width !== this.props.width || height !== this.props.height ) {
-      this._makeTreeLayout(width, height);
-    }
-  },
-  _makeTreeLayout: function(width, height) {
+    let { width, height } = this.props;
     let tree = d3.layout.tree()
       .size([height, width]);
     this.setState({
@@ -44,12 +29,7 @@ export default React.createClass({
     });
   },
   _makeNodes: function() {
-    // don't draw anything when there isn't a page
     let { page, selector, active, actions } = this.props;
-    if ( page === undefined ) {
-      return null;
-    }
-
     let { tree, diagonal } = this.state;
 
     let clonedPage = clone(page);
@@ -57,48 +37,51 @@ export default React.createClass({
     // generate the tree's nodes and links
     let nodes = tree.nodes(clonedPage);
     let links = tree.links(nodes);
-    let paths = links.map((l, i) => {
-      return <path key={i}
-                   className="link"
-                   d={diagonal(l)} />
-    });
-
-    let selectors = nodes.map((n, i) => {
-      let current = false;
-      if ( selector && n.original === selector ) {
-        current = true;
-      }
-      return <Node key={i} 
-                   current={current}
-                   select={actions.selectSelector}
-                   active={active}
-                   {...n} />
-    });
 
     return (
       <g>
-        {paths}
-        {selectors}
+        {
+          links.map((l, i) => {
+            return <path key={i}
+                         className="link"
+                         d={diagonal(l)} />
+          })
+        }
+        {
+          nodes.map((n, i) => {
+            return <Node key={i} 
+                         current={selector !== undefined && n.original === selector}
+                         select={actions.selectSelector}
+                         active={active}
+                         {...n} />
+          })
+        }
       </g>
     );
   },
   render: function() {
     let { page, actions,
-          width, height, margin } = this.props;
+          width, height } = this.props;
+    if ( page === undefined ) {
+      return <div className="graph"></div>
+    }
     let nodes = this._makeNodes();
-    let pageInfo = page === undefined ? null : (
-      <div>
-        <h2>{page.name}</h2>
-        <PageControls actions={actions}
-                      {...page} />
-      </div>
-    );
+    /*
+     * The tree layout places the left and right-most nodes directly on the edge,
+     * so additional space needs to be granted so that the labels aren't cut off.
+     * In this case, a left and right margin of 50 is used by expanding with width
+     * by 100 and translating the tree 50 pixels to the right
+     */
     return (
       <div className="graph">
-        {pageInfo}    
-        <svg width={margin.left+width+margin.right}
-             height={margin.top+height+margin.bottom}>
-          <g transform={`translate(${margin.left},${margin.top})`} >
+        <div>
+          <h2>{page.name}</h2>
+          <PageControls actions={actions}
+                        {...page} />
+        </div>
+        <svg width={width+100}
+             height={height}>
+          <g transform="translate(50,0)" >
             {nodes}
           </g>
         </svg>
@@ -136,22 +119,19 @@ let Node = React.createClass({
     return abbreviate(text, 10);
   },
   render: function() {
-    let { current, depth, hasRules, children, active } = this.props;
-    let hasChildren = children && children.length;
-    let empty = !hasRules && !hasChildren;
+    let { current, hasRules, children, active } = this.props;
+    let empty = !hasRules && !(children && children.length);
     let text = this.specText();
+    // nodes with rules drawn as rect, nodes with no rules drawn as circles
     let marker = hasRules ? (
       <rect width="6" height="6" x="-3" y="-3"></rect>
     ) : (
       <circle r="3"></circle>
     );
+
     let classNames = ["node"];
-    if ( current ) {
-      classNames.push("current");
-    }
-    if ( empty ) {
-      classNames.push("empty");
-    }
+    classNames.push(current ? "current" : null);
+    classNames.push(empty ? "empty" : null);
     // only apply events when the node is "active"
     let events = active ? {
       onClick: this.handleClick,
@@ -172,6 +152,13 @@ let Node = React.createClass({
   }
 });
 
+/*
+ * PageControls
+ * ------------
+ *
+ * Interact with the Page to upload it to a server, preview what the Page would capture
+ * on the current web page, rename the Page, and delete it.
+ */
 let PageControls = React.createClass({
   renameHandler: function(event) {
     event.preventDefault();

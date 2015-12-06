@@ -177,27 +177,30 @@ body.foraging {
     box-sizing: border-box;
     margin-right: 3px;
     padding: 5px; }
-  #forager .graph svg {
-    box-sizing: content-box;
-    font-size: 14px;
-    background: #ffffff; }
-    #forager .graph svg .link {
-      fill: none;
-      stroke: #323033; }
-    #forager .graph svg .node {
-      cursor: pointer;
-      fill: #42752E; }
-    #forager .graph svg .empty {
-      fill: #E85F88; }
-    #forager .graph svg .node text {
-      paint-order: stroke;
-      stroke: #ffffff;
-      stroke-width: 3px;
-      text-anchor: middle;
-      font-weight: bold; }
-    #forager .graph svg .current {
-      font-style: italic;
-      fill: #323033; }
+  #forager .graph {
+    min-width: 500px;
+    min-height: 150px; }
+    #forager .graph svg {
+      box-sizing: content-box;
+      font-size: 14px;
+      background: #ffffff; }
+      #forager .graph svg .link {
+        fill: none;
+        stroke: #323033; }
+      #forager .graph svg .node {
+        cursor: pointer;
+        fill: #42752E; }
+      #forager .graph svg .empty {
+        fill: #E85F88; }
+      #forager .graph svg .node text {
+        paint-order: stroke;
+        stroke: #ffffff;
+        stroke-width: 3px;
+        text-anchor: middle;
+        font-weight: bold; }
+      #forager .graph svg .current {
+        font-style: italic;
+        fill: #323033; }
   #forager .frames {
     width: 400px;
     vertical-align: top; }

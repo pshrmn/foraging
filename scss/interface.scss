@@ -284,6 +284,8 @@ body.foraging {
     }
 
     .graph {
+        min-width: 500px;
+        min-height: 150px;
 
         svg {
             box-sizing: content-box;

@@ -3771,15 +3771,8 @@
 
 	  getDefaultProps: function getDefaultProps() {
 	    return {
-	      selectPage: function selectPage() {},
 	      width: 500,
-	      height: 150,
-	      margin: {
-	        top: 25,
-	        right: 25,
-	        bottom: 25,
-	        left: 50
-	      }
+	      height: 150
 	    };
 	  },
 	  getInitialState: function getInitialState() {
@@ -3790,34 +3783,21 @@
 	    };
 	  },
 	  componentWillMount: function componentWillMount() {
-	    this._makeTreeLayout(this.props.width, this.props.height);
-	  },
-	  componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
-	    var width = nextProps.width;
-	    var height = nextProps.height;
+	    var _props = this.props;
+	    var width = _props.width;
+	    var height = _props.height;
 
-	    if (width !== this.props.width || height !== this.props.height) {
-	      this._makeTreeLayout(width, height);
-	    }
-	  },
-	  _makeTreeLayout: function _makeTreeLayout(width, height) {
 	    var tree = _d2.default.layout.tree().size([height, width]);
 	    this.setState({
 	      tree: tree
 	    });
 	  },
 	  _makeNodes: function _makeNodes() {
-	    // don't draw anything when there isn't a page
-	    var _props = this.props;
-	    var page = _props.page;
-	    var selector = _props.selector;
-	    var active = _props.active;
-	    var actions = _props.actions;
-
-	    if (page === undefined) {
-	      return null;
-	    }
-
+	    var _props2 = this.props;
+	    var page = _props2.page;
+	    var selector = _props2.selector;
+	    var active = _props2.active;
+	    var actions = _props2.actions;
 	    var _state = this.state;
 	    var tree = _state.tree;
 	    var diagonal = _state.diagonal;
@@ -3827,62 +3807,62 @@
 	    // generate the tree's nodes and links
 	    var nodes = tree.nodes(clonedPage);
 	    var links = tree.links(nodes);
-	    var paths = links.map(function (l, i) {
-	      return _react2.default.createElement("path", { key: i,
-	        className: "link",
-	        d: diagonal(l) });
-	    });
-
-	    var selectors = nodes.map(function (n, i) {
-	      var current = false;
-	      if (selector && n.original === selector) {
-	        current = true;
-	      }
-	      return _react2.default.createElement(Node, _extends({ key: i,
-	        current: current,
-	        select: actions.selectSelector,
-	        active: active
-	      }, n));
-	    });
 
 	    return _react2.default.createElement(
 	      "g",
 	      null,
-	      paths,
-	      selectors
+	      links.map(function (l, i) {
+	        return _react2.default.createElement("path", { key: i,
+	          className: "link",
+	          d: diagonal(l) });
+	      }),
+	      nodes.map(function (n, i) {
+	        return _react2.default.createElement(Node, _extends({ key: i,
+	          current: selector !== undefined && n.original === selector,
+	          select: actions.selectSelector,
+	          active: active
+	        }, n));
+	      })
 	    );
 	  },
 	  render: function render() {
-	    var _props2 = this.props;
-	    var page = _props2.page;
-	    var actions = _props2.actions;
-	    var width = _props2.width;
-	    var height = _props2.height;
-	    var margin = _props2.margin;
+	    var _props3 = this.props;
+	    var page = _props3.page;
+	    var actions = _props3.actions;
+	    var width = _props3.width;
+	    var height = _props3.height;
 
+	    if (page === undefined) {
+	      return _react2.default.createElement("div", { className: "graph" });
+	    }
 	    var nodes = this._makeNodes();
-	    var pageInfo = page === undefined ? null : _react2.default.createElement(
-	      "div",
-	      null,
-	      _react2.default.createElement(
-	        "h2",
-	        null,
-	        page.name
-	      ),
-	      _react2.default.createElement(PageControls, _extends({ actions: actions
-	      }, page))
-	    );
+	    /*
+	     * The tree layout places the left and right-most nodes directly on the edge,
+	     * so additional space needs to be granted so that the labels aren't cut off.
+	     * In this case, a left and right margin of 50 is used by expanding with width
+	     * by 100 and translating the tree 50 pixels to the right
+	     */
 	    return _react2.default.createElement(
 	      "div",
 	      { className: "graph" },
-	      pageInfo,
+	      _react2.default.createElement(
+	        "div",
+	        null,
+	        _react2.default.createElement(
+	          "h2",
+	          null,
+	          page.name
+	        ),
+	        _react2.default.createElement(PageControls, _extends({ actions: actions
+	        }, page))
+	      ),
 	      _react2.default.createElement(
 	        "svg",
-	        { width: margin.left + width + margin.right,
-	          height: margin.top + height + margin.bottom },
+	        { width: width + 100,
+	          height: height },
 	        _react2.default.createElement(
 	          "g",
-	          { transform: "translate(" + margin.left + "," + margin.top + ")" },
+	          { transform: "translate(50,0)" },
 	          nodes
 	        )
 	      )
@@ -3905,9 +3885,9 @@
 	    (0, _helpers.unhighlight)(this.hoverClass);
 	  },
 	  specText: function specText() {
-	    var _props3 = this.props;
-	    var selector = _props3.selector;
-	    var spec = _props3.spec;
+	    var _props4 = this.props;
+	    var selector = _props4.selector;
+	    var spec = _props4.spec;
 
 	    var text = "";
 	    if (!spec) {
@@ -3924,24 +3904,20 @@
 	    return (0, _helpers.abbreviate)(text, 10);
 	  },
 	  render: function render() {
-	    var _props4 = this.props;
-	    var current = _props4.current;
-	    var depth = _props4.depth;
-	    var hasRules = _props4.hasRules;
-	    var children = _props4.children;
-	    var active = _props4.active;
+	    var _props5 = this.props;
+	    var current = _props5.current;
+	    var hasRules = _props5.hasRules;
+	    var children = _props5.children;
+	    var active = _props5.active;
 
-	    var hasChildren = children && children.length;
-	    var empty = !hasRules && !hasChildren;
+	    var empty = !hasRules && !(children && children.length);
 	    var text = this.specText();
+	    // nodes with rules drawn as rect, nodes with no rules drawn as circles
 	    var marker = hasRules ? _react2.default.createElement("rect", { width: "6", height: "6", x: "-3", y: "-3" }) : _react2.default.createElement("circle", { r: "3" });
+
 	    var classNames = ["node"];
-	    if (current) {
-	      classNames.push("current");
-	    }
-	    if (empty) {
-	      classNames.push("empty");
-	    }
+	    classNames.push(current ? "current" : null);
+	    classNames.push(empty ? "empty" : null);
 	    // only apply events when the node is "active"
 	    var events = active ? {
 	      onClick: this.handleClick,
@@ -3966,6 +3942,13 @@
 	  }
 	});
 
+	/*
+	 * PageControls
+	 * ------------
+	 *
+	 * Interact with the Page to upload it to a server, preview what the Page would capture
+	 * on the current web page, rename the Page, and delete it.
+	 */
 	var PageControls = _react2.default.createClass({
 	  displayName: "PageControls",
 
