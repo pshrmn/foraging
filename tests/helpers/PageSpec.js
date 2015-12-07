@@ -12,10 +12,11 @@ describe("page", () => {
 
     it("has expected default properties", () => {
       let p = createPage("example");
-      expect(p.selector).to.equal("body");
-      expect(p).to.have.property("children");
-      expect(p).to.have.property("rules");
-      expect(p.spec).to.eql({type: "single", value: 0});
+      let element = p.element;
+      expect(element.selector).to.equal("body");
+      expect(element).to.have.property("children");
+      expect(element).to.have.property("rules");
+      expect(element.spec).to.eql({type: "single", value: 0});
     });
   });
 });

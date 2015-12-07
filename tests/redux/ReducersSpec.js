@@ -8,36 +8,10 @@ import * as ActionTypes from "../../src/constants/ActionTypes";
 describe("redux reducers", () => {
 
   describe("frame reducer", () => {
-    describe("SHOW_SELECTOR_FRAME", () => {
-      it("shows the selector frame", () => {
-        let state = {
-          name: "rule"
-        };
-        let action = {
-          type: ActionTypes.SHOW_SELECTOR_FRAME
-        };
-        let result = frame(state, action);
-        expect(result.name).to.equal("selector");
-      });
-    });
-
-    describe("SHOW_RULE_FRAME", () => {
-      it("shows the rule frame", () => {
-        let state = {
-          name: "selector"
-        };
-        let action = {
-          type: ActionTypes.SHOW_RULE_FRAME
-        };
-        let result = frame(state, action);
-        expect(result.name).to.equal("rule");
-      });
-    });
-
     describe("SHOW_ELEMENT_FRAME", () => {
       it("shows the element frame", () => {
         let state = {
-          name: "selector"
+          name: "rule"
         };
         let action = {
           type: ActionTypes.SHOW_ELEMENT_FRAME
@@ -47,10 +21,36 @@ describe("redux reducers", () => {
       });
     });
 
+    describe("SHOW_RULE_FRAME", () => {
+      it("shows the rule frame", () => {
+        let state = {
+          name: "element"
+        };
+        let action = {
+          type: ActionTypes.SHOW_RULE_FRAME
+        };
+        let result = frame(state, action);
+        expect(result.name).to.equal("rule");
+      });
+    });
+
+    describe("SHOW_HTML_FRAME", () => {
+      it("shows the element frame", () => {
+        let state = {
+          name: "element"
+        };
+        let action = {
+          type: ActionTypes.SHOW_HTML_FRAME
+        };
+        let result = frame(state, action);
+        expect(result.name).to.equal("html");
+      });
+    });
+
     describe("SHOW_PARTS_FRAME", () => {
       it("shows the parts frame", () => {
         let state = {
-          name: "selector"
+          name: "element"
         };
         let action = {
           type: ActionTypes.SHOW_PARTS_FRAME
@@ -63,7 +63,7 @@ describe("redux reducers", () => {
         describe("SHOW_SPEC_FRAME", () => {
       it("shows the spec frame", () => {
         let state = {
-          name: "selector"
+          name: "element"
         };
         let action = {
           type: ActionTypes.SHOW_SPEC_FRAME

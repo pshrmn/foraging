@@ -81,10 +81,10 @@ describe("redux actions", () => {
     });
   });
 
-  describe("showSelectorFrame", () => {
-    it("returns an action to show the selector frame", () => {
-      let action = actions.showSelectorFrame();
-      expect(action.type).to.equal(ActionTypes.SHOW_SELECTOR_FRAME);
+  describe("showElementFrame", () => {
+    it("returns an action to show the element frame", () => {
+      let action = actions.showElementFrame();
+      expect(action.type).to.equal(ActionTypes.SHOW_ELEMENT_FRAME);
     });
   });
 
@@ -95,10 +95,10 @@ describe("redux actions", () => {
     });
   });
 
-  describe("showElementFrame", () => {
-    it("returns an action to show the element frame", () => {
-      let action = actions.showElementFrame();
-      expect(action.type).to.equal(ActionTypes.SHOW_ELEMENT_FRAME);
+  describe("showHTMLFrame", () => {
+    it("returns an action to show the html frame", () => {
+      let action = actions.showHTMLFrame();
+      expect(action.type).to.equal(ActionTypes.SHOW_HTML_FRAME);
     });
   });
 
@@ -137,54 +137,54 @@ describe("redux actions", () => {
     });
   });
 
-  describe("selectSelector", () => {
-    it("returns an action to set the current selector", () => {
-      let selector = {selector: "a"};
-      let action = actions.selectSelector(selector);
-      expect(action.type).to.equal(ActionTypes.SELECT_SELECTOR);
+  describe("selectElement", () => {
+    it("returns an action to set the current element", () => {
+      let element = {selector: "a"};
+      let action = actions.selectElement(element);
+      expect(action.type).to.equal(ActionTypes.SELECT_ELEMENT);
     });
 
     it("sets the selector property of the action", () => {
-      let selector = {selector: "a"};
-      let action = actions.selectSelector(selector);
-      expect(action.selector).to.eql(selector);
+      let element = {selector: "a"};
+      let action = actions.selectElement(element);
+      expect(action.element).to.eql(element);
     });
   });
 
-  describe("saveSelector", () => {
-    it("returns an action to save a new selector", () => {
-      let selector = {selector: "p.info"};
-      let action = actions.saveSelector(selector);
-      expect(action.type).to.equal(ActionTypes.SAVE_SELECTOR);
+  describe("saveElement", () => {
+    it("returns an action to save a new element", () => {
+      let element = {selector: "p.info"};
+      let action = actions.saveElement(element);
+      expect(action.type).to.equal(ActionTypes.SAVE_ELEMENT);
     });
 
-    it("sets the selector property of the action", () => {
-      let selector = {selector: "p.info"};
-      let action = actions.saveSelector(selector);
-      expect(action.selector).to.eql(selector);
+    it("sets the element property of the action", () => {
+      let element = {selector: "p.info"};
+      let action = actions.saveElement(element);
+      expect(action.element).to.eql(element);
     });
   });
 
-  describe("renameSelector", () => {
-    it("returns an action to rename a selector (for type=all selectors)", () => {
+  describe("renameElement", () => {
+    it("returns an action to rename an element (for type=all elements)", () => {
       // the actual renaming is done in the app and since object references are 
       // used it is automatically set in the state. This isn't very redux-y,
       // but neither are trees.
-      let action = actions.renameSelector();
-      expect(action.type).to.equal(ActionTypes.RENAME_SELECTOR);
+      let action = actions.renameElement();
+      expect(action.type).to.equal(ActionTypes.RENAME_ELEMENT);
     });
   });
 
-  describe("removeSelector", () => {
-    it("returns an action to remove the current selector", () => {
-      // see the comment for renameSelector
-      let action = actions.removeSelector();
-      expect(action.type).to.equal(ActionTypes.REMOVE_SELECTOR);
+  describe("removeElement", () => {
+    it("returns an action to remove the current element", () => {
+      // see the comment for renameElement
+      let action = actions.removeElement();
+      expect(action.type).to.equal(ActionTypes.REMOVE_ELEMENT);
     });
   });
 
   describe("saveRule", () => {
-    it("returns an action to add a rule to the current selector", () => {
+    it("returns an action to add a rule to the current element", () => {
       let rule = {name: "url", attr: "href"};
       let action = actions.saveRule(rule);
       expect(action.type).to.equal(ActionTypes.SAVE_RULE);
@@ -198,7 +198,7 @@ describe("redux actions", () => {
   });
 
   describe("removeRule", () => {
-    it("returns an action to remove a rule from the current selector", () => {
+    it("returns an action to remove a rule from the current element", () => {
       let action = actions.removeRule(3);
       expect(action.type).to.equal(ActionTypes.REMOVE_RULE);
     });
