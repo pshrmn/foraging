@@ -62,7 +62,9 @@ body.foraging {
     min-height: 20px;
     padding: 2px;
     font-family: sans-serif;
-    border: 1px solid #323033; }
+    border-style: solid;
+    border-color: #323033;
+    border-width: 0 0 1px 0; }
   #forager select {
     display: inline-block !important;
     border: 1px solid #a9a9a9 !important;
@@ -138,7 +140,9 @@ body.foraging {
       display: -ms-flexbox;
       display: flex; }
     #forager .topbar .message {
-      color: #E85F88; }
+      color: #E85F88;
+      margin: 0;
+      padding: 0; }
     #forager .topbar button {
       display: inline-block;
       line-height: 1.25em !important;

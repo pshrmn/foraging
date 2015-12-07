@@ -35,7 +35,7 @@ export default React.createClass({
       <div className="topbar">
         <div className="controls">
           <div className="page-controls">
-            Page:
+            {"Page "}
             <select value={index}
                     onChange={this.loadHandler}>
               {options}

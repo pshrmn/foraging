@@ -1805,7 +1805,7 @@
 	        _react2.default.createElement(
 	          "div",
 	          { className: "page-controls" },
-	          "Page:",
+	          "Page ",
 	          _react2.default.createElement(
 	            "select",
 	            { value: index,
@@ -3705,7 +3705,7 @@
 	    var valueChooser = this.state.type === "single" ? this._singleValue() : this._allValue();
 	    return _react2.default.createElement(
 	      "div",
-	      null,
+	      { ref: "frame" },
 	      _react2.default.createElement(
 	        "div",
 	        null,
@@ -3733,6 +3733,20 @@
 	      ),
 	      valueChooser
 	    );
+	  },
+	  // while this is normally done globally, the single/all swap doesn't use redux
+	  // so the .no-select class needs to be handled here
+	  _makeNoSelect: function _makeNoSelect() {
+	    [].slice.call(this.refs.frame.querySelectorAll("*")).forEach(function (c) {
+	      c.classList.add("no-select");
+	    });
+	  },
+	  componentDidMount: function componentDidMount() {
+	    // load the site's pages from chrome.storage.local and set the state
+	    this._makeNoSelect();
+	  },
+	  componentDidUpdate: function componentDidUpdate() {
+	    this._makeNoSelect();
 	  }
 	});
 

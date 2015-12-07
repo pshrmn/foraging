@@ -162,7 +162,7 @@ let SpecForm = React.createClass({
   render: function() {
     let valueChooser = this.state.type === "single" ? this._singleValue() : this._allValue();
     return (
-      <div>
+      <div ref="frame">
         <div>
           Type:
           <label>single <input type="radio"
@@ -181,5 +181,19 @@ let SpecForm = React.createClass({
         {valueChooser}
       </div>
     );
+  },
+  // while this is normally done globally, the single/all swap doesn't use redux
+  // so the .no-select class needs to be handled here
+  _makeNoSelect: function() {
+    [].slice.call(this.refs.frame.querySelectorAll("*")).forEach(c => {
+      c.classList.add("no-select");
+    });
+  },
+  componentDidMount: function() {
+    // load the site's pages from chrome.storage.local and set the state
+    this._makeNoSelect();
+  },
+  componentDidUpdate: function() {
+    this._makeNoSelect();
   }
 })

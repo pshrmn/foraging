@@ -39,6 +39,8 @@ You now have a new page, with a base selector on the body element.
 
 .. image:: img/new-page.png
 
+The left box contains controls for the current page and the right box contains controls for the current selector.
+
 Selectors
 ^^^^^^^^^^^^
 
@@ -54,6 +56,12 @@ These target one specific child element of a parent element which matches the se
 
 These target all child elements of the parent element that match the selector. A name string is stored for all selectors to indicate the name of the array to store the children's data in.
 
+Elements
+++++++++
+
+When a page is loaded or created, for each selector in the page, an array of elements that match the selector is added to the selector object. This is useful for highlight which elements in the page match a selector as well as figuring out matching elements for an child selectors.
+
+
 Add Children
 ^^^^^^^^^^^^
 Now that you have a page, it is time to start adding child selectors.
@@ -65,18 +73,18 @@ Because we are getting a list of submissions, the first selector we want to crea
 1. Add child
 ++++++++++++
 
-Make sure that the desired parent element is the current element. By default the last created selector is the current parent selector. Clicking on a node in the tree will make that node's selector the current selector. When you have the desired parent set, click the :code:`Add Child` button
+Before you add a child, make sure that the selector you want to use as the parent of the new selector is the current selector. By default, the root "body" selector is selected when creating or loading a page and when you save a new selector, it is set as the current selector. Clicking on a node in the tree will make that node the current selector. When you have the desired selector selected, click the :code:`Add Child` button
 
 .. image:: img/add-child.png
 
-All elements in the page that can be selected will have an outline. Images that can be selected will have a dashed outline. Mousing over the element will give the element an blue background. Mousing over images will give them an :code:`0.25 opacity`.
+All elements in the page that can be selected will have an outline and when hovered over will have a light blue background. Images that can be selected will have a dashed outline and hovering over them will set the image's opacity to :code:`0.25`.
 
 .. image:: img/highlight-children.png
 
 2. Select Element in the Page
 +++++++++++++++++++++++++++++
 
-Click on any outlined elements in the page. Clicking on an element will add a list of element selectors, from the clicked element to all parent elements before the current selector. 
+Click on any outlined elements in the page. Clicking on an element will generate a list of element css selectors, starting with the element you clicked and including all of its parent elements (up to, but not including, the nearest parent element in the current selector's elements array). Each selector is a string of an element's tag, its id (if it has one) and any classes that it has. Which of these parts of the selector we actually want to use will be determined in the next step.
 
 .. image:: img/element-choices.png
 
@@ -92,7 +100,7 @@ Example:
         </div>
     </body>
 
-If the current selector is :code:`body`, clicking on the :code:`a` element will return the :code:`a`, :code:`p`, and :code:`div#main` selectors.
+If the current css selector is :code:`body`, clicking on the :code:`a` element will return the :code:`a`, :code:`p`, and :code:`div#main` css selectors.
 
 
 3. Choose Element
@@ -102,18 +110,18 @@ Click on the elements in the list to see which elements in the page that each on
 
 .. image:: img/highlight-element.png
 
-The chosen selector does not select all submissions that we want because it is too specific. We will get rid of the unwanted selector parts in the next form.
+The chosen selector does not highlight all of the submissions that we want to capture because it is too specific. In the next form, we will choose the selector parts to match all of the desired elements in the page.
 
-When you have the selector that matches the desired element(s), click the :code:`Confirm` button.
+When you have the selector that matches the desired element(s), click the :code:`Next` button.
 
-4. Confirm the selector
-+++++++++++++++++++++++
+4. Choose the Selector Parts
+++++++++++++++++++++++++++++
 
-By default, all parts of the selector are activated. Click on the various selector parts in the list to toggle whether or not they are included (green is included, red is not) in the final selector. The page will update the highlighted elements to reflect the current final selector.
+By default, all possible parts of the css selector are activated. Click on the various selector parts in the list to toggle whether or not they are included (green is included, white is not) in the final selector. The page will update the highlighted elements to reflect the current final selector.
 
 .. image:: img/narrow-selector.png
 
-Once you have the desired selector, click the :code:`Confirm` button.
+Once you have chosen the desired selector parts, click the :code:`Next` button.
 
 5. Set the name for the selection
 +++++++++++++++++++++++++++++++++
@@ -130,16 +138,14 @@ For an :code:`all` selector, you need to specify a name. Ideally the name should
 
 Because we are targeting all of the submissions in the page, we will use the "all" radio option, and set a name for all of the data for the each element and its children to be stored under. Once the name has been entered, click the :code:`Save` button.
 
-6. The UI will return to the Page tab
-+++++++++++++++++++++++++++++++++++++
+6. The UI will return to the Selector Frame
++++++++++++++++++++++++++++++++++++++++++++
 
 The page tree will be updated now to include the newly selected node. The updated node is bolded because it is the current selector.  It also has brackets around the selector to indicate that it will capture multiple elements and is in red because it is empty (ie. it has neither any child elements nor any attributes).
 
 .. image:: img/updated-page.png
 
-Hovering over the node in the tree will should you which elements that selector targets.
-
-.. image:: img/targeted-elements.png
+All of the elements that match the current selector will have a blue background.
 
 7. Capture children elements
 ++++++++++++++++++++++++++++
@@ -151,7 +157,7 @@ There are various datum that can be captured from here, such as the submitted ti
 8. Save index of elements
 +++++++++++++++++++++++++
 
-For selectors where only one element should be targeted, an index is used in case the selector returns multiple elements. By default, the 0-index element is selected and generally that will be the correct index. However for some sources, such as working with tables, you'll want to target a non-zero index. Changing the index will update which matched element will be selected.
+For selectors where only one element should be targeted, an index is used in case the selector matches multiple elements (per parent element). By default, the 0-index element is selected and generally that will be the correct index. However for some sources you'll want to target a different index. For example, if you want to select the second :code:`td` of a :code:`tr` in a :code:`table`. Changing the index will update the highlights showing which matched element will be selected.
 
 .. image:: img/non-zero-index.png
 
@@ -164,7 +170,7 @@ Go ahead and create child selectors to get the title of the submission, the scor
 
 .. image:: img/completed-selectors.png
 
-Now, all of the desired selectors are created, but some of the nodes are still in red. That is because we still need to create Attrs for them.
+Now, all of the desired selectors are created, but some of the nodes are still in red. That is because we still need to create Rules for them.
 
 Create Rules
 ^^^^^^^^^^^^

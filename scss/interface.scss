@@ -98,7 +98,9 @@ body.foraging {
         min-height: 20px;
         padding: 2px;
         font-family: sans-serif;
-        border: 1px solid $dark-gray;
+        border-style: solid;
+        border-color: $dark-gray;
+        border-width: 0 0 1px 0;
     }
 
     select {
@@ -224,6 +226,8 @@ body.foraging {
 
         .message {
             color: $red;
+            margin: 0;
+            padding: 0;
         }
 
         button{
@@ -338,7 +342,6 @@ body.foraging {
              * the .buttons section
              */
             .info {
-
             }
 
             .buttons {
