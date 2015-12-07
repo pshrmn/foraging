@@ -6,7 +6,7 @@ import { abbreviate, clone, highlight, unhighlight } from "../helpers";
 
 /*
  * A tree rendering of the page, used to show the current page, the current
- * selector, and to select a selector (for editing, adding children, or rules)
+ * element, and to select an element (for editing, adding children, or rules)
  */
 export default React.createClass({
   getDefaultProps: function() {
@@ -29,10 +29,10 @@ export default React.createClass({
     });
   },
   _makeNodes: function() {
-    let { page, selector, active, actions } = this.props;
+    let { page, element, active, actions } = this.props;
     let { tree, diagonal } = this.state;
 
-    let clonedPage = clone(page);
+    let clonedPage = clone(page.element);
 
     // generate the tree's nodes and links
     let nodes = tree.nodes(clonedPage);
@@ -50,8 +50,8 @@ export default React.createClass({
         {
           nodes.map((n, i) => {
             return <Node key={i} 
-                         current={selector !== undefined && n.original === selector}
-                         select={actions.selectSelector}
+                         current={element !== undefined && n.original === element}
+                         select={actions.selectElement}
                          active={active}
                          {...n} />
           })

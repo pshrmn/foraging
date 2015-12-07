@@ -6,9 +6,9 @@ export const attributes = (element, ignored = {}) => {
     if ( ignored[name] ) {
       return stored;
     }
-    // don't include current-selector class
+    // don't include current-element class
     if ( name === "class" ) {
-      value = value.replace("current-selector","").trim();
+      value = value.replace("current-element","").trim();
     }
     // don't include empty attrs
     if ( value !== "" ) {

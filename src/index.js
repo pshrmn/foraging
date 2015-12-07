@@ -26,13 +26,13 @@ if ( !holder ) {
      */
     let initialState = {
       show: true,
-      selector: undefined,
+      element: undefined,
       page: {
         pages: [undefined, ...pages],
         pageIndex: 0
       },
       frame: {
-        name: "selector",
+        name: "element",
         data: {}
       },
       preview: {

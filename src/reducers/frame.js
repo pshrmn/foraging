@@ -4,20 +4,20 @@ import * as types from "../constants/ActionTypes";
  * frame
  * -----
  *
- * Which frame to show. In the majority of cases, the "selector" frame should
+ * Which frame to show. In the majority of cases, the "element" frame should
  * be shown.
  */
 export default function frame(state = "", action) {
   switch ( action.type ) {
   case types.LOAD_PAGE:
-  case types.REMOVE_SELECTOR:
-  case types.SAVE_SELECTOR:
+  case types.REMOVE_ELEMENT:
+  case types.SAVE_ELEMENT:
   case types.SAVE_RULE:
   case types.REMOVE_RULE:
   case types.CLOSE_FORAGER:
-  case types.SHOW_SELECTOR_FRAME:
+  case types.SHOW_ELEMENT_FRAME:
     return Object.assign({}, state, {
-      name: "selector",
+      name: "element",
       data: {}
     });
   case types.SHOW_RULE_FRAME:
@@ -25,9 +25,9 @@ export default function frame(state = "", action) {
       name: "rule",
       data: {}
     });
-  case types.SHOW_ELEMENT_FRAME:
+  case types.SHOW_HTML_FRAME:
     return Object.assign({}, state, {
-      name: "element",
+      name: "html",
       data: {}
     });
   case types.SHOW_PARTS_FRAME:

@@ -93,13 +93,13 @@
 	     */
 	    var initialState = {
 	      show: true,
-	      selector: undefined,
+	      element: undefined,
 	      page: {
 	        pages: [undefined].concat(_toConsumableArray(pages)),
 	        pageIndex: 0
 	      },
 	      frame: {
-	        name: "selector",
+	        name: "element",
 	        data: {}
 	      },
 	      preview: {
@@ -1464,7 +1464,7 @@
 	    var _props = this.props;
 	    var pages = _props.pages;
 	    var pageIndex = _props.pageIndex;
-	    var selector = _props.selector;
+	    var element = _props.element;
 	    var show = _props.show;
 	    var dispatch = _props.dispatch;
 	    var frame = _props.frame;
@@ -1490,10 +1490,10 @@
 	        "div",
 	        { className: "workspace" },
 	        _react2.default.createElement(_PageTree2.default, { page: page,
-	          selector: selector,
+	          element: element,
 	          actions: actions,
-	          active: frame.name === "selector" }),
-	        _react2.default.createElement(_Frames2.default, { selector: selector,
+	          active: frame.name === "element" }),
+	        _react2.default.createElement(_Frames2.default, { element: element,
 	          frame: frame,
 	          actions: actions })
 	      ),
@@ -1531,7 +1531,7 @@
 	    frame: state.frame,
 	    pages: state.page.pages,
 	    pageIndex: state.page.pageIndex,
-	    selector: state.selector,
+	    element: state.element,
 	    preview: state.preview,
 	    message: state.message
 	  };
@@ -1548,7 +1548,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.removeRule = exports.saveRule = exports.removeSelector = exports.renameSelector = exports.saveSelector = exports.selectSelector = exports.closeForager = exports.showSpecFrame = exports.showPartsFrame = exports.showElementFrame = exports.showRuleFrame = exports.showSelectorFrame = exports.showMessage = exports.hidePreview = exports.showPreview = exports.uploadPage = exports.renamePage = exports.removePage = exports.addPage = exports.loadPage = undefined;
+	exports.removeRule = exports.saveRule = exports.removeElement = exports.renameElement = exports.saveElement = exports.selectElement = exports.closeForager = exports.showSpecFrame = exports.showPartsFrame = exports.showHTMLFrame = exports.showRuleFrame = exports.showElementFrame = exports.showMessage = exports.hidePreview = exports.showPreview = exports.uploadPage = exports.renamePage = exports.removePage = exports.addPage = exports.loadPage = undefined;
 
 	var _ActionTypes = __webpack_require__(24);
 
@@ -1559,11 +1559,11 @@
 	/*
 	 * PAGE ACTIONS
 	 */
-	var loadPage = exports.loadPage = function loadPage(index, selector) {
+	var loadPage = exports.loadPage = function loadPage(index, element) {
 	  return {
 	    type: types.LOAD_PAGE,
 	    index: index,
-	    selector: selector
+	    element: element
 	  };
 	};
 
@@ -1617,22 +1617,22 @@
 	 * FRAME ACTIONS
 	 */
 
-	var showSelectorFrame = exports.showSelectorFrame = function showSelectorFrame() {
-	  return {
-	    type: types.SHOW_SELECTOR_FRAME
-	  };
-	};
-
-	var showRuleFrame = exports.showRuleFrame = function showRuleFrame(selector) {
-	  return {
-	    type: types.SHOW_RULE_FRAME,
-	    selector: selector
-	  };
-	};
-
 	var showElementFrame = exports.showElementFrame = function showElementFrame() {
 	  return {
 	    type: types.SHOW_ELEMENT_FRAME
+	  };
+	};
+
+	var showRuleFrame = exports.showRuleFrame = function showRuleFrame(element) {
+	  return {
+	    type: types.SHOW_RULE_FRAME,
+	    element: element
+	  };
+	};
+
+	var showHTMLFrame = exports.showHTMLFrame = function showHTMLFrame() {
+	  return {
+	    type: types.SHOW_HTML_FRAME
 	  };
 	};
 
@@ -1660,31 +1660,31 @@
 	};
 
 	/*
-	 * SELECTOR/RULE ACTIONS
+	 * ELEMENT/RULE ACTIONS
 	 */
-	var selectSelector = exports.selectSelector = function selectSelector(selector) {
+	var selectElement = exports.selectElement = function selectElement(element) {
 	  return {
-	    type: types.SELECT_SELECTOR,
-	    selector: selector
+	    type: types.SELECT_ELEMENT,
+	    element: element
 	  };
 	};
 
-	var saveSelector = exports.saveSelector = function saveSelector(selector) {
+	var saveElement = exports.saveElement = function saveElement(element) {
 	  return {
-	    type: types.SAVE_SELECTOR,
-	    selector: selector
+	    type: types.SAVE_ELEMENT,
+	    element: element
 	  };
 	};
 
-	var renameSelector = exports.renameSelector = function renameSelector() {
+	var renameElement = exports.renameElement = function renameElement() {
 	  return {
-	    type: types.RENAME_SELECTOR
+	    type: types.RENAME_ELEMENT
 	  };
 	};
 
-	var removeSelector = exports.removeSelector = function removeSelector() {
+	var removeElement = exports.removeElement = function removeElement() {
 	  return {
-	    type: types.REMOVE_SELECTOR
+	    type: types.REMOVE_ELEMENT
 	  };
 	};
 
@@ -1721,19 +1721,19 @@
 
 	var SHOW_MESSAGE = exports.SHOW_MESSAGE = "SHOW_MESSAGE";
 
-	var SHOW_SELECTOR_FRAME = exports.SHOW_SELECTOR_FRAME = "SHOW_SELECTOR_FRAME";
-	var SHOW_RULE_FRAME = exports.SHOW_RULE_FRAME = "SHOW_RULE_FRAME";
 	var SHOW_ELEMENT_FRAME = exports.SHOW_ELEMENT_FRAME = "SHOW_ELEMENT_FRAME";
+	var SHOW_RULE_FRAME = exports.SHOW_RULE_FRAME = "SHOW_RULE_FRAME";
+	var SHOW_HTML_FRAME = exports.SHOW_HTML_FRAME = "SHOW_HTML_FRAME";
 	var SHOW_PARTS_FRAME = exports.SHOW_PARTS_FRAME = "SHOW_PARTS_FRAME";
 	var SHOW_SPEC_FRAME = exports.SHOW_SPEC_FRAME = "SHOW_SPEC_FRAME";
 
 	var CLOSE_FORAGER = exports.CLOSE_FORAGER = "CLOSE_FORAGER";
 	var SHOW_FORAGER = exports.SHOW_FORAGER = "SHOW_FORAGER";
 
-	var SELECT_SELECTOR = exports.SELECT_SELECTOR = "SELECT_SELECTOR";
-	var SAVE_SELECTOR = exports.SAVE_SELECTOR = "SAVE_SELECTOR";
-	var REMOVE_SELECTOR = exports.REMOVE_SELECTOR = "REMOVE_SELECTOR";
-	var RENAME_SELECTOR = exports.RENAME_SELECTOR = "RENAME_SELECTOR";
+	var SELECT_ELEMENT = exports.SELECT_ELEMENT = "SELECT_ELEMENT";
+	var SAVE_ELEMENT = exports.SAVE_ELEMENT = "SAVE_ELEMENT";
+	var REMOVE_ELEMENT = exports.REMOVE_ELEMENT = "REMOVE_ELEMENT";
+	var RENAME_ELEMENT = exports.RENAME_ELEMENT = "RENAME_ELEMENT";
 	var SAVE_RULE = exports.SAVE_RULE = "SAVE_RULE";
 	var REMOVE_RULE = exports.REMOVE_RULE = "REMOVE_RULE";
 
@@ -1772,10 +1772,9 @@
 	    this.props.actions.addPage(name);
 	  },
 	  loadHandler: function loadHandler(event) {
-	    var nextPage = parseInt(event.target.value, 10);
-	    // the initial selector is the root selector of the page
-	    var selector = this.props.pages[nextPage];
-	    this.props.actions.loadPage(nextPage, selector);
+	    var nextPageIndex = parseInt(event.target.value, 10);
+	    var element = this.props.pages[nextPageIndex].element;
+	    this.props.actions.loadPage(nextPageIndex, element);
 	  },
 	  closeHandler: function closeHandler(event) {
 	    document.body.classList.remove("foraging");
@@ -1995,17 +1994,17 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _SelectorFrame = __webpack_require__(29);
+	var _ElementFrame = __webpack_require__(29);
 
-	var _SelectorFrame2 = _interopRequireDefault(_SelectorFrame);
+	var _ElementFrame2 = _interopRequireDefault(_ElementFrame);
 
 	var _RuleFrame = __webpack_require__(30);
 
 	var _RuleFrame2 = _interopRequireDefault(_RuleFrame);
 
-	var _ElementFrame = __webpack_require__(38);
+	var _HTMLFrame = __webpack_require__(38);
 
-	var _ElementFrame2 = _interopRequireDefault(_ElementFrame);
+	var _HTMLFrame2 = _interopRequireDefault(_HTMLFrame);
 
 	var _PartsFrame = __webpack_require__(39);
 
@@ -2025,50 +2024,50 @@
 	 *
 	 * The main way for a user to interact with Forager is through the Frames. There
 	 * are a number of different frames associated with different states of viewing
-	 * and creating selectors.
+	 * and creating elements.
 	 *
 	 * Through its props, each frame is given any pertinent actions that, relevant
-	 * parts of the current selector (referred to as the parent when creating a 
-	 * new seletcor), and the destructured parts of a data object containing any
+	 * parts of the current element (referred to as the parent when creating a 
+	 * new element), and the destructured parts of a data object containing any
 	 * extra data for that frame.
 	 */
 	exports.default = _react2.default.createClass({
 	  displayName: "Frames",
 
-	  cssSelector: "current-selector",
+	  cssSelector: "current-element",
 	  _selectFrame: function _selectFrame() {
 	    var _props = this.props;
 	    var frame = _props.frame;
-	    var selector = _props.selector;
+	    var element = _props.element;
 	    var actions = _props.actions;
 
 	    switch (frame.name) {
-	      case "selector":
-	        return _react2.default.createElement(_SelectorFrame2.default, { selector: selector,
-	          createSelector: actions.showElementFrame,
-	          removeSelector: actions.removeSelector,
-	          renameSelector: actions.renameSelector,
+	      case "element":
+	        return _react2.default.createElement(_ElementFrame2.default, { element: element,
+	          createElement: actions.showHTMLFrame,
+	          removeElement: actions.removeElement,
+	          renameElement: actions.renameElement,
 	          createRule: actions.showRuleFrame,
 	          removeRule: actions.removeRule });
 	      case "rule":
-	        return _react2.default.createElement(_RuleFrame2.default, { selector: selector,
+	        return _react2.default.createElement(_RuleFrame2.default, { element: element,
 	          save: actions.saveRule,
-	          cancel: actions.showSelectorFrame });
-	      case "element":
-	        return _react2.default.createElement(_ElementFrame2.default, { parentElements: selector.elements,
+	          cancel: actions.showElementFrame });
+	      case "html":
+	        return _react2.default.createElement(_HTMLFrame2.default, { parentElements: element.elements,
 	          next: actions.showPartsFrame,
-	          cancel: actions.showSelectorFrame,
+	          cancel: actions.showElementFrame,
 	          message: actions.showMessage });
 	      case "parts":
-	        return _react2.default.createElement(_PartsFrame2.default, _extends({ parentElements: selector.elements,
+	        return _react2.default.createElement(_PartsFrame2.default, _extends({ parentElements: element.elements,
 	          next: actions.showSpecFrame,
-	          cancel: actions.showSelectorFrame,
+	          cancel: actions.showElementFrame,
 	          message: actions.showMessage
 	        }, frame.data));
 	      case "spec":
-	        return _react2.default.createElement(_SpecFrame2.default, _extends({ parent: selector,
-	          save: actions.saveSelector,
-	          cancel: actions.showSelectorFrame,
+	        return _react2.default.createElement(_SpecFrame2.default, _extends({ parent: element,
+	          save: actions.saveElement,
+	          cancel: actions.showElementFrame,
 	          message: actions.showMessage
 	        }, frame.data));
 	      default:
@@ -2077,14 +2076,14 @@
 	  },
 	  componentWillMount: function componentWillMount() {
 	    (0, _helpers.unhighlight)(this.cssSelector);
-	    if (this.props.selector) {
-	      (0, _helpers.highlight)(this.props.selector.elements, this.cssSelector);
+	    if (this.props.element) {
+	      (0, _helpers.highlight)(this.props.element.elements, this.cssSelector);
 	    }
 	  },
 	  componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
 	    (0, _helpers.unhighlight)(this.cssSelector);
-	    if (nextProps.selector !== undefined && nextProps.selector !== this.props.selector) {
-	      (0, _helpers.highlight)(nextProps.selector.elements, this.cssSelector);
+	    if (nextProps.element !== undefined && nextProps.element !== this.props.element) {
+	      (0, _helpers.highlight)(nextProps.element.elements, this.cssSelector);
 	    }
 	  },
 	  render: function render() {
@@ -2120,47 +2119,47 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	exports.default = _react2.default.createClass({
-	  displayName: "SelectorFrame",
+	  displayName: "ElementFrame",
 
 	  addChild: function addChild(event) {
-	    this.props.createSelector();
+	    this.props.createElement();
 	  },
 	  addRule: function addRule(event) {
 	    this.props.createRule();
 	  },
 	  remove: function remove(event) {
-	    var selector = this.props.selector;
+	    var element = this.props.element;
 
-	    var parent = selector.parent;
+	    var parent = element.parent;
 	    if (parent === null) {
-	      // root "body" selector
-	      selector.children = [];
-	      selector.rules = [];
+	      // root "body" element
+	      element.children = [];
+	      element.rules = [];
 	    } else {
 	      parent.children = parent.children.filter(function (child) {
-	        return child !== selector;
+	        return child !== element;
 	      });
 	    }
-	    this.props.removeSelector();
+	    this.props.removeElement();
 	  },
 	  rename: function rename(event) {
-	    var newName = window.prompt("New name to save selector's array as:");
+	    var newName = window.prompt("New name to save element's array as:");
 	    if (newName === null || newName === "") {
 	      return;
 	    }
-	    this.props.selector.spec.value = newName;
-	    this.props.renameSelector();
+	    this.props.element.spec.value = newName;
+	    this.props.renameElement();
 	  },
 	  render: function render() {
-	    if (this.props.selector === undefined) {
+	    if (this.props.element === undefined) {
 	      return null;
 	    }
 
-	    var _props$selector = this.props.selector;
-	    var selector = _props$selector.selector;
-	    var rules = _props$selector.rules;
-	    var spec = _props$selector.spec;
-	    var optional = _props$selector.optional;
+	    var _props$element = this.props.element;
+	    var selector = _props$element.selector;
+	    var rules = _props$element.rules;
+	    var spec = _props$element.spec;
+	    var optional = _props$element.optional;
 	    var type = spec.type;
 	    var value = spec.value;
 
@@ -2208,7 +2207,7 @@
 	        _react2.default.createElement(_Inputs.PosButton, { text: "Add Rule",
 	          click: this.addRule }),
 	        _react2.default.createElement(_Inputs.NegButton, { text: "Remove",
-	          title: "Remove Selector",
+	          title: "Remove Element",
 	          click: this.remove }),
 	        renameButton
 	      )
@@ -2300,7 +2299,7 @@
 	exports.default = _react2.default.createClass({
 	  displayName: "RuleFrame",
 
-	  highlight: "current-selector",
+	  highlight: "current-element",
 	  getInitialState: function getInitialState() {
 	    return {
 	      name: "",
@@ -2347,7 +2346,7 @@
 	  render: function render() {
 	    var _this = this;
 
-	    var selector = this.props.selector;
+	    var element = this.props.element;
 	    var _state2 = this.state;
 	    var name = _state2.name;
 	    var type = _state2.type;
@@ -2391,7 +2390,7 @@
 	          "Type: ",
 	          typeRadios
 	        ),
-	        _react2.default.createElement(AttrChoices, { elements: selector.elements,
+	        _react2.default.createElement(AttrChoices, { elements: element.elements,
 	          attr: attr,
 	          setAttr: this.setAttr })
 	      ),
@@ -2404,13 +2403,13 @@
 	    );
 	  },
 	  componentWillMount: function componentWillMount() {
-	    var elements = this.props.selector.elements;
+	    var elements = this.props.element.elements;
 
 	    (0, _helpers.highlight)(elements, this.highlight);
 	  },
 	  componentWillUpdate: function componentWillUpdate(nextProps, nextState) {
 	    (0, _helpers.unhighlight)(this.highlight);
-	    var elements = nextProps.selector.elements;
+	    var elements = nextProps.element.elements;
 
 	    (0, _helpers.highlight)(elements, this.highlight);
 	  },
@@ -2580,10 +2579,10 @@
 	    return _page.createPage;
 	  }
 	});
-	Object.defineProperty(exports, "createSelector", {
+	Object.defineProperty(exports, "createElement", {
 	  enumerable: true,
 	  get: function get() {
-	    return _page.createSelector;
+	    return _page.createElement;
 	  }
 	});
 	Object.defineProperty(exports, "clone", {
@@ -2704,9 +2703,9 @@
 	    if (ignored[name]) {
 	      return stored;
 	    }
-	    // don't include current-selector class
+	    // don't include current-element class
 	    if (name === "class") {
-	      value = value.replace("current-selector", "").trim();
+	      value = value.replace("current-element", "").trim();
 	    }
 	    // don't include empty attrs
 	    if (value !== "") {
@@ -2830,24 +2829,26 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.setupPage = exports.clean = exports.clone = exports.createSelector = exports.createPage = undefined;
+	exports.setupPage = exports.clean = exports.clone = exports.createElement = exports.createPage = undefined;
 
 	var _selection = __webpack_require__(36);
 
 	var createPage = exports.createPage = function createPage(name) {
 	  return {
 	    name: name,
-	    selector: "body",
-	    spec: {
-	      type: "single",
-	      value: 0
-	    },
-	    children: [],
-	    rules: []
+	    element: {
+	      selector: "body",
+	      spec: {
+	        type: "single",
+	        value: 0
+	      },
+	      children: [],
+	      rules: []
+	    }
 	  };
 	};
 
-	var createSelector = exports.createSelector = function createSelector(selector) {
+	var createElement = exports.createElement = function createElement(selector) {
 	  var type = arguments.length <= 1 || arguments[1] === undefined ? "single" : arguments[1];
 	  var value = arguments.length <= 2 || arguments[2] === undefined ? 0 : arguments[2];
 	  var optional = arguments.length <= 3 || arguments[3] === undefined ? false : arguments[3];
@@ -2868,57 +2869,58 @@
 	 * clone a page (useful with the tree because that adds unnecessary properties
 	 * to each selector) does not include the page's name
 	 */
-	var clone = exports.clone = function clone(selector) {
+	var clone = exports.clone = function clone(element) {
 	  return Object.assign({}, {
-	    selector: selector.selector,
-	    spec: selector.spec,
-	    children: selector.children.map(function (child) {
+	    selector: element.selector,
+	    spec: element.spec,
+	    children: element.children.map(function (child) {
 	      return clone(child);
 	    }),
-	    hasRules: selector.rules.length,
-	    elements: selector.elements || [],
-	    original: selector
+	    hasRules: element.rules.length,
+	    elements: element.elements || [],
+	    original: element
 	  });
 	};
 
 	var clean = exports.clean = function clean(page) {
 	  return Object.assign({}, {
-	    name: page.name
-	  }, cleanSelector(page));
+	    name: page.name,
+	    element: cleanElement(page.element)
+	  });
 	};
 
-	var cleanSelector = function cleanSelector(s) {
+	var cleanElement = function cleanElement(e) {
 	  return Object.assign({}, {
-	    selector: s.selector,
-	    spec: Object.assign({}, s.spec),
-	    children: s.children.map(function (c) {
-	      return cleanSelector(c);
+	    selector: e.selector,
+	    spec: Object.assign({}, e.spec),
+	    children: e.children.map(function (c) {
+	      return cleanElement(c);
 	    }),
-	    rules: s.rules.map(function (r) {
+	    rules: e.rules.map(function (r) {
 	      return Object.assign({}, r);
 	    }),
-	    optional: s.optional
+	    optional: e.optional
 	  });
 	};
 
 	/*
-	 * set an id on each selector and determine the elements that each selector matches
+	 * set an id on each element and determine the html elements that each element matches
 	 */
 	var setupPage = exports.setupPage = function setupPage(page) {
 	  if (page === undefined) {
 	    return;
 	  }
 	  var id = 0;
-	  var setup = function setup(selector, parentElements, parent) {
-	    selector.id = id++;
-	    selector.parent = parent;
-	    selector.elements = (0, _selection.select)(parentElements, selector.selector, selector.spec);
-	    selector.children.forEach(function (child) {
-	      setup(child, selector.elements, selector);
+	  var setup = function setup(element, parentElements, parent) {
+	    element.id = id++;
+	    element.parent = parent;
+	    element.elements = (0, _selection.select)(parentElements, element.selector, element.spec);
+	    element.children.forEach(function (child) {
+	      setup(child, element.elements, element);
 	    });
 	  };
 
-	  setup(page, [document], null);
+	  setup(page.element, [document], null);
 	};
 
 /***/ },
@@ -3055,21 +3057,24 @@
 	var preview = exports.preview = function preview(page) {
 	    /*
 	     * Given a parent element, get all children that match the selector
-	     * Return data based on selector's type (index or name)
+	     * Return data based on element's type (index or name)
 	     */
-	    var getElement = function getElement(selector, parent) {
-	        var elements = parent.querySelectorAll(selector.selector);
-	        var value = selector.spec.value;
-	        switch (selector.spec.type) {
+	    var getElement = function getElement(element, parent) {
+	        var elements = parent.querySelectorAll(element.selector);
+	        var _element$spec = element.spec;
+	        var type = _element$spec.type;
+	        var value = _element$spec.value;
+
+	        switch (type) {
 	            case "single":
 	                var ele = elements[value];
 	                if (!ele) {
 	                    return;
 	                }
-	                return getElementData(selector, ele);
+	                return getElementData(element, ele);
 	            case "all":
 	                var data = Array.from(elements).map(function (ele) {
-	                    return getElementData(selector, ele);
+	                    return getElementData(element, ele);
 	                }).filter(function (datum) {
 	                    return datum !== undefined;
 	                });
@@ -3083,9 +3088,9 @@
 	     * Get data for each rule and each child. Merge the child data into the
 	     * rule data.
 	     */
-	    var getElementData = function getElementData(selector, element) {
-	        var data = getRuleData(selector.rules, element);
-	        var childData = getChildData(selector.children, element);
+	    var getElementData = function getElementData(element, htmlElement) {
+	        var data = getRuleData(element.rules, htmlElement);
+	        var childData = getChildData(element.children, htmlElement);
 	        if (!childData) {
 	            return;
 	        }
@@ -3095,10 +3100,10 @@
 	        return data;
 	    };
 
-	    var getChildData = function getChildData(children, element) {
+	    var getChildData = function getChildData(children, htmlElement) {
 	        var data = {};
 	        children.some(function (child) {
-	            var childData = getElement(child, element);
+	            var childData = getElement(child, htmlElement);
 	            if (!childData && !child.optional) {
 	                data = undefined;
 	                return true;
@@ -3113,15 +3118,15 @@
 
 	    var intRegEx = /\d+/;
 	    var floatRegEx = /\d+(\.\d+)?/;
-	    var getRuleData = function getRuleData(rules, element) {
+	    var getRuleData = function getRuleData(rules, htmlElement) {
 	        var data = {};
 	        rules.forEach(function (rule) {
 	            var val;
 	            var match;
 	            if (rule.attr === "text") {
-	                val = element.textContent.replace(/\s+/g, " ");
+	                val = htmlElement.textContent.replace(/\s+/g, " ");
 	            } else {
-	                var attr = element.getAttribute(rule.attr);
+	                var attr = htmlElement.getAttribute(rule.attr);
 	                // attributes that don't exist will return null
 	                // just use empty string for now
 	                val = attr || "";
@@ -3141,7 +3146,7 @@
 	        return data;
 	    };
 
-	    return page === undefined ? "" : getElement(page, document);
+	    return page === undefined ? "" : getElement(page.element, document);
 	};
 
 /***/ },
@@ -3165,7 +3170,7 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	/*
-	 * ElementFrame
+	 * HTMLFrame
 	 * ------------
 	 *
 	 * This frame is used select an element within the page. An elements props is
@@ -3175,7 +3180,7 @@
 	 * parent) will be rendered.
 	 */
 	exports.default = _react2.default.createClass({
-	  displayName: "ElementFrame",
+	  displayName: "HTMLFrame",
 
 	  potentialSelector: "selectable-element",
 	  currentSelector: "query-check",
@@ -3543,23 +3548,23 @@
 	    // all value must be set
 
 	    if (type === "all" && value === "") {
-	      this.props.message("Name for type \"all\" selectors cannot be empty");
+	      this.props.message("Name for type \"all\" elements cannot be empty");
 	      return;
 	    }
-	    var sel = (0, _helpers.createSelector)(css, type, value, optional);
-	    // generate the list of elements for the new selector
-	    sel.elements = (0, _helpers.select)(parent.elements, sel.selector, sel.spec);
-	    sel.parent = parent;
-	    parent.children.push(sel);
+	    var ele = (0, _helpers.createElement)(css, type, value, optional);
+	    // generate the list of elements for the new element
+	    ele.elements = (0, _helpers.select)(parent.elements, ele.selector, ele.spec);
+	    ele.parent = parent;
+	    parent.children.push(ele);
 	    // if saving a selector that selects "select" elements, add a child selector
 	    // to match option elements
-	    if ((0, _helpers.allSelect)(sel.elements)) {
-	      var optionsChild = (0, _helpers.createSelector)("option", "all", "option", false);
-	      optionsChild.elements = (0, _helpers.select)(sel.elements, optionsChild.selector, optionsChild.spec);
-	      optionsChild.parent = sel;
-	      sel.children.push(optionsChild);
+	    if ((0, _helpers.allSelect)(ele.elements)) {
+	      var optionsChild = (0, _helpers.createElement)("option", "all", "option", false);
+	      optionsChild.elements = (0, _helpers.select)(ele.elements, optionsChild.selector, optionsChild.spec);
+	      optionsChild.parent = ele;
+	      ele.children.push(optionsChild);
 	    }
-	    this.props.save(sel);
+	    this.props.save(ele);
 	  },
 	  cancelHandler: function cancelHandler(event) {
 	    event.preventDefault();
@@ -3591,7 +3596,7 @@
 	        _react2.default.createElement(
 	          "div",
 	          null,
-	          "Selector: ",
+	          "CSS Selector: ",
 	          css
 	        ),
 	        _react2.default.createElement(SpecForm, { count: elementCount,
@@ -3778,7 +3783,7 @@
 
 	/*
 	 * A tree rendering of the page, used to show the current page, the current
-	 * selector, and to select a selector (for editing, adding children, or rules)
+	 * element, and to select an element (for editing, adding children, or rules)
 	 */
 	exports.default = _react2.default.createClass({
 	  displayName: "PageTree",
@@ -3809,14 +3814,14 @@
 	  _makeNodes: function _makeNodes() {
 	    var _props2 = this.props;
 	    var page = _props2.page;
-	    var selector = _props2.selector;
+	    var element = _props2.element;
 	    var active = _props2.active;
 	    var actions = _props2.actions;
 	    var _state = this.state;
 	    var tree = _state.tree;
 	    var diagonal = _state.diagonal;
 
-	    var clonedPage = (0, _helpers.clone)(page);
+	    var clonedPage = (0, _helpers.clone)(page.element);
 
 	    // generate the tree's nodes and links
 	    var nodes = tree.nodes(clonedPage);
@@ -3832,8 +3837,8 @@
 	      }),
 	      nodes.map(function (n, i) {
 	        return _react2.default.createElement(Node, _extends({ key: i,
-	          current: selector !== undefined && n.original === selector,
-	          select: actions.selectSelector,
+	          current: element !== undefined && n.original === element,
+	          select: actions.selectElement,
 	          active: active
 	        }, n));
 	      })
@@ -4087,9 +4092,9 @@
 
 	var _page2 = _interopRequireDefault(_page);
 
-	var _selector = __webpack_require__(48);
+	var _element = __webpack_require__(48);
 
-	var _selector2 = _interopRequireDefault(_selector);
+	var _element2 = _interopRequireDefault(_element);
 
 	var _preview = __webpack_require__(49);
 
@@ -4108,13 +4113,13 @@
 	    pageIndex: 0
 	  },
 	  frame: {
-	    name: "selector",
+	    name: "element",
 	    data: {}
 	  },
 	  preview: {
 	    visible: false
 	  },
-	  selector: undefined,
+	  element: undefined,
 	  messages: {
 	    text: "",
 	    fade: undefined
@@ -4134,7 +4139,7 @@
 	        frame: (0, _frame2.default)(state.frame, action),
 	        show: (0, _show2.default)(state.show, action),
 	        page: (0, _page2.default)(state.page, action),
-	        selector: (0, _selector2.default)(state.selector, action),
+	        element: (0, _element2.default)(state.element, action),
 	        preview: (0, _preview2.default)(state.preview, action),
 	        message: (0, _message2.default)(state.message, action)
 	      };
@@ -4164,7 +4169,7 @@
 	 * frame
 	 * -----
 	 *
-	 * Which frame to show. In the majority of cases, the "selector" frame should
+	 * Which frame to show. In the majority of cases, the "element" frame should
 	 * be shown.
 	 */
 	function frame() {
@@ -4173,14 +4178,14 @@
 
 	  switch (action.type) {
 	    case types.LOAD_PAGE:
-	    case types.REMOVE_SELECTOR:
-	    case types.SAVE_SELECTOR:
+	    case types.REMOVE_ELEMENT:
+	    case types.SAVE_ELEMENT:
 	    case types.SAVE_RULE:
 	    case types.REMOVE_RULE:
 	    case types.CLOSE_FORAGER:
-	    case types.SHOW_SELECTOR_FRAME:
+	    case types.SHOW_ELEMENT_FRAME:
 	      return Object.assign({}, state, {
-	        name: "selector",
+	        name: "element",
 	        data: {}
 	      });
 	    case types.SHOW_RULE_FRAME:
@@ -4188,9 +4193,9 @@
 	        name: "rule",
 	        data: {}
 	      });
-	    case types.SHOW_ELEMENT_FRAME:
+	    case types.SHOW_HTML_FRAME:
 	      return Object.assign({}, state, {
-	        name: "element",
+	        name: "html",
 	        data: {}
 	      });
 	    case types.SHOW_PARTS_FRAME:
@@ -4332,14 +4337,14 @@
 	     * reference throughout the app, it is simpler to do that than to keep ids
 	     * on the nodes and make changes in here. Since the changes have already been
 	     * made, all this does is create a new array of pages to trigger an update
-	     * when adding a rule to or removing a rule from a selector so that the UI
+	     * when adding a rule to or removing a rule from an element so that the UI
 	     * can reflect 
 	     *
 	     */
 	    case types.RENAME_PAGE:
-	    case types.SAVE_SELECTOR:
-	    case types.REMOVE_SELECTOR:
-	    case types.RENAME_SELECTOR:
+	    case types.SAVE_ELEMENT:
+	    case types.REMOVE_ELEMENT:
+	    case types.RENAME_ELEMENT:
 	    case types.SAVE_RULE:
 	    case types.REMOVE_RULE:
 	      var pages = state.pages;
@@ -4369,7 +4374,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.default = selector;
+	exports.default = element;
 
 	var _ActionTypes = __webpack_require__(24);
 
@@ -4378,21 +4383,21 @@
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 	/*
-	 * selector
+	 * element
 	 * ---------
 	 *
-	 * Never create a new selector, always just mutate the current one so that
-	 * the changes are reflected in the page that contains the selector.
+	 * Never create a new element, always just mutate the current one so that
+	 * the changes are reflected in the page that contains the element.
 	 */
-	function selector(state, action) {
+	function element(state, action) {
 	  switch (action.type) {
 	    case types.ADD_PAGE:
 	    case types.LOAD_PAGE:
 	    case types.RENAME_PAGE:
-	    case types.SELECT_SELECTOR:
-	    case types.SAVE_SELECTOR:
-	      return action.selector;
-	    case types.REMOVE_SELECTOR:
+	    case types.SELECT_ELEMENT:
+	    case types.SAVE_ELEMENT:
+	      return action.element;
+	    case types.REMOVE_ELEMENT:
 	    case types.REMOVE_PAGE:
 	    case types.CLOSE_FORAGER:
 	      return undefined;
@@ -4580,16 +4585,15 @@
 	            action.fade = fadeTime;
 	            action.error = true;
 	          }
-	          action.selector = current.selector;
+	          action.element = current.element;
 	          // need to actually create the page for ADD_PAGE
 	          if (!action.error) {
 	            if (action.type === types.ADD_PAGE) {
 	              var newPage = (0, _helpers.createPage)(name);
 	              (0, _helpers.setupPage)(newPage);
 	              action.page = newPage;
-	              action.selector = newPage;
+	              action.element = newPage.element;
 	            } else {
-	              //
 	              var currentPage = pages[pageIndex];
 	              currentPage.name = name;
 	            }

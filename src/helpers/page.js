@@ -3,17 +3,19 @@ import { select } from "./selection";
 export const createPage = name => {
   return {
     name: name,
-    selector: "body",
-    spec: {
-      type: "single",
-      value: 0
-    },
-    children: [],
-    rules: []
+    element: {
+      selector: "body",
+      spec: {
+        type: "single",
+        value: 0
+      },
+      children: [],
+      rules: []
+    }
   };
 };
 
-export const createSelector = (selector, type = "single", value = 0, optional = false) => {
+export const createElement = (selector, type = "single", value = 0, optional = false) => {
   return {
     selector: selector,
     spec: {
@@ -31,51 +33,52 @@ export const createSelector = (selector, type = "single", value = 0, optional = 
  * clone a page (useful with the tree because that adds unnecessary properties
  * to each selector) does not include the page's name
  */
-export const clone = selector => {
+export const clone = element => {
   return Object.assign({}, {
-    selector: selector.selector,
-    spec: selector.spec,
-    children: selector.children.map(child => clone(child)),
-    hasRules: selector.rules.length,
-    elements: selector.elements || [],
-    original: selector
+    selector: element.selector,
+    spec: element.spec,
+    children: element.children.map(child => clone(child)),
+    hasRules: element.rules.length,
+    elements: element.elements || [],
+    original: element
   });
 };
 
 
 export const clean = page => {
   return Object.assign({}, {
-    name: page.name
-  }, cleanSelector(page));
+    name: page.name,
+    element: cleanElement(page.element)
+  });
 };
 
 
-const cleanSelector = s => {
+const cleanElement = e => {
   return Object.assign({}, {
-    selector: s.selector,
-    spec: Object.assign({}, s.spec),
-    children: s.children.map(c => cleanSelector(c)),
-    rules: s.rules.map(r => Object.assign({}, r)),
-    optional: s.optional
+    selector: e.selector,
+    spec: Object.assign({}, e.spec),
+    children: e.children.map(c => cleanElement(c)),
+    rules: e.rules.map(r => Object.assign({}, r)),
+    optional: e.optional
   });
 };
 
 /*
- * set an id on each selector and determine the elements that each selector matches
+ * set an id on each element and determine the html elements that each element matches
  */
 export const setupPage = page => {
   if ( page === undefined ) {
     return;
   }
   let id = 0;
-  let setup = (selector, parentElements, parent) => {
-    selector.id = id++;
-    selector.parent = parent;
-    selector.elements = select(parentElements, selector.selector, selector.spec);
-    selector.children.forEach(child => {
-      setup(child, selector.elements, selector);
+  let setup = (element, parentElements, parent) => {
+    element.id = id++;
+    element.parent = parent;
+    element.elements = select(parentElements, element.selector, element.spec);
+    element.children.forEach(child => {
+      setup(child, element.elements, element);
     });
   }
 
-  setup(page, [document], null);
+  setup(page.element, [document], null);
 }

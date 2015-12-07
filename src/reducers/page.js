@@ -60,14 +60,14 @@ export default function page(state = {}, action) {
    * reference throughout the app, it is simpler to do that than to keep ids
    * on the nodes and make changes in here. Since the changes have already been
    * made, all this does is create a new array of pages to trigger an update
-   * when adding a rule to or removing a rule from a selector so that the UI
+   * when adding a rule to or removing a rule from an element so that the UI
    * can reflect 
    *
    */
   case types.RENAME_PAGE:
-  case types.SAVE_SELECTOR:
-  case types.REMOVE_SELECTOR:
-  case types.RENAME_SELECTOR:
+  case types.SAVE_ELEMENT:
+  case types.REMOVE_ELEMENT:
+  case types.RENAME_ELEMENT:
   case types.SAVE_RULE:
   case types.REMOVE_RULE:
     var { pages, pageIndex } = state;

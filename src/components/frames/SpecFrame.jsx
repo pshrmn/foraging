@@ -1,7 +1,7 @@
 import React from "react";
 
 import { PosButton, NegButton } from "../Inputs";
-import { createSelector, allSelect, count, select, highlight, unhighlight } from "../../helpers";
+import { createElement, allSelect, count, select, highlight, unhighlight } from "../../helpers";
 
 export default React.createClass({
   highlight: "query-check",
@@ -18,23 +18,23 @@ export default React.createClass({
     let { css, parent } = this.props;
     // all value must be set
     if ( type === "all" && value === "" ) {
-      this.props.message("Name for type \"all\" selectors cannot be empty");
+      this.props.message("Name for type \"all\" elements cannot be empty");
       return;
     }
-    let sel = createSelector(css, type, value, optional);
-    // generate the list of elements for the new selector
-    sel.elements = select(parent.elements, sel.selector, sel.spec);
-    sel.parent = parent;
-    parent.children.push(sel);
+    let ele = createElement(css, type, value, optional);
+    // generate the list of elements for the new element
+    ele.elements = select(parent.elements, ele.selector, ele.spec);
+    ele.parent = parent;
+    parent.children.push(ele);
     // if saving a selector that selects "select" elements, add a child selector
     // to match option elements
-    if ( allSelect(sel.elements) ) {
-      let optionsChild = createSelector("option", "all", "option", false);
-      optionsChild.elements = select(sel.elements, optionsChild.selector, optionsChild.spec);
-      optionsChild.parent = sel;
-      sel.children.push(optionsChild);
+    if ( allSelect(ele.elements) ) {
+      let optionsChild = createElement("option", "all", "option", false);
+      optionsChild.elements = select(ele.elements, optionsChild.selector, optionsChild.spec);
+      optionsChild.parent = ele;
+      ele.children.push(optionsChild);
     }
-    this.props.save(sel);
+    this.props.save(ele);
   },
   cancelHandler: function(event) {
     event.preventDefault();
@@ -58,7 +58,7 @@ export default React.createClass({
       <div className="frame spec-form">
         <div className="info">
           <div>
-            Selector: {css}
+            CSS Selector: {css}
           </div>
           <SpecForm count={elementCount}
                     setSpec={this.setSpec}/>

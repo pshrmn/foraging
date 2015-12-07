@@ -1,21 +1,21 @@
 import * as types from "../constants/ActionTypes";
 
 /*
- * selector
+ * element
  * ---------
  *
- * Never create a new selector, always just mutate the current one so that
- * the changes are reflected in the page that contains the selector.
+ * Never create a new element, always just mutate the current one so that
+ * the changes are reflected in the page that contains the element.
  */
-export default function selector(state, action) {
+export default function element(state, action) {
   switch ( action.type ) {
   case types.ADD_PAGE:
   case types.LOAD_PAGE:
   case types.RENAME_PAGE:
-  case types.SELECT_SELECTOR:
-  case types.SAVE_SELECTOR:
-    return action.selector;
-  case types.REMOVE_SELECTOR:
+  case types.SELECT_ELEMENT:
+  case types.SAVE_ELEMENT:
+    return action.element;
+  case types.REMOVE_ELEMENT:
   case types.REMOVE_PAGE:
   case types.CLOSE_FORAGER:
     return undefined;

@@ -1,91 +1,106 @@
 #Forager
 
-A Chrome extension to determine how to gather data from a page. 
+A Chrome extension to determine how to gather data from a web page. 
 
 ##[Tutorial](http://www.pshrmn.com/tutorials/forager/)
 
 ###Format
 
-#####Rule
-
-Data is captured through `rule`s. A rule has a name, the attribute of an element to capture (or text), and the expected type of the attribute. By default the type is string, but it can also be int or float. A regular expression will be used to attempt to parse the value out of the text of the attribute.
-
-    rule = {
-        name: "h1",
-        attr: "title",
-        type: "..."
-    }
-
-#####Selector
-
-Rules are created on `selector`s. Selectors are made up of a css `selector`, `children` selectors, `rules`, a `spec`  with a `type` (`single` or `all`) and a `value` (an integer to target a specific element for `single` types and a string name to save the array as for `all` types). There is also an `optional` boolean property to handle cases where an element might not exist, but you still want to gather other data.
-
-Specs are either
-
-    {
-        type: "single",
-        value: <int>
-    }
-    
-or
-
-    {
-        type: "all",
-        value: <string>
-    }
-
-and a selector looks like:
-
-    selector = {
-        selector: "p",
-        children: [
-            {
-                selector: "a",
-                children: [],
-                rules: [
-                    {
-                        name: "url",
-                        attr: "href",
-                        type: "string"
-                    }
-                ],
-                spec: {
-                    type: "all",
-                    value: "urls"
-                }
-            }
-        ],
-        rules: [
-            {
-                name: "description",
-                attr: "text",
-                type: "string"
-            }
-        ],
-        spec: {
-            type: "single",
-            value: 2
-        }
-    }
-
-The above selector will select the second `p` element in the page and capture its `textContent` as the `description`. Any `a` elements that are children of the paragraph will have their `href` attribute captured and stored in a `urls` array.
-
 #####Page
 
-A `page` is a special type of `selector` that has a `name`. Its `selector` is the document's `body`.
-    page = {
-        name: "roster",
+A page is made up of `Element`s which contain `Rule`s. When a `Page` is created, a root `Element` with a `selector` of the document's `body` is made. Any `Element`s that you make will be children (or granchildren) of this root `Element`.
+
+```javascript
+page = {
+    name: "roster",
+    element: {
         selector: "body",
         children: [...],
         rules: []
     }
+}
+```
 
-And a site can have multiple, independent pages, each of which is uploaded individually to the server. The extension stores a `pages` object for each site (determined by the hostname)
+A site can have multiple, independent pages, each of which is uploaded individually to the server. The extension stores a `pages` object for each site (determined by the hostname). Page names cannot be repeated on a site to prevent overriding when uploading to a server.
 
-    pages = {
-        roster: {...},
-        schedule: {...}
+```javascript
+pages = {
+    roster: {...},
+    schedule: {...}
+}
+```
+
+#####Rule
+
+Data is captured through `Rule`s. A `Rule` has a `name`, the `attr`, which is the attribute of an element to capture (or text) to capture, and the expected `type` of the attribute. By default the `type` is `string`, but it can also be `int` or `float`. A regular expression will be used to attempt to parse the int or float value out of the text of the `attr`.
+
+```javascript
+rule = {
+    name: "h1",
+    attr: "title",
+    type: "..."
+}
+```
+
+#####Element
+
+An `Element` is made up of a css `selector` to match elements in the page, `children` Elements, a `rules` array of `Rule`s, and a `spec` with a `type` (`single` or `all`) and a `value` (an integer to target a specific element for `single` types and a string name to save the array as for `all` types). There is also an `optional` boolean property to handle cases where an `Element` might not match any exist, but you still want to gather other data.
+
+Specs are either
+
+```javascript
+{
+    type: "single",
+    value: <int>
+}
+```
+
+or
+
+```javascript
+{
+    type: "all",
+    value: <string>
+}
+```
+
+and an `Element` looks like:
+
+```javascript
+element = {
+    selector: "p",
+    children: [
+        {
+            selector: "a",
+            children: [],
+            rules: [
+                {
+                    name: "url",
+                    attr: "href",
+                    type: "string"
+                }
+            ],
+            spec: {
+                type: "all",
+                value: "urls"
+            }
+        }
+    ],
+    rules: [
+        {
+            name: "description",
+            attr: "text",
+            type: "string"
+        }
+    ],
+    spec: {
+        type: "single",
+        value: 2
     }
+}
+```
+
+The above `Element` will select the second `p` element in the page and capture its `textContent`, saving it as the `description`. Any `a` elements that are children of the paragraph will have their `href` attribute captured and stored in a `urls` array.
 
 #####How to Use
 To pack extension and use:
@@ -96,4 +111,4 @@ To pack extension and use:
 4. Drag the .crx file to the Chrome extensions page
 5. Accept the extension's permissions
 
-Makes extensive use of [d3](http://d3js.org/).
+Built with [React](https://facebook.github.io/react/), [Redux](http://rackt.org/redux/index.html), and [d3](http://d3js.org/).

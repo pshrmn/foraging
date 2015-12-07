@@ -4,7 +4,7 @@ import { PosButton, NegButton } from "../Inputs";
 import { attributes, abbreviate, select, highlight, unhighlight } from "../../helpers";
 
 export default React.createClass({
-  highlight: "current-selector",
+  highlight: "current-element",
   getInitialState: function() {
     return {
       name: "",
@@ -45,7 +45,7 @@ export default React.createClass({
     this.props.cancel();
   },
   render: function() {
-    let { selector } = this.props;
+    let { element } = this.props;
     let { name, type, attr } = this.state;
     let typeRadios = ["string", "int", "float"].map((t,i) => {
       return (
@@ -72,7 +72,7 @@ export default React.createClass({
           <div>
             Type: {typeRadios}
           </div>
-          <AttrChoices elements={selector.elements}
+          <AttrChoices elements={element.elements}
                        attr={attr}
                        setAttr={this.setAttr} />
         </div>
@@ -84,12 +84,12 @@ export default React.createClass({
     );
   },
   componentWillMount: function() {
-    let { elements } = this.props.selector;
+    let { elements } = this.props.element;
     highlight(elements, this.highlight);
   },
   componentWillUpdate: function(nextProps, nextState) {
     unhighlight(this.highlight);
-    let { elements } = nextProps.selector;
+    let { elements } = nextProps.element;
     highlight(elements, this.highlight);
   },
   componentWillUnmount: function() {

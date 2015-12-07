@@ -22,16 +22,15 @@ export default state => next => action => {
       action.fade = fadeTime;
       action.error = true;
     }
-    action.selector = current.selector;
+    action.element = current.element;
     // need to actually create the page for ADD_PAGE
     if ( !action.error ) {
       if ( action.type === types.ADD_PAGE ) {
         let newPage = createPage(name);
         setupPage(newPage);
         action.page = newPage;
-        action.selector = newPage;
+        action.element = newPage.element;
       } else {
-        // 
         let currentPage = pages[pageIndex];
         currentPage.name = name;
       }

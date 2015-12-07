@@ -3,11 +3,11 @@ import * as types from "../constants/ActionTypes";
 /*
  * PAGE ACTIONS
  */
-export const loadPage = (index, selector) => {
+export const loadPage = (index, element) => {
   return {
     type: types.LOAD_PAGE,
     index: index,
-    selector: selector
+    element: element
   };
 };
 
@@ -62,22 +62,22 @@ export const showMessage = (text, fade) => {
  * FRAME ACTIONS
  */
 
-export const showSelectorFrame = () => {
-  return {
-    type: types.SHOW_SELECTOR_FRAME
-  };
-};
-
-export const showRuleFrame = selector => {
-  return {
-    type: types.SHOW_RULE_FRAME,
-    selector: selector
-  };
-};
-
 export const showElementFrame = () => {
   return {
     type: types.SHOW_ELEMENT_FRAME
+  };
+};
+
+export const showRuleFrame = element => {
+  return {
+    type: types.SHOW_RULE_FRAME,
+    element: element
+  };
+};
+
+export const showHTMLFrame = () => {
+  return {
+    type: types.SHOW_HTML_FRAME
   };
 };
 
@@ -105,31 +105,31 @@ export const closeForager = () => {
 };
 
 /*
- * SELECTOR/RULE ACTIONS
+ * ELEMENT/RULE ACTIONS
  */
-export const selectSelector = selector => {
+export const selectElement = element => {
   return {
-    type: types.SELECT_SELECTOR,
-    selector: selector
+    type: types.SELECT_ELEMENT,
+    element: element
   };
 };
 
-export const saveSelector = selector => {
+export const saveElement = element => {
   return {
-    type: types.SAVE_SELECTOR,
-    selector: selector
+    type: types.SAVE_ELEMENT,
+    element: element
   };
 };
 
-export const renameSelector =  () => {
+export const renameElement =  () => {
   return {
-    type: types.RENAME_SELECTOR
+    type: types.RENAME_ELEMENT
   };
 };
 
-export const removeSelector = () => {
+export const removeElement = () => {
   return {
-    type: types.REMOVE_SELECTOR
+    type: types.REMOVE_ELEMENT
   };
 };
 

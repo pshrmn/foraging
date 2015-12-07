@@ -1,7 +1,7 @@
 import frame from "./frame";
 import show from "./show";
 import page from "./page";
-import selector from "./selector";
+import element from "./element";
 import preview from "./preview";
 import message from "./message";
 
@@ -14,13 +14,13 @@ const initialState = {
     pageIndex: 0
   },
   frame: {
-    name: "selector",
+    name: "element",
     data: {}
   },
   preview: {
     visible: false
   },
-  selector: undefined,
+  element: undefined,
   messages: {
     text: "",
     fade: undefined
@@ -37,7 +37,7 @@ function reducer(state = initialState, action) {
       frame: frame(state.frame, action),
       show: show(state.show, action),
       page: page(state.page, action),
-      selector: selector(state.selector, action),
+      element: element(state.element, action),
       preview: preview(state.preview, action),
       message: message(state.message, action)
     };

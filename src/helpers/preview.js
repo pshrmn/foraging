@@ -1,21 +1,21 @@
 export const preview = page => {
     /*
      * Given a parent element, get all children that match the selector
-     * Return data based on selector's type (index or name)
+     * Return data based on element's type (index or name)
      */
-    let getElement = (selector, parent) => {
-        var elements = parent.querySelectorAll(selector.selector);
-        var value = selector.spec.value;
-        switch ( selector.spec.type ) {
+    let getElement = (element, parent) => {
+        let elements = parent.querySelectorAll(element.selector);
+        let { type, value } = element.spec;
+        switch ( type ) {
         case "single":
             var ele = elements[value];
             if ( !ele) {
                 return;
             }
-            return getElementData(selector, ele);
+            return getElementData(element, ele);
         case "all":
             var data = Array.from(elements).map(function(ele){
-                return getElementData(selector, ele);
+                return getElementData(element, ele);
             }).filter(function(datum){
                 return datum !== undefined;
             });
@@ -29,9 +29,9 @@ export const preview = page => {
      * Get data for each rule and each child. Merge the child data into the
      * rule data.
      */
-    let getElementData = (selector, element) => {
-        var data = getRuleData(selector.rules, element);
-        var childData = getChildData(selector.children, element);
+    let getElementData = (element, htmlElement) => {
+        var data = getRuleData(element.rules, htmlElement);
+        var childData = getChildData(element.children, htmlElement);
         if ( !childData ) {
             return;
         }
@@ -41,10 +41,10 @@ export const preview = page => {
         return data;
     }
 
-    let getChildData = (children, element) => {
+    let getChildData = (children, htmlElement) => {
         var data = {};
         children.some(function(child){
-            var childData = getElement(child, element);
+            var childData = getElement(child, htmlElement);
             if ( !childData && !child.optional ) {
                 data = undefined;
                 return true;
@@ -59,15 +59,15 @@ export const preview = page => {
 
     var intRegEx = /\d+/;
     var floatRegEx = /\d+(\.\d+)?/;
-    let getRuleData = (rules, element) => {
+    let getRuleData = (rules, htmlElement) => {
         var data = {};
         rules.forEach(function(rule){
             var val;
             var match;
             if ( rule.attr === "text" ) {
-                 val = element.textContent.replace(/\s+/g, " ");
+                 val = htmlElement.textContent.replace(/\s+/g, " ");
             } else {
-                var attr = element.getAttribute(rule.attr);
+                var attr = htmlElement.getAttribute(rule.attr);
                 // attributes that don't exist will return null
                 // just use empty string for now
                 val = attr || "";
@@ -87,6 +87,6 @@ export const preview = page => {
         return data;
     }
 
-    return page === undefined ? "" : getElement(page, document);
+    return page === undefined ? "" : getElement(page.element, document);
 }
 

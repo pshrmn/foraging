@@ -14,10 +14,9 @@ export default React.createClass({
     this.props.actions.addPage(name);
   },
   loadHandler: function(event) {
-    let nextPage = parseInt(event.target.value, 10);
-    // the initial selector is the root selector of the page
-    let selector = this.props.pages[nextPage];
-    this.props.actions.loadPage(nextPage, selector);
+    let nextPageIndex = parseInt(event.target.value, 10);
+    let element = this.props.pages[nextPageIndex].element
+    this.props.actions.loadPage(nextPageIndex, element);
   },
   closeHandler: function(event){
     document.body.classList.remove("foraging");
