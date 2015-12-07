@@ -15,7 +15,8 @@ export default React.createClass({
   },
   loadHandler: function(event) {
     let nextPageIndex = parseInt(event.target.value, 10);
-    let element = this.props.pages[nextPageIndex].element
+    let nextPage = this.props.pages[nextPageIndex]; 
+    let element = nextPage !== undefined ? nextPage.element : undefined;
     this.props.actions.loadPage(nextPageIndex, element);
   },
   closeHandler: function(event){

@@ -1773,7 +1773,8 @@
 	  },
 	  loadHandler: function loadHandler(event) {
 	    var nextPageIndex = parseInt(event.target.value, 10);
-	    var element = this.props.pages[nextPageIndex].element;
+	    var nextPage = this.props.pages[nextPageIndex];
+	    var element = nextPage !== undefined ? nextPage.element : undefined;
 	    this.props.actions.loadPage(nextPageIndex, element);
 	  },
 	  closeHandler: function closeHandler(event) {
