@@ -1,6 +1,6 @@
 import React from "react";
 
-import { PosButton, NeutralButton } from "./Inputs";
+import { PosButton, NeutralButton } from "./Buttons";
 
 import { preview } from "../helpers";
 

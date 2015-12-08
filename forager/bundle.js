@@ -1751,7 +1751,7 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _Inputs = __webpack_require__(26);
+	var _Buttons = __webpack_require__(26);
 
 	var _Message = __webpack_require__(27);
 
@@ -1812,13 +1812,13 @@
 	              onChange: this.loadHandler },
 	            options
 	          ),
-	          _react2.default.createElement(_Inputs.PosButton, { text: "Add Page",
+	          _react2.default.createElement(_Buttons.PosButton, { text: "Add Page",
 	            click: this.addHandler })
 	        ),
 	        _react2.default.createElement(
 	          "div",
 	          { className: "app-controls" },
-	          _react2.default.createElement(_Inputs.NeutralButton, { text: String.fromCharCode(215),
+	          _react2.default.createElement(_Buttons.NeutralButton, { text: String.fromCharCode(215),
 	            classes: ["transparent"],
 	            click: this.closeHandler })
 	        )
@@ -2115,7 +2115,7 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _Inputs = __webpack_require__(26);
+	var _Buttons = __webpack_require__(26);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -2170,7 +2170,7 @@
 	    } else if (type === "all") {
 	      description = "all elements, stores them as \"" + value + "\"";
 	    }
-	    var renameButton = type === "all" ? _react2.default.createElement(_Inputs.NeutralButton, { text: "Rename", click: this.rename }) : null;
+	    var renameButton = type === "all" ? _react2.default.createElement(_Buttons.NeutralButton, { text: "Rename", click: this.rename }) : null;
 	    // include spaces since this is text
 	    var optionalText = optional ? " (optional)" : "";
 	    return _react2.default.createElement(
@@ -2203,11 +2203,11 @@
 	      _react2.default.createElement(
 	        "div",
 	        { className: "buttons" },
-	        _react2.default.createElement(_Inputs.PosButton, { text: "Add Child",
+	        _react2.default.createElement(_Buttons.PosButton, { text: "Add Child",
 	          click: this.addChild }),
-	        _react2.default.createElement(_Inputs.PosButton, { text: "Add Rule",
+	        _react2.default.createElement(_Buttons.PosButton, { text: "Add Rule",
 	          click: this.addRule }),
-	        _react2.default.createElement(_Inputs.NegButton, { text: "Remove",
+	        _react2.default.createElement(_Buttons.NegButton, { text: "Remove",
 	          title: "Remove Element",
 	          click: this.remove }),
 	        renameButton
@@ -2224,22 +2224,15 @@
 	    var rules = _props.rules;
 	    var remove = _props.remove;
 
-	    var list = rules.length ? rules.map(function (r, i) {
-	      return _react2.default.createElement(Rule, _extends({ key: i, index: i, remove: remove }, r));
-	    }) : _react2.default.createElement(
-	      "li",
-	      null,
-	      "No Rules"
-	    );
+	    if (!rules.length) {
+	      return null;
+	    }
 	    return _react2.default.createElement(
-	      "div",
+	      "ul",
 	      { className: "rules" },
-	      "Rules:",
-	      _react2.default.createElement(
-	        "ul",
-	        null,
-	        list
-	      )
+	      rules.map(function (r, i) {
+	        return _react2.default.createElement(Rule, _extends({ key: i, index: i, remove: remove }, r));
+	      })
 	    );
 	  }
 	});
@@ -2262,15 +2255,20 @@
 	      { className: "rule" },
 	      _react2.default.createElement(
 	        "span",
-	        { className: "name" },
+	        { className: "rule-name", title: "name" },
 	        name
 	      ),
-	      " <",
-	      attr,
-	      "> (",
-	      type,
-	      ")",
-	      _react2.default.createElement(_Inputs.NegButton, { text: String.fromCharCode(215),
+	      _react2.default.createElement(
+	        "span",
+	        { className: "rule-attr", title: "attribute (or text)" },
+	        attr
+	      ),
+	      _react2.default.createElement(
+	        "span",
+	        { className: "rule-type", title: "data type" },
+	        type
+	      ),
+	      _react2.default.createElement(_Buttons.NegButton, { text: String.fromCharCode(215),
 	        classes: ["transparent"],
 	        click: this.handleClick })
 	    );
@@ -2291,7 +2289,7 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _Inputs = __webpack_require__(26);
+	var _Buttons = __webpack_require__(26);
 
 	var _helpers = __webpack_require__(31);
 
@@ -2398,8 +2396,8 @@
 	      _react2.default.createElement(
 	        "div",
 	        { className: "buttons" },
-	        _react2.default.createElement(_Inputs.PosButton, { text: "Save", click: this.saveHandler }),
-	        _react2.default.createElement(_Inputs.NegButton, { text: "Cancel", click: this.cancelHandler })
+	        _react2.default.createElement(_Buttons.PosButton, { text: "Save", click: this.saveHandler }),
+	        _react2.default.createElement(_Buttons.NegButton, { text: "Cancel", click: this.cancelHandler })
 	      )
 	    );
 	  },
@@ -2484,7 +2482,7 @@
 	      _react2.default.createElement(
 	        "div",
 	        null,
-	        _react2.default.createElement(_Inputs.PosButton, { text: "<<",
+	        _react2.default.createElement(_Buttons.PosButton, { text: "<<",
 	          classes: ["transparent"],
 	          click: this.prevElement }),
 	        " ",
@@ -2492,7 +2490,7 @@
 	        "/",
 	        eleCount,
 	        " ",
-	        _react2.default.createElement(_Inputs.PosButton, { text: ">>",
+	        _react2.default.createElement(_Buttons.PosButton, { text: ">>",
 	          classes: ["transparent"],
 	          click: this.nextElement })
 	      ),
@@ -3164,7 +3162,7 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _Inputs = __webpack_require__(26);
+	var _Buttons = __webpack_require__(26);
 
 	var _helpers = __webpack_require__(31);
 
@@ -3281,8 +3279,8 @@
 	      _react2.default.createElement(
 	        "div",
 	        { className: "buttons" },
-	        _react2.default.createElement(_Inputs.PosButton, { text: "Next", click: this.nextHandler }),
-	        _react2.default.createElement(_Inputs.NegButton, { text: "Cancel", click: this.cancelHandler })
+	        _react2.default.createElement(_Buttons.PosButton, { text: "Next", click: this.nextHandler }),
+	        _react2.default.createElement(_Buttons.NegButton, { text: "Cancel", click: this.cancelHandler })
 	      )
 	    );
 	  },
@@ -3369,7 +3367,7 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _Inputs = __webpack_require__(26);
+	var _Buttons = __webpack_require__(26);
 
 	var _helpers = __webpack_require__(31);
 
@@ -3489,8 +3487,8 @@
 	      _react2.default.createElement(
 	        "div",
 	        { className: "buttons" },
-	        _react2.default.createElement(_Inputs.PosButton, { text: "Next", click: this.nextHandler }),
-	        _react2.default.createElement(_Inputs.NegButton, { text: "Cancel", click: this.cancelHander })
+	        _react2.default.createElement(_Buttons.PosButton, { text: "Next", click: this.nextHandler }),
+	        _react2.default.createElement(_Buttons.NegButton, { text: "Cancel", click: this.cancelHander })
 	      )
 	    );
 	  },
@@ -3520,7 +3518,7 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _Inputs = __webpack_require__(26);
+	var _Buttons = __webpack_require__(26);
 
 	var _helpers = __webpack_require__(31);
 
@@ -3618,8 +3616,8 @@
 	      _react2.default.createElement(
 	        "div",
 	        { className: "buttons" },
-	        _react2.default.createElement(_Inputs.PosButton, { text: "Save", click: this.saveHandler }),
-	        _react2.default.createElement(_Inputs.NegButton, { text: "Cancel", click: this.cancelHandler })
+	        _react2.default.createElement(_Buttons.PosButton, { text: "Save", click: this.saveHandler }),
+	        _react2.default.createElement(_Buttons.NegButton, { text: "Cancel", click: this.cancelHandler })
 	      )
 	    );
 	  },
@@ -3776,7 +3774,7 @@
 
 	var _d2 = _interopRequireDefault(_d);
 
-	var _Inputs = __webpack_require__(26);
+	var _Buttons = __webpack_require__(26);
 
 	var _helpers = __webpack_require__(31);
 
@@ -3998,10 +3996,10 @@
 	    return _react2.default.createElement(
 	      "div",
 	      null,
-	      _react2.default.createElement(_Inputs.PosButton, { click: this.uploadHandler, text: "Upload" }),
-	      _react2.default.createElement(_Inputs.PosButton, { click: this.previewHandler, text: "Preview" }),
-	      _react2.default.createElement(_Inputs.PosButton, { click: this.renameHandler, text: "Rename" }),
-	      _react2.default.createElement(_Inputs.NegButton, { click: this.deleteHandler, text: "Delete" })
+	      _react2.default.createElement(_Buttons.PosButton, { click: this.uploadHandler, text: "Upload" }),
+	      _react2.default.createElement(_Buttons.PosButton, { click: this.previewHandler, text: "Preview" }),
+	      _react2.default.createElement(_Buttons.PosButton, { click: this.renameHandler, text: "Rename" }),
+	      _react2.default.createElement(_Buttons.NegButton, { click: this.deleteHandler, text: "Delete" })
 	    );
 	  }
 	});
@@ -4026,7 +4024,7 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _Inputs = __webpack_require__(26);
+	var _Buttons = __webpack_require__(26);
 
 	var _helpers = __webpack_require__(31);
 
@@ -4063,9 +4061,9 @@
 	          null,
 	          previewText
 	        ),
-	        _react2.default.createElement(_Inputs.PosButton, { text: "Log to Console", click: this.logHandler }),
-	        _react2.default.createElement(_Inputs.PosButton, { text: "Pretty Log", click: this.prettyLogHandler }),
-	        _react2.default.createElement(_Inputs.NeutralButton, { text: "Close", click: this.closeHandler })
+	        _react2.default.createElement(_Buttons.PosButton, { text: "Log to Console", click: this.logHandler }),
+	        _react2.default.createElement(_Buttons.PosButton, { text: "Pretty Log", click: this.prettyLogHandler }),
+	        _react2.default.createElement(_Buttons.NeutralButton, { text: "Close", click: this.closeHandler })
 	      )
 	    );
 	  }

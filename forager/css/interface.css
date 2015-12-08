@@ -254,13 +254,23 @@ body.foraging {
     #forager .frames .rules {
       margin: 5px 0; }
       #forager .frames .rules .rule {
-        display: -webkit-flex;
-        display: -ms-flexbox;
-        display: flex; }
-        #forager .frames .rules .rule .name {
+        height: inherit;
+        line-height: 1.1em; }
+        #forager .frames .rules .rule .rule-name {
           font-weight: bold; }
-        #forager .frames .rules .rule button {
-          margin-left: auto; }
+        #forager .frames .rules .rule .rule-attr, #forager .frames .rules .rule .rule-type {
+          font-size: 0.9em;
+          padding: 2px;
+          margin-left: 5px;
+          border: 1px solid #000000; }
+        #forager .frames .rules .rule .rule-attr {
+          color: #225683;
+          background: #BDCDDB;
+          border-color: #225683; }
+        #forager .frames .rules .rule .rule-type {
+          color: #42752E;
+          background: #CCE0C3;
+          border-color: #42752E; }
   #forager .page-controls {
     display: inline-block; }
   #forager .app-controls {

@@ -1,14 +1,21 @@
 $red: #E85F88;
 $dark-red: #D02357;
+
+$light-green: #CCE0C3;
 $green: #76B85C;
 $dark-green: #42752E;
+
+$light-blue: #BDCDDB;
 $blue: #225683;
 $dark-blue: #222233;
+
 $purple: #8F56A6;
+$gold: #FFD700;
+
 $light-gray: #CED1DE;
 $dark-gray: #323033;
 $gray: #898B96;
-$gold: #FFD700;
+
 $white: #ffffff;
 $black: #000000;
 
@@ -381,16 +388,32 @@ body.foraging {
 
         .rules {
             margin: 5px 0;
+
             .rule {
+                height: inherit;
+                line-height: 1.1em;
 
-                display: flex;
-
-                .name {
+                .rule-name {
                     font-weight: bold;
                 }
 
-                button {
-                    margin-left: auto;
+                .rule-attr, .rule-type {
+                    font-size: 0.9em;
+                    padding: 2px;
+                    margin-left: 5px;
+                    border: 1px solid $black;
+                }
+
+                .rule-attr {
+                    color: $blue;
+                    background: $light-blue;
+                    border-color: $blue;
+                }
+
+                .rule-type {
+                    color: $dark-green;
+                    background: $light-green;
+                    border-color: $dark-green;
                 }
             }
         }

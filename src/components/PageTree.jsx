@@ -1,7 +1,7 @@
 import React from "react";
 import d3 from "d3";
 
-import { PosButton, NegButton, NeutralButton } from "./Inputs";
+import { PosButton, NegButton, NeutralButton } from "./Buttons";
 import { abbreviate, clone, highlight, unhighlight } from "../helpers";
 
 /*

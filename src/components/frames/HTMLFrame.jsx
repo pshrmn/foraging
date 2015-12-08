@@ -1,6 +1,6 @@
 import React from "react";
 
-import { PosButton, NegButton } from "../Inputs";
+import { PosButton, NegButton } from "../Buttons";
 import { parts, select, count, stripEvents,
   highlight, unhighlight, iHighlight, iUnhighlight } from "../../helpers";
 

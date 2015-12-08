@@ -46,26 +46,6 @@ rule = {
 
 An `Element` is made up of a css `selector` to match elements in the page, `children` Elements, a `rules` array of `Rule`s, and a `spec` with a `type` (`single` or `all`) and a `value` (an integer to target a specific element for `single` types and a string name to save the array as for `all` types). There is also an `optional` boolean property to handle cases where an `Element` might not match any exist, but you still want to gather other data.
 
-Specs are either
-
-```javascript
-{
-    type: "single",
-    value: <int>
-}
-```
-
-or
-
-```javascript
-{
-    type: "all",
-    value: <string>
-}
-```
-
-and an `Element` looks like:
-
 ```javascript
 element = {
     selector: "p",
@@ -101,6 +81,31 @@ element = {
 ```
 
 The above `Element` will select the second `p` element in the page and capture its `textContent`, saving it as the `description`. Any `a` elements that are children of the paragraph will have their `href` attribute captured and stored in a `urls` array.
+
+######Spec
+
+A `Spec` describes what to do with the elements that are matched by a selector. In both cases, the selector gives you an array of matched elements.
+
+#######Single
+
+```javascript
+let single = {
+    type: "single",
+    value: <int>
+}
+```
+
+A `single` spec returns a data object containing data captured by the `Element`'s rules and the rules of its children. The spec's `value` is used to select the element at the `value` index in the array of matched elements and only that element will be used to get rule data from.
+
+#######All
+
+```javascript
+let all = {
+    type: "all",
+    value: <string>
+}
+```
+An `all` spec returns an array of data objects. The name of the array is the `value` of the spec. Each item in the array will correspond to an element that was matched by the selector.
 
 #####How to Use
 To pack extension and use:

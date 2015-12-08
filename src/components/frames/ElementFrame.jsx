@@ -1,6 +1,6 @@
 import React from "react";
 
-import { PosButton, NegButton, NeutralButton } from "../Inputs";
+import { PosButton, NegButton, NeutralButton } from "../Buttons";
 
 export default React.createClass({
   addChild: function(event) {
@@ -78,16 +78,17 @@ export default React.createClass({
 let RuleList = React.createClass({
   render: function() {
     let { rules, remove } = this.props;
-    let list = rules.length ? rules.map((r,i) => {
-      return <Rule key={i} index={i} remove={remove} {...r}/>;
-    }) : (<li>No Rules</li>);
+    if ( !rules.length ) {
+      return null;
+    }
     return (
-      <div className="rules">
-        Rules:
-        <ul>
-          {list}
-        </ul>
-      </div>
+      <ul className="rules">
+        {
+          rules.map((r,i) => {
+            return <Rule key={i} index={i} remove={remove} {...r}/>;
+          })
+        }
+      </ul>
     );
   }
 })
@@ -101,7 +102,9 @@ let Rule = React.createClass({
     let { name, attr, type } = this.props;
     return (
       <li className="rule">
-        <span className="name">{name}</span> &lt;{attr}&gt; ({type})
+        <span className="rule-name" title="name">{name}</span>
+        <span className="rule-attr" title="attribute (or text)">{attr}</span>
+        <span className="rule-type" title="data type">{type}</span>
         <NegButton text={String.fromCharCode(215)}
                    classes={["transparent"]}
                    click={this.handleClick} />

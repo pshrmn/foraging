@@ -1,6 +1,6 @@
 import React from "react";
 
-import { PosButton, NegButton } from "../Inputs";
+import { PosButton, NegButton } from "../Buttons";
 import { createElement, allSelect, count, select, highlight, unhighlight } from "../../helpers";
 
 export default React.createClass({
