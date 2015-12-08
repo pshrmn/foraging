@@ -1,26 +1,28 @@
 {
-    "name": "simple",
+  "name": "simple",
+  "element": {
     "selector": "body",
     "spec": {
-        "type": "single",
-        "value": 0
+      "type": "single",
+      "value": 0
     },
     "children": [
-        {
-            "selector": "a",
-            "spec": {
-                "type": "all",
-                "value": "links"
-            },
-            "children": [],
-            "rules": [
-                {
-                    "name": "link",
-                    "attr": "href",
-                    "type": "string"
-                }
-            ]
-        }
+      {
+        "selector": "a",
+        "spec": {
+          "type": "all",
+          "value": "links"
+        },
+        "children": [],
+        "rules": [
+          {
+            "name": "link",
+            "attr": "href",
+            "type": "string"
+          }
+        ]
+      }
     ],
     "rules": []
+  }
 }

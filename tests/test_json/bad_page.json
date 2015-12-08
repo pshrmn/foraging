@@ -1,5 +1,6 @@
 {
-    "name": "simple",
+  "name": "simple",
+  "element": {
     "selector": "body",
     "spec": {
         "type": "single",
@@ -7,4 +8,5 @@
     },
     "children": [],
     "rules": []
+  }
 }

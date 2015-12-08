@@ -1,11 +1,11 @@
 import unittest
 
-from gatherer.selector import Selector
+from gatherer.element import Element
 from gatherer.rule import Rule
 from gatherer.errors import BadJSONError
 
 
-class SelectorTestCase(unittest.TestCase):
+class ElementTestCase(unittest.TestCase):
 
     def test_simple_from_json(self):
         # no children, just rules
@@ -29,12 +29,12 @@ class SelectorTestCase(unittest.TestCase):
                 "value": 0
             }
         }
-        s = Selector.from_json(simple_json)
-        self.assertIsNotNone(s)
-        self.assertEqual(len(s.rules), 2)
-        self.assertIsInstance(s.rules[0], Rule)
-        self.assertEqual(s.type, "single")
-        self.assertEqual(s.value, 0)
+        e = Element.from_json(simple_json)
+        self.assertIsNotNone(e)
+        self.assertEqual(len(e.rules), 2)
+        self.assertIsInstance(e.rules[0], Rule)
+        self.assertEqual(e.type, "single")
+        self.assertEqual(e.value, 0)
 
     def test_nested_from_json(self):
         nested_json = {
@@ -63,8 +63,8 @@ class SelectorTestCase(unittest.TestCase):
             }
         }
 
-        s = Selector.from_json(nested_json)
-        self.assertIsInstance(s, Selector)
+        e = Element.from_json(nested_json)
+        self.assertIsInstance(e, Element)
 
     def test_empty_from_json(self):
         # empty returns None
@@ -78,7 +78,7 @@ class SelectorTestCase(unittest.TestCase):
             }
         }
         with self.assertRaises(BadJSONError):
-            Selector.from_json(empty_json)
+            Element.from_json(empty_json)
 
     def test_optional_from_json(self):
         simple_json = {
@@ -97,8 +97,8 @@ class SelectorTestCase(unittest.TestCase):
             },
             "optional": True
         }
-        s = Selector.from_json(simple_json)
-        self.assertTrue(s.optional)
+        e = Element.from_json(simple_json)
+        self.assertTrue(e.optional)
 
 if __name__ == "__main__":
     unittest.main()

@@ -4,7 +4,7 @@ from .rule import Rule
 from .errors import BadJSONError
 
 
-class Selector(object):
+class Element(object):
 
     def __init__(self, selector, sel_type, value, children, rules,
                  optional=False):
@@ -20,37 +20,37 @@ class Selector(object):
     def from_json(cls, sel):
         selector = sel.get("selector")
         if selector is None:
-            msg = "selector requires selector\n{}"
+            msg = "Element requires selector\n{}"
             raise BadJSONError(msg.format(sel))
 
         # verify spec
         spec = sel.get("spec")
         if spec is None:
-            msg = "selector requires spec\n{}"
+            msg = "Element requires spec\n{}"
             raise BadJSONError(msg.format(sel))
         sel_type = spec.get("type")
         value = spec.get("value")
         if sel_type is None:
-            msg = "no selector spec type provided"
+            msg = "no Element spec type provided"
             raise BadJSONError(msg)
         elif sel_type not in ["single", "all"]:
-            msg = "unexpected selector type {}"
+            msg = "unexpected Element type {}"
             raise BadJSONError(msg.format(sel_type))
         if value is None:
-            msg = "no selector spec value provided"
+            msg = "no Element spec value provided"
             raise BadJSONError(msg)
 
         optional = sel.get("optional", False)
 
         # create children and rules
         try:
-            children = [Selector.from_json(child) for child in sel["children"]]
+            children = [Element.from_json(child) for child in sel["children"]]
             rules = [Rule.from_json(a) for a in sel["rules"]]
         except BadJSONError:
             raise
         # ignore if there are no rules and no children to get data from
         if len(children) == 0 and len(rules) == 0:
-            msg = ("selector has no children or rules and "
+            msg = ("Element has no children or rules and "
                    "should be removed from the page")
             raise BadJSONError(msg.format(sel))
         return cls(selector, sel_type, value, children, rules, optional)
@@ -58,8 +58,8 @@ class Selector(object):
     def get(self, parent):
         """
         Given a parent element, get the child element(s) using the compiled
-        xpath for the selector. For "single" selectors, this will be a single
-        element that returns a dict. For "all" selectors, this will be all
+        xpath for the selector. For "single" Elements, this will be a single
+        element that returns a dict. For "all" Elements, this will be all
         elements and returns a list.
         """
         elements = self.xpath(parent)
