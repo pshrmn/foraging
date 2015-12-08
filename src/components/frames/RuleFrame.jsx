@@ -1,7 +1,10 @@
 import React from "react";
 
 import { PosButton, NegButton } from "../Buttons";
-import { attributes, abbreviate, select, highlight, unhighlight } from "../../helpers";
+import { attributes } from "../../helpers/attributes";
+import { select } from "../../helpers/selection";
+import { abbreviate } from "../../helpers/text";
+import { highlight, unhighlight } from "../../helpers/markup";
 
 export default React.createClass({
   highlight: "current-element",

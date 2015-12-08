@@ -2,7 +2,7 @@ import React from "react";
 
 import { PosButton, NeutralButton } from "./Buttons";
 
-import { preview } from "../helpers";
+import { preview } from "../helpers/preview";
 
 export default React.createClass({
   closeHandler: function(event) {

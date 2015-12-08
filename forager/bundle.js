@@ -60,13 +60,13 @@
 
 	var _Forager2 = _interopRequireDefault(_Forager);
 
-	var _reducers = __webpack_require__(44);
+	var _reducers = __webpack_require__(43);
 
 	var _reducers2 = _interopRequireDefault(_reducers);
 
 	var _ActionTypes = __webpack_require__(24);
 
-	var _chromeBackground = __webpack_require__(51);
+	var _chromeBackground = __webpack_require__(50);
 
 	var _chromeBackground2 = _interopRequireDefault(_chromeBackground);
 
@@ -74,7 +74,7 @@
 
 	var _pageMiddleware2 = _interopRequireDefault(_pageMiddleware);
 
-	var _chrome = __webpack_require__(53);
+	var _chrome = __webpack_require__(51);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -118,9 +118,12 @@
 	    var oldPages = {};
 	    store.subscribe(function () {
 	      var state = store.getState();
-	      var pages = state.page.pages;
+	      var _state$page = state.page;
+	      var pages = _state$page.pages;
+	      var pageIndex = _state$page.pageIndex;
+
 	      if (pages !== oldPages) {
-	        (0, _chrome.chromeSave)(pages);
+	        (0, _chrome.chromeSave)(pages[pageIndex]);
 	        oldPages = pages;
 	      }
 	    });
@@ -1445,11 +1448,11 @@
 
 	var _Frames2 = _interopRequireDefault(_Frames);
 
-	var _PageTree = __webpack_require__(41);
+	var _PageTree = __webpack_require__(39);
 
 	var _PageTree2 = _interopRequireDefault(_PageTree);
 
-	var _Preview = __webpack_require__(43);
+	var _Preview = __webpack_require__(41);
 
 	var _Preview2 = _interopRequireDefault(_Preview);
 
@@ -2003,19 +2006,19 @@
 
 	var _RuleFrame2 = _interopRequireDefault(_RuleFrame);
 
-	var _HTMLFrame = __webpack_require__(38);
+	var _HTMLFrame = __webpack_require__(35);
 
 	var _HTMLFrame2 = _interopRequireDefault(_HTMLFrame);
 
-	var _PartsFrame = __webpack_require__(39);
+	var _PartsFrame = __webpack_require__(36);
 
 	var _PartsFrame2 = _interopRequireDefault(_PartsFrame);
 
-	var _SpecFrame = __webpack_require__(40);
+	var _SpecFrame = __webpack_require__(37);
 
 	var _SpecFrame2 = _interopRequireDefault(_SpecFrame);
 
-	var _helpers = __webpack_require__(31);
+	var _markup = __webpack_require__(34);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -2076,15 +2079,15 @@
 	    }
 	  },
 	  componentWillMount: function componentWillMount() {
-	    (0, _helpers.unhighlight)(this.cssSelector);
+	    (0, _markup.unhighlight)(this.cssSelector);
 	    if (this.props.element) {
-	      (0, _helpers.highlight)(this.props.element.elements, this.cssSelector);
+	      (0, _markup.highlight)(this.props.element.elements, this.cssSelector);
 	    }
 	  },
 	  componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
-	    (0, _helpers.unhighlight)(this.cssSelector);
+	    (0, _markup.unhighlight)(this.cssSelector);
 	    if (nextProps.element !== undefined && nextProps.element !== this.props.element) {
-	      (0, _helpers.highlight)(nextProps.element.elements, this.cssSelector);
+	      (0, _markup.highlight)(nextProps.element.elements, this.cssSelector);
 	    }
 	  },
 	  render: function render() {
@@ -2095,7 +2098,7 @@
 	    );
 	  },
 	  componentWillUnmount: function componentWillUnmount() {
-	    (0, _helpers.unhighlight)(this.cssSelector);
+	    (0, _markup.unhighlight)(this.cssSelector);
 	  }
 	});
 
@@ -2291,7 +2294,13 @@
 
 	var _Buttons = __webpack_require__(26);
 
-	var _helpers = __webpack_require__(31);
+	var _attributes = __webpack_require__(31);
+
+	var _selection = __webpack_require__(32);
+
+	var _text = __webpack_require__(33);
+
+	var _markup = __webpack_require__(34);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -2404,16 +2413,16 @@
 	  componentWillMount: function componentWillMount() {
 	    var elements = this.props.element.elements;
 
-	    (0, _helpers.highlight)(elements, this.highlight);
+	    (0, _markup.highlight)(elements, this.highlight);
 	  },
 	  componentWillUpdate: function componentWillUpdate(nextProps, nextState) {
-	    (0, _helpers.unhighlight)(this.highlight);
+	    (0, _markup.unhighlight)(this.highlight);
 	    var elements = nextProps.element.elements;
 
-	    (0, _helpers.highlight)(elements, this.highlight);
+	    (0, _markup.highlight)(elements, this.highlight);
 	  },
 	  componentWillUnmount: function componentWillUnmount() {
-	    (0, _helpers.unhighlight)(this.highlight);
+	    (0, _markup.unhighlight)(this.highlight);
 	  }
 	});
 
@@ -2450,7 +2459,7 @@
 
 	    var attr = this.props.attr;
 
-	    return (0, _helpers.attributes)(element).map(function (a, i) {
+	    return (0, _attributes.attributes)(element).map(function (a, i) {
 	      return _react2.default.createElement(
 	        "li",
 	        { key: i },
@@ -2464,7 +2473,7 @@
 	            onChange: _this2.selectAttr }),
 	          a.name,
 	          " - ",
-	          (0, _helpers.abbreviate)(a.value, 100)
+	          (0, _text.abbreviate)(a.value, 100)
 	        )
 	      );
 	    });
@@ -2505,184 +2514,6 @@
 
 /***/ },
 /* 31 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-
-	var _text = __webpack_require__(32);
-
-	Object.defineProperty(exports, "legalName", {
-	  enumerable: true,
-	  get: function get() {
-	    return _text.legalName;
-	  }
-	});
-	Object.defineProperty(exports, "abbreviate", {
-	  enumerable: true,
-	  get: function get() {
-	    return _text.abbreviate;
-	  }
-	});
-
-	var _attributes = __webpack_require__(33);
-
-	Object.defineProperty(exports, "attributes", {
-	  enumerable: true,
-	  get: function get() {
-	    return _attributes.attributes;
-	  }
-	});
-	Object.defineProperty(exports, "stripEvents", {
-	  enumerable: true,
-	  get: function get() {
-	    return _attributes.stripEvents;
-	  }
-	});
-
-	var _markup = __webpack_require__(34);
-
-	Object.defineProperty(exports, "highlight", {
-	  enumerable: true,
-	  get: function get() {
-	    return _markup.highlight;
-	  }
-	});
-	Object.defineProperty(exports, "unhighlight", {
-	  enumerable: true,
-	  get: function get() {
-	    return _markup.unhighlight;
-	  }
-	});
-	Object.defineProperty(exports, "iHighlight", {
-	  enumerable: true,
-	  get: function get() {
-	    return _markup.iHighlight;
-	  }
-	});
-	Object.defineProperty(exports, "iUnhighlight", {
-	  enumerable: true,
-	  get: function get() {
-	    return _markup.iUnhighlight;
-	  }
-	});
-
-	var _page = __webpack_require__(35);
-
-	Object.defineProperty(exports, "createPage", {
-	  enumerable: true,
-	  get: function get() {
-	    return _page.createPage;
-	  }
-	});
-	Object.defineProperty(exports, "createElement", {
-	  enumerable: true,
-	  get: function get() {
-	    return _page.createElement;
-	  }
-	});
-	Object.defineProperty(exports, "clone", {
-	  enumerable: true,
-	  get: function get() {
-	    return _page.clone;
-	  }
-	});
-	Object.defineProperty(exports, "clean", {
-	  enumerable: true,
-	  get: function get() {
-	    return _page.clean;
-	  }
-	});
-	Object.defineProperty(exports, "setupPage", {
-	  enumerable: true,
-	  get: function get() {
-	    return _page.setupPage;
-	  }
-	});
-
-	var _selection = __webpack_require__(36);
-
-	Object.defineProperty(exports, "select", {
-	  enumerable: true,
-	  get: function get() {
-	    return _selection.select;
-	  }
-	});
-	Object.defineProperty(exports, "count", {
-	  enumerable: true,
-	  get: function get() {
-	    return _selection.count;
-	  }
-	});
-	Object.defineProperty(exports, "parts", {
-	  enumerable: true,
-	  get: function get() {
-	    return _selection.parts;
-	  }
-	});
-	Object.defineProperty(exports, "allSelect", {
-	  enumerable: true,
-	  get: function get() {
-	    return _selection.allSelect;
-	  }
-	});
-
-	var _preview = __webpack_require__(37);
-
-	Object.defineProperty(exports, "preview", {
-	  enumerable: true,
-	  get: function get() {
-	    return _preview.preview;
-	  }
-	});
-
-/***/ },
-/* 32 */
-/***/ function(module, exports) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	var legalName = exports.legalName = function legalName(name) {
-	    if (name === null || name === "") {
-	        return false;
-	    }
-	    var badCharacters = /[<>:"\/\\\|\?\*]/;
-	    return name.match(badCharacters) === null;
-	};
-
-	var abbreviate = exports.abbreviate = function abbreviate(text, max) {
-	    if (text.length <= max) {
-	        return text;
-	    } else if (max <= 3) {
-	        return "...";
-	    }
-	    // determine the length of the first and second halves of the text
-	    var firstHalf;
-	    var secondHalf;
-	    var leftovers = max - 3;
-	    var half = leftovers / 2;
-	    if (leftovers % 2 === 0) {
-	        firstHalf = half;
-	        secondHalf = half;
-	    } else {
-	        firstHalf = Math.ceil(half);
-	        secondHalf = Math.floor(half);
-	    }
-
-	    // splice correct amounts of text
-	    var firstText = text.slice(0, firstHalf);
-	    var secondText = secondHalf === 0 ? "" : text.slice(-secondHalf);
-	    return firstText + "..." + secondText;
-	};
-
-/***/ },
-/* 33 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -2749,181 +2580,7 @@
 	};
 
 /***/ },
-/* 34 */
-/***/ function(module, exports) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	/*
-	 * highlight
-	 * ---------
-	 *
-	 * @param elements - an array of elements
-	 * @param className - the class added to the elements
-	 */
-	var highlight = exports.highlight = function highlight(elements, className) {
-	  Array.from(elements).forEach(function (e) {
-	    e.classList.add(className);
-	  });
-	};
-
-	/*
-	 * unhighlight
-	 * -----------
-	 *
-	 * @param className - the className to remove from all elements that have it
-	 */
-	var unhighlight = exports.unhighlight = function unhighlight(className) {
-	  Array.from(document.getElementsByClassName(className)).forEach(function (e) {
-	    e.classList.remove(className);
-	  });
-	};
-
-	/*
-	 * iHighlight
-	 * ---------
-	 *
-	 * @param elements - an array of elements
-	 * @param className - the class added to the elements
-	 * @param over - the function to call on mouseover
-	 * @param out - the function to call on mouseout
-	 * @param click - the function to call when an element is clicked
-	 */
-	var iHighlight = exports.iHighlight = function iHighlight(elements, className, over, out, click) {
-	  Array.from(elements).forEach(function (e) {
-	    e.classList.add(className);
-	    e.addEventListener("mouseover", over, false);
-	    e.addEventListener("mouseout", out, false);
-	    e.addEventListener("click", click, false);
-	  });
-	};
-
-	/*
-	 * iUnhighlight
-	 * ---------
-	 *
-	 * @param className - the className to remove from all elements that have it
-	 * @param over - mouseover function to remove
-	 * @param out - mouseout function to remove
-	 * @param click - click function to remove
-	 */
-	var iUnhighlight = exports.iUnhighlight = function iUnhighlight(className, over, out, click) {
-	  Array.from(document.getElementsByClassName(className)).forEach(function (e) {
-	    e.classList.remove(className);
-	    e.removeEventListener("mouseover", over, false);
-	    e.removeEventListener("mouseout", out, false);
-	    e.removeEventListener("click", click, false);
-	  });
-	};
-
-/***/ },
-/* 35 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.setupPage = exports.clean = exports.clone = exports.createElement = exports.createPage = undefined;
-
-	var _selection = __webpack_require__(36);
-
-	var createPage = exports.createPage = function createPage(name) {
-	  return {
-	    name: name,
-	    element: {
-	      selector: "body",
-	      spec: {
-	        type: "single",
-	        value: 0
-	      },
-	      children: [],
-	      rules: []
-	    }
-	  };
-	};
-
-	var createElement = exports.createElement = function createElement(selector) {
-	  var type = arguments.length <= 1 || arguments[1] === undefined ? "single" : arguments[1];
-	  var value = arguments.length <= 2 || arguments[2] === undefined ? 0 : arguments[2];
-	  var optional = arguments.length <= 3 || arguments[3] === undefined ? false : arguments[3];
-
-	  return {
-	    selector: selector,
-	    spec: {
-	      type: type,
-	      value: value
-	    },
-	    children: [],
-	    rules: [],
-	    optional: optional
-	  };
-	};
-
-	/*
-	 * clone a page (useful with the tree because that adds unnecessary properties
-	 * to each selector) does not include the page's name
-	 */
-	var clone = exports.clone = function clone(element) {
-	  return Object.assign({}, {
-	    selector: element.selector,
-	    spec: element.spec,
-	    children: element.children.map(function (child) {
-	      return clone(child);
-	    }),
-	    hasRules: element.rules.length,
-	    elements: element.elements || [],
-	    original: element
-	  });
-	};
-
-	var clean = exports.clean = function clean(page) {
-	  return Object.assign({}, {
-	    name: page.name,
-	    element: cleanElement(page.element)
-	  });
-	};
-
-	var cleanElement = function cleanElement(e) {
-	  return Object.assign({}, {
-	    selector: e.selector,
-	    spec: Object.assign({}, e.spec),
-	    children: e.children.map(function (c) {
-	      return cleanElement(c);
-	    }),
-	    rules: e.rules.map(function (r) {
-	      return Object.assign({}, r);
-	    }),
-	    optional: e.optional
-	  });
-	};
-
-	/*
-	 * set an id on each element and determine the html elements that each element matches
-	 */
-	var setupPage = exports.setupPage = function setupPage(page) {
-	  if (page === undefined) {
-	    return;
-	  }
-	  var id = 0;
-	  var setup = function setup(element, parentElements, parent) {
-	    element.id = id++;
-	    element.parent = parent;
-	    element.elements = (0, _selection.select)(parentElements, element.selector, element.spec);
-	    element.children.forEach(function (child) {
-	      setup(child, element.elements, element);
-	    });
-	  };
-
-	  setup(page.element, [document], null);
-	};
-
-/***/ },
-/* 36 */
+/* 32 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -3045,7 +2702,7 @@
 	};
 
 /***/ },
-/* 37 */
+/* 33 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -3053,103 +2710,112 @@
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	var preview = exports.preview = function preview(page) {
-	    /*
-	     * Given a parent element, get all children that match the selector
-	     * Return data based on element's type (index or name)
-	     */
-	    var getElement = function getElement(element, parent) {
-	        var elements = parent.querySelectorAll(element.selector);
-	        var _element$spec = element.spec;
-	        var type = _element$spec.type;
-	        var value = _element$spec.value;
+	var legalName = exports.legalName = function legalName(name) {
+	    if (name === null || name === "") {
+	        return false;
+	    }
+	    var badCharacters = /[<>:"\/\\\|\?\*]/;
+	    return name.match(badCharacters) === null;
+	};
 
-	        switch (type) {
-	            case "single":
-	                var ele = elements[value];
-	                if (!ele) {
-	                    return;
-	                }
-	                return getElementData(element, ele);
-	            case "all":
-	                var data = Array.from(elements).map(function (ele) {
-	                    return getElementData(element, ele);
-	                }).filter(function (datum) {
-	                    return datum !== undefined;
-	                });
-	                var obj = {};
-	                obj[value] = data;
-	                return obj;
-	        }
-	    };
+	var abbreviate = exports.abbreviate = function abbreviate(text, max) {
+	    if (text.length <= max) {
+	        return text;
+	    } else if (max <= 3) {
+	        return "...";
+	    }
+	    // determine the length of the first and second halves of the text
+	    var firstHalf;
+	    var secondHalf;
+	    var leftovers = max - 3;
+	    var half = leftovers / 2;
+	    if (leftovers % 2 === 0) {
+	        firstHalf = half;
+	        secondHalf = half;
+	    } else {
+	        firstHalf = Math.ceil(half);
+	        secondHalf = Math.floor(half);
+	    }
 
-	    /*
-	     * Get data for each rule and each child. Merge the child data into the
-	     * rule data.
-	     */
-	    var getElementData = function getElementData(element, htmlElement) {
-	        var data = getRuleData(element.rules, htmlElement);
-	        var childData = getChildData(element.children, htmlElement);
-	        if (!childData) {
-	            return;
-	        }
-	        for (var key in childData) {
-	            data[key] = childData[key];
-	        }
-	        return data;
-	    };
-
-	    var getChildData = function getChildData(children, htmlElement) {
-	        var data = {};
-	        children.some(function (child) {
-	            var childData = getElement(child, htmlElement);
-	            if (!childData && !child.optional) {
-	                data = undefined;
-	                return true;
-	            }
-	            for (var key in childData) {
-	                data[key] = childData[key];
-	            }
-	            return false;
-	        });
-	        return data;
-	    };
-
-	    var intRegEx = /\d+/;
-	    var floatRegEx = /\d+(\.\d+)?/;
-	    var getRuleData = function getRuleData(rules, htmlElement) {
-	        var data = {};
-	        rules.forEach(function (rule) {
-	            var val;
-	            var match;
-	            if (rule.attr === "text") {
-	                val = htmlElement.textContent.replace(/\s+/g, " ");
-	            } else {
-	                var attr = htmlElement.getAttribute(rule.attr);
-	                // attributes that don't exist will return null
-	                // just use empty string for now
-	                val = attr || "";
-	            }
-	            switch (rule.type) {
-	                case "int":
-	                    match = val.match(intRegEx);
-	                    val = match !== null ? parseInt(match[0], 10) : -1;
-	                    break;
-	                case "float":
-	                    match = val.match(floatRegEx);
-	                    val = match !== null ? parseFloat(match[0]) : -1.0;
-	                    break;
-	            }
-	            data[rule.name] = val;
-	        });
-	        return data;
-	    };
-
-	    return page === undefined ? "" : getElement(page.element, document);
+	    // splice correct amounts of text
+	    var firstText = text.slice(0, firstHalf);
+	    var secondText = secondHalf === 0 ? "" : text.slice(-secondHalf);
+	    return firstText + "..." + secondText;
 	};
 
 /***/ },
-/* 38 */
+/* 34 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	/*
+	 * highlight
+	 * ---------
+	 *
+	 * @param elements - an array of elements
+	 * @param className - the class added to the elements
+	 */
+	var highlight = exports.highlight = function highlight(elements, className) {
+	  Array.from(elements).forEach(function (e) {
+	    e.classList.add(className);
+	  });
+	};
+
+	/*
+	 * unhighlight
+	 * -----------
+	 *
+	 * @param className - the className to remove from all elements that have it
+	 */
+	var unhighlight = exports.unhighlight = function unhighlight(className) {
+	  Array.from(document.getElementsByClassName(className)).forEach(function (e) {
+	    e.classList.remove(className);
+	  });
+	};
+
+	/*
+	 * iHighlight
+	 * ---------
+	 *
+	 * @param elements - an array of elements
+	 * @param className - the class added to the elements
+	 * @param over - the function to call on mouseover
+	 * @param out - the function to call on mouseout
+	 * @param click - the function to call when an element is clicked
+	 */
+	var iHighlight = exports.iHighlight = function iHighlight(elements, className, over, out, click) {
+	  Array.from(elements).forEach(function (e) {
+	    e.classList.add(className);
+	    e.addEventListener("mouseover", over, false);
+	    e.addEventListener("mouseout", out, false);
+	    e.addEventListener("click", click, false);
+	  });
+	};
+
+	/*
+	 * iUnhighlight
+	 * ---------
+	 *
+	 * @param className - the className to remove from all elements that have it
+	 * @param over - mouseover function to remove
+	 * @param out - mouseout function to remove
+	 * @param click - click function to remove
+	 */
+	var iUnhighlight = exports.iUnhighlight = function iUnhighlight(className, over, out, click) {
+	  Array.from(document.getElementsByClassName(className)).forEach(function (e) {
+	    e.classList.remove(className);
+	    e.removeEventListener("mouseover", over, false);
+	    e.removeEventListener("mouseout", out, false);
+	    e.removeEventListener("click", click, false);
+	  });
+	};
+
+/***/ },
+/* 35 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -3164,7 +2830,11 @@
 
 	var _Buttons = __webpack_require__(26);
 
-	var _helpers = __webpack_require__(31);
+	var _selection = __webpack_require__(32);
+
+	var _attributes = __webpack_require__(31);
+
+	var _markup = __webpack_require__(34);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -3196,7 +2866,7 @@
 	      var selectors = Array.from(event.path).filter(function (ele) {
 	        return ele.classList && ele.classList.contains("selectable-element");
 	      }).reverse().map(function (ele) {
-	        return (0, _helpers.parts)(ele);
+	        return (0, _selection.parts)(ele);
 	      });
 	      this.setState({
 	        selectors: selectors
@@ -3215,7 +2885,7 @@
 	  },
 	  setRadio: function setRadio(i) {
 	    var selector = this.state.selectors[i].join("");
-	    var eleCount = (0, _helpers.count)(this.props.parentElements, selector);
+	    var eleCount = (0, _selection.count)(this.props.parentElements, selector);
 	    this.setState({
 	      checked: i,
 	      eleCount: eleCount
@@ -3299,32 +2969,32 @@
 	   */
 	  componentWillUpdate: function componentWillUpdate(nextProps, nextState) {
 	    // remove any highlights from a previously selected selector
-	    (0, _helpers.unhighlight)(this.currentSelector);
+	    (0, _markup.unhighlight)(this.currentSelector);
 	    var clickedSelector = nextState.selectors[nextState.checked];
 	    if (clickedSelector !== undefined) {
 	      var fullSelector = clickedSelector.join("");
-	      var elements = (0, _helpers.select)(nextProps.parentElements, fullSelector);
-	      (0, _helpers.highlight)(elements, this.currentSelector);
+	      var elements = (0, _selection.select)(nextProps.parentElements, fullSelector);
+	      (0, _markup.highlight)(elements, this.currentSelector);
 	    }
 	  },
 	  /*
 	   * remove any classes and event listeners from the page when the frame is unmounted
 	   */
 	  componentWillUnmount: function componentWillUnmount() {
-	    (0, _helpers.unhighlight)(this.currentSelector);
-	    (0, _helpers.iUnhighlight)(this.potentialSelector, this.events.over, this.events.out, this.boundClick);
+	    (0, _markup.unhighlight)(this.currentSelector);
+	    (0, _markup.iUnhighlight)(this.potentialSelector, this.events.over, this.events.out, this.boundClick);
 	    delete this.boundClick;
 	  },
 	  /*
 	   * attach a class and events to all child elements of the current selector
 	   */
 	  _setupPageEvents: function _setupPageEvents(parents) {
-	    var elements = (0, _helpers.select)(parents);
+	    var elements = (0, _selection.select)(parents);
 	    elements = elements.map(function (ele) {
-	      return (0, _helpers.stripEvents)(ele);
+	      return (0, _attributes.stripEvents)(ele);
 	    });
 	    this.boundClick = this.events.click.bind(this);
-	    (0, _helpers.iHighlight)(elements, this.potentialSelector, this.events.over, this.events.out, this.boundClick);
+	    (0, _markup.iHighlight)(elements, this.potentialSelector, this.events.over, this.events.out, this.boundClick);
 	  }
 	});
 
@@ -3354,7 +3024,7 @@
 	});
 
 /***/ },
-/* 39 */
+/* 36 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -3369,7 +3039,9 @@
 
 	var _Buttons = __webpack_require__(26);
 
-	var _helpers = __webpack_require__(31);
+	var _selection = __webpack_require__(32);
+
+	var _markup = __webpack_require__(34);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -3405,7 +3077,7 @@
 	    parts[index].checked = !parts[index].checked;
 	    var fullSelector = this.joinParts(parts);
 
-	    var eleCount = fullSelector === "" ? 0 : (0, _helpers.count)(this.props.parentElements, fullSelector);
+	    var eleCount = fullSelector === "" ? 0 : (0, _selection.count)(this.props.parentElements, fullSelector);
 	    this._setupHighlights(fullSelector);
 	    this.setState({
 	      parts: parts,
@@ -3430,7 +3102,7 @@
 	      };
 	    });
 	    var fullSelector = names.join("");
-	    var eleCount = (0, _helpers.count)(this.props.parentElements, fullSelector);
+	    var eleCount = (0, _selection.count)(this.props.parentElements, fullSelector);
 	    this._setupHighlights(fullSelector);
 	    this.setState({
 	      parts: parts,
@@ -3493,19 +3165,19 @@
 	    );
 	  },
 	  componentWillUnmount: function componentWillUnmount() {
-	    (0, _helpers.unhighlight)(this.previewClass);
+	    (0, _markup.unhighlight)(this.previewClass);
 	  },
 	  _setupHighlights: function _setupHighlights(cssSelector) {
-	    (0, _helpers.unhighlight)(this.previewClass);
+	    (0, _markup.unhighlight)(this.previewClass);
 	    if (cssSelector !== "") {
-	      var elements = (0, _helpers.select)(this.props.parentElements, cssSelector);
-	      (0, _helpers.highlight)(elements, this.previewClass);
+	      var elements = (0, _selection.select)(this.props.parentElements, cssSelector);
+	      (0, _markup.highlight)(elements, this.previewClass);
 	    }
 	  }
 	});
 
 /***/ },
-/* 40 */
+/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -3520,7 +3192,11 @@
 
 	var _Buttons = __webpack_require__(26);
 
-	var _helpers = __webpack_require__(31);
+	var _page = __webpack_require__(38);
+
+	var _selection = __webpack_require__(32);
+
+	var _markup = __webpack_require__(34);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -3550,16 +3226,16 @@
 	      this.props.message("Name for type \"all\" elements cannot be empty");
 	      return;
 	    }
-	    var ele = (0, _helpers.createElement)(css, type, value, optional);
+	    var ele = (0, _page.createElement)(css, type, value, optional);
 	    // generate the list of elements for the new element
-	    ele.elements = (0, _helpers.select)(parent.elements, ele.selector, ele.spec);
+	    ele.elements = (0, _selection.select)(parent.elements, ele.selector, ele.spec);
 	    ele.parent = parent;
 	    parent.children.push(ele);
 	    // if saving a selector that selects "select" elements, add a child selector
 	    // to match option elements
-	    if ((0, _helpers.allSelect)(ele.elements)) {
-	      var optionsChild = (0, _helpers.createElement)("option", "all", "option", false);
-	      optionsChild.elements = (0, _helpers.select)(ele.elements, optionsChild.selector, optionsChild.spec);
+	    if ((0, _selection.allSelect)(ele.elements)) {
+	      var optionsChild = (0, _page.createElement)("option", "all", "option", false);
+	      optionsChild.elements = (0, _selection.select)(ele.elements, optionsChild.selector, optionsChild.spec);
 	      optionsChild.parent = ele;
 	      ele.children.push(optionsChild);
 	    }
@@ -3585,7 +3261,7 @@
 	    var parent = _props2.parent;
 	    var css = _props2.css;
 
-	    var elementCount = (0, _helpers.count)(parent.elements, css);
+	    var elementCount = (0, _selection.count)(parent.elements, css);
 	    return _react2.default.createElement(
 	      "div",
 	      { className: "frame spec-form" },
@@ -3622,22 +3298,22 @@
 	    );
 	  },
 	  componentWillMount: function componentWillMount() {
-	    var elements = (0, _helpers.select)(this.props.parent.elements, this.props.css, {
+	    var elements = (0, _selection.select)(this.props.parent.elements, this.props.css, {
 	      type: this.state.type,
 	      value: this.state.value
 	    });
-	    (0, _helpers.highlight)(elements, this.highlight);
+	    (0, _markup.highlight)(elements, this.highlight);
 	  },
 	  componentWillUpdate: function componentWillUpdate(nextProps, nextState) {
-	    (0, _helpers.unhighlight)(this.highlight);
-	    var elements = (0, _helpers.select)(nextProps.parent.elements, nextProps.css, {
+	    (0, _markup.unhighlight)(this.highlight);
+	    var elements = (0, _selection.select)(nextProps.parent.elements, nextProps.css, {
 	      type: nextState.type,
 	      value: nextState.value
 	    });
-	    (0, _helpers.highlight)(elements, this.highlight);
+	    (0, _markup.highlight)(elements, this.highlight);
 	  },
 	  componentWillUnmount: function componentWillUnmount() {
-	    (0, _helpers.unhighlight)(this.highlight);
+	    (0, _markup.unhighlight)(this.highlight);
 	  }
 	});
 
@@ -3755,7 +3431,110 @@
 	});
 
 /***/ },
-/* 41 */
+/* 38 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.setupPage = exports.clean = exports.clone = exports.createElement = exports.createPage = undefined;
+
+	var _selection = __webpack_require__(32);
+
+	var createPage = exports.createPage = function createPage(name) {
+	  return {
+	    name: name,
+	    element: {
+	      selector: "body",
+	      spec: {
+	        type: "single",
+	        value: 0
+	      },
+	      children: [],
+	      rules: []
+	    }
+	  };
+	};
+
+	var createElement = exports.createElement = function createElement(selector) {
+	  var type = arguments.length <= 1 || arguments[1] === undefined ? "single" : arguments[1];
+	  var value = arguments.length <= 2 || arguments[2] === undefined ? 0 : arguments[2];
+	  var optional = arguments.length <= 3 || arguments[3] === undefined ? false : arguments[3];
+
+	  return {
+	    selector: selector,
+	    spec: {
+	      type: type,
+	      value: value
+	    },
+	    children: [],
+	    rules: [],
+	    optional: optional
+	  };
+	};
+
+	/*
+	 * clone a page (useful with the tree because that adds unnecessary properties
+	 * to each selector) does not include the page's name
+	 */
+	var clone = exports.clone = function clone(element) {
+	  return Object.assign({}, {
+	    selector: element.selector,
+	    spec: element.spec,
+	    children: element.children.map(function (child) {
+	      return clone(child);
+	    }),
+	    hasRules: element.rules.length,
+	    elements: element.elements || [],
+	    original: element
+	  });
+	};
+
+	var clean = exports.clean = function clean(page) {
+	  return Object.assign({}, {
+	    name: page.name,
+	    element: cleanElement(page.element)
+	  });
+	};
+
+	var cleanElement = function cleanElement(e) {
+	  return Object.assign({}, {
+	    selector: e.selector,
+	    spec: Object.assign({}, e.spec),
+	    children: e.children.map(function (c) {
+	      return cleanElement(c);
+	    }),
+	    rules: e.rules.map(function (r) {
+	      return Object.assign({}, r);
+	    }),
+	    optional: e.optional
+	  });
+	};
+
+	/*
+	 * set an id on each element and determine the html elements that each element matches
+	 */
+	var setupPage = exports.setupPage = function setupPage(page) {
+	  if (page === undefined) {
+	    return;
+	  }
+	  var id = 0;
+	  var setup = function setup(element, parentElements, parent) {
+	    element.id = id++;
+	    element.parent = parent;
+	    element.elements = (0, _selection.select)(parentElements, element.selector, element.spec);
+	    element.children.forEach(function (child) {
+	      setup(child, element.elements, element);
+	    });
+	  };
+
+	  setup(page.element, [document], null);
+	};
+
+/***/ },
+/* 39 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -3770,13 +3549,17 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _d = __webpack_require__(42);
+	var _d = __webpack_require__(40);
 
 	var _d2 = _interopRequireDefault(_d);
 
 	var _Buttons = __webpack_require__(26);
 
-	var _helpers = __webpack_require__(31);
+	var _text = __webpack_require__(33);
+
+	var _page = __webpack_require__(38);
+
+	var _markup = __webpack_require__(34);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -3820,7 +3603,7 @@
 	    var tree = _state.tree;
 	    var diagonal = _state.diagonal;
 
-	    var clonedPage = (0, _helpers.clone)(page.element);
+	    var clonedPage = (0, _page.clone)(page.element);
 
 	    // generate the tree's nodes and links
 	    var nodes = tree.nodes(clonedPage);
@@ -3897,10 +3680,10 @@
 	    this.props.select(this.props.original);
 	  },
 	  handleMouseover: function handleMouseover(event) {
-	    (0, _helpers.highlight)(this.props.elements, this.hoverClass);
+	    (0, _markup.highlight)(this.props.elements, this.hoverClass);
 	  },
 	  handleMouseout: function handleMouseout(event) {
-	    (0, _helpers.unhighlight)(this.hoverClass);
+	    (0, _markup.unhighlight)(this.hoverClass);
 	  },
 	  specText: function specText() {
 	    var _props4 = this.props;
@@ -3919,7 +3702,7 @@
 	        text = "[" + selector + "]";
 	        break;
 	    }
-	    return (0, _helpers.abbreviate)(text, 10);
+	    return (0, _text.abbreviate)(text, 10);
 	  },
 	  render: function render() {
 	    var _props5 = this.props;
@@ -3956,7 +3739,7 @@
 	    );
 	  },
 	  componentWillUnmount: function componentWillUnmount() {
-	    (0, _helpers.unhighlight)(this.hoverClass);
+	    (0, _markup.unhighlight)(this.hoverClass);
 	  }
 	});
 
@@ -4005,13 +3788,13 @@
 	});
 
 /***/ },
-/* 42 */
+/* 40 */
 /***/ function(module, exports) {
 
 	module.exports = d3;
 
 /***/ },
-/* 43 */
+/* 41 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -4026,7 +3809,7 @@
 
 	var _Buttons = __webpack_require__(26);
 
-	var _helpers = __webpack_require__(31);
+	var _preview = __webpack_require__(42);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -4039,16 +3822,16 @@
 	  },
 	  logHandler: function logHandler(event) {
 	    event.preventDefault();
-	    console.log(JSON.stringify((0, _helpers.preview)(this.props.page)));
+	    console.log(JSON.stringify((0, _preview.preview)(this.props.page)));
 	  },
 	  prettyLogHandler: function prettyLogHandler(event) {
 	    event.preventDefault();
-	    console.log(JSON.stringify((0, _helpers.preview)(this.props.page), null, 2));
+	    console.log(JSON.stringify((0, _preview.preview)(this.props.page), null, 2));
 	  },
 	  render: function render() {
 	    var page = this.props.page;
 
-	    var previewText = JSON.stringify((0, _helpers.preview)(page), null, 2);
+	    var previewText = JSON.stringify((0, _preview.preview)(page), null, 2);
 	    return _react2.default.createElement(
 	      "div",
 	      { className: "preview-holder" },
@@ -4070,7 +3853,111 @@
 	});
 
 /***/ },
-/* 44 */
+/* 42 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	var preview = exports.preview = function preview(page) {
+	    /*
+	     * Given a parent element, get all children that match the selector
+	     * Return data based on element's type (index or name)
+	     */
+	    var getElement = function getElement(element, parent) {
+	        var elements = parent.querySelectorAll(element.selector);
+	        var _element$spec = element.spec;
+	        var type = _element$spec.type;
+	        var value = _element$spec.value;
+
+	        switch (type) {
+	            case "single":
+	                var ele = elements[value];
+	                if (!ele) {
+	                    return;
+	                }
+	                return getElementData(element, ele);
+	            case "all":
+	                var data = Array.from(elements).map(function (ele) {
+	                    return getElementData(element, ele);
+	                }).filter(function (datum) {
+	                    return datum !== undefined;
+	                });
+	                var obj = {};
+	                obj[value] = data;
+	                return obj;
+	        }
+	    };
+
+	    /*
+	     * Get data for each rule and each child. Merge the child data into the
+	     * rule data.
+	     */
+	    var getElementData = function getElementData(element, htmlElement) {
+	        var data = getRuleData(element.rules, htmlElement);
+	        var childData = getChildData(element.children, htmlElement);
+	        if (!childData) {
+	            return;
+	        }
+	        for (var key in childData) {
+	            data[key] = childData[key];
+	        }
+	        return data;
+	    };
+
+	    var getChildData = function getChildData(children, htmlElement) {
+	        var data = {};
+	        children.some(function (child) {
+	            var childData = getElement(child, htmlElement);
+	            if (!childData && !child.optional) {
+	                data = undefined;
+	                return true;
+	            }
+	            for (var key in childData) {
+	                data[key] = childData[key];
+	            }
+	            return false;
+	        });
+	        return data;
+	    };
+
+	    var intRegEx = /\d+/;
+	    var floatRegEx = /\d+(\.\d+)?/;
+	    var getRuleData = function getRuleData(rules, htmlElement) {
+	        var data = {};
+	        rules.forEach(function (rule) {
+	            var val;
+	            var match;
+	            if (rule.attr === "text") {
+	                val = htmlElement.textContent.replace(/\s+/g, " ");
+	            } else {
+	                var attr = htmlElement.getAttribute(rule.attr);
+	                // attributes that don't exist will return null
+	                // just use empty string for now
+	                val = attr || "";
+	            }
+	            switch (rule.type) {
+	                case "int":
+	                    match = val.match(intRegEx);
+	                    val = match !== null ? parseInt(match[0], 10) : -1;
+	                    break;
+	                case "float":
+	                    match = val.match(floatRegEx);
+	                    val = match !== null ? parseFloat(match[0]) : -1.0;
+	                    break;
+	            }
+	            data[rule.name] = val;
+	        });
+	        return data;
+	    };
+
+	    return page === undefined ? "" : getElement(page.element, document);
+	};
+
+/***/ },
+/* 43 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -4079,27 +3966,27 @@
 	  value: true
 	});
 
-	var _frame = __webpack_require__(45);
+	var _frame = __webpack_require__(44);
 
 	var _frame2 = _interopRequireDefault(_frame);
 
-	var _show = __webpack_require__(46);
+	var _show = __webpack_require__(45);
 
 	var _show2 = _interopRequireDefault(_show);
 
-	var _page = __webpack_require__(47);
+	var _page = __webpack_require__(46);
 
 	var _page2 = _interopRequireDefault(_page);
 
-	var _element = __webpack_require__(48);
+	var _element = __webpack_require__(47);
 
 	var _element2 = _interopRequireDefault(_element);
 
-	var _preview = __webpack_require__(49);
+	var _preview = __webpack_require__(48);
 
 	var _preview2 = _interopRequireDefault(_preview);
 
-	var _message = __webpack_require__(50);
+	var _message = __webpack_require__(49);
 
 	var _message2 = _interopRequireDefault(_message);
 
@@ -4148,7 +4035,7 @@
 	exports.default = reducer;
 
 /***/ },
-/* 45 */
+/* 44 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -4217,7 +4104,7 @@
 	}
 
 /***/ },
-/* 46 */
+/* 45 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -4255,7 +4142,7 @@
 	}
 
 /***/ },
-/* 47 */
+/* 46 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -4365,7 +4252,7 @@
 	}
 
 /***/ },
-/* 48 */
+/* 47 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -4413,7 +4300,7 @@
 	}
 
 /***/ },
-/* 49 */
+/* 48 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -4454,7 +4341,7 @@
 	}
 
 /***/ },
-/* 50 */
+/* 49 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -4497,7 +4384,7 @@
 	}
 
 /***/ },
-/* 51 */
+/* 50 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -4510,7 +4397,7 @@
 
 	var ActionTypes = _interopRequireWildcard(_ActionTypes);
 
-	var _helpers = __webpack_require__(31);
+	var _chrome = __webpack_require__(51);
 
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -4524,14 +4411,7 @@
 	          var pages = _current$page.pages;
 	          var pageIndex = _current$page.pageIndex;
 
-	          var page = pages[pageIndex];
-
-	          var uploadData = {
-	            name: page.name,
-	            site: window.location.hostname,
-	            page: JSON.stringify((0, _helpers.clean)(page))
-	          };
-	          chrome.runtime.sendMessage({ type: 'upload', data: uploadData });
+	          (0, _chrome.chromeUpload)(pages[pageIndex]);
 	      }
 	      return next(action);
 	    };
@@ -4539,7 +4419,7 @@
 	};
 
 /***/ },
-/* 52 */
+/* 51 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -4547,93 +4427,27 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
+	exports.chromeUpload = exports.chromeLoad = exports.chromeSave = undefined;
 
-	var _ActionTypes = __webpack_require__(24);
+	var _selection = __webpack_require__(32);
 
-	var types = _interopRequireWildcard(_ActionTypes);
-
-	var _helpers = __webpack_require__(31);
-
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-	exports.default = function (state) {
-	  return function (next) {
-	    return function (action) {
-	      var fadeTime = 5000;
-	      if (action.type === types.ADD_PAGE || action.type === types.RENAME_PAGE) {
-	        (function () {
-	          action.error = false;
-	          var current = state.getState();
-	          var _current$page = current.page;
-	          var pages = _current$page.pages;
-	          var pageIndex = _current$page.pageIndex;
-
-	          var name = action.name;
-	          // verify that the name contains no illegal characters
-	          if (!(0, _helpers.legalName)(name)) {
-	            action.text = "Name \"" + name + "\" contains one or more illegal characters (< > : \" \\ / | ? *)";
-	            action.fade = fadeTime;
-	            action.error = true;
-	          }
-	          // verify that a page with the given name does not already exist
-	          var exists = pages.some(function (curr) {
-	            return curr === undefined ? false : name === curr.name;
-	          });
-	          if (exists) {
-	            action.text = "A page with the name \"" + name + "\" already exists";
-	            action.fade = fadeTime;
-	            action.error = true;
-	          }
-	          action.element = current.element;
-	          // need to actually create the page for ADD_PAGE
-	          if (!action.error) {
-	            if (action.type === types.ADD_PAGE) {
-	              var newPage = (0, _helpers.createPage)(name);
-	              (0, _helpers.setupPage)(newPage);
-	              action.page = newPage;
-	              action.element = newPage.element;
-	            } else {
-	              var currentPage = pages[pageIndex];
-	              currentPage.name = name;
-	            }
-	          }
-	        })();
-	      }
-	      return next(action);
-	    };
-	  };
-	};
-
-/***/ },
-/* 53 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.chromeLoad = exports.chromeSave = undefined;
-
-	var _helpers = __webpack_require__(31);
+	var _page = __webpack_require__(38);
 
 	/*
-	 * any time that the page is updated, the new value should be saved
+	 * any time that the page is updated, the stored page should be updated
 	 */
-	var chromeSave = exports.chromeSave = function chromeSave(pages) {
-	  var cleaned = cleanPages(pages);
+	var chromeSave = exports.chromeSave = function chromeSave(page) {
+	  if (page === undefined) {
+	    return;
+	  }
+	  var cleaned = (0, _page.clean)(page);
 	  chrome.storage.local.get("sites", function saveSchemaChrome(storage) {
 	    var host = window.location.hostname;
-	    storage.sites[host] = cleaned;
+	    // replace the updated page, keeping the rest the same
+	    storage.sites[host] = storage.sites[host].map(function (s) {
+	      return s.name === cleaned.name ? cleaned : s;
+	    });
 	    chrome.storage.local.set({ "sites": storage.sites });
-	  });
-	};
-
-	var cleanPages = function cleanPages(pages) {
-	  return pages.filter(function (p) {
-	    return p !== undefined;
-	  }).map(function (page) {
-	    return (0, _helpers.clean)(page);
 	  });
 	};
 
@@ -4653,24 +4467,96 @@
 	    var host = window.location.hostname;
 	    var pages = storage.sites[host] || [];
 	    pages.forEach(function (p) {
-	      return (0, _helpers.setupPage)(p);
+	      return (0, _page.setupPage)(p);
 	    });
 	    callback(pages);
 	  });
 	};
 
-	function chromeSync(domain) {
-	  chrome.runtime.sendMessage({ type: 'sync', domain: domain }, function (response) {
-	    if (response.error) {
-	      return;
-	    }
-	    controller.finishSync(response.pages);
-	  });
-	}
-
 	/*
-	 * TODO: this will load options from and save them to chrome.storage.local
+	 * formats the page and sends it to the background script, which will upload it to the server
 	 */
+	var chromeUpload = exports.chromeUpload = function chromeUpload(page) {
+	  if (page === undefined) {
+	    return;
+	  }
+	  chrome.runtime.sendMessage({
+	    type: "upload",
+	    data: {
+	      name: page.name,
+	      site: window.location.hostname,
+	      page: JSON.stringify((0, _page.clean)(page))
+	    }
+	  });
+	};
+
+/***/ },
+/* 52 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _ActionTypes = __webpack_require__(24);
+
+	var types = _interopRequireWildcard(_ActionTypes);
+
+	var _text = __webpack_require__(33);
+
+	var _page = __webpack_require__(38);
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+	exports.default = function (state) {
+	  return function (next) {
+	    return function (action) {
+	      var fadeTime = 5000;
+	      if (action.type === types.ADD_PAGE || action.type === types.RENAME_PAGE) {
+	        (function () {
+	          action.error = false;
+	          var current = state.getState();
+	          var _current$page = current.page;
+	          var pages = _current$page.pages;
+	          var pageIndex = _current$page.pageIndex;
+
+	          var name = action.name;
+	          // verify that the name contains no illegal characters
+	          if (!(0, _text.legalName)(name)) {
+	            action.text = "Name \"" + name + "\" contains one or more illegal characters (< > : \" \\ / | ? *)";
+	            action.fade = fadeTime;
+	            action.error = true;
+	          }
+	          // verify that a page with the given name does not already exist
+	          var exists = pages.some(function (curr) {
+	            return curr === undefined ? false : name === curr.name;
+	          });
+	          if (exists) {
+	            action.text = "A page with the name \"" + name + "\" already exists";
+	            action.fade = fadeTime;
+	            action.error = true;
+	          }
+	          action.element = current.element;
+	          // need to actually create the page for ADD_PAGE
+	          if (!action.error) {
+	            if (action.type === types.ADD_PAGE) {
+	              var newPage = (0, _page.createPage)(name);
+	              (0, _page.setupPage)(newPage);
+	              action.page = newPage;
+	              action.element = newPage.element;
+	            } else {
+	              var currentPage = pages[pageIndex];
+	              currentPage.name = name;
+	            }
+	          }
+	        })();
+	      }
+	      return next(action);
+	    };
+	  };
+	};
 
 /***/ }
 /******/ ]);

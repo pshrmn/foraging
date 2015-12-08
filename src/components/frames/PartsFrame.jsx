@@ -1,7 +1,8 @@
 import React from "react";
 
 import { PosButton, NegButton } from "../Buttons";
-import { select, count, highlight, unhighlight} from "../../helpers";
+import { select, count } from "../../helpers/selection";
+import { highlight, unhighlight} from "../../helpers/markup";
 
 export default React.createClass({
   previewClass: "query-check",

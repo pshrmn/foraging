@@ -2,7 +2,9 @@ import React from "react";
 import d3 from "d3";
 
 import { PosButton, NegButton, NeutralButton } from "./Buttons";
-import { abbreviate, clone, highlight, unhighlight } from "../helpers";
+import { abbreviate } from "../helpers/text";
+import { clone } from "../helpers/page";
+import { highlight, unhighlight } from "../helpers/markup";
 
 /*
  * A tree rendering of the page, used to show the current page, the current

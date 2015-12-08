@@ -11,7 +11,7 @@ import { SHOW_FORAGER } from "./constants/ActionTypes";
 import chromeBackground from "./middleware/chromeBackground";
 import pageMiddleware from "./middleware/pageMiddleware";
 
-import { chromeSave, chromeLoad } from "./chrome";
+import { chromeSave, chromeLoad } from "./helpers/chrome";
 
 /*
  * check if the forager holder exists. If it doesn't, mount the app. If it does,
@@ -54,9 +54,9 @@ if ( !holder ) {
     let oldPages = {};
     store.subscribe(() => {
       let state = store.getState();
-      let pages = state.page.pages;
+      let { pages, pageIndex } = state.page;
       if ( pages !== oldPages ) {
-        chromeSave(pages);
+        chromeSave(pages[pageIndex]);
         oldPages = pages;
       }
     });

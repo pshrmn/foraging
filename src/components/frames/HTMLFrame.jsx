@@ -1,8 +1,10 @@
 import React from "react";
 
 import { PosButton, NegButton } from "../Buttons";
-import { parts, select, count, stripEvents,
-  highlight, unhighlight, iHighlight, iUnhighlight } from "../../helpers";
+
+import { parts, select, count } from "../../helpers/selection";
+import { stripEvents } from "../../helpers/attributes";
+import { highlight, unhighlight, iHighlight, iUnhighlight } from "../../helpers/markup";
 
 /*
  * HTMLFrame

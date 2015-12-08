@@ -1,6 +1,7 @@
 import * as types from "../constants/ActionTypes";
 
-import { legalName, createPage, setupPage } from "../helpers";
+import { legalName } from "../helpers/text";
+import { createPage, setupPage } from "../helpers/page";
 
 export default state => next => action => {
   let fadeTime = 5000;

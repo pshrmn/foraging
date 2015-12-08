@@ -6,7 +6,7 @@ import HTMLFrame from "./HTMLFrame";
 import PartsFrame from "./PartsFrame";
 import SpecFrame from "./SpecFrame";
 
-import { highlight, unhighlight } from "../../helpers";
+import { highlight, unhighlight } from "../../helpers/markup";
 
 /*
  * Frames
