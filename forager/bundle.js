@@ -3422,7 +3422,6 @@
 	    });
 	  },
 	  componentDidMount: function componentDidMount() {
-	    // load the site's pages from chrome.storage.local and set the state
 	    this._makeNoSelect();
 	  },
 	  componentDidUpdate: function componentDidUpdate() {
@@ -4443,10 +4442,8 @@
 	  var cleaned = (0, _page.clean)(page);
 	  chrome.storage.local.get("sites", function saveSchemaChrome(storage) {
 	    var host = window.location.hostname;
-	    // replace the updated page, keeping the rest the same
-	    storage.sites[host] = storage.sites[host].map(function (s) {
-	      return s.name === cleaned.name ? cleaned : s;
-	    });
+	    storage.sites[host] = storage.sites[host] || {};
+	    storage.sites[host][cleaned.name] = cleaned;
 	    chrome.storage.local.set({ "sites": storage.sites });
 	  });
 	};
@@ -4458,14 +4455,15 @@
 	        site: <hostname>
 	        page: <page>
 
-	urls is saved as an object for easier lookup, but converted to an array of the keys before uploading
-
 	If the site object exists for a host, load the saved rules
 	*/
 	var chromeLoad = exports.chromeLoad = function chromeLoad(callback) {
 	  chrome.storage.local.get("sites", function setupHostnameChrome(storage) {
 	    var host = window.location.hostname;
-	    var pages = storage.sites[host] || [];
+	    var current = storage.sites[host] || {};
+	    var pages = Object.keys(current).map(function (key) {
+	      return current[key];
+	    });
 	    pages.forEach(function (p) {
 	      return (0, _page.setupPage)(p);
 	    });

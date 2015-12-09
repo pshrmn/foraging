@@ -192,7 +192,6 @@ let SpecForm = React.createClass({
     });
   },
   componentDidMount: function() {
-    // load the site's pages from chrome.storage.local and set the state
     this._makeNoSelect();
   },
   componentDidUpdate: function() {

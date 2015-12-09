@@ -11,8 +11,8 @@ export const chromeSave = page => {
   let cleaned = clean(page);
   chrome.storage.local.get("sites", function saveSchemaChrome(storage){
     let host = window.location.hostname;
-    // replace the updated page, keeping the rest the same
-    storage.sites[host] = storage.sites[host].map(s => ( s.name === cleaned.name ) ? cleaned : s);
+    storage.sites[host] = storage.sites[host] || {};
+    storage.sites[host][cleaned.name] = cleaned;
     chrome.storage.local.set({"sites": storage.sites});
   });
 }
@@ -24,14 +24,13 @@ the object is:
         site: <hostname>
         page: <page>
 
-urls is saved as an object for easier lookup, but converted to an array of the keys before uploading
-
 If the site object exists for a host, load the saved rules
 */
 export const chromeLoad = callback => {
   chrome.storage.local.get("sites", function setupHostnameChrome(storage){
     let host = window.location.hostname;
-    let pages = storage.sites[host] || [];
+    let current = storage.sites[host] || {};
+    let pages = Object.keys(current).map(key => current[key]);
     pages.forEach(p => setupPage(p));
     callback(pages);
   });
