@@ -223,6 +223,10 @@ body.foraging {
              * frames are broken down into two parts, the .info section and
              * the .buttons section
              */ }
+      #forager .frames .frame .info .line {
+        padding: 2px 0; }
+      #forager .frames .frame .info label {
+        margin-right: 5px; }
       #forager .frames .frame .buttons {
         margin-top: auto;
         display: -webkit-flex;

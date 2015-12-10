@@ -82,8 +82,8 @@ export default React.createClass({
                         {...page} />
         </div>
         <svg width={width+100}
-             height={height}>
-          <g transform="translate(50,0)" >
+             height={height+50}>
+          <g transform="translate(50,25)" >
             {nodes}
           </g>
         </svg>

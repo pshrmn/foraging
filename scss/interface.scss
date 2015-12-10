@@ -349,6 +349,13 @@ body.foraging {
              * the .buttons section
              */
             .info {
+                .line {
+                    padding: 2px 0;
+                }
+
+                label {
+                    margin-right: 5px;
+                }
             }
 
             .buttons {

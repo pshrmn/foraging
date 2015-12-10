@@ -3270,7 +3270,7 @@
 	        { className: "info" },
 	        _react2.default.createElement(
 	          "div",
-	          null,
+	          { className: "line" },
 	          "CSS Selector: ",
 	          css
 	        ),
@@ -3278,7 +3278,7 @@
 	          setSpec: this.setSpec }),
 	        _react2.default.createElement(
 	          "div",
-	          null,
+	          { className: "line" },
 	          _react2.default.createElement(
 	            "label",
 	            null,
@@ -3372,14 +3372,9 @@
 	    );
 	  },
 	  _allValue: function _allValue() {
-	    return _react2.default.createElement(
-	      "div",
-	      null,
-	      "Name: ",
-	      _react2.default.createElement("input", { type: "text",
-	        value: this.state.value,
-	        onChange: this.setValue })
-	    );
+	    return _react2.default.createElement("input", { type: "text",
+	      value: this.state.value,
+	      onChange: this.setValue });
 	  },
 	  render: function render() {
 	    var valueChooser = this.state.type === "single" ? this._singleValue() : this._allValue();
@@ -3388,7 +3383,7 @@
 	      { ref: "frame" },
 	      _react2.default.createElement(
 	        "div",
-	        null,
+	        { className: "line" },
 	        "Type:",
 	        _react2.default.createElement(
 	          "label",
@@ -3411,7 +3406,12 @@
 	            onChange: this.setType })
 	        )
 	      ),
-	      valueChooser
+	      _react2.default.createElement(
+	        "div",
+	        { className: "line" },
+	        "Value: ",
+	        valueChooser
+	      )
 	    );
 	  },
 	  // while this is normally done globally, the single/all swap doesn't use redux
@@ -3659,10 +3659,10 @@
 	      _react2.default.createElement(
 	        "svg",
 	        { width: width + 100,
-	          height: height },
+	          height: height + 50 },
 	        _react2.default.createElement(
 	          "g",
-	          { transform: "translate(50,0)" },
+	          { transform: "translate(50,25)" },
 	          nodes
 	        )
 	      )

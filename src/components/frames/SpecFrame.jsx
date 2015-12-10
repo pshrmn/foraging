@@ -59,12 +59,12 @@ export default React.createClass({
     return (
       <div className="frame spec-form">
         <div className="info">
-          <div>
+          <div className="line">
             CSS Selector: {css}
           </div>
           <SpecForm count={elementCount}
                     setSpec={this.setSpec}/>
-          <div>
+          <div className="line">
             <label>
               Optional: <input type="checkbox"
                                checked={this.state.optional}
@@ -154,18 +154,16 @@ let SpecForm = React.createClass({
   },
   _allValue: function() {
     return (
-      <div>
-        Name: <input type="text"
-                     value={this.state.value}
-                     onChange={this.setValue} />
-      </div>
+      <input type="text"
+             value={this.state.value}
+             onChange={this.setValue} />
     );
   },
   render: function() {
     let valueChooser = this.state.type === "single" ? this._singleValue() : this._allValue();
     return (
       <div ref="frame">
-        <div>
+        <div className="line">
           Type:
           <label>single <input type="radio"
                                name="type"
@@ -180,7 +178,9 @@ let SpecForm = React.createClass({
                                onChange={this.setType} />
           </label>
         </div>
-        {valueChooser}
+        <div className="line">
+          Value: {valueChooser}
+        </div>
       </div>
     );
   },
