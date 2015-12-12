@@ -3839,13 +3839,17 @@
 	        "div",
 	        { className: "preview" },
 	        _react2.default.createElement(
+	          "div",
+	          null,
+	          _react2.default.createElement(_Buttons.PosButton, { text: "Log to Console", click: this.logHandler }),
+	          _react2.default.createElement(_Buttons.PosButton, { text: "Pretty Log", click: this.prettyLogHandler }),
+	          _react2.default.createElement(_Buttons.NegButton, { text: "Close", click: this.closeHandler })
+	        ),
+	        _react2.default.createElement(
 	          "pre",
 	          null,
 	          previewText
-	        ),
-	        _react2.default.createElement(_Buttons.PosButton, { text: "Log to Console", click: this.logHandler }),
-	        _react2.default.createElement(_Buttons.PosButton, { text: "Pretty Log", click: this.prettyLogHandler }),
-	        _react2.default.createElement(_Buttons.NeutralButton, { text: "Close", click: this.closeHandler })
+	        )
 	      )
 	    );
 	  }
