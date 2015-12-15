@@ -1,157 +1,159 @@
 {
-  "selector": "body",
-  "spec": {
-    "type": "single",
-    "value": 0
-  },
-  "rules": [],
-  "optional": false,
-  "children": [
-    {
-      "selector": "table.wikitable",
-      "spec": {
-        "type": "single",
-        "value": 0
-      },
-      "rules": [],
-      "optional": false,
-      "children": [
-        {
-          "selector": "tr",
-          "spec": {
-            "type": "all",
-            "value": "stadiums"
-          },
-          "rules": [],
-          "optional": false,
-          "children": [
-            {
-              "selector": "th",
-              "spec": {
-                "type": "single",
-                "value": 0
-              },
-              "rules": [],
-              "optional": false,
-              "children": [
-                {
-                  "selector": "a",
-                  "spec": {
-                    "type": "single",
-                    "value": 0
-                  },
-                  "rules": [
-                    {
-                      "name": "url",
-                      "attr": "href",
-                      "type": "string"
+  "name": "stadiums",
+  "element": {
+    "selector": "body",
+    "spec": {
+      "type": "single",
+      "value": 0
+    },
+    "rules": [],
+    "optional": false,
+    "children": [
+      {
+        "selector": "table.wikitable",
+        "spec": {
+          "type": "single",
+          "value": 1
+        },
+        "rules": [],
+        "optional": false,
+        "children": [
+          {
+            "selector": "tr",
+            "spec": {
+              "type": "all",
+              "value": "stadiums"
+            },
+            "rules": [],
+            "optional": false,
+            "children": [
+              {
+                "selector": "th",
+                "spec": {
+                  "type": "single",
+                  "value": 0
+                },
+                "rules": [],
+                "optional": false,
+                "children": [
+                  {
+                    "selector": "a",
+                    "spec": {
+                      "type": "single",
+                      "value": 0
                     },
-                    {
-                      "name": "name",
-                      "attr": "text",
-                      "type": "string"
-                    }
-                  ],
-                  "optional": false,
-                  "children": []
-                }
-              ]
-            },
-            {
-              "selector": "td",
-              "spec": {
-                "type": "single",
-                "value": 6
+                    "rules": [
+                      {
+                        "name": "url",
+                        "attr": "href",
+                        "type": "string"
+                      },
+                      {
+                        "name": "name",
+                        "attr": "text",
+                        "type": "string"
+                      }
+                    ],
+                    "optional": false,
+                    "children": []
+                  }
+                ]
               },
-              "rules": [],
-              "optional": false,
-              "children": [
-                {
-                  "selector": "a",
-                  "spec": {
-                    "type": "all",
-                    "value": "teams"
-                  },
-                  "rules": [
-                    {
-                      "name": "name",
-                      "attr": "text",
-                      "type": "string"
-                    }
-                  ],
-                  "optional": false,
-                  "children": []
-                }
-              ]
-            },
-            {
-              "selector": "td",
-              "spec": {
-                "type": "single",
-                "value": 1
+              {
+                "selector": "td",
+                "spec": {
+                  "type": "single",
+                  "value": 5
+                },
+                "rules": [],
+                "optional": false,
+                "children": [
+                  {
+                    "selector": "a",
+                    "spec": {
+                      "type": "all",
+                      "value": "teams"
+                    },
+                    "rules": [
+                      {
+                        "name": "name",
+                        "attr": "text",
+                        "type": "string"
+                      }
+                    ],
+                    "optional": false,
+                    "children": []
+                  }
+                ]
               },
-              "rules": [
-                {
-                  "name": "capacity",
-                  "attr": "text",
-                  "type": "string"
-                }
-              ],
-              "optional": false,
-              "children": []
-            },
-            {
-              "selector": "td",
-              "spec": {
-                "type": "single",
-                "value": 4
+              {
+                "selector": "td",
+                "spec": {
+                  "type": "single",
+                  "value": 1
+                },
+                "rules": [
+                  {
+                    "name": "capacity",
+                    "attr": "text",
+                    "type": "string"
+                  }
+                ],
+                "optional": false,
+                "children": []
               },
-              "rules": [
-                {
-                  "name": "surface",
-                  "attr": "text",
-                  "type": "string"
-                }
-              ],
-              "optional": false,
-              "children": []
-            },
-            {
-              "selector": "td",
-              "spec": {
-                "type": "single",
-                "value": 5
+              {
+                "selector": "td",
+                "spec": {
+                  "type": "single",
+                  "value": 4
+                },
+                "rules": [
+                  {
+                    "name": "surface",
+                    "attr": "text",
+                    "type": "string"
+                  }
+                ],
+                "optional": false,
+                "children": []
               },
-              "rules": [
-                {
-                  "name": "roof",
-                  "attr": "text",
-                  "type": "string"
-                }
-              ],
-              "optional": false,
-              "children": []
-            },
-            {
-              "selector": "td",
-              "spec": {
-                "type": "single",
-                "value": 7
+              {
+                "selector": "td",
+                "spec": {
+                  "type": "single",
+                  "value": 5
+                },
+                "rules": [
+                  {
+                    "name": "roof",
+                    "attr": "text",
+                    "type": "string"
+                  }
+                ],
+                "optional": false,
+                "children": []
               },
-              "rules": [
-                {
-                  "name": "opened",
-                  "attr": "text",
-                  "type": "string"
-                }
-              ],
-              "optional": false,
-              "children": []
-            }
-          ]
-        }
-      ]
-    }
-  ],
-  "name": "stadiums"
+              {
+                "selector": "td",
+                "spec": {
+                  "type": "single",
+                  "value": 7
+                },
+                "rules": [
+                  {
+                    "name": "opened",
+                    "attr": "text",
+                    "type": "string"
+                  }
+                ],
+                "optional": false,
+                "children": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
 }

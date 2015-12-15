@@ -1,118 +1,120 @@
 {
-  "selector": "body",
-  "spec": {
-    "type": "single",
-    "value": 0
-  },
-  "rules": [],
-  "optional": false,
-  "children": [
-    {
-      "selector": "div.thing",
-      "spec": {
-        "type": "all",
-        "value": "submission"
-      },
-      "rules": [],
-      "optional": false,
-      "children": [
-        {
-          "selector": "div.score",
-          "spec": {
-            "type": "single",
-            "value": 1
-          },
-          "rules": [
-            {
-              "name": "score",
-              "attr": "text",
-              "type": "int"
-            }
-          ],
-          "optional": false,
-          "children": []
+  "name": "submissions",
+  "element": {
+    "selector": "body",
+    "spec": {
+      "type": "single",
+      "value": 0
+    },
+    "rules": [],
+    "optional": false,
+    "children": [
+      {
+        "selector": "div.thing",
+        "spec": {
+          "type": "all",
+          "value": "submission"
         },
-        {
-          "selector": "a.title",
-          "spec": {
-            "type": "single",
-            "value": 0
-          },
-          "rules": [
-            {
-              "name": "title",
-              "attr": "text",
-              "type": "string"
+        "rules": [],
+        "optional": false,
+        "children": [
+          {
+            "selector": "div.score",
+            "spec": {
+              "type": "single",
+              "value": 1
             },
-            {
-              "name": "url",
-              "attr": "href",
-              "type": "string"
-            }
-          ],
-          "optional": false,
-          "children": []
-        },
-        {
-          "selector": ".domain",
-          "spec": {
-            "type": "single",
-            "value": 0
+            "rules": [
+              {
+                "name": "score",
+                "attr": "text",
+                "type": "int"
+              }
+            ],
+            "optional": false,
+            "children": []
           },
-          "rules": [
-            {
-              "name": "domain",
-              "attr": "text",
-              "type": "string"
-            }
-          ],
-          "optional": false,
-          "children": []
-        },
-        {
-          "selector": "a.comments",
-          "spec": {
-            "type": "single",
-            "value": 0
-          },
-          "rules": [
-            {
-              "name": "comments_url",
-              "attr": "href",
-              "type": "string"
+          {
+            "selector": "a.title",
+            "spec": {
+              "type": "single",
+              "value": 0
             },
-            {
-              "name": "comment_count",
-              "attr": "text",
-              "type": "int"
-            }
-          ],
-          "optional": false,
-          "children": []
-        },
-        {
-          "selector": "a.author",
-          "spec": {
-            "type": "single",
-            "value": 0
+            "rules": [
+              {
+                "name": "title",
+                "attr": "text",
+                "type": "string"
+              },
+              {
+                "name": "url",
+                "attr": "href",
+                "type": "string"
+              }
+            ],
+            "optional": false,
+            "children": []
           },
-          "rules": [
-            {
-              "name": "submitter",
-              "attr": "text",
-              "type": "string"
+          {
+            "selector": ".domain",
+            "spec": {
+              "type": "single",
+              "value": 0
             },
-            {
-              "name": "submitter_url",
-              "attr": "href",
-              "type": "string"
-            }
-          ],
-          "optional": false,
-          "children": []
-        }
-      ]
-    }
-  ],
-  "name": "submissions"
+            "rules": [
+              {
+                "name": "domain",
+                "attr": "text",
+                "type": "string"
+              }
+            ],
+            "optional": false,
+            "children": []
+          },
+          {
+            "selector": "a.comments",
+            "spec": {
+              "type": "single",
+              "value": 0
+            },
+            "rules": [
+              {
+                "name": "comments_url",
+                "attr": "href",
+                "type": "string"
+              },
+              {
+                "name": "comment_count",
+                "attr": "text",
+                "type": "int"
+              }
+            ],
+            "optional": false,
+            "children": []
+          },
+          {
+            "selector": "a.author",
+            "spec": {
+              "type": "single",
+              "value": 0
+            },
+            "rules": [
+              {
+                "name": "submitter",
+                "attr": "text",
+                "type": "string"
+              },
+              {
+                "name": "submitter_url",
+                "attr": "href",
+                "type": "string"
+              }
+            ],
+            "optional": false,
+            "children": []
+          }
+        ]
+      }
+    ]
+  }    
 }

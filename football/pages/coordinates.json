@@ -1,55 +1,57 @@
 {
-  "selector": "body",
-  "spec": {
-    "type": "single",
-    "value": 0
-  },
-  "rules": [],
-  "optional": false,
-  "children": [
-    {
-      "selector": "span.geo-dms",
-      "spec": {
-        "type": "single",
-        "value": 0
-      },
-      "rules": [],
-      "optional": false,
-      "children": [
-        {
-          "selector": "span.latitude",
-          "spec": {
-            "type": "single",
-            "value": 0
-          },
-          "rules": [
-            {
-              "attr": "text",
-              "name": "latitude",
-              "type": "string"
-            }
-          ],
-          "optional": false,
-          "children": []
+  "name": "stadium",
+  "element": {
+    "selector": "body",
+    "spec": {
+      "type": "single",
+      "value": 0
+    },
+    "rules": [],
+    "optional": false,
+    "children": [
+      {
+        "selector": "span.geo-dms",
+        "spec": {
+          "type": "single",
+          "value": 0
         },
-        {
-          "selector": "span.longitude",
-          "spec": {
-            "type": "single",
-            "value": 0
+        "rules": [],
+        "optional": false,
+        "children": [
+          {
+            "selector": "span.latitude",
+            "spec": {
+              "type": "single",
+              "value": 0
+            },
+            "rules": [
+              {
+                "attr": "text",
+                "name": "latitude",
+                "type": "string"
+              }
+            ],
+            "optional": false,
+            "children": []
           },
-          "rules": [
-            {
-              "attr": "text",
-              "name": "longitude",
-              "type": "string"
-            }
-          ],
-          "optional": false,
-          "children": []
-        }
-      ]
-    }
-  ],
-  "name": "stadium"
+          {
+            "selector": "span.longitude",
+            "spec": {
+              "type": "single",
+              "value": 0
+            },
+            "rules": [
+              {
+                "attr": "text",
+                "name": "longitude",
+                "type": "string"
+              }
+            ],
+            "optional": false,
+            "children": []
+          }
+        ]
+      }
+    ]
+  }  
 }
