@@ -60,13 +60,13 @@
 
 	var _Forager2 = _interopRequireDefault(_Forager);
 
-	var _reducers = __webpack_require__(43);
+	var _reducers = __webpack_require__(44);
 
 	var _reducers2 = _interopRequireDefault(_reducers);
 
 	var _ActionTypes = __webpack_require__(24);
 
-	var _chromeBackground = __webpack_require__(50);
+	var _chromeBackground = __webpack_require__(51);
 
 	var _chromeBackground2 = _interopRequireDefault(_chromeBackground);
 
@@ -74,7 +74,7 @@
 
 	var _pageMiddleware2 = _interopRequireDefault(_pageMiddleware);
 
-	var _chrome = __webpack_require__(51);
+	var _chrome = __webpack_require__(41);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -1452,7 +1452,7 @@
 
 	var _PageTree2 = _interopRequireDefault(_PageTree);
 
-	var _Preview = __webpack_require__(41);
+	var _Preview = __webpack_require__(42);
 
 	var _Preview2 = _interopRequireDefault(_Preview);
 
@@ -3560,6 +3560,8 @@
 
 	var _markup = __webpack_require__(34);
 
+	var _chrome = __webpack_require__(41);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	/*
@@ -3763,6 +3765,7 @@
 	  },
 	  deleteHandler: function deleteHandler(event) {
 	    event.preventDefault();
+	    (0, _chrome.chromeDelete)(this.props.name);
 	    // report the current page index
 	    this.props.actions.removePage();
 	  },
@@ -3801,6 +3804,91 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
+	exports.chromeUpload = exports.chromeLoad = exports.chromeDelete = exports.chromeSave = undefined;
+
+	var _selection = __webpack_require__(32);
+
+	var _page = __webpack_require__(38);
+
+	/*
+	 * any time that the page is updated, the stored page should be updated
+	 */
+	var chromeSave = exports.chromeSave = function chromeSave(page) {
+	  if (page === undefined) {
+	    return;
+	  }
+	  var cleaned = (0, _page.clean)(page);
+	  chrome.storage.local.get("sites", function saveSchemaChrome(storage) {
+	    var host = window.location.hostname;
+	    storage.sites[host] = storage.sites[host] || {};
+	    storage.sites[host][cleaned.name] = cleaned;
+	    chrome.storage.local.set({ "sites": storage.sites });
+	  });
+	};
+
+	/*
+	 * remove the page with the given name from storage
+	 */
+	var chromeDelete = exports.chromeDelete = function chromeDelete(name) {
+	  if (name === undefined) {
+	    return;
+	  }
+	  chrome.storage.local.get("sites", function saveSchemaChrome(storage) {
+	    var host = window.location.hostname;
+	    delete storage.sites[host][name];
+	    chrome.storage.local.set({ "sites": storage.sites });
+	  });
+	};
+
+	/*
+	creates an object representing a site and saves it to chrome.storage.local
+	the object is:
+	    host:
+	        site: <hostname>
+	        page: <page>
+
+	If the site object exists for a host, load the saved rules
+	*/
+	var chromeLoad = exports.chromeLoad = function chromeLoad(callback) {
+	  chrome.storage.local.get("sites", function setupHostnameChrome(storage) {
+	    var host = window.location.hostname;
+	    var current = storage.sites[host] || {};
+	    var pages = Object.keys(current).map(function (key) {
+	      return current[key];
+	    });
+	    pages.forEach(function (p) {
+	      return (0, _page.setupPage)(p);
+	    });
+	    callback(pages);
+	  });
+	};
+
+	/*
+	 * formats the page and sends it to the background script, which will upload it to the server
+	 */
+	var chromeUpload = exports.chromeUpload = function chromeUpload(page) {
+	  if (page === undefined) {
+	    return;
+	  }
+	  chrome.runtime.sendMessage({
+	    type: "upload",
+	    data: {
+	      name: page.name,
+	      site: window.location.hostname,
+	      page: JSON.stringify((0, _page.clean)(page))
+	    }
+	  });
+	};
+
+/***/ },
+/* 42 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
 
 	var _react = __webpack_require__(1);
 
@@ -3808,7 +3896,7 @@
 
 	var _Buttons = __webpack_require__(26);
 
-	var _preview = __webpack_require__(42);
+	var _preview = __webpack_require__(43);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -3856,7 +3944,7 @@
 	});
 
 /***/ },
-/* 42 */
+/* 43 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -3960,7 +4048,7 @@
 	};
 
 /***/ },
-/* 43 */
+/* 44 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -3969,27 +4057,27 @@
 	  value: true
 	});
 
-	var _frame = __webpack_require__(44);
+	var _frame = __webpack_require__(45);
 
 	var _frame2 = _interopRequireDefault(_frame);
 
-	var _show = __webpack_require__(45);
+	var _show = __webpack_require__(46);
 
 	var _show2 = _interopRequireDefault(_show);
 
-	var _page = __webpack_require__(46);
+	var _page = __webpack_require__(47);
 
 	var _page2 = _interopRequireDefault(_page);
 
-	var _element = __webpack_require__(47);
+	var _element = __webpack_require__(48);
 
 	var _element2 = _interopRequireDefault(_element);
 
-	var _preview = __webpack_require__(48);
+	var _preview = __webpack_require__(49);
 
 	var _preview2 = _interopRequireDefault(_preview);
 
-	var _message = __webpack_require__(49);
+	var _message = __webpack_require__(50);
 
 	var _message2 = _interopRequireDefault(_message);
 
@@ -4038,7 +4126,7 @@
 	exports.default = reducer;
 
 /***/ },
-/* 44 */
+/* 45 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -4107,7 +4195,7 @@
 	}
 
 /***/ },
-/* 45 */
+/* 46 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -4145,7 +4233,7 @@
 	}
 
 /***/ },
-/* 46 */
+/* 47 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -4255,7 +4343,7 @@
 	}
 
 /***/ },
-/* 47 */
+/* 48 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -4303,7 +4391,7 @@
 	}
 
 /***/ },
-/* 48 */
+/* 49 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -4344,7 +4432,7 @@
 	}
 
 /***/ },
-/* 49 */
+/* 50 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -4387,7 +4475,7 @@
 	}
 
 /***/ },
-/* 50 */
+/* 51 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -4400,7 +4488,7 @@
 
 	var ActionTypes = _interopRequireWildcard(_ActionTypes);
 
-	var _chrome = __webpack_require__(51);
+	var _chrome = __webpack_require__(41);
 
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -4419,77 +4507,6 @@
 	      return next(action);
 	    };
 	  };
-	};
-
-/***/ },
-/* 51 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.chromeUpload = exports.chromeLoad = exports.chromeSave = undefined;
-
-	var _selection = __webpack_require__(32);
-
-	var _page = __webpack_require__(38);
-
-	/*
-	 * any time that the page is updated, the stored page should be updated
-	 */
-	var chromeSave = exports.chromeSave = function chromeSave(page) {
-	  if (page === undefined) {
-	    return;
-	  }
-	  var cleaned = (0, _page.clean)(page);
-	  chrome.storage.local.get("sites", function saveSchemaChrome(storage) {
-	    var host = window.location.hostname;
-	    storage.sites[host] = storage.sites[host] || {};
-	    storage.sites[host][cleaned.name] = cleaned;
-	    chrome.storage.local.set({ "sites": storage.sites });
-	  });
-	};
-
-	/*
-	creates an object representing a site and saves it to chrome.storage.local
-	the object is:
-	    host:
-	        site: <hostname>
-	        page: <page>
-
-	If the site object exists for a host, load the saved rules
-	*/
-	var chromeLoad = exports.chromeLoad = function chromeLoad(callback) {
-	  chrome.storage.local.get("sites", function setupHostnameChrome(storage) {
-	    var host = window.location.hostname;
-	    var current = storage.sites[host] || {};
-	    var pages = Object.keys(current).map(function (key) {
-	      return current[key];
-	    });
-	    pages.forEach(function (p) {
-	      return (0, _page.setupPage)(p);
-	    });
-	    callback(pages);
-	  });
-	};
-
-	/*
-	 * formats the page and sends it to the background script, which will upload it to the server
-	 */
-	var chromeUpload = exports.chromeUpload = function chromeUpload(page) {
-	  if (page === undefined) {
-	    return;
-	  }
-	  chrome.runtime.sendMessage({
-	    type: "upload",
-	    data: {
-	      name: page.name,
-	      site: window.location.hostname,
-	      page: JSON.stringify((0, _page.clean)(page))
-	    }
-	  });
 	};
 
 /***/ },

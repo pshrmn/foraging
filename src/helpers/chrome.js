@@ -18,6 +18,20 @@ export const chromeSave = page => {
 }
 
 /*
+ * remove the page with the given name from storage
+ */
+export const chromeDelete = name => {
+  if ( name === undefined ) {
+    return;
+  }
+  chrome.storage.local.get("sites", function saveSchemaChrome(storage){
+    let host = window.location.hostname;
+    delete storage.sites[host][name];
+    chrome.storage.local.set({"sites": storage.sites});
+  });
+}
+
+/*
 creates an object representing a site and saves it to chrome.storage.local
 the object is:
     host:

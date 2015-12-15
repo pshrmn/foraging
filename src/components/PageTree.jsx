@@ -5,6 +5,7 @@ import { PosButton, NegButton, NeutralButton } from "./Buttons";
 import { abbreviate } from "../helpers/text";
 import { clone } from "../helpers/page";
 import { highlight, unhighlight } from "../helpers/markup";
+import { chromeDelete } from "../helpers/chrome";
 
 /*
  * A tree rendering of the page, used to show the current page, the current
@@ -173,6 +174,7 @@ let PageControls = React.createClass({
   },
   deleteHandler: function(event) {
     event.preventDefault();
+    chromeDelete(this.props.name);
     // report the current page index
     this.props.actions.removePage();
   },
