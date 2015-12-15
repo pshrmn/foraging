@@ -201,7 +201,8 @@ body.foraging {
         stroke: #ffffff;
         stroke-width: 3px;
         text-anchor: middle;
-        font-weight: bold; }
+        font-weight: bold;
+        fill: inherit; }
       #forager .graph svg .current {
         font-style: italic;
         fill: #323033; }

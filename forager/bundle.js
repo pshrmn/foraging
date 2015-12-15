@@ -2656,7 +2656,7 @@
 	var parts = exports.parts = function parts(element) {
 	  var skipTags = [];
 	  var skipClasses = ["forager-highlight", "query-check", "selectable-element", "current-selector"];
-
+	  var classRegex = /^-?[_a-zA-Z]+[_a-zA-Z0-9-]*/;
 	  var tagAllowed = function tagAllowed(tag) {
 	    return !skipTags.some(function (st) {
 	      return st === tag;
@@ -2666,7 +2666,7 @@
 	  var classAllowed = function classAllowed(c) {
 	    return !skipClasses.some(function (sc) {
 	      return sc === c;
-	    });
+	    }) && classRegex.test(c);
 	  };
 
 	  var pieces = [];
@@ -2679,7 +2679,7 @@
 	  }
 
 	  // id
-	  if (element.id !== "") {
+	  if (element.id !== "" && validID(element.id)) {
 	    pieces.push("#" + element.id);
 	  }
 
@@ -2691,6 +2691,15 @@
 	  });
 	  return pieces;
 	};
+
+	/*
+	 * querySelectorAll requires ids to start with an alphabet character
+	 */
+	function validID(id) {
+	  var firstChar = id.charCodeAt(0);
+	  // A=65, Z=90, a=97, z=122
+	  return !(firstChar < 65 || firstChar > 90 && firstChar < 97 || firstChar > 122);
+	}
 
 	/*
 	 * check if all elements matched by the selector are "select" elements

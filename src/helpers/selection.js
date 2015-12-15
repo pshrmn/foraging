@@ -67,13 +67,13 @@ export const count = (parents, selector, spec) => {
 export const parts = element =>{
   let skipTags = [];
   let skipClasses = ["forager-highlight", "query-check", "selectable-element", "current-selector"];
-
+  let classRegex = /^-?[_a-zA-Z]+[_a-zA-Z0-9-]*/;
   let tagAllowed = tag => {
     return !skipTags.some(st => st === tag);
   }
 
   let classAllowed = c => {
-    return !skipClasses.some(sc => sc === c);
+    return !skipClasses.some(sc => sc === c) && classRegex.test(c);
   }
 
   let pieces = [];
@@ -86,7 +86,7 @@ export const parts = element =>{
   }
 
   // id
-  if ( element.id !== "" ) {
+  if ( element.id !== "" && validID(element.id) ) {
     pieces.push("#" + element.id);
   }
 
@@ -98,6 +98,15 @@ export const parts = element =>{
   });
   return pieces;
 };
+
+/*
+ * querySelectorAll requires ids to start with an alphabet character
+ */
+function validID(id) {
+  let firstChar = id.charCodeAt(0);
+  // A=65, Z=90, a=97, z=122
+  return !( firstChar < 65 || ( firstChar > 90 && firstChar < 97 ) || firstChar > 122 );
+}
 
 /*
  * check if all elements matched by the selector are "select" elements
