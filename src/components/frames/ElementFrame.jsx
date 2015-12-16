@@ -34,6 +34,9 @@ export default React.createClass({
     this.props.element.spec.value = newName;
     this.props.renameElement();
   },
+  toggleOptional: function(event) {
+    this.props.toggleOptional(!this.props.element.optional);
+  },
   render: function() {
     if ( this.props.element === undefined ) {
       return null;
@@ -49,16 +52,17 @@ export default React.createClass({
       
     }
     let renameButton = type === "all" ? <NeutralButton text="Rename" click={this.rename} /> : null;
-    // include spaces since this is text
-    let optionalText = optional ? " (optional)" : "";
     return (
       <div className="frame">
         <div className="info">
           <div>
-            Selector: <span className="big bold">{selector}</span> {optionalText}
+            Selector: <span className="big bold">{selector}</span>
           </div>
           <div>
             Captures: {description}
+          </div>
+          <div>
+            Optional: <input type="checkbox" checked={optional} onChange={this.toggleOptional} />
           </div>
           <RuleList rules={rules}
                     remove={this.props.removeRule} />

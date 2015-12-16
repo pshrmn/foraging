@@ -22,6 +22,9 @@ export default function element(state, action) {
   case types.SAVE_RULE:
     state.rules.push(action.rule);
     return state;
+  case types.TOGGLE_OPTIONAL:
+    state.optional = action.optional;
+    return state;
   case types.REMOVE_RULE:
     var rules = state.rules;
     state.rules.splice(action.index, 1);

@@ -23,3 +23,4 @@ export const REMOVE_ELEMENT = "REMOVE_ELEMENT";
 export const RENAME_ELEMENT = "RENAME_ELEMENT";
 export const SAVE_RULE = "SAVE_RULE";
 export const REMOVE_RULE = "REMOVE_RULE";
+export const TOGGLE_OPTIONAL = "TOGGLE_OPTIONAL";

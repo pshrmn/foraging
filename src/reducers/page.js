@@ -70,6 +70,7 @@ export default function page(state = {}, action) {
   case types.RENAME_ELEMENT:
   case types.SAVE_RULE:
   case types.REMOVE_RULE:
+  case types.TOGGLE_OPTIONAL:
     var { pages, pageIndex } = state;
     var page = pages[pageIndex];
     return Object.assign({}, state, {

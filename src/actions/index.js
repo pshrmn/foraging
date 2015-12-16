@@ -146,3 +146,10 @@ export const removeRule = index => {
     index: index
   };
 };
+
+export const toggleOptional = optional => {
+  return {
+    type: types.TOGGLE_OPTIONAL,
+    optional: optional
+  };
+};

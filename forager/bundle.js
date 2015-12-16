@@ -1535,7 +1535,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.removeRule = exports.saveRule = exports.removeElement = exports.renameElement = exports.saveElement = exports.selectElement = exports.closeForager = exports.showSpecFrame = exports.showPartsFrame = exports.showHTMLFrame = exports.showRuleFrame = exports.showElementFrame = exports.showMessage = exports.hidePreview = exports.showPreview = exports.uploadPage = exports.renamePage = exports.removePage = exports.addPage = exports.loadPage = undefined;
+	exports.toggleOptional = exports.removeRule = exports.saveRule = exports.removeElement = exports.renameElement = exports.saveElement = exports.selectElement = exports.closeForager = exports.showSpecFrame = exports.showPartsFrame = exports.showHTMLFrame = exports.showRuleFrame = exports.showElementFrame = exports.showMessage = exports.hidePreview = exports.showPreview = exports.uploadPage = exports.renamePage = exports.removePage = exports.addPage = exports.loadPage = undefined;
 
 	var _ActionTypes = __webpack_require__(24);
 
@@ -1689,6 +1689,13 @@
 	  };
 	};
 
+	var toggleOptional = exports.toggleOptional = function toggleOptional(optional) {
+	  return {
+	    type: types.TOGGLE_OPTIONAL,
+	    optional: optional
+	  };
+	};
+
 /***/ },
 /* 24 */
 /***/ function(module, exports) {
@@ -1723,6 +1730,7 @@
 	var RENAME_ELEMENT = exports.RENAME_ELEMENT = "RENAME_ELEMENT";
 	var SAVE_RULE = exports.SAVE_RULE = "SAVE_RULE";
 	var REMOVE_RULE = exports.REMOVE_RULE = "REMOVE_RULE";
+	var TOGGLE_OPTIONAL = exports.TOGGLE_OPTIONAL = "TOGGLE_OPTIONAL";
 
 /***/ },
 /* 25 */
@@ -2036,7 +2044,8 @@
 	          removeElement: actions.removeElement,
 	          renameElement: actions.renameElement,
 	          createRule: actions.showRuleFrame,
-	          removeRule: actions.removeRule });
+	          removeRule: actions.removeRule,
+	          toggleOptional: actions.toggleOptional });
 	      case "rule":
 	        return _react2.default.createElement(_RuleFrame2.default, { element: element,
 	          save: actions.saveRule,
@@ -2141,6 +2150,9 @@
 	    this.props.element.spec.value = newName;
 	    this.props.renameElement();
 	  },
+	  toggleOptional: function toggleOptional(event) {
+	    this.props.toggleOptional(!this.props.element.optional);
+	  },
 	  render: function render() {
 	    if (this.props.element === undefined) {
 	      return null;
@@ -2161,8 +2173,6 @@
 	      description = "all elements, stores them as \"" + value + "\"";
 	    }
 	    var renameButton = type === "all" ? _react2.default.createElement(_Buttons.NeutralButton, { text: "Rename", click: this.rename }) : null;
-	    // include spaces since this is text
-	    var optionalText = optional ? " (optional)" : "";
 	    return _react2.default.createElement(
 	      "div",
 	      { className: "frame" },
@@ -2177,15 +2187,19 @@
 	            "span",
 	            { className: "big bold" },
 	            selector
-	          ),
-	          " ",
-	          optionalText
+	          )
 	        ),
 	        _react2.default.createElement(
 	          "div",
 	          null,
 	          "Captures: ",
 	          description
+	        ),
+	        _react2.default.createElement(
+	          "div",
+	          null,
+	          "Optional: ",
+	          _react2.default.createElement("input", { type: "checkbox", checked: optional, onChange: this.toggleOptional })
 	        ),
 	        _react2.default.createElement(RuleList, { rules: rules,
 	          remove: this.props.removeRule })
@@ -4373,6 +4387,7 @@
 	    case types.RENAME_ELEMENT:
 	    case types.SAVE_RULE:
 	    case types.REMOVE_RULE:
+	    case types.TOGGLE_OPTIONAL:
 	      var pages = state.pages;
 	      var pageIndex = state.pageIndex;
 
@@ -4429,6 +4444,9 @@
 	      return undefined;
 	    case types.SAVE_RULE:
 	      state.rules.push(action.rule);
+	      return state;
+	    case types.TOGGLE_OPTIONAL:
+	      state.optional = action.optional;
 	      return state;
 	    case types.REMOVE_RULE:
 	      var rules = state.rules;

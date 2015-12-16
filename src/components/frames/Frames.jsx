@@ -32,7 +32,8 @@ export default React.createClass({
                            removeElement={actions.removeElement}
                            renameElement={actions.renameElement} 
                            createRule={actions.showRuleFrame}
-                           removeRule={actions.removeRule} />
+                           removeRule={actions.removeRule}
+                           toggleOptional={actions.toggleOptional} />
     case "rule":
       return <RuleFrame element={element}
                         save={actions.saveRule}
