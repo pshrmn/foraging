@@ -174,6 +174,9 @@ let PageControls = React.createClass({
   },
   deleteHandler: function(event) {
     event.preventDefault();
+    if ( !confirm(`Are you sure you want to delete the page "${this.props.name}"?`)) {
+      return;
+    }
     chromeDelete(this.props.name);
     // report the current page index
     this.props.actions.removePage();

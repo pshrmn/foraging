@@ -11,6 +11,9 @@ export default React.createClass({
   },
   remove: function(event) {
     let { element } = this.props;
+    if ( !confirm(`Are you sure you want to delete the element "${element.selector}"?`)) {
+      return;
+    }
     let parent = element.parent;
     if ( parent === null ) {
       // root "body" element

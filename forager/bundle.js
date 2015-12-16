@@ -2118,6 +2118,9 @@
 	  remove: function remove(event) {
 	    var element = this.props.element;
 
+	    if (!confirm("Are you sure you want to delete the element \"" + element.selector + "\"?")) {
+	      return;
+	    }
 	    var parent = element.parent;
 	    if (parent === null) {
 	      // root "body" element
@@ -3801,6 +3804,9 @@
 	  },
 	  deleteHandler: function deleteHandler(event) {
 	    event.preventDefault();
+	    if (!confirm("Are you sure you want to delete the page \"" + this.props.name + "\"?")) {
+	      return;
+	    }
 	    (0, _chrome.chromeDelete)(this.props.name);
 	    // report the current page index
 	    this.props.actions.removePage();
