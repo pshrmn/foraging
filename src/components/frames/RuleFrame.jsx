@@ -53,11 +53,12 @@ export default React.createClass({
     let typeRadios = ["string", "int", "float"].map((t,i) => {
       return (
         <label key={i}>
-          {t}: <input type="radio"
+          <input type="radio"
                       name="rule-type"
                       value={t}
                       checked={t === type}
                       onChange={this.setType} />
+          <span className="rule-type">{t}</span>
         </label>
       );
     });
@@ -135,7 +136,7 @@ let AttrChoices = React.createClass({
                    value={a.name}
                    checked={a.name === attr }
                    onChange={this.selectAttr} />
-            {a.name} - {abbreviate(a.value, 100)}
+            <span className="rule-attr">{a.name}</span> {abbreviate(a.value, 40)}
           </label>
         </li>
       );
@@ -147,6 +148,9 @@ let AttrChoices = React.createClass({
     let eleCount = elements.length;
     return (
       <div className="element-attributes">
+        <ul>
+          {this.elementAttributes(elements[index])}
+        </ul>
         <div>
           <PosButton text="<<"
                      classes={["transparent"]}
@@ -156,9 +160,6 @@ let AttrChoices = React.createClass({
                      classes={["transparent"]}
                      click={this.nextElement} />
         </div>
-        <ul>
-          {this.elementAttributes(elements[index])}
-        </ul>
       </div>
     );
   }

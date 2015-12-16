@@ -224,12 +224,14 @@ body.foraging {
              * frames are broken down into two parts, the .info section and
              * the .buttons section
              */ }
+      #forager .frames .frame .info > * {
+        padding: 2px 0; }
       #forager .frames .frame .info .line {
         padding: 2px 0; }
       #forager .frames .frame .info label {
         margin-right: 5px; }
       #forager .frames .frame .buttons {
-        margin-top: auto;
+        margin-top: 5px;
         display: -webkit-flex;
         display: -ms-flexbox;
         display: flex; }
@@ -240,6 +242,11 @@ body.foraging {
       #forager .frames .frame ul {
         padding: 0;
         overflow-wrap: break-word; }
+      #forager .frames .frame li {
+        min-height: 1.5em; }
+      #forager .frames .frame .element-attributes {
+        padding: 5px;
+        margin-top: 5px; }
       #forager .frames .frame .choices {
         display: -webkit-flex;
         display: -ms-flexbox;
@@ -261,21 +268,22 @@ body.foraging {
       #forager .frames .rules .rule {
         height: inherit;
         line-height: 1.1em; }
-        #forager .frames .rules .rule .rule-name {
-          font-weight: bold; }
-        #forager .frames .rules .rule .rule-attr, #forager .frames .rules .rule .rule-type {
-          font-size: 0.9em;
-          padding: 2px;
-          margin-left: 5px;
-          border: 1px solid #000000; }
-        #forager .frames .rules .rule .rule-attr {
-          color: #225683;
-          background: #BDCDDB;
-          border-color: #225683; }
-        #forager .frames .rules .rule .rule-type {
-          color: #42752E;
-          background: #CCE0C3;
-          border-color: #42752E; }
+        #forager .frames .rules .rule > * {
+          margin: 0 3px; }
+    #forager .frames .rule-name {
+      font-weight: bold; }
+    #forager .frames .rule-attr, #forager .frames .rule-type {
+      font-size: 0.9em;
+      padding: 2px;
+      border: 1px solid #000000; }
+    #forager .frames .rule-attr {
+      color: #225683;
+      background: #BDCDDB;
+      border-color: #225683; }
+    #forager .frames .rule-type {
+      color: #42752E;
+      background: #CCE0C3;
+      border-color: #42752E; }
   #forager .page-controls {
     display: inline-block; }
   #forager .app-controls {

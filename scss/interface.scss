@@ -51,7 +51,7 @@ body.foraging {
         display: none !important;
     }
 
-    *{
+    * {
         color: $black;
         box-sizing: border-box;
         line-height: 1.1em !important;
@@ -351,6 +351,11 @@ body.foraging {
              * the .buttons section
              */
             .info {
+
+                > * {
+                    padding: 2px 0;
+                }
+
                 .line {
                     padding: 2px 0;
                 }
@@ -361,7 +366,7 @@ body.foraging {
             }
 
             .buttons {
-                margin-top: auto;
+                margin-top: 5px;
                 display: flex;
 
                 button {
@@ -372,6 +377,15 @@ body.foraging {
             ul {
                 padding: 0;
                 overflow-wrap: break-word;
+            }
+
+            li {
+                min-height: 1.5em;
+            }
+
+            .element-attributes {
+                padding: 5px;
+                margin-top: 5px;
             }
 
             .choices {
@@ -401,30 +415,32 @@ body.foraging {
             .rule {
                 height: inherit;
                 line-height: 1.1em;
-
-                .rule-name {
-                    font-weight: bold;
-                }
-
-                .rule-attr, .rule-type {
-                    font-size: 0.9em;
-                    padding: 2px;
-                    margin-left: 5px;
-                    border: 1px solid $black;
-                }
-
-                .rule-attr {
-                    color: $blue;
-                    background: $light-blue;
-                    border-color: $blue;
-                }
-
-                .rule-type {
-                    color: $dark-green;
-                    background: $light-green;
-                    border-color: $dark-green;
+                > * {
+                    margin: 0 3px;
                 }
             }
+        }
+
+        .rule-name {
+            font-weight: bold;
+        }
+
+        .rule-attr, .rule-type {
+            font-size: 0.9em;
+            padding: 2px;
+            border: 1px solid $black;
+        }
+
+        .rule-attr {
+            color: $blue;
+            background: $light-blue;
+            border-color: $blue;
+        }
+
+        .rule-type {
+            color: $dark-green;
+            background: $light-green;
+            border-color: $dark-green;
         }
     }
 

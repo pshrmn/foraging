@@ -2351,13 +2351,16 @@
 	      return _react2.default.createElement(
 	        "label",
 	        { key: i },
-	        t,
-	        ": ",
 	        _react2.default.createElement("input", { type: "radio",
 	          name: "rule-type",
 	          value: t,
 	          checked: t === type,
-	          onChange: _this.setType })
+	          onChange: _this.setType }),
+	        _react2.default.createElement(
+	          "span",
+	          { className: "rule-type" },
+	          t
+	        )
 	      );
 	    });
 
@@ -2458,9 +2461,13 @@
 	            value: a.name,
 	            checked: a.name === attr,
 	            onChange: _this2.selectAttr }),
-	          a.name,
-	          " - ",
-	          (0, _text.abbreviate)(a.value, 100)
+	          _react2.default.createElement(
+	            "span",
+	            { className: "rule-attr" },
+	            a.name
+	          ),
+	          " ",
+	          (0, _text.abbreviate)(a.value, 40)
 	        )
 	      );
 	    });
@@ -2476,6 +2483,11 @@
 	      "div",
 	      { className: "element-attributes" },
 	      _react2.default.createElement(
+	        "ul",
+	        null,
+	        this.elementAttributes(elements[index])
+	      ),
+	      _react2.default.createElement(
 	        "div",
 	        null,
 	        _react2.default.createElement(_Buttons.PosButton, { text: "<<",
@@ -2489,11 +2501,6 @@
 	        _react2.default.createElement(_Buttons.PosButton, { text: ">>",
 	          classes: ["transparent"],
 	          click: this.nextElement })
-	      ),
-	      _react2.default.createElement(
-	        "ul",
-	        null,
-	        this.elementAttributes(elements[index])
 	      )
 	    );
 	  }
