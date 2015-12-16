@@ -1,6 +1,7 @@
 import React from "react";
 
 import { PosButton, NegButton } from "../Buttons";
+import NoSelectMixin from "../NoSelectMixin";
 
 import { parts, select, count } from "../../helpers/selection";
 import { stripEvents } from "../../helpers/attributes";
@@ -38,7 +39,9 @@ export default React.createClass({
             return parts(ele);
         });
       this.setState({
-        selectors: selectors
+        // maintain the wildcard selector
+        selectors: [["*"]].concat(selectors),
+        checked: undefined
       });
     }
   },
@@ -46,8 +49,9 @@ export default React.createClass({
     return {
       // the index of the selected selector
       checked: undefined,
-      // the array of possible selectors
-      selectors: [],
+      // the array of possible selectors. each selector is an array of selector parts
+      // ie tag name, class names, and id
+      selectors: [["*"]],
       // the number of elements the currently selected selector matches
       eleCount: 0
     };
@@ -142,6 +146,7 @@ export default React.createClass({
 });
 
 let SelectorRadio = React.createClass({
+  mixins: [NoSelectMixin],
   setRadio: function(event) {
     // do not call event.preventDefault() here or the checked dot will fail to render
     this.props.select(this.props.index);
@@ -150,7 +155,7 @@ let SelectorRadio = React.createClass({
     let { selector, checked } = this.props;
     let labelClass = checked ? "selected" : "";
     return (
-      <label className={labelClass}>
+      <label ref="parent" className={labelClass}>
         <input type="radio"
                name="css-selector"
                checked={checked}

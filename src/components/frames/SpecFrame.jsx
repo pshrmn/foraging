@@ -1,6 +1,8 @@
 import React from "react";
 
 import { PosButton, NegButton } from "../Buttons";
+import NoSelectMixin from "../NoSelectMixin";
+
 import { createElement } from "../../helpers/page";
 import { allSelect, count, select } from "../../helpers/selection";
 import { highlight, unhighlight } from "../../helpers/markup";
@@ -104,6 +106,7 @@ export default React.createClass({
 });
 
 let SpecForm = React.createClass({
+  mixins: [NoSelectMixin],
   getInitialState: function() {
     return {
       type: "single",
@@ -162,7 +165,7 @@ let SpecForm = React.createClass({
   render: function() {
     let valueChooser = this.state.type === "single" ? this._singleValue() : this._allValue();
     return (
-      <div ref="frame">
+      <div ref="parent">
         <div className="line">
           Type:
           <label>single <input type="radio"
@@ -183,18 +186,5 @@ let SpecForm = React.createClass({
         </div>
       </div>
     );
-  },
-  // while this is normally done globally, the single/all swap doesn't use redux
-  // so the .no-select class needs to be handled here
-  _makeNoSelect: function() {
-    [].slice.call(this.refs.frame.querySelectorAll("*")).forEach(c => {
-      c.classList.add("no-select");
-    });
-  },
-  componentDidMount: function() {
-    this._makeNoSelect();
-  },
-  componentDidUpdate: function() {
-    this._makeNoSelect();
   }
 })

@@ -60,21 +60,21 @@
 
 	var _Forager2 = _interopRequireDefault(_Forager);
 
-	var _reducers = __webpack_require__(44);
+	var _reducers = __webpack_require__(45);
 
 	var _reducers2 = _interopRequireDefault(_reducers);
 
 	var _ActionTypes = __webpack_require__(24);
 
-	var _chromeBackground = __webpack_require__(51);
+	var _chromeBackground = __webpack_require__(52);
 
 	var _chromeBackground2 = _interopRequireDefault(_chromeBackground);
 
-	var _pageMiddleware = __webpack_require__(52);
+	var _pageMiddleware = __webpack_require__(53);
 
 	var _pageMiddleware2 = _interopRequireDefault(_pageMiddleware);
 
-	var _chrome = __webpack_require__(41);
+	var _chrome = __webpack_require__(42);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -1448,13 +1448,17 @@
 
 	var _Frames2 = _interopRequireDefault(_Frames);
 
-	var _PageTree = __webpack_require__(39);
+	var _PageTree = __webpack_require__(40);
 
 	var _PageTree2 = _interopRequireDefault(_PageTree);
 
-	var _Preview = __webpack_require__(42);
+	var _Preview = __webpack_require__(43);
 
 	var _Preview2 = _interopRequireDefault(_Preview);
+
+	var _NoSelectMixin = __webpack_require__(36);
+
+	var _NoSelectMixin2 = _interopRequireDefault(_NoSelectMixin);
 
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -1463,6 +1467,7 @@
 	var Forager = _react2.default.createClass({
 	  displayName: "Forager",
 
+	  mixins: [_NoSelectMixin2.default],
 	  render: function render() {
 	    var _props = this.props;
 	    var pages = _props.pages;
@@ -1476,7 +1481,7 @@
 
 	    var page = pages[pageIndex];
 	    var actions = (0, _redux.bindActionCreators)(ForagerActions, dispatch);
-	    var classNames = ["no-select"];
+	    var classNames = [];
 	    if (!show) {
 	      classNames.push("hidden");
 	    }
@@ -1484,7 +1489,7 @@
 
 	    return _react2.default.createElement(
 	      "div",
-	      { id: "forager", className: classNames.join(" "), ref: "app" },
+	      { id: "forager", className: classNames.join(" "), ref: "parent" },
 	      _react2.default.createElement(_Controls2.default, { pages: pages,
 	        index: pageIndex,
 	        message: message,
@@ -1502,27 +1507,6 @@
 	      ),
 	      previewModal
 	    );
-	  },
-	  /*
-	   * When choosing elements in the page, the selector uses a :not(.no-select)
-	   * query to ignore certain elements. To make sure that no elements in the
-	   * Forager app are selected, this function selects all child elements in the
-	   * app and gives them the "no-select" class. This is done in lieu of manually
-	   * setting className="no-select" on all elements (and handling cases where
-	   * there are multiple classes on an element). Ideally a :not(.forager, .forager *)
-	   * selector would exist, but this will have to do.
-	   */
-	  _makeNoSelect: function _makeNoSelect() {
-	    [].slice.call(this.refs.app.querySelectorAll("*")).forEach(function (c) {
-	      c.classList.add("no-select");
-	    });
-	  },
-	  componentDidMount: function componentDidMount() {
-	    // load the site's pages from chrome.storage.local and set the state
-	    this._makeNoSelect();
-	  },
-	  componentDidUpdate: function componentDidUpdate() {
-	    this._makeNoSelect();
 	  }
 	});
 
@@ -2010,11 +1994,11 @@
 
 	var _HTMLFrame2 = _interopRequireDefault(_HTMLFrame);
 
-	var _PartsFrame = __webpack_require__(36);
+	var _PartsFrame = __webpack_require__(37);
 
 	var _PartsFrame2 = _interopRequireDefault(_PartsFrame);
 
-	var _SpecFrame = __webpack_require__(37);
+	var _SpecFrame = __webpack_require__(38);
 
 	var _SpecFrame2 = _interopRequireDefault(_SpecFrame);
 
@@ -2839,6 +2823,10 @@
 
 	var _Buttons = __webpack_require__(26);
 
+	var _NoSelectMixin = __webpack_require__(36);
+
+	var _NoSelectMixin2 = _interopRequireDefault(_NoSelectMixin);
+
 	var _selection = __webpack_require__(32);
 
 	var _attributes = __webpack_require__(31);
@@ -2878,7 +2866,9 @@
 	        return (0, _selection.parts)(ele);
 	      });
 	      this.setState({
-	        selectors: selectors
+	        // maintain the wildcard selector
+	        selectors: [["*"]].concat(selectors),
+	        checked: undefined
 	      });
 	    }
 	  },
@@ -2886,8 +2876,9 @@
 	    return {
 	      // the index of the selected selector
 	      checked: undefined,
-	      // the array of possible selectors
-	      selectors: [],
+	      // the array of possible selectors. each selector is an array of selector parts
+	      // ie tag name, class names, and id
+	      selectors: [["*"]],
 	      // the number of elements the currently selected selector matches
 	      eleCount: 0
 	    };
@@ -3010,6 +3001,7 @@
 	var SelectorRadio = _react2.default.createClass({
 	  displayName: "SelectorRadio",
 
+	  mixins: [_NoSelectMixin2.default],
 	  setRadio: function setRadio(event) {
 	    // do not call event.preventDefault() here or the checked dot will fail to render
 	    this.props.select(this.props.index);
@@ -3022,7 +3014,7 @@
 	    var labelClass = checked ? "selected" : "";
 	    return _react2.default.createElement(
 	      "label",
-	      { className: labelClass },
+	      { ref: "parent", className: labelClass },
 	      _react2.default.createElement("input", { type: "radio",
 	        name: "css-selector",
 	        checked: checked,
@@ -3034,6 +3026,49 @@
 
 /***/ },
 /* 36 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	/*
+	 * When choosing elements in the page, the selector uses a :not(.no-select)
+	 * query to ignore certain elements. To make sure that no elements in the
+	 * Forager app are selected, this function selects all child elements in the
+	 * app and gives them the "no-select" class. This is done in lieu of manually
+	 * setting className="no-select" on all elements (and handling cases where
+	 * there are multiple classes on an element). Ideally a :not(.forager, .forager *)
+	 * selector would exist, but this will have to do.
+	 *
+	 * While most state updates are done through the store and thus managing the
+	 * "no-select" class can mostly be done through the main app, a few Frames
+	 * maintain an internal state and so they need to set the "no-select" class
+	 * on their children themselves.
+	 *
+	 * The main element in a component with the NoSelectMixin applied needs to have
+	 * a ref="parent" prop.
+	 */
+	exports.default = {
+	  _makeNoSelect: function _makeNoSelect() {
+	    this.refs.parent.classList.add("no-select");
+	    [].slice.call(this.refs.parent.querySelectorAll("*")).forEach(function (c) {
+	      c.classList.add("no-select");
+	    });
+	  },
+	  componentDidMount: function componentDidMount() {
+	    // load the site's pages from chrome.storage.local and set the state
+	    this._makeNoSelect();
+	  },
+	  componentDidUpdate: function componentDidUpdate() {
+	    this._makeNoSelect();
+	  }
+	};
+
+/***/ },
+/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -3186,7 +3221,7 @@
 	});
 
 /***/ },
-/* 37 */
+/* 38 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -3201,7 +3236,11 @@
 
 	var _Buttons = __webpack_require__(26);
 
-	var _page = __webpack_require__(38);
+	var _NoSelectMixin = __webpack_require__(36);
+
+	var _NoSelectMixin2 = _interopRequireDefault(_NoSelectMixin);
+
+	var _page = __webpack_require__(39);
 
 	var _selection = __webpack_require__(32);
 
@@ -3329,6 +3368,7 @@
 	var SpecForm = _react2.default.createClass({
 	  displayName: "SpecForm",
 
+	  mixins: [_NoSelectMixin2.default],
 	  getInitialState: function getInitialState() {
 	    return {
 	      type: "single",
@@ -3389,7 +3429,7 @@
 	    var valueChooser = this.state.type === "single" ? this._singleValue() : this._allValue();
 	    return _react2.default.createElement(
 	      "div",
-	      { ref: "frame" },
+	      { ref: "parent" },
 	      _react2.default.createElement(
 	        "div",
 	        { className: "line" },
@@ -3422,24 +3462,11 @@
 	        valueChooser
 	      )
 	    );
-	  },
-	  // while this is normally done globally, the single/all swap doesn't use redux
-	  // so the .no-select class needs to be handled here
-	  _makeNoSelect: function _makeNoSelect() {
-	    [].slice.call(this.refs.frame.querySelectorAll("*")).forEach(function (c) {
-	      c.classList.add("no-select");
-	    });
-	  },
-	  componentDidMount: function componentDidMount() {
-	    this._makeNoSelect();
-	  },
-	  componentDidUpdate: function componentDidUpdate() {
-	    this._makeNoSelect();
 	  }
 	});
 
 /***/ },
-/* 38 */
+/* 39 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -3542,7 +3569,7 @@
 	};
 
 /***/ },
-/* 39 */
+/* 40 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -3557,7 +3584,7 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _d = __webpack_require__(40);
+	var _d = __webpack_require__(41);
 
 	var _d2 = _interopRequireDefault(_d);
 
@@ -3565,11 +3592,11 @@
 
 	var _text = __webpack_require__(33);
 
-	var _page = __webpack_require__(38);
+	var _page = __webpack_require__(39);
 
 	var _markup = __webpack_require__(34);
 
-	var _chrome = __webpack_require__(41);
+	var _chrome = __webpack_require__(42);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -3799,13 +3826,13 @@
 	});
 
 /***/ },
-/* 40 */
+/* 41 */
 /***/ function(module, exports) {
 
 	module.exports = d3;
 
 /***/ },
-/* 41 */
+/* 42 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -3817,7 +3844,7 @@
 
 	var _selection = __webpack_require__(32);
 
-	var _page = __webpack_require__(38);
+	var _page = __webpack_require__(39);
 
 	/*
 	 * any time that the page is updated, the stored page should be updated
@@ -3890,7 +3917,7 @@
 	};
 
 /***/ },
-/* 42 */
+/* 43 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -3905,7 +3932,7 @@
 
 	var _Buttons = __webpack_require__(26);
 
-	var _preview = __webpack_require__(43);
+	var _preview = __webpack_require__(44);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -3953,7 +3980,7 @@
 	});
 
 /***/ },
-/* 43 */
+/* 44 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -4057,7 +4084,7 @@
 	};
 
 /***/ },
-/* 44 */
+/* 45 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -4066,27 +4093,27 @@
 	  value: true
 	});
 
-	var _frame = __webpack_require__(45);
+	var _frame = __webpack_require__(46);
 
 	var _frame2 = _interopRequireDefault(_frame);
 
-	var _show = __webpack_require__(46);
+	var _show = __webpack_require__(47);
 
 	var _show2 = _interopRequireDefault(_show);
 
-	var _page = __webpack_require__(47);
+	var _page = __webpack_require__(48);
 
 	var _page2 = _interopRequireDefault(_page);
 
-	var _element = __webpack_require__(48);
+	var _element = __webpack_require__(49);
 
 	var _element2 = _interopRequireDefault(_element);
 
-	var _preview = __webpack_require__(49);
+	var _preview = __webpack_require__(50);
 
 	var _preview2 = _interopRequireDefault(_preview);
 
-	var _message = __webpack_require__(50);
+	var _message = __webpack_require__(51);
 
 	var _message2 = _interopRequireDefault(_message);
 
@@ -4135,7 +4162,7 @@
 	exports.default = reducer;
 
 /***/ },
-/* 45 */
+/* 46 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -4204,7 +4231,7 @@
 	}
 
 /***/ },
-/* 46 */
+/* 47 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -4242,7 +4269,7 @@
 	}
 
 /***/ },
-/* 47 */
+/* 48 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -4352,7 +4379,7 @@
 	}
 
 /***/ },
-/* 48 */
+/* 49 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -4400,7 +4427,7 @@
 	}
 
 /***/ },
-/* 49 */
+/* 50 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -4441,7 +4468,7 @@
 	}
 
 /***/ },
-/* 50 */
+/* 51 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -4484,7 +4511,7 @@
 	}
 
 /***/ },
-/* 51 */
+/* 52 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -4497,7 +4524,7 @@
 
 	var ActionTypes = _interopRequireWildcard(_ActionTypes);
 
-	var _chrome = __webpack_require__(41);
+	var _chrome = __webpack_require__(42);
 
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -4519,7 +4546,7 @@
 	};
 
 /***/ },
-/* 52 */
+/* 53 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -4534,7 +4561,7 @@
 
 	var _text = __webpack_require__(33);
 
-	var _page = __webpack_require__(38);
+	var _page = __webpack_require__(39);
 
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 

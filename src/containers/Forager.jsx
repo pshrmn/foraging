@@ -8,14 +8,16 @@ import Controls from "../components/Controls";
 import Frames from "../components/frames/Frames";
 import PageTree from "../components/PageTree";
 import Preview from "../components/Preview";
+import NoSelectMixin from "../components/NoSelectMixin";
 
 let Forager = React.createClass({
+  mixins: [NoSelectMixin],
   render: function() {
     let { pages, pageIndex, element, show,
           dispatch, frame, preview, message } = this.props;
     let page = pages[pageIndex];
     const actions = bindActionCreators(ForagerActions, dispatch);
-    let classNames = ["no-select"];
+    let classNames = [];
     if ( !show ) {
       classNames.push("hidden");
     }
@@ -24,7 +26,7 @@ let Forager = React.createClass({
     ) : null;
 
     return (
-      <div id="forager" className={classNames.join(" ")} ref="app">
+      <div id="forager" className={classNames.join(" ")} ref="parent">
         <Controls pages={pages}
                   index={pageIndex}
                   message={message}
@@ -41,27 +43,6 @@ let Forager = React.createClass({
         {previewModal}
       </div>
     );
-  },
-  /*
-   * When choosing elements in the page, the selector uses a :not(.no-select)
-   * query to ignore certain elements. To make sure that no elements in the
-   * Forager app are selected, this function selects all child elements in the
-   * app and gives them the "no-select" class. This is done in lieu of manually
-   * setting className="no-select" on all elements (and handling cases where
-   * there are multiple classes on an element). Ideally a :not(.forager, .forager *)
-   * selector would exist, but this will have to do.
-   */
-  _makeNoSelect: function() {
-    [].slice.call(this.refs.app.querySelectorAll("*")).forEach(c => {
-      c.classList.add("no-select");
-    });
-  },
-  componentDidMount: function() {
-    // load the site's pages from chrome.storage.local and set the state
-    this._makeNoSelect();
-  },
-  componentDidUpdate: function() {
-    this._makeNoSelect();
   }
 });
 
