@@ -27,43 +27,42 @@ If you are starting from here, you will need to create the :code:`subreddit.py` 
 Basics
 ^^^^^^
 
-The program needs to import :code:`json` to parse the rules file.
+Parse the file containing the desired rules and create a :code:`Fetch` object to get content from urls and a :code:`Page` object to gather the desired data from the content.
 
 .. code-block:: python
 
   import json
+  from gatherer import Page, Fetch
 
   # open and load the submissions.json file
   with open("rules/www_reddit_com/submissions.json", "r") as fp:
       submission_json = json.load(fp)
 
-:code:`gatherer.Page` represents the rules to gather data from a webpage.
-
-:code:`gatherer.Fetch` akes http requests to get the text contents from a url. It has a built in sleep between requests (default of 5 seconds), so you do not overload the server of the site you're gathering data from with too many requests. The :code:`Fetch` class can be provided a :code:`gatherer.Cache`, but for this tutorial we won't be using one because we always want fresh content.
-
-.. code-block:: python
-
-  from gatherer import Page, Fetch
-
   # provide a User-Agent because reddit rate limits crawlers
   # that do not provide one
   fetcher = Fetch(headers={"User-Agent": "subreddit-gatherer"})
 
-  # create a Page using the rules json and the Fetch object
-  subreddit_page = Page.from_json(submission_json, fetcher)
+  # create a Page using the rules json
+  subreddit_page = Page.from_json(submission_json)
+
+:code:`gatherer.Page` represents the rules to gather data from a webpage.
+
+:code:`gatherer.Fetch` makes http requests to get the text contents from a url. It has a built in sleep between requests (default of 5 seconds), so you do not hit the server of the site you're gathering data from with too many requests. The :code:`Fetch` class can be provided a :code:`gatherer.Cache`, but for this tutorial we won't be using one because we always want fresh content.
+
 
 At this point you have a :code:`Page` object that is ready to gather data.
 
 Gathering Data
 ^^^^^^^^^^^^^^
 
-To gather data, all that you need to do is to pass a url to the :code:`get` function of your :code:`Page` object.
+To gather data, first call the :code:`get` function of your :code:`Fetch` object, passing it the desired url. Once that returns verify that it has returned a DOM (is not None), then pass the DOM to your :code:`Page` through its :code:`gather` function.
 
 .. code-block:: python
 
   URL = "https://www.reddit.com/r/bodyweightfitness"
-
-  submissions = subreddit_page.get(URL)
+  dom = fetcher.get(URL)
+  if dom is not None:
+    submissions = subreddit_page.gather(dom)
 
 Saving Data
 ^^^^^^^^^^^
@@ -92,12 +91,14 @@ Your program should now look like the code shown below. The code below is proper
   with open("rules/www_reddit_com/submissions.json", "r") as fp:
       submission_json = json.load(fp)
 
-  subreddit_page = Page.from_json(submission_json, fetcher)
+  subreddit_page = Page.from_json(submission_json)
 
-  submissions = subreddit_page.get(URL)
+  dom = fetcher.get(URL)
+  if dom is not None:
+    submissions = subreddit_page.gather(dom)
 
-  with open("data/bwf.json", "w") as fp:
-    json.dump(submissions, fp, indent=2)
+    with open("data/bwf.json", "w") as fp:
+      json.dump(submissions, fp, indent=2)
 
 Now, just call the program from your command line, and you should get a :code:`bwf.json` file in your data directory.
 
@@ -111,78 +112,80 @@ Example JSON
 .. code-block:: json
 
     {
-      "selector": "body",
-      "spec": {
-        "type": "single",
-        "value": 0
-      },
-      "rules": [],
-      "optional": false,
-      "children": [
-        {
-          "selector": "div.thing.link",
-          "spec": {
-            "type": "all",
-            "value": "submissions"
-          },
-          "rules": [],
-          "optional": false,
-          "children": [
-            {
-              "selector": "a.title",
-              "spec": {
-                "type": "single",
-                "value": 0
-              },
-              "rules": [
-                {
-                  "attr": "text",
-                  "name": "title"
-                },
-                {
-                  "attr": "href",
-                  "name": "url"
-                }
-              ],
-              "optional": false,
-              "children": []
+      "name": "submissions",
+      "element": {
+        "selector": "body",
+        "spec": {
+          "type": "single",
+          "value": 0
+        },
+        "rules": [],
+        "optional": false,
+        "children": [
+          {
+            "selector": "div.thing.link",
+            "spec": {
+              "type": "all",
+              "value": "submissions"
             },
-            {
-              "selector": "div.score",
-              "spec": {
-                "type": "single",
-                "value": 1
-              },
-              "rules": [
-                {
-                  "attr": "text",
-                  "name": "score"
-                }
-              ],
-              "optional": false,
-              "children": []
-            },
-            {
-              "selector": "a.comments",
-              "spec": {
-                "type": "single",
-                "value": 0
-              },
-              "rules": [
-                {
-                  "attr": "href",
-                  "name": "comments_url"
+            "rules": [],
+            "optional": false,
+            "children": [
+              {
+                "selector": "a.title",
+                "spec": {
+                  "type": "single",
+                  "value": 0
                 },
-                {
-                  "attr": "text",
-                  "name": "comment_count"
-                }
-              ],
-              "optional": false,
-              "children": []
-            }
-          ]
-        }
-      ],
-      "name": "submissions"
+                "rules": [
+                  {
+                    "attr": "text",
+                    "name": "title"
+                  },
+                  {
+                    "attr": "href",
+                    "name": "url"
+                  }
+                ],
+                "optional": false,
+                "children": []
+              },
+              {
+                "selector": "div.score",
+                "spec": {
+                  "type": "single",
+                  "value": 1
+                },
+                "rules": [
+                  {
+                    "attr": "text",
+                    "name": "score"
+                  }
+                ],
+                "optional": false,
+                "children": []
+              },
+              {
+                "selector": "a.comments",
+                "spec": {
+                  "type": "single",
+                  "value": 0
+                },
+                "rules": [
+                  {
+                    "attr": "href",
+                    "name": "comments_url"
+                  },
+                  {
+                    "attr": "text",
+                    "name": "comment_count"
+                  }
+                ],
+                "optional": false,
+                "children": []
+              }
+            ]
+          }
+        ]
+      }
     }    
