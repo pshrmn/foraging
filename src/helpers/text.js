@@ -2,7 +2,7 @@ export const legalName = name => {
   if ( name === null || name === "" ) {
     return false;
   }
-  let badCharacters = /[<>:"\/\\\|\?\*]/;
+  const badCharacters = /[<>:"\/\\\|\?\*]/;
   return name.match(badCharacters) === null
 };
 
@@ -13,10 +13,10 @@ export const abbreviate = (text, max) => {
         return "...";
     }
     // determine the length of the first and second halves of the text
-    var firstHalf;
-    var secondHalf;
-    var leftovers = max-3;
-    var half = leftovers/2;
+    let firstHalf;
+    let secondHalf;
+    const leftovers = max-3;
+    const half = leftovers/2;
     if ( leftovers % 2 === 0 ) {
         firstHalf = half;
         secondHalf = half;
@@ -26,8 +26,8 @@ export const abbreviate = (text, max) => {
     }
 
     // splice correct amounts of text
-    var firstText = text.slice(0, firstHalf);
-    var secondText = ( secondHalf === 0 ) ? "" : text.slice(-secondHalf);
+    const firstText = text.slice(0, firstHalf);
+    const secondText = ( secondHalf === 0 ) ? "" : text.slice(-secondHalf);
     return `${firstText}...${secondText}`;
 };
 

@@ -8,9 +8,9 @@ export const chromeSave = page => {
   if ( page === undefined ) {
     return;
   }
-  let cleaned = clean(page);
+  const cleaned = clean(page);
   chrome.storage.local.get("sites", function saveSchemaChrome(storage){
-    let host = window.location.hostname;
+    const host = window.location.hostname;
     storage.sites[host] = storage.sites[host] || {};
     storage.sites[host][cleaned.name] = cleaned;
     chrome.storage.local.set({"sites": storage.sites});
@@ -25,7 +25,7 @@ export const chromeDelete = name => {
     return;
   }
   chrome.storage.local.get("sites", function saveSchemaChrome(storage){
-    let host = window.location.hostname;
+    const host = window.location.hostname;
     delete storage.sites[host][name];
     chrome.storage.local.set({"sites": storage.sites});
   });
@@ -42,9 +42,9 @@ If the site object exists for a host, load the saved rules
 */
 export const chromeLoad = callback => {
   chrome.storage.local.get("sites", function setupHostnameChrome(storage){
-    let host = window.location.hostname;
-    let current = storage.sites[host] || {};
-    let pages = Object.keys(current).map(key => current[key]);
+    const host = window.location.hostname;
+    const current = storage.sites[host] || {};
+    const pages = Object.keys(current).map(key => current[key]);
     pages.forEach(p => setupPage(p));
     callback(pages);
   });

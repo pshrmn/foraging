@@ -24,7 +24,10 @@ import { highlight, unhighlight } from "../../helpers/markup";
 export default React.createClass({
   cssSelector: "current-element",
   _selectFrame: function() {
-    let { frame, element, actions } = this.props;
+    const { frame, element, actions } = this.props;
+    /*
+     * only the necessary actions are sent to the frame components
+     */
     switch ( frame.name ) {
     case "element":
       return <ElementFrame element={element}

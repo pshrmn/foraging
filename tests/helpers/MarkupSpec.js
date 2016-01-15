@@ -3,7 +3,7 @@ import { jsdom } from "jsdom";
 
 import { highlight, unhighlight, iHighlight, iUnhighlight } from "../../src/helpers/markup";
 
-let doc = jsdom(`<!doctype html>
+const doc = jsdom(`<!doctype html>
   <html>
   <body>
     <div>
@@ -17,7 +17,7 @@ let doc = jsdom(`<!doctype html>
     </div>
   </body>
 </html>`);
-let win = doc.defaultView;
+const win = doc.defaultView;
 global.document = doc;
 global.window = win;
 
@@ -25,8 +25,8 @@ describe("markup", () => {
   
   describe("highlight", () => {
     it("adds the class to all elements", () => {
-      let elements = document.querySelectorAll("div");
-      let className = "highlighted";
+      const elements = document.querySelectorAll("div");
+      const className = "highlighted";
       expect(document.getElementsByClassName(className).length).to.equal(0);
       highlight(elements, className);
       expect(document.getElementsByClassName(className).length).to.equal(3);
@@ -35,8 +35,8 @@ describe("markup", () => {
 
   describe("unhighlight", () => {
     it("remove the class from all elements", () => {
-      let elements = document.querySelectorAll("div");
-      let className = "highlighted";
+      const elements = document.querySelectorAll("div");
+      const className = "highlighted";
       highlight(elements, className);
       expect(document.getElementsByClassName(className).length).to.equal(3);
       unhighlight(className);
@@ -48,11 +48,11 @@ describe("markup", () => {
     // can't actually test if an element has an event attached without
     // simulating that event occurring
     it("adds the class to all elements", () => {
-      let elements = document.querySelectorAll("div");
-      let className = "highlighted";
-      let over = () => {};
-      let out = () => {};
-      let click = () => {};
+      const elements = document.querySelectorAll("div");
+      const className = "highlighted";
+      const over = () => {};
+      const out = () => {};
+      const click = () => {};
       expect(document.getElementsByClassName(className).length).to.equal(0);
       iHighlight(elements, className, over, out, click);
       expect(document.getElementsByClassName(className).length).to.equal(3);
@@ -61,11 +61,11 @@ describe("markup", () => {
 
   describe("iUnhighlight", () => {
     it("remove the class from all elements", () => {
-      let elements = document.querySelectorAll("div");
-      let className = "highlighted";
-      let over = () => {};
-      let out = () => {};
-      let click = () => {};
+      const elements = document.querySelectorAll("div");
+      const className = "highlighted";
+      const over = () => {};
+      const out = () => {};
+      const click = () => {};
       iHighlight(elements, className, over, out, click);
       expect(document.getElementsByClassName(className).length).to.equal(3);
       iUnhighlight(className);

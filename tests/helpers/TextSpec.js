@@ -6,7 +6,7 @@ describe("text", () => {
 
   describe("legalName", () => {
     it("returns true for legal names", () => {
-      let allGood = [
+      const allGood = [
         "these",
         "names_are",
         "all-legal"
@@ -26,7 +26,7 @@ describe("text", () => {
 
     it("returns false when a name contains illegal characters", () => {
       // illegal characters: < > : " / \ | ? *
-      let allBad = [
+      const allBad = [
         "<name",
         ">name",
         ":name",
@@ -44,7 +44,7 @@ describe("text", () => {
 
   describe("abbreviate", () => {
     it("returns text when length is less than max", () => {
-      let text = "characters";
+      const text = "characters";
       expect(abbreviate(text, text.length)).to.equal(text);
     });
 
@@ -55,15 +55,15 @@ describe("text", () => {
     });
 
     it("returns even first and second half length when max is odd", () => {
-      let abbr = abbreviate("a string of characters", 15);
-      let halves = abbr.split("...");
+      const abbr = abbreviate("a string of characters", 15);
+      const halves = abbr.split("...");
       expect(halves[0].length).to.equal(6);
       expect(halves[1].length).to.equal(6);
     });
 
     it("returns longer first half when max is even", () => {
-      let abbr = abbreviate("a string of characters", 14);
-      let halves = abbr.split("...");
+      const abbr = abbreviate("a string of characters", 14);
+      const halves = abbr.split("...");
       expect(halves[0].length).to.equal(6);
       expect(halves[1].length).to.equal(5);
     });

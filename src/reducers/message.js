@@ -13,12 +13,12 @@ export default function message(state = {}, action) {
   case types.RENAME_PAGE:
     return Object.assign({}, {
       text: action.text,
-      fade: action.fade
+      wait: action.wait
     });
   default:
     return {
       text: "",
-      fade: undefined
+      wait: undefined
     };
   }
 }

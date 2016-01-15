@@ -10,18 +10,18 @@ import PageTree from "../components/PageTree";
 import Preview from "../components/Preview";
 import NoSelectMixin from "../components/NoSelectMixin";
 
-let Forager = React.createClass({
+const Forager = React.createClass({
   mixins: [NoSelectMixin],
   render: function() {
-    let { pages, pageIndex, element, show,
+    const { pages, pageIndex, element, show,
           dispatch, frame, preview, message } = this.props;
-    let page = pages[pageIndex];
+    const page = pages[pageIndex];
     const actions = bindActionCreators(ForagerActions, dispatch);
-    let classNames = [];
+    const classNames = [];
     if ( !show ) {
       classNames.push("hidden");
     }
-    let previewModal = preview.visible ? (
+    const previewModal = preview.visible ? (
       <Preview page={page} close={actions.hidePreview} />
     ) : null;
 

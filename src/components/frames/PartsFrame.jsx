@@ -14,8 +14,8 @@ export default React.createClass({
   },
   nextHandler: function(event) {
     event.preventDefault();
-    let { parts } = this.state;
-    let selector = this.joinParts(parts);
+    const { parts } = this.state;
+    const selector = this.joinParts(parts);
     if ( selector !== "" ) {
       this.props.next(selector);
     } else {
@@ -28,16 +28,15 @@ export default React.createClass({
   },
   toggleRadio: function(event) {
     // don't prevent default
-    let index = event.target.value;
-    let parts = this.state.parts;
+    const index = event.target.value;
+    const parts = this.state.parts;
     parts[index].checked = !parts[index].checked;
-    let fullSelector = this.joinParts(parts);
+    const fullSelector = this.joinParts(parts);
 
-    let eleCount = fullSelector === "" ? 0 : count(this.props.parentElements, fullSelector);
     this._setupHighlights(fullSelector);
     this.setState({
       parts: parts,
-      eleCount: eleCount
+      eleCount: fullSelector === "" ? 0 : count(this.props.parentElements, fullSelector)
     });
   },
   joinParts: parts => {
@@ -49,30 +48,28 @@ export default React.createClass({
     }, "");
   },
   componentWillMount: function() {
-    let names = this.props.parts;
+    const names = this.props.parts;
     // by default, each css selector part should be checked
-    let parts = names.map(name => {
+    const parts = names.map(name => {
       return {
         name: name,
         checked: true
       }
     });
-    let fullSelector = names.join("");
-    let eleCount = count(this.props.parentElements, fullSelector);
+    const fullSelector = names.join("");
     this._setupHighlights(fullSelector);
     this.setState({
       parts: parts,
-      eleCount: eleCount
+      eleCount: count(this.props.parentElements, fullSelector)
     });
   },
   render: function() {
-    let { parts, eleCount } = this.state;
-    let opts = parts.map((part, index) => {
-      let { name, checked } = part;
-      let labelClass = checked ? "selected" : "";
+    const { parts, eleCount } = this.state;
+    const opts = parts.map((part, index) => {
+      const { name, checked } = part;
       return (
         <label key={index}
-               className={labelClass} >
+               className={checked ? "selected" : ""}>
           {name}
           <input type="checkbox"
                  name="selector-part"
@@ -104,7 +101,7 @@ export default React.createClass({
   _setupHighlights: function(cssSelector) {
     unhighlight(this.previewClass);
     if ( cssSelector !== "" ) {
-      let elements = select(this.props.parentElements, cssSelector);
+      const elements = select(this.props.parentElements, cssSelector);
       highlight(elements, this.previewClass);
     }
   }

@@ -3,9 +3,9 @@ export const preview = page => {
      * Given a parent element, get all children that match the selector
      * Return data based on element's type (index or name)
      */
-    let getElement = (element, parent) => {
-        let elements = parent.querySelectorAll(element.selector);
-        let { type, value } = element.spec;
+    const getElement = (element, parent) => {
+        const elements = parent.querySelectorAll(element.selector);
+        const { type, value } = element.spec;
         switch ( type ) {
         case "single":
             var ele = elements[value];
@@ -29,27 +29,27 @@ export const preview = page => {
      * Get data for each rule and each child. Merge the child data into the
      * rule data.
      */
-    let getElementData = (element, htmlElement) => {
-        var data = getRuleData(element.rules, htmlElement);
-        var childData = getChildData(element.children, htmlElement);
+    const getElementData = (element, htmlElement) => {
+        const data = getRuleData(element.rules, htmlElement);
+        const childData = getChildData(element.children, htmlElement);
         if ( !childData ) {
             return;
         }
-        for ( var key in childData ) {
+        for ( const key in childData ) {
             data[key] = childData[key];
         }
         return data;
     }
 
-    let getChildData = (children, htmlElement) => {
-        var data = {};
+    const getChildData = (children, htmlElement) => {
+        let data = {};
         children.some(function(child){
-            var childData = getElement(child, htmlElement);
+            const childData = getElement(child, htmlElement);
             if ( !childData && !child.optional ) {
                 data = undefined;
                 return true;
             }
-            for ( var key in childData ) {
+            for ( const key in childData ) {
                 data[key] = childData[key];
             }
             return false;
@@ -57,13 +57,13 @@ export const preview = page => {
         return data;
     }
 
-    var intRegEx = /\d+/;
-    var floatRegEx = /\d+(\.\d+)?/;
-    let getRuleData = (rules, htmlElement) => {
-        var data = {};
+    const intRegEx = /\d+/;
+    const floatRegEx = /\d+(\.\d+)?/;
+    const getRuleData = (rules, htmlElement) => {
+        const data = {};
         rules.forEach(function(rule){
-            var val;
-            var match;
+            let val;
+            let match;
             if ( rule.attr === "text" ) {
                  val = htmlElement.textContent.replace(/\s+/g, " ");
             } else {

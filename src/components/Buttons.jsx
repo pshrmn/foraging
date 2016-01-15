@@ -4,7 +4,7 @@
 
 export const PosButton = React.createClass({
   render: function() {
-    let { classes, ...rest } = this.props;
+    const { classes, ...rest } = this.props;
     return (
       <NeutralButton {...rest}
                      classes={["pos"].concat(classes)} />
@@ -14,7 +14,7 @@ export const PosButton = React.createClass({
 
 export const NegButton = React.createClass({
   render: function() {
-    let { classes, ...rest } = this.props;
+    const { classes, ...rest } = this.props;
     return (
       <NeutralButton {...rest}
                      classes={["neg"].concat(classes)} />
@@ -32,7 +32,7 @@ export const NeutralButton = React.createClass({
     };
   },
   render: function() {
-    let { text, click, classes, title } = this.props;
+    const { text, click, classes, title } = this.props;
     return (
       <button className={classes.join(" ")}
               title={title}

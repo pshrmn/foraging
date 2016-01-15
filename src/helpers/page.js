@@ -71,7 +71,7 @@ export const setupPage = page => {
     return;
   }
   let id = 0;
-  let setup = (element, parentElements, parent) => {
+  const setup = (element, parentElements, parent) => {
     element.id = id++;
     element.parent = parent;
     element.elements = select(parentElements, element.selector, element.spec);

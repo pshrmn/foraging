@@ -17,14 +17,14 @@ import { chromeSave, chromeLoad } from "./helpers/chrome";
  * check if the forager holder exists. If it doesn't, mount the app. If it does,
  * check if the app is hidden. If it is hidden, show it.
  */
-let holder = document.querySelector(".forager-holder");
+const holder = document.querySelector(".forager-holder");
 document.body.classList.add("foraging");
 if ( !holder ) {
   chromeLoad(pages => {
     /*
      * initialState uses the pages loaded by chrome
      */
-    let initialState = {
+    const initialState = {
       show: true,
       element: undefined,
       page: {
@@ -40,10 +40,10 @@ if ( !holder ) {
       },
       message: {
         text: "",
-        fade: undefined
+        wait: undefined
       }
     };
-    let store = applyMiddleware(
+    const store = applyMiddleware(
         chromeBackground,
         pageMiddleware
       )(createStore)(reducer, initialState);
@@ -53,8 +53,8 @@ if ( !holder ) {
      */
     let oldPages = {};
     store.subscribe(() => {
-      let state = store.getState();
-      let { pages, pageIndex } = state.page;
+      const state = store.getState();
+      const { pages, pageIndex } = state.page;
       if ( pages !== oldPages ) {
         chromeSave(pages[pageIndex]);
         oldPages = pages;
@@ -64,26 +64,30 @@ if ( !holder ) {
     /*
      * actually render Forager
      */
-    let holder = document.createElement("div");
+    const holder = document.createElement("div");
     holder.classList.add("forager-holder");
     holder.classList.add("no-select");
     document.body.appendChild(holder);
 
-    render((
-      <Provider store={store}>
-        <Forager />
-      </Provider>
+    render(
+      (
+        <Provider store={store}>
+          <Forager />
+        </Provider>
       ), holder
     );
 
     // window here is the extension's context, so it is not reachable by code
-    // outside of the extension.
+    // outside of the extension. It does, however, need to be accessible when
+    // the user click on the browser action button
     window.store = store;
 
   })
 } else {
+  // if the app has already been created, dispatch an action to the store
+  // to let it know that the app should be visible
   document.body.classList.add("foraging");
-  let currentState = store.getState();
+  const currentState = store.getState();
   if ( !currentState.show ) {
     store.dispatch({
       type: SHOW_FORAGER

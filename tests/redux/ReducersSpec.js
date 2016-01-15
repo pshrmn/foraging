@@ -10,65 +10,65 @@ describe("redux reducers", () => {
   describe("frame reducer", () => {
     describe("SHOW_ELEMENT_FRAME", () => {
       it("shows the element frame", () => {
-        let state = {
+        const state = {
           name: "rule"
         };
-        let action = {
+        const action = {
           type: ActionTypes.SHOW_ELEMENT_FRAME
         };
-        let result = frame(state, action);
+        const result = frame(state, action);
         expect(result.name).to.equal("element");
       });
     });
 
     describe("SHOW_RULE_FRAME", () => {
       it("shows the rule frame", () => {
-        let state = {
+        const state = {
           name: "element"
         };
-        let action = {
+        const action = {
           type: ActionTypes.SHOW_RULE_FRAME
         };
-        let result = frame(state, action);
+        const result = frame(state, action);
         expect(result.name).to.equal("rule");
       });
     });
 
     describe("SHOW_HTML_FRAME", () => {
       it("shows the element frame", () => {
-        let state = {
+        const state = {
           name: "element"
         };
-        let action = {
+        const action = {
           type: ActionTypes.SHOW_HTML_FRAME
         };
-        let result = frame(state, action);
+        const result = frame(state, action);
         expect(result.name).to.equal("html");
       });
     });
 
     describe("SHOW_PARTS_FRAME", () => {
       it("shows the parts frame", () => {
-        let state = {
+        const state = {
           name: "element"
         };
-        let action = {
+        const action = {
           type: ActionTypes.SHOW_PARTS_FRAME
         };
-        let result = frame(state, action);
+        const result = frame(state, action);
         expect(result.name).to.equal("parts");
       });
     });
 
-        describe("SHOW_SPEC_FRAME", () => {
+    describe("SHOW_SPEC_FRAME", () => {
       it("shows the spec frame", () => {
-        let state = {
+        const state = {
           name: "element"
         };
-        let action = {
+        const action = {
           type: ActionTypes.SHOW_SPEC_FRAME
         };
-        let result = frame(state, action);
+        const result = frame(state, action);
         expect(result.name).to.equal("spec");
       });
     });
@@ -77,29 +77,29 @@ describe("redux reducers", () => {
   describe("show reducer", () => {
     describe("CLOSE_FORAGER", () => {
       it("sets show to false", () => {
-        let state = true
-        let action = {
+        const state = true
+        const action = {
           type: ActionTypes.CLOSE_FORAGER
         };
-        let result = show(state, action);
+        const result = show(state, action);
         expect(result).to.be.false;
       });
     });
 
     describe("SHOW_FORAGER", () => {
       it("sets show to true", () => {
-        let state = false;
-        let action = {
+        const state = false;
+        const action = {
           type: ActionTypes.SHOW_FORAGER
         };
-        let result = show(state, action);
+        const result = show(state, action);
         expect(result).to.be.true;
       });
     });
   });  
 
   describe("page reducer", () => {
-    let initialState = {
+    const initialState = {
       pages: [
         undefined,
         {name: "1"},
@@ -108,60 +108,60 @@ describe("redux reducers", () => {
       pageIndex: 0
     };
 
-    var state;
+    let state;
     beforeEach(() => {
       state = Object.assign({}, initialState);
     });
 
     describe("LOAD_PAGE", () => {
       it("sets pageIndex using the action's index", () => {
-        let index = 1;
-        let action = {
+        const index = 1;
+        const action = {
           type: ActionTypes.LOAD_PAGE,
           index: index
         };
-        let result = page(state, action);
+        const result = page(state, action);
         expect(result.pageIndex).to.equal(index);
       });
 
       it("sets pageIndex to 0 when action.index is < 0", () => {
-        let action = {
+        const action = {
           type: ActionTypes.LOAD_PAGE,
           index: -1
         }
-        let result = page(state, action);
+        const result = page(state, action);
         expect(result.pageIndex).to.equal(0);
       });
 
       it("sets pageIndex to 0 when action.index is >= pages.length", () => {
-        let action = {
+        const action = {
           type: ActionTypes.LOAD_PAGE,
           index: 3
         }
-        let result = page(state, action);
+        const result = page(state, action);
         expect(result.pageIndex).to.equal(0);
       });
     });
 
     describe("ADD_PAGE", () => {
       it("adds the page to the end of pages", () => {
-        let newPage = {name: "3"};
-        let action = {
+        const newPage = {name: "3"};
+        const action = {
           type: ActionTypes.ADD_PAGE,
           page: newPage
         };
-        let result = page(state, action);
-        let newPages = result.pages;
+        const result = page(state, action);
+        const newPages = result.pages;
         expect(newPages[newPages.length-1]).to.eql(newPage);
       });
 
       it("sets the pageIndex to the index of the added page", () => {
-        let newPage = {name: "3"};
-        let action = {
+        const newPage = {name: "3"};
+        const action = {
           type: ActionTypes.ADD_PAGE,
           page: newPage
         };
-        let result = page(state, action);
+        const result = page(state, action);
         expect(result.pageIndex).to.equal(result.pages.length - 1);
       });
     });
@@ -169,7 +169,7 @@ describe("redux reducers", () => {
     describe("REMOVE_PAGE", () => {
 
       it("removes the page at pageIndex", () => {
-        let state = {
+        const state = {
           pages: [
             undefined,
             {name: "1"},
@@ -178,15 +178,15 @@ describe("redux reducers", () => {
           pageIndex: 1
         };
         expect(state.pages.length).to.equal(3);
-        let action = {
+        const action = {
           type: ActionTypes.REMOVE_PAGE
         };
-        let result = page(state, action);
+        const result = page(state, action);
         expect(result.pages.length).to.equal(2);
       });
 
       it("does nothing when pageIndex === 0", () => {
-        let state = {
+        const state = {
           pages: [
             undefined,
             {name: "1"},
@@ -195,10 +195,10 @@ describe("redux reducers", () => {
           pageIndex: 0
         };
         expect(state.pages.length).to.equal(3);
-        let action = {
+        const action = {
           type: ActionTypes.REMOVE_PAGE
         };
-        let result = page(state, action);
+        const result = page(state, action);
         expect(result.pages.length).to.equal(3);
       });
     });

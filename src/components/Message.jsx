@@ -5,8 +5,8 @@ import React from "react";
  * -------
  *
  * A message is a simple text string that is displayed to the user. An optional
- * fade prop can also be passed, which is used to hide the text string after
- * the fade time has passed.
+ * wait prop can also be passed, which indicates how long to wait before fading
+ * out the message.
  */
 export default React.createClass({
   getInitialState: function() {
@@ -28,10 +28,9 @@ export default React.createClass({
     });
   },
   render: function() {
-    let { text } = this.state;
     return (
       <div className="message">
-        {text}
+        {this.state.text}
       </div>
     );
   },
@@ -43,7 +42,7 @@ export default React.createClass({
   },
   fade: function() {
     clearTimeout(this.timeout);
-    let wait = this.props.fade;
+    const { wait } = this.props;
     if ( wait !== undefined && this.state.faded === false ) {
       this.timeout = setTimeout(() => {
         this.setState({

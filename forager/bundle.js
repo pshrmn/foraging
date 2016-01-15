@@ -107,7 +107,7 @@
 	      },
 	      message: {
 	        text: "",
-	        fade: undefined
+	        wait: undefined
 	      }
 	    };
 	    var store = (0, _redux.applyMiddleware)(_chromeBackground2.default, _pageMiddleware2.default)(_redux.createStore)(_reducers2.default, initialState);
@@ -143,10 +143,13 @@
 	    ), holder);
 
 	    // window here is the extension's context, so it is not reachable by code
-	    // outside of the extension.
+	    // outside of the extension. It does, however, need to be accessible when
+	    // the user click on the browser action button
 	    window.store = store;
 	  });
 	} else {
+	  // if the app has already been created, dispatch an action to the store
+	  // to let it know that the app should be visible
 	  document.body.classList.add("foraging");
 	  var currentState = store.getState();
 	  if (!currentState.show) {
@@ -1592,11 +1595,11 @@
 	  };
 	};
 
-	var showMessage = exports.showMessage = function showMessage(text, fade) {
+	var showMessage = exports.showMessage = function showMessage(text, wait) {
 	  return {
 	    type: types.SHOW_MESSAGE,
 	    text: text,
-	    fade: fade
+	    wait: wait
 	  };
 	};
 
@@ -1776,21 +1779,27 @@
 	    document.body.classList.remove("foraging");
 	    this.props.actions.closeForager();
 	  },
+	  pageControls: function pageControls() {
+	    var options = this.props.pages.map(function (p, i) {
+	      return _react2.default.createElement(
+	        "option",
+	        { key: i, value: i },
+	        p === undefined ? "" : p.name
+	      );
+	    });
+	    return _react2.default.createElement(
+	      "select",
+	      { value: index,
+	        onChange: this.loadHandler },
+	      options
+	    );
+	  },
 	  render: function render() {
 	    var _props = this.props;
-	    var pages = _props.pages;
 	    var index = _props.index;
 	    var message = _props.message;
 	    var actions = _props.actions;
 
-	    var options = pages.map(function (p, i) {
-	      var text = p === undefined ? "" : p.name;
-	      return _react2.default.createElement(
-	        "option",
-	        { key: i, value: i },
-	        text
-	      );
-	    });
 	    return _react2.default.createElement(
 	      "div",
 	      { className: "topbar" },
@@ -1801,12 +1810,7 @@
 	          "div",
 	          { className: "page-controls" },
 	          "Page ",
-	          _react2.default.createElement(
-	            "select",
-	            { value: index,
-	              onChange: this.loadHandler },
-	            options
-	          ),
+	          this.pageControls(),
 	          _react2.default.createElement(_Buttons.PosButton, { text: "Add Page",
 	            click: this.addHandler })
 	        ),
@@ -1918,8 +1922,8 @@
 	 * -------
 	 *
 	 * A message is a simple text string that is displayed to the user. An optional
-	 * fade prop can also be passed, which is used to hide the text string after
-	 * the fade time has passed.
+	 * wait prop can also be passed, which indicates how long to wait before fading
+	 * out the message.
 	 */
 	exports.default = _react2.default.createClass({
 	  displayName: "Message",
@@ -1943,12 +1947,10 @@
 	    });
 	  },
 	  render: function render() {
-	    var text = this.state.text;
-
 	    return _react2.default.createElement(
 	      "div",
 	      { className: "message" },
-	      text
+	      this.state.text
 	    );
 	  },
 	  componentDidMount: function componentDidMount() {
@@ -1961,7 +1963,8 @@
 	    var _this = this;
 
 	    clearTimeout(this.timeout);
-	    var wait = this.props.fade;
+	    var wait = this.props.wait;
+
 	    if (wait !== undefined && this.state.faded === false) {
 	      this.timeout = setTimeout(function () {
 	        _this.setState({
@@ -2036,6 +2039,9 @@
 	    var frame = _props.frame;
 	    var element = _props.element;
 	    var actions = _props.actions;
+	    /*
+	     * only the necessary actions are sent to the frame components
+	     */
 
 	    switch (frame.name) {
 	      case "element":
@@ -2458,6 +2464,10 @@
 	  selectAttr: function selectAttr(event) {
 	    this.props.setAttr(event.target.value);
 	  },
+	  /*
+	   * return an array of radio inputs, one for each attribute. input is checked
+	   * if it matches the attr prop
+	   */
 	  elementAttributes: function elementAttributes(element) {
 	    var _this2 = this;
 
@@ -2742,8 +2752,8 @@
 	        return "...";
 	    }
 	    // determine the length of the first and second halves of the text
-	    var firstHalf;
-	    var secondHalf;
+	    var firstHalf = undefined;
+	    var secondHalf = undefined;
 	    var leftovers = max - 3;
 	    var half = leftovers / 2;
 	    if (leftovers % 2 === 0) {
@@ -2909,10 +2919,9 @@
 	  },
 	  setRadio: function setRadio(i) {
 	    var selector = this.state.selectors[i].join("");
-	    var eleCount = (0, _selection.count)(this.props.parentElements, selector);
 	    this.setState({
 	      checked: i,
-	      eleCount: eleCount
+	      eleCount: (0, _selection.count)(this.props.parentElements, selector)
 	    });
 	  },
 	  nextHandler: function nextHandler(event) {
@@ -2921,9 +2930,9 @@
 	    var checked = _state.checked;
 	    var selectors = _state.selectors;
 
-	    var s = selectors[checked];
-	    if (checked !== undefined && s !== undefined) {
-	      this.props.next(s);
+	    var selectedSelector = selectors[checked];
+	    if (checked !== undefined && selectedSelector !== undefined) {
+	      this.props.next(selectedSelector);
 	    } else {
 	      this.props.message("No selector selected");
 	    }
@@ -3013,8 +3022,7 @@
 	   * attach a class and events to all child elements of the current selector
 	   */
 	  _setupPageEvents: function _setupPageEvents(parents) {
-	    var elements = (0, _selection.select)(parents);
-	    elements = elements.map(function (ele) {
+	    var elements = (0, _selection.select)(parents).map(function (ele) {
 	      return (0, _attributes.stripEvents)(ele);
 	    });
 	    this.boundClick = this.events.click.bind(this);
@@ -3035,10 +3043,9 @@
 	    var selector = _props.selector;
 	    var checked = _props.checked;
 
-	    var labelClass = checked ? "selected" : "";
 	    return _react2.default.createElement(
 	      "label",
-	      { ref: "parent", className: labelClass },
+	      { ref: "parent", className: checked ? "selected" : "" },
 	      _react2.default.createElement("input", { type: "radio",
 	        name: "css-selector",
 	        checked: checked,
@@ -3145,11 +3152,10 @@
 	    parts[index].checked = !parts[index].checked;
 	    var fullSelector = this.joinParts(parts);
 
-	    var eleCount = fullSelector === "" ? 0 : (0, _selection.count)(this.props.parentElements, fullSelector);
 	    this._setupHighlights(fullSelector);
 	    this.setState({
 	      parts: parts,
-	      eleCount: eleCount
+	      eleCount: fullSelector === "" ? 0 : (0, _selection.count)(this.props.parentElements, fullSelector)
 	    });
 	  },
 	  joinParts: function joinParts(parts) {
@@ -3170,11 +3176,10 @@
 	      };
 	    });
 	    var fullSelector = names.join("");
-	    var eleCount = (0, _selection.count)(this.props.parentElements, fullSelector);
 	    this._setupHighlights(fullSelector);
 	    this.setState({
 	      parts: parts,
-	      eleCount: eleCount
+	      eleCount: (0, _selection.count)(this.props.parentElements, fullSelector)
 	    });
 	  },
 	  render: function render() {
@@ -3188,11 +3193,10 @@
 	      var name = part.name;
 	      var checked = part.checked;
 
-	      var labelClass = checked ? "selected" : "";
 	      return _react2.default.createElement(
 	        "label",
 	        { key: index,
-	          className: labelClass },
+	          className: checked ? "selected" : "" },
 	        name,
 	        _react2.default.createElement("input", { type: "checkbox",
 	          name: "selector-part",
@@ -3429,14 +3433,13 @@
 	  _singleValue: function _singleValue() {
 	    var value = this.state.value;
 
-	    var options = [];
-	    for (var i = 0; i < this.props.count; i++) {
-	      options.push(_react2.default.createElement(
+	    var options = Array.from(this.props.count).map(function (u, i) {
+	      return _react2.default.createElement(
 	        "option",
 	        { key: i, value: i },
 	        i
-	      ));
-	    }
+	      );
+	    });
 	    return _react2.default.createElement(
 	      "select",
 	      { value: value,
@@ -3649,9 +3652,8 @@
 	    var width = _props.width;
 	    var height = _props.height;
 
-	    var tree = _d2.default.layout.tree().size([height, width]);
 	    this.setState({
-	      tree: tree
+	      tree: _d2.default.layout.tree().size([height, width])
 	    });
 	  },
 	  _makeNodes: function _makeNodes() {
@@ -3664,6 +3666,8 @@
 	    var tree = _state.tree;
 	    var diagonal = _state.diagonal;
 
+	    // clone the page since it overwrites children
+
 	    var clonedPage = (0, _page.clone)(page.element);
 
 	    // generate the tree's nodes and links
@@ -3673,10 +3677,10 @@
 	    return _react2.default.createElement(
 	      "g",
 	      null,
-	      links.map(function (l, i) {
+	      links.map(function (link, i) {
 	        return _react2.default.createElement("path", { key: i,
 	          className: "link",
-	          d: diagonal(l) });
+	          d: diagonal(link) });
 	      }),
 	      nodes.map(function (n, i) {
 	        return _react2.default.createElement(Node, _extends({ key: i,
@@ -3693,11 +3697,11 @@
 	    var actions = _props3.actions;
 	    var width = _props3.width;
 	    var height = _props3.height;
+	    // return an empty .graph when there is no page
 
 	    if (page === undefined) {
 	      return _react2.default.createElement("div", { className: "graph" });
 	    }
-	    var nodes = this._makeNodes();
 	    /*
 	     * The tree layout places the left and right-most nodes directly on the edge,
 	     * so additional space needs to be granted so that the labels aren't cut off.
@@ -3725,7 +3729,7 @@
 	        _react2.default.createElement(
 	          "g",
 	          { transform: "translate(50,25)" },
-	          nodes
+	          this._makeNodes()
 	        )
 	      )
 	    );
@@ -3979,9 +3983,6 @@
 	    console.log(JSON.stringify((0, _preview.preview)(this.props.page), null, 2));
 	  },
 	  render: function render() {
-	    var page = this.props.page;
-
-	    var previewText = JSON.stringify((0, _preview.preview)(page), null, 2);
 	    return _react2.default.createElement(
 	      "div",
 	      { className: "preview-holder" },
@@ -3999,7 +4000,7 @@
 	        _react2.default.createElement(
 	          "pre",
 	          null,
-	          previewText
+	          JSON.stringify((0, _preview.preview)(this.props.page), null, 2)
 	        )
 	      )
 	    );
@@ -4082,8 +4083,8 @@
 	    var getRuleData = function getRuleData(rules, htmlElement) {
 	        var data = {};
 	        rules.forEach(function (rule) {
-	            var val;
-	            var match;
+	            var val = undefined;
+	            var match = undefined;
 	            if (rule.attr === "text") {
 	                val = htmlElement.textContent.replace(/\s+/g, " ");
 	            } else {
@@ -4162,7 +4163,7 @@
 	  element: undefined,
 	  messages: {
 	    text: "",
-	    fade: undefined
+	    wait: undefined
 	  }
 	};
 
@@ -4531,12 +4532,12 @@
 	    case types.RENAME_PAGE:
 	      return Object.assign({}, {
 	        text: action.text,
-	        fade: action.fade
+	        wait: action.wait
 	      });
 	    default:
 	      return {
 	        text: "",
-	        fade: undefined
+	        wait: undefined
 	      };
 	  }
 	}
@@ -4599,20 +4600,22 @@
 	exports.default = function (state) {
 	  return function (next) {
 	    return function (action) {
-	      var fadeTime = 5000;
 	      if (action.type === types.ADD_PAGE || action.type === types.RENAME_PAGE) {
 	        (function () {
 	          action.error = false;
+
 	          var current = state.getState();
 	          var _current$page = current.page;
 	          var pages = _current$page.pages;
 	          var pageIndex = _current$page.pageIndex;
 
 	          var name = action.name;
+	          var wait = 5000;
+
 	          // verify that the name contains no illegal characters
 	          if (!(0, _text.legalName)(name)) {
 	            action.text = "Name \"" + name + "\" contains one or more illegal characters (< > : \" \\ / | ? *)";
-	            action.fade = fadeTime;
+	            action.wait = wait;
 	            action.error = true;
 	          }
 	          // verify that a page with the given name does not already exist
@@ -4621,7 +4624,7 @@
 	          });
 	          if (exists) {
 	            action.text = "A page with the name \"" + name + "\" already exists";
-	            action.fade = fadeTime;
+	            action.wait = wait;
 	            action.error = true;
 	          }
 	          action.element = current.element;

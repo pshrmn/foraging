@@ -9,10 +9,10 @@
  * @param spec - how to select the child element or elements of a parent element
  */
 export const select = (parents, selector, spec) => {
-  let sel = (selector || "*") + ":not(.no-select)";
-  let index = spec && spec.type === "single" ? spec.value : undefined;
+  const sel = (selector || "*") + ":not(.no-select)";
+  const index = spec && spec.type === "single" ? spec.value : undefined;
 
-  let specElements = elements => {
+  const specElements = elements => {
     if ( index !== undefined ) {
       return elements[index] !== undefined ? [elements[index]] : [];
     } else {
@@ -21,7 +21,7 @@ export const select = (parents, selector, spec) => {
   }
 
   return [].slice.call(parents).reduce((arr, p) => {
-    let eles = p.querySelectorAll(sel);
+    const eles = p.querySelectorAll(sel);
     return arr.concat(specElements(eles));
   }, []);
 }
@@ -37,10 +37,10 @@ export const select = (parents, selector, spec) => {
  * @param spec - how to select the child element or elements of a parent element
  */
 export const count = (parents, selector, spec) => {
-  let sel = (selector || "*") + ":not(.no-select)";
-  let index = spec && spec.type === "single" ? spec.value : undefined;
+  const sel = (selector || "*") + ":not(.no-select)";
+  const index = spec && spec.type === "single" ? spec.value : undefined;
 
-  let specElements = elements => {
+  const specElements = elements => {
     if ( index !== undefined ) {
       return elements[index] !== undefined ? 1 :0;
     } else {
@@ -49,8 +49,8 @@ export const count = (parents, selector, spec) => {
   }
 
   return [].slice.call(parents).reduce((top, p) => {
-    let eles = p.querySelectorAll(sel);
-    let count = specElements(eles);
+    const eles = p.querySelectorAll(sel);
+    const count = specElements(eles);
     return top > count ? top : count;
   }, 0);
 }
@@ -65,19 +65,19 @@ export const count = (parents, selector, spec) => {
  * @param element - the element to analyze
  */
 export const parts = element =>{
-  let skipTags = [];
-  let skipClasses = ["forager-highlight", "query-check", "selectable-element", "current-selector"];
-  let classRegex = /^-?[_a-zA-Z]+[_a-zA-Z0-9-]*/;
-  let tagAllowed = tag => {
+  const skipTags = [];
+  const skipClasses = ["forager-highlight", "query-check", "selectable-element", "current-selector"];
+  const classRegex = /^-?[_a-zA-Z]+[_a-zA-Z0-9-]*/;
+  const tagAllowed = tag => {
     return !skipTags.some(st => st === tag);
   }
 
-  let classAllowed = c => {
+  const classAllowed = c => {
     return !skipClasses.some(sc => sc === c) && classRegex.test(c);
   }
 
-  let pieces = [];
-  let tag = element.tagName.toLowerCase();
+  const pieces = [];
+  const tag = element.tagName.toLowerCase();
   if ( tagAllowed(tag) ) {
     pieces.push(tag);
   } else {
@@ -103,7 +103,7 @@ export const parts = element =>{
  * querySelectorAll requires ids to start with an alphabet character
  */
 function validID(id) {
-  let firstChar = id.charCodeAt(0);
+  const firstChar = id.charCodeAt(0);
   // A=65, Z=90, a=97, z=122
   return !( firstChar < 65 || ( firstChar > 90 && firstChar < 97 ) || firstChar > 122 );
 }

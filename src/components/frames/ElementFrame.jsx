@@ -10,11 +10,11 @@ export default React.createClass({
     this.props.createRule();
   },
   remove: function(event) {
-    let { element } = this.props;
+    const { element } = this.props;
     if ( !confirm(`Are you sure you want to delete the element "${element.selector}"?`)) {
       return;
     }
-    let parent = element.parent;
+    const parent = element.parent;
     if ( parent === null ) {
       // root "body" element
       element.children = [];
@@ -27,7 +27,7 @@ export default React.createClass({
     this.props.removeElement();
   },
   rename: function(event) {
-    let newName = window.prompt("New name to save element's array as:");
+    const newName = window.prompt("New name to save element's array as:");
     if ( newName === null || newName === "" ) {
       return;
     }
@@ -42,8 +42,8 @@ export default React.createClass({
       return null;
     }
 
-    let { selector, rules, spec, optional } = this.props.element;
-    let { type, value } = spec;
+    const { selector, rules, spec, optional } = this.props.element;
+    const { type, value } = spec;
     let description = "";
     if ( type === "single" ) {
       description = `element at index ${value}`;
@@ -51,7 +51,7 @@ export default React.createClass({
       description = `all elements, stores them as "${value}"`;
       
     }
-    let renameButton = type === "all" ? <NeutralButton text="Rename" click={this.rename} /> : null;
+    const renameButton = type === "all" ? <NeutralButton text="Rename" click={this.rename} /> : null;
     return (
       <div className="frame">
         <div className="info">
@@ -82,9 +82,9 @@ export default React.createClass({
   }
 });
 
-let RuleList = React.createClass({
+const RuleList = React.createClass({
   render: function() {
-    let { rules, remove } = this.props;
+    const { rules, remove } = this.props;
     if ( !rules.length ) {
       return null;
     }
@@ -100,13 +100,13 @@ let RuleList = React.createClass({
   }
 })
 
-let Rule = React.createClass({
+const Rule = React.createClass({
   handleClick: function(event) {
     event.preventDefault();
     this.props.remove(this.props.index);
   },
   render: function() {
-    let { name, attr, type } = this.props;
+    const { name, attr, type } = this.props;
     return (
       <li className="rule">
         <span className="rule-name" title="name">{name}</span>

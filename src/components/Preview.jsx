@@ -18,8 +18,6 @@ export default React.createClass({
     console.log(JSON.stringify(preview(this.props.page), null, 2));
   },
   render: function() {
-    let { page } = this.props;
-    let previewText = JSON.stringify(preview(page), null, 2);
     return (
       <div className="preview-holder">
         <div className="preview-bg" onClick={this.closeHandler} ></div>
@@ -30,7 +28,7 @@ export default React.createClass({
             <NegButton text="Close" click={this.closeHandler} />
           </div>
           <pre>
-            {previewText}
+            {JSON.stringify(preview(this.props.page), null, 2)}
           </pre>
         </div>
       </div>

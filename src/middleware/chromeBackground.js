@@ -4,8 +4,8 @@ import { chromeUpload } from "../helpers/chrome";
 export default state => next => action => {
   switch ( action.type ) {
   case ActionTypes.UPLOAD_PAGE:
-    var current = state.getState();
-    var { pages, pageIndex } = current.page;
+    const current = state.getState();
+    const { pages, pageIndex } = current.page;
     chromeUpload(pages[pageIndex]);
   }
   return next(action);

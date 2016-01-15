@@ -30,7 +30,7 @@ export default React.createClass({
     click: function(event) {
       event.preventDefault();
       event.stopPropagation();
-      let selectors = Array.from(event.path)
+      const selectors = Array.from(event.path)
         .filter(function(ele){
             return ele.classList && ele.classList.contains("selectable-element");
         })
@@ -57,19 +57,18 @@ export default React.createClass({
     };
   },
   setRadio: function(i) {
-    let selector = this.state.selectors[i].join("");
-    let eleCount = count(this.props.parentElements, selector);
+    const selector = this.state.selectors[i].join("");
     this.setState({
       checked: i,
-      eleCount: eleCount
+      eleCount: count(this.props.parentElements, selector)
     });
   },
   nextHandler: function(event) {
     event.preventDefault();
-    let { checked, selectors } = this.state;
-    let s = selectors[checked];
-    if ( checked !== undefined && s !== undefined ) {
-      this.props.next(s);
+    const { checked, selectors } = this.state;
+    const selectedSelector = selectors[checked];
+    if ( checked !== undefined && selectedSelector !== undefined ) {
+      this.props.next(selectedSelector);
     } else {
       this.props.message("No selector selected");
     }
@@ -79,8 +78,8 @@ export default React.createClass({
     this.props.cancel();
   },
   render: function() {
-    let { selectors, checked, eleCount } = this.state;
-    let opts = selectors.map((s, i) => {
+    const { selectors, checked, eleCount } = this.state;
+    const opts = selectors.map((s, i) => {
       return <SelectorRadio key={i}
                             selector={s}
                             index={i}
@@ -119,10 +118,10 @@ export default React.createClass({
   componentWillUpdate: function(nextProps, nextState) {
     // remove any highlights from a previously selected selector
     unhighlight(this.currentSelector);
-    let clickedSelector = nextState.selectors[nextState.checked];
+    const clickedSelector = nextState.selectors[nextState.checked];
     if ( clickedSelector !== undefined ) {
-      let fullSelector = clickedSelector.join("");
-      let elements = select(nextProps.parentElements, fullSelector);
+      const fullSelector = clickedSelector.join("");
+      const elements = select(nextProps.parentElements, fullSelector);
       highlight(elements, this.currentSelector);
     }
   },
@@ -138,24 +137,22 @@ export default React.createClass({
    * attach a class and events to all child elements of the current selector
    */
   _setupPageEvents: function(parents) {
-    let elements = select(parents);
-    elements = elements.map(ele => stripEvents(ele));
+    const elements = select(parents).map(ele => stripEvents(ele));
     this.boundClick = this.events.click.bind(this);
     iHighlight(elements, this.potentialSelector, this.events.over, this.events.out, this.boundClick);
   }
 });
 
-let SelectorRadio = React.createClass({
+const SelectorRadio = React.createClass({
   mixins: [NoSelectMixin],
   setRadio: function(event) {
     // do not call event.preventDefault() here or the checked dot will fail to render
     this.props.select(this.props.index);
   },
   render: function() {
-    let { selector, checked } = this.props;
-    let labelClass = checked ? "selected" : "";
+    const { selector, checked } = this.props;
     return (
-      <label ref="parent" className={labelClass}>
+      <label ref="parent" className={checked ? "selected" : ""}>
         <input type="radio"
                name="css-selector"
                checked={checked}

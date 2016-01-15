@@ -33,7 +33,7 @@ export default React.createClass({
   },
   saveHandler: function(event) {
     event.preventDefault();
-    let { name, type, attr } = this.state;
+    const { name, type, attr } = this.state;
     // basic validation
     if ( name !== "" && attr !== "" ) {
       this.props.save({
@@ -48,16 +48,16 @@ export default React.createClass({
     this.props.cancel();
   },
   render: function() {
-    let { element } = this.props;
-    let { name, type, attr } = this.state;
-    let typeRadios = ["string", "int", "float"].map((t,i) => {
+    const { element } = this.props;
+    const { name, type, attr } = this.state;
+    const typeRadios = ["string", "int", "float"].map((t,i) => {
       return (
         <label key={i}>
           <input type="radio"
-                      name="rule-type"
-                      value={t}
-                      checked={t === type}
-                      onChange={this.setType} />
+                 name="rule-type"
+                 value={t}
+                 checked={t === type}
+                 onChange={this.setType} />
           <span className="rule-type">{t}</span>
         </label>
       );
@@ -88,12 +88,12 @@ export default React.createClass({
     );
   },
   componentWillMount: function() {
-    let { elements } = this.props.element;
+    const { elements } = this.props.element;
     highlight(elements, this.highlight);
   },
   componentWillUpdate: function(nextProps, nextState) {
     unhighlight(this.highlight);
-    let { elements } = nextProps.element;
+    const { elements } = nextProps.element;
     highlight(elements, this.highlight);
   },
   componentWillUnmount: function() {
@@ -101,22 +101,22 @@ export default React.createClass({
   }
 });
 
-let AttrChoices = React.createClass({
+const AttrChoices = React.createClass({
   getInitialState: function() {
     return {
       index: 0
     };
   },
   nextElement: function(event) {
-    let { index } = this.state;
-    let eleCount = this.props.elements.length;
+    const { index } = this.state;
+    const eleCount = this.props.elements.length;
     this.setState({
       index: (index+1) % eleCount
     });
   },
   prevElement: function(event) {
-    let { index } = this.state;
-    let eleCount = this.props.elements.length;
+    const { index } = this.state;
+    const eleCount = this.props.elements.length;
     // JavaScript's modulo of negative numbers stay negative
     this.setState({
       index: (((index-1) % eleCount) + eleCount) % eleCount
@@ -125,8 +125,12 @@ let AttrChoices = React.createClass({
   selectAttr: function(event) {
     this.props.setAttr(event.target.value);
   },
+  /*
+   * return an array of radio inputs, one for each attribute. input is checked
+   * if it matches the attr prop
+   */
   elementAttributes: function(element) {
-    let { attr } = this.props;
+    const { attr } = this.props;
     return attributes(element).map((a,i) => {
       return (
         <li key={i}>
@@ -143,9 +147,9 @@ let AttrChoices = React.createClass({
     });
   },
   render: function() {
-    let { elements, attr } = this.props;
-    let { index } = this.state;
-    let eleCount = elements.length;
+    const { elements, attr } = this.props;
+    const { index } = this.state;
+    const eleCount = elements.length;
     return (
       <div className="element-attributes">
         <ul>

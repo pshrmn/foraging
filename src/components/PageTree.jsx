@@ -24,30 +24,29 @@ export default React.createClass({
     };
   },
   componentWillMount: function() {
-    let { width, height } = this.props;
-    let tree = d3.layout.tree()
-      .size([height, width]);
+    const { width, height } = this.props;
     this.setState({
-      tree: tree
+      tree: d3.layout.tree().size([height, width])
     });
   },
   _makeNodes: function() {
-    let { page, element, active, actions } = this.props;
-    let { tree, diagonal } = this.state;
+    const { page, element, active, actions } = this.props;
+    const { tree, diagonal } = this.state;
 
-    let clonedPage = clone(page.element);
+    // clone the page since it overwrites children
+    const clonedPage = clone(page.element);
 
     // generate the tree's nodes and links
-    let nodes = tree.nodes(clonedPage);
-    let links = tree.links(nodes);
+    const nodes = tree.nodes(clonedPage);
+    const links = tree.links(nodes);
 
     return (
       <g>
         {
-          links.map((l, i) => {
+          links.map((link, i) => {
             return <path key={i}
                          className="link"
-                         d={diagonal(l)} />
+                         d={diagonal(link)} />
           })
         }
         {
@@ -63,12 +62,11 @@ export default React.createClass({
     );
   },
   render: function() {
-    let { page, actions,
-          width, height } = this.props;
+    const { page, actions, width, height } = this.props;
+    // return an empty .graph when there is no page
     if ( page === undefined ) {
       return <div className="graph"></div>
     }
-    let nodes = this._makeNodes();
     /*
      * The tree layout places the left and right-most nodes directly on the edge,
      * so additional space needs to be granted so that the labels aren't cut off.
@@ -85,7 +83,7 @@ export default React.createClass({
         <svg width={width+100}
              height={height+50}>
           <g transform="translate(50,25)" >
-            {nodes}
+            {this._makeNodes()}
           </g>
         </svg>
       </div>
@@ -93,7 +91,7 @@ export default React.createClass({
   }
 });
 
-let Node = React.createClass({
+const Node = React.createClass({
   hoverClass: "saved-preview",
   handleClick: function(event) {
     event.preventDefault();
@@ -106,7 +104,7 @@ let Node = React.createClass({
     unhighlight(this.hoverClass);
   },
   specText: function() {
-    let { selector, spec } = this.props;
+    const { selector, spec } = this.props;
     let text = "";
     if ( !spec ) {
       return text;
@@ -122,21 +120,21 @@ let Node = React.createClass({
     return abbreviate(text, 10);
   },
   render: function() {
-    let { current, hasRules, children, active } = this.props;
-    let empty = !hasRules && !(children && children.length);
-    let text = this.specText();
+    const { current, hasRules, children, active } = this.props;
+    const empty = !hasRules && !(children && children.length);
+    const text = this.specText();
     // nodes with rules drawn as rect, nodes with no rules drawn as circles
-    let marker = hasRules ? (
+    const marker = hasRules ? (
       <rect width="6" height="6" x="-3" y="-3"></rect>
     ) : (
       <circle r="3"></circle>
     );
 
-    let classNames = ["node"];
+    const classNames = ["node"];
     classNames.push(current ? "current" : null);
     classNames.push(empty ? "empty" : null);
     // only apply events when the node is "active"
-    let events = active ? {
+    const events = active ? {
       onClick: this.handleClick,
       onMouseOver: this.handleMouseover,
       onMouseOut: this.handleMouseout
@@ -162,10 +160,10 @@ let Node = React.createClass({
  * Interact with the Page to upload it to a server, preview what the Page would capture
  * on the current web page, rename the Page, and delete it.
  */
-let PageControls = React.createClass({
+const PageControls = React.createClass({
   renameHandler: function(event) {
     event.preventDefault();
-    let name = window.prompt("Page Name:\nCannot contain the following characters: < > : \" \\ / | ? * ");
+    const name = window.prompt("Page Name:\nCannot contain the following characters: < > : \" \\ / | ? * ");
     // do nothing if the user cancels, does not enter a name, or enter the same name as the current one
     if ( name === null || name === "" || name === this.props.name) {
       return;

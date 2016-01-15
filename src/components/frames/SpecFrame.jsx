@@ -18,14 +18,14 @@ export default React.createClass({
   },
   saveHandler: function(event) {
     event.preventDefault();
-    let { type, value, optional } = this.state;
-    let { css, parent } = this.props;
+    const { type, value, optional } = this.state;
+    const { css, parent } = this.props;
     // all value must be set
     if ( type === "all" && value === "" ) {
       this.props.message("Name for type \"all\" elements cannot be empty");
       return;
     }
-    let ele = createElement(css, type, value, optional);
+    const ele = createElement(css, type, value, optional);
     // generate the list of elements for the new element
     ele.elements = select(parent.elements, ele.selector, ele.spec);
     ele.parent = parent;
@@ -33,7 +33,7 @@ export default React.createClass({
     // if saving a selector that selects "select" elements, add a child selector
     // to match option elements
     if ( allSelect(ele.elements) ) {
-      let optionsChild = createElement("option", "all", "option", false);
+      const optionsChild = createElement("option", "all", "option", false);
       optionsChild.elements = select(ele.elements, optionsChild.selector, optionsChild.spec);
       optionsChild.parent = ele;
       ele.children.push(optionsChild);
@@ -56,8 +56,8 @@ export default React.createClass({
     });
   },
   render: function() {
-    let { parent, css } = this.props;
-    let elementCount = count(parent.elements, css);
+    const { parent, css } = this.props;
+    const elementCount = count(parent.elements, css);
     return (
       <div className="frame spec-form">
         <div className="info">
@@ -82,7 +82,7 @@ export default React.createClass({
     );
   },
   componentWillMount: function() {
-    let elements = select(
+    const elements = select(
       this.props.parent.elements,
       this.props.css, {
       type: this.state.type,
@@ -92,7 +92,7 @@ export default React.createClass({
   },
   componentWillUpdate: function(nextProps, nextState) {
     unhighlight(this.highlight);
-    let elements = select(
+    const elements = select(
       nextProps.parent.elements,
       nextProps.css, {
       type: nextState.type,
@@ -105,7 +105,7 @@ export default React.createClass({
   }
 });
 
-let SpecForm = React.createClass({
+const SpecForm = React.createClass({
   mixins: [NoSelectMixin],
   getInitialState: function() {
     return {
@@ -114,7 +114,7 @@ let SpecForm = React.createClass({
     };
   },
   setType: function(event) {
-    let type = event.target.value;
+    const type = event.target.value;
     let value;
     if ( type === "single" ) {
       value = 0;
@@ -141,13 +141,12 @@ let SpecForm = React.createClass({
     this.props.setSpec(type, value);
   },
   _singleValue: function() {
-    let { value } = this.state;
-    let options = [];
-    for ( var i=0; i<this.props.count; i++ ) {
-      options.push(
+    const { value } = this.state;
+    const options = Array.from(this.props.count).map((u, i) => {
+      return (
         <option key={i} value={i}>{i}</option>
       );
-    }
+    });
     return (
       <select value={value}
               onChange={this.setValue} >
@@ -163,7 +162,7 @@ let SpecForm = React.createClass({
     );
   },
   render: function() {
-    let valueChooser = this.state.type === "single" ? this._singleValue() : this._allValue();
+    const valueChooser = this.state.type === "single" ? this._singleValue() : this._allValue();
     return (
       <div ref="parent">
         <div className="line">

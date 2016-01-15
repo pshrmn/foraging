@@ -50,11 +50,11 @@ export const hidePreview = () => {
   };
 };
 
-export const showMessage = (text, fade) => {
+export const showMessage = (text, wait) => {
   return {
     type: types.SHOW_MESSAGE,
     text: text,
-    fade: fade
+    wait: wait
   };
 };
 

@@ -23,7 +23,7 @@ const initialState = {
   element: undefined,
   messages: {
     text: "",
-    fade: undefined
+    wait: undefined
   }
 };
 
