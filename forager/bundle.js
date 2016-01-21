@@ -1780,7 +1780,11 @@
 	    this.props.actions.closeForager();
 	  },
 	  pageControls: function pageControls() {
-	    var options = this.props.pages.map(function (p, i) {
+	    var _props = this.props;
+	    var pages = _props.pages;
+	    var index = _props.index;
+
+	    var options = pages.map(function (p, i) {
 	      return _react2.default.createElement(
 	        "option",
 	        { key: i, value: i },
@@ -1795,10 +1799,7 @@
 	    );
 	  },
 	  render: function render() {
-	    var _props = this.props;
-	    var index = _props.index;
-	    var message = _props.message;
-	    var actions = _props.actions;
+	    var message = this.props.message;
 
 	    return _react2.default.createElement(
 	      "div",
@@ -3433,7 +3434,7 @@
 	  _singleValue: function _singleValue() {
 	    var value = this.state.value;
 
-	    var options = Array.from(this.props.count).map(function (u, i) {
+	    var options = Array.from(new Array(this.props.count)).map(function (u, i) {
 	      return _react2.default.createElement(
 	        "option",
 	        { key: i, value: i },

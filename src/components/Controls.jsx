@@ -24,7 +24,8 @@ export default React.createClass({
     this.props.actions.closeForager();
   },
   pageControls: function() {
-    const options = this.props.pages.map((p, i) => {
+    const { pages, index } = this.props;
+    const options = pages.map((p, i) => {
       return (
         <option key={i} value={i}>{p === undefined ? "" : p.name}</option>
       );
@@ -37,7 +38,7 @@ export default React.createClass({
     );
   },
   render: function() {
-    const { index, message, actions } = this.props;
+    const { message } = this.props;
     return (
       <div className="topbar">
         <div className="controls">

@@ -142,7 +142,7 @@ const SpecForm = React.createClass({
   },
   _singleValue: function() {
     const { value } = this.state;
-    const options = Array.from(this.props.count).map((u, i) => {
+    const options = Array.from(new Array(this.props.count)).map((u, i) => {
       return (
         <option key={i} value={i}>{i}</option>
       );
