@@ -21,7 +21,7 @@ for creating rule sets.
 :license: MIT, see LICENSE for more details
 """
 
-__version__ = "1.3.0"
+__version__ = "1.4.0"
 
 from .fetch import Fetch
 from .cache import Cache

@@ -1,0 +1,40 @@
+{
+  "selector": "div.main",
+  "spec": {
+    "type": "single",
+    "value": 0
+  },
+  "children": [
+    {
+      "selector": "h1",
+      "spec": {
+        "type": "single",
+        "value": 0
+      },
+      "children": [],
+      "rules": [
+        {
+          "name": "title",
+          "attr": "text",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "selector": "p.author",
+      "spec": {
+        "type": "single",
+        "value": 0
+      },
+      "children": [],
+      "rules": [
+        {
+          "name": "author",
+          "attr": "text",
+          "type": "string"
+        }
+      ]
+    }
+  ],
+  "rules": []
+}

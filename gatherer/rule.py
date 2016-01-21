@@ -24,6 +24,10 @@ class Rule(object):
         return cls(name, attribute, _type)
 
     def get(self, element):
+        """
+        Returns an error message and a value. If there is as error message, the
+        value is None and vice versa.
+        """
         val = ""
         if self.attr == "text":
             val = element.text_content().strip()
@@ -39,14 +43,22 @@ class Rule(object):
 
     @staticmethod
     def find_int(text):
+        """
+        find an int in the string, parse it, and return it. If there is no
+        int found in the string, return None
+        """
         match = re.search(r"\d+", text)
         if match is not None:
             return int(match.group())
-        return -1
+        return None
 
     @staticmethod
     def find_float(text):
+        """
+        find an float in the string, parse it, and return it. If there is no
+        float found in the string, return None
+        """
         match = re.search(r"\d+(\.\d+)?", text)
         if match is not None:
             return float(match.group())
-        return -1.0
+        return None

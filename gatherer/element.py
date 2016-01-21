@@ -69,14 +69,14 @@ class Element(object):
             except IndexError:
                 # return None if element doesn't exist
                 return
-            return self.getElementData(element)
+            return self.get_element_data(element)
         elif self.type == "all":
-            data = [self.getElementData(e) for e in elements]
+            data = [self.get_element_data(e) for e in elements]
             return {self.value: [d for d in data if d]}
 
-    def getElementData(self, element):
-        data = self.ruleData(element)
-        child_data = self.childData(element)
+    def get_element_data(self, element):
+        data = self.rule_data(element)
+        child_data = self.child_data(element)
         # if child_data does not exist, return
         if child_data is None:
             return
@@ -84,7 +84,7 @@ class Element(object):
             data[key] = val
         return data
 
-    def ruleData(self, element):
+    def rule_data(self, element):
         """
         Return the data associated with each attribute for each Rule.
         If the element does not have the attribute for a rule, the get call
@@ -92,7 +92,7 @@ class Element(object):
         """
         return {rule.name: rule.get(element) for rule in self.rules}
 
-    def childData(self, element):
+    def child_data(self, element):
         """
         Get the data for all child selectors, merge that data into a dict,
         and return that dict. If a selector fails to match an element in the

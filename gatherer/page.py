@@ -1,3 +1,5 @@
+import json
+
 from .element import Element
 from .errors import BadJSONError
 

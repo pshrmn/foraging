@@ -1,0 +1,25 @@
+{
+  "selector": "body",
+  "spec": {
+    "type": "single",
+    "value": 0
+  },
+  "children": [
+    {
+      "selector": "a",
+      "spec": {
+        "type": "all",
+        "value": "links"
+      },
+      "children": [],
+      "rules": [
+        {
+          "name": "link",
+          "attr": "href",
+          "type": "string"
+        }
+      ]
+    }
+  ],
+  "rules": []
+}
