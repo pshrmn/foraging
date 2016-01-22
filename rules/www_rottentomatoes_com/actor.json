@@ -1,0 +1,223 @@
+{
+  "name": "actor",
+  "element": {
+    "selector": "body",
+    "spec": {
+      "type": "single",
+      "value": 0
+    },
+    "children": [
+      {
+        "selector": "h1",
+        "spec": {
+          "type": "single",
+          "value": 0
+        },
+        "children": [],
+        "rules": [
+          {
+            "attr": "text",
+            "name": "name",
+            "type": "string"
+          }
+        ],
+        "optional": false
+      },
+      {
+        "selector": "#filmography_box",
+        "spec": {
+          "type": "single",
+          "value": 0
+        },
+        "children": [
+          {
+            "selector": "table#filmographyTbl",
+            "spec": {
+              "type": "single",
+              "value": 0
+            },
+            "children": [
+              {
+                "selector": "tr",
+                "spec": {
+                  "type": "all",
+                  "value": "movies"
+                },
+                "children": [
+                  {
+                    "selector": "span.tMeterScore",
+                    "spec": {
+                      "type": "single",
+                      "value": 0
+                    },
+                    "children": [],
+                    "rules": [
+                      {
+                        "attr": "text",
+                        "name": "score",
+                        "type": "int"
+                      }
+                    ],
+                    "optional": false
+                  },
+                  {
+                    "selector": "td",
+                    "spec": {
+                      "type": "single",
+                      "value": 1
+                    },
+                    "children": [
+                      {
+                        "selector": "a.articleLink",
+                        "spec": {
+                          "type": "single",
+                          "value": 0
+                        },
+                        "children": [],
+                        "rules": [
+                          {
+                            "attr": "href",
+                            "name": "url",
+                            "type": "string"
+                          },
+                          {
+                            "attr": "text",
+                            "name": "title",
+                            "type": "string"
+                          }
+                        ],
+                        "optional": false
+                      }
+                    ],
+                    "rules": [],
+                    "optional": false
+                  },
+                  {
+                    "selector": "td",
+                    "spec": {
+                      "type": "single",
+                      "value": 4
+                    },
+                    "children": [],
+                    "rules": [
+                      {
+                        "attr": "text",
+                        "name": "year",
+                        "type": "string"
+                      }
+                    ],
+                    "optional": false
+                  },
+                  {
+                    "selector": "td",
+                    "spec": {
+                      "type": "single",
+                      "value": 2
+                    },
+                    "children": [
+                      {
+                        "selector": "span",
+                        "spec": {
+                          "type": "single",
+                          "value": 0
+                        },
+                        "children": [],
+                        "rules": [
+                          {
+                            "attr": "text",
+                            "name": "role",
+                            "type": "string"
+                          }
+                        ],
+                        "optional": false
+                      }
+                    ],
+                    "rules": [],
+                    "optional": false
+                  },
+                  {
+                    "selector": "td",
+                    "spec": {
+                      "type": "single",
+                      "value": 3
+                    },
+                    "children": [],
+                    "rules": [
+                      {
+                        "attr": "text",
+                        "name": "box-office",
+                        "type": "string"
+                      }
+                    ],
+                    "optional": false
+                  }
+                ],
+                "rules": [],
+                "optional": false
+              }
+            ],
+            "rules": [],
+            "optional": false
+          }
+        ],
+        "rules": [],
+        "optional": false
+      },
+      {
+        "selector": ".celeb_bio",
+        "spec": {
+          "type": "single",
+          "value": 0
+        },
+        "children": [
+          {
+            "selector": "tr",
+            "spec": {
+              "type": "all",
+              "value": "information"
+            },
+            "children": [
+              {
+                "selector": "td",
+                "spec": {
+                  "type": "single",
+                  "value": 0
+                },
+                "children": [],
+                "rules": [
+                  {
+                    "attr": "text",
+                    "name": "key",
+                    "type": "string"
+                  }
+                ],
+                "optional": false
+              },
+              {
+                "selector": "td",
+                "spec": {
+                  "type": "single",
+                  "value": 1
+                },
+                "children": [],
+                "rules": [
+                  {
+                    "attr": "text",
+                    "name": "value",
+                    "type": "string"
+                  }
+                ],
+                "optional": false
+              }
+            ],
+            "rules": [],
+            "optional": false
+          }
+        ],
+        "rules": [],
+        "optional": false
+      }
+    ],
+    "rules": []
+  }
+}
