@@ -1,11 +1,16 @@
 import re
 import logging
 import datetime
+import json
+from gatherer import Page
 
-from .get import actor
+from .get import get_dom
 
 log = logging.getLogger(__name__)
 
+with open("rules/www_rottentomatoes_com/actor.json") as fp:
+    actor_json = json.load(fp)
+actor_page = Page.from_json(actor_json)
 
 MONTHS = {
     "January": 1,
@@ -27,6 +32,7 @@ def movie_info(movie):
     return {
         "title": movie["title"],
         "score": movie["score"],
+        "role": movie["role"],
         "url": movie["url"]
     }
 
@@ -48,11 +54,24 @@ def get_birthdate(info):
     log.warning("no birthday found")
 
 
-def get_actor(name):
-    log.info("getting information actor:\t{}".format(name))
-    data = actor(name)
+def get_actor_by_name(name):
+    log.info("<actor> name={}".format(name))
+    under_name = name.lower().replace(" ", "_")
+    url = "http://www.rottentomatoes.com/celebrity/{}/".format(under_name)
+    return gather_actor(url)
+
+
+def get_actor_by_url(url):
+    log.info("<actor> url={}".format(url))
+    return gather_actor(url)
+
+
+def gather_actor(url):
+    dom = get_dom(url)
+    if dom is not None:
+        data = actor_page.gather(dom)
     if data is None:
-        log.warning("failed to retrive information for actor:\t{}".format(name))
+        log.warning("<actor> bad data for url {}".format(url))
     return {
         "name": data["name"],
         "birthdate": get_birthdate(data["information"]),
