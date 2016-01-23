@@ -38,7 +38,7 @@ def release_date(info):
                 year = int(match.group("year"))
                 day = int(match.group("day"))
                 month = MONTHS[match.group("month")]
-                return datetime.date(year, month, day).strftime("%B %d, %Y")
+                return datetime.date(year, month, day)
             log.warning("failed to match date:\t{}".format(item["value"]))
     log.warning("no release date found")
 
