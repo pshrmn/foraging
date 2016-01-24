@@ -50,16 +50,17 @@ class Fetch(object):
             if diff < self.sleep_time:
                 time.sleep(self.sleep_time - diff)
 
-    def get(self, url):
+    def get(self, url, no_cache=False):
         """
         returns the html of the url as a string. Will check cache to see if it
         exists and returns that string if it does. Otherwise uses requests
         to send a get request and returns the contents of the response. If the
         get request fails, returns None.
         """
-        cached_text = self.get_cached(url)
-        if cached_text is not None:
-            return self.parse(cached_text, url)
+        if not no_cache:
+            cached_text = self.get_cached(url)
+            if cached_text is not None:
+                return self.parse(cached_text, url)
 
         domain = urlparse(url).netloc
         log.info("<requests> {}".format(url))
@@ -75,7 +76,7 @@ class Fetch(object):
             return None
         dom = self.parse(resp.text, url)
         # cache after formatting
-        if self.cache is not None:
+        if not no_cache and self.cache is not None:
             self.save(dom, url)
         return dom
 
@@ -127,10 +128,11 @@ class PhantomFetch(Fetch):
         self.js_path = js_path
         super().__init__(*args, **kwargs)
 
-    def get(self, url):
-        cached_text = self.get_cached(url)
-        if cached_text is not None:
-            return self.parse(cached_text, url)
+    def get(self, url, no_cache=False):
+        if not no_cache:
+            cached_text = self.get_cached(url)
+            if cached_text is not None:
+                return self.parse(cached_text, url)
 
         domain = urlparse(url).netloc
         log.info("<phantomjs> {}".format(url))
@@ -143,7 +145,7 @@ class PhantomFetch(Fetch):
             return None
         dom = self.parse(text, url)
         # save after formatting
-        if self.cache is not None:
+        if not no_cache and self.cache is not None:
             self.save(dom, url)
         return dom
 
