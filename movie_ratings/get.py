@@ -4,5 +4,5 @@ cache = Cache("cache")
 fetcher = Fetch(cache=cache)
 
 
-def get_dom(url):
-    return fetcher.get(url)
+def get_dom(url, no_cache=False):
+    return fetcher.get(url, no_cache)

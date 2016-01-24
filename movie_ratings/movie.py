@@ -41,6 +41,11 @@ def match_date(date_string):
 
 
 def release_date(info):
+    """
+    return a datetime.date of the date that the movie was released. If there is
+    no theatrical release listed, falls back to the DVD release date. If that
+    doesn't exist either, returns None
+    """
     dvd_date = None
     for item in info:
         if item["key"] == "In Theaters:":
@@ -77,6 +82,7 @@ def gather_movie(url):
         log.warning("<movie> bad data for url {}".format(url))
     return {
         "title": data["title"],
+        "url": url,
         "release": release_date(data["information"]),
         "critics": data["critics_value"],
         "audience": data["audience_value"]

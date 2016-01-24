@@ -67,7 +67,7 @@ def get_actor_by_url(url):
 
 
 def gather_actor(url):
-    dom = get_dom(url)
+    dom = get_dom(url, True)
     if dom is not None:
         data = actor_page.gather(dom)
     if data is None:

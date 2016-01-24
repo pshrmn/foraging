@@ -1,64 +1,57 @@
 import argparse
-import os
-import json
-import re
 import logging
 
 from .actor import get_actor_by_name
 from .movie import get_movie_by_url
+from .db import (db_session, db_actor, db_movie, db_role,
+                 Actor, Role, Movie)
 
 logging.basicConfig(level=logging.WARNING)
-
-OUTPUT_DIR = os.path.join(os.getcwd(), "data")
-ACTOR_DIR = os.path.join(OUTPUT_DIR, "actor")
-MOVIE_DIR = os.path.join(OUTPUT_DIR, "movie")
-
-os.makedirs(ACTOR_DIR, exist_ok=True)
-os.makedirs(MOVIE_DIR, exist_ok=True)
-
-BACKUP = True
-
-
-def clean_filename(name):
-    """
-    remove any illegal filename characters from a string
-    """
-    new_name, _ = re.subn(r"[<>:\"/\\\|?*]", "", name)
-    return new_name
+session = db_session()
 
 
 def add_actor(name):
+    # always fetch the actor in case there are any new movies
     data = get_actor_by_name(name)
     if data is not None:
-        # convert to a string for json
-        if data["birthdate"] is not None:
-            data["birthdate"] = data["birthdate"].strftime("%B %d, %Y")
-        get_movies(data["movies"])
-        if BACKUP:
-            under_name = args.name.lower().replace(" ", "_")
-            clean_under_name = clean_filename(under_name)
-            actor_path = os.path.join(ACTOR_DIR, "{}.json".format(clean_under_name))
-            with open(actor_path, "w") as fp:
-                json.dump(data, fp, indent=2)
+        actor_tuple = db_actor(name)
+        if actor_tuple is None:
+            actor_tuple = Actor(name=data["name"], birthdate=data["birthdate"])
+            session.add(actor_tuple)
+            session.commit()
+
+        new_movies = []
+        movie_tuples = []
+        for movie in data["movies"]:
+            movie_tuple = db_movie(movie["url"])
+            if movie_tuple is None:
+                movie_tuple = get_movie(movie)
+                new_movies.append(movie_tuple)
+            movie_tuples.append((movie["role"], movie_tuple))
+        # commit any new movies
+        session.add_all(new_movies)
+        session.commit()
+
+        roles = []
+        for row in movie_tuples:
+            role, m_tuple = row
+            role_tuple = db_role(actor_tuple.id, m_tuple.id)
+            if role_tuple is None:
+                roles.append(Role(role=role,
+                                  actor_id=actor_tuple.id,
+                                  movie_id=m_tuple.id))
+        session.add_all(roles)
+        session.commit()
 
 
-def get_movies(movies):
-    data = []
-    for movie in movies:
-        movie_data = get_movie_by_url(movie["url"])
-        # convert to a string for json
-        if movie_data["release"] is not None:
-            movie_data["release"] = movie_data["release"].strftime("%B %d, %Y")
-        # don't want the year left on
-        movie_data["title"] = movie["title"]
-        data.append(movie_data)
-        if BACKUP:
-            under_title = movie["title"].lower().replace(" ", "_")
-            clean_under_title = clean_filename(under_title)
-            path = os.path.join(MOVIE_DIR, "{}.json".format(clean_under_title))
-            with open(path, "w") as fp:
-                json.dump(movie_data, fp, indent=2)
-    return data
+def get_movie(movie):
+    movie_data = get_movie_by_url(movie["url"])
+    return Movie(title=movie["title"],
+                 url=movie_data["url"],
+                 release=movie_data["release"],
+                 critics=movie_data["critics"],
+                 audience=movie_data["audience"])
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
