@@ -29,17 +29,30 @@ MONTHS = {
 }
 
 
+def match_date(date_string):
+    pattern = r"(?P<month>[a-zA-Z]{3}) (?P<day>\d{1,2}), (?P<year>\d{4})"
+    match = re.search(pattern, date_string)
+    if match is not None:
+        year = int(match.group("year"))
+        day = int(match.group("day"))
+        month = MONTHS[match.group("month")]
+        return datetime.date(year, month, day)
+    log.warning("failed to match date:\t{}".format(date_string))
+
+
 def release_date(info):
+    dvd_date = None
     for item in info:
         if item["key"] == "In Theaters:":
-            pattern = r"(?P<month>[a-zA-Z]{3}) (?P<day>\d{1,2}), (?P<year>\d{4})"
-            match = re.search(pattern, item["value"])
-            if match is not None:
-                year = int(match.group("year"))
-                day = int(match.group("day"))
-                month = MONTHS[match.group("month")]
-                return datetime.date(year, month, day)
-            log.warning("failed to match date:\t{}".format(item["value"]))
+            date = match_date(item["value"])
+            if date is not None:
+                return date
+        elif item["key"] == "On DVD:":
+            # use the dvd release date as backup
+            dvd_date = match_date(item["value"])
+    if dvd_date is not None:
+        log.info("using DVD release date")
+        return dvd_date
     log.warning("no release date found")
 
 
