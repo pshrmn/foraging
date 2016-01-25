@@ -12,7 +12,9 @@ class Actor(Base):
     name = Column(String(255))
     birthdate = Column(Date)
 
-    roles = relationship("Role", back_populates="actor")
+    roles = relationship("Role",
+                         back_populates="actor",
+                         cascade="save-update, delete")
 
     def __repr__(self):
         return "<Actor(name={}, birthdate={}>".format(self.name, self.birthdate)
@@ -28,7 +30,9 @@ class Movie(Base):
     critics = Column(Integer)
     audience = Column(Integer)
 
-    roles = relationship("Role", back_populates="movie")
+    roles = relationship("Role",
+                         back_populates="movie",
+                         cascade="save-update, delete")
 
     def __repr__(self):
         return "<Movie(title={}, release={}, critics={}, audience={}>".format(

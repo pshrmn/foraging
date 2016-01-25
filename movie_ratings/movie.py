@@ -1,42 +1,9 @@
-import re
-import datetime
 import logging
-import json
-from gatherer import Page
 
-from .dom import fetch
-
-with open("rules/www_rottentomatoes_com/movie.json") as fp:
-    movie_json = json.load(fp)
-movie_page = Page.from_json(movie_json)
-
+from .dom import get_movie
+from .utils.dates import short_month
 
 log = logging.getLogger(__name__)
-
-
-def match_date(date_string):
-    MONTHS = {
-        "Jan": 1,
-        "Feb": 2,
-        "Mar": 3,
-        "Apr": 4,
-        "May": 5,
-        "Jun": 6,
-        "Jul": 7,
-        "Aug": 8,
-        "Sep": 9,
-        "Oct": 10,
-        "Nov": 11,
-        "Dec": 12
-    }
-    pattern = r"(?P<month>[a-zA-Z]{3}) (?P<day>\d{1,2}), (?P<year>\d{4})"
-    match = re.search(pattern, date_string)
-    if match is not None:
-        year = int(match.group("year"))
-        day = int(match.group("day"))
-        month = MONTHS[match.group("month")]
-        return datetime.date(year, month, day)
-    log.warning("failed to match date:\t{}".format(date_string))
 
 
 def release_date(info):
@@ -48,12 +15,12 @@ def release_date(info):
     dvd_date = None
     for item in info:
         if item["key"] == "In Theaters:":
-            date = match_date(item["value"])
+            date = short_month(item["value"])
             if date is not None:
                 return date
         elif item["key"] == "On DVD:":
             # use the dvd release date as backup
-            dvd_date = match_date(item["value"])
+            dvd_date = short_month(item["value"])
     if dvd_date is not None:
         log.info("using DVD release date")
         return dvd_date
@@ -73,10 +40,7 @@ def by_url(url):
 
 
 def get_movie_data(url):
-    dom = fetch(url)
-    if dom is None:
-        return
-    data = movie_page.gather(dom)
+    data = get_movie(url)
     if data is None:
         log.warning("<movie> bad data for url {}".format(url))
     return {
