@@ -1,10 +1,7 @@
-from sqlalchemy import (create_engine,
-                        Column, ForeignKey, Integer, String, Date,
-                        and_, func)
+from sqlalchemy import Column, ForeignKey, Integer, String, Date
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, relationship
+from sqlalchemy.orm import relationship
 
-engine = create_engine("sqlite:///ratings.sqlite")
 Base = declarative_base()
 
 
@@ -52,26 +49,3 @@ class Role(Base):
     def __repr__(self):
         return "<Role(role={}, actor={}, movie={}>".format(
                 self.role, self.actor, self.movie)
-
-
-Base.metadata.create_all(engine)
-Session = sessionmaker(bind=engine)
-session = Session()
-
-
-def db_session():
-    return session
-
-
-def db_actor(name):
-    return session.query(Actor).\
-        filter(func.lower(Actor.name) == func.lower(name)).first()
-
-
-def db_movie(url):
-    return session.query(Movie).filter(Movie.url == url).first()
-
-
-def db_role(actor, movie):
-    return session.query(Role).\
-        filter(and_(Role.actor_id == actor, Role.movie_id == movie)).first()

@@ -4,7 +4,7 @@ import logging
 import json
 from gatherer import Page
 
-from .get import get_dom
+from .dom import fetch
 
 with open("rules/www_rottentomatoes_com/movie.json") as fp:
     movie_json = json.load(fp)
@@ -13,23 +13,22 @@ movie_page = Page.from_json(movie_json)
 
 log = logging.getLogger(__name__)
 
-MONTHS = {
-    "Jan": 1,
-    "Feb": 2,
-    "Mar": 3,
-    "Apr": 4,
-    "May": 5,
-    "Jun": 6,
-    "Jul": 7,
-    "Aug": 8,
-    "Sep": 9,
-    "Oct": 10,
-    "Nov": 11,
-    "Dec": 12
-}
-
 
 def match_date(date_string):
+    MONTHS = {
+        "Jan": 1,
+        "Feb": 2,
+        "Mar": 3,
+        "Apr": 4,
+        "May": 5,
+        "Jun": 6,
+        "Jul": 7,
+        "Aug": 8,
+        "Sep": 9,
+        "Oct": 10,
+        "Nov": 11,
+        "Dec": 12
+    }
     pattern = r"(?P<month>[a-zA-Z]{3}) (?P<day>\d{1,2}), (?P<year>\d{4})"
     match = re.search(pattern, date_string)
     if match is not None:
@@ -61,20 +60,20 @@ def release_date(info):
     log.warning("no release date found")
 
 
-def get_movie_by_title(title):
+def by_title(title):
     log.info("<movie> name={}".format(title))
     under_title = title.lower().replace(" ", "_")
     url = "http://www.rottentomatoes.com/m/{}/".format(under_title)
-    return gather_movie(url)
+    return get_movie_data(url)
 
 
-def get_movie_by_url(url):
+def by_url(url):
     log.info("<movie> url={}".format(url))
-    return gather_movie(url)
+    return get_movie_data(url)
 
 
-def gather_movie(url):
-    dom = get_dom(url)
+def get_movie_data(url):
+    dom = fetch(url)
     if dom is None:
         return
     data = movie_page.gather(dom)
