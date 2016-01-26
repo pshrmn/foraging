@@ -14,17 +14,17 @@ OUTPUT_DIR = os.path.join(os.getcwd(), "data")
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 
-def get_actor(name, require_new=True):
+def get_actor(name, fresh=True):
     """
     get an actor, then iterate over their roles, getting the movie for each
     role. A tuple in the db is created for the actor, each movie the actor
     has appeared in, and for each role the actor has portrayed.
 
-    If require_new is False and there is already an entry for the actor in the
+    If fresh is False and there is already an entry for the actor in the
     database, just require that entry.
     """
     actor_tuple = db_actor(name)
-    if not require_new and actor_tuple is not None:
+    if not fresh and actor_tuple is not None:
         return actor_tuple
 
     data = by_name(name)
@@ -92,13 +92,15 @@ def output_actor(actor):
         json.dump(data, fp, indent=2)
 
 
-def get_and_save(name):
-    actor = get_actor(args.name)
+def get_and_save(name, fresh=False):
+    actor = get_actor(name, fresh)
     if actor is not None:
         output_actor(actor)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-name", "-N", dest="name", help="name of actor")
+    parser.add_argument("-fresh", "-F", dest="fresh", action="store_true",
+                        help="get a fresh copy of actor's info")
     args = parser.parse_args()
-    get_and_save(args.name)
+    get_and_save(args.name, args.fresh)
