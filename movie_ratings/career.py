@@ -76,6 +76,7 @@ def movie_dict(role):
     return {
         "title": movie.title,
         "critics": movie.critics,
+        "audience": movie.audience,
         "release": movie.release.strftime("%B %d, %Y") if movie.release else None
     }
 

@@ -10,15 +10,24 @@ session = Session()
 
 
 def db_actor(name):
+    """
+    find an actor given their name
+    """
     return session.query(Actor).\
         filter(func.lower(Actor.name) == func.lower(name)).first()
 
 
 def db_movie(url):
+    """
+    find a movie given its url
+    """
     return session.query(Movie).filter(Movie.url == url).first()
 
 
 def db_role(actor, movie):
+    """
+    find a role given an actor and a movie
+    """
     return session.query(Role).\
         filter(and_(Role.actor_id == actor, Role.movie_id == movie)).first()
 
