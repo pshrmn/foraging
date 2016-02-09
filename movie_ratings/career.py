@@ -2,6 +2,7 @@ import json
 import os
 import argparse
 import logging
+from tqdm import tqdm
 
 from .actor import by_name
 from .movie import by_url
@@ -35,7 +36,7 @@ def get_actor(name, fresh=True):
 
         new_movies = []
         movie_tuples = []
-        for m in data["movies"]:
+        for m in tqdm(data["movies"]):
             movie_tuple = db_movie(m["url"])
             if movie_tuple is None:
                 movie_tuple = get_movie(m)
