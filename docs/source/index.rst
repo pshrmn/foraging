@@ -1,7 +1,7 @@
 Forager Documentation
 =========================
 
-View project on `GitHub <https://github.com/psherman/forager>`_
+View project on `GitHub <https://github.com/pshrmn/forager>`_
 
 Guide:
 ^^^^^^

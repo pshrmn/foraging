@@ -13,7 +13,7 @@ When opening Forager, you will get an empty interface.
 Before You Get Started
 ^^^^^^^^^^^^^^^^^^^^^^
 
-One thing to keep in mind is that the page that you're seeing isn't necessarily the page that `Gatherer <https://github.com/psherman/gatherer>`_ (the library used to gather data using the rules we are creating) will see. :code:`Gatherer` will be receiving the html of the site as a non-logged in user, as well as having no extensions modifying the page. You should log out and disable any extensions that are running (eg. Reddit Enhancement Suite) if you want to see what :code:`Gatherer` will.
+One thing to keep in mind is that the page that you're seeing isn't necessarily the page that `Gatherer <https://github.com/pshrmn/gatherer>`_ (the library used to gather data using the rules we are creating) will see. :code:`Gatherer` will be receiving the html of the site as a non-logged in user, as well as having no extensions modifying the page. You should log out and disable any extensions that are running (eg. Reddit Enhancement Suite) if you want to see what :code:`Gatherer` will.
 
 Create Page
 ^^^^^^^^^^^^
@@ -217,7 +217,7 @@ Once you have created rules for all of the selectors, it is time to upload the p
 
 .. image:: img/completed-page.png
 
-In order to upload, you need to have `Granary <https://github.com/psherman/granary>`_ running. Make sure to call the following code in the desired directory to run the granary server.
+In order to upload, you need to have `Granary <https://github.com/pshrmn/granary>`_ running. Make sure to call the following code in the desired directory to run the granary server.
 
 .. code-block:: python
 
@@ -229,4 +229,4 @@ Uploading is as simple as clicking the :code:`upload` button.
 
 As long as the granary is running, the page should be saved as a json file in the :code:`rules/<domain>` folder where the server is running (unless you specify a different location). (:code:`domain` is the hostname of the website the page is created for, except with periods :code:`.` replaced by underscores :code:`_`)
 
-Once you have a page uploaded, it is time to use `Gatherer <https://github.com/psherman/gatherer>`_ to collect the data.
+Once you have a page uploaded, it is time to use `Gatherer <https://github.com/pshrmn/gatherer>`_ to collect the data.
