@@ -5,7 +5,7 @@ Installation of Gatherer is done directly from Github
 
 .. code-block:: none
 
-    pip install git+git://github.com/psherman/gatherer.git
+    pip install git+git://github.com/pshrmn/gatherer.git
 
 Windows
 +++++++
