@@ -121,7 +121,7 @@ export const saveElement = element => {
   };
 };
 
-export const renameElement =  () => {
+export const renameElement = () => {
   return {
     type: types.RENAME_ELEMENT
   };

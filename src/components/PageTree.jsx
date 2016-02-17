@@ -1,17 +1,23 @@
 import React from "react";
+import { connect } from "react-redux";
 import d3 from "d3";
 
+import NoSelectMixin from "./NoSelectMixin";
 import { PosButton, NegButton, NeutralButton } from "./Buttons";
+
 import { abbreviate } from "../helpers/text";
 import { clone } from "../helpers/page";
 import { highlight, unhighlight } from "../helpers/markup";
 import { chromeDelete } from "../helpers/chrome";
+import { selectElement, renamePage, removePage,
+  uploadPage, showPreview } from "../actions";
 
 /*
  * A tree rendering of the page, used to show the current page, the current
  * element, and to select an element (for editing, adding children, or rules)
  */
-export default React.createClass({
+const PageTree = React.createClass({
+  mixins: [NoSelectMixin],
   getDefaultProps: function() {
     return {
       width: 500,
@@ -30,7 +36,7 @@ export default React.createClass({
     });
   },
   _makeNodes: function() {
-    const { page, element, active, actions } = this.props;
+    const { page, element, active, selectElement } = this.props;
     const { tree, diagonal } = this.state;
 
     // clone the page since it overwrites children
@@ -53,7 +59,7 @@ export default React.createClass({
           nodes.map((n, i) => {
             return <Node key={i} 
                          current={element !== undefined && n.original === element}
-                         select={actions.selectElement}
+                         select={selectElement}
                          active={active}
                          {...n} />
           })
@@ -62,7 +68,8 @@ export default React.createClass({
     );
   },
   render: function() {
-    const { page, actions, width, height } = this.props;
+    const { page, width, height,
+      renamePage, removePage, uploadPage, showPreview } = this.props;
     // return an empty .graph when there is no page
     if ( page === undefined ) {
       return <div className="graph"></div>
@@ -74,10 +81,13 @@ export default React.createClass({
      * by 100 and translating the tree 50 pixels to the right
      */
     return (
-      <div className="graph">
+      <div className="graph" ref="parent">
         <div>
           <h2>{page.name}</h2>
-          <PageControls actions={actions}
+          <PageControls renamePage={renamePage}
+                        removePage={removePage}
+                        uploadPage={uploadPage}
+                        showPreview={showPreview}
                         {...page} />
         </div>
         <svg width={width+100}
@@ -168,7 +178,7 @@ const PageControls = React.createClass({
     if ( name === null || name === "" || name === this.props.name) {
       return;
     }
-    this.props.actions.renamePage(name);
+    this.props.renamePage(name);
   },
   deleteHandler: function(event) {
     event.preventDefault();
@@ -177,15 +187,15 @@ const PageControls = React.createClass({
     }
     chromeDelete(this.props.name);
     // report the current page index
-    this.props.actions.removePage();
+    this.props.removePage();
   },
   uploadHandler: function(event) {
     event.preventDefault();
-    this.props.actions.uploadPage();
+    this.props.uploadPage();
   },
   previewHandler: function(event) {
     event.preventDefault();
-    this.props.actions.showPreview();
+    this.props.showPreview();
   },
   render: function() {
     return (
@@ -197,4 +207,19 @@ const PageControls = React.createClass({
       </div>
     );
   }
-})
+});
+
+export default connect(
+  state => ({
+    page: state.page.pages[state.page.pageIndex],
+    element: state.element,
+    active: state.frame.name === "element"
+  }),
+  {
+    selectElement,
+    renamePage,
+    removePage,
+    uploadPage,
+    showPreview
+  }
+)(PageTree);

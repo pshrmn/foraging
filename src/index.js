@@ -1,10 +1,10 @@
 import React from "react";
-import { render } from "react-dom";
+import ReactDOM from "react-dom";
 
 import { createStore, applyMiddleware } from "redux";
 import { Provider } from "react-redux";
 
-import Forager from "./containers/Forager";
+import Forager from "./components/Forager";
 import reducer from './reducers';
 
 import { SHOW_FORAGER } from "./constants/ActionTypes";
@@ -43,10 +43,15 @@ if ( !holder ) {
         wait: undefined
       }
     };
-    const store = applyMiddleware(
+
+    const store = createStore(
+      reducer,
+      initialState,
+      applyMiddleware(
         chromeBackground,
         pageMiddleware
-      )(createStore)(reducer, initialState);
+      )
+    );
 
     /*
      * subscribe to the store and save the pages any time that they change
@@ -69,12 +74,11 @@ if ( !holder ) {
     holder.classList.add("no-select");
     document.body.appendChild(holder);
 
-    render(
-      (
-        <Provider store={store}>
-          <Forager />
-        </Provider>
-      ), holder
+    ReactDOM.render(
+      <Provider store={store}>
+        <Forager />
+      </Provider>
+      , holder
     );
 
     // window here is the extension's context, so it is not reachable by code

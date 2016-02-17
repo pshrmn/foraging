@@ -1,8 +1,14 @@
 import React from "react";
+import { connect } from "react-redux";
 
+import NoSelectMixin from "../NoSelectMixin";
+
+import { showHTMLFrame, removeElement, renameElement,
+  showRuleFrame, removeRule, toggleOptional } from "../../actions";
 import { PosButton, NegButton, NeutralButton } from "../Buttons";
 
-export default React.createClass({
+const ElementFrame = React.createClass({
+  mixins: [NoSelectMixin],
   addChild: function(event) {
     this.props.createElement();
   },
@@ -10,7 +16,7 @@ export default React.createClass({
     this.props.createRule();
   },
   remove: function(event) {
-    const { element } = this.props;
+    const { element, removeElement } = this.props;
     if ( !confirm(`Are you sure you want to delete the element "${element.selector}"?`)) {
       return;
     }
@@ -24,25 +30,27 @@ export default React.createClass({
         return child !== element;
       });
     }
-    this.props.removeElement();
+    removeElement();
   },
   rename: function(event) {
     const newName = window.prompt("New name to save element's array as:");
     if ( newName === null || newName === "" ) {
       return;
     }
-    this.props.element.spec.value = newName;
-    this.props.renameElement();
+    const { element, renameElement } = this.props;
+    element.spec.value = newName;
+    renameElement();
   },
   toggleOptional: function(event) {
     this.props.toggleOptional(!this.props.element.optional);
   },
   render: function() {
-    if ( this.props.element === undefined ) {
+    const { element } = this.props;
+    if ( element === undefined ) {
       return null;
     }
 
-    const { selector, rules, spec, optional } = this.props.element;
+    const { selector, rules, spec, optional } = element;
     const { type, value } = spec;
     let description = "";
     if ( type === "single" ) {
@@ -53,7 +61,7 @@ export default React.createClass({
     }
     const renameButton = type === "all" ? <NeutralButton text="Rename" click={this.rename} /> : null;
     return (
-      <div className="frame">
+      <div className="frame" ref="parent">
         <div className="info">
           <div>
             Selector: <span className="big bold">{selector}</span>
@@ -119,3 +127,17 @@ const Rule = React.createClass({
     );
   }
 });
+
+export default connect(
+  state => ({
+    element: state.element
+  }),
+  {
+    createElement: showHTMLFrame,
+    removeElement,
+    renameElement,
+    createRule: showRuleFrame,
+    removeRule,
+    toggleOptional
+  }
+)(ElementFrame);

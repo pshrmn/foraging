@@ -1,9 +1,14 @@
 import React from "react";
+import { connect } from "react-redux";
 
+import NoSelectMixin from "./NoSelectMixin";
 import { PosButton, NeutralButton } from "./Buttons";
 import Message from "./Message";
 
-export default React.createClass({
+import { addPage, loadPage, closeForager } from "../actions";
+
+const Controls = React.createClass({
+  mixins: [NoSelectMixin],
   addHandler: function(event) {
     event.preventDefault();
     const name = window.prompt("Page Name:\nCannot contain the following characters: < > : \" \\ / | ? * ");
@@ -11,17 +16,17 @@ export default React.createClass({
     if ( name === null || name === "" ) {
       return;
     }
-    this.props.actions.addPage(name);
+    this.props.addPage(name);
   },
   loadHandler: function(event) {
     const nextPageIndex = parseInt(event.target.value, 10);
     const nextPage = this.props.pages[nextPageIndex]; 
     const element = nextPage !== undefined ? nextPage.element : undefined;
-    this.props.actions.loadPage(nextPageIndex, element);
+    this.props.loadPage(nextPageIndex, element);
   },
   closeHandler: function(event){
     document.body.classList.remove("foraging");
-    this.props.actions.closeForager();
+    this.props.closeForager();
   },
   pageControls: function() {
     const { pages, index } = this.props;
@@ -40,7 +45,7 @@ export default React.createClass({
   render: function() {
     const { message } = this.props;
     return (
-      <div className="topbar">
+      <div className="topbar" ref="parent">
         <div className="controls">
           <div className="page-controls">
             {"Page "}
@@ -59,3 +64,16 @@ export default React.createClass({
     );
   }
 });
+
+export default connect(
+  state => ({
+    pages: state.page.pages,
+    index: state.page.pageIndex,
+    message: state.message
+  }),
+  {
+    addPage,
+    loadPage,
+    closeForager
+  }
+)(Controls);

@@ -1,4 +1,5 @@
 import React from "react";
+import { connect } from "react-redux";
 
 import { PosButton, NegButton } from "../Buttons";
 import NoSelectMixin from "../NoSelectMixin";
@@ -6,8 +7,9 @@ import NoSelectMixin from "../NoSelectMixin";
 import { createElement } from "../../helpers/page";
 import { allSelect, count, select } from "../../helpers/selection";
 import { highlight, unhighlight } from "../../helpers/markup";
+import { saveElement, showElementFrame, showMessage } from "../../actions";
 
-export default React.createClass({
+const SpecFrame = React.createClass({
   highlight: "query-check",
   getInitialState: function() {
     return {
@@ -186,4 +188,16 @@ const SpecForm = React.createClass({
       </div>
     );
   }
-})
+});
+
+export default connect(
+  state => ({
+    parent: state.element,
+    ...state.frame.data
+  }),
+  {
+    save: saveElement,
+    cancel: showElementFrame,
+    message: showMessage
+  }
+)(SpecFrame);

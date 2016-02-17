@@ -18,10 +18,13 @@
  */
 export default {
   _makeNoSelect: function() {
-    this.refs.parent.classList.add("no-select");
-    [].slice.call(this.refs.parent.querySelectorAll("*")).forEach(c => {
-      c.classList.add("no-select");
-    });
+    const { parent } = this.refs;
+    if ( parent !== undefined ) {
+      parent.classList.add("no-select");
+      Array.from(parent.querySelectorAll("*")).forEach(c => {
+        c.classList.add("no-select");
+      });
+    }
   },
   componentDidMount: function() {
     // load the site's pages from chrome.storage.local and set the state

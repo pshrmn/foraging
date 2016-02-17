@@ -1,10 +1,13 @@
 import React from "react";
+import { connect } from "react-redux";
 
 import { PosButton, NegButton } from "../Buttons";
+
 import { select, count } from "../../helpers/selection";
 import { highlight, unhighlight} from "../../helpers/markup";
+import { showSpecFrame, showElementFrame, showMessage } from "../../actions";
 
-export default React.createClass({
+const PartsFrame = React.createClass({
   previewClass: "query-check",
   getInitialState: function() {
     return {
@@ -106,3 +109,15 @@ export default React.createClass({
     }
   }
 });
+
+export default connect(
+  state => ({
+    parentElements: state.element.elements,
+    ...state.frame.data
+  }),
+  {
+    next: showSpecFrame,
+    cancel: showElementFrame,
+    message: showMessage 
+  }
+)(PartsFrame);

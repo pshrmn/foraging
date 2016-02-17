@@ -1,12 +1,15 @@
 import React from "react";
+import { connect } from "react-redux";
 
 import { PosButton, NegButton } from "../Buttons";
+
 import { attributes } from "../../helpers/attributes";
 import { select } from "../../helpers/selection";
 import { abbreviate } from "../../helpers/text";
 import { highlight, unhighlight } from "../../helpers/markup";
+import { saveRule, showElementFrame } from "../../actions";
 
-export default React.createClass({
+const RuleFrame = React.createClass({
   highlight: "current-element",
   getInitialState: function() {
     return {
@@ -168,3 +171,13 @@ const AttrChoices = React.createClass({
     );
   }
 });
+
+export default connect(
+  state => ({
+    element: state.element
+  }),
+  {
+    save: saveRule,
+    cancel: showElementFrame
+  }
+)(RuleFrame);

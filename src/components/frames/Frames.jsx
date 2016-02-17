@@ -1,4 +1,5 @@
 import React from "react";
+import { connect } from "react-redux";
 
 import ElementFrame from "./ElementFrame";
 import RuleFrame from "./RuleFrame";
@@ -21,43 +22,24 @@ import { highlight, unhighlight } from "../../helpers/markup";
  * new element), and the destructured parts of a data object containing any
  * extra data for that frame.
  */
-export default React.createClass({
+const Frames = React.createClass({
   cssSelector: "current-element",
   _selectFrame: function() {
-    const { frame, element, actions } = this.props;
+    const { frame } = this.props;
     /*
      * only the necessary actions are sent to the frame components
      */
     switch ( frame.name ) {
     case "element":
-      return <ElementFrame element={element}
-                           createElement={actions.showHTMLFrame}
-                           removeElement={actions.removeElement}
-                           renameElement={actions.renameElement} 
-                           createRule={actions.showRuleFrame}
-                           removeRule={actions.removeRule}
-                           toggleOptional={actions.toggleOptional} />
+      return <ElementFrame />
     case "rule":
-      return <RuleFrame element={element}
-                        save={actions.saveRule}
-                        cancel={actions.showElementFrame} />
+      return <RuleFrame />
     case "html":
-      return <HTMLFrame parentElements={element.elements}
-                        next={actions.showPartsFrame}
-                        cancel={actions.showElementFrame}
-                        message={actions.showMessage} />
+      return <HTMLFrame />
     case "parts":
-      return <PartsFrame parentElements={element.elements}
-                         next={actions.showSpecFrame}
-                         cancel={actions.showElementFrame}
-                         message={actions.showMessage}
-                         {...frame.data} />
+      return <PartsFrame />
     case "spec":
-      return <SpecFrame parent={element}
-                        save={actions.saveElement}
-                        cancel={actions.showElementFrame}
-                        message={actions.showMessage} 
-                        {...frame.data} />
+      return <SpecFrame />
     default:
       return null;
     }
@@ -85,3 +67,11 @@ export default React.createClass({
     unhighlight(this.cssSelector);
   }
 });
+
+export default connect(
+  state => ({
+    frame: state.frame,
+    element: state.element
+  })
+)(Frames);
+

@@ -16,11 +16,11 @@ export const select = (parents, selector, spec) => {
     if ( index !== undefined ) {
       return elements[index] !== undefined ? [elements[index]] : [];
     } else {
-      return [].slice.call(elements);
+      return Array.from(elements);
     }
   }
 
-  return [].slice.call(parents).reduce((arr, p) => {
+  return Array.from(parents).reduce((arr, p) => {
     const eles = p.querySelectorAll(sel);
     return arr.concat(specElements(eles));
   }, []);
@@ -48,7 +48,7 @@ export const count = (parents, selector, spec) => {
     }
   }
 
-  return [].slice.call(parents).reduce((top, p) => {
+  return Array.from(parents).reduce((top, p) => {
     const eles = p.querySelectorAll(sel);
     const count = specElements(eles);
     return top > count ? top : count;
@@ -91,7 +91,7 @@ export const parts = element =>{
   }
 
   // classes
-  [].slice.call(element.classList).forEach(c => {
+  Array.from(element.classList).forEach(c => {
     if ( classAllowed(c) ) {
       pieces.push(`.${c}`);
     }  

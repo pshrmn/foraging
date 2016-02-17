@@ -1,10 +1,12 @@
 import React from "react";
+import { connect } from "react-redux";
 
 import { PosButton, NegButton } from "./Buttons";
 
 import { preview } from "../helpers/preview";
+import { hidePreview } from "../actions";
 
-export default React.createClass({
+const Preview = React.createClass({
   closeHandler: function(event) {
     event.preventDefault();
     this.props.close();
@@ -18,6 +20,10 @@ export default React.createClass({
     console.log(JSON.stringify(preview(this.props.page), null, 2));
   },
   render: function() {
+    if ( !this.props.visible ) {
+      return null;
+    }
+
     return (
       <div className="preview-holder">
         <div className="preview-bg" onClick={this.closeHandler} ></div>
@@ -35,3 +41,13 @@ export default React.createClass({
     );
   }
 });
+
+export default connect(
+  state => ({
+    page: state.page.pages[state.page.pageIndex],
+    visible: state.preview.visible
+  }),
+  {
+    close: hidePreview
+  }
+)(Preview);

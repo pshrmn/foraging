@@ -1,4 +1,5 @@
 import React from "react";
+import { connect } from "react-redux";
 
 import { PosButton, NegButton } from "../Buttons";
 import NoSelectMixin from "../NoSelectMixin";
@@ -6,6 +7,7 @@ import NoSelectMixin from "../NoSelectMixin";
 import { parts, select, count } from "../../helpers/selection";
 import { stripEvents } from "../../helpers/attributes";
 import { highlight, unhighlight, iHighlight, iUnhighlight } from "../../helpers/markup";
+import { showPartsFrame, showElementFrame, showMessage } from "../../actions";
 
 /*
  * HTMLFrame
@@ -17,7 +19,7 @@ import { highlight, unhighlight, iHighlight, iUnhighlight } from "../../helpers/
  * is clicked, an array of css selector options (from the clicked element to the
  * parent) will be rendered.
  */
-export default React.createClass({
+const HTMLFrame = React.createClass({
   potentialSelector: "selectable-element",
   currentSelector: "query-check",
   events: {
@@ -162,3 +164,14 @@ const SelectorRadio = React.createClass({
     );
   }
 });
+
+export default connect(
+  state => ({
+    parentElements: state.element.elements
+  }),
+  {
+    next: showPartsFrame,
+    cancel: showElementFrame,
+    message: showMessage
+  }
+)(HTMLFrame);
