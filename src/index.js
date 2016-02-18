@@ -8,10 +8,9 @@ import Forager from "./components/Forager";
 import reducer from './reducers';
 
 import { SHOW_FORAGER } from "./constants/ActionTypes";
-import chromeBackground from "./middleware/chromeBackground";
-import pageMiddleware from "./middleware/pageMiddleware";
+import chromeMiddleware from "./middleware/chromeMiddleware";
 
-import { chromeSave, chromeLoad } from "./helpers/chrome";
+import { chromeLoad } from "./helpers/chrome";
 
 /*
  * check if the forager holder exists. If it doesn't, mount the app. If it does,
@@ -48,23 +47,9 @@ if ( !holder ) {
       reducer,
       initialState,
       applyMiddleware(
-        chromeBackground,
-        pageMiddleware
+        chromeMiddleware
       )
     );
-
-    /*
-     * subscribe to the store and save the pages any time that they change
-     */
-    let oldPages = {};
-    store.subscribe(() => {
-      const state = store.getState();
-      const { pages, pageIndex } = state.page;
-      if ( pages !== oldPages ) {
-        chromeSave(pages[pageIndex]);
-        oldPages = pages;
-      }
-    });
 
     /*
      * actually render Forager
@@ -91,8 +76,7 @@ if ( !holder ) {
   // if the app has already been created, dispatch an action to the store
   // to let it know that the app should be visible
   document.body.classList.add("foraging");
-  const currentState = store.getState();
-  if ( !currentState.show ) {
+  if ( !store.getState().show ) {
     store.dispatch({
       type: SHOW_FORAGER
     });

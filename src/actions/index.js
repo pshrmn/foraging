@@ -11,10 +11,10 @@ export const loadPage = (index, element) => {
   };
 };
 
-export const addPage = name => {
+export const addPage = page => {
   return {
     type: types.ADD_PAGE,
-    name: name
+    page: page
   };
 };
 
@@ -133,23 +133,20 @@ export const removeElement = () => {
   };
 };
 
-export const saveRule = rule => {
+export const saveRule = () => {
   return {
-    type: types.SAVE_RULE,
-    rule: rule
+    type: types.SAVE_RULE
   };
 };
 
-export const removeRule = index => {
+export const removeRule = () => {
   return {
-    type: types.REMOVE_RULE,
-    index: index
+    type: types.REMOVE_RULE
   };
 };
 
-export const toggleOptional = optional => {
+export const toggleOptional = () => {
   return {
-    type: types.TOGGLE_OPTIONAL,
-    optional: optional
+    type: types.TOGGLE_OPTIONAL
   };
 };

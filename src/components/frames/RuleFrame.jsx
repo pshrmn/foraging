@@ -39,11 +39,12 @@ const RuleFrame = React.createClass({
     const { name, type, attr } = this.state;
     // basic validation
     if ( name !== "" && attr !== "" ) {
-      this.props.save({
+      this.props.element.rules.push({
         name: name,
         type: type,
         attr: attr
       });
+      this.props.save();
     }
   },
   cancelHandler: function(event) {

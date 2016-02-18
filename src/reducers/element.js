@@ -10,25 +10,25 @@ import * as types from "../constants/ActionTypes";
 export default function element(state, action) {
   switch ( action.type ) {
   case types.ADD_PAGE:
+    return action.page.element;
+
+  // loadPage is passed the element since it doesn't have
+  // access to the store's page
   case types.LOAD_PAGE:
-  case types.RENAME_PAGE:
   case types.SELECT_ELEMENT:
   case types.SAVE_ELEMENT:
     return action.element;
+
   case types.REMOVE_ELEMENT:
   case types.REMOVE_PAGE:
   case types.CLOSE_FORAGER:
     return undefined;
+
   case types.SAVE_RULE:
-    state.rules.push(action.rule);
-    return state;
-  case types.TOGGLE_OPTIONAL:
-    state.optional = action.optional;
-    return state;
   case types.REMOVE_RULE:
-    var rules = state.rules;
-    state.rules.splice(action.index, 1);
-    return state;
+  case types.RENAME_ELEMENT:
+  case types.TOGGLE_OPTIONAL:
+    return Object.assign({}, state);
   default:
     return state;
   }

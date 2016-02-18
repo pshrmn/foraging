@@ -62,21 +62,17 @@
 
 	var _Forager2 = _interopRequireDefault(_Forager);
 
-	var _reducers = __webpack_require__(48);
+	var _reducers = __webpack_require__(47);
 
 	var _reducers2 = _interopRequireDefault(_reducers);
 
-	var _ActionTypes = __webpack_require__(31);
+	var _ActionTypes = __webpack_require__(34);
 
-	var _chromeBackground = __webpack_require__(55);
+	var _chromeMiddleware = __webpack_require__(54);
 
-	var _chromeBackground2 = _interopRequireDefault(_chromeBackground);
+	var _chromeMiddleware2 = _interopRequireDefault(_chromeMiddleware);
 
-	var _pageMiddleware = __webpack_require__(56);
-
-	var _pageMiddleware2 = _interopRequireDefault(_pageMiddleware);
-
-	var _chrome = __webpack_require__(45);
+	var _chrome = __webpack_require__(55);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -113,23 +109,7 @@
 	      }
 	    };
 
-	    var store = (0, _redux.createStore)(_reducers2.default, initialState, (0, _redux.applyMiddleware)(_chromeBackground2.default, _pageMiddleware2.default));
-
-	    /*
-	     * subscribe to the store and save the pages any time that they change
-	     */
-	    var oldPages = {};
-	    store.subscribe(function () {
-	      var state = store.getState();
-	      var _state$page = state.page;
-	      var pages = _state$page.pages;
-	      var pageIndex = _state$page.pageIndex;
-
-	      if (pages !== oldPages) {
-	        (0, _chrome.chromeSave)(pages[pageIndex]);
-	        oldPages = pages;
-	      }
-	    });
+	    var store = (0, _redux.createStore)(_reducers2.default, initialState, (0, _redux.applyMiddleware)(_chromeMiddleware2.default));
 
 	    /*
 	     * actually render Forager
@@ -154,8 +134,7 @@
 	  // if the app has already been created, dispatch an action to the store
 	  // to let it know that the app should be visible
 	  document.body.classList.add("foraging");
-	  var currentState = store.getState();
-	  if (!currentState.show) {
+	  if (!store.getState().show) {
 	    store.dispatch({
 	      type: _ActionTypes.SHOW_FORAGER
 	    });
@@ -1748,7 +1727,7 @@
 
 	var _Controls2 = _interopRequireDefault(_Controls);
 
-	var _Frames = __webpack_require__(32);
+	var _Frames = __webpack_require__(35);
 
 	var _Frames2 = _interopRequireDefault(_Frames);
 
@@ -1756,20 +1735,25 @@
 
 	var _PageTree2 = _interopRequireDefault(_PageTree);
 
-	var _Preview = __webpack_require__(46);
+	var _Preview = __webpack_require__(45);
 
 	var _Preview2 = _interopRequireDefault(_Preview);
+
+	var _NoSelectMixin = __webpack_require__(27);
+
+	var _NoSelectMixin2 = _interopRequireDefault(_NoSelectMixin);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var Forager = _react2.default.createClass({
 	  displayName: "Forager",
 
+	  mixins: [_NoSelectMixin2.default],
 	  render: function render() {
 	    var hidden = this.props.show ? "" : "hidden";
 	    return _react2.default.createElement(
 	      "div",
-	      { id: "forager", className: hidden },
+	      { id: "forager", className: hidden, ref: "parent" },
 	      _react2.default.createElement(_Controls2.default, null),
 	      _react2.default.createElement(
 	        "div",
@@ -1814,7 +1798,11 @@
 
 	var _Message2 = _interopRequireDefault(_Message);
 
-	var _actions = __webpack_require__(30);
+	var _text = __webpack_require__(30);
+
+	var _page = __webpack_require__(31);
+
+	var _actions = __webpack_require__(33);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -1824,12 +1812,22 @@
 	  mixins: [_NoSelectMixin2.default],
 	  addHandler: function addHandler(event) {
 	    event.preventDefault();
+
 	    var name = window.prompt("Page Name:\nCannot contain the following characters: < > : \" \\ / | ? * ");
-	    // don't bother sending an action if the user cancels or does not enter a name
-	    if (name === null || name === "") {
-	      return;
+	    var existingNames = this.props.pages.filter(function (p) {
+	      return p !== undefined;
+	    }).map(function (p) {
+	      return p.name;
+	    });
+	    if (!(0, _text.validName)(name, existingNames)) {
+	      this.props.showMessage("Invalid Name: \"" + name + "\"", 5000);
+	    } else {
+
+	      var newPage = (0, _page.createPage)(name);
+	      (0, _page.setupPage)(newPage);
+
+	      this.props.addPage(newPage);
 	    }
-	    this.props.addPage(name);
 	  },
 	  loadHandler: function loadHandler(event) {
 	    var nextPageIndex = parseInt(event.target.value, 10);
@@ -1899,7 +1897,8 @@
 	}, {
 	  addPage: _actions.addPage,
 	  loadPage: _actions.loadPage,
-	  closeForager: _actions.closeForager
+	  closeForager: _actions.closeForager,
+	  showMessage: _actions.showMessage
 	})(Controls);
 
 /***/ },
@@ -2101,6 +2100,289 @@
 
 /***/ },
 /* 30 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	var validName = exports.validName = function validName(name) {
+	    var takenNames = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
+
+	    if (name === null || name === "") {
+	        return false;
+	    }
+	    var badCharacters = /[<>:"\/\\\|\?\*]/;
+	    if (name.match(badCharacters) !== null) {
+	        return false;
+	    }
+	    return takenNames.every(function (tn) {
+	        return tn !== name;
+	    });
+	};
+
+	var abbreviate = exports.abbreviate = function abbreviate(text, max) {
+	    if (text.length <= max) {
+	        return text;
+	    } else if (max <= 3) {
+	        return "...";
+	    }
+	    // determine the length of the first and second halves of the text
+	    var firstHalf = undefined;
+	    var secondHalf = undefined;
+	    var leftovers = max - 3;
+	    var half = leftovers / 2;
+	    if (leftovers % 2 === 0) {
+	        firstHalf = half;
+	        secondHalf = half;
+	    } else {
+	        firstHalf = Math.ceil(half);
+	        secondHalf = Math.floor(half);
+	    }
+
+	    // splice correct amounts of text
+	    var firstText = text.slice(0, firstHalf);
+	    var secondText = secondHalf === 0 ? "" : text.slice(-secondHalf);
+	    return firstText + "..." + secondText;
+	};
+
+/***/ },
+/* 31 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.setupPage = exports.clean = exports.clone = exports.createElement = exports.createPage = undefined;
+
+	var _selection = __webpack_require__(32);
+
+	var createPage = exports.createPage = function createPage(name) {
+	  return {
+	    name: name,
+	    element: {
+	      selector: "body",
+	      spec: {
+	        type: "single",
+	        value: 0
+	      },
+	      children: [],
+	      rules: []
+	    }
+	  };
+	};
+
+	var createElement = exports.createElement = function createElement(selector) {
+	  var type = arguments.length <= 1 || arguments[1] === undefined ? "single" : arguments[1];
+	  var value = arguments.length <= 2 || arguments[2] === undefined ? 0 : arguments[2];
+	  var optional = arguments.length <= 3 || arguments[3] === undefined ? false : arguments[3];
+
+	  return {
+	    selector: selector,
+	    spec: {
+	      type: type,
+	      value: value
+	    },
+	    children: [],
+	    rules: [],
+	    optional: optional
+	  };
+	};
+
+	/*
+	 * clone a page (useful with the tree because that adds unnecessary properties
+	 * to each selector) does not include the page's name
+	 */
+	var clone = exports.clone = function clone(element) {
+	  return Object.assign({}, {
+	    selector: element.selector,
+	    spec: element.spec,
+	    children: element.children.map(function (child) {
+	      return clone(child);
+	    }),
+	    hasRules: element.rules.length,
+	    elements: element.elements || [],
+	    original: element
+	  });
+	};
+
+	var clean = exports.clean = function clean(page) {
+	  return Object.assign({}, {
+	    name: page.name,
+	    element: cleanElement(page.element)
+	  });
+	};
+
+	var cleanElement = function cleanElement(e) {
+	  return Object.assign({}, {
+	    selector: e.selector,
+	    spec: Object.assign({}, e.spec),
+	    children: e.children.map(function (c) {
+	      return cleanElement(c);
+	    }),
+	    rules: e.rules.map(function (r) {
+	      return Object.assign({}, r);
+	    }),
+	    optional: e.optional
+	  });
+	};
+
+	/*
+	 * set an id on each element and determine the html elements that each element matches
+	 */
+	var setupPage = exports.setupPage = function setupPage(page) {
+	  if (page === undefined) {
+	    return;
+	  }
+	  var id = 0;
+	  var setup = function setup(element, parentElements, parent) {
+	    element.id = id++;
+	    element.parent = parent;
+	    element.elements = (0, _selection.select)(parentElements, element.selector, element.spec);
+	    element.children.forEach(function (child) {
+	      setup(child, element.elements, element);
+	    });
+	  };
+
+	  setup(page.element, [document], null);
+	};
+
+/***/ },
+/* 32 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	/*
+	 * select
+	 * ------
+	 * Returns an array of elements that are children of the parent elements and
+	 * match the selector.
+	 *
+	 * @param parents - an array of parent elements to search using the selector
+	 * @param selector - the selector to use to match children of the parent elements
+	 * @param spec - how to select the child element or elements of a parent element
+	 */
+	var select = exports.select = function select(parents, selector, spec) {
+	  var sel = (selector || "*") + ":not(.no-select)";
+	  var index = spec && spec.type === "single" ? spec.value : undefined;
+
+	  var specElements = function specElements(elements) {
+	    if (index !== undefined) {
+	      return elements[index] !== undefined ? [elements[index]] : [];
+	    } else {
+	      return Array.from(elements);
+	    }
+	  };
+
+	  return Array.from(parents).reduce(function (arr, p) {
+	    var eles = p.querySelectorAll(sel);
+	    return arr.concat(specElements(eles));
+	  }, []);
+	};
+
+	/*
+	 * count
+	 * ------
+	 * Returns the max number of child elements that the selector matches per parent
+	 *
+	 * @param parents - an array of parent elements to search using the selector
+	 * @param selector - the selector to use to match children of the parent elements
+	 * @param spec - how to select the child element or elements of a parent element
+	 */
+	var count = exports.count = function count(parents, selector, spec) {
+	  var sel = (selector || "*") + ":not(.no-select)";
+	  var index = spec && spec.type === "single" ? spec.value : undefined;
+
+	  var specElements = function specElements(elements) {
+	    if (index !== undefined) {
+	      return elements[index] !== undefined ? 1 : 0;
+	    } else {
+	      return elements.length;
+	    }
+	  };
+
+	  return Array.from(parents).reduce(function (top, p) {
+	    var eles = p.querySelectorAll(sel);
+	    var count = specElements(eles);
+	    return top > count ? top : count;
+	  }, 0);
+	};
+
+	/*
+	 * parts
+	 * -------------
+	 * Returns an array of strings that can be used as CSS selectors to select the element.
+	 * Element tags are converted to lowercase, ids are preceded by a "#" and classes are
+	 * preceded by a "."
+	 *
+	 * @param element - the element to analyze
+	 */
+	var parts = exports.parts = function parts(element) {
+	  var skipTags = [];
+	  var skipClasses = ["forager-highlight", "query-check", "selectable-element", "current-selector"];
+	  var classRegex = /^-?[_a-zA-Z]+[_a-zA-Z0-9-]*/;
+	  var tagAllowed = function tagAllowed(tag) {
+	    return !skipTags.some(function (st) {
+	      return st === tag;
+	    });
+	  };
+
+	  var classAllowed = function classAllowed(c) {
+	    return !skipClasses.some(function (sc) {
+	      return sc === c;
+	    }) && classRegex.test(c);
+	  };
+
+	  var pieces = [];
+	  var tag = element.tagName.toLowerCase();
+	  if (tagAllowed(tag)) {
+	    pieces.push(tag);
+	  } else {
+	    // if the tag isn't allowed, return an empty array
+	    return [];
+	  }
+
+	  // id
+	  if (element.id !== "" && validID(element.id)) {
+	    pieces.push("#" + element.id);
+	  }
+
+	  // classes
+	  Array.from(element.classList).forEach(function (c) {
+	    if (classAllowed(c)) {
+	      pieces.push("." + c);
+	    }
+	  });
+	  return pieces;
+	};
+
+	/*
+	 * querySelectorAll requires ids to start with an alphabet character
+	 */
+	function validID(id) {
+	  var firstChar = id.charCodeAt(0);
+	  // A=65, Z=90, a=97, z=122
+	  return !(firstChar < 65 || firstChar > 90 && firstChar < 97 || firstChar > 122);
+	}
+
+	/*
+	 * check if all elements matched by the selector are "select" elements
+	 */
+	var allSelect = exports.allSelect = function allSelect(selection) {
+	  return selection.every(function (ele) {
+	    return ele.tagName === "SELECT";
+	  });
+	};
+
+/***/ },
+/* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -2110,7 +2392,7 @@
 	});
 	exports.toggleOptional = exports.removeRule = exports.saveRule = exports.removeElement = exports.renameElement = exports.saveElement = exports.selectElement = exports.closeForager = exports.showSpecFrame = exports.showPartsFrame = exports.showHTMLFrame = exports.showRuleFrame = exports.showElementFrame = exports.showMessage = exports.hidePreview = exports.showPreview = exports.uploadPage = exports.renamePage = exports.removePage = exports.addPage = exports.loadPage = undefined;
 
-	var _ActionTypes = __webpack_require__(31);
+	var _ActionTypes = __webpack_require__(34);
 
 	var types = _interopRequireWildcard(_ActionTypes);
 
@@ -2127,10 +2409,10 @@
 	  };
 	};
 
-	var addPage = exports.addPage = function addPage(name) {
+	var addPage = exports.addPage = function addPage(page) {
 	  return {
 	    type: types.ADD_PAGE,
-	    name: name
+	    page: page
 	  };
 	};
 
@@ -2248,29 +2530,26 @@
 	  };
 	};
 
-	var saveRule = exports.saveRule = function saveRule(rule) {
+	var saveRule = exports.saveRule = function saveRule() {
 	  return {
-	    type: types.SAVE_RULE,
-	    rule: rule
+	    type: types.SAVE_RULE
 	  };
 	};
 
-	var removeRule = exports.removeRule = function removeRule(index) {
+	var removeRule = exports.removeRule = function removeRule() {
 	  return {
-	    type: types.REMOVE_RULE,
-	    index: index
+	    type: types.REMOVE_RULE
 	  };
 	};
 
-	var toggleOptional = exports.toggleOptional = function toggleOptional(optional) {
+	var toggleOptional = exports.toggleOptional = function toggleOptional() {
 	  return {
-	    type: types.TOGGLE_OPTIONAL,
-	    optional: optional
+	    type: types.TOGGLE_OPTIONAL
 	  };
 	};
 
 /***/ },
-/* 31 */
+/* 34 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -2306,7 +2585,7 @@
 	var TOGGLE_OPTIONAL = exports.TOGGLE_OPTIONAL = "TOGGLE_OPTIONAL";
 
 /***/ },
-/* 32 */
+/* 35 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -2321,27 +2600,27 @@
 
 	var _reactRedux = __webpack_require__(14);
 
-	var _ElementFrame = __webpack_require__(33);
+	var _ElementFrame = __webpack_require__(36);
 
 	var _ElementFrame2 = _interopRequireDefault(_ElementFrame);
 
-	var _RuleFrame = __webpack_require__(34);
+	var _RuleFrame = __webpack_require__(37);
 
 	var _RuleFrame2 = _interopRequireDefault(_RuleFrame);
 
-	var _HTMLFrame = __webpack_require__(39);
+	var _HTMLFrame = __webpack_require__(40);
 
 	var _HTMLFrame2 = _interopRequireDefault(_HTMLFrame);
 
-	var _PartsFrame = __webpack_require__(40);
+	var _PartsFrame = __webpack_require__(41);
 
 	var _PartsFrame2 = _interopRequireDefault(_PartsFrame);
 
-	var _SpecFrame = __webpack_require__(41);
+	var _SpecFrame = __webpack_require__(42);
 
 	var _SpecFrame2 = _interopRequireDefault(_SpecFrame);
 
-	var _markup = __webpack_require__(38);
+	var _markup = __webpack_require__(39);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -2415,7 +2694,7 @@
 	})(Frames);
 
 /***/ },
-/* 33 */
+/* 36 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -2436,11 +2715,13 @@
 
 	var _NoSelectMixin2 = _interopRequireDefault(_NoSelectMixin);
 
-	var _actions = __webpack_require__(30);
+	var _actions = __webpack_require__(33);
 
 	var _Buttons = __webpack_require__(28);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 	var ElementFrame = _react2.default.createClass({
 	  displayName: "ElementFrame",
@@ -2484,8 +2765,14 @@
 	    element.spec.value = newName;
 	    renameElement();
 	  },
+	  removeRule: function removeRule(index) {
+	    var rules = this.props.element.rules;
+	    this.props.element.rules = [].concat(_toConsumableArray(rules.slice(0, index)), _toConsumableArray(rules.slice(index + 1)));
+	    this.props.removeRule();
+	  },
 	  toggleOptional: function toggleOptional(event) {
-	    this.props.toggleOptional(!this.props.element.optional);
+	    this.props.element.optional = !this.props.element.optional;
+	    this.props.toggleOptional();
 	  },
 	  render: function render() {
 	    var element = this.props.element;
@@ -2537,7 +2824,7 @@
 	          _react2.default.createElement("input", { type: "checkbox", checked: optional, onChange: this.toggleOptional })
 	        ),
 	        _react2.default.createElement(RuleList, { rules: rules,
-	          remove: this.props.removeRule })
+	          remove: this.removeRule })
 	      ),
 	      _react2.default.createElement(
 	        "div",
@@ -2628,7 +2915,7 @@
 	})(ElementFrame);
 
 /***/ },
-/* 34 */
+/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -2645,15 +2932,15 @@
 
 	var _Buttons = __webpack_require__(28);
 
-	var _attributes = __webpack_require__(35);
+	var _attributes = __webpack_require__(38);
 
-	var _selection = __webpack_require__(36);
+	var _selection = __webpack_require__(32);
 
-	var _text = __webpack_require__(37);
+	var _text = __webpack_require__(30);
 
-	var _markup = __webpack_require__(38);
+	var _markup = __webpack_require__(39);
 
-	var _actions = __webpack_require__(30);
+	var _actions = __webpack_require__(33);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -2693,11 +2980,12 @@
 	    // basic validation
 
 	    if (name !== "" && attr !== "") {
-	      this.props.save({
+	      this.props.element.rules.push({
 	        name: name,
 	        type: type,
 	        attr: attr
 	      });
+	      this.props.save();
 	    }
 	  },
 	  cancelHandler: function cancelHandler(event) {
@@ -2886,7 +3174,7 @@
 	})(RuleFrame);
 
 /***/ },
-/* 35 */
+/* 38 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -2953,180 +3241,7 @@
 	};
 
 /***/ },
-/* 36 */
-/***/ function(module, exports) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	/*
-	 * select
-	 * ------
-	 * Returns an array of elements that are children of the parent elements and
-	 * match the selector.
-	 *
-	 * @param parents - an array of parent elements to search using the selector
-	 * @param selector - the selector to use to match children of the parent elements
-	 * @param spec - how to select the child element or elements of a parent element
-	 */
-	var select = exports.select = function select(parents, selector, spec) {
-	  var sel = (selector || "*") + ":not(.no-select)";
-	  var index = spec && spec.type === "single" ? spec.value : undefined;
-
-	  var specElements = function specElements(elements) {
-	    if (index !== undefined) {
-	      return elements[index] !== undefined ? [elements[index]] : [];
-	    } else {
-	      return Array.from(elements);
-	    }
-	  };
-
-	  return Array.from(parents).reduce(function (arr, p) {
-	    var eles = p.querySelectorAll(sel);
-	    return arr.concat(specElements(eles));
-	  }, []);
-	};
-
-	/*
-	 * count
-	 * ------
-	 * Returns the max number of child elements that the selector matches per parent
-	 *
-	 * @param parents - an array of parent elements to search using the selector
-	 * @param selector - the selector to use to match children of the parent elements
-	 * @param spec - how to select the child element or elements of a parent element
-	 */
-	var count = exports.count = function count(parents, selector, spec) {
-	  var sel = (selector || "*") + ":not(.no-select)";
-	  var index = spec && spec.type === "single" ? spec.value : undefined;
-
-	  var specElements = function specElements(elements) {
-	    if (index !== undefined) {
-	      return elements[index] !== undefined ? 1 : 0;
-	    } else {
-	      return elements.length;
-	    }
-	  };
-
-	  return Array.from(parents).reduce(function (top, p) {
-	    var eles = p.querySelectorAll(sel);
-	    var count = specElements(eles);
-	    return top > count ? top : count;
-	  }, 0);
-	};
-
-	/*
-	 * parts
-	 * -------------
-	 * Returns an array of strings that can be used as CSS selectors to select the element.
-	 * Element tags are converted to lowercase, ids are preceded by a "#" and classes are
-	 * preceded by a "."
-	 *
-	 * @param element - the element to analyze
-	 */
-	var parts = exports.parts = function parts(element) {
-	  var skipTags = [];
-	  var skipClasses = ["forager-highlight", "query-check", "selectable-element", "current-selector"];
-	  var classRegex = /^-?[_a-zA-Z]+[_a-zA-Z0-9-]*/;
-	  var tagAllowed = function tagAllowed(tag) {
-	    return !skipTags.some(function (st) {
-	      return st === tag;
-	    });
-	  };
-
-	  var classAllowed = function classAllowed(c) {
-	    return !skipClasses.some(function (sc) {
-	      return sc === c;
-	    }) && classRegex.test(c);
-	  };
-
-	  var pieces = [];
-	  var tag = element.tagName.toLowerCase();
-	  if (tagAllowed(tag)) {
-	    pieces.push(tag);
-	  } else {
-	    // if the tag isn't allowed, return an empty array
-	    return [];
-	  }
-
-	  // id
-	  if (element.id !== "" && validID(element.id)) {
-	    pieces.push("#" + element.id);
-	  }
-
-	  // classes
-	  Array.from(element.classList).forEach(function (c) {
-	    if (classAllowed(c)) {
-	      pieces.push("." + c);
-	    }
-	  });
-	  return pieces;
-	};
-
-	/*
-	 * querySelectorAll requires ids to start with an alphabet character
-	 */
-	function validID(id) {
-	  var firstChar = id.charCodeAt(0);
-	  // A=65, Z=90, a=97, z=122
-	  return !(firstChar < 65 || firstChar > 90 && firstChar < 97 || firstChar > 122);
-	}
-
-	/*
-	 * check if all elements matched by the selector are "select" elements
-	 */
-	var allSelect = exports.allSelect = function allSelect(selection) {
-	  return selection.every(function (ele) {
-	    return ele.tagName === "SELECT";
-	  });
-	};
-
-/***/ },
-/* 37 */
-/***/ function(module, exports) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	var legalName = exports.legalName = function legalName(name) {
-	    if (name === null || name === "") {
-	        return false;
-	    }
-	    var badCharacters = /[<>:"\/\\\|\?\*]/;
-	    return name.match(badCharacters) === null;
-	};
-
-	var abbreviate = exports.abbreviate = function abbreviate(text, max) {
-	    if (text.length <= max) {
-	        return text;
-	    } else if (max <= 3) {
-	        return "...";
-	    }
-	    // determine the length of the first and second halves of the text
-	    var firstHalf = undefined;
-	    var secondHalf = undefined;
-	    var leftovers = max - 3;
-	    var half = leftovers / 2;
-	    if (leftovers % 2 === 0) {
-	        firstHalf = half;
-	        secondHalf = half;
-	    } else {
-	        firstHalf = Math.ceil(half);
-	        secondHalf = Math.floor(half);
-	    }
-
-	    // splice correct amounts of text
-	    var firstText = text.slice(0, firstHalf);
-	    var secondText = secondHalf === 0 ? "" : text.slice(-secondHalf);
-	    return firstText + "..." + secondText;
-	};
-
-/***/ },
-/* 38 */
+/* 39 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -3197,7 +3312,7 @@
 	};
 
 /***/ },
-/* 39 */
+/* 40 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -3218,13 +3333,13 @@
 
 	var _NoSelectMixin2 = _interopRequireDefault(_NoSelectMixin);
 
-	var _selection = __webpack_require__(36);
+	var _selection = __webpack_require__(32);
 
-	var _attributes = __webpack_require__(35);
+	var _attributes = __webpack_require__(38);
 
-	var _markup = __webpack_require__(38);
+	var _markup = __webpack_require__(39);
 
-	var _actions = __webpack_require__(30);
+	var _actions = __webpack_require__(33);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -3425,7 +3540,7 @@
 	})(HTMLFrame);
 
 /***/ },
-/* 40 */
+/* 41 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -3444,11 +3559,11 @@
 
 	var _Buttons = __webpack_require__(28);
 
-	var _selection = __webpack_require__(36);
+	var _selection = __webpack_require__(32);
 
-	var _markup = __webpack_require__(38);
+	var _markup = __webpack_require__(39);
 
-	var _actions = __webpack_require__(30);
+	var _actions = __webpack_require__(33);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -3591,7 +3706,7 @@
 	})(PartsFrame);
 
 /***/ },
-/* 41 */
+/* 42 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -3614,13 +3729,13 @@
 
 	var _NoSelectMixin2 = _interopRequireDefault(_NoSelectMixin);
 
-	var _page = __webpack_require__(42);
+	var _page = __webpack_require__(31);
 
-	var _selection = __webpack_require__(36);
+	var _selection = __webpack_require__(32);
 
-	var _markup = __webpack_require__(38);
+	var _markup = __webpack_require__(39);
 
-	var _actions = __webpack_require__(30);
+	var _actions = __webpack_require__(33);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -3651,10 +3766,14 @@
 	      return;
 	    }
 	    var ele = (0, _page.createElement)(css, type, value, optional);
-	    // generate the list of elements for the new element
+
+	    // select all of the elements in the page that are matched by the new element
 	    ele.elements = (0, _selection.select)(parent.elements, ele.selector, ele.spec);
+
 	    ele.parent = parent;
 	    parent.children.push(ele);
+
+	    // SPECIAL CASE: "select" elements
 	    // if saving a selector that selects "select" elements, add a child selector
 	    // to match option elements
 	    if ((0, _selection.allSelect)(ele.elements)) {
@@ -3663,6 +3782,7 @@
 	      optionsChild.parent = ele;
 	      ele.children.push(optionsChild);
 	    }
+
 	    this.props.save(ele);
 	  },
 	  cancelHandler: function cancelHandler(event) {
@@ -3851,109 +3971,6 @@
 	})(SpecFrame);
 
 /***/ },
-/* 42 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.setupPage = exports.clean = exports.clone = exports.createElement = exports.createPage = undefined;
-
-	var _selection = __webpack_require__(36);
-
-	var createPage = exports.createPage = function createPage(name) {
-	  return {
-	    name: name,
-	    element: {
-	      selector: "body",
-	      spec: {
-	        type: "single",
-	        value: 0
-	      },
-	      children: [],
-	      rules: []
-	    }
-	  };
-	};
-
-	var createElement = exports.createElement = function createElement(selector) {
-	  var type = arguments.length <= 1 || arguments[1] === undefined ? "single" : arguments[1];
-	  var value = arguments.length <= 2 || arguments[2] === undefined ? 0 : arguments[2];
-	  var optional = arguments.length <= 3 || arguments[3] === undefined ? false : arguments[3];
-
-	  return {
-	    selector: selector,
-	    spec: {
-	      type: type,
-	      value: value
-	    },
-	    children: [],
-	    rules: [],
-	    optional: optional
-	  };
-	};
-
-	/*
-	 * clone a page (useful with the tree because that adds unnecessary properties
-	 * to each selector) does not include the page's name
-	 */
-	var clone = exports.clone = function clone(element) {
-	  return Object.assign({}, {
-	    selector: element.selector,
-	    spec: element.spec,
-	    children: element.children.map(function (child) {
-	      return clone(child);
-	    }),
-	    hasRules: element.rules.length,
-	    elements: element.elements || [],
-	    original: element
-	  });
-	};
-
-	var clean = exports.clean = function clean(page) {
-	  return Object.assign({}, {
-	    name: page.name,
-	    element: cleanElement(page.element)
-	  });
-	};
-
-	var cleanElement = function cleanElement(e) {
-	  return Object.assign({}, {
-	    selector: e.selector,
-	    spec: Object.assign({}, e.spec),
-	    children: e.children.map(function (c) {
-	      return cleanElement(c);
-	    }),
-	    rules: e.rules.map(function (r) {
-	      return Object.assign({}, r);
-	    }),
-	    optional: e.optional
-	  });
-	};
-
-	/*
-	 * set an id on each element and determine the html elements that each element matches
-	 */
-	var setupPage = exports.setupPage = function setupPage(page) {
-	  if (page === undefined) {
-	    return;
-	  }
-	  var id = 0;
-	  var setup = function setup(element, parentElements, parent) {
-	    element.id = id++;
-	    element.parent = parent;
-	    element.elements = (0, _selection.select)(parentElements, element.selector, element.spec);
-	    element.children.forEach(function (child) {
-	      setup(child, element.elements, element);
-	    });
-	  };
-
-	  setup(page.element, [document], null);
-	};
-
-/***/ },
 /* 43 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -3981,15 +3998,13 @@
 
 	var _Buttons = __webpack_require__(28);
 
-	var _text = __webpack_require__(37);
+	var _text = __webpack_require__(30);
 
-	var _page = __webpack_require__(42);
+	var _page = __webpack_require__(31);
 
-	var _markup = __webpack_require__(38);
+	var _markup = __webpack_require__(39);
 
-	var _chrome = __webpack_require__(45);
-
-	var _actions = __webpack_require__(30);
+	var _actions = __webpack_require__(33);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -4061,12 +4076,14 @@
 	  render: function render() {
 	    var _props3 = this.props;
 	    var page = _props3.page;
+	    var pageNames = _props3.pageNames;
 	    var width = _props3.width;
 	    var height = _props3.height;
 	    var renamePage = _props3.renamePage;
 	    var removePage = _props3.removePage;
 	    var uploadPage = _props3.uploadPage;
 	    var showPreview = _props3.showPreview;
+	    var showMessage = _props3.showMessage;
 	    // return an empty .graph when there is no page
 
 	    if (page === undefined) {
@@ -4092,7 +4109,9 @@
 	        _react2.default.createElement(PageControls, _extends({ renamePage: renamePage,
 	          removePage: removePage,
 	          uploadPage: uploadPage,
-	          showPreview: showPreview
+	          showPreview: showPreview,
+	          showMessage: showMessage,
+	          pageNames: pageNames
 	        }, page))
 	      ),
 	      _react2.default.createElement(
@@ -4195,17 +4214,17 @@
 	    event.preventDefault();
 	    var name = window.prompt("Page Name:\nCannot contain the following characters: < > : \" \\ / | ? * ");
 	    // do nothing if the user cancels, does not enter a name, or enter the same name as the current one
-	    if (name === null || name === "" || name === this.props.name) {
-	      return;
+	    if (!(0, _text.validName)(name, this.props.pageNames)) {
+	      this.props.showMessage("Invalid Name: \"" + name + "\"", 5000);
+	    } else {
+	      this.props.renamePage(name);
 	    }
-	    this.props.renamePage(name);
 	  },
 	  deleteHandler: function deleteHandler(event) {
 	    event.preventDefault();
 	    if (!confirm("Are you sure you want to delete the page \"" + this.props.name + "\"?")) {
 	      return;
 	    }
-	    (0, _chrome.chromeDelete)(this.props.name);
 	    // report the current page index
 	    this.props.removePage();
 	  },
@@ -4232,6 +4251,11 @@
 	exports.default = (0, _reactRedux.connect)(function (state) {
 	  return {
 	    page: state.page.pages[state.page.pageIndex],
+	    pageNames: state.page.pages.filter(function (p) {
+	      return p !== undefined;
+	    }).map(function (p) {
+	      return p.name;
+	    }),
 	    element: state.element,
 	    active: state.frame.name === "element"
 	  };
@@ -4240,7 +4264,8 @@
 	  renamePage: _actions.renamePage,
 	  removePage: _actions.removePage,
 	  uploadPage: _actions.uploadPage,
-	  showPreview: _actions.showPreview
+	  showPreview: _actions.showPreview,
+	  showMessage: _actions.showMessage
 	})(PageTree);
 
 /***/ },
@@ -4258,91 +4283,6 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.chromeUpload = exports.chromeLoad = exports.chromeDelete = exports.chromeSave = undefined;
-
-	var _selection = __webpack_require__(36);
-
-	var _page = __webpack_require__(42);
-
-	/*
-	 * any time that the page is updated, the stored page should be updated
-	 */
-	var chromeSave = exports.chromeSave = function chromeSave(page) {
-	  if (page === undefined) {
-	    return;
-	  }
-	  var cleaned = (0, _page.clean)(page);
-	  chrome.storage.local.get("sites", function saveSchemaChrome(storage) {
-	    var host = window.location.hostname;
-	    storage.sites[host] = storage.sites[host] || {};
-	    storage.sites[host][cleaned.name] = cleaned;
-	    chrome.storage.local.set({ "sites": storage.sites });
-	  });
-	};
-
-	/*
-	 * remove the page with the given name from storage
-	 */
-	var chromeDelete = exports.chromeDelete = function chromeDelete(name) {
-	  if (name === undefined) {
-	    return;
-	  }
-	  chrome.storage.local.get("sites", function saveSchemaChrome(storage) {
-	    var host = window.location.hostname;
-	    delete storage.sites[host][name];
-	    chrome.storage.local.set({ "sites": storage.sites });
-	  });
-	};
-
-	/*
-	creates an object representing a site and saves it to chrome.storage.local
-	the object is:
-	    host:
-	        site: <hostname>
-	        page: <page>
-
-	If the site object exists for a host, load the saved rules
-	*/
-	var chromeLoad = exports.chromeLoad = function chromeLoad(callback) {
-	  chrome.storage.local.get("sites", function setupHostnameChrome(storage) {
-	    var host = window.location.hostname;
-	    var current = storage.sites[host] || {};
-	    var pages = Object.keys(current).map(function (key) {
-	      return current[key];
-	    });
-	    pages.forEach(function (p) {
-	      return (0, _page.setupPage)(p);
-	    });
-	    callback(pages);
-	  });
-	};
-
-	/*
-	 * formats the page and sends it to the background script, which will upload it to the server
-	 */
-	var chromeUpload = exports.chromeUpload = function chromeUpload(page) {
-	  if (page === undefined) {
-	    return;
-	  }
-	  chrome.runtime.sendMessage({
-	    type: "upload",
-	    data: {
-	      name: page.name,
-	      site: window.location.hostname,
-	      page: JSON.stringify((0, _page.clean)(page))
-	    }
-	  });
-	};
-
-/***/ },
-/* 46 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
 
 	var _react = __webpack_require__(1);
 
@@ -4352,9 +4292,9 @@
 
 	var _Buttons = __webpack_require__(28);
 
-	var _preview = __webpack_require__(47);
+	var _preview = __webpack_require__(46);
 
-	var _actions = __webpack_require__(30);
+	var _actions = __webpack_require__(33);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -4412,7 +4352,7 @@
 	})(Preview);
 
 /***/ },
-/* 47 */
+/* 46 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -4516,7 +4456,7 @@
 	};
 
 /***/ },
-/* 48 */
+/* 47 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -4525,27 +4465,27 @@
 	  value: true
 	});
 
-	var _frame = __webpack_require__(49);
+	var _frame = __webpack_require__(48);
 
 	var _frame2 = _interopRequireDefault(_frame);
 
-	var _show = __webpack_require__(50);
+	var _show = __webpack_require__(49);
 
 	var _show2 = _interopRequireDefault(_show);
 
-	var _page = __webpack_require__(51);
+	var _page = __webpack_require__(50);
 
 	var _page2 = _interopRequireDefault(_page);
 
-	var _element = __webpack_require__(52);
+	var _element = __webpack_require__(51);
 
 	var _element2 = _interopRequireDefault(_element);
 
-	var _preview = __webpack_require__(53);
+	var _preview = __webpack_require__(52);
 
 	var _preview2 = _interopRequireDefault(_preview);
 
-	var _message = __webpack_require__(54);
+	var _message = __webpack_require__(53);
 
 	var _message2 = _interopRequireDefault(_message);
 
@@ -4594,7 +4534,7 @@
 	exports.default = reducer;
 
 /***/ },
-/* 49 */
+/* 48 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -4604,7 +4544,7 @@
 	});
 	exports.default = frame;
 
-	var _ActionTypes = __webpack_require__(31);
+	var _ActionTypes = __webpack_require__(34);
 
 	var types = _interopRequireWildcard(_ActionTypes);
 
@@ -4663,7 +4603,7 @@
 	}
 
 /***/ },
-/* 50 */
+/* 49 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -4673,7 +4613,7 @@
 	});
 	exports.default = show;
 
-	var _ActionTypes = __webpack_require__(31);
+	var _ActionTypes = __webpack_require__(34);
 
 	var types = _interopRequireWildcard(_ActionTypes);
 
@@ -4701,7 +4641,7 @@
 	}
 
 /***/ },
-/* 51 */
+/* 50 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -4711,7 +4651,7 @@
 	});
 	exports.default = page;
 
-	var _ActionTypes = __webpack_require__(31);
+	var _ActionTypes = __webpack_require__(34);
 
 	var types = _interopRequireWildcard(_ActionTypes);
 
@@ -4750,9 +4690,6 @@
 	     * so care needs to be taken when uploading.
 	     */
 	    case types.ADD_PAGE:
-	      if (action.error) {
-	        return state;
-	      }
 	      var pages = state.pages;
 	      var newPages = [].concat(_toConsumableArray(pages), [action.page]);
 	      return Object.assign({}, state, {
@@ -4776,6 +4713,16 @@
 	        pageIndex: 0
 	      });
 
+	    case types.RENAME_PAGE:
+	      var pages = state.pages;
+	      var pageIndex = state.pageIndex;
+
+	      var page = pages[pageIndex];
+	      page.name = action.name;
+	      return Object.assign({}, state, {
+	        pages: [].concat(_toConsumableArray(pages.slice(0, pageIndex)), [page], _toConsumableArray(pages.slice(pageIndex + 1)))
+	      });
+
 	    /*
 	     * all of the updating is done in the components, which is not very redux-y,
 	     * but since the data is tree-like and the tree's nodes are passed by
@@ -4786,7 +4733,6 @@
 	     * can reflect 
 	     *
 	     */
-	    case types.RENAME_PAGE:
 	    case types.SAVE_ELEMENT:
 	    case types.REMOVE_ELEMENT:
 	    case types.RENAME_ELEMENT:
@@ -4812,7 +4758,7 @@
 	}
 
 /***/ },
-/* 52 */
+/* 51 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -4822,7 +4768,7 @@
 	});
 	exports.default = element;
 
-	var _ActionTypes = __webpack_require__(31);
+	var _ActionTypes = __webpack_require__(34);
 
 	var types = _interopRequireWildcard(_ActionTypes);
 
@@ -4838,32 +4784,32 @@
 	function element(state, action) {
 	  switch (action.type) {
 	    case types.ADD_PAGE:
+	      return action.page.element;
+
+	    // loadPage is passed the element since it doesn't have
+	    // access to the store's page
 	    case types.LOAD_PAGE:
-	    case types.RENAME_PAGE:
 	    case types.SELECT_ELEMENT:
 	    case types.SAVE_ELEMENT:
 	      return action.element;
+
 	    case types.REMOVE_ELEMENT:
 	    case types.REMOVE_PAGE:
 	    case types.CLOSE_FORAGER:
 	      return undefined;
+
 	    case types.SAVE_RULE:
-	      state.rules.push(action.rule);
-	      return state;
-	    case types.TOGGLE_OPTIONAL:
-	      state.optional = action.optional;
-	      return state;
 	    case types.REMOVE_RULE:
-	      var rules = state.rules;
-	      state.rules.splice(action.index, 1);
-	      return state;
+	    case types.RENAME_ELEMENT:
+	    case types.TOGGLE_OPTIONAL:
+	      return Object.assign({}, state);
 	    default:
 	      return state;
 	  }
 	}
 
 /***/ },
-/* 53 */
+/* 52 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -4873,7 +4819,7 @@
 	});
 	exports.default = preview;
 
-	var _ActionTypes = __webpack_require__(31);
+	var _ActionTypes = __webpack_require__(34);
 
 	var types = _interopRequireWildcard(_ActionTypes);
 
@@ -4904,7 +4850,7 @@
 	}
 
 /***/ },
-/* 54 */
+/* 53 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -4914,7 +4860,7 @@
 	});
 	exports.default = message;
 
-	var _ActionTypes = __webpack_require__(31);
+	var _ActionTypes = __webpack_require__(34);
 
 	var types = _interopRequireWildcard(_ActionTypes);
 
@@ -4932,8 +4878,6 @@
 
 	  switch (action.type) {
 	    case types.SHOW_MESSAGE:
-	    case types.ADD_PAGE:
-	    case types.RENAME_PAGE:
 	      return Object.assign({}, {
 	        text: action.text,
 	        wait: action.wait
@@ -4947,6 +4891,68 @@
 	}
 
 /***/ },
+/* 54 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _ActionTypes = __webpack_require__(34);
+
+	var ActionTypes = _interopRequireWildcard(_ActionTypes);
+
+	var _chrome = __webpack_require__(55);
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+	exports.default = function (state) {
+	  return function (next) {
+	    return function (action) {
+	      var current = state.getState();
+	      var _current$page = current.page;
+	      var pages = _current$page.pages;
+	      var pageIndex = _current$page.pageIndex;
+
+	      var page = pages[pageIndex];
+	      switch (action.type) {
+
+	        case ActionTypes.ADD_PAGE:
+	          (0, _chrome.chromeSave)(action.page);
+	          return next(action);
+
+	        case ActionTypes.RENAME_PAGE:
+	          (0, _chrome.chromeRename)(action.name, page.name);
+	          return next(action);
+
+	        case ActionTypes.REMOVE_PAGE:
+	          (0, _chrome.chromeDelete)(pages[pageIndex].name);
+	          return next(action);
+
+	        case ActionTypes.UPLOAD_PAGE:
+	          // the upload action doesn't need to hit the reducer
+	          (0, _chrome.chromeUpload)(pages[pageIndex]);
+	          break;
+
+	        case ActionTypes.SAVE_ELEMENT:
+	        case ActionTypes.REMOVE_ELEMENT:
+	        case ActionTypes.RENAME_ELEMENT:
+	        case ActionTypes.SAVE_RULE:
+	        case ActionTypes.REMOVE_RULE:
+	        case ActionTypes.TOGGLE_OPTIONAL:
+	          (0, _chrome.chromeSave)(page);
+	          return next(action);
+
+	        default:
+	          return next(action);
+	      }
+	    };
+	  };
+	};
+
+/***/ },
 /* 55 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -4955,100 +4961,93 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
+	exports.chromeUpload = exports.chromeLoad = exports.chromeDelete = exports.chromeRename = exports.chromeSave = undefined;
 
-	var _ActionTypes = __webpack_require__(31);
+	var _selection = __webpack_require__(32);
 
-	var ActionTypes = _interopRequireWildcard(_ActionTypes);
+	var _page = __webpack_require__(31);
 
-	var _chrome = __webpack_require__(45);
-
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-	exports.default = function (state) {
-	  return function (next) {
-	    return function (action) {
-	      switch (action.type) {
-	        case ActionTypes.UPLOAD_PAGE:
-	          var current = state.getState();
-	          var _current$page = current.page;
-	          var pages = _current$page.pages;
-	          var pageIndex = _current$page.pageIndex;
-
-	          (0, _chrome.chromeUpload)(pages[pageIndex]);
-	      }
-	      return next(action);
-	    };
-	  };
+	/*
+	 * any time that the page is updated, the stored page should be updated
+	 */
+	var chromeSave = exports.chromeSave = function chromeSave(page) {
+	  if (page === undefined) {
+	    return;
+	  }
+	  var cleaned = (0, _page.clean)(page);
+	  chrome.storage.local.get("sites", function saveSchemaChrome(storage) {
+	    var host = window.location.hostname;
+	    storage.sites[host] = storage.sites[host] || {};
+	    storage.sites[host][cleaned.name] = cleaned;
+	    chrome.storage.local.set({ "sites": storage.sites });
+	  });
 	};
 
-/***/ },
-/* 56 */
-/***/ function(module, exports, __webpack_require__) {
+	var chromeRename = exports.chromeRename = function chromeRename(newName, oldName) {
+	  chrome.storage.local.get("sites", function saveSchemaChrome(storage) {
+	    var host = window.location.hostname;
+	    var page = storage.sites[host][oldName];
+	    page.name = newName;
+	    storage.sites[host][newName] = page;
+	    delete storage.sites[host][oldName];
+	    chrome.storage.local.set({ "sites": storage.sites });
+	  });
+	};
 
-	"use strict";
+	/*
+	 * remove the page with the given name from storage
+	 */
+	var chromeDelete = exports.chromeDelete = function chromeDelete(name) {
+	  if (name === undefined) {
+	    return;
+	  }
+	  chrome.storage.local.get("sites", function saveSchemaChrome(storage) {
+	    var host = window.location.hostname;
+	    delete storage.sites[host][name];
+	    chrome.storage.local.set({ "sites": storage.sites });
+	  });
+	};
 
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
+	/*
+	creates an object representing a site and saves it to chrome.storage.local
+	the object is:
+	    host:
+	        site: <hostname>
+	        page: <page>
 
-	var _ActionTypes = __webpack_require__(31);
+	If the site object exists for a host, load the saved rules
+	*/
+	var chromeLoad = exports.chromeLoad = function chromeLoad(callback) {
+	  chrome.storage.local.get("sites", function setupHostnameChrome(storage) {
+	    var host = window.location.hostname;
+	    var current = storage.sites[host] || {};
+	    var pages = Object.keys(current).map(function (key) {
+	      return current[key];
+	    }).filter(function (p) {
+	      return p !== null;
+	    });
+	    pages.forEach(function (p) {
+	      return (0, _page.setupPage)(p);
+	    });
+	    callback(pages);
+	  });
+	};
 
-	var types = _interopRequireWildcard(_ActionTypes);
-
-	var _text = __webpack_require__(37);
-
-	var _page = __webpack_require__(42);
-
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-	exports.default = function (state) {
-	  return function (next) {
-	    return function (action) {
-	      if (action.type === types.ADD_PAGE || action.type === types.RENAME_PAGE) {
-	        (function () {
-	          action.error = false;
-
-	          var current = state.getState();
-	          var _current$page = current.page;
-	          var pages = _current$page.pages;
-	          var pageIndex = _current$page.pageIndex;
-
-	          var name = action.name;
-	          var wait = 5000;
-
-	          // verify that the name contains no illegal characters
-	          if (!(0, _text.legalName)(name)) {
-	            action.text = "Name \"" + name + "\" contains one or more illegal characters (< > : \" \\ / | ? *)";
-	            action.wait = wait;
-	            action.error = true;
-	          }
-	          // verify that a page with the given name does not already exist
-	          var exists = pages.some(function (curr) {
-	            return curr === undefined ? false : name === curr.name;
-	          });
-	          if (exists) {
-	            action.text = "A page with the name \"" + name + "\" already exists";
-	            action.wait = wait;
-	            action.error = true;
-	          }
-	          action.element = current.element;
-	          // need to actually create the page for ADD_PAGE
-	          if (!action.error) {
-	            if (action.type === types.ADD_PAGE) {
-	              var newPage = (0, _page.createPage)(name);
-	              (0, _page.setupPage)(newPage);
-	              action.page = newPage;
-	              action.element = newPage.element;
-	            } else {
-	              var currentPage = pages[pageIndex];
-	              currentPage.name = name;
-	            }
-	          }
-	        })();
-	      }
-	      return next(action);
-	    };
-	  };
+	/*
+	 * formats the page and sends it to the background script, which will upload it to the server
+	 */
+	var chromeUpload = exports.chromeUpload = function chromeUpload(page) {
+	  if (page === undefined) {
+	    return;
+	  }
+	  chrome.runtime.sendMessage({
+	    type: "upload",
+	    data: {
+	      name: page.name,
+	      site: window.location.hostname,
+	      page: JSON.stringify((0, _page.clean)(page))
+	    }
+	  });
 	};
 
 /***/ }

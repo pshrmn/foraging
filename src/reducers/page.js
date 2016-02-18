@@ -28,9 +28,6 @@ export default function page(state = {}, action) {
    * so care needs to be taken when uploading.
    */
   case types.ADD_PAGE:
-    if ( action.error ) {
-      return state;
-    }
     var pages = state.pages;
     var newPages = [...pages, action.page];
     return Object.assign({}, state, {
@@ -54,6 +51,14 @@ export default function page(state = {}, action) {
       pageIndex: 0
     });
 
+  case types.RENAME_PAGE:
+    var { pages, pageIndex } = state;
+    var page = pages[pageIndex];
+    page.name = action.name;
+    return Object.assign({}, state, {
+      pages: [...pages.slice(0, pageIndex), page, ...pages.slice(pageIndex+1)]
+    });
+
   /*
    * all of the updating is done in the components, which is not very redux-y,
    * but since the data is tree-like and the tree's nodes are passed by
@@ -64,7 +69,6 @@ export default function page(state = {}, action) {
    * can reflect 
    *
    */
-  case types.RENAME_PAGE:
   case types.SAVE_ELEMENT:
   case types.REMOVE_ELEMENT:
   case types.RENAME_ELEMENT:

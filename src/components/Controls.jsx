@@ -5,18 +5,32 @@ import NoSelectMixin from "./NoSelectMixin";
 import { PosButton, NeutralButton } from "./Buttons";
 import Message from "./Message";
 
-import { addPage, loadPage, closeForager } from "../actions";
+import { validName } from "../helpers/text";
+import { createPage, setupPage } from "../helpers/page";
+import { addPage, loadPage, closeForager, showMessage } from "../actions";
 
 const Controls = React.createClass({
   mixins: [NoSelectMixin],
   addHandler: function(event) {
     event.preventDefault();
+
     const name = window.prompt("Page Name:\nCannot contain the following characters: < > : \" \\ / | ? * ");
-    // don't bother sending an action if the user cancels or does not enter a name
-    if ( name === null || name === "" ) {
-      return;
+    const existingNames = this.props.pages
+      .filter(p => p !== undefined)
+      .map(p => p.name);
+    if ( !validName(name, existingNames) ) {
+      this.props.showMessage(
+        `Invalid Name: "${name}"`,
+        5000
+      );
+    } else {
+
+      const newPage = createPage(name);
+      setupPage(newPage);
+    
+      this.props.addPage(newPage);
+      
     }
-    this.props.addPage(name);
   },
   loadHandler: function(event) {
     const nextPageIndex = parseInt(event.target.value, 10);
@@ -74,6 +88,7 @@ export default connect(
   {
     addPage,
     loadPage,
-    closeForager
+    closeForager,
+    showMessage
   }
 )(Controls);

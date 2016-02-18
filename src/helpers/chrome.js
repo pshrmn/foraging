@@ -17,6 +17,17 @@ export const chromeSave = page => {
   });
 }
 
+export const chromeRename = (newName, oldName) => {
+  chrome.storage.local.get("sites", function saveSchemaChrome(storage){
+    const host = window.location.hostname;
+    const page = storage.sites[host][oldName];
+    page.name = newName;
+    storage.sites[host][newName] = page;
+    delete storage.sites[host][oldName];
+    chrome.storage.local.set({"sites": storage.sites});
+  });
+}
+
 /*
  * remove the page with the given name from storage
  */
@@ -44,7 +55,9 @@ export const chromeLoad = callback => {
   chrome.storage.local.get("sites", function setupHostnameChrome(storage){
     const host = window.location.hostname;
     const current = storage.sites[host] || {};
-    const pages = Object.keys(current).map(key => current[key]);
+    const pages = Object.keys(current)
+      .map(key => current[key])
+      .filter(p => p !== null);
     pages.forEach(p => setupPage(p));
     callback(pages);
   });

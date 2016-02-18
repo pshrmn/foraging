@@ -41,8 +41,14 @@ const ElementFrame = React.createClass({
     element.spec.value = newName;
     renameElement();
   },
+  removeRule: function(index) {
+    const rules = this.props.element.rules;
+    this.props.element.rules = [...rules.slice(0, index), ...rules.slice(index+1)];
+    this.props.removeRule();
+  },
   toggleOptional: function(event) {
-    this.props.toggleOptional(!this.props.element.optional);
+    this.props.element.optional = !this.props.element.optional;
+    this.props.toggleOptional();
   },
   render: function() {
     const { element } = this.props;
@@ -73,7 +79,7 @@ const ElementFrame = React.createClass({
             Optional: <input type="checkbox" checked={optional} onChange={this.toggleOptional} />
           </div>
           <RuleList rules={rules}
-                    remove={this.props.removeRule} />
+                    remove={this.removeRule} />
         </div>
         <div className="buttons">
           <PosButton text="Add Child"

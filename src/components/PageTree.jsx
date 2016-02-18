@@ -5,12 +5,12 @@ import d3 from "d3";
 import NoSelectMixin from "./NoSelectMixin";
 import { PosButton, NegButton, NeutralButton } from "./Buttons";
 
-import { abbreviate } from "../helpers/text";
+import { abbreviate, validName } from "../helpers/text";
 import { clone } from "../helpers/page";
 import { highlight, unhighlight } from "../helpers/markup";
-import { chromeDelete } from "../helpers/chrome";
+
 import { selectElement, renamePage, removePage,
-  uploadPage, showPreview } from "../actions";
+  uploadPage, showPreview, showMessage } from "../actions";
 
 /*
  * A tree rendering of the page, used to show the current page, the current
@@ -68,8 +68,8 @@ const PageTree = React.createClass({
     );
   },
   render: function() {
-    const { page, width, height,
-      renamePage, removePage, uploadPage, showPreview } = this.props;
+    const { page, pageNames, width, height,
+      renamePage, removePage, uploadPage, showPreview, showMessage } = this.props;
     // return an empty .graph when there is no page
     if ( page === undefined ) {
       return <div className="graph"></div>
@@ -88,6 +88,8 @@ const PageTree = React.createClass({
                         removePage={removePage}
                         uploadPage={uploadPage}
                         showPreview={showPreview}
+                        showMessage={showMessage}
+                        pageNames={pageNames}
                         {...page} />
         </div>
         <svg width={width+100}
@@ -175,17 +177,20 @@ const PageControls = React.createClass({
     event.preventDefault();
     const name = window.prompt("Page Name:\nCannot contain the following characters: < > : \" \\ / | ? * ");
     // do nothing if the user cancels, does not enter a name, or enter the same name as the current one
-    if ( name === null || name === "" || name === this.props.name) {
-      return;
+    if ( !validName(name, this.props.pageNames)) {
+      this.props.showMessage(
+        `Invalid Name: "${name}"`,
+        5000
+      );
+    } else {
+      this.props.renamePage(name);
     }
-    this.props.renamePage(name);
   },
   deleteHandler: function(event) {
     event.preventDefault();
     if ( !confirm(`Are you sure you want to delete the page "${this.props.name}"?`)) {
       return;
     }
-    chromeDelete(this.props.name);
     // report the current page index
     this.props.removePage();
   },
@@ -212,6 +217,7 @@ const PageControls = React.createClass({
 export default connect(
   state => ({
     page: state.page.pages[state.page.pageIndex],
+    pageNames: state.page.pages.filter(p => p !== undefined).map(p => p.name),
     element: state.element,
     active: state.frame.name === "element"
   }),
@@ -220,6 +226,7 @@ export default connect(
     renamePage,
     removePage,
     uploadPage,
-    showPreview
+    showPreview,
+    showMessage
   }
 )(PageTree);

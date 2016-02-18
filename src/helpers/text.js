@@ -1,9 +1,12 @@
-export const legalName = name => {
+export const validName = (name, takenNames = []) => {
   if ( name === null || name === "" ) {
     return false;
   }
   const badCharacters = /[<>:"\/\\\|\?\*]/;
-  return name.match(badCharacters) === null
+  if ( name.match(badCharacters) !== null ) {
+    return false;
+  }
+  return takenNames.every(tn => tn !== name);
 };
 
 export const abbreviate = (text, max) => {

@@ -5,12 +5,14 @@ import Controls from "./Controls";
 import Frames from "./frames/Frames";
 import PageTree from "./PageTree";
 import Preview from "./Preview";
+import NoSelectMixin from "./NoSelectMixin";
 
 const Forager = React.createClass({
+  mixins: [NoSelectMixin],
   render: function() {
     const hidden = this.props.show ? "" : "hidden";
     return (
-      <div id="forager" className={hidden}>
+      <div id="forager" className={hidden} ref="parent">
         <Controls  />
         <div className="workspace">
           <PageTree />

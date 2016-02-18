@@ -1,27 +1,27 @@
 import { expect } from "chai";
 
-import { legalName, abbreviate } from "../../src/helpers/text";
+import { validName, abbreviate } from "../../src/helpers/text";
 
 describe("text", () => {
 
-  describe("legalName", () => {
+  describe("validName", () => {
     it("returns true for legal names", () => {
       const allGood = [
         "these",
         "names_are",
         "all-legal"
       ].every(s => {
-        return legalName(s);
+        return validName(s);
       });
       expect(allGood).to.be.true;
     });
 
     it("returns false when a name is null", () => {
-      expect(legalName(null)).to.be.false;
+      expect(validName(null)).to.be.false;
     });
 
     it("returns false when a name is an empty string", () => {
-      expect(legalName("")).to.be.false;
+      expect(validName("")).to.be.false;
     });    
 
     it("returns false when a name contains illegal characters", () => {
@@ -36,9 +36,15 @@ describe("text", () => {
         "?name",
         "*name"
       ].every(s => {
-        return !legalName(s);
+        return !validName(s);
       })
       expect(allBad).to.be.true;
+    });
+
+    it("returns false when a name is already taken", () => {
+      const existing = ["foo", "bar", "baz"];
+      expect(validName("test", existing)).to.be.true;
+      expect(validName("foo", existing)).to.be.false;
     });
   });
 

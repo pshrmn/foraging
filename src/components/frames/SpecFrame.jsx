@@ -28,10 +28,14 @@ const SpecFrame = React.createClass({
       return;
     }
     const ele = createElement(css, type, value, optional);
-    // generate the list of elements for the new element
+
+    // select all of the elements in the page that are matched by the new element
     ele.elements = select(parent.elements, ele.selector, ele.spec);
+
     ele.parent = parent;
     parent.children.push(ele);
+
+    // SPECIAL CASE: "select" elements
     // if saving a selector that selects "select" elements, add a child selector
     // to match option elements
     if ( allSelect(ele.elements) ) {
@@ -40,6 +44,7 @@ const SpecFrame = React.createClass({
       optionsChild.parent = ele;
       ele.children.push(optionsChild);
     }
+
     this.props.save(ele);
   },
   cancelHandler: function(event) {

@@ -23,8 +23,9 @@ describe("redux actions", () => {
     });
 
     it("sets the page value", () => {
-      const action = actions.addPage("example");
-      expect(action.name).to.equal("example");
+      const page = {name: "fake page"};
+      const action = actions.addPage(page);
+      expect(action.page).to.equal(page);
     })
   });
 
@@ -185,29 +186,28 @@ describe("redux actions", () => {
 
   describe("saveRule", () => {
     it("returns an action to add a rule to the current element", () => {
-      const rule = {name: "url", attr: "href"};
-      const action = actions.saveRule(rule);
+      const action = actions.saveRule();
       expect(action.type).to.equal(ActionTypes.SAVE_RULE);
-    });
-
-    it("sets the rule property of the action", () => {
-      const rule = {name: "url", attr: "href"};
-      const action = actions.saveRule(rule);
-      expect(action.rule).to.eql(rule);
     });
   });
 
   describe("removeRule", () => {
     it("returns an action to remove a rule from the current element", () => {
-      const action = actions.removeRule(3);
+      const action = actions.removeRule();
       expect(action.type).to.equal(ActionTypes.REMOVE_RULE);
     });
-
-    it("sets the index property of the action for the rule to remove", () => {
-      const action = actions.removeRule(3);
-      expect(action.index).to.equal(3);
-    });
   });
+
+  describe("toggleOptional", () => {
+    it(
+      "returns an action to specify that the current element's optional property has been toggles",
+      () => {
+        const action = actions.removeRule();
+        expect(action.type).to.equal(ActionTypes.REMOVE_RULE);
+      }
+    );
+  });
+
 
   /*
   describe("", () => {
