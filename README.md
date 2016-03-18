@@ -31,19 +31,29 @@ from gatherer import Cache
 cache = Cache("cache_folder")
 ```
 
+###Backends
+Backend functions take a url and return the text of the returned web page. There are two built-in backends, `requests_backend` and `phantom_backend`.
+
+* `requests_backend` uses the `requests` module to make the request. This function can be passed directly to the `Fetch` class.
+* `phantom_backend` is a closure that takes two paths, the first to the `phantomjs` executable and the second to a JavaScript script that `phantomjs` uses to get the content of a web page from a url. The closure returns a function that is passed to the Fetch class. This backend is most useful when you have pages whose content isn't given with the base HTML and relies on JavaScript to render the page.
+
 ###Fetch
 A fetcher takes a url and return the DOM (as parsed by `lxml`) of the corresponding web page. Requests can either be static (default) or dynamic. In order to make dynamic requests, the `make_dynamic` function needs to be called on the fetcher.
 
 Arguments:
 
+* `backend`: a function that takes a url and headers and returns the text of the web page at the url.
+* `headers`: a dict of headers to send with the request. Your headers must include a `'User-Agent'` key to identify your gatherer.
 * `sleep_time`: how long to wait until the next request. (default `5`)
-* `headers`: a dict of headers to send with the request. Your headers should include a `'User-Agent'` key to identify your gatherer.
 * `cache`: an optional `Cache` object used to store webpages to mitigate duplicate requests (default `None`)
 
 ```python
-from gatherer import Fetch
+from gatherer import Fetch, requests_backend, phantom_backend
 
-fetch = Fetch(headers={"User-Agent": "custom-gatherer-user-agent"})
+fetch = Fetch(requests_backend, headers={"User-Agent": "custom-gatherer-user-agent"})
+
+phantom_get = phantom_backend('./phantomjs.exe', './getScript.js')
+dynamic_fetch = Fetch(phantom_get, headers={"User-Agent": "custom-gatherer-user-agent"})
 ```
 
 ######get(url, dynamic=False)
@@ -51,13 +61,6 @@ Takes a url and if the request was successful it returns an lxml html element, o
 
 ```python
 fetch.get("http://www.example.com")
-```
-
-######make_dynamic(phantom_path, js_path)
-`make_dynamic` sets up the fetcher to be able to make requests to pages that have data you want to collect that is dynamically loaded. This requires PhantomJS and a Phantomjs script that logs the page's html. PhantomJS can be downloaded from its [website](http://phantomjs.org/). The code in [html_text.js](/html_text.js) should be downloaded and placed in your project folder. Calling this allows get requests using PhantomJS to be made by passing a `dynamic=True` argument in your `get` calls. If either path does not exist, this will raise a `ValueError`.
-
-```python
-f.make_dynamic("phantomjs/phantomjs.exe", "html_text.js")
 ```
 
 ###Pages
@@ -71,10 +74,10 @@ Usage:
 
 ```python
 import json
-from gatherer import Page, Fetch
+from gatherer import Page, Fetch, requests_backend
 from gatherer.errors import BadJSONError
 
-f = Fetch()
+f = Fetch(requests_backend, {'User-Agent': 'example-agent'})
 try:
     with open("page.json") as fp:
         data = json.load(fp)
@@ -89,8 +92,6 @@ except BadJSONError:
 Use the `Fetch` object to get the data for the page by calling `get` with the `url` of the desired page.
 
 ```python
-from gatherer import Fetch
-f = Fetch()
 dom = f.get(url)
 data = p.gather(dom)
 ```

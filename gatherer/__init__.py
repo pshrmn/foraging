@@ -3,11 +3,11 @@ Gatherer
 ~~~~~~~~
 
 A tiny web scraping library. Pairs well with https://github.com/psherman/forager
-for creating rule sets.
+for creating rule sets to get structured data.
 
     >>> import json
-    >>> from Gatherer import Fetch, Page
-    >>> f = Fetch(header={"User-Agent": "My Custom User Agent"})
+    >>> from Gatherer import Page, Fetch, requests_backend
+    >>> f = Fetch(requests_backend, header={"User-Agent": "My Custom User Agent"})
     >>> with open("example.json") as fp:
     >>>     page_json = json.load(fp)
     >>> p = Page.from_json(page_json)
@@ -21,8 +21,8 @@ for creating rule sets.
 :license: MIT, see LICENSE for more details
 """
 
-__version__ = "1.5.0"
+__version__ = "1.6.0"
 
-from .fetch import Fetch
+from .fetch import Fetch, requests_backend, phantom_backend
 from .cache import Cache
 from .page import Page

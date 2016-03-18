@@ -94,8 +94,7 @@ class RuleTestCase(unittest.TestCase):
         html_string = "<div>Nothing to see here</div>"
         ele = html.fragment_fromstring(html_string)
         val = r.get(ele)
-        self.assertIsInstance(val, int)
-        self.assertEqual(val, -1)
+        self.assertIsNone(val)
 
     def test_type_float(self):
         examples = [
@@ -116,7 +115,7 @@ class RuleTestCase(unittest.TestCase):
             self.assertEqual(val, expected)
 
     def test_bad_float(self):
-        # should return -1.0
+        # should return None
         r = Rule.from_json({
             "name": "url",
             "attr": "text",
@@ -125,8 +124,7 @@ class RuleTestCase(unittest.TestCase):
         html_string = "<div>Nothing to see here</div>"
         ele = html.fragment_fromstring(html_string)
         val = r.get(ele)
-        self.assertIsInstance(val, float)
-        self.assertEqual(val, -1.0)
+        self.assertIsNone(val)
 
 if __name__ == "__main__":
     unittest.main()
