@@ -6,7 +6,7 @@ with open("pages/schedule.json") as fp:
     schedule_json = json.load(fp)
 
 c = Cache("cache")
-f = Fetch(cache=c)
+f = Fetch(headers={'User-Agent': 'gatherer agent'}, cache=c)
 
 schedule = Page.from_json(schedule_json)
 

@@ -25,7 +25,7 @@ def coordinate_decimal(coord):
     return float(coord["degree"]) + (float(coord["minutes"])/60)
 
 c = Cache("cache")
-f = Fetch(cache=c)
+f = Fetch(headers={'User-Agent': 'gatherer agent'}, cache=c)
 
 with open("pages/stadiums.json") as fp:
     stadium_json = json.load(fp)
