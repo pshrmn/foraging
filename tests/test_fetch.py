@@ -14,7 +14,6 @@ def fake_backend(url, headers):
 class PhantomBackendTestCase(unittest.TestCase):
 
     def test_phantom_backend(self):
-
         """
         verify that the phantom_backend closure requires that the
         phantom_path and js_path files exist
@@ -29,9 +28,10 @@ class PhantomBackendTestCase(unittest.TestCase):
             phantom_backend(phantom_path, 'fake_path.js')
         # both paths exist
         try:
-            backend = phantom_backend(phantom_path, js_path)
+            phantom_backend(phantom_path, js_path)
         except ValueError:
             self.fail('phantom_backend raises ValueError')
+
 
 class FetchTestCase(unittest.TestCase):
 
@@ -51,6 +51,11 @@ class FetchTestCase(unittest.TestCase):
         f = Fetch(fake_backend, {'User-Agent': 'my fetcher'}, sleep_time=0)
         dom = f.get('http://www.example.com')
         self.assertIsInstance(dom, HtmlElement)
+
+    def test_default_values(self):
+        f = Fetch(headers={'User-Agent': 'my fetcher'})
+        self.assertEqual(f.backend, requests_backend)
+        self.assertEqual(f.sleep_time, 5)
 
 
 if __name__ == "__main__":

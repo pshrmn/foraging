@@ -27,7 +27,7 @@ If you are starting from here, you will need to create the :code:`subreddit.py` 
 Basics
 ^^^^^^
 
-Parse the file containing the desired rules and create a :code:`Fetch` object to get content from urls and a :code:`Page` object to gather the desired data from the content.
+Parse the file containing the desired rules and create a :code:`Fetch` object to get content from urls and a :code:`Page` object to gather the desired data from the content. All of the content that will be useful for us is available in the static HTML markup, so we can use the default :code:`backend`, :code:`requests_backend` to make requests instead of specifying one.
 
 .. code-block:: python
 

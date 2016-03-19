@@ -87,18 +87,19 @@ class Fetch(object):
         making a network request
     """
 
-    def __init__(self, backend, headers, sleep_time=5, cache=None):
+    def __init__(self, backend=requests_backend, headers=None, sleep_time=5, cache=None):
         self.last = {}
         self.sleep_time = sleep_time
 
         self.cache = cache
-        
+
         self.backend = backend
         self.headers = headers
-        if self.headers is None or 'User-Agent' not in self.headers:
+        if not isinstance(self.headers, dict) or 'User-Agent' not in self.headers:
             raise ValueError(
                 'Headers dict must include "User-Agent" key, received'.format(self.headers)
             )
+        # the cleaner is used to remove dom markup gatherer doesn't care about
         self.cleaner = Cleaner(style=True, links=True, add_nofollow=True,
                                page_structure=False, safe_attrs_only=False)
 

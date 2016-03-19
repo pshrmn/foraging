@@ -21,7 +21,7 @@ for creating rule sets to get structured data.
 :license: MIT, see LICENSE for more details
 """
 
-__version__ = "1.6.0"
+__version__ = "1.6.1"
 
 from .fetch import Fetch, requests_backend, phantom_backend
 from .cache import Cache

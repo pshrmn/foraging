@@ -1,6 +1,6 @@
 #gatherer
 
-Gather data from web pages. Works with pages created by [Forager](https://github.com/psherman/forager). For the data format, refer to that project's README.
+Gather data from web pages. Works with pages created by [Forager](https://github.com/pshrmn/forager). For the data format, refer to that project's README.
 
 ##[Tutorial](http://www.pshrmn.com/tutorials/gatherer/)
 
@@ -8,7 +8,7 @@ Gather data from web pages. Works with pages created by [Forager](https://github
 
 Install gatherer using pip
 
-    pip install git+git://github.com/psherman/gatherer.git
+    pip install git+git://github.com/pshrmn/gatherer.git
 
 For Windows users, if installing `lxml` causes errors, download the wheel from the [Python Extension Packages for Windows](http://www.lfd.uci.edu/~gohlke/pythonlibs/#lxml) and place the wheel in your project. Pip install that file, then try the above gatherer installation.
 
@@ -34,7 +34,7 @@ cache = Cache("cache_folder")
 ###Backends
 Backend functions take a url and return the text of the returned web page. There are two built-in backends, `requests_backend` and `phantom_backend`.
 
-* `requests_backend` uses the `requests` module to make the request. This function can be passed directly to the `Fetch` class.
+* `requests_backend` (default) uses the `requests` module to make the request. This function can be passed directly to the `Fetch` class.
 * `phantom_backend` is a closure that takes two paths, the first to the `phantomjs` executable and the second to a JavaScript script that `phantomjs` uses to get the content of a web page from a url. The closure returns a function that is passed to the Fetch class. This backend is most useful when you have pages whose content isn't given with the base HTML and relies on JavaScript to render the page.
 
 ###Fetch
@@ -50,10 +50,13 @@ Arguments:
 ```python
 from gatherer import Fetch, requests_backend, phantom_backend
 
-fetch = Fetch(requests_backend, headers={"User-Agent": "custom-gatherer-user-agent"})
+fetch = Fetch(backend=requests_backend, headers={"User-Agent": "custom-gatherer-user-agent"})
+# requests_backend is the default backend, so it doesn't
+# actually need to be specified
+fetch = Fetch(headers={"User-Agent": "custom-gatherer-user-agent"})
 
 phantom_get = phantom_backend('./phantomjs.exe', './getScript.js')
-dynamic_fetch = Fetch(phantom_get, headers={"User-Agent": "custom-gatherer-user-agent"})
+dynamic_fetch = Fetch(backend=phantom_get, headers={"User-Agent": "custom-gatherer-user-agent"})
 ```
 
 ######get(url, dynamic=False)
@@ -64,7 +67,7 @@ fetch.get("http://www.example.com")
 ```
 
 ###Pages
-Pages are collections of rules to gather data from elements in a web page. For a better explanation of the makeup of a Page, read the README for [Forager](https://github.com/psherman/forager)
+Pages are collections of rules to gather data from elements in a web page. For a better explanation of the makeup of a Page, read the README for [Forager](https://github.com/pshrmn/forager)
 
 ####Page
 
@@ -74,10 +77,10 @@ Usage:
 
 ```python
 import json
-from gatherer import Page, Fetch, requests_backend
+from gatherer import Page, Fetch
 from gatherer.errors import BadJSONError
 
-f = Fetch(requests_backend, {'User-Agent': 'example-agent'})
+f = Fetch(headers={'User-Agent': 'example-agent'})
 try:
     with open("page.json") as fp:
         data = json.load(fp)

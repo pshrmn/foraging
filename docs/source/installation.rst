@@ -12,8 +12,8 @@ Windows
 
 For Windows users, installing :code:`lxml` may cause errors. If it does, you can install :code:`lxml` by downloading the :code:`lxml` wheel from the `Python Extension Packages for Windows <http://www.lfd.uci.edu/~gohlke/pythonlibs/#lxml>`_ and installing.
 
-Install Wheel
-^^^^^^^^^^^^^
+Install lxml From Wheel
+^^^^^^^^^^^^^^^^^^^^^^^
 
 If you are not using a virtual environment, you can navigate to the downloaded folder in the command prompt and install from there. Otherwise, you should move the wheel to your project directory (and after activating the virtual environment) install :code:`lxml`. Call the command shown below to install :code:`lxml`.
 
