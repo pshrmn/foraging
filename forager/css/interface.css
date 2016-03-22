@@ -26,12 +26,47 @@ body.foraging {
      * input elements are the source of the biggest style
      * issues, so !important is used quite liberally
      */ }
+  #forager div, #forager span, #forager applet, #forager object, #forager iframe,
+  #forager h1, #forager h2, #forager h3, #forager h4, #forager h5, #forager h6, #forager p, #forager blockquote, #forager pre,
+  #forager a, #forager abbr, #forager acronym, #forager address, #forager big, #forager cite, #forager code,
+  #forager del, #forager dfn, #forager em, #forager img, #forager ins, #forager kbd, #forager q, #forager s, #forager samp,
+  #forager small, #forager strike, #forager strong, #forager sub, #forager sup, #forager tt, #forager var,
+  #forager b, #forager u, #forager i, #forager center,
+  #forager dl, #forager dt, #forager dd, #forager ol, #forager ul, #forager li,
+  #forager fieldset, #forager form, #forager label, #forager legend,
+  #forager table, #forager caption, #forager tbody, #forager tfoot, #forager thead, #forager tr, #forager th, #forager td,
+  #forager article, #forager aside, #forager canvas, #forager details, #forager embed,
+  #forager figure, #forager figcaption, #forager footer, #forager header, #forager hgroup,
+  #forager menu, #forager nav, #forager output, #forager ruby, #forager section, #forager summary,
+  #forager time, #forager mark, #forager audio, #forager video {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    font: inherit;
+    vertical-align: baseline; }
+  #forager article, #forager aside, #forager details, #forager figcaption, #forager figure,
+  #forager footer, #forager header, #forager hgroup, #forager menu, #forager nav, #forager section {
+    display: block; }
+  #forager body {
+    line-height: 1; }
+  #forager ol, #forager ul {
+    list-style: none; }
+  #forager blockquote, #forager q {
+    quotes: none; }
+  #forager blockquote:before, #forager blockquote:after,
+  #forager q:before, #forager q:after {
+    content: '';
+    content: none; }
+  #forager table {
+    border-collapse: collapse;
+    border-spacing: 0; }
   #forager.hidden {
     display: none !important; }
   #forager * {
-    color: #000000;
+    color: #222233;
     box-sizing: border-box;
-    line-height: 1.1em !important; }
+    line-height: 1.1 !important; }
   #forager .not-allowed {
     cursor: no-drop; }
     #forager .not-allowed * {
@@ -41,7 +76,7 @@ body.foraging {
   #forager .hidden {
     display: none !important; }
   #forager input, #forager select, #forager option, #forager textarea, #forager button {
-    line-height: 1.1em !important;
+    line-height: 1.1 !important;
     padding: 0 !important;
     margin: 0 !important;
     font-size: 1em !important;
@@ -132,7 +167,8 @@ body.foraging {
   #forager .topbar {
     min-height: 31px;
     margin-bottom: 10px;
-    min-width: 650px; }
+    min-width: 650px;
+    background: #222233; }
     #forager .topbar span {
       color: #EFEFEF; }
     #forager .topbar .controls {
@@ -145,7 +181,8 @@ body.foraging {
       padding: 0; }
     #forager .topbar button {
       display: inline-block;
-      line-height: 1.25em !important;
+      line-height: 1.25 !important;
+      min-height: 1.25em !important;
       border-radius: 3px;
       border-width: 1px;
       border-style: solid;
@@ -267,7 +304,7 @@ body.foraging {
       margin: 5px 0; }
       #forager .frames .rules .rule {
         height: inherit;
-        line-height: 1.1em; }
+        line-height: 1.1; }
         #forager .frames .rules .rule > * {
           margin: 0 3px; }
     #forager .frames .rule-name {
@@ -294,7 +331,7 @@ body.foraging {
       color: #ffffff !important;
       margin: 0 !important; }
       #forager .app-controls button:hover {
-        background: #000000 !important; }
+        background: #222233 !important; }
 
 .preview-holder {
   z-index: 2147483638;
