@@ -117,8 +117,8 @@ export const simpleGrow = elementArray => {
     return {
       selector: e.selector,
       spec: Object.assign({}, e.spec),
-      hasRules: e.rules.length,
-      hasChildren: e.childIndices.length,
+      hasRules: e.rules.length > 0,
+      hasChildren: e.childIndices.length > 0,
       children: [],
       index: e.index,
       parent: e.parent,

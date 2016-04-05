@@ -111,8 +111,4 @@ function validID(id) {
 /*
  * check if all elements matched by the selector are "select" elements
  */
-export const allSelect = selection => {
-  return selection.every(ele => {
-    return ele.tagName === "SELECT";
-  });
-};
+export const allSelect = s => s.every(ele => ele.tagName === "SELECT");

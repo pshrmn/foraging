@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { jsdom } from "jsdom";
 
-import { select, count, parts } from "../../src/helpers/selection";
+import { select, count, parts, allSelect } from "../../src/helpers/selection";
 
 describe("selector", () => {
 
@@ -75,6 +75,18 @@ describe("selector", () => {
       element.classList.add("forager-highlight");
       const tags= parts(element);
       expect(tags).to.eql(["span"]);
+    });
+  });
+
+  describe("allSelect", () => {
+    it("returns true when all elements are select elements", () => {
+      const elements = ["select", "select", "select"].map(t => document.createElement(t));
+      expect(allSelect(elements)).to.be.true;
+    });
+
+    it("returns false if any elements are not select elements", () => {
+      const elements = ["select", "div", "select"].map(t => document.createElement(t));
+      expect(allSelect(elements)).to.be.false;
     });
   });
 });
