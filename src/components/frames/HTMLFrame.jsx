@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 import { PosButton, NegButton } from "../common/Buttons";
 import NoSelectMixin from "../NoSelectMixin";
 
-import { parts, select, count } from "../../helpers/selection";
+import { parts, select, count, allSelect } from "../../helpers/selection";
 import { stripEvents } from "../../helpers/attributes";
 import { highlight, unhighlight, iHighlight, iUnhighlight } from "../../helpers/markup";
 import { showPartsFrame, showElementFrame, showMessage } from "../../actions";
@@ -48,12 +48,18 @@ const HTMLFrame = React.createClass({
     }
   },
   getInitialState: function() {
+    const selectors = [["*"]];
+    // when the parentElements are select elements, automatically add "option"
+    // to the selectors array since it cannot be selected
+    if ( allSelect(this.props.parentElements) ) {
+      selectors.push(["option"]);
+    }
     return {
       // the index of the selected selector
       checked: undefined,
       // the array of possible selectors. each selector is an array of selector parts
       // ie tag name, class names, and id
-      selectors: [["*"]],
+      selectors: selectors,
       // the number of elements the currently selected selector matches
       eleCount: 0
     };

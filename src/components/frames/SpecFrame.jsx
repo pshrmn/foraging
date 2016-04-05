@@ -32,18 +32,6 @@ const SpecFrame = React.createClass({
 
     save(ele);
     return;
-
-    // TODO make options selector work, maybe rethink old way?
-    // SPECIAL CASE: "select" elements
-    // if saving a selector that selects "select" elements, add a child selector
-    // to match option elements
-    if ( allSelect(ele.elements) ) {
-      const optionsChild = createElement("option", "all", "option", false);
-      optionsChild.elements = select(ele.elements, optionsChild.selector, optionsChild.spec);
-      optionsChild.parent = ele;
-      ele.children.push(optionsChild);
-    }
-
   },
   cancelHandler: function(event) {
     event.preventDefault();

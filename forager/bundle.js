@@ -2169,8 +2169,8 @@
 	/*
 	 * check if all elements matched by the selector are "select" elements
 	 */
-	var allSelect = exports.allSelect = function allSelect(selection) {
-	  return selection.every(function (ele) {
+	var allSelect = exports.allSelect = function allSelect(s) {
+	  return s.every(function (ele) {
 	    return ele.tagName === "SELECT";
 	  });
 	};
@@ -2184,16 +2184,9 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.simpleGrow = exports.fullGrow = exports.clean = exports.selectElements = exports.flatten = exports.createElement = exports.createPage = undefined;
+	exports.simpleGrow = exports.fullGrow = exports.clean = exports.selectElements = exports.flatten = exports.createElement = undefined;
 
 	var _selection = __webpack_require__(29);
-
-	var createPage = exports.createPage = function createPage(name) {
-	  return {
-	    name: name,
-	    elements: [createElement("body")]
-	  };
-	};
 
 	var createElement = exports.createElement = function createElement(selector) {
 	  var type = arguments.length <= 1 || arguments[1] === undefined ? "single" : arguments[1];
@@ -2316,8 +2309,8 @@
 	    return {
 	      selector: e.selector,
 	      spec: Object.assign({}, e.spec),
-	      hasRules: e.rules.length,
-	      hasChildren: e.childIndices.length,
+	      hasRules: e.rules.length > 0,
+	      hasChildren: e.childIndices.length > 0,
 	      children: [],
 	      index: e.index,
 	      parent: e.parent,
@@ -3432,12 +3425,18 @@
 	    }
 	  },
 	  getInitialState: function getInitialState() {
+	    var selectors = [["*"]];
+	    // when the parentElements are select elements, automatically add "option"
+	    // to the selectors array since it cannot be selected
+	    if ((0, _selection.allSelect)(this.props.parentElements)) {
+	      selectors.push(["option"]);
+	    }
 	    return {
 	      // the index of the selected selector
 	      checked: undefined,
 	      // the array of possible selectors. each selector is an array of selector parts
 	      // ie tag name, class names, and id
-	      selectors: [["*"]],
+	      selectors: selectors,
 	      // the number of elements the currently selected selector matches
 	      eleCount: 0
 	    };
@@ -3840,17 +3839,6 @@
 
 	    save(ele);
 	    return;
-
-	    // TODO make options selector work, maybe rethink old way?
-	    // SPECIAL CASE: "select" elements
-	    // if saving a selector that selects "select" elements, add a child selector
-	    // to match option elements
-	    if ((0, _selection.allSelect)(ele.elements)) {
-	      var optionsChild = (0, _page.createElement)("option", "all", "option", false);
-	      optionsChild.elements = (0, _selection.select)(ele.elements, optionsChild.selector, optionsChild.spec);
-	      optionsChild.parent = ele;
-	      ele.children.push(optionsChild);
-	    }
 	  },
 	  cancelHandler: function cancelHandler(event) {
 	    event.preventDefault();
