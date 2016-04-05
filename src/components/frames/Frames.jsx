@@ -69,9 +69,15 @@ const Frames = React.createClass({
 });
 
 export default connect(
-  state => ({
-    frame: state.frame,
-    element: state.element
-  })
+  state => {
+    const { page, frame } = state;
+    const { pages, pageIndex, elementIndex } = page;
+    const currentPage = pages[pageIndex];
+    const element = currentPage === undefined ? undefined : currentPage.elements[elementIndex];
+    return {
+      frame,
+      element
+    }
+  }
 )(Frames);
 

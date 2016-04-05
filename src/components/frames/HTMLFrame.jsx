@@ -1,7 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
 
-import { PosButton, NegButton } from "../Buttons";
+import { PosButton, NegButton } from "../common/Buttons";
 import NoSelectMixin from "../NoSelectMixin";
 
 import { parts, select, count } from "../../helpers/selection";
@@ -166,9 +166,17 @@ const SelectorRadio = React.createClass({
 });
 
 export default connect(
-  state => ({
-    parentElements: state.element.elements
-  }),
+  state => {
+    const { page } = state;
+    const { pages, pageIndex, elementIndex } = page;
+
+    const currentPage = pages[pageIndex];
+    const element = currentPage === undefined ? undefined : currentPage.elements[elementIndex];
+    const parentElements = element.elements || [];
+    return {
+      parentElements
+    };
+  },
   {
     next: showPartsFrame,
     cancel: showElementFrame,

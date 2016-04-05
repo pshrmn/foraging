@@ -1,8 +1,9 @@
 import React from "react";
 import { connect } from "react-redux";
 
-import { PosButton, NegButton } from "./Buttons";
+import { PosButton, NegButton } from "./common/Buttons";
 
+import { fullGrow } from "../helpers/page";
 import { preview } from "../helpers/preview";
 import { hidePreview } from "../actions";
 
@@ -13,11 +14,11 @@ const Preview = React.createClass({
   },
   logHandler: function(event) {
     event.preventDefault();
-    console.log(JSON.stringify(preview(this.props.page)));
+    console.log(JSON.stringify(preview(this.props.tree)));
   },
   prettyLogHandler: function(event) {
     event.preventDefault();
-    console.log(JSON.stringify(preview(this.props.page), null, 2));
+    console.log(JSON.stringify(preview(this.props.tree), null, 2));
   },
   render: function() {
     if ( !this.props.visible ) {
@@ -34,7 +35,7 @@ const Preview = React.createClass({
             <NegButton text="Close" click={this.closeHandler} />
           </div>
           <pre>
-            {JSON.stringify(preview(this.props.page), null, 2)}
+            {JSON.stringify(preview(this.props.tree), null, 2)}
           </pre>
         </div>
       </div>
@@ -43,10 +44,18 @@ const Preview = React.createClass({
 });
 
 export default connect(
-  state => ({
-    page: state.page.pages[state.page.pageIndex],
-    visible: state.preview.visible
-  }),
+  state => {
+    const { page, preview } = state;
+    const { pages, pageIndex } = page;
+    const currentPage = pages[pageIndex];
+    return {
+      visible: preview.visible,
+      // only grow the tree when visible
+      tree: preview.visible ? 
+        currentPage === undefined ? {} : fullGrow(currentPage.elements) :
+        undefined
+    }
+  },
   {
     close: hidePreview
   }

@@ -3,10 +3,10 @@ import { connect } from "react-redux";
 import d3 from "d3";
 
 import NoSelectMixin from "./NoSelectMixin";
-import { PosButton, NegButton, NeutralButton } from "./Buttons";
+import { PosButton, NegButton, NeutralButton } from "./common/Buttons";
 
 import { abbreviate, validName } from "../helpers/text";
-import { clone } from "../helpers/page";
+import { simpleGrow } from "../helpers/page";
 import { highlight, unhighlight } from "../helpers/markup";
 
 import { selectElement, renamePage, removePage,
@@ -36,11 +36,10 @@ const PageTree = React.createClass({
     });
   },
   _makeNodes: function() {
-    const { page, element, active, selectElement } = this.props;
+    const { page, element, elementIndex, active, selectElement } = this.props;
     const { tree, diagonal } = this.state;
 
-    // clone the page since it overwrites children
-    const clonedPage = clone(page.element);
+    const clonedPage = simpleGrow(page.elements);
 
     // generate the tree's nodes and links
     const nodes = tree.nodes(clonedPage);
@@ -58,7 +57,7 @@ const PageTree = React.createClass({
         {
           nodes.map((n, i) => {
             return <Node key={i} 
-                         current={element !== undefined && n.original === element}
+                         current={element !== undefined && n.index === elementIndex}
                          select={selectElement}
                          active={active}
                          {...n} />
@@ -107,7 +106,7 @@ const Node = React.createClass({
   hoverClass: "saved-preview",
   handleClick: function(event) {
     event.preventDefault();
-    this.props.select(this.props.original);
+    this.props.select(this.props.index);
   },
   handleMouseover: function(event) {
     highlight(this.props.elements, this.hoverClass);
@@ -215,12 +214,19 @@ const PageControls = React.createClass({
 });
 
 export default connect(
-  state => ({
-    page: state.page.pages[state.page.pageIndex],
-    pageNames: state.page.pages.filter(p => p !== undefined).map(p => p.name),
-    element: state.element,
-    active: state.frame.name === "element"
-  }),
+  state => {
+    const { page, frame } = state;
+    const { pages, pageIndex, elementIndex } = page;
+    const currentPage = pages[pageIndex];
+    const element = currentPage === undefined ? undefined : currentPage.elements[elementIndex];
+    return {
+      page: currentPage,
+      pageNames: pages.filter(p => p !== undefined).map(p => p.name),
+      element: element,
+      active: frame.name === "element",
+      elementIndex
+    };
+  },
   {
     selectElement,
     renamePage,

@@ -1,4 +1,4 @@
-export const preview = page => {
+export const preview = tree => {
     /*
      * Given a parent element, get all children that match the selector
      * Return data based on element's type (index or name)
@@ -87,6 +87,6 @@ export const preview = page => {
         return data;
     }
 
-    return page === undefined ? "" : getElement(page.element, document);
+    return tree === undefined ? "" : getElement(tree, document);
 }
 

@@ -1,7 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
 
-import { PosButton, NegButton } from "../Buttons";
+import { PosButton, NegButton } from "../common/Buttons";
 
 import { attributes } from "../../helpers/attributes";
 import { select } from "../../helpers/selection";
@@ -39,12 +39,11 @@ const RuleFrame = React.createClass({
     const { name, type, attr } = this.state;
     // basic validation
     if ( name !== "" && attr !== "" ) {
-      this.props.element.rules.push({
+      this.props.saveRule({
         name: name,
         type: type,
         attr: attr
       });
-      this.props.save();
     }
   },
   cancelHandler: function(event) {
@@ -174,11 +173,17 @@ const AttrChoices = React.createClass({
 });
 
 export default connect(
-  state => ({
-    element: state.element
-  }),
+  state => {
+    const { page } = state;
+    const { pages, pageIndex, elementIndex } = page;
+    const currentPage = pages[pageIndex];
+    const element = currentPage === undefined ? undefined : currentPage.elements[elementIndex];
+    return {
+      element
+    };
+  },
   {
-    save: saveRule,
+    saveRule,
     cancel: showElementFrame
   }
 )(RuleFrame);

@@ -56,17 +56,17 @@
 
 	var _redux = __webpack_require__(3);
 
-	var _reactRedux = __webpack_require__(14);
+	var _reactRedux = __webpack_require__(15);
 
-	var _Forager = __webpack_require__(25);
+	var _Forager = __webpack_require__(23);
 
 	var _Forager2 = _interopRequireDefault(_Forager);
 
-	var _reducers = __webpack_require__(47);
+	var _reducers = __webpack_require__(48);
 
 	var _reducers2 = _interopRequireDefault(_reducers);
 
-	var _ActionTypes = __webpack_require__(34);
+	var _actions = __webpack_require__(31);
 
 	var _chromeMiddleware = __webpack_require__(54);
 
@@ -78,67 +78,61 @@
 
 	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
+	document.body.classList.add("foraging");
+
 	/*
 	 * check if the forager holder exists. If it doesn't, mount the app. If it does,
 	 * check if the app is hidden. If it is hidden, show it.
 	 */
-	var holder = document.querySelector(".forager-holder");
-	document.body.classList.add("foraging");
-	if (!holder) {
-	  (0, _chrome.chromeLoad)(function (pages) {
-	    /*
-	     * initialState uses the pages loaded by chrome
-	     */
-	    var initialState = {
-	      show: true,
-	      element: undefined,
-	      page: {
-	        pages: [undefined].concat(_toConsumableArray(pages)),
-	        pageIndex: 0
-	      },
-	      frame: {
-	        name: "element",
-	        data: {}
-	      },
-	      preview: {
-	        visible: false
-	      },
-	      message: {
-	        text: "",
-	        wait: undefined
-	      }
-	    };
-
-	    var store = (0, _redux.createStore)(_reducers2.default, initialState, (0, _redux.applyMiddleware)(_chromeMiddleware2.default));
-
-	    /*
-	     * actually render Forager
-	     */
+	if (!document.querySelector(".forager-holder")) {
+	  (function () {
+	    // create the element that will hold the app
 	    var holder = document.createElement("div");
 	    holder.classList.add("forager-holder");
 	    holder.classList.add("no-select");
 	    document.body.appendChild(holder);
 
-	    _reactDom2.default.render(_react2.default.createElement(
-	      _reactRedux.Provider,
-	      { store: store },
-	      _react2.default.createElement(_Forager2.default, null)
-	    ), holder);
+	    (0, _chrome.chromeLoad)().then(function (pages) {
 
-	    // window here is the extension's context, so it is not reachable by code
-	    // outside of the extension. It does, however, need to be accessible when
-	    // the user click on the browser action button
-	    window.store = store;
-	  });
-	} else {
-	  // if the app has already been created, dispatch an action to the store
-	  // to let it know that the app should be visible
-	  document.body.classList.add("foraging");
-	  if (!store.getState().show) {
-	    store.dispatch({
-	      type: _ActionTypes.SHOW_FORAGER
+	      var initialState = {
+	        show: true,
+	        page: {
+	          pages: [undefined].concat(_toConsumableArray(pages)),
+	          pageIndex: 0,
+	          elementIndex: 0
+	        },
+	        frame: {
+	          name: "element",
+	          data: {}
+	        },
+	        preview: {
+	          visible: false
+	        },
+	        message: {
+	          text: "",
+	          wait: undefined
+	        }
+	      };
+
+	      var store = (0, _redux.createStore)(_reducers2.default, initialState, (0, _redux.applyMiddleware)(_chromeMiddleware2.default));
+
+	      _reactDom2.default.render(_react2.default.createElement(
+	        _reactRedux.Provider,
+	        { store: store },
+	        _react2.default.createElement(_Forager2.default, null)
+	      ), holder);
+
+	      // a function to re-show the app if it has been closed
+	      window.restore = function () {
+	        if (!store.getState().show) {
+	          store.dispatch((0, _actions.openForager)());
+	        }
+	      };
 	    });
-	  }
+	  })();
+	} else {
+	  document.body.classList.add("foraging");
+	  window.restore();
 	}
 
 /***/ },
@@ -166,23 +160,23 @@
 
 	var _createStore2 = _interopRequireDefault(_createStore);
 
-	var _combineReducers = __webpack_require__(9);
+	var _combineReducers = __webpack_require__(10);
 
 	var _combineReducers2 = _interopRequireDefault(_combineReducers);
 
-	var _bindActionCreators = __webpack_require__(11);
+	var _bindActionCreators = __webpack_require__(12);
 
 	var _bindActionCreators2 = _interopRequireDefault(_bindActionCreators);
 
-	var _applyMiddleware = __webpack_require__(12);
+	var _applyMiddleware = __webpack_require__(13);
 
 	var _applyMiddleware2 = _interopRequireDefault(_applyMiddleware);
 
-	var _compose = __webpack_require__(13);
+	var _compose = __webpack_require__(14);
 
 	var _compose2 = _interopRequireDefault(_compose);
 
-	var _warning = __webpack_require__(10);
+	var _warning = __webpack_require__(11);
 
 	var _warning2 = _interopRequireDefault(_warning);
 
@@ -527,8 +521,9 @@
 /* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isHostObject = __webpack_require__(7),
-	    isObjectLike = __webpack_require__(8);
+	var getPrototype = __webpack_require__(7),
+	    isHostObject = __webpack_require__(8),
+	    isObjectLike = __webpack_require__(9);
 
 	/** `Object#toString` result references. */
 	var objectTag = '[object Object]';
@@ -539,17 +534,18 @@
 	/** Used to resolve the decompiled source of functions. */
 	var funcToString = Function.prototype.toString;
 
+	/** Used to check objects for own properties. */
+	var hasOwnProperty = objectProto.hasOwnProperty;
+
 	/** Used to infer the `Object` constructor. */
 	var objectCtorString = funcToString.call(Object);
 
 	/**
-	 * Used to resolve the [`toStringTag`](http://ecma-international.org/ecma-262/6.0/#sec-object.prototype.tostring)
+	 * Used to resolve the
+	 * [`toStringTag`](http://ecma-international.org/ecma-262/6.0/#sec-object.prototype.tostring)
 	 * of values.
 	 */
 	var objectToString = objectProto.toString;
-
-	/** Built-in value references. */
-	var getPrototypeOf = Object.getPrototypeOf;
 
 	/**
 	 * Checks if `value` is a plain object, that is, an object created by the
@@ -557,9 +553,11 @@
 	 *
 	 * @static
 	 * @memberOf _
+	 * @since 0.8.0
 	 * @category Lang
 	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if `value` is a plain object, else `false`.
+	 * @returns {boolean} Returns `true` if `value` is a plain object,
+	 *  else `false`.
 	 * @example
 	 *
 	 * function Foo() {
@@ -583,14 +581,11 @@
 	      objectToString.call(value) != objectTag || isHostObject(value)) {
 	    return false;
 	  }
-	  var proto = objectProto;
-	  if (typeof value.constructor == 'function') {
-	    proto = getPrototypeOf(value);
-	  }
+	  var proto = getPrototype(value);
 	  if (proto === null) {
 	    return true;
 	  }
-	  var Ctor = proto.constructor;
+	  var Ctor = hasOwnProperty.call(proto, 'constructor') && proto.constructor;
 	  return (typeof Ctor == 'function' &&
 	    Ctor instanceof Ctor && funcToString.call(Ctor) == objectCtorString);
 	}
@@ -600,6 +595,27 @@
 
 /***/ },
 /* 7 */
+/***/ function(module, exports) {
+
+	/* Built-in method references for those with the same name as other `lodash` methods. */
+	var nativeGetPrototype = Object.getPrototypeOf;
+
+	/**
+	 * Gets the `[[Prototype]]` of `value`.
+	 *
+	 * @private
+	 * @param {*} value The value to query.
+	 * @returns {null|Object} Returns the `[[Prototype]]`.
+	 */
+	function getPrototype(value) {
+	  return nativeGetPrototype(Object(value));
+	}
+
+	module.exports = getPrototype;
+
+
+/***/ },
+/* 8 */
 /***/ function(module, exports) {
 
 	/**
@@ -625,7 +641,7 @@
 
 
 /***/ },
-/* 8 */
+/* 9 */
 /***/ function(module, exports) {
 
 	/**
@@ -634,6 +650,7 @@
 	 *
 	 * @static
 	 * @memberOf _
+	 * @since 4.0.0
 	 * @category Lang
 	 * @param {*} value The value to check.
 	 * @returns {boolean} Returns `true` if `value` is object-like, else `false`.
@@ -659,7 +676,7 @@
 
 
 /***/ },
-/* 9 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
@@ -673,7 +690,7 @@
 
 	var _isPlainObject2 = _interopRequireDefault(_isPlainObject);
 
-	var _warning = __webpack_require__(10);
+	var _warning = __webpack_require__(11);
 
 	var _warning2 = _interopRequireDefault(_warning);
 
@@ -792,7 +809,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ },
-/* 10 */
+/* 11 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -821,7 +838,7 @@
 	}
 
 /***/ },
-/* 11 */
+/* 12 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -877,7 +894,7 @@
 	}
 
 /***/ },
-/* 12 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -887,7 +904,7 @@
 	exports.__esModule = true;
 	exports["default"] = applyMiddleware;
 
-	var _compose = __webpack_require__(13);
+	var _compose = __webpack_require__(14);
 
 	var _compose2 = _interopRequireDefault(_compose);
 
@@ -939,7 +956,7 @@
 	}
 
 /***/ },
-/* 13 */
+/* 14 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -973,7 +990,7 @@
 	}
 
 /***/ },
-/* 14 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -981,11 +998,11 @@
 	exports.__esModule = true;
 	exports.connect = exports.Provider = undefined;
 
-	var _Provider = __webpack_require__(15);
+	var _Provider = __webpack_require__(16);
 
 	var _Provider2 = _interopRequireDefault(_Provider);
 
-	var _connect = __webpack_require__(17);
+	var _connect = __webpack_require__(18);
 
 	var _connect2 = _interopRequireDefault(_connect);
 
@@ -995,7 +1012,7 @@
 	exports.connect = _connect2["default"];
 
 /***/ },
-/* 15 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
@@ -1005,7 +1022,7 @@
 
 	var _react = __webpack_require__(1);
 
-	var _storeShape = __webpack_require__(16);
+	var _storeShape = __webpack_require__(17);
 
 	var _storeShape2 = _interopRequireDefault(_storeShape);
 
@@ -1079,7 +1096,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ },
-/* 16 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1095,7 +1112,7 @@
 	});
 
 /***/ },
-/* 17 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
@@ -1107,27 +1124,27 @@
 
 	var _react = __webpack_require__(1);
 
-	var _storeShape = __webpack_require__(16);
+	var _storeShape = __webpack_require__(17);
 
 	var _storeShape2 = _interopRequireDefault(_storeShape);
 
-	var _shallowEqual = __webpack_require__(18);
+	var _shallowEqual = __webpack_require__(19);
 
 	var _shallowEqual2 = _interopRequireDefault(_shallowEqual);
 
-	var _wrapActionCreators = __webpack_require__(19);
+	var _wrapActionCreators = __webpack_require__(20);
 
 	var _wrapActionCreators2 = _interopRequireDefault(_wrapActionCreators);
 
-	var _isPlainObject = __webpack_require__(20);
+	var _isPlainObject = __webpack_require__(6);
 
 	var _isPlainObject2 = _interopRequireDefault(_isPlainObject);
 
-	var _hoistNonReactStatics = __webpack_require__(23);
+	var _hoistNonReactStatics = __webpack_require__(21);
 
 	var _hoistNonReactStatics2 = _interopRequireDefault(_hoistNonReactStatics);
 
-	var _invariant = __webpack_require__(24);
+	var _invariant = __webpack_require__(22);
 
 	var _invariant2 = _interopRequireDefault(_invariant);
 
@@ -1423,7 +1440,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ },
-/* 18 */
+/* 19 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -1454,7 +1471,7 @@
 	}
 
 /***/ },
-/* 19 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1471,142 +1488,7 @@
 	}
 
 /***/ },
-/* 20 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var isHostObject = __webpack_require__(21),
-	    isObjectLike = __webpack_require__(22);
-
-	/** `Object#toString` result references. */
-	var objectTag = '[object Object]';
-
-	/** Used for built-in method references. */
-	var objectProto = Object.prototype;
-
-	/** Used to resolve the decompiled source of functions. */
-	var funcToString = Function.prototype.toString;
-
-	/** Used to infer the `Object` constructor. */
-	var objectCtorString = funcToString.call(Object);
-
-	/**
-	 * Used to resolve the [`toStringTag`](http://ecma-international.org/ecma-262/6.0/#sec-object.prototype.tostring)
-	 * of values.
-	 */
-	var objectToString = objectProto.toString;
-
-	/** Built-in value references. */
-	var getPrototypeOf = Object.getPrototypeOf;
-
-	/**
-	 * Checks if `value` is a plain object, that is, an object created by the
-	 * `Object` constructor or one with a `[[Prototype]]` of `null`.
-	 *
-	 * @static
-	 * @memberOf _
-	 * @category Lang
-	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if `value` is a plain object, else `false`.
-	 * @example
-	 *
-	 * function Foo() {
-	 *   this.a = 1;
-	 * }
-	 *
-	 * _.isPlainObject(new Foo);
-	 * // => false
-	 *
-	 * _.isPlainObject([1, 2, 3]);
-	 * // => false
-	 *
-	 * _.isPlainObject({ 'x': 0, 'y': 0 });
-	 * // => true
-	 *
-	 * _.isPlainObject(Object.create(null));
-	 * // => true
-	 */
-	function isPlainObject(value) {
-	  if (!isObjectLike(value) ||
-	      objectToString.call(value) != objectTag || isHostObject(value)) {
-	    return false;
-	  }
-	  var proto = objectProto;
-	  if (typeof value.constructor == 'function') {
-	    proto = getPrototypeOf(value);
-	  }
-	  if (proto === null) {
-	    return true;
-	  }
-	  var Ctor = proto.constructor;
-	  return (typeof Ctor == 'function' &&
-	    Ctor instanceof Ctor && funcToString.call(Ctor) == objectCtorString);
-	}
-
-	module.exports = isPlainObject;
-
-
-/***/ },
 /* 21 */
-/***/ function(module, exports) {
-
-	/**
-	 * Checks if `value` is a host object in IE < 9.
-	 *
-	 * @private
-	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if `value` is a host object, else `false`.
-	 */
-	function isHostObject(value) {
-	  // Many host objects are `Object` objects that can coerce to strings
-	  // despite having improperly defined `toString` methods.
-	  var result = false;
-	  if (value != null && typeof value.toString != 'function') {
-	    try {
-	      result = !!(value + '');
-	    } catch (e) {}
-	  }
-	  return result;
-	}
-
-	module.exports = isHostObject;
-
-
-/***/ },
-/* 22 */
-/***/ function(module, exports) {
-
-	/**
-	 * Checks if `value` is object-like. A value is object-like if it's not `null`
-	 * and has a `typeof` result of "object".
-	 *
-	 * @static
-	 * @memberOf _
-	 * @category Lang
-	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if `value` is object-like, else `false`.
-	 * @example
-	 *
-	 * _.isObjectLike({});
-	 * // => true
-	 *
-	 * _.isObjectLike([1, 2, 3]);
-	 * // => true
-	 *
-	 * _.isObjectLike(_.noop);
-	 * // => false
-	 *
-	 * _.isObjectLike(null);
-	 * // => false
-	 */
-	function isObjectLike(value) {
-	  return !!value && typeof value == 'object';
-	}
-
-	module.exports = isObjectLike;
-
-
-/***/ },
-/* 23 */
 /***/ function(module, exports) {
 
 	/**
@@ -1639,7 +1521,11 @@
 	    var keys = Object.getOwnPropertyNames(sourceComponent);
 	    for (var i=0; i<keys.length; ++i) {
 	        if (!REACT_STATICS[keys[i]] && !KNOWN_STATICS[keys[i]]) {
-	            targetComponent[keys[i]] = sourceComponent[keys[i]];
+	            try {
+	                targetComponent[keys[i]] = sourceComponent[keys[i]];
+	            } catch (error) {
+
+	            }
 	        }
 	    }
 
@@ -1648,7 +1534,7 @@
 
 
 /***/ },
-/* 24 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -1658,8 +1544,6 @@
 	 * This source code is licensed under the BSD-style license found in the
 	 * LICENSE file in the root directory of this source tree. An additional grant
 	 * of patent rights can be found in the PATENTS file in the same directory.
-	 *
-	 * @providesModule invariant
 	 */
 
 	'use strict';
@@ -1693,9 +1577,9 @@
 	      var args = [a, b, c, d, e, f];
 	      var argIndex = 0;
 	      error = new Error(
-	        'Invariant Violation: ' +
 	        format.replace(/%s/g, function() { return args[argIndex++]; })
 	      );
+	      error.name = 'Invariant Violation';
 	    }
 
 	    error.framesToPop = 1; // we don't care about invariant's own frame
@@ -1708,7 +1592,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ },
-/* 25 */
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -1721,25 +1605,25 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _reactRedux = __webpack_require__(14);
+	var _reactRedux = __webpack_require__(15);
 
-	var _Controls = __webpack_require__(26);
+	var _Controls = __webpack_require__(24);
 
 	var _Controls2 = _interopRequireDefault(_Controls);
 
-	var _Frames = __webpack_require__(35);
+	var _Frames = __webpack_require__(36);
 
 	var _Frames2 = _interopRequireDefault(_Frames);
 
-	var _PageTree = __webpack_require__(43);
+	var _PageTree = __webpack_require__(44);
 
 	var _PageTree2 = _interopRequireDefault(_PageTree);
 
-	var _Preview = __webpack_require__(45);
+	var _Preview = __webpack_require__(46);
 
 	var _Preview2 = _interopRequireDefault(_Preview);
 
-	var _NoSelectMixin = __webpack_require__(27);
+	var _NoSelectMixin = __webpack_require__(25);
 
 	var _NoSelectMixin2 = _interopRequireDefault(_NoSelectMixin);
 
@@ -1750,10 +1634,10 @@
 
 	  mixins: [_NoSelectMixin2.default],
 	  render: function render() {
-	    var hidden = this.props.show ? "" : "hidden";
-	    return _react2.default.createElement(
+	    // don't render anything when show=False
+	    return !this.props.show ? null : _react2.default.createElement(
 	      "div",
-	      { id: "forager", className: hidden, ref: "parent" },
+	      { id: "forager", ref: "parent" },
 	      _react2.default.createElement(_Controls2.default, null),
 	      _react2.default.createElement(
 	        "div",
@@ -1773,7 +1657,7 @@
 	})(Forager);
 
 /***/ },
-/* 26 */
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -1786,23 +1670,25 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _reactRedux = __webpack_require__(14);
+	var _reactRedux = __webpack_require__(15);
 
-	var _NoSelectMixin = __webpack_require__(27);
+	var _NoSelectMixin = __webpack_require__(25);
 
 	var _NoSelectMixin2 = _interopRequireDefault(_NoSelectMixin);
 
-	var _Buttons = __webpack_require__(28);
+	var _Buttons = __webpack_require__(26);
 
-	var _Message = __webpack_require__(29);
+	var _Message = __webpack_require__(27);
 
 	var _Message2 = _interopRequireDefault(_Message);
 
-	var _text = __webpack_require__(30);
+	var _text = __webpack_require__(28);
 
-	var _page = __webpack_require__(31);
+	var _selection = __webpack_require__(29);
 
-	var _actions = __webpack_require__(33);
+	var _page = __webpack_require__(30);
+
+	var _actions = __webpack_require__(31);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -1812,37 +1698,48 @@
 	  mixins: [_NoSelectMixin2.default],
 	  addHandler: function addHandler(event) {
 	    event.preventDefault();
+	    var _props = this.props;
+	    var pages = _props.pages;
+	    var showMessage = _props.showMessage;
+	    var addPage = _props.addPage;
 
 	    var name = window.prompt("Page Name:\nCannot contain the following characters: < > : \" \\ / | ? * ");
-	    var existingNames = this.props.pages.filter(function (p) {
+
+	    var existingNames = pages.filter(function (p) {
 	      return p !== undefined;
 	    }).map(function (p) {
 	      return p.name;
 	    });
+
 	    if (!(0, _text.validName)(name, existingNames)) {
-	      this.props.showMessage("Invalid Name: \"" + name + "\"", 5000);
+	      showMessage("Invalid Name: \"" + name + "\"", 5000);
 	    } else {
 
-	      var newPage = (0, _page.createPage)(name);
-	      (0, _page.setupPage)(newPage);
+	      var body = (0, _page.createElement)("body");
+	      // initial values for the body selector
+	      body = Object.assign({}, body, {
+	        index: 0,
+	        parent: null,
+	        elements: [document.body]
+	      });
 
-	      this.props.addPage(newPage);
+	      addPage({
+	        name: name,
+	        elements: [body]
+	      });
 	    }
 	  },
 	  loadHandler: function loadHandler(event) {
-	    var nextPageIndex = parseInt(event.target.value, 10);
-	    var nextPage = this.props.pages[nextPageIndex];
-	    var element = nextPage !== undefined ? nextPage.element : undefined;
-	    this.props.loadPage(nextPageIndex, element);
+	    this.props.loadPage(parseInt(event.target.value, 10));
 	  },
 	  closeHandler: function closeHandler(event) {
 	    document.body.classList.remove("foraging");
 	    this.props.closeForager();
 	  },
 	  pageControls: function pageControls() {
-	    var _props = this.props;
-	    var pages = _props.pages;
-	    var index = _props.index;
+	    var _props2 = this.props;
+	    var pages = _props2.pages;
+	    var index = _props2.index;
 
 	    var options = pages.map(function (p, i) {
 	      return _react2.default.createElement(
@@ -1902,7 +1799,7 @@
 	})(Controls);
 
 /***/ },
-/* 27 */
+/* 25 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -1949,16 +1846,16 @@
 	};
 
 /***/ },
-/* 28 */
+/* 26 */
 /***/ function(module, exports) {
 
 	"use strict";
 
-	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
+
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 	function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
 
@@ -2023,7 +1920,7 @@
 	});
 
 /***/ },
-/* 29 */
+/* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -2099,7 +1996,7 @@
 	});
 
 /***/ },
-/* 30 */
+/* 28 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -2129,8 +2026,8 @@
 	        return "...";
 	    }
 	    // determine the length of the first and second halves of the text
-	    var firstHalf = undefined;
-	    var secondHalf = undefined;
+	    var firstHalf = void 0;
+	    var secondHalf = void 0;
 	    var leftovers = max - 3;
 	    var half = leftovers / 2;
 	    if (leftovers % 2 === 0) {
@@ -2148,110 +2045,7 @@
 	};
 
 /***/ },
-/* 31 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.setupPage = exports.clean = exports.clone = exports.createElement = exports.createPage = undefined;
-
-	var _selection = __webpack_require__(32);
-
-	var createPage = exports.createPage = function createPage(name) {
-	  return {
-	    name: name,
-	    element: {
-	      selector: "body",
-	      spec: {
-	        type: "single",
-	        value: 0
-	      },
-	      children: [],
-	      rules: []
-	    }
-	  };
-	};
-
-	var createElement = exports.createElement = function createElement(selector) {
-	  var type = arguments.length <= 1 || arguments[1] === undefined ? "single" : arguments[1];
-	  var value = arguments.length <= 2 || arguments[2] === undefined ? 0 : arguments[2];
-	  var optional = arguments.length <= 3 || arguments[3] === undefined ? false : arguments[3];
-
-	  return {
-	    selector: selector,
-	    spec: {
-	      type: type,
-	      value: value
-	    },
-	    children: [],
-	    rules: [],
-	    optional: optional
-	  };
-	};
-
-	/*
-	 * clone a page (useful with the tree because that adds unnecessary properties
-	 * to each selector) does not include the page's name
-	 */
-	var clone = exports.clone = function clone(element) {
-	  return Object.assign({}, {
-	    selector: element.selector,
-	    spec: element.spec,
-	    children: element.children.map(function (child) {
-	      return clone(child);
-	    }),
-	    hasRules: element.rules.length,
-	    elements: element.elements || [],
-	    original: element
-	  });
-	};
-
-	var clean = exports.clean = function clean(page) {
-	  return Object.assign({}, {
-	    name: page.name,
-	    element: cleanElement(page.element)
-	  });
-	};
-
-	var cleanElement = function cleanElement(e) {
-	  return Object.assign({}, {
-	    selector: e.selector,
-	    spec: Object.assign({}, e.spec),
-	    children: e.children.map(function (c) {
-	      return cleanElement(c);
-	    }),
-	    rules: e.rules.map(function (r) {
-	      return Object.assign({}, r);
-	    }),
-	    optional: e.optional
-	  });
-	};
-
-	/*
-	 * set an id on each element and determine the html elements that each element matches
-	 */
-	var setupPage = exports.setupPage = function setupPage(page) {
-	  if (page === undefined) {
-	    return;
-	  }
-	  var id = 0;
-	  var setup = function setup(element, parentElements, parent) {
-	    element.id = id++;
-	    element.parent = parent;
-	    element.elements = (0, _selection.select)(parentElements, element.selector, element.spec);
-	    element.children.forEach(function (child) {
-	      setup(child, element.elements, element);
-	    });
-	  };
-
-	  setup(page.element, [document], null);
-	};
-
-/***/ },
-/* 32 */
+/* 29 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -2382,7 +2176,7 @@
 	};
 
 /***/ },
-/* 33 */
+/* 30 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -2390,22 +2184,355 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.toggleOptional = exports.removeRule = exports.saveRule = exports.removeElement = exports.renameElement = exports.saveElement = exports.selectElement = exports.closeForager = exports.showSpecFrame = exports.showPartsFrame = exports.showHTMLFrame = exports.showRuleFrame = exports.showElementFrame = exports.showMessage = exports.hidePreview = exports.showPreview = exports.uploadPage = exports.renamePage = exports.removePage = exports.addPage = exports.loadPage = undefined;
+	exports.simpleGrow = exports.fullGrow = exports.clean = exports.selectElements = exports.flatten = exports.createElement = exports.createPage = undefined;
 
-	var _ActionTypes = __webpack_require__(34);
+	var _selection = __webpack_require__(29);
+
+	var createPage = exports.createPage = function createPage(name) {
+	  return {
+	    name: name,
+	    elements: [createElement("body")]
+	  };
+	};
+
+	var createElement = exports.createElement = function createElement(selector) {
+	  var type = arguments.length <= 1 || arguments[1] === undefined ? "single" : arguments[1];
+	  var value = arguments.length <= 2 || arguments[2] === undefined ? 0 : arguments[2];
+	  var optional = arguments.length <= 3 || arguments[3] === undefined ? false : arguments[3];
+
+	  return {
+	    selector: selector,
+	    spec: {
+	      type: type,
+	      value: value
+	    },
+	    childIndices: [],
+	    rules: [],
+	    optional: optional
+	  };
+	};
+
+	/*
+	 * flatten a page object's nested selectors into an array. each item
+	 * has three additional properties: index (the same as the index in
+	 * the array), parent (the index of the parent selector in the array),
+	 * and childIndices (the index values of child selectors in the array)
+	 */
+	var flatten = exports.flatten = function flatten(pageTree) {
+	  if (pageTree === undefined) {
+	    return [];
+	  }
+	  var index = 0;
+
+	  // pageTree is the root element
+	  var breadth = [Object.assign({}, pageTree, {
+	    parent: null,
+	    childIndices: []
+	  })];
+
+	  while (index < breadth.length) {
+	    var current = breadth[index];
+	    current.index = index;
+	    if (current.parent !== null) {
+	      breadth[current.parent].childIndices.push(index);
+	    }
+	    current.children.forEach(function (c) {
+	      breadth.push(Object.assign({}, c, {
+	        parent: index,
+	        childIndices: []
+	      }));
+	    });
+	    delete current.children;
+	    index += 1;
+	  }
+	  return breadth;
+	};
+
+	/*
+	 * iterate over the selector elements and add an elements property which is an array
+	 * of all elements in the page that the selector matches
+	 */
+	var selectElements = exports.selectElements = function selectElements(elements) {
+	  elements.forEach(function (s) {
+	    var parentElements = s.parent === null ? [document] : elements[s.parent].elements;
+	    s.elements = (0, _selection.select)(parentElements, s.selector, s.spec);
+	  });
+	};
+
+	/* 
+	 * return a version of the page with elements as a tree for saving/uploading
+	 */
+	var clean = exports.clean = function clean(page) {
+	  return {
+	    name: page.name,
+	    element: fullGrow(page.elements)
+	  };
+	};
+
+	/*
+	 * create a tree for saving a page
+	 */
+	var fullGrow = exports.fullGrow = function fullGrow(elementArray) {
+	  var cleanElements = elementArray.map(function (e) {
+	    if (e === null) {
+	      return null;
+	    };
+	    return {
+	      selector: e.selector,
+	      spec: Object.assign({}, e.spec),
+	      children: [],
+	      rules: e.rules.map(function (r) {
+	        return Object.assign({}, r);
+	      }),
+	      optional: e.optional,
+	      // preserve for tree building
+	      parent: e.parent
+	    };
+	  });
+	  cleanElements.forEach(function (e) {
+	    if (e === null) {
+	      return;
+	    }
+	    var parent = e.parent;
+	    delete e.parent;
+	    if (parent === null) {
+	      return;
+	    }
+	    cleanElements[parent].children.push(e);
+	  });
+	  // return the root
+	  return cleanElements[0];
+	};
+
+	/*
+	 * create a tree for an array of elements with only the properties needed for
+	 * drawing and interacting with the tree
+	 */
+	var simpleGrow = exports.simpleGrow = function simpleGrow(elementArray) {
+	  var cleanElements = elementArray.map(function (e) {
+	    if (e === null) {
+	      return null;
+	    };
+	    return {
+	      selector: e.selector,
+	      spec: Object.assign({}, e.spec),
+	      hasRules: e.rules.length,
+	      hasChildren: e.childIndices.length,
+	      children: [],
+	      index: e.index,
+	      parent: e.parent,
+	      elements: e.elements
+	    };
+	  });
+	  cleanElements.forEach(function (e) {
+	    if (e === null) {
+	      return null;
+	    };
+	    if (e.parent === null) {
+	      return;
+	    }
+	    cleanElements[e.parent].children.push(e);
+	  });
+	  return cleanElements[0];
+	};
+
+/***/ },
+/* 31 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _general = __webpack_require__(32);
+
+	Object.keys(_general).forEach(function (key) {
+	  if (key === "default") return;
+	  Object.defineProperty(exports, key, {
+	    enumerable: true,
+	    get: function get() {
+	      return _general[key];
+	    }
+	  });
+	});
+
+	var _frame = __webpack_require__(34);
+
+	Object.keys(_frame).forEach(function (key) {
+	  if (key === "default") return;
+	  Object.defineProperty(exports, key, {
+	    enumerable: true,
+	    get: function get() {
+	      return _frame[key];
+	    }
+	  });
+	});
+
+	var _page = __webpack_require__(35);
+
+	Object.keys(_page).forEach(function (key) {
+	  if (key === "default") return;
+	  Object.defineProperty(exports, key, {
+	    enumerable: true,
+	    get: function get() {
+	      return _page[key];
+	    }
+	  });
+	});
+
+/***/ },
+/* 32 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.showMessage = exports.openForager = exports.closeForager = undefined;
+
+	var _ActionTypes = __webpack_require__(33);
 
 	var types = _interopRequireWildcard(_ActionTypes);
 
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-	/*
-	 * PAGE ACTIONS
-	 */
-	var loadPage = exports.loadPage = function loadPage(index, element) {
+	var closeForager = exports.closeForager = function closeForager() {
+	  return {
+	    type: types.CLOSE_FORAGER
+	  };
+	};
+
+	var openForager = exports.openForager = function openForager() {
+	  return {
+	    type: types.OPEN_FORAGER
+	  };
+	};
+
+	var showMessage = exports.showMessage = function showMessage(text, wait) {
+	  return {
+	    type: types.SHOW_MESSAGE,
+	    text: text,
+	    wait: wait
+	  };
+	};
+
+/***/ },
+/* 33 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	/* page */
+	// set a page as the current page
+	var LOAD_PAGE = exports.LOAD_PAGE = "LOAD_PAGE";
+	var ADD_PAGE = exports.ADD_PAGE = "ADD_PAGE";
+	var REMOVE_PAGE = exports.REMOVE_PAGE = "REMOVE_PAGE";
+	var RENAME_PAGE = exports.RENAME_PAGE = "RENAME_PAGE";
+	var UPLOAD_PAGE = exports.UPLOAD_PAGE = "UPLOAD_PAGE";
+	var SHOW_PREVIEW = exports.SHOW_PREVIEW = "SHOW_PREVIEW";
+	var HIDE_PREVIEW = exports.HIDE_PREVIEW = "HIDE_PREVIEW";
+
+	var SELECT_ELEMENT = exports.SELECT_ELEMENT = "SELECT_ELEMENT";
+	var SAVE_ELEMENT = exports.SAVE_ELEMENT = "SAVE_ELEMENT";
+	var REMOVE_ELEMENT = exports.REMOVE_ELEMENT = "REMOVE_ELEMENT";
+	var RENAME_ELEMENT = exports.RENAME_ELEMENT = "RENAME_ELEMENT";
+	var TOGGLE_OPTIONAL = exports.TOGGLE_OPTIONAL = "TOGGLE_OPTIONAL";
+	var SAVE_RULE = exports.SAVE_RULE = "SAVE_RULE";
+	var REMOVE_RULE = exports.REMOVE_RULE = "REMOVE_RULE";
+
+	/* frame */
+	// the app is made up of frames,
+	// the following action types show specific frames
+	var SHOW_ELEMENT_FRAME = exports.SHOW_ELEMENT_FRAME = "SHOW_ELEMENT_FRAME";
+	var SHOW_RULE_FRAME = exports.SHOW_RULE_FRAME = "SHOW_RULE_FRAME";
+	var SHOW_HTML_FRAME = exports.SHOW_HTML_FRAME = "SHOW_HTML_FRAME";
+	var SHOW_PARTS_FRAME = exports.SHOW_PARTS_FRAME = "SHOW_PARTS_FRAME";
+	var SHOW_SPEC_FRAME = exports.SHOW_SPEC_FRAME = "SHOW_SPEC_FRAME";
+
+	/* general */
+	// open and close the app
+	var CLOSE_FORAGER = exports.CLOSE_FORAGER = "CLOSE_FORAGER";
+	var OPEN_FORAGER = exports.OPEN_FORAGER = "OPEN_FORAGER";
+	// show the user a message (such as an error)
+	var SHOW_MESSAGE = exports.SHOW_MESSAGE = "SHOW_MESSAGE";
+
+/***/ },
+/* 34 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.showSpecFrame = exports.showPartsFrame = exports.showHTMLFrame = exports.showRuleFrame = exports.showElementFrame = undefined;
+
+	var _ActionTypes = __webpack_require__(33);
+
+	var types = _interopRequireWildcard(_ActionTypes);
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+	var showElementFrame = exports.showElementFrame = function showElementFrame() {
+	  return {
+	    type: types.SHOW_ELEMENT_FRAME
+	  };
+	};
+
+	var showRuleFrame = exports.showRuleFrame = function showRuleFrame(element) {
+	  return {
+	    type: types.SHOW_RULE_FRAME,
+	    element: element
+	  };
+	};
+
+	var showHTMLFrame = exports.showHTMLFrame = function showHTMLFrame() {
+	  return {
+	    type: types.SHOW_HTML_FRAME
+	  };
+	};
+
+	var showPartsFrame = exports.showPartsFrame = function showPartsFrame(parts) {
+	  return {
+	    type: types.SHOW_PARTS_FRAME,
+	    parts: parts
+	  };
+	};
+
+	var showSpecFrame = exports.showSpecFrame = function showSpecFrame(css) {
+	  return {
+	    type: types.SHOW_SPEC_FRAME,
+	    css: css
+	  };
+	};
+
+/***/ },
+/* 35 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.removeRule = exports.saveRule = exports.toggleOptional = exports.removeElement = exports.renameElement = exports.saveElement = exports.selectElement = exports.hidePreview = exports.showPreview = exports.uploadPage = exports.renamePage = exports.removePage = exports.addPage = exports.loadPage = undefined;
+
+	var _ActionTypes = __webpack_require__(33);
+
+	var types = _interopRequireWildcard(_ActionTypes);
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+	var loadPage = exports.loadPage = function loadPage(index) {
 	  return {
 	    type: types.LOAD_PAGE,
-	    index: index,
-	    element: element
+	    index: index
 	  };
 	};
 
@@ -2447,70 +2574,18 @@
 	  };
 	};
 
-	var showMessage = exports.showMessage = function showMessage(text, wait) {
-	  return {
-	    type: types.SHOW_MESSAGE,
-	    text: text,
-	    wait: wait
-	  };
-	};
-
-	/*
-	 * FRAME ACTIONS
-	 */
-
-	var showElementFrame = exports.showElementFrame = function showElementFrame() {
-	  return {
-	    type: types.SHOW_ELEMENT_FRAME
-	  };
-	};
-
-	var showRuleFrame = exports.showRuleFrame = function showRuleFrame(element) {
-	  return {
-	    type: types.SHOW_RULE_FRAME,
-	    element: element
-	  };
-	};
-
-	var showHTMLFrame = exports.showHTMLFrame = function showHTMLFrame() {
-	  return {
-	    type: types.SHOW_HTML_FRAME
-	  };
-	};
-
-	var showPartsFrame = exports.showPartsFrame = function showPartsFrame(parts) {
-	  return {
-	    type: types.SHOW_PARTS_FRAME,
-	    parts: parts
-	  };
-	};
-
-	var showSpecFrame = exports.showSpecFrame = function showSpecFrame(css) {
-	  return {
-	    type: types.SHOW_SPEC_FRAME,
-	    css: css
-	  };
-	};
-
-	/*
-	 * GENERAL ACTIONS
-	 */
-	var closeForager = exports.closeForager = function closeForager() {
-	  return {
-	    type: types.CLOSE_FORAGER
-	  };
-	};
-
 	/*
 	 * ELEMENT/RULE ACTIONS
 	 */
-	var selectElement = exports.selectElement = function selectElement(element) {
+	var selectElement = exports.selectElement = function selectElement(index) {
 	  return {
 	    type: types.SELECT_ELEMENT,
-	    element: element
+	    index: index
 	  };
 	};
 
+	// add a new element selector, using the current element
+	// selector as its parent
 	var saveElement = exports.saveElement = function saveElement(element) {
 	  return {
 	    type: types.SAVE_ELEMENT,
@@ -2518,74 +2593,44 @@
 	  };
 	};
 
-	var renameElement = exports.renameElement = function renameElement() {
+	// rename the currently selected element selector
+	var renameElement = exports.renameElement = function renameElement(name) {
 	  return {
-	    type: types.RENAME_ELEMENT
+	    type: types.RENAME_ELEMENT,
+	    name: name
 	  };
 	};
 
+	// remove the currently selected element selector
 	var removeElement = exports.removeElement = function removeElement() {
 	  return {
 	    type: types.REMOVE_ELEMENT
 	  };
 	};
 
-	var saveRule = exports.saveRule = function saveRule() {
-	  return {
-	    type: types.SAVE_RULE
-	  };
-	};
-
-	var removeRule = exports.removeRule = function removeRule() {
-	  return {
-	    type: types.REMOVE_RULE
-	  };
-	};
-
+	// toggle whether the current element selector is optional
 	var toggleOptional = exports.toggleOptional = function toggleOptional() {
 	  return {
 	    type: types.TOGGLE_OPTIONAL
 	  };
 	};
 
-/***/ },
-/* 34 */
-/***/ function(module, exports) {
+	var saveRule = exports.saveRule = function saveRule(rule) {
+	  return {
+	    type: types.SAVE_RULE,
+	    rule: rule
+	  };
+	};
 
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	var LOAD_PAGE = exports.LOAD_PAGE = "LOAD_PAGE";
-	var ADD_PAGE = exports.ADD_PAGE = "ADD_PAGE";
-	var REMOVE_PAGE = exports.REMOVE_PAGE = "REMOVE_PAGE";
-	var RENAME_PAGE = exports.RENAME_PAGE = "RENAME_PAGE";
-	var UPLOAD_PAGE = exports.UPLOAD_PAGE = "UPLOAD_PAGE";
-	var SHOW_PREVIEW = exports.SHOW_PREVIEW = "SHOW_PREVIEW";
-	var HIDE_PREVIEW = exports.HIDE_PREVIEW = "HIDE_PREVIEW";
-
-	var SHOW_MESSAGE = exports.SHOW_MESSAGE = "SHOW_MESSAGE";
-
-	var SHOW_ELEMENT_FRAME = exports.SHOW_ELEMENT_FRAME = "SHOW_ELEMENT_FRAME";
-	var SHOW_RULE_FRAME = exports.SHOW_RULE_FRAME = "SHOW_RULE_FRAME";
-	var SHOW_HTML_FRAME = exports.SHOW_HTML_FRAME = "SHOW_HTML_FRAME";
-	var SHOW_PARTS_FRAME = exports.SHOW_PARTS_FRAME = "SHOW_PARTS_FRAME";
-	var SHOW_SPEC_FRAME = exports.SHOW_SPEC_FRAME = "SHOW_SPEC_FRAME";
-
-	var CLOSE_FORAGER = exports.CLOSE_FORAGER = "CLOSE_FORAGER";
-	var SHOW_FORAGER = exports.SHOW_FORAGER = "SHOW_FORAGER";
-
-	var SELECT_ELEMENT = exports.SELECT_ELEMENT = "SELECT_ELEMENT";
-	var SAVE_ELEMENT = exports.SAVE_ELEMENT = "SAVE_ELEMENT";
-	var REMOVE_ELEMENT = exports.REMOVE_ELEMENT = "REMOVE_ELEMENT";
-	var RENAME_ELEMENT = exports.RENAME_ELEMENT = "RENAME_ELEMENT";
-	var SAVE_RULE = exports.SAVE_RULE = "SAVE_RULE";
-	var REMOVE_RULE = exports.REMOVE_RULE = "REMOVE_RULE";
-	var TOGGLE_OPTIONAL = exports.TOGGLE_OPTIONAL = "TOGGLE_OPTIONAL";
+	var removeRule = exports.removeRule = function removeRule(index) {
+	  return {
+	    type: types.REMOVE_RULE,
+	    index: index
+	  };
+	};
 
 /***/ },
-/* 35 */
+/* 36 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -2598,29 +2643,29 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _reactRedux = __webpack_require__(14);
+	var _reactRedux = __webpack_require__(15);
 
-	var _ElementFrame = __webpack_require__(36);
+	var _ElementFrame = __webpack_require__(37);
 
 	var _ElementFrame2 = _interopRequireDefault(_ElementFrame);
 
-	var _RuleFrame = __webpack_require__(37);
+	var _RuleFrame = __webpack_require__(38);
 
 	var _RuleFrame2 = _interopRequireDefault(_RuleFrame);
 
-	var _HTMLFrame = __webpack_require__(40);
+	var _HTMLFrame = __webpack_require__(41);
 
 	var _HTMLFrame2 = _interopRequireDefault(_HTMLFrame);
 
-	var _PartsFrame = __webpack_require__(41);
+	var _PartsFrame = __webpack_require__(42);
 
 	var _PartsFrame2 = _interopRequireDefault(_PartsFrame);
 
-	var _SpecFrame = __webpack_require__(42);
+	var _SpecFrame = __webpack_require__(43);
 
 	var _SpecFrame2 = _interopRequireDefault(_SpecFrame);
 
-	var _markup = __webpack_require__(39);
+	var _markup = __webpack_require__(40);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -2687,51 +2732,57 @@
 	});
 
 	exports.default = (0, _reactRedux.connect)(function (state) {
+	  var page = state.page;
+	  var frame = state.frame;
+	  var pages = page.pages;
+	  var pageIndex = page.pageIndex;
+	  var elementIndex = page.elementIndex;
+
+	  var currentPage = pages[pageIndex];
+	  var element = currentPage === undefined ? undefined : currentPage.elements[elementIndex];
 	  return {
-	    frame: state.frame,
-	    element: state.element
+	    frame: frame,
+	    element: element
 	  };
 	})(Frames);
 
 /***/ },
-/* 36 */
+/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-
-	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
 
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 	var _react = __webpack_require__(1);
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _reactRedux = __webpack_require__(14);
+	var _reactRedux = __webpack_require__(15);
 
-	var _NoSelectMixin = __webpack_require__(27);
+	var _NoSelectMixin = __webpack_require__(25);
 
 	var _NoSelectMixin2 = _interopRequireDefault(_NoSelectMixin);
 
-	var _actions = __webpack_require__(33);
+	var _actions = __webpack_require__(31);
 
-	var _Buttons = __webpack_require__(28);
+	var _Buttons = __webpack_require__(26);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 	var ElementFrame = _react2.default.createClass({
 	  displayName: "ElementFrame",
 
 	  mixins: [_NoSelectMixin2.default],
 	  addChild: function addChild(event) {
-	    this.props.createElement();
+	    this.props.showHTMLFrame();
 	  },
 	  addRule: function addRule(event) {
-	    this.props.createRule();
+	    this.props.showRuleFrame();
 	  },
 	  remove: function remove(event) {
 	    var _props = this.props;
@@ -2740,16 +2791,6 @@
 
 	    if (!confirm("Are you sure you want to delete the element \"" + element.selector + "\"?")) {
 	      return;
-	    }
-	    var parent = element.parent;
-	    if (parent === null) {
-	      // root "body" element
-	      element.children = [];
-	      element.rules = [];
-	    } else {
-	      parent.children = parent.children.filter(function (child) {
-	        return child !== element;
-	      });
 	    }
 	    removeElement();
 	  },
@@ -2762,16 +2803,13 @@
 	    var element = _props2.element;
 	    var renameElement = _props2.renameElement;
 
-	    element.spec.value = newName;
-	    renameElement();
+	    renameElement(newName);
 	  },
 	  removeRule: function removeRule(index) {
 	    var rules = this.props.element.rules;
-	    this.props.element.rules = [].concat(_toConsumableArray(rules.slice(0, index)), _toConsumableArray(rules.slice(index + 1)));
-	    this.props.removeRule();
+	    this.props.removeRule(index);
 	  },
 	  toggleOptional: function toggleOptional(event) {
-	    this.props.element.optional = !this.props.element.optional;
 	    this.props.toggleOptional();
 	  },
 	  render: function render() {
@@ -2902,20 +2940,27 @@
 	});
 
 	exports.default = (0, _reactRedux.connect)(function (state) {
+	  var page = state.page;
+	  var pages = page.pages;
+	  var pageIndex = page.pageIndex;
+	  var elementIndex = page.elementIndex;
+
+	  var currentPage = pages[pageIndex];
+	  var element = currentPage === undefined ? undefined : currentPage.elements[elementIndex];
 	  return {
-	    element: state.element
+	    element: element
 	  };
 	}, {
-	  createElement: _actions.showHTMLFrame,
+	  showHTMLFrame: _actions.showHTMLFrame,
 	  removeElement: _actions.removeElement,
 	  renameElement: _actions.renameElement,
-	  createRule: _actions.showRuleFrame,
+	  showRuleFrame: _actions.showRuleFrame,
 	  removeRule: _actions.removeRule,
 	  toggleOptional: _actions.toggleOptional
 	})(ElementFrame);
 
 /***/ },
-/* 37 */
+/* 38 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -2928,19 +2973,19 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _reactRedux = __webpack_require__(14);
+	var _reactRedux = __webpack_require__(15);
 
-	var _Buttons = __webpack_require__(28);
+	var _Buttons = __webpack_require__(26);
 
-	var _attributes = __webpack_require__(38);
+	var _attributes = __webpack_require__(39);
 
-	var _selection = __webpack_require__(32);
+	var _selection = __webpack_require__(29);
 
-	var _text = __webpack_require__(30);
+	var _text = __webpack_require__(28);
 
-	var _markup = __webpack_require__(39);
+	var _markup = __webpack_require__(40);
 
-	var _actions = __webpack_require__(33);
+	var _actions = __webpack_require__(31);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -2980,12 +3025,11 @@
 	    // basic validation
 
 	    if (name !== "" && attr !== "") {
-	      this.props.element.rules.push({
+	      this.props.saveRule({
 	        name: name,
 	        type: type,
 	        attr: attr
 	      });
-	      this.props.save();
 	    }
 	  },
 	  cancelHandler: function cancelHandler(event) {
@@ -3165,16 +3209,23 @@
 	});
 
 	exports.default = (0, _reactRedux.connect)(function (state) {
+	  var page = state.page;
+	  var pages = page.pages;
+	  var pageIndex = page.pageIndex;
+	  var elementIndex = page.elementIndex;
+
+	  var currentPage = pages[pageIndex];
+	  var element = currentPage === undefined ? undefined : currentPage.elements[elementIndex];
 	  return {
-	    element: state.element
+	    element: element
 	  };
 	}, {
-	  save: _actions.saveRule,
+	  saveRule: _actions.saveRule,
 	  cancel: _actions.showElementFrame
 	})(RuleFrame);
 
 /***/ },
-/* 38 */
+/* 39 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -3241,7 +3292,7 @@
 	};
 
 /***/ },
-/* 39 */
+/* 40 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -3312,7 +3363,7 @@
 	};
 
 /***/ },
-/* 40 */
+/* 41 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -3325,21 +3376,21 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _reactRedux = __webpack_require__(14);
+	var _reactRedux = __webpack_require__(15);
 
-	var _Buttons = __webpack_require__(28);
+	var _Buttons = __webpack_require__(26);
 
-	var _NoSelectMixin = __webpack_require__(27);
+	var _NoSelectMixin = __webpack_require__(25);
 
 	var _NoSelectMixin2 = _interopRequireDefault(_NoSelectMixin);
 
-	var _selection = __webpack_require__(32);
+	var _selection = __webpack_require__(29);
 
-	var _attributes = __webpack_require__(38);
+	var _attributes = __webpack_require__(39);
 
-	var _markup = __webpack_require__(39);
+	var _markup = __webpack_require__(40);
 
-	var _actions = __webpack_require__(33);
+	var _actions = __webpack_require__(31);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -3530,8 +3581,17 @@
 	});
 
 	exports.default = (0, _reactRedux.connect)(function (state) {
+	  var page = state.page;
+	  var pages = page.pages;
+	  var pageIndex = page.pageIndex;
+	  var elementIndex = page.elementIndex;
+
+
+	  var currentPage = pages[pageIndex];
+	  var element = currentPage === undefined ? undefined : currentPage.elements[elementIndex];
+	  var parentElements = element.elements || [];
 	  return {
-	    parentElements: state.element.elements
+	    parentElements: parentElements
 	  };
 	}, {
 	  next: _actions.showPartsFrame,
@@ -3540,30 +3600,30 @@
 	})(HTMLFrame);
 
 /***/ },
-/* 41 */
+/* 42 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-
-	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
 
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 	var _react = __webpack_require__(1);
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _reactRedux = __webpack_require__(14);
+	var _reactRedux = __webpack_require__(15);
 
-	var _Buttons = __webpack_require__(28);
+	var _Buttons = __webpack_require__(26);
 
-	var _selection = __webpack_require__(32);
+	var _selection = __webpack_require__(29);
 
-	var _markup = __webpack_require__(39);
+	var _markup = __webpack_require__(40);
 
-	var _actions = __webpack_require__(33);
+	var _actions = __webpack_require__(31);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -3696,8 +3756,16 @@
 	});
 
 	exports.default = (0, _reactRedux.connect)(function (state) {
+	  var page = state.page;
+	  var pages = page.pages;
+	  var pageIndex = page.pageIndex;
+	  var elementIndex = page.elementIndex;
+
+	  var currentPage = pages[pageIndex];
+	  var element = currentPage === undefined ? undefined : currentPage.elements[elementIndex];
+	  var parentElements = element.elements || [];
 	  return _extends({
-	    parentElements: state.element.elements
+	    parentElements: element.elements
 	  }, state.frame.data);
 	}, {
 	  next: _actions.showSpecFrame,
@@ -3706,36 +3774,36 @@
 	})(PartsFrame);
 
 /***/ },
-/* 42 */
+/* 43 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-
-	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
 
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 	var _react = __webpack_require__(1);
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _reactRedux = __webpack_require__(14);
+	var _reactRedux = __webpack_require__(15);
 
-	var _Buttons = __webpack_require__(28);
+	var _Buttons = __webpack_require__(26);
 
-	var _NoSelectMixin = __webpack_require__(27);
+	var _NoSelectMixin = __webpack_require__(25);
 
 	var _NoSelectMixin2 = _interopRequireDefault(_NoSelectMixin);
 
-	var _page = __webpack_require__(31);
+	var _page = __webpack_require__(30);
 
-	var _selection = __webpack_require__(32);
+	var _selection = __webpack_require__(29);
 
-	var _markup = __webpack_require__(39);
+	var _markup = __webpack_require__(40);
 
-	var _actions = __webpack_require__(33);
+	var _actions = __webpack_require__(31);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -3759,20 +3827,21 @@
 	    var _props = this.props;
 	    var css = _props.css;
 	    var parent = _props.parent;
+	    var message = _props.message;
+	    var save = _props.save;
 	    // all value must be set
 
 	    if (type === "all" && value === "") {
-	      this.props.message("Name for type \"all\" elements cannot be empty");
+	      message("Name for type \"all\" elements cannot be empty");
 	      return;
 	    }
 	    var ele = (0, _page.createElement)(css, type, value, optional);
-
-	    // select all of the elements in the page that are matched by the new element
 	    ele.elements = (0, _selection.select)(parent.elements, ele.selector, ele.spec);
 
-	    ele.parent = parent;
-	    parent.children.push(ele);
+	    save(ele);
+	    return;
 
+	    // TODO make options selector work, maybe rethink old way?
 	    // SPECIAL CASE: "select" elements
 	    // if saving a selector that selects "select" elements, add a child selector
 	    // to match option elements
@@ -3782,8 +3851,6 @@
 	      optionsChild.parent = ele;
 	      ele.children.push(optionsChild);
 	    }
-
-	    this.props.save(ele);
 	  },
 	  cancelHandler: function cancelHandler(event) {
 	    event.preventDefault();
@@ -3873,7 +3940,7 @@
 	  },
 	  setType: function setType(event) {
 	    var type = event.target.value;
-	    var value = undefined;
+	    var value = void 0;
 	    if (type === "single") {
 	      value = 0;
 	    } else if (type === "all") {
@@ -3961,8 +4028,15 @@
 	});
 
 	exports.default = (0, _reactRedux.connect)(function (state) {
+	  var page = state.page;
+	  var pages = page.pages;
+	  var pageIndex = page.pageIndex;
+	  var elementIndex = page.elementIndex;
+
+	  var currentPage = pages[pageIndex];
+	  var element = currentPage === undefined ? undefined : currentPage.elements[elementIndex];
 	  return _extends({
-	    parent: state.element
+	    parent: element
 	  }, state.frame.data);
 	}, {
 	  save: _actions.saveElement,
@@ -3971,40 +4045,40 @@
 	})(SpecFrame);
 
 /***/ },
-/* 43 */
+/* 44 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-
-	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
 
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 	var _react = __webpack_require__(1);
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _reactRedux = __webpack_require__(14);
+	var _reactRedux = __webpack_require__(15);
 
-	var _d = __webpack_require__(44);
+	var _d = __webpack_require__(45);
 
 	var _d2 = _interopRequireDefault(_d);
 
-	var _NoSelectMixin = __webpack_require__(27);
+	var _NoSelectMixin = __webpack_require__(25);
 
 	var _NoSelectMixin2 = _interopRequireDefault(_NoSelectMixin);
 
-	var _Buttons = __webpack_require__(28);
+	var _Buttons = __webpack_require__(26);
 
-	var _text = __webpack_require__(30);
+	var _text = __webpack_require__(28);
 
-	var _page = __webpack_require__(31);
+	var _page = __webpack_require__(30);
 
-	var _markup = __webpack_require__(39);
+	var _markup = __webpack_require__(40);
 
-	var _actions = __webpack_require__(33);
+	var _actions = __webpack_require__(31);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -4042,15 +4116,15 @@
 	    var _props2 = this.props;
 	    var page = _props2.page;
 	    var element = _props2.element;
+	    var elementIndex = _props2.elementIndex;
 	    var active = _props2.active;
 	    var selectElement = _props2.selectElement;
 	    var _state = this.state;
 	    var tree = _state.tree;
 	    var diagonal = _state.diagonal;
 
-	    // clone the page since it overwrites children
 
-	    var clonedPage = (0, _page.clone)(page.element);
+	    var clonedPage = (0, _page.simpleGrow)(page.elements);
 
 	    // generate the tree's nodes and links
 	    var nodes = tree.nodes(clonedPage);
@@ -4066,7 +4140,7 @@
 	      }),
 	      nodes.map(function (n, i) {
 	        return _react2.default.createElement(Node, _extends({ key: i,
-	          current: element !== undefined && n.original === element,
+	          current: element !== undefined && n.index === elementIndex,
 	          select: selectElement,
 	          active: active
 	        }, n));
@@ -4134,7 +4208,7 @@
 	  hoverClass: "saved-preview",
 	  handleClick: function handleClick(event) {
 	    event.preventDefault();
-	    this.props.select(this.props.original);
+	    this.props.select(this.props.index);
 	  },
 	  handleMouseover: function handleMouseover(event) {
 	    (0, _markup.highlight)(this.props.elements, this.hoverClass);
@@ -4249,15 +4323,24 @@
 	});
 
 	exports.default = (0, _reactRedux.connect)(function (state) {
+	  var page = state.page;
+	  var frame = state.frame;
+	  var pages = page.pages;
+	  var pageIndex = page.pageIndex;
+	  var elementIndex = page.elementIndex;
+
+	  var currentPage = pages[pageIndex];
+	  var element = currentPage === undefined ? undefined : currentPage.elements[elementIndex];
 	  return {
-	    page: state.page.pages[state.page.pageIndex],
-	    pageNames: state.page.pages.filter(function (p) {
+	    page: currentPage,
+	    pageNames: pages.filter(function (p) {
 	      return p !== undefined;
 	    }).map(function (p) {
 	      return p.name;
 	    }),
-	    element: state.element,
-	    active: state.frame.name === "element"
+	    element: element,
+	    active: frame.name === "element",
+	    elementIndex: elementIndex
 	  };
 	}, {
 	  selectElement: _actions.selectElement,
@@ -4269,13 +4352,13 @@
 	})(PageTree);
 
 /***/ },
-/* 44 */
+/* 45 */
 /***/ function(module, exports) {
 
 	module.exports = d3;
 
 /***/ },
-/* 45 */
+/* 46 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -4288,13 +4371,15 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _reactRedux = __webpack_require__(14);
+	var _reactRedux = __webpack_require__(15);
 
-	var _Buttons = __webpack_require__(28);
+	var _Buttons = __webpack_require__(26);
 
-	var _preview = __webpack_require__(46);
+	var _page = __webpack_require__(30);
 
-	var _actions = __webpack_require__(33);
+	var _preview = __webpack_require__(47);
+
+	var _actions = __webpack_require__(31);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -4307,11 +4392,11 @@
 	  },
 	  logHandler: function logHandler(event) {
 	    event.preventDefault();
-	    console.log(JSON.stringify((0, _preview.preview)(this.props.page)));
+	    console.log(JSON.stringify((0, _preview.preview)(this.props.tree)));
 	  },
 	  prettyLogHandler: function prettyLogHandler(event) {
 	    event.preventDefault();
-	    console.log(JSON.stringify((0, _preview.preview)(this.props.page), null, 2));
+	    console.log(JSON.stringify((0, _preview.preview)(this.props.tree), null, 2));
 	  },
 	  render: function render() {
 	    if (!this.props.visible) {
@@ -4335,7 +4420,7 @@
 	        _react2.default.createElement(
 	          "pre",
 	          null,
-	          JSON.stringify((0, _preview.preview)(this.props.page), null, 2)
+	          JSON.stringify((0, _preview.preview)(this.props.tree), null, 2)
 	        )
 	      )
 	    );
@@ -4343,16 +4428,23 @@
 	});
 
 	exports.default = (0, _reactRedux.connect)(function (state) {
+	  var page = state.page;
+	  var preview = state.preview;
+	  var pages = page.pages;
+	  var pageIndex = page.pageIndex;
+
+	  var currentPage = pages[pageIndex];
 	  return {
-	    page: state.page.pages[state.page.pageIndex],
-	    visible: state.preview.visible
+	    visible: preview.visible,
+	    // only grow the tree when visible
+	    tree: preview.visible ? currentPage === undefined ? {} : (0, _page.fullGrow)(currentPage.elements) : undefined
 	  };
 	}, {
 	  close: _actions.hidePreview
 	})(Preview);
 
 /***/ },
-/* 46 */
+/* 47 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -4360,7 +4452,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	var preview = exports.preview = function preview(page) {
+	var preview = exports.preview = function preview(tree) {
 	    /*
 	     * Given a parent element, get all children that match the selector
 	     * Return data based on element's type (index or name)
@@ -4427,8 +4519,8 @@
 	    var getRuleData = function getRuleData(rules, htmlElement) {
 	        var data = {};
 	        rules.forEach(function (rule) {
-	            var val = undefined;
-	            var match = undefined;
+	            var val = void 0;
+	            var match = void 0;
 	            if (rule.attr === "text") {
 	                val = htmlElement.textContent.replace(/\s+/g, " ");
 	            } else {
@@ -4452,11 +4544,11 @@
 	        return data;
 	    };
 
-	    return page === undefined ? "" : getElement(page.element, document);
+	    return tree === undefined ? "" : getElement(tree, document);
 	};
 
 /***/ },
-/* 47 */
+/* 48 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -4464,10 +4556,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-
-	var _frame = __webpack_require__(48);
-
-	var _frame2 = _interopRequireDefault(_frame);
+	exports.default = reducer;
 
 	var _show = __webpack_require__(49);
 
@@ -4477,9 +4566,9 @@
 
 	var _page2 = _interopRequireDefault(_page);
 
-	var _element = __webpack_require__(51);
+	var _frame = __webpack_require__(51);
 
-	var _element2 = _interopRequireDefault(_element);
+	var _frame2 = _interopRequireDefault(_frame);
 
 	var _preview = __webpack_require__(52);
 
@@ -4504,16 +4593,12 @@
 	  preview: {
 	    visible: false
 	  },
-	  element: undefined,
-	  messages: {
+	  message: {
 	    text: "",
 	    wait: undefined
 	  }
 	};
 
-	/*
-	 * Forager reducer
-	 */
 	function reducer() {
 	  var state = arguments.length <= 0 || arguments[0] === undefined ? initialState : arguments[0];
 	  var action = arguments[1];
@@ -4524,17 +4609,317 @@
 	        frame: (0, _frame2.default)(state.frame, action),
 	        show: (0, _show2.default)(state.show, action),
 	        page: (0, _page2.default)(state.page, action),
-	        element: (0, _element2.default)(state.element, action),
 	        preview: (0, _preview2.default)(state.preview, action),
 	        message: (0, _message2.default)(state.message, action)
 	      };
 	  }
 	}
 
-	exports.default = reducer;
+/***/ },
+/* 49 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = show;
+
+	var _ActionTypes = __webpack_require__(33);
+
+	var types = _interopRequireWildcard(_ActionTypes);
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+	/*
+	 * show
+	 * ----
+	 *
+	 * Determines whether or not the Forager UI is shown. When show=false, the
+	 * extension can be considered off.
+	 */
+	function show() {
+	  var state = arguments.length <= 0 || arguments[0] === undefined ? true : arguments[0];
+	  var action = arguments[1];
+
+	  switch (action.type) {
+	    case types.CLOSE_FORAGER:
+	      return false;
+	    case types.OPEN_FORAGER:
+	      return true;
+	    default:
+	      return state;
+	  }
+	}
 
 /***/ },
-/* 48 */
+/* 50 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = page;
+
+	var _ActionTypes = __webpack_require__(33);
+
+	var types = _interopRequireWildcard(_ActionTypes);
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+	/*
+	 * page
+	 * ----
+	 *
+	 * a page is made up of an array of pages, a pageIndex to indicate the current
+	 * page within the array, and a elementIndex to indicate the current selector
+	 * within the current page
+	 *
+	 * pages[0] is an undefined page.
+	 */
+	function page() {
+	  var state = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+	  var action = arguments[1];
+
+	  switch (action.type) {
+	    case types.LOAD_PAGE:
+	      var index = parseInt(action.index, 10);
+	      // bad index values will be set to 0
+	      if (isNaN(index) || index < 0 || index >= state.pages.length) {
+	        index = 0;
+	      }
+	      return Object.assign({}, state, {
+	        pageIndex: index,
+	        elementIndex: 0
+	      });
+
+	    case types.ADD_PAGE:
+	      var pages = state.pages;
+	      var newPages = [].concat(_toConsumableArray(pages), [action.page]);
+	      return Object.assign({}, state, {
+	        pages: newPages,
+	        pageIndex: newPages.length - 1,
+	        elementIndex: 0
+	      });
+
+	    case types.REMOVE_PAGE:
+	      var pages = state.pages;
+	      var pageIndex = state.pageIndex;
+	      // don't remove the undefined page
+
+	      if (pageIndex === 0) {
+	        return state;
+	      }
+	      return Object.assign({}, state, {
+	        pages: [].concat(_toConsumableArray(pages.slice(0, pageIndex)), _toConsumableArray(pages.slice(pageIndex + 1))),
+	        pageIndex: 0,
+	        elementIndex: 0
+	      });
+
+	    case types.RENAME_PAGE:
+	      var pages = state.pages;
+	      var pageIndex = state.pageIndex;
+
+	      return Object.assign({}, state, {
+	        pages: [].concat(_toConsumableArray(pages.slice(0, pageIndex)), [Object.assign({}, pages[pageIndex], {
+	          name: action.name
+	        })], _toConsumableArray(pages.slice(pageIndex + 1)))
+	      });
+
+	    case types.SELECT_ELEMENT:
+	      var pages = state.pages;
+	      var pageIndex = state.pageIndex;
+	      var elementIndex = state.elementIndex;
+
+	      var selectorCount = pages[pageIndex].elements.length;
+	      var index = parseInt(action.index, 10);
+	      // set to 0 when out of bounds
+	      if (isNaN(index) || index < 0 || index >= selectorCount) {
+	        index = 0;
+	      }
+	      return Object.assign({}, state, {
+	        elementIndex: index
+	      });
+
+	    case types.SAVE_ELEMENT:
+	      var pages = state.pages;
+	      var pageIndex = state.pageIndex;
+	      var elementIndex = state.elementIndex;
+
+	      var currentPage = pages[pageIndex];
+	      var currentSelector = currentPage.elements[elementIndex];
+	      var currentCount = currentPage.elements.length;
+
+	      // set parent/child/index values
+	      var element = action.element;
+
+	      element.parent = currentSelector.index;
+	      element.index = currentCount;
+	      currentSelector.childIndices.push(currentCount);
+
+	      return Object.assign({}, state, {
+	        pages: [].concat(_toConsumableArray(pages.slice(0, pageIndex)), [Object.assign({}, currentPage, {
+	          elements: currentPage.elements.concat([element])
+	        })], _toConsumableArray(pages.slice(pageIndex + 1))),
+	        elementIndex: currentCount
+	      });
+
+	    case types.REMOVE_ELEMENT:
+	      var pages = state.pages;
+	      var pageIndex = state.pageIndex;
+	      var elementIndex = state.elementIndex;
+	      // elementIndex will be the parent index
+
+	      var currentPage = pages[pageIndex];
+	      var currentSelector = currentPage.elements[elementIndex];
+
+	      // clear everything else out, but don't remove the body selector
+	      if (elementIndex === 0) {
+	        var cleanedBody = Object.assign({}, currentPage.elements[0], {
+	          childIndices: []
+	        });
+	        return Object.assign({}, state, {
+	          pages: [].concat(_toConsumableArray(pages.slice(0, pageIndex)), [Object.assign({}, currentPage, {
+	            elements: [cleanedBody]
+	          })], _toConsumableArray(pages.slice(pageIndex + 1))),
+	          elementIndex: 0
+	        });
+	      }
+
+	      // index values of elements that should be removed
+	      var removeIndex = [elementIndex];
+	      var updatedPage = Object.assign({}, currentPage, {
+	        elements: currentPage.elements.map(function (s) {
+	          // remove any elements being removed from child indices
+	          s.childIndices = s.childIndices.filter(function (c) {
+	            return !removeIndex.includes(c);
+	          });
+	          if (removeIndex.includes(s.index)) {
+	            // if removing the selector element, remove any of its children
+	            // as well
+	            removeIndex = removeIndex.concat(s.childIndices);
+	            // replace with null so we don't have to recalculate references
+	            return null;
+	          }
+	          return s;
+	        })
+	      });
+
+	      return Object.assign({}, state, {
+	        pages: [].concat(_toConsumableArray(pages.slice(0, pageIndex)), [updatedPage], _toConsumableArray(pages.slice(pageIndex + 1))),
+	        elementIndex: 0
+	      });
+
+	    case types.RENAME_ELEMENT:
+	      var pages = state.pages;
+	      var pageIndex = state.pageIndex;
+	      var elementIndex = state.elementIndex;
+	      var name = action.name;
+
+	      // elementIndex will be the parent index
+
+	      var currentPage = pages[pageIndex];
+
+	      return Object.assign({}, state, {
+	        pages: [].concat(_toConsumableArray(pages.slice(0, pageIndex)), [Object.assign({}, currentPage, {
+	          elements: currentPage.elements.map(function (s) {
+	            // set the new name for the element matching elementIndex
+	            // only affects 'all' type elements
+	            if (s.index === elementIndex && s.spec.type === "all") {
+	              return Object.assign({}, s, {
+	                spec: Object.assign({}, s.spec, {
+	                  value: name
+	                })
+	              });
+	            }
+	            return s;
+	          })
+	        })], _toConsumableArray(pages.slice(pageIndex + 1)))
+	      });
+
+	    case types.TOGGLE_OPTIONAL:
+	      var pages = state.pages;
+	      var pageIndex = state.pageIndex;
+	      var elementIndex = state.elementIndex;
+
+	      var currentPage = pages[pageIndex];
+	      return Object.assign({}, state, {
+	        pages: [].concat(_toConsumableArray(pages.slice(0, pageIndex)), [Object.assign({}, currentPage, {
+	          elements: currentPage.elements.map(function (s) {
+	            if (s.index === elementIndex) {
+	              return Object.assign({}, s, {
+	                optional: !s.optional
+	              });
+	            }
+	            return s;
+	          })
+	        })], _toConsumableArray(pages.slice(pageIndex + 1)))
+	      });
+
+	    case types.SAVE_RULE:
+	      var pages = state.pages;
+	      var pageIndex = state.pageIndex;
+	      var elementIndex = state.elementIndex;
+	      var rule = action.rule;
+
+
+	      var currentPage = pages[pageIndex];
+
+	      return Object.assign({}, state, {
+	        pages: [].concat(_toConsumableArray(pages.slice(0, pageIndex)), [Object.assign({}, currentPage, {
+	          elements: currentPage.elements.map(function (s) {
+	            // set the new name for the element matching elementIndex
+	            if (s.index === elementIndex) {
+	              s.rules = s.rules.concat([rule]);
+	            }
+	            return s;
+	          })
+	        })], _toConsumableArray(pages.slice(pageIndex + 1)))
+	      });
+
+	    case types.REMOVE_RULE:
+	      var pages = state.pages;
+	      var pageIndex = state.pageIndex;
+	      var elementIndex = state.elementIndex;
+	      var index = action.index;
+
+
+	      var currentPage = pages[pageIndex];
+
+	      return Object.assign({}, state, {
+	        pages: [].concat(_toConsumableArray(pages.slice(0, pageIndex)), [Object.assign({}, currentPage, {
+	          elements: currentPage.elements.map(function (s) {
+	            // remove the rule from the current element
+	            if (s.index === elementIndex) {
+	              return Object.assign({}, s, {
+	                rules: s.rules.filter(function (r, i) {
+	                  return i !== index;
+	                })
+	              });
+	            }
+	            return s;
+	          })
+	        })], _toConsumableArray(pages.slice(pageIndex + 1)))
+	      });
+
+	    case types.CLOSE_FORAGER:
+	      return Object.assign({}, state, {
+	        pageIndex: 0,
+	        elementIndex: 0
+	      });
+
+	    default:
+	      return state;
+	  }
+	}
+
+/***/ },
+/* 51 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -4544,7 +4929,7 @@
 	});
 	exports.default = frame;
 
-	var _ActionTypes = __webpack_require__(34);
+	var _ActionTypes = __webpack_require__(33);
 
 	var types = _interopRequireWildcard(_ActionTypes);
 
@@ -4603,212 +4988,6 @@
 	}
 
 /***/ },
-/* 49 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.default = show;
-
-	var _ActionTypes = __webpack_require__(34);
-
-	var types = _interopRequireWildcard(_ActionTypes);
-
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-	/*
-	 * show
-	 * ----
-	 *
-	 * Determines whether or not the Forager UI is shown. When show=false, the
-	 * extension can be considered off.
-	 */
-	function show() {
-	  var state = arguments.length <= 0 || arguments[0] === undefined ? true : arguments[0];
-	  var action = arguments[1];
-
-	  switch (action.type) {
-	    case types.CLOSE_FORAGER:
-	      return false;
-	    case types.SHOW_FORAGER:
-	      return true;
-	    default:
-	      return state;
-	  }
-	}
-
-/***/ },
-/* 50 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.default = page;
-
-	var _ActionTypes = __webpack_require__(34);
-
-	var types = _interopRequireWildcard(_ActionTypes);
-
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-
-	/*
-	 * page
-	 * ----
-	 *
-	 * a page is made up of an array of pages and a pageIndex to indicate the current
-	 * page within the array. pages[0] is an undefined page.
-	 */
-	function page() {
-	  var state = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
-	  var action = arguments[1];
-
-	  switch (action.type) {
-	    /*
-	     * sets the pageIndex, specifying that the page in the pages array at that
-	     * index is the "current" page. If the index is out of the bounds of the
-	     * state.pages array, set to 0.
-	     */
-	    case types.LOAD_PAGE:
-	      var index = parseInt(action.index, 10);
-	      if (isNaN(index) || index < 0 || index >= state.pages.length) {
-	        index = 0;
-	      }
-	      return Object.assign({}, state, {
-	        pageIndex: index
-	      });
-
-	    /*
-	     * add a page to the pages array. Multiple pages with the same name can be created
-	     * so care needs to be taken when uploading.
-	     */
-	    case types.ADD_PAGE:
-	      var pages = state.pages;
-	      var newPages = [].concat(_toConsumableArray(pages), [action.page]);
-	      return Object.assign({}, state, {
-	        pages: newPages,
-	        pageIndex: newPages.length - 1
-	      });
-
-	    /*
-	     * remove the page from the pages array
-	     */
-	    case types.REMOVE_PAGE:
-	      var pages = state.pages;
-	      var pageIndex = state.pageIndex;
-	      // don't remove the undefined page
-
-	      if (pageIndex === 0) {
-	        return state;
-	      }
-	      return Object.assign({}, state, {
-	        pages: [].concat(_toConsumableArray(pages.slice(0, pageIndex)), _toConsumableArray(pages.slice(pageIndex + 1))),
-	        pageIndex: 0
-	      });
-
-	    case types.RENAME_PAGE:
-	      var pages = state.pages;
-	      var pageIndex = state.pageIndex;
-
-	      var page = pages[pageIndex];
-	      page.name = action.name;
-	      return Object.assign({}, state, {
-	        pages: [].concat(_toConsumableArray(pages.slice(0, pageIndex)), [page], _toConsumableArray(pages.slice(pageIndex + 1)))
-	      });
-
-	    /*
-	     * all of the updating is done in the components, which is not very redux-y,
-	     * but since the data is tree-like and the tree's nodes are passed by
-	     * reference throughout the app, it is simpler to do that than to keep ids
-	     * on the nodes and make changes in here. Since the changes have already been
-	     * made, all this does is create a new array of pages to trigger an update
-	     * when adding a rule to or removing a rule from an element so that the UI
-	     * can reflect 
-	     *
-	     */
-	    case types.SAVE_ELEMENT:
-	    case types.REMOVE_ELEMENT:
-	    case types.RENAME_ELEMENT:
-	    case types.SAVE_RULE:
-	    case types.REMOVE_RULE:
-	    case types.TOGGLE_OPTIONAL:
-	      var pages = state.pages;
-	      var pageIndex = state.pageIndex;
-
-	      var page = pages[pageIndex];
-	      return Object.assign({}, state, {
-	        pages: [].concat(_toConsumableArray(pages.slice(0, pageIndex)), [page], _toConsumableArray(pages.slice(pageIndex + 1)))
-	      });
-
-	    case types.CLOSE_FORAGER:
-	      return Object.assign({}, state, {
-	        pageIndex: 0
-	      });
-
-	    default:
-	      return state;
-	  }
-	}
-
-/***/ },
-/* 51 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.default = element;
-
-	var _ActionTypes = __webpack_require__(34);
-
-	var types = _interopRequireWildcard(_ActionTypes);
-
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-	/*
-	 * element
-	 * ---------
-	 *
-	 * Never create a new element, always just mutate the current one so that
-	 * the changes are reflected in the page that contains the element.
-	 */
-	function element(state, action) {
-	  switch (action.type) {
-	    case types.ADD_PAGE:
-	      return action.page.element;
-
-	    // loadPage is passed the element since it doesn't have
-	    // access to the store's page
-	    case types.LOAD_PAGE:
-	    case types.SELECT_ELEMENT:
-	    case types.SAVE_ELEMENT:
-	      return action.element;
-
-	    case types.REMOVE_ELEMENT:
-	    case types.REMOVE_PAGE:
-	    case types.CLOSE_FORAGER:
-	      return undefined;
-
-	    case types.SAVE_RULE:
-	    case types.REMOVE_RULE:
-	    case types.RENAME_ELEMENT:
-	    case types.TOGGLE_OPTIONAL:
-	      return Object.assign({}, state);
-	    default:
-	      return state;
-	  }
-	}
-
-/***/ },
 /* 52 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -4819,7 +4998,7 @@
 	});
 	exports.default = preview;
 
-	var _ActionTypes = __webpack_require__(34);
+	var _ActionTypes = __webpack_require__(33);
 
 	var types = _interopRequireWildcard(_ActionTypes);
 
@@ -4860,7 +5039,7 @@
 	});
 	exports.default = message;
 
-	var _ActionTypes = __webpack_require__(34);
+	var _ActionTypes = __webpack_require__(33);
 
 	var types = _interopRequireWildcard(_ActionTypes);
 
@@ -4900,7 +5079,7 @@
 	  value: true
 	});
 
-	var _ActionTypes = __webpack_require__(34);
+	var _ActionTypes = __webpack_require__(33);
 
 	var ActionTypes = _interopRequireWildcard(_ActionTypes);
 
@@ -4908,22 +5087,18 @@
 
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-	exports.default = function (state) {
+	exports.default = function (fullStore) {
 	  return function (next) {
 	    return function (action) {
-	      var current = state.getState();
+	      var current = fullStore.getState();
 	      var _current$page = current.page;
 	      var pages = _current$page.pages;
 	      var pageIndex = _current$page.pageIndex;
 
 	      var page = pages[pageIndex];
 	      switch (action.type) {
-
-	        case ActionTypes.ADD_PAGE:
-	          (0, _chrome.chromeSave)(action.page);
-	          return next(action);
-
 	        case ActionTypes.RENAME_PAGE:
+	          // new name, old name
 	          (0, _chrome.chromeRename)(action.name, page.name);
 	          return next(action);
 
@@ -4936,14 +5111,23 @@
 	          (0, _chrome.chromeUpload)(pages[pageIndex]);
 	          break;
 
+	        // for chromeSave actions, save after the action has reached the reducer
+	        // so that we are saving the updated state of the store
+	        case ActionTypes.ADD_PAGE:
 	        case ActionTypes.SAVE_ELEMENT:
 	        case ActionTypes.REMOVE_ELEMENT:
 	        case ActionTypes.RENAME_ELEMENT:
 	        case ActionTypes.SAVE_RULE:
 	        case ActionTypes.REMOVE_RULE:
 	        case ActionTypes.TOGGLE_OPTIONAL:
-	          (0, _chrome.chromeSave)(page);
-	          return next(action);
+	          var retVal = next(action);
+	          var newState = fullStore.getState();
+	          var newPage = newState.page;
+	          var newPages = newPage.pages;
+	          var newPageIndex = newPage.pageIndex;
+
+	          (0, _chrome.chromeSave)(newPages[newPageIndex]);
+	          return retVal;
 
 	        default:
 	          return next(action);
@@ -4963,9 +5147,9 @@
 	});
 	exports.chromeUpload = exports.chromeLoad = exports.chromeDelete = exports.chromeRename = exports.chromeSave = undefined;
 
-	var _selection = __webpack_require__(32);
+	var _selection = __webpack_require__(29);
 
-	var _page = __webpack_require__(31);
+	var _page = __webpack_require__(30);
 
 	/*
 	 * any time that the page is updated, the stored page should be updated
@@ -5017,19 +5201,26 @@
 
 	If the site object exists for a host, load the saved rules
 	*/
-	var chromeLoad = exports.chromeLoad = function chromeLoad(callback) {
-	  chrome.storage.local.get("sites", function setupHostnameChrome(storage) {
-	    var host = window.location.hostname;
-	    var current = storage.sites[host] || {};
-	    var pages = Object.keys(current).map(function (key) {
-	      return current[key];
-	    }).filter(function (p) {
-	      return p !== null;
+	var chromeLoad = exports.chromeLoad = function chromeLoad() {
+	  return new Promise(function (resolve, reject) {
+	    chrome.storage.local.get("sites", function setupHostnameChrome(storage) {
+	      var host = window.location.hostname;
+	      var current = storage.sites[host] || {};
+	      var pages = Object.keys(current).map(function (key) {
+	        return current[key];
+	      }).filter(function (p) {
+	        return p !== null;
+	      }).map(function (p) {
+	        return {
+	          name: p.name,
+	          elements: (0, _page.flatten)(p.element)
+	        };
+	      });
+	      pages.forEach(function (p) {
+	        return (0, _page.selectElements)(p.elements);
+	      });
+	      resolve(pages);
 	    });
-	    pages.forEach(function (p) {
-	      return (0, _page.setupPage)(p);
-	    });
-	    callback(pages);
 	  });
 	};
 

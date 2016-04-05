@@ -2,41 +2,49 @@ import React from "react";
 import { connect } from "react-redux";
 
 import NoSelectMixin from "./NoSelectMixin";
-import { PosButton, NeutralButton } from "./Buttons";
+import { PosButton, NeutralButton } from "./common/Buttons";
 import Message from "./Message";
 
 import { validName } from "../helpers/text";
-import { createPage, setupPage } from "../helpers/page";
+import { select } from "../helpers/selection";
+import { createElement, selectElements } from "../helpers/page";
 import { addPage, loadPage, closeForager, showMessage } from "../actions";
 
 const Controls = React.createClass({
   mixins: [NoSelectMixin],
   addHandler: function(event) {
     event.preventDefault();
-
+    const { pages, showMessage, addPage } = this.props;
     const name = window.prompt("Page Name:\nCannot contain the following characters: < > : \" \\ / | ? * ");
-    const existingNames = this.props.pages
+
+    const existingNames = pages
       .filter(p => p !== undefined)
       .map(p => p.name);
+
     if ( !validName(name, existingNames) ) {
-      this.props.showMessage(
+      showMessage(
         `Invalid Name: "${name}"`,
         5000
       );
     } else {
+      
+      let body = createElement("body");
+      // initial values for the body selector
+      body = Object.assign({}, body, {
+        index: 0,
+        parent: null,
+        elements: [document.body]
+      });
 
-      const newPage = createPage(name);
-      setupPage(newPage);
-    
-      this.props.addPage(newPage);
+      addPage({
+        name: name,
+        elements: [body]
+      });
       
     }
   },
   loadHandler: function(event) {
-    const nextPageIndex = parseInt(event.target.value, 10);
-    const nextPage = this.props.pages[nextPageIndex]; 
-    const element = nextPage !== undefined ? nextPage.element : undefined;
-    this.props.loadPage(nextPageIndex, element);
+    this.props.loadPage(parseInt(event.target.value, 10));
   },
   closeHandler: function(event){
     document.body.classList.remove("foraging");

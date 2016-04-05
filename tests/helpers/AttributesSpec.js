@@ -3,25 +3,33 @@ import { jsdom } from "jsdom";
 
 import { attributes, stripEvents } from "../../src/helpers/attributes";
 
-const doc = jsdom(`<!doctype html>
-  <html>
-  <body>
-    <div>
-      <p>One</p>
-      <p>Two</p>
-    </div>
-    <div></div>
-    <div>
-      <p>Three</p>
-      <p class='no-select'>Ignore</p>
-    </div>
-  </body>
-</html>`);
-const win = doc.defaultView;
-global.document = doc;
-global.window = win;
 
 describe("attribute", () => {
+
+  beforeEach(() => {
+    const doc = jsdom(`<!doctype html>
+      <html>
+      <body>
+        <div>
+          <p>One</p>
+          <p>Two</p>
+        </div>
+        <div></div>
+        <div>
+          <p>Three</p>
+          <p class='no-select'>Ignore</p>
+        </div>
+      </body>
+    </html>`);
+    const win = doc.defaultView;
+    global.document = doc;
+    global.window = win;
+  });
+
+  afterEach(() => {
+    delete global.document;
+    delete global.window;
+  });
 
   describe("attributes", () => {
     it("returns an array of objects representing an element's attributes", () => {

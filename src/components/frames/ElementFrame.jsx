@@ -5,30 +5,20 @@ import NoSelectMixin from "../NoSelectMixin";
 
 import { showHTMLFrame, removeElement, renameElement,
   showRuleFrame, removeRule, toggleOptional } from "../../actions";
-import { PosButton, NegButton, NeutralButton } from "../Buttons";
+import { PosButton, NegButton, NeutralButton } from "../common/Buttons";
 
 const ElementFrame = React.createClass({
   mixins: [NoSelectMixin],
   addChild: function(event) {
-    this.props.createElement();
+    this.props.showHTMLFrame();
   },
   addRule: function(event) {
-    this.props.createRule();
+    this.props.showRuleFrame();
   },
   remove: function(event) {
     const { element, removeElement } = this.props;
     if ( !confirm(`Are you sure you want to delete the element "${element.selector}"?`)) {
       return;
-    }
-    const parent = element.parent;
-    if ( parent === null ) {
-      // root "body" element
-      element.children = [];
-      element.rules = [];
-    } else {
-      parent.children = parent.children.filter(child => {
-        return child !== element;
-      });
     }
     removeElement();
   },
@@ -38,16 +28,13 @@ const ElementFrame = React.createClass({
       return;
     }
     const { element, renameElement } = this.props;
-    element.spec.value = newName;
-    renameElement();
+    renameElement(newName);
   },
   removeRule: function(index) {
     const rules = this.props.element.rules;
-    this.props.element.rules = [...rules.slice(0, index), ...rules.slice(index+1)];
-    this.props.removeRule();
+    this.props.removeRule(index);
   },
   toggleOptional: function(event) {
-    this.props.element.optional = !this.props.element.optional;
     this.props.toggleOptional();
   },
   render: function() {
@@ -135,14 +122,20 @@ const Rule = React.createClass({
 });
 
 export default connect(
-  state => ({
-    element: state.element
-  }),
+  state => {
+    const { page } = state;
+    const { pages, pageIndex, elementIndex } = page;
+    const currentPage = pages[pageIndex];
+    const element = currentPage === undefined ? undefined : currentPage.elements[elementIndex];
+    return {
+      element: element
+    }
+  },
   {
-    createElement: showHTMLFrame,
+    showHTMLFrame,
     removeElement,
     renameElement,
-    createRule: showRuleFrame,
+    showRuleFrame,
     removeRule,
     toggleOptional
   }

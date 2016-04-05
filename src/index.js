@@ -7,28 +7,33 @@ import { Provider } from "react-redux";
 import Forager from "./components/Forager";
 import reducer from './reducers';
 
-import { SHOW_FORAGER } from "./constants/ActionTypes";
+import { openForager } from "./actions";
 import chromeMiddleware from "./middleware/chromeMiddleware";
 
 import { chromeLoad } from "./helpers/chrome";
+
+document.body.classList.add("foraging");
 
 /*
  * check if the forager holder exists. If it doesn't, mount the app. If it does,
  * check if the app is hidden. If it is hidden, show it.
  */
-const holder = document.querySelector(".forager-holder");
-document.body.classList.add("foraging");
-if ( !holder ) {
-  chromeLoad(pages => {
-    /*
-     * initialState uses the pages loaded by chrome
-     */
+if ( !document.querySelector(".forager-holder") ) {
+  // create the element that will hold the app
+  const holder = document.createElement("div");
+  holder.classList.add("forager-holder");
+  holder.classList.add("no-select");
+  document.body.appendChild(holder);
+
+  chromeLoad()
+    .then(pages => {
+
     const initialState = {
       show: true,
-      element: undefined,
       page: {
         pages: [undefined, ...pages],
-        pageIndex: 0
+        pageIndex: 0,
+        elementIndex: 0
       },
       frame: {
         name: "element",
@@ -51,14 +56,6 @@ if ( !holder ) {
       )
     );
 
-    /*
-     * actually render Forager
-     */
-    const holder = document.createElement("div");
-    holder.classList.add("forager-holder");
-    holder.classList.add("no-select");
-    document.body.appendChild(holder);
-
     ReactDOM.render(
       <Provider store={store}>
         <Forager />
@@ -66,20 +63,15 @@ if ( !holder ) {
       , holder
     );
 
-    // window here is the extension's context, so it is not reachable by code
-    // outside of the extension. It does, however, need to be accessible when
-    // the user click on the browser action button
-    window.store = store;
-
-  })
+    // a function to re-show the app if it has been closed
+    window.restore = () => {
+      if ( !store.getState().show ) {
+        store.dispatch(openForager());
+      }
+    }
+  });
 } else {
-  // if the app has already been created, dispatch an action to the store
-  // to let it know that the app should be visible
   document.body.classList.add("foraging");
-  if ( !store.getState().show ) {
-    store.dispatch({
-      type: SHOW_FORAGER
-    });
-  }
+  window.restore();
 }
 

@@ -10,17 +10,18 @@ import NoSelectMixin from "./NoSelectMixin";
 const Forager = React.createClass({
   mixins: [NoSelectMixin],
   render: function() {
-    const hidden = this.props.show ? "" : "hidden";
-    return (
-      <div id="forager" className={hidden} ref="parent">
-        <Controls  />
-        <div className="workspace">
-          <PageTree />
-          <Frames />
+    // don't render anything when show=False
+    return !this.props.show ? null :
+      (
+        <div id="forager" ref="parent">
+          <Controls />
+          <div className="workspace">
+            <PageTree />
+            <Frames />
+          </div>
+          <Preview />
         </div>
-        <Preview />
-      </div>
-    );
+      );
   }
 });
 

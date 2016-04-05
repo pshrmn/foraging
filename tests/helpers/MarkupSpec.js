@@ -3,26 +3,33 @@ import { jsdom } from "jsdom";
 
 import { highlight, unhighlight, iHighlight, iUnhighlight } from "../../src/helpers/markup";
 
-const doc = jsdom(`<!doctype html>
-  <html>
-  <body>
-    <div>
-      <p>One</p>
-      <p>Two</p>
-    </div>
-    <div></div>
-    <div>
-      <p>Three</p>
-      <p class='no-select'>Ignore</p>
-    </div>
-  </body>
-</html>`);
-const win = doc.defaultView;
-global.document = doc;
-global.window = win;
-
 describe("markup", () => {
   
+    beforeEach(() => {
+    const doc = jsdom(`<!doctype html>
+      <html>
+      <body>
+        <div>
+          <p>One</p>
+          <p>Two</p>
+        </div>
+        <div></div>
+        <div>
+          <p>Three</p>
+          <p class='no-select'>Ignore</p>
+        </div>
+      </body>
+    </html>`);
+    const win = doc.defaultView;
+    global.document = doc;
+    global.window = win;
+  });
+
+  afterEach(() => {
+    delete global.document;
+    delete global.window;
+  });
+
   describe("highlight", () => {
     it("adds the class to all elements", () => {
       const elements = document.querySelectorAll("div");

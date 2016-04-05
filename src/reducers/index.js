@@ -1,7 +1,6 @@
-import frame from "./frame";
 import show from "./show";
 import page from "./page";
-import element from "./element";
+import frame from "./frame";
 import preview from "./preview";
 import message from "./message";
 
@@ -20,28 +19,21 @@ const initialState = {
   preview: {
     visible: false
   },
-  element: undefined,
-  messages: {
+  message: {
     text: "",
     wait: undefined
   }
 };
 
-/*
- * Forager reducer
- */
-function reducer(state = initialState, action) {
+export default function reducer(state = initialState, action) {
   switch ( action.type ) {
   default:
     return {
       frame: frame(state.frame, action),
       show: show(state.show, action),
       page: page(state.page, action),
-      element: element(state.element, action),
       preview: preview(state.preview, action),
       message: message(state.message, action)
     };
   }
 }
-
-export default reducer;

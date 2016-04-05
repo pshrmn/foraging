@@ -1,7 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
 
-import { PosButton, NegButton } from "../Buttons";
+import { PosButton, NegButton } from "../common/Buttons";
 import NoSelectMixin from "../NoSelectMixin";
 
 import { createElement } from "../../helpers/page";
@@ -21,20 +21,19 @@ const SpecFrame = React.createClass({
   saveHandler: function(event) {
     event.preventDefault();
     const { type, value, optional } = this.state;
-    const { css, parent } = this.props;
+    const { css, parent, message, save } = this.props;
     // all value must be set
     if ( type === "all" && value === "" ) {
-      this.props.message("Name for type \"all\" elements cannot be empty");
+      message("Name for type \"all\" elements cannot be empty");
       return;
     }
     const ele = createElement(css, type, value, optional);
-
-    // select all of the elements in the page that are matched by the new element
     ele.elements = select(parent.elements, ele.selector, ele.spec);
 
-    ele.parent = parent;
-    parent.children.push(ele);
+    save(ele);
+    return;
 
+    // TODO make options selector work, maybe rethink old way?
     // SPECIAL CASE: "select" elements
     // if saving a selector that selects "select" elements, add a child selector
     // to match option elements
@@ -45,7 +44,6 @@ const SpecFrame = React.createClass({
       ele.children.push(optionsChild);
     }
 
-    this.props.save(ele);
   },
   cancelHandler: function(event) {
     event.preventDefault();
@@ -196,10 +194,16 @@ const SpecForm = React.createClass({
 });
 
 export default connect(
-  state => ({
-    parent: state.element,
-    ...state.frame.data
-  }),
+  state => {
+    const { page } = state;
+    const { pages, pageIndex, elementIndex } = page;
+    const currentPage = pages[pageIndex];
+    const element = currentPage === undefined ? undefined : currentPage.elements[elementIndex];
+    return {
+      parent: element,
+      ...state.frame.data
+    };
+  },
   {
     save: saveElement,
     cancel: showElementFrame,

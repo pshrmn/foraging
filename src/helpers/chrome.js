@@ -1,5 +1,5 @@
 import { select } from "./selection";
-import { clean, setupPage } from "./page"
+import { flatten, selectElements, clean } from "./page"
 
 /*
  * any time that the page is updated, the stored page should be updated
@@ -51,15 +51,24 @@ the object is:
 
 If the site object exists for a host, load the saved rules
 */
-export const chromeLoad = callback => {
-  chrome.storage.local.get("sites", function setupHostnameChrome(storage){
-    const host = window.location.hostname;
-    const current = storage.sites[host] || {};
-    const pages = Object.keys(current)
-      .map(key => current[key])
-      .filter(p => p !== null);
-    pages.forEach(p => setupPage(p));
-    callback(pages);
+export const chromeLoad = () => {
+  return new Promise((resolve, reject) => {
+    chrome.storage.local.get("sites", function setupHostnameChrome(storage){
+      const host = window.location.hostname;
+      const current = storage.sites[host] || {};
+      const pages = Object.keys(current)
+        .map(key => current[key])
+        .filter(p => p !== null)
+        .map(p => {
+          return {
+            name: p.name,
+            elements: flatten(p.element)
+          };
+        });
+      pages.forEach(p => selectElements(p.elements));
+      resolve(pages);
+    });
+
   });
 };
 

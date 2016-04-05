@@ -1,7 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
 
-import { PosButton, NegButton } from "../Buttons";
+import { PosButton, NegButton } from "../common/Buttons";
 
 import { select, count } from "../../helpers/selection";
 import { highlight, unhighlight} from "../../helpers/markup";
@@ -111,10 +111,17 @@ const PartsFrame = React.createClass({
 });
 
 export default connect(
-  state => ({
-    parentElements: state.element.elements,
-    ...state.frame.data
-  }),
+  state => {
+    const { page } = state;
+    const { pages, pageIndex, elementIndex } = page;
+    const currentPage = pages[pageIndex];
+    const element = currentPage === undefined ? undefined : currentPage.elements[elementIndex];
+    const parentElements = element.elements || [];
+    return {
+      parentElements: element.elements,
+      ...state.frame.data
+    }
+  },
   {
     next: showSpecFrame,
     cancel: showElementFrame,

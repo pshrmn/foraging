@@ -3,25 +3,32 @@ import { jsdom } from "jsdom";
 
 import { select, count, parts } from "../../src/helpers/selection";
 
-const doc = jsdom(`<!doctype html>
-  <html>
-  <body>
-    <div>
-      <p>One</p>
-      <p>Two</p>
-    </div>
-    <div></div>
-    <div>
-      <p>Three</p>
-      <p class='no-select'>Ignore</p>
-    </div>
-  </body>
-</html>`);
-const win = doc.defaultView;
-global.document = doc;
-global.window = win;
-
 describe("selector", () => {
+
+    beforeEach(() => {
+    const doc = jsdom(`<!doctype html>
+      <html>
+      <body>
+        <div>
+          <p>One</p>
+          <p>Two</p>
+        </div>
+        <div></div>
+        <div>
+          <p>Three</p>
+          <p class='no-select'>Ignore</p>
+        </div>
+      </body>
+    </html>`);
+    const win = doc.defaultView;
+    global.document = doc;
+    global.window = win;
+  });
+
+  afterEach(() => {
+    delete global.document;
+    delete global.window;
+  });
 
   describe("select", () => {
     it("matches all child elements, ignores .no-select elements", () => {
