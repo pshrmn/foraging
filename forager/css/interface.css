@@ -6,7 +6,6 @@ body {
 body.foraging {
   margin-bottom: 350px; }
 
-/* Interface */
 #forager {
   word-wrap: normal;
   z-index: 2147483637;
@@ -21,11 +20,11 @@ body.foraging {
   color: #000000;
   text-align: left;
   border: 10px solid #222233;
-  box-sizing: border-box;
-  /*
-     * input elements are the source of the biggest style
-     * issues, so !important is used quite liberally
-     */ }
+  box-sizing: border-box; }
+  #forager * {
+    color: #222233;
+    box-sizing: border-box;
+    line-height: 1.1 !important; }
   #forager div, #forager span, #forager applet, #forager object, #forager iframe,
   #forager h1, #forager h2, #forager h3, #forager h4, #forager h5, #forager h6, #forager p, #forager blockquote, #forager pre,
   #forager a, #forager abbr, #forager acronym, #forager address, #forager big, #forager cite, #forager code,
@@ -61,20 +60,21 @@ body.foraging {
   #forager table {
     border-collapse: collapse;
     border-spacing: 0; }
-  #forager.hidden {
-    display: none !important; }
-  #forager * {
-    color: #222233;
-    box-sizing: border-box;
-    line-height: 1.1 !important; }
-  #forager .not-allowed {
-    cursor: no-drop; }
-    #forager .not-allowed * {
-      cursor: no-drop; }
-  #forager .inline {
-    display: inline-block; }
-  #forager .hidden {
-    display: none !important; }
+  #forager ol, #forager ul {
+    list-style: none; }
+    #forager ol li, #forager ul li {
+      margin: 0; }
+  #forager h1, #forager h2, #forager h3, #forager h4, #forager h5, #forager h6, #forager p {
+    margin: 2px 0;
+    padding: 0; }
+  #forager h1 {
+    font-size: 1.5em; }
+  #forager h2 {
+    font-size: 1.25em; }
+  #forager h3 {
+    font-size: 1.2em; }
+  #forager h4, #forager h5, #forager h6 {
+    font-size: 1.1em; }
   #forager input, #forager select, #forager option, #forager textarea, #forager button {
     line-height: 1.1 !important;
     padding: 0 !important;
@@ -119,10 +119,7 @@ body.foraging {
     cursor: pointer !important;
     margin: 2px !important;
     padding: 3px 6px !important;
-    min-width: initial !important;
-    /*
-         * some classes to customize the look of buttons
-         */ }
+    min-width: initial !important; }
     #forager button:hover, #forager button:active, #forager button:focus {
       border-color: #898B96;
       color: #000000 !important; }
@@ -145,104 +142,11 @@ body.foraging {
       color: #D02357 !important; }
       #forager button.neg.transparent:hover, #forager button.neg.transparent:active, #forager button.neg.transparent:focus {
         color: #E85F88 !important; }
-  #forager .big {
-    font-size: 1.1em; }
-  #forager .bold {
-    font-weight: bold; }
-  #forager ul {
-    list-style: none; }
-    #forager ul li {
-      margin: 0; }
-  #forager h1, #forager h2, #forager h3, #forager h4, #forager h5, #forager h6, #forager p {
-    margin: 2px 0;
-    padding: 0; }
-  #forager h1 {
-    font-size: 1.5em; }
-  #forager h2 {
-    font-size: 1.25em; }
-  #forager h3 {
-    font-size: 1.2em; }
-  #forager h4, #forager h5, #forager h6 {
-    font-size: 1.1em; }
-  #forager .topbar {
-    min-height: 31px;
-    margin-bottom: 10px;
-    min-width: 650px;
-    background: #222233; }
-    #forager .topbar span {
-      color: #EFEFEF; }
-    #forager .topbar .controls {
-      display: -webkit-flex;
-      display: -ms-flexbox;
-      display: flex; }
-    #forager .topbar .message {
-      color: #E85F88;
-      margin: 0;
-      padding: 0; }
-    #forager .topbar button {
-      display: inline-block;
-      line-height: 1.25 !important;
-      min-height: 1.25em !important;
-      border-radius: 3px;
-      border-width: 1px;
-      border-style: solid;
-      background: #222233 !important; }
-      #forager .topbar button.pos, #forager .topbar button.pos:active, #forager .topbar button.pos:focus {
-        color: #76B85C !important;
-        border-color: #76B85C !important;
-        background: #222233 !important; }
-      #forager .topbar button.pos:hover {
-        background: #76B85C !important;
-        color: #222233 !important; }
-      #forager .topbar button.neg, #forager .topbar button.neg:active, #forager .topbar button.neg:focus {
-        border-color: #E85F88 !important;
-        color: #E85F88 !important;
-        background: #222233 !important; }
-      #forager .topbar button.neg:hover {
-        background: #E85F88 !important;
-        color: #222233 !important; }
-    #forager .topbar button:active {
-      border-style: inset !important;
-      color: #000000 !important; }
-    #forager .topbar select {
-      width: 100px;
-      min-height: 22px;
-      height: 22px;
-      border-radius: 2px; }
-  #forager .workspace {
-    display: -webkit-flex;
-    display: -ms-flexbox;
-    display: flex; }
   #forager .frames, #forager .graph {
     background: #ffffff;
     box-sizing: border-box;
     margin-right: 3px;
     padding: 5px; }
-  #forager .graph {
-    min-width: 500px;
-    min-height: 150px; }
-    #forager .graph svg {
-      box-sizing: content-box;
-      font-size: 14px;
-      background: #ffffff; }
-      #forager .graph svg .link {
-        fill: none;
-        stroke: #323033; }
-      #forager .graph svg .node {
-        cursor: pointer;
-        fill: #42752E; }
-      #forager .graph svg .empty {
-        fill: #E85F88; }
-      #forager .graph svg .node text {
-        paint-order: stroke;
-        stroke: #ffffff;
-        stroke-width: 3px;
-        text-anchor: middle;
-        font-weight: bold;
-        fill: inherit; }
-      #forager .graph svg .current {
-        font-style: italic;
-        fill: #323033; }
   #forager .frames {
     width: 400px;
     vertical-align: top; }
@@ -258,9 +162,9 @@ body.foraging {
           -ms-flex-direction: column;
               flex-direction: column;
       /*
-             * frames are broken down into two parts, the .info section and
-             * the .buttons section
-             */ }
+         * frames are broken down into two parts, the .info section and
+         * the .buttons section
+         */ }
       #forager .frames .frame .info > * {
         padding: 2px 0; }
       #forager .frames .frame .info .line {
@@ -321,6 +225,94 @@ body.foraging {
       color: #42752E;
       background: #CCE0C3;
       border-color: #42752E; }
+  #forager .graph {
+    min-width: 500px;
+    min-height: 150px; }
+    #forager .graph svg {
+      box-sizing: content-box;
+      font-size: 14px;
+      background: #ffffff; }
+      #forager .graph svg .link {
+        fill: none;
+        stroke: #323033; }
+      #forager .graph svg .node {
+        cursor: pointer;
+        fill: #42752E; }
+      #forager .graph svg .empty {
+        fill: #E85F88; }
+      #forager .graph svg .node text {
+        paint-order: stroke;
+        stroke: #ffffff;
+        stroke-width: 3px;
+        text-anchor: middle;
+        font-weight: bold;
+        fill: inherit; }
+      #forager .graph svg .current {
+        font-style: italic;
+        fill: #323033; }
+  #forager .topbar {
+    min-height: 31px;
+    margin-bottom: 10px;
+    min-width: 650px;
+    background: #222233; }
+    #forager .topbar span {
+      color: #EFEFEF; }
+    #forager .topbar .controls {
+      display: -webkit-flex;
+      display: -ms-flexbox;
+      display: flex; }
+    #forager .topbar .message {
+      color: #E85F88;
+      margin: 0;
+      padding: 0; }
+    #forager .topbar button {
+      display: inline-block;
+      line-height: 1.25 !important;
+      min-height: 1.25em !important;
+      border-radius: 3px;
+      border-width: 1px;
+      border-style: solid;
+      background: #222233 !important; }
+      #forager .topbar button.pos, #forager .topbar button.pos:active, #forager .topbar button.pos:focus {
+        color: #76B85C !important;
+        border-color: #76B85C !important;
+        background: #222233 !important; }
+      #forager .topbar button.pos:hover {
+        background: #76B85C !important;
+        color: #222233 !important; }
+      #forager .topbar button.neg, #forager .topbar button.neg:active, #forager .topbar button.neg:focus {
+        border-color: #E85F88 !important;
+        color: #E85F88 !important;
+        background: #222233 !important; }
+      #forager .topbar button.neg:hover {
+        background: #E85F88 !important;
+        color: #222233 !important; }
+    #forager .topbar button:active {
+      border-style: inset !important;
+      color: #000000 !important; }
+    #forager .topbar select {
+      width: 100px;
+      min-height: 22px;
+      height: 22px;
+      border-radius: 2px; }
+  #forager.hidden {
+    display: none !important; }
+  #forager .not-allowed {
+    cursor: no-drop; }
+    #forager .not-allowed * {
+      cursor: no-drop; }
+  #forager .inline {
+    display: inline-block; }
+  #forager .hidden {
+    display: none !important; }
+  #forager .big {
+    font-size: 1.1em; }
+  #forager .bold {
+    font-weight: bold; }
+  #forager .workspace {
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex; }
   #forager .page-controls {
     display: inline-block; }
   #forager .app-controls {
@@ -332,6 +324,58 @@ body.foraging {
       margin: 0 !important; }
       #forager .app-controls button:hover {
         background: #222233 !important; }
+
+/*
+ * the selectable-element class is added to all children of the elements in the
+ * current element's element array. This signifies that a new Element can be
+ * created based on this html element.
+ */
+.selectable-element {
+  box-shadow: inset 0 0 2px #1e0a3f !important; }
+
+img.selectable-element {
+  border: 1px dashed #1e0a3f !important; }
+
+/*
+ * the forager-highlight class is added while mousing over an element while
+ * creating a element in the HTMLFrame
+ */
+.forager-highlight {
+  background: rgba(46, 130, 158, 0.5) !important; }
+
+img.forager-highlight {
+  opacity: 0.25 !important; }
+
+/*
+ * While creating an element, the query-check class is applied to all elements
+ * that match the element's css selector string (and are children of the current
+ * element's elements)
+ */
+.query-check {
+  background: rgba(255, 215, 0, 0.25) !important;
+  box-shadow: inset 0 0 1px #FFD700; }
+
+img.query-check, a.query-check > img {
+  border: 1px solid rgba(255, 215, 0, 0.25) !important; }
+
+/*
+ * This class is added when hovering over a node in the page's tree chart. All
+ * elements for the hovered node's elements will be given this class
+ */
+.saved-preview {
+  background: rgba(255, 0, 0, 0.25) !important; }
+
+img.saved-preview {
+  border: 1px solid rgba(255, 0, 0, 0.25) !important; }
+
+/*
+ * This class is added to all elements of the current element
+ */
+.current-element {
+  background: rgba(69, 175, 204, 0.25) !important; }
+
+img.current-element {
+  border: 1px dotted #225683 !important; }
 
 .preview-holder {
   z-index: 2147483638;
@@ -385,55 +429,3 @@ body.foraging {
     margin-right: 25px; }
     .options-modal label input[type=checkbox] {
       margin-left: 5px; }
-
-/*
- * the selectable-element class is added to all children of the elements in the
- * current element's element array. This signifies that a new Element can be
- * created based on this html element.
- */
-.selectable-element {
-  box-shadow: inset 0 0 2px #1e0a3f !important; }
-
-img.selectable-element {
-  border: 1px dashed #1e0a3f !important; }
-
-/*
- * the forager-highlight class is added while mousing over an element while
- * creating a element in the HTMLFrame
- */
-.forager-highlight {
-  background: rgba(46, 130, 158, 0.5) !important; }
-
-img.forager-highlight {
-  opacity: 0.25 !important; }
-
-/*
- * While creating an element, the query-check class is applied to all elements
- * that match the element's css selector string (and are children of the current
- * element's elements)
- */
-.query-check {
-  background: rgba(255, 215, 0, 0.25) !important;
-  box-shadow: inset 0 0 1px #FFD700; }
-
-img.query-check, a.query-check > img {
-  border: 1px solid rgba(255, 215, 0, 0.25) !important; }
-
-/*
- * This class is added when hovering over a node in the page's tree chart. All
- * elements for the hovered node's elements will be given this class
- */
-.saved-preview {
-  background: rgba(255, 0, 0, 0.25) !important; }
-
-img.saved-preview {
-  border: 1px solid rgba(255, 0, 0, 0.25) !important; }
-
-/*
- * This class is added to all elements of the current element
- */
-.current-element {
-  background: rgba(69, 175, 204, 0.25) !important; }
-
-img.current-element {
-  border: 1px dotted #225683 !important; }

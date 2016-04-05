@@ -1,0 +1,90 @@
+// because forager is injected into a page, we need to be
+// careful about not affecting the rest of the page
+// these are nested under #forager to prevent inadvertently
+// styling other elements (unless for some reason the page has
+// a #forager element already). What this doesn't do is prevent
+// a pages existing rules from affecting elements inside of the
+// #forager element. To avoid that, a lot of rules have to be reset
+// explicitly, and even then there will probably always be
+// styles leaking through.
+#forager{
+
+    word-wrap: normal;
+    z-index: 2147483637;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    min-width: 700px;
+    min-height: 30px;
+    background: $dark-blue;
+    font-size: 16px;
+    font-family: sans-serif;
+    color: $black;
+    text-align: left;
+    border: 10px solid $dark-blue;
+    box-sizing: border-box;
+
+    * {
+        color: $dark-blue;
+        box-sizing: border-box;
+        line-height: 1.1 !important;
+    }
+
+    // nested imports
+    @import 'reset';
+    @import 'common';
+    @import 'frames';
+    @import 'topbar';
+
+    &.hidden {
+        display: none !important;
+    }
+
+    .not-allowed{
+        cursor: no-drop;
+
+        * {
+            cursor: no-drop;
+        }
+    }
+
+    .inline{
+        display: inline-block;
+    }
+
+    .hidden{
+        display: none !important;
+    }
+
+    .big {
+        font-size: 1.1em;
+    }
+
+    .bold {
+        font-weight: bold;
+    }
+
+    .workspace {
+        display: flex;
+    }
+
+    .page-controls {
+        display: inline-block;
+    }
+
+    .app-controls {
+        display: inline-block;
+        /* this pushes the .app-controls to the right edge */
+        margin-left: auto;
+        
+        button {
+            color: $white !important;
+            margin: 0 !important;
+
+            &:hover {
+                background: $dark-blue !important;
+            }
+        }
+    }
+
+}

@@ -1,0 +1,155 @@
+.frames, .graph {
+    background: $white;
+    box-sizing: border-box;
+    margin-right: 3px;
+    padding: 5px;
+}
+
+.frames {
+    width: 400px;
+    vertical-align: top;
+
+    .frame {
+        text-align: left;
+        width: 100%;
+        background: $white;
+        padding: 5px;
+        display: flex;
+        flex-direction: column;
+
+        /*
+         * frames are broken down into two parts, the .info section and
+         * the .buttons section
+         */
+        .info {
+
+            > * {
+                padding: 2px 0;
+            }
+
+            .line {
+                padding: 2px 0;
+            }
+
+            label {
+                margin-right: 5px;
+            }
+        }
+
+        .buttons {
+            margin-top: 5px;
+            display: flex;
+
+            button {
+                flex-grow: 1;
+            }
+        }
+
+        ul {
+            padding: 0;
+            overflow-wrap: break-word;
+        }
+
+        li {
+            min-height: 1.5em;
+        }
+
+        .element-attributes {
+            padding: 5px;
+            margin-top: 5px;
+        }
+
+        .choices {
+            display: flex;
+            flex-wrap: wrap;
+
+            label {
+                margin-right: 15px;
+                padding: 2px 3px;
+                border-radius: 3px;
+                word-break: break-all;
+            }
+
+            label.selected {
+                background: $green;
+            }
+        }
+    }
+
+    .buttons {
+        margin: 5px 0;
+    }
+
+    .rules {
+        margin: 5px 0;
+
+        .rule {
+            height: inherit;
+            line-height: 1.1;
+            > * {
+                margin: 0 3px;
+            }
+        }
+    }
+
+    .rule-name {
+        font-weight: bold;
+    }
+
+    .rule-attr, .rule-type {
+        font-size: 0.9em;
+        padding: 2px;
+        border: 1px solid $black;
+    }
+
+    .rule-attr {
+        color: $blue;
+        background: $light-blue;
+        border-color: $blue;
+    }
+
+    .rule-type {
+        color: $dark-green;
+        background: $light-green;
+        border-color: $dark-green;
+    }
+}
+
+.graph {
+    min-width: 500px;
+    min-height: 150px;
+
+    svg {
+        box-sizing: content-box;
+        font-size: 14px;
+        background: $white;
+
+        .link {
+          fill: none;
+          stroke: $dark-gray;
+        }
+
+        .node{
+            cursor: pointer;
+            fill: $dark-green;
+        }
+
+        .empty{
+            fill: $red;
+        }
+
+        .node text {
+            paint-order: stroke;
+            stroke: $white;
+            stroke-width: 3px;
+            text-anchor: middle;
+            font-weight: bold;
+            fill: inherit;
+        }
+
+        .current{
+            font-style: italic;
+            fill: $dark-gray;
+        }
+    }
+}

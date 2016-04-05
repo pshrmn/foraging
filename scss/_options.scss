@@ -1,0 +1,27 @@
+.options-modal {
+    color: $dark-gray;
+
+    h2 {
+        margin: 5px 0;
+        font-size: 1.25em;
+    }
+    h3 {
+        margin: 5px 0;
+        font-size: 1.1em;
+    }
+
+    .note {
+        font-style: italic;
+        font-size: 0.9em;
+        margin: 3px 0;
+    }
+
+    label {
+        font-weight: normal;
+        margin-right: 25px;
+
+        input[type=checkbox]{
+            margin-left: 5px;
+        }
+    }
+}

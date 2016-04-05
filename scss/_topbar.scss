@@ -1,0 +1,66 @@
+.topbar{
+    min-height: 31px;
+    margin-bottom: 10px;
+    min-width: 650px;
+    background: $dark-blue;
+
+    span {
+        color: $light-gray
+    }
+
+    .controls {
+        display: flex;
+    }
+
+    .message {
+        color: $red;
+        margin: 0;
+        padding: 0;
+    }
+
+    button{
+        display: inline-block;
+        line-height: 1.25 !important;
+        min-height: 1.25em !important;
+        border-radius: 3px;
+        border-width: 1px;
+        border-style: solid;
+        
+        background: $dark-blue !important;
+
+        &.pos, &.pos:active, &.pos:focus {
+            color: $green !important;
+            border-color: $green !important;
+            background: $dark-blue !important;
+        }
+
+        &.pos:hover {
+            background: $green !important;
+            color: $dark-blue !important;
+        }
+
+        &.neg, &.neg:active, &.neg:focus{
+            border-color: $red !important;
+            color: $red !important;
+            background: $dark-blue !important;
+        }
+
+        &.neg:hover {
+            background: $red !important;
+            color: $dark-blue !important;            
+        }
+
+    }
+
+    button:active{
+        border-style: inset !important;
+        color: $black !important;
+    }
+
+    select{
+        width: 100px;
+        min-height: 22px;
+        height: 22px;
+        border-radius: 2px;
+    }
+}

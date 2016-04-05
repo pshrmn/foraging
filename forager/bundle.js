@@ -4141,6 +4141,7 @@
 	    var pageNames = _props3.pageNames;
 	    var width = _props3.width;
 	    var height = _props3.height;
+	    var active = _props3.active;
 	    var renamePage = _props3.renamePage;
 	    var removePage = _props3.removePage;
 	    var uploadPage = _props3.uploadPage;
@@ -4179,7 +4180,8 @@
 	      _react2.default.createElement(
 	        "svg",
 	        { width: width + 100,
-	          height: height + 50 },
+	          height: height + 50,
+	          className: active ? "no-select" : "no-select not-allowed" },
 	        _react2.default.createElement(
 	          "g",
 	          { transform: "translate(50,25)" },

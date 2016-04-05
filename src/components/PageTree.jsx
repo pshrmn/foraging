@@ -67,7 +67,7 @@ const PageTree = React.createClass({
     );
   },
   render: function() {
-    const { page, pageNames, width, height,
+    const { page, pageNames, width, height, active,
       renamePage, removePage, uploadPage, showPreview, showMessage } = this.props;
     // return an empty .graph when there is no page
     if ( page === undefined ) {
@@ -92,7 +92,8 @@ const PageTree = React.createClass({
                         {...page} />
         </div>
         <svg width={width+100}
-             height={height+50}>
+             height={height+50}
+             className={active ? "no-select" : "no-select not-allowed"} >
           <g transform="translate(50,25)" >
             {this._makeNodes()}
           </g>
