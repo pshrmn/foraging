@@ -43,9 +43,19 @@ const ElementFrame = React.createClass({
       return null;
     }
 
-    const { selector, rules, spec, optional } = element;
-    const { type, value } = spec;
+    const {
+      selector,
+      rules,
+      spec,
+      optional = false
+    } = element;
+    const {
+      type = "single",
+      value = 0
+    } = spec;
+
     let description = "";
+
     if ( type === "single" ) {
       description = `element at index ${value}`;
     } else if ( type === "all" ) {

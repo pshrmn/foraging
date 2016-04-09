@@ -35,6 +35,7 @@
     @import 'common';
     @import 'frames';
     @import 'topbar';
+    @import 'preview';
 
     &.hidden {
         display: none !important;

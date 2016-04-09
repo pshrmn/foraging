@@ -6,3 +6,4 @@ node_modules
 overview.txt
 docs/build
 *.log
+*.map

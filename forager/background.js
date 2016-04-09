@@ -20,9 +20,7 @@ chrome.storage.local.get(null, storage => {
  */
 chrome.browserAction.onClicked.addListener(tab => {
   chrome.tabs.insertCSS(null, {file: "css/interface.css"});
-  chrome.tabs.executeScript(null, {file: "lib/libs.js"}, () => {
-    chrome.tabs.executeScript(null, {file: "bundle.js"});
-  });
+  chrome.tabs.executeScript(null, {file: "bundle.js"});
 });
 
 // the url for the Granary server

@@ -5,15 +5,13 @@ module.exports = {
     extensions: ["", ".js", ".jsx"]
   },
   externals: {
-    "chrome": "chrome",
-    "react": "React",
-    "react-dom": "ReactDOM",
-    "d3": "d3"
+    "chrome": "chrome"
   },
   output: {
     path: __dirname + "/forager/",
     filename: "bundle.js",
   },
+  devtool: "source-map",
   module: {
     loaders: [
      {
