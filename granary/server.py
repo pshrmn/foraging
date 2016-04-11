@@ -62,12 +62,12 @@ def page_json(path):
 @app.route('/sync', methods=['GET'])
 def sync():
     """
-    return an object containing all of the uploaded pages for a domain
+    return an object containing all of the uploaded pages for a site
     """
-    domain = request.args.get("domain")
-    if domain is None:
+    site = request.args.get("site")
+    if site is None:
         return jsonify({"error": True})
-    folder = host_folder(domain, False)
+    folder = host_folder(site, False)
     files = glob.glob(os.path.join(folder, "*.json"))
     pages = {os.path.basename(f)[:-5]: page_json(f) for f in files}
     return jsonify({"pages": pages, "error": False})
