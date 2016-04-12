@@ -1,9 +1,9 @@
 /*
- * Forager background page
+ * Forager Event Page
  */
 
 /*
- * Verify that chrome.storage.local contains sites and options objetcs, creating
+ * Verify that chrome.storage.local contains sites and options objects, creating
  * them if they don't already exist
  */
 chrome.storage.local.get(null, storage => {
@@ -30,6 +30,7 @@ var url = "http://localhost:5000";
  * interact with Granary server
  */
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  console.log(sendResponse);
   if ( message ) {
     switch ( message.type ) {
       case "upload":
@@ -38,7 +39,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         // http://developer.chrome.com/extensions/runtime.html#event-onMessage
         return true;
       case "sync":
-        xhr("GET", `${url}/sync`, {"domain": message.domain}, sendResponse);
+        xhr("GET", `${url}/sync`, {"site": message.site}, sendResponse);
         return true;
     }
   }
@@ -72,7 +73,7 @@ function xhr(type, url, data, callback){
 
   var params = jsonToParams(data);
   if ( type === "GET" ) {
-    req.open("GET", `${url}/?${params}`);
+    req.open("GET", `${url}?${params}`);
     req.send();
   } else if ( type === "POST") {
     req.open("POST", url);

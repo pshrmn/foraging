@@ -1,8 +1,8 @@
 import * as types from "../constants/ActionTypes";
 
-export const loadPage = index => {
+export const selectPage = index => {
   return {
-    type: types.LOAD_PAGE,
+    type: types.SELECT_PAGE,
     index: index
   };
 };
@@ -33,6 +33,18 @@ export const uploadPage = () => {
   };
 };
 
+export const syncPages = () => {
+  return {
+    type: types.SYNC_PAGES
+  };
+};
+
+export const setPages = pages => {
+  return {
+    type: types.SET_PAGES,
+    pages
+  };
+};
 
 export const showPreview = () => {
   return {

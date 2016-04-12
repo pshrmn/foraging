@@ -8,7 +8,13 @@ import Message from "./Message";
 import { validName } from "../helpers/text";
 import { select } from "../helpers/selection";
 import { createElement, selectElements } from "../helpers/page";
-import { addPage, loadPage, closeForager, showMessage } from "../actions";
+import {
+  addPage,
+  selectPage,
+  closeForager,
+  showMessage,
+  syncPages
+} from "../actions";
 
 const Controls = React.createClass({
   mixins: [NoSelectMixin],
@@ -43,8 +49,15 @@ const Controls = React.createClass({
       
     }
   },
+  syncHandler: function(event) {
+    event.preventDefault();
+    if (!window.confirm("Syncing pages will overwrite duplicate pages. Continue?")) {
+      return;
+    }
+    this.props.syncPages();
+  },
   loadHandler: function(event) {
-    this.props.loadPage(parseInt(event.target.value, 10));
+    this.props.selectPage(parseInt(event.target.value, 10));
   },
   closeHandler: function(event){
     document.body.classList.remove("foraging");
@@ -74,6 +87,8 @@ const Controls = React.createClass({
             {this.pageControls()}
             <PosButton text="Add Page"
                        click={this.addHandler} />
+            <PosButton text="Sync Pages"
+                           click={this.syncHandler} />
           </div>
           <div className="app-controls">
             <NeutralButton text={String.fromCharCode(215)}
@@ -95,8 +110,9 @@ export default connect(
   }),
   {
     addPage,
-    loadPage,
+    selectPage,
     closeForager,
-    showMessage
+    showMessage,
+    syncPages
   }
 )(Controls);

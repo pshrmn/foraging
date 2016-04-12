@@ -80,11 +80,11 @@ describe("page reducer", () => {
   });
 
 
-  describe("LOAD_PAGE", () => {
+  describe("SELECT_PAGE", () => {
     it("sets pageIndex using the action's index", () => {
       const index = 1;
       const newState = page(state, {
-        type: ActionTypes.LOAD_PAGE,
+        type: ActionTypes.SELECT_PAGE,
         index: index
       });
       expect(newState.pageIndex).to.equal(index);
@@ -93,7 +93,7 @@ describe("page reducer", () => {
 
     it("sets pageIndex to 0 when action.index is < 0", () => {
       const newState = page(state, {
-        type: ActionTypes.LOAD_PAGE,
+        type: ActionTypes.SELECT_PAGE,
         index: -1
       });
       expect(newState.pageIndex).to.equal(0);
@@ -101,7 +101,7 @@ describe("page reducer", () => {
 
     it("sets pageIndex to 0 when action.index is >= pages.length", () => {
       const newState = page(state, {
-        type: ActionTypes.LOAD_PAGE,
+        type: ActionTypes.SELECT_PAGE,
         index: 3
       });
       expect(newState.pageIndex).to.equal(0);
@@ -166,6 +166,20 @@ describe("page reducer", () => {
       });
       const { pages, pageIndex } = newState;
       expect(pages[pageIndex].name).to.equal(newName);
+    });
+  });
+
+  describe("SET_PAGES", () => {
+    it("sets the pages in the store", () => {
+      const newPages = [1,2,3];
+      const newState = page(state, {
+        type: ActionTypes.SET_PAGES,
+        pages: newPages
+      });
+      const { pages, pageIndex, elementIndex } = newState;
+      expect(pageIndex).to.equal(0)
+      expect(elementIndex).to.equal(0);
+      expect(pages.slice(1)).to.deep.equal(newPages);
     });
   });
 

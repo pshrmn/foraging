@@ -1,6 +1,6 @@
 {
   "name": "Forager",
-  "version": "2.8.0",
+  "version": "2.9.0",
   "license": "MIT",
   "author": "Paul Sherman",
   "repository": {
@@ -10,12 +10,12 @@
   "scripts": {
     "autoprefix": "postcss --use autoprefixer --autoprefixer.browsers \"last 2 versions\" forager/css/interface.css --dir forager/css/",
     "css": "npm run sass & npm run autoprefix",
-    "dev-build": "npm run webpack & npm run css",
-    "prod-build": "npm run prod-webpack & npm run css",
-    "prod-webpack": "webpack --config=webpack.config.min.js",
+    "build-dev": "npm run webpack-dev & npm run css",
+    "build-prod": "npm run webpack-prod & npm run css",
     "sass": "node-sass scss/** -o forager/css/**",
     "test": "mocha tests --harmony_array_includes --compilers js:babel-core/register --recursive",
-    "webpack": "webpack"
+    "webpack-dev": "webpack",
+    "webpack-prod": "webpack --config=webpack.config.min.js"
   },
   "devDependencies": {
     "autoprefixer": "^6.1.0",

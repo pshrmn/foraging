@@ -1,16 +1,11 @@
 import React from "react";
 import ReactDOM from "react-dom";
-
-import { createStore, applyMiddleware } from "redux";
 import { Provider } from "react-redux";
 
 import Forager from "./components/Forager";
-import reducer from './reducers';
-
-import { openForager } from "./actions";
-import chromeMiddleware from "./middleware/chromeMiddleware";
-
+import { openForager, setPages } from "./actions";
 import { chromeLoad } from "./helpers/chrome";
+import makeStore from "./store";
 
 document.body.classList.add("foraging");
 
@@ -25,51 +20,27 @@ if ( !document.querySelector(".forager-holder") ) {
   holder.classList.add("no-select");
   document.body.appendChild(holder);
 
+  const store = makeStore();
+
   chromeLoad()
     .then(pages => {
+      store.dispatch(
+        setPages(pages)
+      );
+      ReactDOM.render(
+        <Provider store={store}>
+          <Forager />
+        </Provider>
+        , holder
+      );
 
-    const initialState = {
-      show: true,
-      page: {
-        pages: [undefined, ...pages],
-        pageIndex: 0,
-        elementIndex: 0
-      },
-      frame: {
-        name: "element",
-        data: {}
-      },
-      preview: {
-        visible: false
-      },
-      message: {
-        text: "",
-        wait: undefined
+      // a function to re-show the app if it has been closed
+      window.restore = () => {
+        if ( !store.getState().show ) {
+          store.dispatch(openForager());
+        }
       }
-    };
-
-    const store = createStore(
-      reducer,
-      initialState,
-      applyMiddleware(
-        chromeMiddleware
-      )
-    );
-
-    ReactDOM.render(
-      <Provider store={store}>
-        <Forager />
-      </Provider>
-      , holder
-    );
-
-    // a function to re-show the app if it has been closed
-    window.restore = () => {
-      if ( !store.getState().show ) {
-        store.dispatch(openForager());
-      }
-    }
-  });
+    });
 } else {
   document.body.classList.add("foraging");
   window.restore();

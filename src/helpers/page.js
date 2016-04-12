@@ -14,6 +14,24 @@ export const createElement = (selector, type = "single", value = 0, optional = f
 };
 
 /*
+ * Iterate over the array of page tree, setting each up for use
+ * in the app
+ */
+export const preparePages = pages => {
+  const preppedPages = Object.keys(pages)
+    .map(key => pages[key])
+    .filter(p => p !== null)
+    .map(p => {
+      return {
+        name: p.name,
+        elements: flatten(p.element)
+      };
+    });
+  preppedPages.forEach(p => selectElements(p.elements));
+  return preppedPages;
+};
+
+/*
  * flatten a page object's nested selectors into an array. each item
  * has three additional properties: index (the same as the index in
  * the array), parent (the index of the parent selector in the array),

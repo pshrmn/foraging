@@ -255,7 +255,7 @@ body.foraging {
     margin-bottom: 10px;
     min-width: 650px;
     background: #222233; }
-    #forager .topbar span {
+    #forager .topbar .page-controls {
       color: #EFEFEF; }
     #forager .topbar .controls {
       display: -webkit-flex;

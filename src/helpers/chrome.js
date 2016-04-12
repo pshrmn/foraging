@@ -1,5 +1,5 @@
 import { select } from "./selection";
-import { flatten, selectElements, clean } from "./page"
+import { preparePages, clean } from "./page"
 
 /*
  * any time that the page is updated, the stored page should be updated
@@ -56,19 +56,9 @@ export const chromeLoad = () => {
     chrome.storage.local.get("sites", function setupHostnameChrome(storage){
       const host = window.location.hostname;
       const current = storage.sites[host] || {};
-      const pages = Object.keys(current)
-        .map(key => current[key])
-        .filter(p => p !== null)
-        .map(p => {
-          return {
-            name: p.name,
-            elements: flatten(p.element)
-          };
-        });
-      pages.forEach(p => selectElements(p.elements));
+      const pages = preparePages(current);
       resolve(pages);
     });
-
   });
 };
 
@@ -87,4 +77,36 @@ export const chromeUpload = page => {
       page: JSON.stringify(clean(page))
     }
   }); 
-}
+};
+
+export const chromeSync = () => {
+  return new Promise((resolve, reject) => {
+    const host = window.location.hostname;
+    chrome.runtime.sendMessage(
+      {
+        type: "sync",
+        site: host
+      },
+      function saveSyncedPages(response) {
+        // figure out how to handle no response
+        if ( response.error ) {
+          reject('Failed to sync pages');
+        } else {
+          const syncedPages = response.pages;
+
+          chrome.storage.local.get("sites", function mergeSyncedPagesChrome(storage){
+            const currentPages = storage.sites[host] || {};
+            // merge the synced pages with the current pages and save them
+            const allPages = Object.assign({}, currentPages, syncedPages);
+            storage.sites[host] = allPages;
+            chrome.storage.local.set({"sites": storage.sites});
+
+            const parsedPages = preparePages(allPages);
+            resolve(parsedPages);
+          });
+        }
+      }
+    );
+    
+  })
+};

@@ -1,10 +1,13 @@
 /* page */
 // set a page as the current page
-export const LOAD_PAGE = "LOAD_PAGE";
+export const SELECT_PAGE = "SELECT_PAGE";
 export const ADD_PAGE = "ADD_PAGE";
 export const REMOVE_PAGE = "REMOVE_PAGE";
 export const RENAME_PAGE = "RENAME_PAGE";
 export const UPLOAD_PAGE = "UPLOAD_PAGE";
+export const SYNC_PAGES = "SYNC_PAGES";
+export const SET_PAGES = "SET_PAGES";
+
 export const SHOW_PREVIEW = "SHOW_PREVIEW";
 export const HIDE_PREVIEW = "HIDE_PREVIEW";
 

@@ -4,10 +4,10 @@ import * as ActionTypes from "../../../src/constants/ActionTypes";
 
 describe("page actions", () => {
 
-  describe("loadPage", () => {
+  describe("selectPage", () => {
     it("returns an action with the expected values", () => {
-      const action = actions.loadPage(1);
-      expect(action.type).to.equal(ActionTypes.LOAD_PAGE);
+      const action = actions.selectPage(1);
+      expect(action.type).to.equal(ActionTypes.SELECT_PAGE);
       expect(action.index).to.equal(1);
     });
   });
@@ -41,6 +41,22 @@ describe("page actions", () => {
     it("returns an action with the expected values", () => {
       const action = actions.uploadPage();
       expect(action.type).to.equal(ActionTypes.UPLOAD_PAGE);
+    });
+  });
+
+  describe("syncPages", () => {
+    it("returns an action with the expected values", () => {
+      const action = actions.syncPages();
+      expect(action.type).to.equal(ActionTypes.SYNC_PAGES);
+    });
+  });
+
+  describe("setPages", () => {
+    it("returns an action with the expected values", () => {
+      const pages = [1,2,3];
+      const action = actions.setPages(pages);
+      expect(action.type).to.equal(ActionTypes.SET_PAGES);
+      expect(action.pages).to.deep.equal(pages);
     });
   });
 

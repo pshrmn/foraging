@@ -21,7 +21,7 @@ describe("frame reducer", () => {
   describe("reset actions", () => {
     it("reverts to the element frame on certain actions", () => {
       const types = [
-        ActionTypes.LOAD_PAGE,
+        ActionTypes.SELECT_PAGE,
         ActionTypes.REMOVE_ELEMENT,
         ActionTypes.SAVE_ELEMENT,
         ActionTypes.SAVE_RULE,

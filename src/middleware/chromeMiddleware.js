@@ -1,6 +1,13 @@
 import * as ActionTypes from "../constants/ActionTypes";
 
-import { chromeSave, chromeDelete, chromeUpload, chromeRename } from "../helpers/chrome";
+import { setPages, showMessage } from "../actions";
+
+import {
+  chromeSave,
+  chromeDelete,
+  chromeUpload,
+  chromeRename,
+  chromeSync } from "../helpers/chrome";
 
 export default fullStore => next => action => {
   const current = fullStore.getState();
@@ -19,6 +26,23 @@ export default fullStore => next => action => {
   case ActionTypes.UPLOAD_PAGE:
     // the upload action doesn't need to hit the reducer
     chromeUpload(pages[pageIndex]);
+    break;
+
+  case ActionTypes.SYNC_PAGES:
+    chromeSync()
+      .then(pages => {
+        fullStore.dispatch(
+          setPages(pages)
+        );
+      })
+      .catch(error => {
+        fullStore.dispatch(
+          showMessage(
+            'Failed to sync pages',
+            5000
+          )
+        );
+      });
     break;
 
   // for chromeSave actions, save after the action has reached the reducer

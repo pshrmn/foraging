@@ -12,7 +12,7 @@ import * as types from "../constants/ActionTypes";
  */
 export default function page(state = {}, action) {
   switch ( action.type ) {
-  case types.LOAD_PAGE:
+  case types.SELECT_PAGE:
     var index = parseInt(action.index, 10);
     // bad index values will be set to 0
     if ( isNaN(index) || index < 0 || index >= state.pages.length ) {
@@ -20,6 +20,16 @@ export default function page(state = {}, action) {
     }
     return Object.assign({}, state, {
       pageIndex: index,
+      elementIndex: 0
+    });
+
+  /*
+   * when setting pages, reset to empty page
+   */
+  case types.SET_PAGES:
+    return Object.assign({}, state, {
+      pageIndex: 0,
+      pages: [undefined, ...action.pages],
       elementIndex: 0
     });
 

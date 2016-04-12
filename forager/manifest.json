@@ -2,14 +2,14 @@
   "manifest_version": 2,
   "name": "Forager",
   "description": "Hunt and gather data",
-  "version": "2.8.0",
+  "version": "2.9.0",
   "permissions": [
     "activeTab",
     "storage",
     "http://localhost/*"
   ],
   "background": {
-    "scripts": ["background.js"],
+    "scripts": ["eventPage.js"],
     "persistent": false
   },
   "browser_action": {
