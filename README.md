@@ -19,16 +19,24 @@ Example: (the filename will vary depending on your system and python version)
 ##Usage
 
 ###Cache
-A cache is a folder where static copies of the html for a page are stored to prevent multiple unnecessary requests to a server for a page. Currently the cache is very simple, storing a page the first time it is encountered and then subsequently always using that cached version. This is not ideal for pages where the content changes frequently (eg pages with user submitted content), so no cache should be used for pages where multiple requests to the same url will return different content.
+A cache is a folder where static copies of the html for a page are stored to prevent multiple unnecessary requests to a server for a page. Currently the cache is very simple, storing a page the first time it is encountered.
 
 Arguments:
 
 * `folder`: folder to store the cached pages in.
+* `max_age`: the maximum time (in seconds) that a cached page should be considered valid.
 
 ```python
 from gatherer import Cache
 
 cache = Cache("cache_folder")
+```
+
+You can pass the `Cache` a `max_age` to specify that files that were last modified longer than `max_age` seconds ago are removed from the cache folder. Each time that you call the `get` method of the cache, the associated file will be checked to see if it has expired.
+
+```python
+week_in_seconds = 7*24*60*60
+cache = Cache("cache_folder", max_age=week_in_seconds)
 ```
 
 ###Backends
@@ -105,7 +113,7 @@ When the HTML of a web page is changed unexpected results can happen when gather
 
 #####flatten_element(element)
 
-`flatten_element` returns a dict where the keys are rule names and the values are the type that is expected to be returned by that rule (`str`, `int`, or `float`). A fourth value is also possible: for elements whose `spec` `type` is `all`, a `dict` containing the rule name/types for that element's rules and its children is returned.
+`flatten_element` returns a dict of the expected structure of data fetched by the `Element`. In the structure dict, the keys are rule names and the values are the type that is returned by that rule (`str`, `int`, or `float`). A fourth value is also possible: for elements whose `spec` `type` is `all`, a `dict` containing the rule name/types for that element's rules and its children is returned.
 
 ```python
 # element's json contains "title" and "author" rules
@@ -159,6 +167,13 @@ flattened == {
 """
 ```
 
+Note: This uses an `Element`, not a `Page`. If you want to test a `Page`, pass the `Page`'s `element` attribute in the `flatten_element` call.
+
+```python
+page = Page.from_json(some_page_json)
+flattened = flatten_element(page.element)
+```
+
 #####compare(values, expected)
 
 `compare` compares the types of values returned from a page to their expected type, returning a boolean `True` if everything matches, and `False` if anything is wrong.
@@ -178,6 +193,13 @@ missing_values = {
     "title": "The Three-Body Problem"
 }
 compare(missing_values, flattened) # False
+
+bad_values = {
+  "title": "Death's End",
+  "author": 7
+}
+
+compare(bad_values, flattened) # False
 ```
 
 #####differences(values, expected)

@@ -1,5 +1,6 @@
 import glob
 import os
+import time
 import re
 from urllib.parse import urlparse
 import logging
@@ -29,28 +30,66 @@ def url_info(url):
     return domain, filename
 
 
+def should_expire(path, max_age):
+    if max_age is None:
+        return False
+    oldest = time.time() - max_age
+    modified = os.path.getmtime(path)
+    return modified < oldest
+
+
 class Cache(object):
 
-    """Cache is a basic file system cache where the HTML for a given URL is
-    stored in a folder based on the domain name of the url, and the contents
-    is stored in a file whose name is created by stripping any illegal
-    characters from the URL. Illegal characters are based off of characters
-    which cannot be used in Windows filenames.
+    """
+    Cache is a basic file system cache where the HTML for a given page is
+    stored in a folder based on the domain name of the url. The name of the file
+    is created by stripping any illegal characters from the page's url. Illegal
+    characters are based off of characters which cannot be used in Windows filenames.
+
+    File structure:
+    <cache>
+    |-- www_example_com
+    |  +-- httpwww.example.compage1
+    |  +-- httpwww.example.compage2
+    |-- en_wikipedia_org
+    |  +-- httpen.wikipedia.orgwikiFoobar
+
+    :param folder: the location of the folder where cached files should
+        be saved
+    :param max_age: the maximum age of the file, in seconds, since last modification
+
     """
 
-    def __init__(self, folder):
+    def __init__(self, folder, max_age=None):
         self.folder = folder
+        self.max_age = max_age
         os.makedirs(self.folder, exist_ok=True)
         """
         iterates over the folders in the cache to create a lookup dict to
         quickly check whether a url is cached
         """
-        self.sites = {}
+        self.sites = self.parse_files()
+
+    def parse_files(self):
+        sites = {}
         for f in os.listdir(self.folder):
-            f_path = os.path.join(self.folder, f)
-            if os.path.isdir(f_path):
-                path = os.path.join(f_path, "*")
-                self.sites[f] = {name: True for name in glob.glob(path)}
+            dir_path = os.path.join(self.folder, f)
+            if os.path.isdir(dir_path):
+                path = os.path.join(dir_path, "*")
+                site_urls = {}
+                for fp in glob.glob(path):
+                    if not os.path.isdir(fp):
+                        removed = False
+                        # if max_age is set, delete the file if it was last
+                        # modified before max_age
+                        if should_expire(fp, self.max_age):
+                            log.info("<cache> removed {}".format(fp))
+                            os.remove(fp)
+                            removed = True
+                        if not removed:
+                            site_urls[fp] = True
+                sites[f] = site_urls
+        return sites
 
     def get(self, url):
         """
@@ -61,11 +100,17 @@ class Cache(object):
         if domain not in self.sites:
             return None
         site_cache = self.sites[domain]
-        long_filename = os.path.join(self.folder, domain, filename)
-        if long_filename in site_cache:
+        full_name = os.path.join(self.folder, domain, filename)
+        if full_name in site_cache:
+            # test the file to see if it should be expired
+            if should_expire(full_name, self.max_age):
+                log.info("<cache> expired {}".format(url))
+                os.remove(full_name)
+                del site_cache[full_name]
+                return None
             log.info("<cache> {}".format(url))
-            long_filename = os.path.join(self.folder, domain, filename)
-            with open(long_filename, "r") as fp:
+            full_name = os.path.join(self.folder, domain, filename)
+            with open(full_name, "r") as fp:
                 return fp.read()
         return None
 
