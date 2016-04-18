@@ -25,7 +25,23 @@ export default fullStore => next => action => {
 
   case ActionTypes.UPLOAD_PAGE:
     // the upload action doesn't need to hit the reducer
-    chromeUpload(pages[pageIndex]);
+    chromeUpload(pages[pageIndex])
+      .then(resp => {
+        fullStore.dispatch(
+          showMessage(
+            'Upload Successful',
+            5000
+          )
+        );
+      })
+      .catch(error => {
+        fullStore.dispatch(
+          showMessage(
+            error,
+            5000
+          )
+        );
+      });
     break;
 
   case ActionTypes.SYNC_PAGES:

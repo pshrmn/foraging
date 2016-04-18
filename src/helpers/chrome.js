@@ -66,17 +66,29 @@ export const chromeLoad = () => {
  * formats the page and sends it to the background script, which will upload it to the server
  */
 export const chromeUpload = page => {
-  if ( page === undefined ) {
-    return;
-  }
-  chrome.runtime.sendMessage({
-    type: "upload",
-    data: {
-      name: page.name,
-      site: window.location.hostname,
-      page: JSON.stringify(clean(page))
+  return new Promise((resolve, reject) => {
+    if ( page === undefined ) {
+      reject('No page to upload');
     }
-  }); 
+    chrome.runtime.sendMessage(
+      {
+        type: "upload",
+        data: {
+          name: page.name,
+          site: window.location.hostname,
+          page: JSON.stringify(clean(page))
+        }
+      },
+      function uploadResponse(response) {
+        if ( response.error ) {
+          reject('Failed to upload page');
+        } else {
+          resolve(response);
+        }
+      }
+    );
+
+  });
 };
 
 export const chromeSync = () => {
