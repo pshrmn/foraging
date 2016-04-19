@@ -3,8 +3,9 @@ import { connect } from 'react-redux';
 
 import { validName } from "../helpers/text";
 import { PosButton, NegButton } from "./common/Buttons";
+import { showMessage } from "expiring-redux-messages";
 import { selectElement, renamePage, removePage,
-  uploadPage, showPreview, showMessage } from "../actions";
+  uploadPage, showPreview } from "../actions";
 
 /*
  * Interact with the Page to upload it to a server, preview what the Page would capture

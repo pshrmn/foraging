@@ -1,6 +1,7 @@
 import * as ActionTypes from "../constants/ActionTypes";
 
-import { setPages, showMessage } from "../actions";
+import { showMessage } from "expiring-redux-messages";
+import { setPages } from "../actions";
 
 import {
   chromeSave,

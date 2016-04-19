@@ -7,7 +7,8 @@ import NoSelectMixin from "../NoSelectMixin";
 import { createElement } from "../../helpers/page";
 import { allSelect, count, select } from "../../helpers/selection";
 import { highlight, unhighlight } from "../../helpers/markup";
-import { saveElement, showElementFrame, showMessage } from "../../actions";
+import { showMessage } from "expiring-redux-messages";
+import { saveElement, showElementFrame } from "../../actions";
 
 const SpecFrame = React.createClass({
   highlight: "query-check",

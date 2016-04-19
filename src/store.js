@@ -1,8 +1,12 @@
-import { createStore, applyMiddleware } from "redux";
+import { createStore, combineReducers, applyMiddleware } from "redux";
+import { messages, messagesMiddleware } from "expiring-redux-messages";
 
-import reducer from './reducers';
+import reducers from './reducers';
 import chromeMiddleware from "./middleware/chromeMiddleware";
-import messageMiddleware from "./middleware/messageMiddleware";
+
+const reducer = combineReducers(Object.assign({}, reducers, {
+  messages
+}));
 
 const initialState = {
   show: true,
@@ -18,10 +22,7 @@ const initialState = {
   preview: {
     visible: false
   },
-  message: {
-    text: "",
-    wait: undefined
-  }
+  messages: []
 };
 
 export default function makeStore() {
@@ -30,7 +31,7 @@ export default function makeStore() {
     initialState,
     applyMiddleware(
       chromeMiddleware,
-      messageMiddleware
+      messagesMiddleware
     )
   );
   return store;

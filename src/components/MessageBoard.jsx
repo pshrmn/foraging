@@ -2,7 +2,7 @@ import React from "react";
 import { connect } from "react-redux";
 
 function MessageBoard(props) {
-  const messages = props.messages.map(m => <Message key={m.id} text={m.text} />)
+  const messages = props.messages.map(m => <Message key={m.id} message={m.message} />)
   return (
     <div className="message-board">
       { messages }
@@ -13,7 +13,7 @@ function MessageBoard(props) {
 function Message(props) {
   return (
     <div className="message">
-      { props.text }
+      { props.message }
     </div>
   );
 }

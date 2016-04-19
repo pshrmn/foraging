@@ -5,7 +5,8 @@ import { PosButton, NegButton } from "../common/Buttons";
 
 import { select, count } from "../../helpers/selection";
 import { highlight, unhighlight} from "../../helpers/markup";
-import { showSpecFrame, showElementFrame, showMessage } from "../../actions";
+import { showMessage } from "expiring-redux-messages";
+import { showSpecFrame, showElementFrame } from "../../actions";
 
 const PartsFrame = React.createClass({
   previewClass: "query-check",

@@ -8,11 +8,11 @@ import MessageBoard from "./MessageBoard";
 import { validName } from "../helpers/text";
 import { select } from "../helpers/selection";
 import { createElement, selectElements } from "../helpers/page";
+import { showMessage } from "expiring-redux-messages";
 import {
   addPage,
   selectPage,
   closeForager,
-  showMessage,
   syncPages
 } from "../actions";
 

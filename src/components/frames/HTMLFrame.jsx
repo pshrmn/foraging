@@ -7,7 +7,8 @@ import NoSelectMixin from "../NoSelectMixin";
 import { parts, select, count, allSelect } from "../../helpers/selection";
 import { stripEvents } from "../../helpers/attributes";
 import { highlight, unhighlight, iHighlight, iUnhighlight } from "../../helpers/markup";
-import { showPartsFrame, showElementFrame, showMessage } from "../../actions";
+import { showMessage } from "expiring-redux-messages";
+import { showPartsFrame, showElementFrame } from "../../actions";
 
 /*
  * HTMLFrame
