@@ -34,4 +34,5 @@ export const CLOSE_FORAGER = "CLOSE_FORAGER";
 export const OPEN_FORAGER = "OPEN_FORAGER";
 // show the user a message (such as an error)
 export const SHOW_MESSAGE = "SHOW_MESSAGE";
-
+export const ADD_MESSAGE = "ADD_MESSAGE";
+export const REMOVE_MESSAGE = "REMOVE_MESSAGE";

@@ -28,4 +28,24 @@ describe("general actions", () => {
       expect(action.wait).to.equal(fade);
     });
   });
+
+  describe("addMessage", () => {
+    it("returns an action with the expected values", () => {
+      const msg = "test message";
+      const id = 17;
+      const action = actions.addMessage(msg, id);
+      expect(action.type).to.equal(ActionTypes.ADD_MESSAGE);
+      expect(action.text).to.equal(msg);
+      expect(action.id).to.equal(id);
+    });
+  });
+
+  describe("removeMessage", () => {
+    it("returns an action with the expected values", () => {
+      const id = 4;
+      const action = actions.removeMessage(id);
+      expect(action.type).to.equal(ActionTypes.REMOVE_MESSAGE);
+      expect(action.id).to.equal(id);
+    });
+  });
 });

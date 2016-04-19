@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 
 import NoSelectMixin from "./NoSelectMixin";
 import { PosButton, NeutralButton } from "./common/Buttons";
-import Message from "./Message";
+import MessageBoard from "./MessageBoard";
 
 import { validName } from "../helpers/text";
 import { select } from "../helpers/selection";
@@ -96,7 +96,7 @@ const Controls = React.createClass({
                            click={this.closeHandler} />
           </div>
         </div>
-        <Message {...message} />
+        <MessageBoard />
       </div>
     );
   }
@@ -105,8 +105,7 @@ const Controls = React.createClass({
 export default connect(
   state => ({
     pages: state.page.pages,
-    index: state.page.pageIndex,
-    message: state.message
+    index: state.page.pageIndex
   }),
   {
     addPage,

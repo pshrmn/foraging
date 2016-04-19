@@ -261,10 +261,11 @@ body.foraging {
       display: -webkit-flex;
       display: -ms-flexbox;
       display: flex; }
-    #forager .topbar .message {
-      color: #E85F88;
+    #forager .topbar .message-board {
       margin: 0;
       padding: 0; }
+      #forager .topbar .message-board .message {
+        color: #E85F88; }
     #forager .topbar button {
       display: inline-block;
       line-height: 1.25 !important;

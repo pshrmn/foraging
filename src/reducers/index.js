@@ -2,7 +2,7 @@ import show from "./show";
 import page from "./page";
 import frame from "./frame";
 import preview from "./preview";
-import message from "./message";
+import messages from "./messages";
 
 const initialState = {
   show: true,
@@ -19,10 +19,7 @@ const initialState = {
   preview: {
     visible: false
   },
-  message: {
-    text: "",
-    wait: undefined
-  }
+  messages: []
 };
 
 export default function reducer(state = initialState, action) {
@@ -33,7 +30,7 @@ export default function reducer(state = initialState, action) {
       show: show(state.show, action),
       page: page(state.page, action),
       preview: preview(state.preview, action),
-      message: message(state.message, action)
+      messages: messages(state.messages, action)
     };
   }
 }

@@ -12,10 +12,13 @@
         display: flex;
     }
 
-    .message {
-        color: $red;
+    .message-board {
         margin: 0;
         padding: 0;
+
+        .message {
+            color: $red;
+        }
     }
 
     button{

@@ -2,6 +2,7 @@ import { createStore, applyMiddleware } from "redux";
 
 import reducer from './reducers';
 import chromeMiddleware from "./middleware/chromeMiddleware";
+import messageMiddleware from "./middleware/messageMiddleware";
 
 const initialState = {
   show: true,
@@ -28,7 +29,8 @@ export default function makeStore() {
     reducer,
     initialState,
     applyMiddleware(
-      chromeMiddleware
+      chromeMiddleware,
+      messageMiddleware
     )
   );
   return store;
