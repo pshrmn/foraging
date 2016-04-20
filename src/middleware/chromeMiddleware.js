@@ -18,10 +18,17 @@ export default fullStore => next => action => {
   case ActionTypes.RENAME_PAGE:
     // new name, old name
     chromeRename(action.name, page.name);
+    fullStore.dispatch(
+      showMessage(`Renamed "${page.name}" to "${action.name}"`, 1000, 1)
+    );
     return next(action);
 
   case ActionTypes.REMOVE_PAGE:
-    chromeDelete(pages[pageIndex].name);
+    var nameToRemove = pages[pageIndex].name;
+    chromeDelete(nameToRemove);
+    fullStore.dispatch(
+      showMessage(`Removed Page "${nameToRemove}"`, 1000, 0)
+    );
     return next(action);
 
   case ActionTypes.UPLOAD_PAGE:
@@ -69,6 +76,9 @@ export default fullStore => next => action => {
     const { page: newPage } = newState;
     const { pages: newPages, pageIndex: newPageIndex } = newPage;
     chromeSave(newPages[newPageIndex]);
+    fullStore.dispatch(
+      showMessage('Saved', 1000, 1)
+    );
     return retVal;
 
   default:

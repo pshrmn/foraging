@@ -264,10 +264,12 @@ body.foraging {
     #forager .topbar .message-board {
       margin: 0;
       padding: 0; }
-      #forager .topbar .message-board .message.pos {
-        color: #76B85C; }
-      #forager .topbar .message-board .message.neg {
-        color: #E85F88; }
+      #forager .topbar .message-board .message {
+        color: #EFEFEF; }
+        #forager .topbar .message-board .message.pos {
+          color: #76B85C; }
+        #forager .topbar .message-board .message.neg {
+          color: #E85F88; }
     #forager .topbar button {
       display: inline-block;
       line-height: 1.25 !important;
