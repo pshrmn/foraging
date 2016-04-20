@@ -25,22 +25,15 @@ export default fullStore => next => action => {
     return next(action);
 
   case ActionTypes.UPLOAD_PAGE:
-    // the upload action doesn't need to hit the reducer
     chromeUpload(pages[pageIndex])
       .then(resp => {
         fullStore.dispatch(
-          showMessage(
-            'Upload Successful',
-            5000
-          )
+          showMessage('Upload Successful', 5000, 1)
         );
       })
       .catch(error => {
         fullStore.dispatch(
-          showMessage(
-            error,
-            5000
-          )
+          showMessage(error, 5000, -1)
         );
       });
     break;
@@ -51,13 +44,13 @@ export default fullStore => next => action => {
         fullStore.dispatch(
           setPages(pages)
         );
+        fullStore.dispatch(
+          showMessage('Pages synced', 5000, 1)
+        );
       })
       .catch(error => {
         fullStore.dispatch(
-          showMessage(
-            'Failed to sync pages',
-            5000
-          )
+          showMessage('Failed to sync pages', 5000, -1)
         );
       });
     break;

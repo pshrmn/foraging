@@ -79,7 +79,7 @@ const HTMLFrame = React.createClass({
     if ( checked !== undefined && selectedSelector !== undefined ) {
       this.props.next(selectedSelector);
     } else {
-      this.props.message("No selector selected");
+      this.props.showMessage("No selector selected", 5000, -1);
     }
   },
   cancelHandler: function(event) {
@@ -187,6 +187,6 @@ export default connect(
   {
     next: showPartsFrame,
     cancel: showElementFrame,
-    message: showMessage
+    showMessage
   }
 )(HTMLFrame);

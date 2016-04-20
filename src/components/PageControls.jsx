@@ -18,10 +18,7 @@ const PageControls = React.createClass({
     const { pageNames, showMessage, renamePage } = this.props;
     // do nothing if the user cancels, does not enter a name, or enter the same name as the current one
     if ( !validName(name, pageNames)) {
-      showMessage(
-        `Invalid Name: "${name}"`,
-        5000
-      );
+      showMessage(`Invalid Name: "${name}"`, 5000, -1);
     } else {
       renamePage(name);
     }

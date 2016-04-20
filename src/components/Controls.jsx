@@ -28,10 +28,7 @@ const Controls = React.createClass({
       .map(p => p.name);
 
     if ( !validName(name, existingNames) ) {
-      showMessage(
-        `Invalid Name: "${name}"`,
-        5000
-      );
+      showMessage(`Invalid Name: "${name}"`, 5000, -1);
     } else {
       
       let body = createElement("body");

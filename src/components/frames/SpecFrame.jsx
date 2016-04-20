@@ -22,10 +22,10 @@ const SpecFrame = React.createClass({
   saveHandler: function(event) {
     event.preventDefault();
     const { type, value, optional } = this.state;
-    const { css, parent, message, save } = this.props;
+    const { css, parent, showMessage, save } = this.props;
     // all value must be set
     if ( type === "all" && value === "" ) {
-      message("Name for type \"all\" elements cannot be empty");
+      showMessage("Name for type \"all\" elements cannot be empty", 5000, -1);
       return;
     }
     const ele = createElement(css, type, value, optional);
@@ -196,6 +196,6 @@ export default connect(
   {
     save: saveElement,
     cancel: showElementFrame,
-    message: showMessage
+    showMessage
   }
 )(SpecFrame);

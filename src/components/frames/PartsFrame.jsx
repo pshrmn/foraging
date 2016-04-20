@@ -23,7 +23,7 @@ const PartsFrame = React.createClass({
     if ( selector !== "" ) {
       this.props.next(selector);
     } else {
-      this.props.message("No selectors parts selected");
+      this.props.showMessage("No selectors parts selected", 5000, -1);
     }
   },
   cancelHander: function(event) {
@@ -126,6 +126,6 @@ export default connect(
   {
     next: showSpecFrame,
     cancel: showElementFrame,
-    message: showMessage 
+    showMessage 
   }
 )(PartsFrame);
