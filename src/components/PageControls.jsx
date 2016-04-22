@@ -1,6 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
+import NoSelectMixin from "./NoSelectMixin";
 import { validName } from "../helpers/text";
 import { PosButton, NegButton } from "./common/Buttons";
 import { showMessage } from "expiring-redux-messages";
@@ -12,6 +13,7 @@ import { selectElement, renamePage, removePage,
  * on the current web page, rename the Page, and delete it.
  */
 const PageControls = React.createClass({
+  mixins: [NoSelectMixin],
   renameHandler: function(event) {
     event.preventDefault();
     const name = window.prompt("Page Name:\nCannot contain the following characters: < > : \" \\ / | ? * ");
@@ -45,7 +47,7 @@ const PageControls = React.createClass({
       return null;
     }
     return (
-      <div>
+      <div ref="parent">
         <PosButton click={this.uploadHandler} text="Upload" />
         <PosButton click={this.previewHandler} text="Preview" />
         <PosButton click={this.renameHandler} text="Rename" />

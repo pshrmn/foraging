@@ -21,29 +21,15 @@ export default function frame(state = "", action) {
       name: "element",
       data: {}
     });
+  case types.SHOW_ELEMENT_WIZARD:
+    return Object.assign({}, state, {
+      name: "wizard",
+      data: {}
+    })
   case types.SHOW_RULE_FRAME:
     return Object.assign({}, state, {
       name: "rule",
       data: {}
-    });
-  case types.SHOW_HTML_FRAME:
-    return Object.assign({}, state, {
-      name: "html",
-      data: {}
-    });
-  case types.SHOW_PARTS_FRAME:
-    return Object.assign({}, state, {
-      name: "parts",
-      data: {
-        parts: action.parts
-      }
-    });
-  case types.SHOW_SPEC_FRAME:
-    return Object.assign({}, state, {
-      name: "spec",
-      data: {
-        css: action.css
-      }
     });
   default:
     return state;

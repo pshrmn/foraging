@@ -188,20 +188,6 @@ body.foraging {
       #forager .frames .frame .element-attributes {
         padding: 5px;
         margin-top: 5px; }
-      #forager .frames .frame .choices {
-        display: -webkit-flex;
-        display: -ms-flexbox;
-        display: flex;
-        -webkit-flex-wrap: wrap;
-            -ms-flex-wrap: wrap;
-                flex-wrap: wrap; }
-        #forager .frames .frame .choices label {
-          margin-right: 15px;
-          padding: 2px 3px;
-          border-radius: 3px;
-          word-break: break-all; }
-        #forager .frames .frame .choices label.selected {
-          background: #76B85C; }
     #forager .frames .buttons {
       margin: 5px 0; }
     #forager .frames .rules {
@@ -250,6 +236,55 @@ body.foraging {
       #forager .graph svg .current {
         font-style: italic;
         fill: #323033; }
+  #forager .wizard {
+    text-align: left;
+    width: 100%;
+    background: #ffffff;
+    padding: 5px;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-flex-direction: column;
+        -ms-flex-direction: column;
+            flex-direction: column;
+    /*
+     * frames are broken down into two parts, the .info section and
+     * the .buttons section
+     */ }
+    #forager .wizard .info > * {
+      padding: 2px 0; }
+    #forager .wizard .info .line {
+      padding: 2px 0; }
+    #forager .wizard .info label {
+      margin-right: 5px; }
+    #forager .wizard .buttons {
+      margin-top: 5px;
+      display: -webkit-flex;
+      display: -ms-flexbox;
+      display: flex; }
+      #forager .wizard .buttons button {
+        -webkit-flex-grow: 1;
+            -ms-flex-positive: 1;
+                flex-grow: 1; }
+    #forager .wizard ul {
+      padding: 0;
+      overflow-wrap: break-word; }
+    #forager .wizard li {
+      min-height: 1.5em; }
+    #forager .wizard .choices {
+      display: -webkit-flex;
+      display: -ms-flexbox;
+      display: flex;
+      -webkit-flex-wrap: wrap;
+          -ms-flex-wrap: wrap;
+              flex-wrap: wrap; }
+      #forager .wizard .choices label {
+        margin-right: 15px;
+        padding: 2px 3px;
+        border-radius: 3px;
+        word-break: break-all; }
+      #forager .wizard .choices label.selected {
+        background: #76B85C; }
   #forager .topbar {
     min-height: 31px;
     margin-bottom: 10px;

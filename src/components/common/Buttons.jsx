@@ -1,46 +1,35 @@
 import React from 'react';
 
-/*
- * Forager app specific input/form elements
- */
+export function PosButton(props) {
+  const { classes, ...rest } = props;
+  return (
+    <NeutralButton {...rest}
+                   classes={["pos"].concat(classes)} />
+  );
+}
 
-export const PosButton = React.createClass({
-  render: function() {
-    const { classes, ...rest } = this.props;
-    return (
-      <NeutralButton {...rest}
-                     classes={["pos"].concat(classes)} />
-    );
-  }
-});
+export function NegButton(props) {
+  const { classes, ...rest } = props;
+  return (
+    <NeutralButton {...rest}
+                   classes={["neg"].concat(classes)} />
+  );
+}
 
-export const NegButton = React.createClass({
-  render: function() {
-    const { classes, ...rest } = this.props;
-    return (
-      <NeutralButton {...rest}
-                     classes={["neg"].concat(classes)} />
-    );
-  }
-});
-
-export const NeutralButton = React.createClass({
-  getDefaultProps: function() {
-    return {
-      text: "",
-      click: () => {},
-      title: "",
-      classes: []
-    };
-  },
-  render: function() {
-    const { text, click, classes, title } = this.props;
-    return (
-      <button className={classes.join(" ")}
-              title={title}
-              onClick={click} >
-        {text}
-      </button>
-    );
-  }
-});
+export function NeutralButton(props) {
+  const {
+    text = "",
+    click = () => {},
+    classes = [],
+    title = "",
+    disabled = false
+  } = props;
+  return (
+    <button className={classes.join(" ")}
+            title={title}
+            disabled={disabled}
+            onClick={click} >
+      {text}
+    </button>
+  );  
+}

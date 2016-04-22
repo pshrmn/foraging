@@ -3,12 +3,11 @@ import { connect } from "react-redux";
 
 import ElementFrame from "./ElementFrame";
 import RuleFrame from "./RuleFrame";
-import HTMLFrame from "./HTMLFrame";
-import PartsFrame from "./PartsFrame";
-import SpecFrame from "./SpecFrame";
+import ElementWizard from "./ElementWizard";
 
 import { highlight, unhighlight } from "../../helpers/markup";
 
+const cssSelector = "current-element";
 /*
  * Frames
  * ------
@@ -23,7 +22,6 @@ import { highlight, unhighlight } from "../../helpers/markup";
  * extra data for that frame.
  */
 const Frames = React.createClass({
-  cssSelector: "current-element",
   _selectFrame: function() {
     const { frame } = this.props;
     /*
@@ -32,28 +30,24 @@ const Frames = React.createClass({
     switch ( frame.name ) {
     case "element":
       return <ElementFrame />
+    case "wizard":
+      return <ElementWizard />
     case "rule":
       return <RuleFrame />
-    case "html":
-      return <HTMLFrame />
-    case "parts":
-      return <PartsFrame />
-    case "spec":
-      return <SpecFrame />
     default:
       return null;
     }
   },
   componentWillMount: function() {
-    unhighlight(this.cssSelector);
+    unhighlight(cssSelector);
     if ( this.props.element ) {
-      highlight(this.props.element.elements, this.cssSelector);
+      highlight(this.props.element.elements, cssSelector);
     }
   },
   componentWillReceiveProps: function(nextProps) {
-    unhighlight(this.cssSelector);
+    unhighlight(cssSelector);
     if ( nextProps.element !== undefined && nextProps.element !== this.props.element ) {
-      highlight(nextProps.element.elements, this.cssSelector);
+      highlight(nextProps.element.elements, cssSelector);
     }
   },
   render: function() {
@@ -64,7 +58,7 @@ const Frames = React.createClass({
     );
   },
   componentWillUnmount: function() {
-    unhighlight(this.cssSelector);
+    unhighlight(cssSelector);
   }
 });
 

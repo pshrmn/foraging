@@ -3,14 +3,14 @@ import { connect } from "react-redux";
 
 import NoSelectMixin from "../NoSelectMixin";
 
-import { showHTMLFrame, removeElement, renameElement,
+import { showElementWizard, removeElement, renameElement,
   showRuleFrame, removeRule, toggleOptional } from "../../actions";
 import { PosButton, NegButton, NeutralButton } from "../common/Buttons";
 
 const ElementFrame = React.createClass({
   mixins: [NoSelectMixin],
   addChild: function(event) {
-    this.props.showHTMLFrame();
+    this.props.showElementWizard();
   },
   addRule: function(event) {
     this.props.showRuleFrame();
@@ -142,7 +142,7 @@ export default connect(
     }
   },
   {
-    showHTMLFrame,
+    showElementWizard,
     removeElement,
     renameElement,
     showRuleFrame,

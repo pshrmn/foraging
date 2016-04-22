@@ -7,32 +7,41 @@ import NoSelectMixin from "../NoSelectMixin";
 import { createElement } from "../../helpers/page";
 import { allSelect, count, select } from "../../helpers/selection";
 import { highlight, unhighlight } from "../../helpers/markup";
-import { showMessage } from "expiring-redux-messages";
 import { saveElement, showElementFrame } from "../../actions";
 
-const SpecFrame = React.createClass({
-  highlight: "query-check",
+const highlightClass = "query-check";
+
+const ChooseSpec = React.createClass({
   getInitialState: function() {
     return {
       type: "single",
       value: 0,
-      optional: false
+      optional: false,
+      error: ""
     };
   },
   saveHandler: function(event) {
     event.preventDefault();
     const { type, value, optional } = this.state;
-    const { css, parent, showMessage, save } = this.props;
+    const { startData, next: save } = this.props;
+    const { selector, current } = startData;
     // all value must be set
     if ( type === "all" && value === "" ) {
-      showMessage("Name for type \"all\" elements cannot be empty", 5000, -1);
+      this.setState({
+        error: "Name for type \"all\" elements cannot be empty"
+      });
       return;
     }
-    const ele = createElement(css, type, value, optional);
-    ele.elements = select(parent.elements, ele.selector, ele.spec);
-
+    const ele = createElement(selector, type, value, optional);
+    ele.elements = select(current.elements, ele.selector, ele.spec);
+    // the next function serves as the save function for this wizard
+    // because ChooseSpec is the last step
     save(ele);
     return;
+  },
+  previousHandler: function(event) {
+    event.preventDefault();
+    this.props.previous();
   },
   cancelHandler: function(event) {
     event.preventDefault();
@@ -50,13 +59,14 @@ const SpecFrame = React.createClass({
     });
   },
   render: function() {
-    const { parent, css } = this.props;
-    const elementCount = count(parent.elements, css);
+    const { startData} = this.props;
+    const { current, selector } = startData
+    const elementCount = count(current.elements, selector);
     return (
       <div className="frame spec-form">
         <div className="info">
           <div className="line">
-            CSS Selector: {css}
+            CSS Selector: {selector}
           </div>
           <SpecForm count={elementCount}
                     setSpec={this.setSpec}/>
@@ -69,6 +79,7 @@ const SpecFrame = React.createClass({
           </div>
         </div>
         <div className="buttons">
+          <NegButton text="Previous" click={this.previousHandler} />
           <PosButton text="Save" click={this.saveHandler} />
           <NegButton text="Cancel" click={this.cancelHandler} />
         </div>
@@ -76,26 +87,23 @@ const SpecFrame = React.createClass({
     );
   },
   componentWillMount: function() {
-    const elements = select(
-      this.props.parent.elements,
-      this.props.css, {
-      type: this.state.type,
-      value: this.state.value
-    });
-    highlight(elements, this.highlight);
+    const { startData } = this.props;
+    const { current, selector } = startData;
+    const { type, value } = this.state;
+    const elements = select(current.elements, selector, {type, value});
+    highlight(elements, highlightClass);
   },
   componentWillUpdate: function(nextProps, nextState) {
-    unhighlight(this.highlight);
-    const elements = select(
-      nextProps.parent.elements,
-      nextProps.css, {
-      type: nextState.type,
-      value: nextState.value
-    });
-    highlight(elements, this.highlight);
+    unhighlight(highlightClass);
+
+    const { startData } = nextProps;
+    const { current, selector } = startData;
+    const { type, value } = nextState;
+    const elements = select(current.elements, selector, {type, value});
+    highlight(elements, highlightClass);
   },
   componentWillUnmount: function() {
-    unhighlight(this.highlight);
+    unhighlight(highlightClass);
   }
 });
 
@@ -182,20 +190,4 @@ const SpecForm = React.createClass({
   }
 });
 
-export default connect(
-  state => {
-    const { page } = state;
-    const { pages, pageIndex, elementIndex } = page;
-    const currentPage = pages[pageIndex];
-    const element = currentPage === undefined ? undefined : currentPage.elements[elementIndex];
-    return {
-      parent: element,
-      ...state.frame.data
-    };
-  },
-  {
-    save: saveElement,
-    cancel: showElementFrame,
-    showMessage
-  }
-)(SpecFrame);
+export default ChooseSpec;

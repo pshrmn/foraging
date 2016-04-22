@@ -1,32 +1,53 @@
 import React from "react";
 import { connect } from "react-redux";
 
+import NoSelectMixin from "../NoSelectMixin";
 import { PosButton, NegButton } from "../common/Buttons";
 
 import { select, count } from "../../helpers/selection";
 import { highlight, unhighlight} from "../../helpers/markup";
-import { showMessage } from "expiring-redux-messages";
-import { showSpecFrame, showElementFrame } from "../../actions";
 
-const PartsFrame = React.createClass({
-  previewClass: "query-check",
+function joinParts(parts) {
+  return parts.reduce((str, curr) => {
+    if ( curr.checked ) {
+      str += curr.name;
+    }
+    return str;
+  }, "");
+}
+
+const previewClass = "query-check";
+
+const ChooseParts = React.createClass({
+  mixins: [NoSelectMixin],
   getInitialState: function() {
     return {
       parts: [],
-      eleCount: 0
+      eleCount: 0,
+      error: true
     };
   },
   nextHandler: function(event) {
     event.preventDefault();
     const { parts } = this.state;
-    const selector = this.joinParts(parts);
+    const { next, startData } = this.props;
+    const selector = joinParts(parts);
     if ( selector !== "" ) {
-      this.props.next(selector);
+      next({
+        selector,
+        current: startData.current
+      });
     } else {
-      this.props.showMessage("No selectors parts selected", 5000, -1);
+      this.setState({
+        error: true
+      });
     }
   },
-  cancelHander: function(event) {
+  previousHander: function(event) {
+    event.preventDefault();
+    this.props.previous();
+  },
+  cancelHandler: function(event) {
     event.preventDefault();
     this.props.cancel();
   },
@@ -35,36 +56,26 @@ const PartsFrame = React.createClass({
     const index = event.target.value;
     const parts = this.state.parts;
     parts[index].checked = !parts[index].checked;
-    const fullSelector = this.joinParts(parts);
+    const fullSelector = joinParts(parts);
 
     this._setupHighlights(fullSelector);
+    const { startData } = this.props;
     this.setState({
       parts: parts,
-      eleCount: fullSelector === "" ? 0 : count(this.props.parentElements, fullSelector)
+      eleCount: fullSelector === "" ? 0 : count(startData.current.elements, fullSelector),
+      error: false
     });
-  },
-  joinParts: parts => {
-    return parts.reduce((str, curr) => {
-      if ( curr.checked ) {
-        str += curr.name;
-      }
-      return str;
-    }, "");
   },
   componentWillMount: function() {
-    const names = this.props.parts;
-    // by default, each css selector part should be checked
-    const parts = names.map(name => {
-      return {
-        name: name,
-        checked: true
-      }
-    });
-    const fullSelector = names.join("");
+    const { startData } = this.props;
+    const { parts, current } = startData;
+
+    const fullSelector = parts.join("");
     this._setupHighlights(fullSelector);
+
     this.setState({
-      parts: parts,
-      eleCount: count(this.props.parentElements, fullSelector)
+      parts: parts.map(name => ({name: name, checked: true})),
+      eleCount: count(current.elements, fullSelector)
     });
   },
   render: function() {
@@ -84,7 +95,7 @@ const PartsFrame = React.createClass({
       );
     });
     return (
-      <div className="frame parts-form">
+      <div className="frame parts-form" ref="parent">
         <div className="info">
           <h3>Select Relevant Parts of the CSS selector</h3>
           <div className="choices">
@@ -93,39 +104,24 @@ const PartsFrame = React.createClass({
           <h5>Count: {this.state.eleCount}</h5>
         </div>
         <div className="buttons">
+          <NegButton text="Previous" click={this.previousHander} />
           <PosButton text="Next" click={this.nextHandler} />
-          <NegButton text="Cancel" click={this.cancelHander} />
+          <NegButton text="Cancel" click={this.cancelHandler} />
         </div>
       </div>
     );
   },
   componentWillUnmount: function() {
-    unhighlight(this.previewClass);
+    unhighlight(previewClass);
   },
   _setupHighlights: function(cssSelector) {
-    unhighlight(this.previewClass);
+    unhighlight(previewClass);
     if ( cssSelector !== "" ) {
-      const elements = select(this.props.parentElements, cssSelector);
-      highlight(elements, this.previewClass);
+      const { startData } = this.props;
+      const elements = select(startData.current.elements, cssSelector);
+      highlight(elements, previewClass);
     }
   }
 });
 
-export default connect(
-  state => {
-    const { page } = state;
-    const { pages, pageIndex, elementIndex } = page;
-    const currentPage = pages[pageIndex];
-    const element = currentPage === undefined ? undefined : currentPage.elements[elementIndex];
-    const parentElements = element.elements || [];
-    return {
-      parentElements: element.elements,
-      ...state.frame.data
-    }
-  },
-  {
-    next: showSpecFrame,
-    cancel: showElementFrame,
-    showMessage 
-  }
-)(PartsFrame);
+export default ChooseParts;

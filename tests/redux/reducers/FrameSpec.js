@@ -53,6 +53,18 @@ describe("frame reducer", () => {
     });
   });
 
+  describe("SHOW_ELEMENT_WIZARD", () => {
+    it("shows the element wizard", () => {
+      const state = {
+        name: "element"
+      };
+      const newState = frame(state, {
+        type: ActionTypes.SHOW_ELEMENT_WIZARD
+      });
+      expect(newState.name).to.equal("wizard");
+    });
+  });
+
   describe("SHOW_RULE_FRAME", () => {
     it("shows the rule frame", () => {
       const state = {
@@ -63,45 +75,6 @@ describe("frame reducer", () => {
       };
       const newState = frame(state, action);
       expect(newState.name).to.equal("rule");
-    });
-  });
-
-  describe("SHOW_HTML_FRAME", () => {
-    it("shows the element frame", () => {
-      const state = {
-        name: "element"
-      };
-      const action = {
-        type: ActionTypes.SHOW_HTML_FRAME
-      };
-      const newState = frame(state, action);
-      expect(newState.name).to.equal("html");
-    });
-  });
-
-  describe("SHOW_PARTS_FRAME", () => {
-    it("shows the parts frame", () => {
-      const state = {
-        name: "element"
-      };
-      const action = {
-        type: ActionTypes.SHOW_PARTS_FRAME
-      };
-      const newState = frame(state, action);
-      expect(newState.name).to.equal("parts");
-    });
-  });
-
-  describe("SHOW_SPEC_FRAME", () => {
-    it("shows the spec frame", () => {
-      const state = {
-        name: "element"
-      };
-      const action = {
-        type: ActionTypes.SHOW_SPEC_FRAME
-      };
-      const newState = frame(state, action);
-      expect(newState.name).to.equal("spec");
     });
   });
 });

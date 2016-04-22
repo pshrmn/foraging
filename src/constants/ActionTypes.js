@@ -23,6 +23,7 @@ export const REMOVE_RULE = "REMOVE_RULE";
 // the app is made up of frames,
 // the following action types show specific frames
 export const SHOW_ELEMENT_FRAME = "SHOW_ELEMENT_FRAME";
+export const SHOW_ELEMENT_WIZARD = "SHOW_ELEMENT_WIZARD";
 export const SHOW_RULE_FRAME = "SHOW_RULE_FRAME";
 export const SHOW_HTML_FRAME = "SHOW_HTML_FRAME";
 export const SHOW_PARTS_FRAME = "SHOW_PARTS_FRAME";
