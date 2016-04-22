@@ -142,6 +142,8 @@ body.foraging {
       color: #D02357 !important; }
       #forager button.neg.transparent:hover, #forager button.neg.transparent:active, #forager button.neg.transparent:focus {
         color: #E85F88 !important; }
+    #forager button:disabled {
+      opacity: 0.25; }
   #forager .frames, #forager .graph {
     background: #ffffff;
     box-sizing: border-box;
@@ -327,9 +329,9 @@ body.foraging {
       #forager .topbar button.neg:hover {
         background: #E85F88 !important;
         color: #222233 !important; }
-    #forager .topbar button:active {
-      border-style: inset !important;
-      color: #000000 !important; }
+      #forager .topbar button:active {
+        border-style: inset !important;
+        color: #000000 !important; }
     #forager .topbar select {
       width: 100px;
       min-height: 22px;

@@ -2,7 +2,7 @@ import React from "react";
 import { connect } from "react-redux";
 
 import NoSelectMixin from "./NoSelectMixin";
-import { PosButton, NeutralButton } from "./common/Buttons";
+import { PosButton, NegButton, NeutralButton } from "./common/Buttons";
 import MessageBoard from "./MessageBoard";
 
 import { validName } from "../helpers/text";
@@ -13,7 +13,11 @@ import {
   addPage,
   selectPage,
   closeForager,
-  syncPages
+  syncPages,
+  renamePage,
+  removePage,
+  uploadPage,
+  showPreview
 } from "../actions";
 
 const Controls = React.createClass({
@@ -22,12 +26,10 @@ const Controls = React.createClass({
     event.preventDefault();
     const { pages, showMessage, addPage } = this.props;
     const name = window.prompt("Page Name:\nCannot contain the following characters: < > : \" \\ / | ? * ");
-
-    const existingNames = pages
+    const pageNames = pages
       .filter(p => p !== undefined)
       .map(p => p.name);
-
-    if ( !validName(name, existingNames) ) {
+    if ( !validName(name, pageNames) ) {
       showMessage(`Invalid Name: "${name}"`, 5000, -1);
     } else {
       
@@ -60,32 +62,77 @@ const Controls = React.createClass({
     document.body.classList.remove("foraging");
     this.props.closeForager();
   },
-  pageControls: function() {
-    const { pages, index } = this.props;
+  pageSelect: function() {
+    const { pages, currentIndex } = this.props;
     const options = pages.map((p, i) => {
       return (
         <option key={i} value={i}>{p === undefined ? "" : p.name}</option>
       );
     });
     return (
-      <select value={index}
+      <select value={currentIndex}
               onChange={this.loadHandler}>
         {options}
       </select>
     );
   },
+  renameHandler: function(event) {
+    event.preventDefault();
+    const name = window.prompt("Page Name:\nCannot contain the following characters: < > : \" \\ / | ? * ");
+    const { pages, showMessage, renamePage } = this.props;
+    const pageNames = pages
+      .filter(p => p !== undefined)
+      .map(p => p.name);
+    // do nothing if the user cancels, does not enter a name, or enter the same name as the current one
+    if ( !validName(name, pageNames)) {
+      showMessage(`Invalid Name: "${name}"`, 5000, -1);
+    } else {
+      renamePage(name);
+    }
+  },
+  deleteHandler: function(event) {
+    const { pages, currentIndex, removePage } = this.props;
+    const currentPage = pages[currentIndex];
+    event.preventDefault();
+    if ( !confirm(`Are you sure you want to delete the page "${currentPage.name}"?`)) {
+      return;
+    }
+    // report the current page index
+    this.props.removePage();
+  },
+  uploadHandler: function(event) {
+    event.preventDefault();
+    this.props.uploadPage();
+  },
+  previewHandler: function(event) {
+    event.preventDefault();
+    this.props.showPreview();
+  },
   render: function() {
-    const { message } = this.props;
+    const { message, currentIndex } = this.props;
+    const active = currentIndex !== 0;
     return (
       <div className="topbar" ref="parent">
         <div className="controls">
           <div className="page-controls">
             {"Page "}
-            {this.pageControls()}
+            {this.pageSelect()}
             <PosButton text="Add Page"
                        click={this.addHandler} />
+            <PosButton text="Preview"
+                       click={this.previewHandler} 
+                       disabled={!active} />
+            <NegButton text="Delete"
+                       click={this.deleteHandler}
+                       disabled={!active} />
+            <PosButton text="Rename"
+                       click={this.renameHandler}
+                       disabled={!active} />
+            <PosButton text="Upload"
+                       click={this.uploadHandler}
+                       disabled={!active} />
             <PosButton text="Sync Pages"
-                           click={this.syncHandler} />
+                       click={this.syncHandler} />
           </div>
           <div className="app-controls">
             <NeutralButton text={String.fromCharCode(215)}
@@ -100,15 +147,23 @@ const Controls = React.createClass({
 });
 
 export default connect(
-  state => ({
-    pages: state.page.pages,
-    index: state.page.pageIndex
-  }),
+  state => {
+    const { page } = state;
+    const { pages, pageIndex } = page;
+    return {
+      currentIndex: pageIndex,
+      pages
+    }
+  },
   {
     addPage,
     selectPage,
     closeForager,
     showMessage,
-    syncPages
+    syncPages,
+    renamePage,
+    removePage,
+    uploadPage,
+    showPreview
   }
 )(Controls);

@@ -61,11 +61,10 @@
             color: $dark-blue !important;            
         }
 
-    }
-
-    button:active{
-        border-style: inset !important;
-        color: $black !important;
+        &:active {
+            border-style: inset !important;
+            color: $black !important;
+        }
     }
 
     select{

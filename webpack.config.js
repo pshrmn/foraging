@@ -11,7 +11,6 @@ module.exports = {
     path: __dirname + "/forager/",
     filename: "bundle.js",
   },
-  devtool: "source-map",
   module: {
     loaders: [
      {

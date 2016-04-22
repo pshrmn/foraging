@@ -4,7 +4,6 @@ import { connect } from "react-redux";
 import Controls from "./Controls";
 import Frames from "./frames/Frames";
 import Tree from "./Tree";
-import PageControls from "./PageControls";
 import Preview from "./Preview";
 import NoSelectMixin from "./NoSelectMixin";
 
@@ -18,7 +17,6 @@ const Forager = React.createClass({
           <Controls />
           <div className="workspace">
             <div className="graph">
-              <PageControls />
               <Tree />
             </div>
             <Frames />

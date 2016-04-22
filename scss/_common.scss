@@ -128,4 +128,8 @@ button {
             color: $red !important;
         }
     }
+
+    &:disabled {
+        opacity: 0.25;
+    }
 }
