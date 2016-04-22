@@ -1,3 +1,11 @@
+import {
+  currentSelector,
+  potentialSelector,
+  queryCheck,
+  hoverClass,
+  savedPreview
+} from "../constants/CSSClasses";
+
 /*
  * select
  * ------
@@ -66,7 +74,13 @@ export const count = (parents, selector, spec) => {
  */
 export const parts = element =>{
   const skipTags = [];
-  const skipClasses = ["forager-highlight", "query-check", "selectable-element", "current-selector"];
+  const skipClasses = [
+    currentSelector,
+    potentialSelector,
+    queryCheck,
+    hoverClass,
+    savedPreview
+  ];
   const classRegex = /^-?[_a-zA-Z]+[_a-zA-Z0-9-]*/;
   const tagAllowed = tag => {
     return !skipTags.some(st => st === tag);

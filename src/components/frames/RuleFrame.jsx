@@ -8,9 +8,9 @@ import { select } from "../../helpers/selection";
 import { abbreviate } from "../../helpers/text";
 import { highlight, unhighlight } from "../../helpers/markup";
 import { saveRule, showElementFrame } from "../../actions";
+import { currentSelector } from "../../constants/CSSClasses";
 
 const RuleFrame = React.createClass({
-  highlight: "current-element",
   getInitialState: function() {
     return {
       name: "",
@@ -92,15 +92,15 @@ const RuleFrame = React.createClass({
   },
   componentWillMount: function() {
     const { elements } = this.props.element;
-    highlight(elements, this.highlight);
+    highlight(elements, currentSelector);
   },
   componentWillUpdate: function(nextProps, nextState) {
-    unhighlight(this.highlight);
+    unhighlight(currentSelector);
     const { elements } = nextProps.element;
-    highlight(elements, this.highlight);
+    highlight(elements, currentSelector);
   },
   componentWillUnmount: function() {
-    unhighlight(this.highlight);
+    unhighlight(currentSelector);
   }
 });
 

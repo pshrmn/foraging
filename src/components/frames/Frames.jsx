@@ -6,8 +6,8 @@ import RuleFrame from "./RuleFrame";
 import ElementWizard from "./ElementWizard";
 
 import { highlight, unhighlight } from "../../helpers/markup";
+import { currentSelector } from "../../constants/CSSClasses";
 
-const cssSelector = "current-element";
 /*
  * Frames
  * ------
@@ -39,15 +39,15 @@ const Frames = React.createClass({
     }
   },
   componentWillMount: function() {
-    unhighlight(cssSelector);
+    unhighlight(currentSelector);
     if ( this.props.element ) {
-      highlight(this.props.element.elements, cssSelector);
+      highlight(this.props.element.elements, currentSelector);
     }
   },
   componentWillReceiveProps: function(nextProps) {
-    unhighlight(cssSelector);
+    unhighlight(currentSelector);
     if ( nextProps.element !== undefined && nextProps.element !== this.props.element ) {
-      highlight(nextProps.element.elements, cssSelector);
+      highlight(nextProps.element.elements, currentSelector);
     }
   },
   render: function() {
@@ -58,7 +58,7 @@ const Frames = React.createClass({
     );
   },
   componentWillUnmount: function() {
-    unhighlight(cssSelector);
+    unhighlight(currentSelector);
   }
 });
 

@@ -8,8 +8,7 @@ import { createElement } from "../../helpers/page";
 import { allSelect, count, select } from "../../helpers/selection";
 import { highlight, unhighlight } from "../../helpers/markup";
 import { saveElement, showElementFrame } from "../../actions";
-
-const highlightClass = "query-check";
+import { queryCheck } from "../../constants/CSSClasses";
 
 const ChooseSpec = React.createClass({
   getInitialState: function() {
@@ -91,19 +90,19 @@ const ChooseSpec = React.createClass({
     const { current, selector } = startData;
     const { type, value } = this.state;
     const elements = select(current.elements, selector, {type, value});
-    highlight(elements, highlightClass);
+    highlight(elements, queryCheck);
   },
   componentWillUpdate: function(nextProps, nextState) {
-    unhighlight(highlightClass);
+    unhighlight(queryCheck);
 
     const { startData } = nextProps;
     const { current, selector } = startData;
     const { type, value } = nextState;
     const elements = select(current.elements, selector, {type, value});
-    highlight(elements, highlightClass);
+    highlight(elements, queryCheck);
   },
   componentWillUnmount: function() {
-    unhighlight(highlightClass);
+    unhighlight(queryCheck);
   }
 });
 

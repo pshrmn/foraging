@@ -7,10 +7,7 @@ import NoSelectMixin from "../NoSelectMixin";
 import { parts, select, count, allSelect } from "../../helpers/selection";
 import { stripEvents } from "../../helpers/attributes";
 import { highlight, unhighlight, iHighlight, iUnhighlight } from "../../helpers/markup";
-
-const potentialSelector = "selectable-element";
-const currentSelector = "query-check";
-const hoverClass = "forager-highlight";
+import { queryCheck, potentialSelector, hoverClass } from "../../constants/CSSClasses";
 
 function PageCoordinator(parents) {
   
@@ -44,7 +41,7 @@ function PageCoordinator(parents) {
   iHighlight(elements, potentialSelector, mouseover, mouseout, click);
 
   return function unbind() {
-    unhighlight(currentSelector);
+    unhighlight(queryCheck);
     iUnhighlight(potentialSelector, mouseover, mouseout, click);
   }
 }
@@ -158,13 +155,13 @@ const ChooseElement = React.createClass({
    */
   componentWillUpdate: function(nextProps, nextState) {
     // remove any highlights from a previously selected selector
-    unhighlight(currentSelector);
+    unhighlight(queryCheck);
     const clickedSelector = nextState.selectors[nextState.checked];
     if ( clickedSelector !== undefined ) {
       const fullSelector = clickedSelector.join("");
       const { startData } = nextProps;
       const elements = select(startData.current.elements, fullSelector);
-      highlight(elements, currentSelector);
+      highlight(elements, queryCheck);
     }
   },
   /*

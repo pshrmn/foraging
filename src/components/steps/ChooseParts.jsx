@@ -6,6 +6,7 @@ import { PosButton, NegButton } from "../common/Buttons";
 
 import { select, count } from "../../helpers/selection";
 import { highlight, unhighlight} from "../../helpers/markup";
+import { queryCheck } from "../../constants/CSSClasses";
 
 function joinParts(parts) {
   return parts.reduce((str, curr) => {
@@ -15,8 +16,6 @@ function joinParts(parts) {
     return str;
   }, "");
 }
-
-const previewClass = "query-check";
 
 const ChooseParts = React.createClass({
   mixins: [NoSelectMixin],
@@ -112,14 +111,14 @@ const ChooseParts = React.createClass({
     );
   },
   componentWillUnmount: function() {
-    unhighlight(previewClass);
+    unhighlight(queryCheck);
   },
   _setupHighlights: function(cssSelector) {
-    unhighlight(previewClass);
+    unhighlight(queryCheck);
     if ( cssSelector !== "" ) {
       const { startData } = this.props;
       const elements = select(startData.current.elements, cssSelector);
-      highlight(elements, previewClass);
+      highlight(elements, queryCheck);
     }
   }
 });

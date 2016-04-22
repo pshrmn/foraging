@@ -7,6 +7,7 @@ import { abbreviate } from "../helpers/text";
 import { simpleGrow } from "../helpers/page";
 import { highlight, unhighlight } from "../helpers/markup";
 import { selectElement } from "../actions";
+import { savedPreview } from "../constants/CSSClasses";
 
 const Tree = React.createClass({
   mixins: [NoSelectMixin],
@@ -87,16 +88,15 @@ const Tree = React.createClass({
 });
 
 const Node = React.createClass({
-  hoverClass: "saved-preview",
   handleClick: function(event) {
     event.preventDefault();
     this.props.select(this.props.index);
   },
   handleMouseover: function(event) {
-    highlight(this.props.elements, this.hoverClass);
+    highlight(this.props.elements, savedPreview);
   },
   handleMouseout: function(event) {
-    unhighlight(this.hoverClass);
+    unhighlight(savedPreview);
   },
   specText: function() {
     const { selector, spec } = this.props;
@@ -144,7 +144,7 @@ const Node = React.createClass({
     );
   },
   componentWillUnmount: function() {
-    unhighlight(this.hoverClass);
+    unhighlight(savedPreview);
   }
 });
 

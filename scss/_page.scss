@@ -1,7 +1,6 @@
 $transparent-red: rgba(255, 0, 0, 0.25);
 $transparent-gold: rgba(255, 215, 0, 0.25);
 $purple: rgb(30, 10, 63);
-$transparent-purple: rgba(30, 10, 63, 0.25);
 $transparent-blue: rgba(69, 175, 204, 0.25);
 
 /*
@@ -10,7 +9,7 @@ $transparent-blue: rgba(69, 175, 204, 0.25);
  * created based on this html element.
  */
 .selectable-element{
-    box-shadow: inset 0 0 2px $purple !important;
+    box-shadow: inset 1px 1px $purple, inset -1px -1px $purple !important;
 }
 
 img.selectable-element{
