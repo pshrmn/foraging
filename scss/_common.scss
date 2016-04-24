@@ -77,27 +77,30 @@ button {
     font-weight: normal !important;
     text-transform: capitalize !important;
 
-    border-radius: 0px;
-    border-width: 0 0 4px 0;
+    border-radius: 2px;
+    border-width: 1px;
     border-style: solid;
-    border-color: $dark-gray;
-    box-shadow: none !important;
+    border-color: $button-gray;
+    box-shadow: inset 0 1px 0 $white !important;
 
     cursor: pointer !important;
     margin: 2px !important;
     padding: 3px 6px !important;
-    
     min-width: initial !important;
 
+    transition: border-color 0.5s;
+
     &:hover, &:active, &:focus{
-        border-color: $gray;
         color: $black !important;
+        border-color: $gray;
+        transition: border-color 0.5s;
     }
 
     &.transparent {
         background: transparent !important;
         border: 0 !important;
         font-weight: bold !important;
+        box-shadow: none !important;
 
         &:hover {
             background: transparent !important;            
@@ -105,24 +108,33 @@ button {
     }
 
     &.neg {
-        border-color: $dark-red !important;
+        background: $red !important;
+        border-color: $red !important;   
+        box-shadow: inset 0 1px 0 $light-red !important;
+        transition: border-color 0.5s;
 
         &:hover, &:active, &:focus {
-            border-color: $red !important;   
+            border-color: $dark-red !important;
+            transition: border-color 0.5s;
         }
     }
 
     &.pos {
-        border-color: $dark-green !important;
+        background: $green !important;
+        border-color: $green !important;
+        box-shadow: inset 0 1px 0 $light-green !important;
+        transition: border-color 0.5s;
 
         &:hover, &:active, &:focus {
-            border-color: $green !important;   
+            border-color: $dark-green !important;   
+            transition: border-color 0.5s;
         }
     }
 
     &.neg.transparent {
         background: transparent !important;
         color: $dark-red !important;
+        box-shadow: none !important;
 
         &:hover , &:active, &:focus {
             color: $red !important;
@@ -131,5 +143,6 @@ button {
 
     &:disabled {
         opacity: 0.25;
+        cursor: default !important;
     }
 }

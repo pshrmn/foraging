@@ -32,7 +32,8 @@ function PageCoordinator(parents) {
     this.setState({
       // maintain the wildcard selector
       selectors: [["*"]].concat(selectors),
-      checked: undefined
+      checked: undefined,
+      error: true
     });
   }
 

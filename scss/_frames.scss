@@ -1,11 +1,8 @@
-.frames, .graph {
+.frames {
     background: $white;
     box-sizing: border-box;
     margin-right: 3px;
     padding: 5px;
-}
-
-.frames {
     width: 400px;
     vertical-align: top;
 
@@ -99,41 +96,3 @@
     }
 }
 
-.graph {
-    min-width: 500px;
-    min-height: 150px;
-
-    svg {
-        box-sizing: content-box;
-        font-size: 14px;
-        background: $white;
-
-        .link {
-          fill: none;
-          stroke: $dark-gray;
-        }
-
-        .node{
-            cursor: pointer;
-            fill: $dark-green;
-        }
-
-        .empty{
-            fill: $red;
-        }
-
-        .node text {
-            paint-order: stroke;
-            stroke: $white;
-            stroke-width: 3px;
-            text-anchor: middle;
-            font-weight: bold;
-            fill: inherit;
-        }
-
-        .current{
-            font-style: italic;
-            fill: $dark-gray;
-        }
-    }
-}

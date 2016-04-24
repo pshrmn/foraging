@@ -36,7 +36,8 @@
         border-radius: 3px;
         border-width: 1px;
         border-style: solid;
-        
+        box-shadow: none !important;
+
         background: $dark-blue !important;
 
         &.pos, &.pos:active, &.pos:focus {
@@ -48,6 +49,11 @@
         &.pos:hover {
             background: $green !important;
             color: $dark-blue !important;
+
+          &:disabled {
+            background: $dark-blue !important;
+            color: $green !important;
+          }
         }
 
         &.neg, &.neg:active, &.neg:focus{
@@ -58,13 +64,19 @@
 
         &.neg:hover {
             background: $red !important;
-            color: $dark-blue !important;            
+            color: $dark-blue !important;
+
+            &:disabled {
+            background: $dark-blue !important;
+            color: $red !important;
+          }
         }
 
         &:active {
             border-style: inset !important;
             color: $black !important;
         }
+
     }
 
     select{

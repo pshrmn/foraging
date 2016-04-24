@@ -62,7 +62,7 @@ const ChooseParts = React.createClass({
     this.setState({
       parts: parts,
       eleCount: fullSelector === "" ? 0 : count(startData.current.elements, fullSelector),
-      error: false
+      error: fullSelector === ""
     });
   },
   componentWillMount: function() {
@@ -74,11 +74,12 @@ const ChooseParts = React.createClass({
 
     this.setState({
       parts: parts.map(name => ({name: name, checked: true})),
-      eleCount: count(current.elements, fullSelector)
+      eleCount: count(current.elements, fullSelector),
+      error: false
     });
   },
   render: function() {
-    const { parts, eleCount } = this.state;
+    const { parts, eleCount, error } = this.state;
     const opts = parts.map((part, index) => {
       const { name, checked } = part;
       return (
@@ -104,7 +105,7 @@ const ChooseParts = React.createClass({
         </div>
         <div className="buttons">
           <NegButton text="Previous" click={this.previousHander} />
-          <PosButton text="Next" click={this.nextHandler} />
+          <PosButton text="Next" disabled={error} click={this.nextHandler} />
           <NegButton text="Cancel" click={this.cancelHandler} />
         </div>
       </div>

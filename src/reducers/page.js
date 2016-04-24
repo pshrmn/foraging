@@ -170,7 +170,7 @@ export default function page(state = {}, action) {
           elements: currentPage.elements.map(s => {
             // set the new name for the element matching elementIndex
             // only affects 'all' type elements
-            if ( s.index === elementIndex && s.spec.type === "all" ) {
+            if ( s !== null && s.index === elementIndex && s.spec.type === "all" ) {
               return Object.assign({}, s, {
                 spec: Object.assign({}, s.spec, {
                   value: name
@@ -192,7 +192,7 @@ export default function page(state = {}, action) {
           ...pages.slice(0, pageIndex),
           Object.assign({}, currentPage, {
             elements: currentPage.elements.map(s => {
-              if ( s.index === elementIndex ) {
+              if ( s !== null && s.index === elementIndex ) {
                 return Object.assign({}, s, {
                   optional: !s.optional
                 });
@@ -216,7 +216,7 @@ export default function page(state = {}, action) {
         Object.assign({}, currentPage, {
           elements: currentPage.elements.map(s => {
             // set the new name for the element matching elementIndex
-            if ( s.index === elementIndex ) {
+            if ( s !== null && s.index === elementIndex ) {
               s.rules = s.rules.concat([rule])
             }
             return s;
@@ -238,7 +238,7 @@ export default function page(state = {}, action) {
         Object.assign({}, currentPage, {
           elements: currentPage.elements.map(s => {
             // remove the rule from the current element
-            if ( s.index === elementIndex ) {
+            if ( s !== null && s.index === elementIndex ) {
               return Object.assign({}, s, {
                 rules: s.rules.filter((r,i) => i !== index)
               });

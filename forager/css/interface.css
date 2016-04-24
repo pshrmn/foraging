@@ -111,45 +111,57 @@ body.foraging {
     color: #000000 !important;
     font-weight: normal !important;
     text-transform: capitalize !important;
-    border-radius: 0px;
-    border-width: 0 0 4px 0;
+    border-radius: 2px;
+    border-width: 1px;
     border-style: solid;
-    border-color: #323033;
-    box-shadow: none !important;
+    border-color: #CED1DE;
+    box-shadow: inset 0 1px 0 #ffffff !important;
     cursor: pointer !important;
     margin: 2px !important;
     padding: 3px 6px !important;
-    min-width: initial !important; }
+    min-width: initial !important;
+    transition: border-color 0.5s; }
     #forager button:hover, #forager button:active, #forager button:focus {
+      color: #000000 !important;
       border-color: #898B96;
-      color: #000000 !important; }
+      transition: border-color 0.5s; }
     #forager button.transparent {
       background: transparent !important;
       border: 0 !important;
-      font-weight: bold !important; }
+      font-weight: bold !important;
+      box-shadow: none !important; }
       #forager button.transparent:hover {
         background: transparent !important; }
     #forager button.neg {
-      border-color: #D02357 !important; }
+      background: #E85F88 !important;
+      border-color: #E85F88 !important;
+      box-shadow: inset 0 1px 0 #F799B5 !important;
+      transition: border-color 0.5s; }
       #forager button.neg:hover, #forager button.neg:active, #forager button.neg:focus {
-        border-color: #E85F88 !important; }
+        border-color: #D02357 !important;
+        transition: border-color 0.5s; }
     #forager button.pos {
-      border-color: #42752E !important; }
+      background: #76B85C !important;
+      border-color: #76B85C !important;
+      box-shadow: inset 0 1px 0 #CCE0C3 !important;
+      transition: border-color 0.5s; }
       #forager button.pos:hover, #forager button.pos:active, #forager button.pos:focus {
-        border-color: #76B85C !important; }
+        border-color: #42752E !important;
+        transition: border-color 0.5s; }
     #forager button.neg.transparent {
       background: transparent !important;
-      color: #D02357 !important; }
+      color: #D02357 !important;
+      box-shadow: none !important; }
       #forager button.neg.transparent:hover, #forager button.neg.transparent:active, #forager button.neg.transparent:focus {
         color: #E85F88 !important; }
     #forager button:disabled {
-      opacity: 0.25; }
-  #forager .frames, #forager .graph {
+      opacity: 0.25;
+      cursor: default !important; }
+  #forager .frames {
     background: #ffffff;
     box-sizing: border-box;
     margin-right: 3px;
-    padding: 5px; }
-  #forager .frames {
+    padding: 5px;
     width: 400px;
     vertical-align: top; }
     #forager .frames .frame {
@@ -214,6 +226,10 @@ body.foraging {
       background: #CCE0C3;
       border-color: #42752E; }
   #forager .graph {
+    background: #ffffff;
+    box-sizing: border-box;
+    margin-right: 3px;
+    padding: 5px;
     min-width: 500px;
     min-height: 150px; }
     #forager .graph svg {
@@ -233,7 +249,6 @@ body.foraging {
         stroke: #ffffff;
         stroke-width: 3px;
         text-anchor: middle;
-        font-weight: bold;
         fill: inherit; }
       #forager .graph svg .current {
         font-style: italic;
@@ -314,6 +329,7 @@ body.foraging {
       border-radius: 3px;
       border-width: 1px;
       border-style: solid;
+      box-shadow: none !important;
       background: #222233 !important; }
       #forager .topbar button.pos, #forager .topbar button.pos:active, #forager .topbar button.pos:focus {
         color: #76B85C !important;
@@ -322,6 +338,9 @@ body.foraging {
       #forager .topbar button.pos:hover {
         background: #76B85C !important;
         color: #222233 !important; }
+        #forager .topbar button.pos:hover:disabled {
+          background: #222233 !important;
+          color: #76B85C !important; }
       #forager .topbar button.neg, #forager .topbar button.neg:active, #forager .topbar button.neg:focus {
         border-color: #E85F88 !important;
         color: #E85F88 !important;
@@ -329,6 +348,9 @@ body.foraging {
       #forager .topbar button.neg:hover {
         background: #E85F88 !important;
         color: #222233 !important; }
+        #forager .topbar button.neg:hover:disabled {
+          background: #222233 !important;
+          color: #E85F88 !important; }
       #forager .topbar button:active {
         border-style: inset !important;
         color: #000000 !important; }
