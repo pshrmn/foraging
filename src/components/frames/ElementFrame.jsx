@@ -6,6 +6,8 @@ import NoSelectMixin from "../NoSelectMixin";
 import { showElementWizard, removeElement, renameElement,
   showRuleFrame, removeRule, toggleOptional } from "../../actions";
 import { PosButton, NegButton, NeutralButton } from "../common/Buttons";
+import { highlight, unhighlight } from "../../helpers/markup";
+import { currentSelector } from "../../constants/CSSClasses";
 
 const ElementFrame = React.createClass({
   mixins: [NoSelectMixin],
@@ -90,6 +92,21 @@ const ElementFrame = React.createClass({
         </div>
       </div>
     );
+  },
+  componentWillMount: function() {
+    unhighlight(currentSelector);
+    if ( this.props.element ) {
+      highlight(this.props.element.elements, currentSelector);
+    }
+  },
+  componentWillReceiveProps: function(nextProps) {
+    unhighlight(currentSelector);
+    if ( nextProps.element !== undefined && nextProps.element !== this.props.element ) {
+      highlight(nextProps.element.elements, currentSelector);
+    }
+  },
+  componentWillUnmount: function() {
+    unhighlight(currentSelector);
   }
 });
 

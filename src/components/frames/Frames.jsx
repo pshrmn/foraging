@@ -5,9 +5,6 @@ import ElementFrame from "./ElementFrame";
 import RuleFrame from "./RuleFrame";
 import ElementWizard from "./ElementWizard";
 
-import { highlight, unhighlight } from "../../helpers/markup";
-import { currentSelector } from "../../constants/CSSClasses";
-
 /*
  * Frames
  * ------
@@ -38,18 +35,7 @@ const Frames = React.createClass({
       return null;
     }
   },
-  componentWillMount: function() {
-    unhighlight(currentSelector);
-    if ( this.props.element ) {
-      highlight(this.props.element.elements, currentSelector);
-    }
-  },
-  componentWillReceiveProps: function(nextProps) {
-    unhighlight(currentSelector);
-    if ( nextProps.element !== undefined && nextProps.element !== this.props.element ) {
-      highlight(nextProps.element.elements, currentSelector);
-    }
-  },
+
   render: function() {
     return (
       <div className="frames">
@@ -57,21 +43,11 @@ const Frames = React.createClass({
       </div>
     );
   },
-  componentWillUnmount: function() {
-    unhighlight(currentSelector);
-  }
 });
 
 export default connect(
-  state => {
-    const { page, frame } = state;
-    const { pages, pageIndex, elementIndex } = page;
-    const currentPage = pages[pageIndex];
-    const element = currentPage === undefined ? undefined : currentPage.elements[elementIndex];
-    return {
-      frame,
-      element
-    }
-  }
+  state => ({
+    frame: state.frame
+  })
 )(Frames);
 
