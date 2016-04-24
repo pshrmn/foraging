@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { jsdom } from "jsdom";
 
-import { select, count, parts, allSelect } from "../../src/helpers/selection";
+import { protect, select, count, parts, allSelect } from "../../src/helpers/selection";
 
 describe("selector", () => {
 
@@ -14,7 +14,7 @@ describe("selector", () => {
           <p>Two</p>
         </div>
         <div></div>
-        <div>
+        <div class='third'>
           <p>Three</p>
           <p class='no-select'>Ignore</p>
         </div>
@@ -30,11 +30,34 @@ describe("selector", () => {
     delete global.window;
   });
 
+  describe("protect", () => {
+    it("should add the no-select class to elements matching selector and children", () => {
+
+      protect('.third');
+      Array.from(document.querySelectorAll('.third')).forEach(ele => {
+        expect(ele.classList.contains('no-select')).to.be.true;
+        Array.from(ele.querySelectorAll('*')).forEach(child => {
+          expect(child.classList.contains('no-select')).to.be.true;
+        });
+      });
+    });
+  });
+
   describe("select", () => {
     it("matches all child elements, ignores .no-select elements", () => {
       const divs = document.querySelectorAll("div");
       const elements = select(divs, "p");
       expect(elements.length).to.equal(3);
+    });
+
+    it("only selects elements that match the spec", () => {
+      const elements = select([document.body], "div", {type: "single", value: 0});
+      expect(elements.length).to.equal(1);
+    });
+
+    it("adds the no-select class to ignored classes before selecting", () => {
+      const elements = select([document.body], "div", {type: "all", value: "div"}, ".third");
+      expect(elements.length).to.equal(2)
     });
   });
 
