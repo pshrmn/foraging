@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "Forager",
   "description": "Hunt and gather data",
-  "version": "2.12.0",
+  "version": "2.13.0",
   "permissions": [
     "activeTab",
     "storage",

@@ -18,7 +18,7 @@ import { saveElement, showElementFrame } from "../../actions";
  *   ChooseValue -> ChooseOptional -> ConfirmElement
  * each step should make sure to pass the current object (the currently
  * selected element selector) as a property of the object returned
- * in its next call (except ChooseSpec, which doesn't care)
+ * in its next call
  */
 const ElementWizard = React.createClass({
   mixins: [NoSelectMixin],

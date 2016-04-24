@@ -2,7 +2,7 @@ import React from "react";
 import { connect } from "react-redux";
 
 import ElementFrame from "./ElementFrame";
-import RuleFrame from "./RuleFrame";
+import RuleWizard from "./RuleWizard";
 import ElementWizard from "./ElementWizard";
 
 /*
@@ -28,7 +28,7 @@ import ElementWizard from "./ElementWizard";
     frameElement = <ElementWizard />;
     break;
   case "rule":
-    frameElement = <RuleFrame />;
+    frameElement = <RuleWizard />;
     break;
   }
   return (
