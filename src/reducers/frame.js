@@ -18,18 +18,15 @@ export default function frame(state = "", action) {
   case types.CLOSE_FORAGER:
   case types.SHOW_ELEMENT_FRAME:
     return Object.assign({}, state, {
-      name: "element",
-      data: {}
+      name: "element"
     });
   case types.SHOW_ELEMENT_WIZARD:
     return Object.assign({}, state, {
-      name: "wizard",
-      data: {}
+      name: "element-wizard"
     })
-  case types.SHOW_RULE_FRAME:
+  case types.SHOW_RULE_WIZARD:
     return Object.assign({}, state, {
-      name: "rule",
-      data: {}
+      name: "rule-wizard"
     });
   default:
     return state;

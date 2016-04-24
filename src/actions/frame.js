@@ -12,9 +12,8 @@ export const showElementWizard = () => {
   };
 };
 
-export const showRuleFrame = element => {
+export const showRuleWizard = element => {
   return {
-    type: types.SHOW_RULE_FRAME,
-    element: element
+    type: types.SHOW_RULE_WIZARD
   };
 };

@@ -24,10 +24,10 @@ import ElementWizard from "./ElementWizard";
   case "element":
     frameElement = <ElementFrame />;
     break;
-  case "wizard":
+  case "element-wizard":
     frameElement = <ElementWizard />;
     break;
-  case "rule":
+  case "rule-wizard":
     frameElement = <RuleWizard />;
     break;
   }

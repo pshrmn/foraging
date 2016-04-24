@@ -9,6 +9,8 @@ import ChooseName from "./ruleSteps/ChooseName";
 import ConfirmRule from "./ruleSteps/ConfirmRule";
 
 import { saveRule, showElementFrame } from "../../actions";
+import { highlight, unhighlight} from "../../helpers/markup";
+import { currentSelector } from "../../constants/CSSClasses";
 
 /*
  * ChooseAttribute -> ChooseType -> ChooseName -> ConfirmRule
@@ -38,6 +40,18 @@ const RuleWizard = React.createClass({
               save={this.save}
               cancel={this.cancel} />
     );
+  },
+  componentWillMount: function() {
+    const { current } = this.props;
+    highlight(current.elements, currentSelector);
+  },
+  componentWillUpdate: function(nextProps, nextState) {
+    unhighlight(currentSelector);
+    const { current } = this.props;
+    highlight(current.elements, currentSelector);
+  },
+  componentWillUnmount: function() {
+    unhighlight(currentSelector);
   }
 });
 

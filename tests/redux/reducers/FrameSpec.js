@@ -61,20 +61,20 @@ describe("frame reducer", () => {
       const newState = frame(state, {
         type: ActionTypes.SHOW_ELEMENT_WIZARD
       });
-      expect(newState.name).to.equal("wizard");
+      expect(newState.name).to.equal("element-wizard");
     });
   });
 
-  describe("SHOW_RULE_FRAME", () => {
+  describe("SHOW_RULE_WIZARD", () => {
     it("shows the rule frame", () => {
       const state = {
         name: "element"
       };
       const action = {
-        type: ActionTypes.SHOW_RULE_FRAME
+        type: ActionTypes.SHOW_RULE_WIZARD
       };
       const newState = frame(state, action);
-      expect(newState.name).to.equal("rule");
+      expect(newState.name).to.equal("rule-wizard");
     });
   });
 });

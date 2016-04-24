@@ -1,3 +1,11 @@
+import {
+  currentSelector,
+  potentialSelector,
+  queryCheck,
+  hoverClass,
+  savedPreview
+} from "../constants/CSSClasses";
+
 // return an object mapping attribute names to their value
 // for all attributes of an element
 export const attributes = (element, ignored = {}) => {
@@ -8,7 +16,18 @@ export const attributes = (element, ignored = {}) => {
     }
     // don't include current-element class
     if ( name === "class" ) {
-      value = value.replace("current-element","").trim();
+      const ignoredClasses = [
+        currentSelector,
+        potentialSelector,
+        queryCheck,
+        hoverClass,
+        savedPreview
+      ]
+      const classes = value.split(" ");
+      const goodClasses = classes.filter(c => {
+        return !ignoredClasses.includes(c);
+      });
+      value = goodClasses.join(" ");
     }
     // don't include empty attrs
     if ( value !== "" ) {

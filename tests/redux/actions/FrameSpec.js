@@ -18,10 +18,10 @@ describe("frame actions", () => {
     });
   });
 
-  describe("showRuleFrame", () => {
+  describe("showRuleWizard", () => {
     it("returns an action to show the rule frame", () => {
-      const action = actions.showRuleFrame();
-      expect(action.type).to.equal(ActionTypes.SHOW_RULE_FRAME);
+      const action = actions.showRuleWizard();
+      expect(action.type).to.equal(ActionTypes.SHOW_RULE_WIZARD);
     });
   });
 });

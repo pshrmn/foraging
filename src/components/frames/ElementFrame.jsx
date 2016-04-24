@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 import NoSelectMixin from "../NoSelectMixin";
 
 import { showElementWizard, removeElement, renameElement,
-  showRuleFrame, removeRule, toggleOptional } from "../../actions";
+  showRuleWizard, removeRule, toggleOptional } from "../../actions";
 import { PosButton, NegButton, NeutralButton } from "../common/Buttons";
 import { highlight, unhighlight } from "../../helpers/markup";
 import { currentSelector } from "../../constants/CSSClasses";
@@ -15,7 +15,7 @@ const ElementFrame = React.createClass({
     this.props.showElementWizard();
   },
   addRule: function(event) {
-    this.props.showRuleFrame();
+    this.props.showRuleWizard();
   },
   remove: function(event) {
     const { element, removeElement } = this.props;
@@ -162,7 +162,7 @@ export default connect(
     showElementWizard,
     removeElement,
     renameElement,
-    showRuleFrame,
+    showRuleWizard,
     removeRule,
     toggleOptional
   }

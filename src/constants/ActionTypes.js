@@ -24,7 +24,7 @@ export const REMOVE_RULE = "REMOVE_RULE";
 // the following action types show specific frames
 export const SHOW_ELEMENT_FRAME = "SHOW_ELEMENT_FRAME";
 export const SHOW_ELEMENT_WIZARD = "SHOW_ELEMENT_WIZARD";
-export const SHOW_RULE_FRAME = "SHOW_RULE_FRAME";
+export const SHOW_RULE_WIZARD = "SHOW_RULE_WIZARD";
 export const SHOW_HTML_FRAME = "SHOW_HTML_FRAME";
 export const SHOW_PARTS_FRAME = "SHOW_PARTS_FRAME";
 export const SHOW_SPEC_FRAME = "SHOW_SPEC_FRAME";
