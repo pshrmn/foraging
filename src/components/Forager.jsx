@@ -5,15 +5,13 @@ import Controls from "./Controls";
 import Frames from "./frames/Frames";
 import Tree from "./Tree";
 import Preview from "./Preview";
-import NoSelectMixin from "./NoSelectMixin";
 
 const Forager = React.createClass({
-  mixins: [NoSelectMixin],
   render: function() {
     // don't render anything when show=False
     return !this.props.show ? null :
       (
-        <div id="forager" ref="parent">
+        <div id="forager">
           <Controls />
           <div className="workspace">
             <div className="graph">

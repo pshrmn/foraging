@@ -59,14 +59,14 @@ const ChooseOptional = React.createClass({
   componentWillMount: function() {
     const { startData } = this.props;
     const { current, selector, type, value } = startData;
-    const elements = select(current.elements, selector, {type, value});
+    const elements = select(current.elements, selector, {type, value}, '.forager-holder');
     highlight(elements, queryCheck);
   },
   componentWillUpdate: function(nextProps, nextState) {
     unhighlight(queryCheck);
     const { startData } = nextProps;
     const { current, selector, type, value } = startData;
-    const elements = select(current.elements, selector, {type, value});
+    const elements = select(current.elements, selector, {type, value}, '.forager-holder');
     highlight(elements, queryCheck);
   },
   componentWillUnmount: function() {

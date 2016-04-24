@@ -7,6 +7,20 @@ import {
 } from "../constants/CSSClasses";
 
 /*
+ * add the no-select class to all elements that are selected by the selector
+ * as well as all of those elements' children
+ */
+export const protect = selector => {
+  const roots = document.querySelectorAll(selector);
+  Array.from(roots).forEach(element => {
+    element.classList.add("no-select");
+    Array.from(element.querySelectorAll("*")).forEach(c => {
+      c.classList.add("no-select");
+    });
+  });
+}
+
+/*
  * select
  * ------
  * Returns an array of elements that are children of the parent elements and
@@ -15,8 +29,10 @@ import {
  * @param parents - an array of parent elements to search using the selector
  * @param selector - the selector to use to match children of the parent elements
  * @param spec - how to select the child element or elements of a parent element
+ * @param ignored - a selector that when an element has it, the element should
+ *   be ignored
  */
-export const select = (parents, selector, spec) => {
+export const select = (parents, selector, spec, ignored) => {
   const sel = (selector || "*") + ":not(.no-select)";
   const index = spec && spec.type === "single" ? spec.value : undefined;
 
@@ -26,6 +42,10 @@ export const select = (parents, selector, spec) => {
     } else {
       return Array.from(elements);
     }
+  }
+
+  if ( ignored ) {
+    protect(ignored);
   }
 
   return Array.from(parents).reduce((arr, p) => {

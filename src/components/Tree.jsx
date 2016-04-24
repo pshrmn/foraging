@@ -2,7 +2,6 @@ import React from "react";
 import { connect } from "react-redux";
 import d3 from "d3";
 
-import NoSelectMixin from "./NoSelectMixin";
 import { abbreviate } from "../helpers/text";
 import { simpleGrow } from "../helpers/page";
 import { highlight, unhighlight } from "../helpers/markup";
@@ -10,7 +9,6 @@ import { selectElement } from "../actions";
 import { savedPreview } from "../constants/CSSClasses";
 
 const Tree = React.createClass({
-  mixins: [NoSelectMixin],
   getDefaultProps: function() {
     return {
       width: 500,
@@ -77,8 +75,7 @@ const Tree = React.createClass({
      * by 100 and translating the tree 50 pixels to the right
      */
     return (
-      <svg ref="parent"
-           width={width+100}
+      <svg width={width+100}
            height={height+50}
            className={active ? "no-select" : "no-select not-allowed"} >
         {this._makeNodes()}

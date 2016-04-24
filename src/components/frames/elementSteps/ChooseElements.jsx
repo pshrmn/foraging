@@ -1,7 +1,6 @@
 import React from "react";
 
 import { PosButton, NegButton } from "../../common/Buttons";
-import NoSelectMixin from "../../NoSelectMixin";
 
 import { parts, select, count, allSelect } from "../../../helpers/selection";
 import { stripEvents } from "../../../helpers/attributes";
@@ -37,7 +36,7 @@ function PageCoordinator(parents) {
   }
 
   // get all child elements of the parents
-  const elements = select(parents).map(ele => stripEvents(ele));
+  const elements = select(parents, null, null, '.forager-holder').map(ele => stripEvents(ele));
   iHighlight(elements, potentialSelector, mouseover, mouseout, click);
 
   return function unbind() {
@@ -54,7 +53,6 @@ function PageCoordinator(parents) {
  * parent) will be rendered.
  */
 const ChooseElement = React.createClass({
-  mixins: [NoSelectMixin],
   propTypes: {
     startData: React.PropTypes.object,
     endData: React.PropTypes.object,
@@ -115,7 +113,7 @@ const ChooseElement = React.createClass({
     const { next, previous } = this.props;
     const { selectors, checked, eleCount, error } = this.state;
     return (
-      <div className="element-form" ref="parent">
+      <div className="element-form">
         <div className="info">
           <h3>Select Relevant Element(s)</h3>
           { error ? <p>No Element Selected</p> : null }
@@ -160,7 +158,7 @@ const ChooseElement = React.createClass({
     if ( clickedSelector !== undefined ) {
       const fullSelector = clickedSelector.join("");
       const { startData } = nextProps;
-      const elements = select(startData.current.elements, fullSelector);
+      const elements = select(startData.current.elements, fullSelector, null, '.forager-holder');
       highlight(elements, queryCheck);
     }
   },
@@ -173,7 +171,6 @@ const ChooseElement = React.createClass({
 });
 
 const SelectorRadio = React.createClass({
-  mixins: [NoSelectMixin],
   setRadio: function(event) {
     // do not call event.preventDefault() here or the checked dot will fail to render
     this.props.select(this.props.index);
@@ -181,7 +178,7 @@ const SelectorRadio = React.createClass({
   render: function() {
     const { selector, checked } = this.props;
     return (
-      <label ref="parent" className={checked ? "selected" : ""}>
+      <label className={checked ? "selected" : ""}>
         <input type="radio"
                name="css-selector"
                checked={checked}

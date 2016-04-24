@@ -2,7 +2,6 @@ import React from "react";
 import { connect } from "react-redux";
 
 import Wizard from "simple-wizard-component";
-import NoSelectMixin from "../NoSelectMixin";
 
 import ChooseElements from "./elementSteps/ChooseElements";
 import ChooseParts from "./elementSteps/ChooseParts";
@@ -21,7 +20,6 @@ import { saveElement, showElementFrame } from "../../actions";
  * in its next call
  */
 const ElementWizard = React.createClass({
-  mixins: [NoSelectMixin],
   save: function(ele) {
     this.props.saveElement(ele);
   },
@@ -42,7 +40,7 @@ const ElementWizard = React.createClass({
       ConfirmElement
     ];
     return (
-      <div ref="parent">
+      <div>
         <Wizard steps={steps}
                 initialData={initialData}
                 save={this.save}

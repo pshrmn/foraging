@@ -76,7 +76,7 @@ export const flatten = pageTree => {
 export const selectElements = elements => {
   elements.forEach(s => {
     const parentElements = s.parent === null ? [document] : elements[s.parent].elements;
-    s.elements = select(parentElements, s.selector, s.spec);
+    s.elements = select(parentElements, s.selector, s.spec, '.forager-holder');
   })
 }
 

@@ -1,7 +1,6 @@
 import React from "react";
 
 import { PosButton, NegButton } from "../../common/Buttons";
-import NoSelectMixin from "../../NoSelectMixin";
 import { select, count } from "../../../helpers/selection";
 import { highlight, unhighlight } from "../../../helpers/markup";
 import { queryCheck } from "../../../constants/CSSClasses";
@@ -121,7 +120,7 @@ const ChooseValue = React.createClass({
     const { startData } = this.props;
     const { current, selector, type } = startData;
     const { value } = this.state;
-    const elements = select(current.elements, selector, {type, value});
+    const elements = select(current.elements, selector, {type, value}, '.forager-holder');
     highlight(elements, queryCheck);
   },
   componentWillUpdate: function(nextProps, nextState) {
@@ -130,7 +129,7 @@ const ChooseValue = React.createClass({
     const { startData } = nextProps;
     const { current, selector, type } = startData;
     const { value } = nextState;
-    const elements = select(current.elements, selector, {type, value});
+    const elements = select(current.elements, selector, {type, value}, '.forager-holder');
     highlight(elements, queryCheck);
   },
   componentWillUnmount: function() {

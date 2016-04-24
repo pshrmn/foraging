@@ -11,7 +11,7 @@ const ConfirmElement = React.createClass({
     const { startData, next: save } = this.props;
     const { current, selector, type, value, optional } = startData;
     const ele = createElement(selector, type, value, optional);
-    ele.elements = select(current.elements, ele.selector, ele.spec);
+    ele.elements = select(current.elements, ele.selector, ele.spec, '.forager-holder');
     save(ele);
   },
   previousHandler: function(event) {
@@ -45,7 +45,7 @@ const ConfirmElement = React.createClass({
   componentWillMount: function() {
     const { startData } = this.props;
     const { current, selector, type, value } = startData;
-    const elements = select(current.elements, selector, {type, value});
+    const elements = select(current.elements, selector, {type, value}, '.forager-holder');
     highlight(elements, queryCheck);
   },
   componentWillUnmount: function() {

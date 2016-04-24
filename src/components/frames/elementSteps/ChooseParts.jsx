@@ -1,6 +1,5 @@
 import React from "react";
 
-import NoSelectMixin from "../../NoSelectMixin";
 import { PosButton, NegButton } from "../../common/Buttons";
 
 import { select, count } from "../../../helpers/selection";
@@ -17,7 +16,6 @@ function joinParts(parts) {
 }
 
 const ChooseParts = React.createClass({
-  mixins: [NoSelectMixin],
   getInitialState: function() {
     return {
       parts: [],
@@ -94,7 +92,7 @@ const ChooseParts = React.createClass({
       );
     });
     return (
-      <div className="parts-form" ref="parent">
+      <div className="parts-form">
         <div className="info">
           <h3>Select Relevant Part(s) of the CSS selector</h3>
           <div className="choices">
@@ -117,7 +115,7 @@ const ChooseParts = React.createClass({
     unhighlight(queryCheck);
     if ( cssSelector !== "" ) {
       const { startData } = this.props;
-      const elements = select(startData.current.elements, cssSelector);
+      const elements = select(startData.current.elements, cssSelector, null, '.forager-holder');
       highlight(elements, queryCheck);
     }
   }

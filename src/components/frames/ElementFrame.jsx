@@ -1,8 +1,6 @@
 import React from "react";
 import { connect } from "react-redux";
 
-import NoSelectMixin from "../NoSelectMixin";
-
 import { showElementWizard, removeElement, renameElement,
   showRuleWizard, removeRule, toggleOptional } from "../../actions";
 import { PosButton, NegButton, NeutralButton } from "../common/Buttons";
@@ -10,7 +8,6 @@ import { highlight, unhighlight } from "../../helpers/markup";
 import { currentSelector } from "../../constants/CSSClasses";
 
 const ElementFrame = React.createClass({
-  mixins: [NoSelectMixin],
   addChild: function(event) {
     this.props.showElementWizard();
   },
@@ -66,7 +63,7 @@ const ElementFrame = React.createClass({
     }
     const renameButton = type === "all" ? <NeutralButton text="Rename" click={this.rename} /> : null;
     return (
-      <div className="frame" ref="parent">
+      <div className="frame">
         <div className="info">
           <div>
             Selector: <span className="big bold">{selector}</span>

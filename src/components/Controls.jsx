@@ -1,7 +1,6 @@
 import React from "react";
 import { connect } from "react-redux";
 
-import NoSelectMixin from "./NoSelectMixin";
 import { PosButton, NegButton, NeutralButton } from "./common/Buttons";
 import MessageBoard from "./MessageBoard";
 
@@ -21,7 +20,6 @@ import {
 } from "../actions";
 
 const Controls = React.createClass({
-  mixins: [NoSelectMixin],
   addHandler: function(event) {
     event.preventDefault();
     const { pages, showMessage, addPage } = this.props;
@@ -112,7 +110,7 @@ const Controls = React.createClass({
     const { message, currentIndex } = this.props;
     const active = currentIndex !== 0;
     return (
-      <div className="topbar" ref="parent">
+      <div className="topbar">
         <div className="controls">
           <div className="page-controls">
             {"Page "}
