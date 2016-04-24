@@ -2,7 +2,7 @@ import { expect } from "chai";
 import { jsdom } from "jsdom";
 
 import { attributes, stripEvents } from "../../src/helpers/attributes";
-
+import * as classNames from "../../src/constants/CSSClasses";
 
 describe("attribute", () => {
 
@@ -71,16 +71,20 @@ describe("attribute", () => {
       expect(matches.length).to.equal(0);
     });
 
-    it("removes the 'current-selector' class from the class attribute", () => {
-      const ele = document.createElement("a");
-      ele.classList.add("foo");
-      ele.classList.add("current-selector");
-      const attrs = attributes(ele);
-      attrs.some(attr => {
-        if (attr.name === "text") {
-          expect(attr.value).to.equal("foo");
-        }
-      });
+    it("removes Forager's classes from the class attribute", () => {
+      const classes = Object.keys(classNames).map(n => classNames[n]);
+      classes.forEach(c => {
+        const ele = document.createElement("a");
+        ele.classList.add("foo");
+        ele.classList.add(c);
+        const attrs = attributes(ele);
+        attrs.some(attr => {
+          if (attr.name === "text") {
+            expect(attr.value).to.equal("foo");
+          }
+        });
+        
+      })
     });
 
     it("does not include ignored attributes", () => {
