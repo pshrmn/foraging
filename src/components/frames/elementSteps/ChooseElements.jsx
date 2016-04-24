@@ -1,13 +1,12 @@
 import React from "react";
-import { connect } from "react-redux";
 
-import { PosButton, NegButton } from "../common/Buttons";
-import NoSelectMixin from "../NoSelectMixin";
+import { PosButton, NegButton } from "../../common/Buttons";
+import NoSelectMixin from "../../NoSelectMixin";
 
-import { parts, select, count, allSelect } from "../../helpers/selection";
-import { stripEvents } from "../../helpers/attributes";
-import { highlight, unhighlight, iHighlight, iUnhighlight } from "../../helpers/markup";
-import { queryCheck, potentialSelector, hoverClass } from "../../constants/CSSClasses";
+import { parts, select, count, allSelect } from "../../../helpers/selection";
+import { stripEvents } from "../../../helpers/attributes";
+import { highlight, unhighlight, iHighlight, iUnhighlight } from "../../../helpers/markup";
+import { queryCheck, potentialSelector, hoverClass } from "../../../constants/CSSClasses";
 
 function PageCoordinator(parents) {
   

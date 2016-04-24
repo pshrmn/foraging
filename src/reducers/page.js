@@ -132,6 +132,9 @@ export default function page(state = {}, action) {
     let removeIndex = [elementIndex];
     var updatedPage = Object.assign({}, currentPage, {
       elements: currentPage.elements.map(s => {
+        if ( s === null ) {
+          return null;
+        }
         // remove any elements being removed from child indices
         s.childIndices = s.childIndices.filter(c => {
           return !removeIndex.includes(c);

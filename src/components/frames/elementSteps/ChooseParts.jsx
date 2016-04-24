@@ -1,12 +1,11 @@
 import React from "react";
-import { connect } from "react-redux";
 
-import NoSelectMixin from "../NoSelectMixin";
-import { PosButton, NegButton } from "../common/Buttons";
+import NoSelectMixin from "../../NoSelectMixin";
+import { PosButton, NegButton } from "../../common/Buttons";
 
-import { select, count } from "../../helpers/selection";
-import { highlight, unhighlight} from "../../helpers/markup";
-import { queryCheck } from "../../constants/CSSClasses";
+import { select, count } from "../../../helpers/selection";
+import { highlight, unhighlight} from "../../../helpers/markup";
+import { queryCheck } from "../../../constants/CSSClasses";
 
 function joinParts(parts) {
   return parts.reduce((str, curr) => {
@@ -95,9 +94,9 @@ const ChooseParts = React.createClass({
       );
     });
     return (
-      <div className="frame parts-form" ref="parent">
+      <div className="parts-form" ref="parent">
         <div className="info">
-          <h3>Select Relevant Parts of the CSS selector</h3>
+          <h3>Select Relevant Part(s) of the CSS selector</h3>
           <div className="choices">
             {opts}
           </div>

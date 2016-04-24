@@ -272,6 +272,8 @@ body.foraging {
       padding: 2px 0; }
     #forager .wizard .info .line {
       padding: 2px 0; }
+      #forager .wizard .info .line p {
+        font-weight: bold; }
     #forager .wizard .info label {
       margin-right: 5px; }
     #forager .wizard .buttons {

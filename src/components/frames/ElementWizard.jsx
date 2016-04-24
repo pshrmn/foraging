@@ -3,22 +3,27 @@ import { connect } from "react-redux";
 
 import Wizard from "simple-wizard-component";
 import NoSelectMixin from "../NoSelectMixin";
-import ChooseElements from "../steps/ChooseElements";
-import ChooseParts from "../steps/ChooseParts";
-import ChooseSpec from "../steps/ChooseSpec";
+
+import ChooseElements from "./elementSteps/ChooseElements";
+import ChooseParts from "./elementSteps/ChooseParts";
+import ChooseType from "./elementSteps/ChooseType";
+import ChooseValue from "./elementSteps/ChooseValue";
+import ChooseOptional from "./elementSteps/ChooseOptional";
+import ConfirmElement from "./elementSteps/ConfirmElement";
 
 import { saveElement, showElementFrame } from "../../actions";
 
 /*
- * ChooseElements -> ChooseParts -> ChooseSpec
+ * ChooseElements -> ChooseParts -> ChooseType ->
+ *   ChooseValue -> ChooseOptional -> ConfirmElement
  * each step should make sure to pass the current object (the currently
  * selected element selector) as a property of the object returned
  * in its next call (except ChooseSpec, which doesn't care)
  */
 const ElementWizard = React.createClass({
   mixins: [NoSelectMixin],
-  save: function(data) {
-    this.props.saveElement(data);
+  save: function(ele) {
+    this.props.saveElement(ele);
   },
   cancel: function() {
     this.props.cancel();
@@ -28,9 +33,17 @@ const ElementWizard = React.createClass({
     const initialData = {
       current
     };
+    const steps = [
+      ChooseElements,
+      ChooseParts,
+      ChooseType,
+      ChooseValue,
+      ChooseOptional,
+      ConfirmElement
+    ];
     return (
       <div ref="parent">
-        <Wizard steps={[ChooseElements, ChooseParts, ChooseSpec]}
+        <Wizard steps={steps}
                 initialData={initialData}
                 save={this.save}
                 cancel={this.cancel} />

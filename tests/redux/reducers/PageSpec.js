@@ -39,6 +39,30 @@ describe("page reducer", () => {
                 parent: 0,
                 index: 1,
                 childIndices: []
+              },
+              {
+                selector: "div",
+                spec: {
+                  type: "single",
+                  value: 0
+                },
+                rules: [],
+                optional: true,
+                parent: 0,
+                index: 2,
+                childIndices: [3]
+              },
+              {
+                selector: "a",
+                spec: {
+                  type: "single",
+                  value: 0
+                },
+                rules: [],
+                optional: false,
+                parent: 2,
+                index: 3,
+                childIndices: []
               }
             ]
           },
@@ -195,7 +219,7 @@ describe("page reducer", () => {
     });
 
     it("reverts to 0 for bad index values", () => {
-      [-2, 3, 'f'].forEach(i => {
+      [-2, 10, 'f'].forEach(i => {
         // "cheap" copy
         let tempState = JSON.parse(JSON.stringify(state)); 
         const newState = page(tempState, {
@@ -252,6 +276,33 @@ describe("page reducer", () => {
       expect(pages[pageIndex].elements[0]).to.not.be.null;
       expect(elementIndex).to.equal(0);
     });
+
+    it("ignores null elements", () => {
+      state.elementIndex = 1;
+      const newState = page(state, {
+        type: ActionTypes.REMOVE_ELEMENT
+      });
+      newState.elementIndex = 2;
+      const newerState = page(newState, {
+        type: ActionTypes.REMOVE_ELEMENT
+      });
+      const { pages, pageIndex, elementIndex } = newerState;
+      expect(pages[pageIndex].elements[2]).to.be.null;
+      expect(elementIndex).to.equal(0);
+    });
+
+    it("also removes child elements", () => {
+      // element 3 is a child of element 2
+      state.elementIndex = 2;
+      const newState = page(state, {
+        type: ActionTypes.REMOVE_ELEMENT
+      });
+      const { pages, pageIndex, elementIndex } = newState;
+      const currentPage = pages[pageIndex];
+      expect(currentPage.elements[2]).to.be.null;
+      expect(currentPage.elements[3]).to.be.null;
+      expect(elementIndex).to.equal(0);
+    })
   });
 
   describe("RENAME_ELEMENT", () => {
