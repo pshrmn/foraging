@@ -1,65 +1,28 @@
-.wizard {
-    text-align: left;
-    width: 100%;
-    background: $white;
-    padding: 5px;
+.progress-bar {
     display: flex;
-    flex-direction: column;
+    flex-flow: row nowrap;
+    justify-content: space-between;
 
-    /*
-     * frames are broken down into two parts, the .info section and
-     * the .buttons section
-     */
-    .info {
+    .marker {
+        height: 10px;
+        background: $light-red;
+        flex-grow: 1;
+        border: 1px solid $white;
 
-        > * {
-            padding: 2px 0;
+        &.active {
+            background: $blue;
         }
 
-        .line {
-            padding: 2px 0;
-
-            p {
-                font-weight: bold;
-            }
-        }
-
-        label {
-            margin-right: 5px;
-        }
-    }
-
-    .buttons {
-        margin-top: 5px;
-        display: flex;
-
-        button {
-            flex-grow: 1;
-        }
-    }
-
-    ul {
-        padding: 0;
-        overflow-wrap: break-word;
-    }
-
-    li {
-        min-height: 1.5em;
-    }
-
-    .choices {
-        display: flex;
-        flex-wrap: wrap;
-
-        label {
-            margin-right: 15px;
-            padding: 2px 3px;
-            border-radius: 3px;
-            word-break: break-all;
-        }
-
-        label.selected {
+        &.complete {
             background: $green;
+        }
+
+        &:first-child {
+            border-radius: 5px 0 0 5px;
+        }
+
+        &:last-child {
+            border-radius: 0 5px 5px 0;
         }
     }
 }

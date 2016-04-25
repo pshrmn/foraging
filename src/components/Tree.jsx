@@ -77,7 +77,7 @@ const Tree = React.createClass({
     return (
       <svg width={width+100}
            height={height+50}
-           className={active ? "no-select" : "no-select not-allowed"} >
+           className={active ? null : "not-allowed"} >
         {this._makeNodes()}
       </svg>
     );

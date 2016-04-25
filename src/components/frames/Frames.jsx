@@ -16,9 +16,6 @@ import ElementWizard from "./ElementWizard";
  */
  function Frames(props) {
   const { frame } = props;
-  /*
-   * only the necessary actions are sent to the frame components
-   */
   let frameElement = null;
   switch ( frame.name ) {
   case "element":

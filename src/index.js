@@ -17,7 +17,6 @@ if ( !document.querySelector(".forager-holder") ) {
   // create the element that will hold the app
   const holder = document.createElement("div");
   holder.classList.add("forager-holder");
-  holder.classList.add("no-select");
   document.body.appendChild(holder);
 
   const store = makeStore();

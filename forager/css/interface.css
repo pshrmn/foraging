@@ -163,11 +163,16 @@ body.foraging {
     margin-right: 3px;
     padding: 5px;
     width: 400px;
-    vertical-align: top; }
-    #forager .frames .frame {
-      text-align: left;
-      width: 100%;
+    vertical-align: top;
+    /*
+     * frames are broken down into two parts, the .info section and
+     * the .buttons section
+     */ }
+    #forager .frames .frame, #forager .frames .wizard {
       background: #ffffff;
+      text-align: left;
+      height: 100%;
+      width: 100%;
       padding: 5px;
       display: -webkit-flex;
       display: -ms-flexbox;
@@ -175,35 +180,46 @@ body.foraging {
       -webkit-flex-direction: column;
           -ms-flex-direction: column;
               flex-direction: column;
-      /*
-         * frames are broken down into two parts, the .info section and
-         * the .buttons section
-         */ }
-      #forager .frames .frame .info > * {
-        padding: 2px 0; }
-      #forager .frames .frame .info .line {
-        padding: 2px 0; }
-      #forager .frames .frame .info label {
-        margin-right: 5px; }
-      #forager .frames .frame .buttons {
-        margin-top: 5px;
-        display: -webkit-flex;
-        display: -ms-flexbox;
-        display: flex; }
-        #forager .frames .frame .buttons button {
-          -webkit-flex-grow: 1;
-              -ms-flex-positive: 1;
-                  flex-grow: 1; }
-      #forager .frames .frame ul {
+      -webkit-justify-content: space-between;
+          -ms-flex-pack: justify;
+              justify-content: space-between; }
+      #forager .frames .frame ul, #forager .frames .wizard ul {
         padding: 0;
         overflow-wrap: break-word; }
-      #forager .frames .frame li {
+      #forager .frames .frame li, #forager .frames .wizard li {
         min-height: 1.5em; }
-      #forager .frames .frame .element-attributes {
+      #forager .frames .frame .element-attributes, #forager .frames .wizard .element-attributes {
         padding: 5px;
         margin-top: 5px; }
+    #forager .frames .choices {
+      display: -webkit-flex;
+      display: -ms-flexbox;
+      display: flex;
+      -webkit-flex-wrap: wrap;
+          -ms-flex-wrap: wrap;
+              flex-wrap: wrap; }
+      #forager .frames .choices label {
+        margin-right: 15px;
+        padding: 2px 3px;
+        border-radius: 3px;
+        word-break: break-all; }
+      #forager .frames .choices label.selected {
+        background: #76B85C; }
+    #forager .frames .info > * {
+      padding: 2px 0; }
+    #forager .frames .info .line {
+      padding: 2px 0; }
+    #forager .frames .info label {
+      margin-right: 5px; }
     #forager .frames .buttons {
-      margin: 5px 0; }
+      margin: 5px 0 0;
+      display: -webkit-flex;
+      display: -ms-flexbox;
+      display: flex; }
+      #forager .frames .buttons button {
+        -webkit-flex-grow: 1;
+            -ms-flex-positive: 1;
+                flex-grow: 1; }
     #forager .frames .rules {
       margin: 5px 0; }
       #forager .frames .rules .rule {
@@ -253,57 +269,31 @@ body.foraging {
       #forager .graph svg .current {
         font-style: italic;
         fill: #323033; }
-  #forager .wizard {
-    text-align: left;
-    width: 100%;
-    background: #ffffff;
-    padding: 5px;
+  #forager .progress-bar {
     display: -webkit-flex;
     display: -ms-flexbox;
     display: flex;
-    -webkit-flex-direction: column;
-        -ms-flex-direction: column;
-            flex-direction: column;
-    /*
-     * frames are broken down into two parts, the .info section and
-     * the .buttons section
-     */ }
-    #forager .wizard .info > * {
-      padding: 2px 0; }
-    #forager .wizard .info .line {
-      padding: 2px 0; }
-      #forager .wizard .info .line p {
-        font-weight: bold; }
-    #forager .wizard .info label {
-      margin-right: 5px; }
-    #forager .wizard .buttons {
-      margin-top: 5px;
-      display: -webkit-flex;
-      display: -ms-flexbox;
-      display: flex; }
-      #forager .wizard .buttons button {
-        -webkit-flex-grow: 1;
-            -ms-flex-positive: 1;
-                flex-grow: 1; }
-    #forager .wizard ul {
-      padding: 0;
-      overflow-wrap: break-word; }
-    #forager .wizard li {
-      min-height: 1.5em; }
-    #forager .wizard .choices {
-      display: -webkit-flex;
-      display: -ms-flexbox;
-      display: flex;
-      -webkit-flex-wrap: wrap;
-          -ms-flex-wrap: wrap;
-              flex-wrap: wrap; }
-      #forager .wizard .choices label {
-        margin-right: 15px;
-        padding: 2px 3px;
-        border-radius: 3px;
-        word-break: break-all; }
-      #forager .wizard .choices label.selected {
+    -webkit-flex-flow: row nowrap;
+        -ms-flex-flow: row nowrap;
+            flex-flow: row nowrap;
+    -webkit-justify-content: space-between;
+        -ms-flex-pack: justify;
+            justify-content: space-between; }
+    #forager .progress-bar .marker {
+      height: 10px;
+      background: #F799B5;
+      -webkit-flex-grow: 1;
+          -ms-flex-positive: 1;
+              flex-grow: 1;
+      border: 1px solid #ffffff; }
+      #forager .progress-bar .marker.active {
+        background: #225683; }
+      #forager .progress-bar .marker.complete {
         background: #76B85C; }
+      #forager .progress-bar .marker:first-child {
+        border-radius: 5px 0 0 5px; }
+      #forager .progress-bar .marker:last-child {
+        border-radius: 0 5px 5px 0; }
   #forager .topbar {
     min-height: 31px;
     margin-bottom: 10px;
