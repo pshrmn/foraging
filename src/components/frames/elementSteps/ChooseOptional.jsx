@@ -33,7 +33,7 @@ const ChooseOptional = React.createClass({
     });
   },
   render: function() {
-    const { error } = this.state;
+    const { error, optional } = this.state;
     const { startData } = this.props;
     const { current, selector } = startData
     return (
@@ -43,8 +43,10 @@ const ChooseOptional = React.createClass({
             Is this element optional?
           </h3>
           <label>
+            { optional ? "Yes" : "No" }
+            {" "}
             <input type="checkbox"
-                   checked={this.state.optional}
+                   checked={optional}
                    onChange={this.toggleOptional} />
           </label>
         </div>

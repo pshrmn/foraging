@@ -19,7 +19,7 @@ const Cycle = React.createClass({
         <button onClick={this.previousElement}>
           {"<"}
         </button>
-        {index} / {count-1}
+        {index + 1} / {count}
         <button onClick={this.nextElement}>
           {">"}
         </button>

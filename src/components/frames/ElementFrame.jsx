@@ -56,9 +56,9 @@ const ElementFrame = React.createClass({
     let description = "";
 
     if ( type === "single" ) {
-      description = `element at index ${value}`;
+      description = `captures element at index ${value}`;
     } else if ( type === "all" ) {
-      description = `all elements, stores them as "${value}"`;
+      description = `captures all elements, groups them as "${value}"`;
       
     }
     const renameButton = type === "all" ? <NeutralButton text="Rename" click={this.rename} /> : null;
@@ -66,13 +66,17 @@ const ElementFrame = React.createClass({
       <div className="frame">
         <div className="info">
           <div>
-            Selector: <span className="big bold">{selector}</span>
+            <span className="big bold">{selector}</span>
           </div>
           <div>
-            Captures: {description}
+            {description}
           </div>
           <div>
-            Optional: <input type="checkbox" checked={optional} onChange={this.toggleOptional} />
+            <button onClick={this.toggleOptional}
+                    title="click to toggle optional">
+              Optional
+              <input type="checkbox" checked={optional} onChange={() => {}} />
+            </button>
           </div>
           <RuleList rules={rules}
                     remove={this.removeRule} />

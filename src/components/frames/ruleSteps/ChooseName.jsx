@@ -42,6 +42,7 @@ const ChooseName = React.createClass({
             What should the rule be named?
           </h3>
           <input type="text"
+                 placeholder="e.g., name"
                  value={name}
                  onChange={this.nameHandler} />
         </div>

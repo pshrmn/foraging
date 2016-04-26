@@ -27,7 +27,7 @@ const Preview = React.createClass({
 
     return (
       <div className="preview-holder">
-        <div className="preview-bg" onClick={this.closeHandler} ></div>
+        <div className="preview-bg" onClick={this.closeHandler} title="click to close"></div>
         <div className="preview">
           <div>
             <PosButton text="Log to Console" click={this.logHandler} />

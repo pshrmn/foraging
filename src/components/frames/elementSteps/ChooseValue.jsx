@@ -85,6 +85,7 @@ const ChooseValue = React.createClass({
           What should the elements be named?
         </h3>
         <input type="text"
+               placeholder="e.g., names"
                value={this.state.value}
                onChange={this.valueHandler} />
       </div>

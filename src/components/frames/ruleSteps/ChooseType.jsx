@@ -2,6 +2,8 @@ import React from "react";
 
 import { PosButton, NegButton } from "../../common/Buttons";
 import Cycle from "./Cycle";
+import { abbreviate } from "../../../helpers/text";
+import { integer, float } from "../../../helpers/parse";
 
 const ChooseType = React.createClass({
   getInitialState: function() {
@@ -63,6 +65,25 @@ const ChooseType = React.createClass({
       );
     });
 
+    let preview;
+    switch (type) {
+    case "string":
+      preview = abbreviate(value, 40);
+      break;
+    case "int":
+      preview = integer(value);
+      if ( preview === null ) {
+        preview = "No int detected";
+      }
+      break;
+    case "float":
+      preview = float(value);
+      if ( preview === null ) {
+        preview = "No float detected";
+      }
+      break;
+    }
+
     return (
       <div>
         <div className="info">
@@ -71,7 +92,7 @@ const ChooseType = React.createClass({
           </h3>
           {typeRadios}
           <p>
-            {value}
+            {preview}
           </p>
           <Cycle index={index}
                         count={current.elements.length}
