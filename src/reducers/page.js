@@ -130,6 +130,7 @@ export default function page(state = {}, action) {
 
     // index values of elements that should be removed
     let removeIndex = [elementIndex];
+    let newElementIndex = currentPage.elements[elementIndex].parent || 0;
     var updatedPage = Object.assign({}, currentPage, {
       elements: currentPage.elements.map(s => {
         if ( s === null ) {
@@ -156,7 +157,7 @@ export default function page(state = {}, action) {
         updatedPage,
         ...pages.slice(pageIndex+1)
       ],
-      elementIndex: 0
+      elementIndex: newElementIndex
     });
 
   case types.RENAME_ELEMENT:

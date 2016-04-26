@@ -265,7 +265,6 @@ describe("page reducer", () => {
       });
       const { pages, pageIndex, elementIndex } = newState;
       expect(pages[pageIndex].elements[1]).to.be.null;
-      expect(elementIndex).to.equal(0);
     });
 
     it("doesn't actually remove the 0th element", () => {
@@ -288,7 +287,6 @@ describe("page reducer", () => {
       });
       const { pages, pageIndex, elementIndex } = newerState;
       expect(pages[pageIndex].elements[2]).to.be.null;
-      expect(elementIndex).to.equal(0);
     });
 
     it("also removes child elements", () => {
@@ -301,8 +299,17 @@ describe("page reducer", () => {
       const currentPage = pages[pageIndex];
       expect(currentPage.elements[2]).to.be.null;
       expect(currentPage.elements[3]).to.be.null;
-      expect(elementIndex).to.equal(0);
-    })
+    });
+
+    it("sets the elementIndex to the element's parent's index", () => {
+      // element 3 is a child of element 2
+      state.elementIndex = 3;
+      const newState = page(state, {
+        type: ActionTypes.REMOVE_ELEMENT
+      });
+      const { pages, pageIndex, elementIndex } = newState;
+      expect(elementIndex).to.equal(2);
+    });
   });
 
   describe("RENAME_ELEMENT", () => {
