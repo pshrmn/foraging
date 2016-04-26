@@ -7,6 +7,8 @@ import { openForager, setPages } from "./actions";
 import { chromeLoad } from "./helpers/chrome";
 import makeStore from "./store";
 
+// the foraging class adds a margin to the bottom of the page, which
+// is helpful in preventing the app from overlapping content
 document.body.classList.add("foraging");
 
 /*
@@ -33,13 +35,13 @@ if ( !document.querySelector(".forager-holder") ) {
         , holder
       );
 
-      // a function to re-show the app if it has been closed
-      window.restore = () => {
-        if ( !store.getState().show ) {
-          store.dispatch(openForager());
-        }
-      }
     });
+  // a function to re-show the app if it has been closed
+  window.restore = () => {
+    if ( !store.getState().show ) {
+      store.dispatch(openForager());
+    }
+  }
 } else {
   document.body.classList.add("foraging");
   window.restore();

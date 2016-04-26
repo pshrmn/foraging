@@ -5,26 +5,35 @@ import { preparePages, clean } from "./page"
  * any time that the page is updated, the stored page should be updated
  */
 export const chromeSave = page => {
-  if ( page === undefined ) {
-    return;
-  }
-  const cleaned = clean(page);
-  chrome.storage.local.get("sites", function saveSchemaChrome(storage){
-    const host = window.location.hostname;
-    storage.sites[host] = storage.sites[host] || {};
-    storage.sites[host][cleaned.name] = cleaned;
-    chrome.storage.local.set({"sites": storage.sites});
-  });
+  return new Promise((resolve, reject) => {
+    if ( page === undefined ) {
+      reject('No page to save');
+    }
+    const cleaned = clean(page);
+    chrome.storage.local.get("sites", function saveSchemaChrome(storage){
+      const host = window.location.hostname;
+      storage.sites[host] = storage.sites[host] || {};
+      storage.sites[host][cleaned.name] = cleaned;
+      chrome.storage.local.set({"sites": storage.sites});
+      resolve('Saved');
+    });
+  })
 }
 
 export const chromeRename = (newName, oldName) => {
-  chrome.storage.local.get("sites", function saveSchemaChrome(storage){
-    const host = window.location.hostname;
-    const page = storage.sites[host][oldName];
-    page.name = newName;
-    storage.sites[host][newName] = page;
-    delete storage.sites[host][oldName];
-    chrome.storage.local.set({"sites": storage.sites});
+  return new Promise((resolve, reject) => {
+    chrome.storage.local.get("sites", function saveSchemaChrome(storage){
+      const host = window.location.hostname;
+      const page = storage.sites[host][oldName];
+      if ( page === undefined ) {
+        reject(`No page named ${oldName} found`);
+      }
+      page.name = newName;
+      storage.sites[host][newName] = page;
+      delete storage.sites[host][oldName];
+      chrome.storage.local.set({"sites": storage.sites});
+      resolve(`Renamed "${oldName}" to "${newName}"`);
+    });
   });
 }
 
@@ -32,13 +41,16 @@ export const chromeRename = (newName, oldName) => {
  * remove the page with the given name from storage
  */
 export const chromeDelete = name => {
-  if ( name === undefined ) {
-    return;
-  }
-  chrome.storage.local.get("sites", function saveSchemaChrome(storage){
-    const host = window.location.hostname;
-    delete storage.sites[host][name];
-    chrome.storage.local.set({"sites": storage.sites});
+  return new Promise((resolve, reject) => {
+    if ( name === undefined ) {
+      reject('No page to delete');
+    }
+    chrome.storage.local.get("sites", function saveSchemaChrome(storage){
+      const host = window.location.hostname;
+      delete storage.sites[host][name];
+      chrome.storage.local.set({"sites": storage.sites});
+      resolve(`Deleted page ${name}`);
+    });
   });
 }
 

@@ -17,18 +17,32 @@ export default fullStore => next => action => {
   switch ( action.type ) {
   case ActionTypes.RENAME_PAGE:
     // new name, old name
-    chromeRename(action.name, page.name);
-    fullStore.dispatch(
-      showMessage(`Renamed "${page.name}" to "${action.name}"`, 1000, 1)
-    );
+    chromeRename(action.name, page.name)
+      .then(resp => {
+        fullStore.dispatch(
+          showMessage(resp, 1000, 1)
+        );
+      })
+      .catch(error => {
+        fullStore.dispatch(
+          showMessage(error, 1000, -1)
+        );
+      });
     return next(action);
 
   case ActionTypes.REMOVE_PAGE:
     var nameToRemove = pages[pageIndex].name;
-    chromeDelete(nameToRemove);
-    fullStore.dispatch(
-      showMessage(`Removed Page "${nameToRemove}"`, 1000, 0)
-    );
+    chromeDelete(nameToRemove)
+      .then(resp => {
+        fullStore.dispatch(
+          showMessage(resp, 1000, 1)
+        );
+      })
+      .catch(error => {
+        fullStore.dispatch(
+          showMessage(error, 1000, -1)
+        );
+      });
     return next(action);
 
   case ActionTypes.UPLOAD_PAGE:
@@ -75,10 +89,17 @@ export default fullStore => next => action => {
     const newState = fullStore.getState();
     const { page: newPage } = newState;
     const { pages: newPages, pageIndex: newPageIndex } = newPage;
-    chromeSave(newPages[newPageIndex]);
-    fullStore.dispatch(
-      showMessage('Saved', 1000, 1)
-    );
+    chromeSave(newPages[newPageIndex])
+      .then(resp => {
+        fullStore.dispatch(
+          showMessage(resp, 1000, 1)
+        );
+      })
+      .catch(error => {
+        fullStore.dispatch(
+          showMessage(error, 1000, -1)
+        )
+      })
     return retVal;
 
   default:
