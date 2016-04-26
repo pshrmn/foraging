@@ -36,7 +36,7 @@ const ChooseName = React.createClass({
   render: function() {
     const { name, error } = this.state;
     return (
-      <div>
+      <div className="info-box">
         <div className="info">
           <h3>
             What should the rule be named?

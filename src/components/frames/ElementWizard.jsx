@@ -40,12 +40,10 @@ const ElementWizard = React.createClass({
       ConfirmElement
     ];
     return (
-      <div>
-        <Wizard steps={steps}
-                initialData={initialData}
-                save={this.save}
-                cancel={this.cancel} />
-      </div>
+      <Wizard steps={steps}
+              initialData={initialData}
+              save={this.save}
+              cancel={this.cancel} />
     );
   }
 });

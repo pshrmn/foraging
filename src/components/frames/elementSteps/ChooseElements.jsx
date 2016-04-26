@@ -113,10 +113,9 @@ const ChooseElement = React.createClass({
     const { next, previous } = this.props;
     const { selectors, checked, eleCount, error } = this.state;
     return (
-      <div className="element-form">
+      <div className="info-box">
         <div className="info">
           <h3>Select Relevant Element(s)</h3>
-          { error ? <p>No Element Selected</p> : null }
           <div className="choices">
             {selectors.map((s, i) =>
               <SelectorRadio key={i}

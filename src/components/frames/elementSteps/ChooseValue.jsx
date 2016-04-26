@@ -105,7 +105,7 @@ const ChooseValue = React.createClass({
       break;
     }
     return (
-      <div>
+      <div className="info-box">
         <div className="info">
           {input}
         </div>

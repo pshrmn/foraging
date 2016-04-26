@@ -35,7 +35,7 @@ const ChooseType = React.createClass({
   render: function() {
     const { type } = this.state;
     return (
-      <div>
+      <div className="info-box">
         <div className="info">
           <h3>
             Should the element target a single element or all?

@@ -85,7 +85,7 @@ const ChooseType = React.createClass({
     }
 
     return (
-      <div>
+      <div className="info-box">
         <div className="info">
           <h3>
             What type of value is this?

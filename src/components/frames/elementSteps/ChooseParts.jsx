@@ -92,7 +92,7 @@ const ChooseParts = React.createClass({
       );
     });
     return (
-      <div className="parts-form">
+      <div className="info-box">
         <div className="info">
           <h3>Select Relevant Part(s) of the CSS selector</h3>
           <div className="choices">

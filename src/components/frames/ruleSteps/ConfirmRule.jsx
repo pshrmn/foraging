@@ -24,7 +24,7 @@ const ConfirmElement = React.createClass({
     const { startData } = this.props;
     const { name, attribute, type } = startData;
     return (
-      <div className="confirm-element">
+      <div className="info-box">
         <h2>Confirm Rule</h2>
         <ul>
           <li>Name: {name}</li>

@@ -37,7 +37,7 @@ const ChooseOptional = React.createClass({
     const { startData } = this.props;
     const { current, selector } = startData
     return (
-      <div>
+      <div className="info-box">
         <div className="info">
           <h3>
             Is this element optional?

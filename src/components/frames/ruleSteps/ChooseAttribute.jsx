@@ -71,7 +71,7 @@ const ChooseAttribute = React.createClass({
       );
     });
     return (
-      <div>
+      <div className="info-box">
         <div className="info">
           <h3>
             Which attribute has the value that you want?

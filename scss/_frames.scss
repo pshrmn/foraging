@@ -5,16 +5,16 @@
     padding: 5px;
     width: 400px;
     vertical-align: top;
+    min-height: 200px;
 
     .frame, .wizard {
         background: $white;
         text-align: left;
-        height: 100%;
-        width: 100%;
         padding: 5px;
+        width: 100%;
+        min-height: 200px;
         display: flex;
         flex-direction: column;
-        justify-content: space-between;
 
         ul {
             padding: 0;
@@ -23,11 +23,6 @@
 
         li {
             min-height: 1.5em;
-        }
-
-        .element-attributes {
-            padding: 5px;
-            margin-top: 5px;
         }
     }
 
@@ -47,10 +42,12 @@
         }
     }
 
-    /*
-     * frames are broken down into two parts, the .info section and
-     * the .buttons section
-     */
+    .info-box {
+        display: flex;
+        flex-flow: column nowrap;
+        flex-grow: 2;
+    }
+
     .info {
 
         > * {
@@ -67,7 +64,7 @@
     }
 
     .buttons {
-        margin: 5px 0 0;
+        margin: auto 0 0;
         display: flex;
 
         button {

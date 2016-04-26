@@ -158,33 +158,24 @@ body.foraging {
     padding: 5px;
     width: 400px;
     vertical-align: top;
-    /*
-     * frames are broken down into two parts, the .info section and
-     * the .buttons section
-     */ }
+    min-height: 200px; }
     #forager .frames .frame, #forager .frames .wizard {
       background: #ffffff;
       text-align: left;
-      height: 100%;
-      width: 100%;
       padding: 5px;
+      width: 100%;
+      min-height: 200px;
       display: -webkit-flex;
       display: -ms-flexbox;
       display: flex;
       -webkit-flex-direction: column;
           -ms-flex-direction: column;
-              flex-direction: column;
-      -webkit-justify-content: space-between;
-          -ms-flex-pack: justify;
-              justify-content: space-between; }
+              flex-direction: column; }
       #forager .frames .frame ul, #forager .frames .wizard ul {
         padding: 0;
         overflow-wrap: break-word; }
       #forager .frames .frame li, #forager .frames .wizard li {
         min-height: 1.5em; }
-      #forager .frames .frame .element-attributes, #forager .frames .wizard .element-attributes {
-        padding: 5px;
-        margin-top: 5px; }
     #forager .frames .choices {
       display: -webkit-flex;
       display: -ms-flexbox;
@@ -199,6 +190,16 @@ body.foraging {
         word-break: break-all; }
       #forager .frames .choices label.selected {
         background: #76B85C; }
+    #forager .frames .info-box {
+      display: -webkit-flex;
+      display: -ms-flexbox;
+      display: flex;
+      -webkit-flex-flow: column nowrap;
+          -ms-flex-flow: column nowrap;
+              flex-flow: column nowrap;
+      -webkit-flex-grow: 2;
+          -ms-flex-positive: 2;
+              flex-grow: 2; }
     #forager .frames .info > * {
       padding: 2px 0; }
     #forager .frames .info .line {
@@ -206,7 +207,7 @@ body.foraging {
     #forager .frames .info label {
       margin-right: 5px; }
     #forager .frames .buttons {
-      margin: 5px 0 0;
+      margin: auto 0 0;
       display: -webkit-flex;
       display: -ms-flexbox;
       display: flex; }
@@ -241,7 +242,7 @@ body.foraging {
     margin-right: 3px;
     padding: 5px;
     min-width: 500px;
-    min-height: 150px; }
+    min-height: 200px; }
     #forager .graph svg {
       box-sizing: content-box;
       font-size: 14px;
