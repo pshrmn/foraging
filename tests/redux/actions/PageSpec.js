@@ -92,12 +92,14 @@ describe("page actions", () => {
     });
   });
 
-  describe("renameElement", () => {
+  describe("updateElement", () => {
     it("returns an action with the expected values", () => {
-      const newName = "bill";
-      const action = actions.renameElement(newName);
-      expect(action.type).to.equal(ActionTypes.RENAME_ELEMENT);
-      expect(action.name).to.equal(newName);
+      const index = 2;
+      const newProps = {optional: true};
+      const action = actions.updateElement(index, newProps);
+      expect(action.type).to.equal(ActionTypes.UPDATE_ELEMENT);
+      expect(action.index).to.equal(index);
+      expect(action.newProps).to.deep.equal(newProps);
     });
   });
 
@@ -105,13 +107,6 @@ describe("page actions", () => {
     it("returns an action with the expected values", () => {
       const action = actions.removeElement();
       expect(action.type).to.equal(ActionTypes.REMOVE_ELEMENT);
-    });
-  });
-
-  describe("toggleOptional", () => {
-    it("returns an action with the expected values", () => {
-      const action = actions.removeRule();
-      expect(action.type).to.equal(ActionTypes.REMOVE_RULE);
     });
   });
 

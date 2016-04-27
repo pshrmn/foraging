@@ -81,10 +81,9 @@ export default fullStore => next => action => {
   case ActionTypes.ADD_PAGE:
   case ActionTypes.SAVE_ELEMENT:
   case ActionTypes.REMOVE_ELEMENT:
-  case ActionTypes.RENAME_ELEMENT:
+  case ActionTypes.UPDATE_ELEMENT:
   case ActionTypes.SAVE_RULE:
   case ActionTypes.REMOVE_RULE:
-  case ActionTypes.TOGGLE_OPTIONAL:
     const retVal = next(action);
     const newState = fullStore.getState();
     const { page: newPage } = newState;

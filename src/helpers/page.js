@@ -70,13 +70,13 @@ export const flatten = pageTree => {
 };
 
 /*
- * iterate over the selector elements and add an elements property which is an array
+ * iterate over the selector elements and add a matches property which is an array
  * of all elements in the page that the selector matches
  */
 export const selectElements = elements => {
   elements.forEach(s => {
-    const parentElements = s.parent === null ? [document] : elements[s.parent].elements;
-    s.elements = select(parentElements, s.selector, s.spec, '.forager-holder');
+    const parentElements = s.parent === null ? [document] : elements[s.parent].matches;
+    s.matches = select(parentElements, s.selector, s.spec, '.forager-holder');
   })
 }
 
@@ -140,7 +140,7 @@ export const simpleGrow = elementArray => {
       children: [],
       index: e.index,
       parent: e.parent,
-      elements: e.elements
+      matches: e.matches
     };
   });
   cleanElements.forEach(e => {

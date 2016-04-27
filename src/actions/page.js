@@ -78,11 +78,12 @@ export const saveElement = element => {
   };
 };
 
-// rename the currently selected element selector
-export const renameElement = name => {
+// update the properties of the element at index
+export const updateElement = (index, newProps) => {
   return {
-    type: types.RENAME_ELEMENT,
-    name
+    type: types.UPDATE_ELEMENT,
+    index,
+    newProps
   };
 };
 
@@ -90,13 +91,6 @@ export const renameElement = name => {
 export const removeElement = () => {
   return {
     type: types.REMOVE_ELEMENT
-  };
-};
-
-// toggle whether the current element selector is optional
-export const toggleOptional = () => {
-  return {
-    type: types.TOGGLE_OPTIONAL
   };
 };
 

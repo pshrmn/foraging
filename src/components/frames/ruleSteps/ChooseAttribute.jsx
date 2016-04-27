@@ -55,7 +55,7 @@ const ChooseAttribute = React.createClass({
     const { attribute, index, error } = this.state;
     const { startData } = this.props;
     const { current } = startData;
-    const element = current.elements[index];
+    const element = current.matches[index];
     const attrs = attributes(element).map((a,i) => {
       return (
         <li key={i}>
@@ -78,8 +78,8 @@ const ChooseAttribute = React.createClass({
           </h3>
           {attrs}
           <Cycle index={index}
-                        count={current.elements.length}
-                        setIndex={this.indexHandler} />
+                 count={current.matches.length}
+                 setIndex={this.indexHandler} />
         </div>
         <div className="buttons">
           <NegButton text="Previous" click={this.previousHandler} />

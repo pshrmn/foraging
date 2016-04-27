@@ -105,6 +105,31 @@ export default function page(state = {}, action) {
       elementIndex: currentCount
     });
 
+  case types.UPDATE_ELEMENT:
+    var { pages, pageIndex, elementIndex } = state;
+    var currentPage = pages[pageIndex];
+    var currentSelector = currentPage.elements[elementIndex];
+
+    var { index, newProps } = action;
+
+    return Object.assign({}, state, {
+      pages: [
+        ...pages.slice(0, pageIndex),
+        Object.assign({}, currentPage, {
+          elements: currentPage.elements.map(e => {
+            if ( e === null ) {
+              return null;
+            } else if ( e.index !== index ) {
+              return e;
+            } else {
+              return Object.assign({}, e, newProps);
+            }
+          })
+        }),
+        ...pages.slice(pageIndex+1)
+      ]
+    });
+
   case types.REMOVE_ELEMENT:
     var { pages, pageIndex, elementIndex } = state;
     // elementIndex will be the parent index
@@ -159,54 +184,6 @@ export default function page(state = {}, action) {
       ],
       elementIndex: newElementIndex
     });
-
-  case types.RENAME_ELEMENT:
-    var { pages, pageIndex, elementIndex } = state;
-    var { name } = action;
-
-    // elementIndex will be the parent index
-    var currentPage = pages[pageIndex];
-
-    return Object.assign({}, state, {
-      pages: [
-      ...pages.slice(0, pageIndex),
-        Object.assign({}, currentPage, {
-          elements: currentPage.elements.map(s => {
-            // set the new name for the element matching elementIndex
-            // only affects 'all' type elements
-            if ( s !== null && s.index === elementIndex && s.spec.type === "all" ) {
-              return Object.assign({}, s, {
-                spec: Object.assign({}, s.spec, {
-                  value: name
-                })
-              });
-            }
-            return s;
-          })
-        }),
-        ...pages.slice(pageIndex+1)
-      ]
-    });
-
-    case types.TOGGLE_OPTIONAL:
-      var { pages, pageIndex, elementIndex } = state;
-      var currentPage = pages[pageIndex];
-      return Object.assign({}, state, {
-        pages: [
-          ...pages.slice(0, pageIndex),
-          Object.assign({}, currentPage, {
-            elements: currentPage.elements.map(s => {
-              if ( s !== null && s.index === elementIndex ) {
-                return Object.assign({}, s, {
-                  optional: !s.optional
-                });
-              }
-              return s;
-            })
-          }),
-          ...pages.slice(pageIndex+1)
-        ]
-      });
 
   case types.SAVE_RULE:
     var { pages, pageIndex, elementIndex } = state;

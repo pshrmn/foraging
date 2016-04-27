@@ -67,7 +67,7 @@ const ChooseType = React.createClass({
     const { current, selector } = startData;
     const { type } = this.state;
     const value = type === "single" ? 0 : "name";
-    const elements = select(current.elements, selector, {type, value}, '.forager-holder');
+    const elements = select(current.matches, selector, {type, value}, '.forager-holder');
     highlight(elements, queryCheck);
   },
   componentWillUpdate: function(nextProps, nextState) {
@@ -77,7 +77,7 @@ const ChooseType = React.createClass({
     const { current, selector } = startData;
     const { type } = nextState;
     const value = type === "single" ? 0 : "name";
-    const elements = select(current.elements, selector, {type, value}, '.forager-holder');
+    const elements = select(current.matches, selector, {type, value}, '.forager-holder');
     highlight(elements, queryCheck);
   },
   componentWillUnmount: function() {

@@ -1,8 +1,8 @@
 import React from "react";
 import { connect } from "react-redux";
 
-import { showElementWizard, removeElement, renameElement,
-  showRuleWizard, removeRule, toggleOptional } from "../../actions";
+import { showElementWizard, removeElement, updateElement,
+  showRuleWizard, removeRule } from "../../actions";
 import { PosButton, NegButton, NeutralButton } from "../common/Buttons";
 import { highlight, unhighlight } from "../../helpers/markup";
 import { currentSelector } from "../../constants/CSSClasses";
@@ -26,15 +26,23 @@ const ElementFrame = React.createClass({
     if ( newName === null || newName === "" ) {
       return;
     }
-    const { element, renameElement } = this.props;
-    renameElement(newName);
+    const { element, updateElement } = this.props;
+    updateElement(element.index, {
+      spec: {
+        type: "all",
+        value: newName
+      }
+    });
   },
   removeRule: function(index) {
     const rules = this.props.element.rules;
     this.props.removeRule(index);
   },
   toggleOptional: function(event) {
-    this.props.toggleOptional();
+    const { updateElement, element } = this.props;
+    updateElement(element.index, {
+      optional: !element.optional
+    });
   },
   render: function() {
     const { element } = this.props;
@@ -97,13 +105,13 @@ const ElementFrame = React.createClass({
   componentWillMount: function() {
     unhighlight(currentSelector);
     if ( this.props.element ) {
-      highlight(this.props.element.elements, currentSelector);
+      highlight(this.props.element.matches, currentSelector);
     }
   },
   componentWillReceiveProps: function(nextProps) {
     unhighlight(currentSelector);
     if ( nextProps.element !== undefined && nextProps.element !== this.props.element ) {
-      highlight(nextProps.element.elements, currentSelector);
+      highlight(nextProps.element.matches, currentSelector);
     }
   },
   componentWillUnmount: function() {
@@ -162,9 +170,9 @@ export default connect(
   {
     showElementWizard,
     removeElement,
-    renameElement,
+    updateElement,
     showRuleWizard,
     removeRule,
-    toggleOptional
+    updateElement
   }
 )(ElementFrame);

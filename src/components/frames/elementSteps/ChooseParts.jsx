@@ -58,7 +58,7 @@ const ChooseParts = React.createClass({
     const { startData } = this.props;
     this.setState({
       parts: parts,
-      eleCount: fullSelector === "" ? 0 : count(startData.current.elements, fullSelector),
+      eleCount: fullSelector === "" ? 0 : count(startData.current.matches, fullSelector),
       error: fullSelector === ""
     });
   },
@@ -71,7 +71,7 @@ const ChooseParts = React.createClass({
 
     this.setState({
       parts: parts.map(name => ({name: name, checked: true})),
-      eleCount: count(current.elements, fullSelector),
+      eleCount: count(current.matches, fullSelector),
       error: false
     });
   },
@@ -115,7 +115,7 @@ const ChooseParts = React.createClass({
     unhighlight(queryCheck);
     if ( cssSelector !== "" ) {
       const { startData } = this.props;
-      const elements = select(startData.current.elements, cssSelector, null, '.forager-holder');
+      const elements = select(startData.current.matches, cssSelector, null, '.forager-holder');
       highlight(elements, queryCheck);
     }
   }

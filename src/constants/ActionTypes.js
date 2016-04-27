@@ -14,8 +14,7 @@ export const HIDE_PREVIEW = "HIDE_PREVIEW";
 export const SELECT_ELEMENT = "SELECT_ELEMENT";
 export const SAVE_ELEMENT = "SAVE_ELEMENT";
 export const REMOVE_ELEMENT = "REMOVE_ELEMENT";
-export const RENAME_ELEMENT = "RENAME_ELEMENT";
-export const TOGGLE_OPTIONAL = "TOGGLE_OPTIONAL";
+export const UPDATE_ELEMENT = "UPDATE_ELEMENT";
 export const SAVE_RULE = "SAVE_RULE";
 export const REMOVE_RULE = "REMOVE_RULE";
 

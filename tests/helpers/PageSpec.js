@@ -124,7 +124,7 @@ describe("page", () => {
       const elements = examplePage.elements;
       selectElements(elements);
       elements.forEach(e => {
-        expect(e.elements).to.be.instanceof(Array);
+        expect(e.matches).to.be.instanceof(Array);
       })
     });
   });

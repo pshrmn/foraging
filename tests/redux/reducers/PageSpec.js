@@ -257,6 +257,44 @@ describe("page reducer", () => {
     });
   });
 
+  describe("UPDATE_ELEMENT", () => {
+    it("updates the properties of the element at index", () => {
+      const newProps = {
+        spec: {
+          type: 'all',
+          value: 'new name'
+        },
+        optional: true
+      };
+      // index 1 is an all element, so it has a name to update
+      const index = 1;
+      state.elementIndex = index;
+
+      // verify values prior to update
+      const {
+        pages: initPages,
+        pageIndex: initPageIndex
+      } = state;
+      const initElement = initPages[initPageIndex].elements[index];
+      expect(initElement.spec.value).to.equal('links');
+      expect(initElement.optional).to.be.false;
+
+      const newState = page(state, {
+        type: ActionTypes.UPDATE_ELEMENT,
+        index,
+        newProps
+      });
+
+      const {
+        pages: newPages,
+        pageIndex: newPageIndex
+      } = newState;
+      const current = newPages[newPageIndex].elements[index];
+      expect(current.spec.value).to.equal(newProps.spec.value);
+      expect(current.optional).to.equal(newProps.optional);
+    });
+  });
+
   describe("REMOVE_ELEMENT", () => {
     it("sets any \"removed\" elements to be null", () => {
       state.elementIndex = 1;
@@ -309,32 +347,6 @@ describe("page reducer", () => {
       });
       const { pages, pageIndex, elementIndex } = newState;
       expect(elementIndex).to.equal(2);
-    });
-  });
-
-  describe("RENAME_ELEMENT", () => {
-    it("renames the current element", () => {
-      state.elementIndex = 1;
-      const newName = "test name";
-      const newState = page(state, {
-        type: ActionTypes.RENAME_ELEMENT,
-        name: newName
-      });
-      const { pages, pageIndex, elementIndex } = newState;
-      expect(pages[pageIndex].elements[elementIndex].spec.value).to.equal(newName);
-    });
-  });
-
-  describe("TOGGLE_OPTIONAL", () => {
-    it("toggles the optional value of the currently selected element", () => {
-      state.elementIndex = 1;
-      const { pages: oldPages, pageIndex: oldPageIndex, elementIndex: oldElementIndex } = state;
-      expect(oldPages[oldPageIndex].elements[oldElementIndex].optional).to.be.false;
-      const newState = page(state, {
-        type: ActionTypes.TOGGLE_OPTIONAL
-      });
-      const { pages, pageIndex, elementIndex } = newState;
-      expect(pages[pageIndex].elements[elementIndex].optional).to.be.true;
     });
   });
 

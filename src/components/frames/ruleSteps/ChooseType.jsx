@@ -48,7 +48,7 @@ const ChooseType = React.createClass({
     const { type, index } = this.state;
     const { startData } = this.props;
     const { current, attribute } = startData;
-    const element = current.elements[index];
+    const element = current.matches[index];
     const value = attribute === "text" ?
       element.innerText : element.getAttribute(attribute);
 
@@ -95,8 +95,8 @@ const ChooseType = React.createClass({
             {preview}
           </p>
           <Cycle index={index}
-                        count={current.elements.length}
-                        setIndex={this.indexHandler} />
+                 count={current.matches.length}
+                 setIndex={this.indexHandler} />
         </div>
         <div className="buttons">
           <NegButton text="Previous" click={this.previousHandler} />

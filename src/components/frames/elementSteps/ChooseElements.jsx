@@ -65,7 +65,7 @@ const ChooseElement = React.createClass({
     const { current } = startData;
     // when current's elements are select elements, automatically add "option"
     // to the selectors array since it cannot be selected by the user
-    if ( allSelect(current.elements) ) {
+    if ( allSelect(current.matches) ) {
       selectors.push(["option"]);
     }
     return {
@@ -85,7 +85,7 @@ const ChooseElement = React.createClass({
     const { current } = startData;
     this.setState({
       checked: i,
-      eleCount: count(current.elements, selector),
+      eleCount: count(current.matches, selector),
       error: false
     });
   },
@@ -140,11 +140,11 @@ const ChooseElement = React.createClass({
    */
   componentWillMount: function() {
     const { startData } = this.props;
-    this.unbind = PageCoordinator.call(this, startData.current.elements);
+    this.unbind = PageCoordinator.call(this, startData.current.matches);
   },
   componentWillReceiveNewProps: function(nextProps) {
     const { startData } = nextProps;
-    this.unbind = PageCoordinator.call(this, startData.current.elements);
+    this.unbind = PageCoordinator.call(this, startData.current.matches);
   },
   /*
    * when a selector possibility is chosen, add a class to all matching elements
@@ -157,7 +157,7 @@ const ChooseElement = React.createClass({
     if ( clickedSelector !== undefined ) {
       const fullSelector = clickedSelector.join("");
       const { startData } = nextProps;
-      const elements = select(startData.current.elements, fullSelector, null, '.forager-holder');
+      const elements = select(startData.current.matches, fullSelector, null, '.forager-holder');
       highlight(elements, queryCheck);
     }
   },

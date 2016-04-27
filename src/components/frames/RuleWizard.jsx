@@ -43,12 +43,12 @@ const RuleWizard = React.createClass({
   },
   componentWillMount: function() {
     const { current } = this.props;
-    highlight(current.elements, currentSelector);
+    highlight(current.matches, currentSelector);
   },
   componentWillUpdate: function(nextProps, nextState) {
     unhighlight(currentSelector);
     const { current } = this.props;
-    highlight(current.elements, currentSelector);
+    highlight(current.matches, currentSelector);
   },
   componentWillUnmount: function() {
     unhighlight(currentSelector);

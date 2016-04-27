@@ -69,7 +69,7 @@ const AllValueStep = React.createClass({
     const { startData } = this.props;
     const { current, selector } = startData;
     const { value } = this.state;
-    const elements = select(current.elements, selector, {type: "all", value}, '.forager-holder');
+    const elements = select(current.matches, selector, {type: "all", value}, '.forager-holder');
     highlight(elements, queryCheck);
   },
   componentWillUpdate: function(nextProps, nextState) {
@@ -78,7 +78,7 @@ const AllValueStep = React.createClass({
     const { startData } = nextProps;
     const { current, selector } = startData;
     const { value } = nextState;
-    const elements = select(current.elements, selector, {type: "all", value}, '.forager-holder');
+    const elements = select(current.matches, selector, {type: "all", value}, '.forager-holder');
     highlight(elements, queryCheck);
   },
   componentWillUnmount: function() {

@@ -90,7 +90,7 @@ const Node = React.createClass({
     this.props.select(this.props.index);
   },
   handleMouseover: function(event) {
-    highlight(this.props.elements, savedPreview);
+    highlight(this.props.matches, savedPreview);
   },
   handleMouseout: function(event) {
     unhighlight(savedPreview);
