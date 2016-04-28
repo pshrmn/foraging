@@ -11,7 +11,6 @@ const ConfirmElement = React.createClass({
     const { startData, next: save } = this.props;
     const { current, selector, type, value, optional } = startData;
     const ele = createElement(selector, type, value, optional);
-    ele.matches = select(current.matches, ele.selector, ele.spec, '.forager-holder');
     save(ele);
   },
   previousHandler: function(event) {

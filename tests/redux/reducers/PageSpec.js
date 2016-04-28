@@ -207,6 +207,26 @@ describe("page reducer", () => {
     });
   });
 
+  describe("SET_MATCHES", () => {
+    it("merges the matches arrays with the corresponding elements", () => {
+      const matches = {
+        1: ['foo', 'bar'],
+        2: ['baz', 'quux']
+      }
+      const newState = page(state, {
+        type: ActionTypes.SET_MATCHES,
+        matches
+      });
+      const { pages, pageIndex } = newState;
+      pages[pageIndex].elements.forEach(element => {
+        const { index } = element;
+        if ( matches[index] !== undefined ) {
+          expect(element.matches).to.deep.equal(matches[index]);
+        }
+      });
+    });
+  });
+
   describe("SELECT_ELEMENT", () => {
     it("sets the elementIndex", () => {
       const index = 1;

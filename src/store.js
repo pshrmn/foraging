@@ -3,6 +3,7 @@ import { messages, messagesMiddleware } from "expiring-redux-messages";
 
 import reducers from './reducers';
 import chromeMiddleware from "./middleware/chromeMiddleware";
+import selectMiddleware from "./middleware/selectMiddleware";
 
 const reducer = combineReducers(Object.assign({}, reducers, {
   messages
@@ -30,6 +31,7 @@ export default function makeStore() {
     reducer,
     initialState,
     applyMiddleware(
+      selectMiddleware,
       chromeMiddleware,
       messagesMiddleware
     )

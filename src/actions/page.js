@@ -58,6 +58,16 @@ export const hidePreview = () => {
   };
 };
 
+// matches is an object where the keys are
+// element indices and the values are elements
+// that are matched by the element selector with
+// the same index
+export const setMatches = matches => {
+  return {
+    type: types.SET_MATCHES,
+    matches
+  };
+};
 
 /*
  * ELEMENT/RULE ACTIONS

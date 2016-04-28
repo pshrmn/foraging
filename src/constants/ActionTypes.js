@@ -8,6 +8,9 @@ export const UPLOAD_PAGE = "UPLOAD_PAGE";
 export const SYNC_PAGES = "SYNC_PAGES";
 export const SET_PAGES = "SET_PAGES";
 
+// set the matches property of multiple elements
+export const SET_MATCHES = "SET_MATCHES";
+
 export const SHOW_PREVIEW = "SHOW_PREVIEW";
 export const HIDE_PREVIEW = "HIDE_PREVIEW";
 

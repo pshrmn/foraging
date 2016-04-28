@@ -8,7 +8,7 @@ import { queryCheck } from "../../../constants/CSSClasses";
 const AllValueStep = React.createClass({
   getInitialState: function() {
     const { startData, endData = {} } = this.props;
-    let value = 0;
+    let value = "";
     // if there is an existing value, only use it if the types match
     if ( startData.type === endData.type && endData.value !== undefined ) {
       value = endData.value;

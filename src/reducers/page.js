@@ -70,6 +70,30 @@ export default function page(state = {}, action) {
         ...pages.slice(pageIndex+1)]
     });
 
+  case types.SET_MATCHES:
+    var { pages, pageIndex } = state;
+    var { matches } = action;
+    return Object.assign({}, state, {
+      pages: [
+        ...pages.slice(0, pageIndex),
+        Object.assign({}, pages[pageIndex], {
+          elements: pages[pageIndex].elements.map(element => {
+            if ( element === null ) {
+              return null;
+            }
+            const eleMatches = matches[element.index];
+            if ( eleMatches !== undefined ) {
+              return Object.assign({}, element, {
+                matches: eleMatches
+              });
+            } else {
+              return element;
+            }
+          })
+        }),
+        ...pages.slice(pageIndex+1)]
+    });    
+
   case types.SELECT_ELEMENT:
     var { pages, pageIndex, elementIndex } = state;
     var selectorCount = pages[pageIndex].elements.length;

@@ -9,7 +9,8 @@ export const createElement = (selector, type = "single", value = 0, optional = f
     },
     childIndices: [],
     rules: [],
-    optional: optional
+    optional: optional,
+    matches: []
   };
 };
 
@@ -27,7 +28,7 @@ export const preparePages = pages => {
         elements: flatten(p.element)
       };
     });
-  preppedPages.forEach(p => selectElements(p.elements));
+  //preppedPages.forEach(p => selectElements(p.elements));
   return preppedPages;
 };
 
@@ -68,17 +69,6 @@ export const flatten = pageTree => {
   }
   return breadth;
 };
-
-/*
- * iterate over the selector elements and add a matches property which is an array
- * of all elements in the page that the selector matches
- */
-export const selectElements = elements => {
-  elements.forEach(s => {
-    const parentElements = s.parent === null ? [document] : elements[s.parent].matches;
-    s.matches = select(parentElements, s.selector, s.spec, '.forager-holder');
-  })
-}
 
 /* 
  * return a version of the page with elements as a tree for saving/uploading

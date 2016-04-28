@@ -74,6 +74,15 @@ describe("page actions", () => {
     });
   });
 
+  describe("setMatches", () => {
+    it("returns an action with the expected values", () => {
+      const matches = {1: [1,2,3], 0: [4,5,6]}
+      const action = actions.setMatches(matches);
+      expect(action.type).to.equal(ActionTypes.SET_MATCHES);
+      expect(action.matches).to.deep.equal(matches);
+    });
+  });
+
   describe("selectElement", () => {
     it("returns an action with the expected values", () => {
       const index = 2;

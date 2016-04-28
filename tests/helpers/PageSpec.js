@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { jsdom } from "jsdom";
 
-import { createElement, flatten, selectElements, clean,
+import { createElement, flatten, clean,
   fullGrow, simpleGrow } from "../../src/helpers/page";
 
 describe("page", () => {
@@ -48,6 +48,7 @@ describe("page", () => {
       expect(links.spec.value).to.equal(0);
       expect(links.childIndices).to.be.instanceof(Array);
       expect(links.optional).to.be.false;
+      expect(links.matches).to.be.instanceof(Array);
     });
 
     it("sets alternate values when provided", () => {
@@ -90,41 +91,6 @@ describe("page", () => {
         expect(a.index).to.equal(i);
         expect(a.parent).to.be.defined;
         expect(a.childIndices).to.be.instanceof(Array);
-      })
-    });
-  });
-
-  describe("selectElements", () => {
-    beforeEach(() => {
-      const doc = jsdom(`<!doctype html>
-        <html>
-        <body>
-          <div>
-            <p>One</p>
-            <p>Two</p>
-          </div>
-          <div></div>
-          <div>
-            <p>Three</p>
-            <p class='no-select'>Ignore</p>
-          </div>
-        </body>
-      </html>`);
-      const win = doc.defaultView;
-      global.document = doc;
-      global.window = win;
-    });
-
-    afterEach(() => {
-      delete global.document;
-      delete global.window;
-    });
-
-    it("adds an elements array to each selector element", () => {
-      const elements = examplePage.elements;
-      selectElements(elements);
-      elements.forEach(e => {
-        expect(e.matches).to.be.instanceof(Array);
       })
     });
   });
