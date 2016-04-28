@@ -40,6 +40,20 @@
 
         background: $dark-blue !important;
 
+        color: $button-gray !important;
+        border-color: $button-gray !important;
+        background: $dark-blue !important;
+
+        &:hover {
+            color: $dark-blue !important;
+            background: $button-gray !important;
+
+            &:disabled {
+                color: $button-gray !important;
+                background: $dark-blue !important;                
+            }
+        }
+
         &.pos, &.pos:active, &.pos:focus {
             color: $green !important;
             border-color: $green !important;

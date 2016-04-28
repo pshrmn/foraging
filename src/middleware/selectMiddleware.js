@@ -9,7 +9,8 @@ export default store => next => action => {
   const selectActions = [
     types.SELECT_PAGE,
     types.SAVE_ELEMENT,
-    types.UPDATE_ELEMENT
+    types.UPDATE_ELEMENT,
+    types.REFRESH_MATCHES
   ];
   if ( !selectActions.includes(action.type) ) {
     return next(action);
@@ -20,6 +21,7 @@ export default store => next => action => {
   case types.SELECT_PAGE:
   case types.SAVE_ELEMENT:
   case types.UPDATE_ELEMENT:
+  case types.REFRESH_MATCHES:
     var result = next(action);
     var page = store.getState().page;
     var { pages, pageIndex } = page;

@@ -69,6 +69,13 @@ export const setMatches = matches => {
   };
 };
 
+// trigger the matches to be re-selected
+export const refreshMatches = matches => {
+  return {
+    type: types.REFRESH_MATCHES
+  };
+};
+
 /*
  * ELEMENT/RULE ACTIONS
  */

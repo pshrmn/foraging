@@ -13,6 +13,7 @@ import {
   selectPage,
   closeForager,
   syncPages,
+  refreshMatches,
   renamePage,
   removePage,
   uploadPage,
@@ -36,7 +37,7 @@ const Controls = React.createClass({
       body = Object.assign({}, body, {
         index: 0,
         parent: null,
-        elements: [document.body]
+        matches: [document.body]
       });
 
       addPage({
@@ -59,6 +60,9 @@ const Controls = React.createClass({
   closeHandler: function(event){
     document.body.classList.remove("foraging");
     this.props.closeForager();
+  },
+  refreshHandler: function(event) {
+    this.props.refreshMatches();
   },
   pageSelect: function() {
     const { pages, currentIndex } = this.props;
@@ -117,6 +121,10 @@ const Controls = React.createClass({
             {this.pageSelect()}
             <PosButton text="Add Page"
                        click={this.addHandler} />
+            <NeutralButton text="Refresh"
+                           title="Refresh the list of matched elements"
+                           click={this.refreshHandler}
+                           disabled={!active} />
             <PosButton text="Preview"
                        click={this.previewHandler} 
                        disabled={!active} />
@@ -133,7 +141,7 @@ const Controls = React.createClass({
                        click={this.syncHandler} />
           </div>
           <div className="app-controls">
-            <NeutralButton text={String.fromCharCode(215)}
+            <NegButton text={String.fromCharCode(215)}
                            classes={["transparent"]}
                            click={this.closeHandler} />
           </div>
@@ -159,6 +167,7 @@ export default connect(
     closeForager,
     showMessage,
     syncPages,
+    refreshMatches,
     renamePage,
     removePage,
     uploadPage,

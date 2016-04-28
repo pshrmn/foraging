@@ -83,6 +83,13 @@ describe("page actions", () => {
     });
   });
 
+  describe("refreshMatches", () => {
+    it("returns an action with the expected values", () => {
+      const action = actions.refreshMatches();
+      expect(action.type).to.equal(ActionTypes.REFRESH_MATCHES);
+    });
+  });
+
   describe("selectElement", () => {
     it("returns an action with the expected values", () => {
       const index = 2;

@@ -6,27 +6,30 @@ import Frames from "./frames/Frames";
 import Tree from "./Tree";
 import Preview from "./Preview";
 
-const Forager = React.createClass({
-  render: function() {
-    // don't render anything when show=False
-    return !this.props.show ? null :
-      (
-        <div id="forager">
-          <Controls />
+function Forager(props) {
+  return !props.show ? null :
+    (
+      <div id="forager">
+        <Controls />
+        { props.active ? (
           <div className="workspace">
             <div className="graph">
               <Tree />
             </div>
             <Frames />
           </div>
-          <Preview />
-        </div>
-      );
-  }
-});
+          ) : (
+            null
+          )
+        }
+        <Preview />
+      </div>
+    );  
+}
 
 export default connect(
   state => ({
-    show: state.show
+    show: state.show,
+    active: state.page.pageIndex !== 0
   })
 )(Forager);

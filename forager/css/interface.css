@@ -12,7 +12,7 @@ body.foraging {
   position: fixed;
   left: 0;
   bottom: 0;
-  min-width: 700px;
+  min-width: 1000px;
   min-height: 30px;
   background: #222233;
   font-size: 16px;
@@ -246,7 +246,8 @@ body.foraging {
     #forager .graph svg {
       box-sizing: content-box;
       font-size: 14px;
-      background: #ffffff; }
+      background: #ffffff;
+      display: block; }
       #forager .graph svg .link {
         fill: none;
         stroke: #323033; }
@@ -317,7 +318,16 @@ body.foraging {
       border-width: 1px;
       border-style: solid;
       box-shadow: none !important;
+      background: #222233 !important;
+      color: #CED1DE !important;
+      border-color: #CED1DE !important;
       background: #222233 !important; }
+      #forager .topbar button:hover {
+        color: #222233 !important;
+        background: #CED1DE !important; }
+        #forager .topbar button:hover:disabled {
+          color: #CED1DE !important;
+          background: #222233 !important; }
       #forager .topbar button.pos, #forager .topbar button.pos:active, #forager .topbar button.pos:focus {
         color: #76B85C !important;
         border-color: #76B85C !important;

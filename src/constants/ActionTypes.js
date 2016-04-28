@@ -10,6 +10,7 @@ export const SET_PAGES = "SET_PAGES";
 
 // set the matches property of multiple elements
 export const SET_MATCHES = "SET_MATCHES";
+export const REFRESH_MATCHES = "REFRESH_MATCHES";
 
 export const SHOW_PREVIEW = "SHOW_PREVIEW";
 export const HIDE_PREVIEW = "HIDE_PREVIEW";
