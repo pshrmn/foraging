@@ -8,7 +8,14 @@ import { integer, float } from "../../../helpers/parse";
 const ChooseType = React.createClass({
   getInitialState: function() {
     const { startData, endData = {} } = this.props;
-    const { type = "string" } = endData;
+    
+    let type = "string";
+    if ( endData.type ) {
+      type = endData.type;
+    } else if ( startData.type ) {
+      type = startData.type;
+    }
+
     let index = 0;
     if ( endData.index !== undefined ) {
       index = endData.index;
@@ -16,8 +23,8 @@ const ChooseType = React.createClass({
       index = startData.index;
     }
     return {
-      type: "string",
-      index: index
+      type,
+      index
     };
   },
   nextHandler: function(event) {

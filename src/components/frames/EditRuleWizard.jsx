@@ -3,10 +3,10 @@ import { connect } from "react-redux";
 
 import Wizard from "simple-wizard-component";
 
-import ChooseAttribute from "./editRuleSteps/ChooseAttribute";
-import ChooseType from "./editRuleSteps/ChooseType";
-import ChooseName from "./editRuleSteps/ChooseName";
-import ConfirmRule from "./editRuleSteps/ConfirmRule";
+import ChooseAttribute from "./ruleSteps/ChooseAttribute";
+import ChooseType from "./ruleSteps/ChooseType";
+import ChooseName from "./ruleSteps/ChooseName";
+import ConfirmUpdateRule from "./ruleSteps/ConfirmUpdateRule";
 
 import { updateRule, showElementFrame } from "../../actions";
 import { highlight, unhighlight} from "../../helpers/markup";
@@ -43,7 +43,7 @@ const EditRuleWizard = React.createClass({
       ChooseAttribute,
       ChooseType,
       ChooseName,
-      ConfirmRule
+      ConfirmUpdateRule
     ];
     return (
       <Wizard steps={steps}

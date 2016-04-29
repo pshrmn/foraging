@@ -4,11 +4,17 @@ import { PosButton, NegButton } from "../../common/Buttons";
 
 const ChooseName = React.createClass({
   getInitialState: function() {
-    const { endData = {} } = this.props;
-    const { name = "" } = endData;
+    const { startData, endData = {} } = this.props;
+    
+    let name = "";
+    if ( endData.name ) {
+      name = endData.name;
+    } else if ( startData.name ) {
+      name = startData.name;
+    }
 
     return {
-      name: name,
+      name,
       error: name === ""
     };
   },

@@ -8,7 +8,14 @@ import Cycle from "./Cycle";
 const ChooseAttribute = React.createClass({
   getInitialState: function() {
     const { startData, endData = {} } = this.props;
-    const { attribute = "" } = endData;
+  
+    let attribute = "";
+    if ( endData.attribute ) {
+      attribute = endData.attribute;
+    } else if ( startData.attr ) {
+      attribute = startData.attr;
+    }
+
     let index = 0;
     if ( endData.index !== undefined ) {
       index = endData.index;
@@ -16,8 +23,8 @@ const ChooseAttribute = React.createClass({
       index = startData.index;
     }
     return {
-      attribute: attribute,
-      index: index,
+      attribute,
+      index,
       error: attribute === ""
     };
   },
