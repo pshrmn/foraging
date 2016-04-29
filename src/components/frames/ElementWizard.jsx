@@ -11,6 +11,8 @@ import ChooseOptional from "./elementSteps/ChooseOptional";
 import ConfirmElement from "./elementSteps/ConfirmElement";
 
 import { saveElement, showElementFrame } from "../../actions";
+import { highlight, unhighlight} from "../../helpers/markup";
+import { currentSelector } from "../../constants/CSSClasses";
 
 /*
  * ChooseElements -> ChooseParts -> ChooseType ->
@@ -45,6 +47,18 @@ const ElementWizard = React.createClass({
               save={this.save}
               cancel={this.cancel} />
     );
+  },
+  componentWillMount: function() {
+    const { current } = this.props;
+    highlight(current.matches, currentSelector);
+  },
+  componentWillUpdate: function(nextProps, nextState) {
+    unhighlight(currentSelector);
+    const { current } = this.props;
+    highlight(current.matches, currentSelector);
+  },
+  componentWillUnmount: function() {
+    unhighlight(currentSelector);
   }
 });
 

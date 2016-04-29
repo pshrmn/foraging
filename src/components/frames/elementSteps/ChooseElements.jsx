@@ -7,44 +7,6 @@ import { stripEvents } from "../../../helpers/attributes";
 import { highlight, unhighlight, iHighlight, iUnhighlight } from "../../../helpers/markup";
 import { queryCheck, potentialSelector, hoverClass } from "../../../constants/CSSClasses";
 
-function PageCoordinator(parents) {
-  
-  const mouseover = event => {
-    event.target.classList.add(hoverClass);
-  }
-
-  const mouseout = event => {
-    event.target.classList.remove(hoverClass);
-  }
-
-  // requires a component to be bound to this in order to call setState
-  const click = event => {
-    // preventDefault & stopPropagation to deal with
-    // any real events from the page
-    event.preventDefault();
-    event.stopPropagation();
-    const selectors = Array.from(event.path)
-      .filter(ele => ele.classList && ele.classList.contains(potentialSelector))
-      .reverse()
-      .map(ele => parts(ele));
-    this.setState({
-      // maintain the wildcard selector
-      selectors: [["*"]].concat(selectors),
-      checked: undefined,
-      error: true
-    });
-  }
-
-  // get all child elements of the parents
-  const elements = select(parents, null, null, '.forager-holder').map(ele => stripEvents(ele));
-  iHighlight(elements, potentialSelector, mouseover, mouseout, click);
-
-  return function unbind() {
-    unhighlight(queryCheck);
-    iUnhighlight(potentialSelector, mouseover, mouseout, click);
-  }
-}
-
 /*
  * This step is used select an element within the page. An elements props is
  * passed to the frame, which is used when the frame is mounted/updated to attach
@@ -78,6 +40,33 @@ const ChooseElement = React.createClass({
       eleCount: 0,
       error: true
     };
+  },
+  events: {
+    mouseover(event) {
+      event.target.classList.add(hoverClass);
+    },
+
+    mouseout(event) {
+      event.target.classList.remove(hoverClass);
+    },
+
+    // requires a component to be bound to this in order to call setState
+    click(event) {
+      // preventDefault & stopPropagation to deal with
+      // any real events from the page
+      event.preventDefault();
+      event.stopPropagation();
+      const selectors = Array.from(event.path)
+        .filter(ele => ele.classList && ele.classList.contains(potentialSelector))
+        .reverse()
+        .map(ele => parts(ele));
+      this.setState({
+        // maintain the wildcard selector
+        selectors: [["*"]].concat(selectors),
+        checked: undefined,
+        error: true
+      });
+    }
   },
   setRadio: function(i) {
     const selector = this.state.selectors[i].join("");
@@ -140,11 +129,31 @@ const ChooseElement = React.createClass({
    */
   componentWillMount: function() {
     const { startData } = this.props;
-    this.unbind = PageCoordinator.call(this, startData.current.matches);
+    // get all child elements of the parents
+    const elements = select(startData.current.matches, null, null, '.forager-holder')
+      .map(ele => stripEvents(ele));
+    this.events.boundClick = this.events.click.bind(this);
+    iHighlight(
+      elements,
+      potentialSelector,
+      this.events.mouseover,
+      this.events.mouseout,
+      this.events.boundClick
+    );
   },
   componentWillReceiveNewProps: function(nextProps) {
     const { startData } = nextProps;
-    this.unbind = PageCoordinator.call(this, startData.current.matches);
+    // get all child elements of the parents
+    const elements = select(startData.current.matches, null, null, '.forager-holder')
+      .map(ele => stripEvents(ele));
+    this.events.boundClick = this.events.click.bind(this);
+    iHighlight(
+      elements,
+      potentialSelector,
+      this.events.mouseover,
+      this.events.mouseout,
+      this.events.boundClick
+    );
   },
   /*
    * when a selector possibility is chosen, add a class to all matching elements
@@ -165,7 +174,13 @@ const ChooseElement = React.createClass({
    * remove any classes and event listeners from the page when the frame is unmounted
    */
   componentWillUnmount: function() {
-    this.unbind();
+    unhighlight(queryCheck);
+    iUnhighlight(
+      potentialSelector,
+      this.events.mouseover,
+      this.events.mouseout,
+      this.events.boundClick
+    );
   }
 });
 

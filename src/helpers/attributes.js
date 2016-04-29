@@ -61,6 +61,7 @@ export const stripEvents = element => {
         element.removeAttribute(name);
       }
     });
+    // this breaks the page (so that Forager events can dispatch uninterrupted)
     const clone = element.cloneNode(true);
     element.parentNode.replaceChild(clone, element);
     return clone;
