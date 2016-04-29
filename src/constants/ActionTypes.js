@@ -21,6 +21,7 @@ export const REMOVE_ELEMENT = "REMOVE_ELEMENT";
 export const UPDATE_ELEMENT = "UPDATE_ELEMENT";
 export const SAVE_RULE = "SAVE_RULE";
 export const REMOVE_RULE = "REMOVE_RULE";
+export const UPDATE_RULE = "UPDATE_RULE";
 
 /* frame */
 // the app is made up of frames,
@@ -28,9 +29,7 @@ export const REMOVE_RULE = "REMOVE_RULE";
 export const SHOW_ELEMENT_FRAME = "SHOW_ELEMENT_FRAME";
 export const SHOW_ELEMENT_WIZARD = "SHOW_ELEMENT_WIZARD";
 export const SHOW_RULE_WIZARD = "SHOW_RULE_WIZARD";
-export const SHOW_HTML_FRAME = "SHOW_HTML_FRAME";
-export const SHOW_PARTS_FRAME = "SHOW_PARTS_FRAME";
-export const SHOW_SPEC_FRAME = "SHOW_SPEC_FRAME";
+export const SHOW_EDIT_RULE_WIZARD = "SHOW_EDIT_RULE_WIZARD";
 
 /* general */
 // open and close the app

@@ -146,4 +146,15 @@ describe("page actions", () => {
     });
   });
 
+  describe("updateRule", () => {
+    it("returns an action that replaces the rule with the given index", () => {
+      const index = 0;
+      const rule = {name: "foo", attr: "text", type: "string"};
+      const action = actions.updateRule(index, rule);
+      expect(action.type).to.equal(ActionTypes.UPDATE_RULE);
+      expect(action.index).to.equal(index);
+      expect(action.rule).to.deep.equal(rule);
+    });
+  });
+
 });

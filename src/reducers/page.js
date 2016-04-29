@@ -255,6 +255,30 @@ export default function page(state = {}, action) {
       ]
     });  
 
+  case types.UPDATE_RULE:
+    var { pages, pageIndex, elementIndex } = state;
+    var { index, rule } = action;
+
+    var currentPage = pages[pageIndex];
+
+    return Object.assign({}, state, {
+      pages: [
+      ...pages.slice(0, pageIndex),
+        Object.assign({}, currentPage, {
+          elements: currentPage.elements.map(s => {
+            // set the new name for the element matching elementIndex
+            if ( s !== null && s.index === elementIndex ) {
+              s.rules = s.rules.map((r,i) => {
+                return i === index ? rule : r
+              });
+            }
+            return s;
+          })
+        }),
+        ...pages.slice(pageIndex+1)
+      ]
+    });
+
   case types.CLOSE_FORAGER:
     return Object.assign({}, state, {
       pageIndex: 0,

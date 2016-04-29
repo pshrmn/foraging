@@ -77,4 +77,20 @@ describe("frame reducer", () => {
       expect(newState.name).to.equal("rule-wizard");
     });
   });
+
+  describe("SHOW_EDIT_RULE_WIZARD", () => {
+    it("shows the rule frame", () => {
+      const state = {
+        name: "element"
+      };
+      const index = 2;
+      const action = {
+        type: ActionTypes.SHOW_EDIT_RULE_WIZARD,
+        index
+      };
+      const newState = frame(state, action);
+      expect(newState.name).to.equal("edit-rule-wizard");
+      expect(newState.index).to.equal(index);
+    });
+  });
 });

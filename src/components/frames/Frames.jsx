@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 import ElementFrame from "./ElementFrame";
 import RuleWizard from "./RuleWizard";
 import ElementWizard from "./ElementWizard";
+import EditRuleWizard from "./EditRuleWizard";
 
 /*
  * Frames
@@ -26,6 +27,9 @@ import ElementWizard from "./ElementWizard";
     break;
   case "rule-wizard":
     frameElement = <RuleWizard />;
+    break;
+  case "edit-rule-wizard":
+    frameElement = <EditRuleWizard />;
     break;
   }
   return (

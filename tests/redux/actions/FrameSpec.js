@@ -24,4 +24,13 @@ describe("frame actions", () => {
       expect(action.type).to.equal(ActionTypes.SHOW_RULE_WIZARD);
     });
   });
+
+  describe("showEditRuleWizard", () => {
+    it("returns an action to show the rule frame", () => {
+      const index = 1;
+      const action = actions.showEditRuleWizard(index);
+      expect(action.type).to.equal(ActionTypes.SHOW_EDIT_RULE_WIZARD);
+      expect(action.index).to.equal(index);
+    });
+  });
 });

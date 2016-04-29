@@ -2,7 +2,7 @@ import React from "react";
 import { connect } from "react-redux";
 
 import { showElementWizard, removeElement, updateElement,
-  showRuleWizard, removeRule } from "../../actions";
+  showRuleWizard, removeRule, showEditRuleWizard } from "../../actions";
 import { PosButton, NegButton, NeutralButton } from "../common/Buttons";
 import { highlight, unhighlight } from "../../helpers/markup";
 import { currentSelector } from "../../constants/CSSClasses";
@@ -35,8 +35,10 @@ const ElementFrame = React.createClass({
     });
   },
   removeRule: function(index) {
-    const rules = this.props.element.rules;
     this.props.removeRule(index);
+  },
+  updateRule: function(index) {
+    this.props.showEditRuleWizard(index);
   },
   toggleOptional: function(event) {
     const { updateElement, element } = this.props;
@@ -87,7 +89,8 @@ const ElementFrame = React.createClass({
             </button>
           </div>
           <RuleList rules={rules}
-                    remove={this.removeRule} />
+                    remove={this.removeRule}
+                    update={this.updateRule} />
         </div>
         <div className="buttons">
           <PosButton text="Add Child"
@@ -121,7 +124,7 @@ const ElementFrame = React.createClass({
 
 const RuleList = React.createClass({
   render: function() {
-    const { rules, remove } = this.props;
+    const { rules, remove, update } = this.props;
     if ( !rules.length ) {
       return null;
     }
@@ -129,7 +132,7 @@ const RuleList = React.createClass({
       <ul className="rules">
         {
           rules.map((r,i) => {
-            return <Rule key={i} index={i} remove={remove} {...r}/>;
+            return <Rule key={i} index={i} remove={remove} update={update} {...r}/>;
           })
         }
       </ul>
@@ -138,9 +141,13 @@ const RuleList = React.createClass({
 })
 
 const Rule = React.createClass({
-  handleClick: function(event) {
+  handleDelete: function(event) {
     event.preventDefault();
     this.props.remove(this.props.index);
+  },
+  handleUpdate: function(event) {
+    event.preventDefault();
+    this.props.update(this.props.index);
   },
   render: function() {
     const { name, attr, type } = this.props;
@@ -149,9 +156,10 @@ const Rule = React.createClass({
         <span className="rule-name" title="name">{name}</span>
         <span className="rule-attr" title="attribute (or text)">{attr}</span>
         <span className="rule-type" title="data type">{type}</span>
-        <NegButton text={String.fromCharCode(215)}
-                   classes={["transparent"]}
-                   click={this.handleClick} />
+        <NeutralButton text="Edit"
+                       click={this.handleUpdate} />
+        <NegButton text="Delete"
+                   click={this.handleDelete} />
       </li>
     );
   }
@@ -173,6 +181,6 @@ export default connect(
     updateElement,
     showRuleWizard,
     removeRule,
-    updateElement
+    showEditRuleWizard
   }
 )(ElementFrame);

@@ -124,3 +124,11 @@ export const removeRule = index => {
     index
   };
 };
+
+export const updateRule = (index, rule) => {
+  return {
+    type: types.UPDATE_RULE,
+    index,
+    rule
+  };
+};

@@ -7,7 +7,7 @@ import * as types from "../constants/ActionTypes";
  * Which frame to show. In the majority of cases, the "element" frame should
  * be shown.
  */
-export default function frame(state = "", action) {
+export default function frame(state = {name: "element"}, action) {
   switch ( action.type ) {
   case types.SELECT_PAGE:
   case types.SET_PAGES:
@@ -15,19 +15,25 @@ export default function frame(state = "", action) {
   case types.SAVE_ELEMENT:
   case types.SAVE_RULE:
   case types.REMOVE_RULE:
+  case types.UPDATE_RULE:
   case types.CLOSE_FORAGER:
   case types.SHOW_ELEMENT_FRAME:
-    return Object.assign({}, state, {
+    return {
       name: "element"
-    });
+    };
   case types.SHOW_ELEMENT_WIZARD:
-    return Object.assign({}, state, {
+    return{
       name: "element-wizard"
-    })
+    };
   case types.SHOW_RULE_WIZARD:
-    return Object.assign({}, state, {
+    return{
       name: "rule-wizard"
-    });
+    };
+  case types.SHOW_EDIT_RULE_WIZARD:
+    return {
+      name: "edit-rule-wizard",
+      index: action.index
+    };
   default:
     return state;
   }

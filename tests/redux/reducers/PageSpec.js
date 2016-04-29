@@ -401,6 +401,27 @@ describe("page reducer", () => {
     });
   });
 
+  describe("UPDATE_RULE", () => {
+    it("replaces the rule at index with the new rule", () => {
+      state.elementIndex = 1;
+      const newRule = {
+        name: "foo",
+        attr: "href",
+        type: "string"
+      };
+      const ruleIndex = 0;
+      const newState = page(state, {
+        type: ActionTypes.UPDATE_RULE,
+        index: ruleIndex,
+        rule: newRule
+      });
+      const { pages, pageIndex, elementIndex } = newState;
+      const current = pages[pageIndex].elements[elementIndex];
+      const updatedRule = current.rules[ruleIndex];
+      expect(updatedRule).to.deep.equal(newRule);
+    });
+  });
+
   describe("CLOSE_FORAGER", () => {
     const newState = page(state, {
       type: ActionTypes.CLOSE_FORAGER

@@ -12,8 +12,15 @@ export const showElementWizard = () => {
   };
 };
 
-export const showRuleWizard = element => {
+export const showRuleWizard = () => {
   return {
     type: types.SHOW_RULE_WIZARD
+  };
+};
+
+export const showEditRuleWizard = index => {
+  return {
+    type: types.SHOW_EDIT_RULE_WIZARD,
+    index
   };
 };
