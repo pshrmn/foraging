@@ -42,12 +42,11 @@ const ChooseOptional = React.createClass({
           <h3>
             Is this element optional?
           </h3>
-          <label>
-            { optional ? "Yes" : "No" }
-            {" "}
+          <label className={optional ? "selected" : null}>
             <input type="checkbox"
                    checked={optional}
                    onChange={this.toggleOptional} />
+            { optional ? "Yes" : "No" }
           </label>
         </div>
         <div className="buttons">

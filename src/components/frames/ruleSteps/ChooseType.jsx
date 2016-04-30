@@ -67,7 +67,7 @@ const ChooseType = React.createClass({
                  value={t}
                  checked={t === type}
                  onChange={this.typeHandler} />
-          <span className="rule-type">{t}</span>
+          {t}
         </label>
       );
     });

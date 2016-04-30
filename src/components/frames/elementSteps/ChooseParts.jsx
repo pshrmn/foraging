@@ -82,12 +82,12 @@ const ChooseParts = React.createClass({
       return (
         <label key={index}
                className={checked ? "selected" : ""}>
-          {name}
           <input type="checkbox"
                  name="selector-part"
                  value={index}
                  checked={checked}
                  onChange={this.toggleRadio} />
+          {name}
         </label>
       );
     });

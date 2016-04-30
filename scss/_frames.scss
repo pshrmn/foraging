@@ -30,16 +30,24 @@
         display: flex;
         flex-wrap: wrap;
 
-        label {
-            margin-right: 15px;
-            padding: 2px 3px;
-            border-radius: 3px;
-            word-break: break-all;
-        }
+    }
 
-        label.selected {
-            background: $green;
-        }
+    ul, ol {
+        list-style: none;
+    }
+
+    label {
+        margin-right: 15px;
+        padding: 2px 3px;
+        border-radius: 3px;
+        word-break: break-all;
+        border: 1px solid $gray;
+        background: $button-gray;
+    }
+
+    label.selected {
+        background: $green;
+        border-color: $dark-green;
     }
 
     .info-box {
@@ -50,7 +58,7 @@
 
     .info {
 
-        > * {
+        > div {
             padding: 2px 0;
         }
 

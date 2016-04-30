@@ -41,17 +41,21 @@ const ChooseType = React.createClass({
             Should the element target a single element or all?
           </h3>
 
-          <label>single <input type="radio"
-                               name="type"
-                               value="single"
-                               checked={type === "single"}
-                               onChange={this.typeHandler} />
+          <label className={type === "single" ? "selected": null}>
+            <input type="radio"
+                   name="type"
+                   value="single"
+                   checked={type === "single"}
+                   onChange={this.typeHandler} />
+            single
           </label>
-          <label>all <input type="radio"
-                               name="type"
-                               value="all"
-                               checked={type === "all"}
-                               onChange={this.typeHandler} />
+          <label className={type === "all" ? "selected": null}>
+            <input type="radio"
+                   name="type"
+                   value="all"
+                   checked={type === "all"}
+                   onChange={this.typeHandler} />
+            all
           </label>
         </div>
         <div className="buttons">

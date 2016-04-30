@@ -183,13 +183,18 @@ body.foraging {
       -webkit-flex-wrap: wrap;
           -ms-flex-wrap: wrap;
               flex-wrap: wrap; }
-      #forager .frames .choices label {
-        margin-right: 15px;
-        padding: 2px 3px;
-        border-radius: 3px;
-        word-break: break-all; }
-      #forager .frames .choices label.selected {
-        background: #76B85C; }
+    #forager .frames ul, #forager .frames ol {
+      list-style: none; }
+    #forager .frames label {
+      margin-right: 15px;
+      padding: 2px 3px;
+      border-radius: 3px;
+      word-break: break-all;
+      border: 1px solid #898B96;
+      background: #CED1DE; }
+    #forager .frames label.selected {
+      background: #76B85C;
+      border-color: #42752E; }
     #forager .frames .info-box {
       display: -webkit-flex;
       display: -ms-flexbox;
@@ -200,7 +205,7 @@ body.foraging {
       -webkit-flex-grow: 2;
           -ms-flex-positive: 2;
               flex-grow: 2; }
-    #forager .frames .info > * {
+    #forager .frames .info > div {
       padding: 2px 0; }
     #forager .frames .info .line {
       padding: 2px 0; }

@@ -72,8 +72,9 @@ const ChooseAttribute = React.createClass({
                    value={a.name}
                    checked={a.name === attribute }
                    onChange={this.attributeHandler} />
-            <span className="rule-attr">{a.name}</span> {abbreviate(a.value, 40)}
+            {a.name}
           </label>
+          {abbreviate(a.value, 40)}
         </li>
       );
     });
@@ -83,7 +84,9 @@ const ChooseAttribute = React.createClass({
           <h3>
             Which attribute has the value that you want?
           </h3>
-          {attrs}
+          <ul>
+            {attrs}
+          </ul>
           <Cycle index={index}
                  count={current.matches.length}
                  setIndex={this.indexHandler} />
