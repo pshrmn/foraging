@@ -1,7 +1,6 @@
 import React from "react";
 
 import { PosButton, NegButton } from "../../common/Buttons";
-import Cycle from "./Cycle";
 import { abbreviate } from "../../../helpers/text";
 import { integer, float } from "../../../helpers/parse";
 
@@ -16,22 +15,15 @@ const ChooseType = React.createClass({
       type = startData.type;
     }
 
-    let index = 0;
-    if ( endData.index !== undefined ) {
-      index = endData.index;
-    } else if ( startData.index !== undefined ) {
-      index = startData.index;
-    }
     return {
-      type,
-      index
+      type
     };
   },
   nextHandler: function(event) {
     event.preventDefault();
-    const { type, index } = this.state;
+    const { type } = this.state;
     const { startData, next } = this.props;
-    next(Object.assign({}, startData, { type, index }));
+    next(Object.assign({}, startData, { type }));
   },
   previousHandler: function(event) {
     event.preventDefault();
@@ -46,16 +38,14 @@ const ChooseType = React.createClass({
       type: event.target.value
     });
   },
-  indexHandler: function(index) {
-    this.setState({
-      index
-    });
-  },
   render: function() {
-    const { type, index } = this.state;
+    const { type } = this.state;
     const { startData } = this.props;
-    const { current, attribute } = startData;
-    const element = current.matches[index];
+    const { attribute } = startData;
+
+    const { extraData } = this.props;
+    const { element } = extraData;
+
     const value = attribute === "text" ?
       element.innerText : element.getAttribute(attribute);
 
@@ -101,9 +91,7 @@ const ChooseType = React.createClass({
           <p>
             {preview}
           </p>
-          <Cycle index={index}
-                 count={current.matches.length}
-                 setIndex={this.indexHandler} />
+          {this.props.children}
         </div>
         <div className="buttons">
           <NegButton text="Previous" click={this.previousHandler} />

@@ -7,6 +7,7 @@ import ChooseAttribute from "./ruleSteps/ChooseAttribute";
 import ChooseType from "./ruleSteps/ChooseType";
 import ChooseName from "./ruleSteps/ChooseName";
 import ConfirmUpdateRule from "./ruleSteps/ConfirmUpdateRule";
+import Cycle from "./ruleSteps/Cycle";
 
 import { updateRule, showElementFrame } from "../../actions";
 import { highlight, unhighlight} from "../../helpers/markup";
@@ -16,6 +17,16 @@ import { currentSelector } from "../../constants/CSSClasses";
  * ChooseAttribute -> ChooseType -> ChooseName -> ConfirmRule
  */
 const EditRuleWizard = React.createClass({
+  getInitialState: function() {
+    return {
+      index: 0
+    };
+  },
+  setIndex: function(index) {
+    this.setState({
+      index
+    });
+  },
   save: function(rule) {
     const { updateRule, ruleIndex } = this.props;
     updateRule(ruleIndex, rule);
@@ -31,6 +42,8 @@ const EditRuleWizard = React.createClass({
       return null;
     }
 
+    const { index } = this.state;
+
     const { name, attr, type } = rule;
     const initialData = {
       current,
@@ -38,6 +51,9 @@ const EditRuleWizard = React.createClass({
       name,
       attr,
       type
+    };
+    const extraData = {
+      element: current.matches[index]
     };
     const steps = [
       ChooseAttribute,
@@ -48,8 +64,13 @@ const EditRuleWizard = React.createClass({
     return (
       <Wizard steps={steps}
               initialData={initialData}
+              extraData={extraData}
               save={this.save}
-              cancel={this.cancel} />
+              cancel={this.cancel}>
+        <Cycle index={index}
+               count={current.matches.length}
+               setIndex={this.setIndex} />
+      </Wizard>
     );
   },
   componentWillMount: function() {

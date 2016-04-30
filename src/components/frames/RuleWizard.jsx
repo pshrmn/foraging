@@ -8,14 +8,29 @@ import ChooseType from "./ruleSteps/ChooseType";
 import ChooseName from "./ruleSteps/ChooseName";
 import ConfirmRule from "./ruleSteps/ConfirmRule";
 
+import Cycle from "./ruleSteps/Cycle";
 import { saveRule, showElementFrame } from "../../actions";
 import { highlight, unhighlight} from "../../helpers/markup";
 import { currentSelector } from "../../constants/CSSClasses";
 
 /*
  * ChooseAttribute -> ChooseType -> ChooseName -> ConfirmRule
+ *
+ * The RuleWizard is used to create a rule for an element. A Cycle is
+ * used to cycle through the DOM elements that the element matches while
+ * creating the rule.
  */
 const RuleWizard = React.createClass({
+  getInitialState: function() {
+    return {
+      index: 0
+    };
+  },
+  setIndex: function(index) {
+    this.setState({
+      index
+    });
+  },
   save: function(rule) {
     this.props.saveRule(rule);
   },
@@ -24,9 +39,11 @@ const RuleWizard = React.createClass({
   },
   render: function() {
     const { current } = this.props;
-    const initialData = {
-      current,
-      index: 0
+    const { index } = this.state;
+
+    const initialData = {};
+    const extraData = {
+      element: current.matches[index]
     };
     const steps = [
       ChooseAttribute,
@@ -37,8 +54,13 @@ const RuleWizard = React.createClass({
     return (
       <Wizard steps={steps}
               initialData={initialData}
+              extraData={extraData}
               save={this.save}
-              cancel={this.cancel} />
+              cancel={this.cancel}>
+        <Cycle index={index}
+               count={current.matches.length}
+               setIndex={this.setIndex} />
+      </Wizard>
     );
   },
   componentWillMount: function() {
