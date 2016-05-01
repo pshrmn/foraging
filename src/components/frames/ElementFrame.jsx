@@ -21,21 +21,6 @@ const ElementFrame = React.createClass({
     }
     removeElement();
   },
-  /*
-  rename: function(event) {
-    const newName = window.prompt("New name to save element's array as:");
-    if ( newName === null || newName === "" ) {
-      return;
-    }
-    const { element, updateElement } = this.props;
-    updateElement(element.index, {
-      spec: {
-        type: "all",
-        value: newName
-      }
-    });
-  },
-  */
   edit: function() {
     this.props.showEditElementWizard();
   },
@@ -45,13 +30,6 @@ const ElementFrame = React.createClass({
   updateRule: function(index) {
     this.props.showEditRuleWizard(index);
   },
-  /*
-  toggleOptional: function(event) {
-    const { updateElement, element } = this.props;
-    updateElement(element.index, {
-      optional: !element.optional
-    });
-  },*/
   render: function() {
     const { element } = this.props;
     if ( element === undefined ) {
@@ -81,13 +59,10 @@ const ElementFrame = React.createClass({
       <div className="frame">
         <div className="info">
           <div>
-            <span className="big bold">{selector}</span>
+            <span className="big bold">{selector}{optional ? <span title="optional">*</span> : null}</span>
           </div>
           <div>
             {description}
-          </div>
-          <div>
-            { optional ? "Optional" : "Required" }
           </div>
           <RuleList rules={rules}
                     remove={this.removeRule}

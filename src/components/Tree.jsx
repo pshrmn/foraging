@@ -96,7 +96,7 @@ const Node = React.createClass({
     unhighlight(savedPreview);
   },
   specText: function() {
-    const { selector, spec } = this.props;
+    const { selector, spec, optional } = this.props;
     let text = "";
     if ( !spec ) {
       return text;
@@ -109,7 +109,11 @@ const Node = React.createClass({
         text = `[${selector}]`;
         break;
     }
-    return abbreviate(text, 10);
+    let shortened = abbreviate(text, 10);
+    if ( optional ) {
+      shortened += "*";
+    }
+    return shortened;
   },
   render: function() {
     const { current, hasRules, children, active } = this.props;

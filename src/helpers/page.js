@@ -130,7 +130,8 @@ export const simpleGrow = elementArray => {
       children: [],
       index: e.index,
       parent: e.parent,
-      matches: e.matches
+      matches: e.matches,
+      optional: e.optional
     };
   });
   cleanElements.forEach(e => {
