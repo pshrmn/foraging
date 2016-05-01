@@ -3,7 +3,7 @@ import React from "react";
 import { PosButton, NegButton } from "../../common/Buttons";
 import { select } from "../../../helpers/selection";
 import { highlight, unhighlight } from "../../../helpers/markup";
-import { queryCheck } from "../../../constants/CSSClasses";
+import { currentSelector } from "../../../constants/CSSClasses";
 
 const ChooseType = React.createClass({
   getInitialState: function() {
@@ -23,7 +23,16 @@ const ChooseType = React.createClass({
     event.preventDefault();
     const { type } = this.state;
     const { startData, next } = this.props;
-    next(Object.assign({}, startData, { type }));
+    // handle resetting the value here if the type is changing
+    let { type: originalType, value } = startData;
+    if ( type !== originalType ) {
+      if ( type === "single" ) {
+        value = 0;
+      } else {
+        value = "";
+      }
+    }
+    next(Object.assign({}, startData, { type, value }));
   },
   previousHandler: function(event) {
     event.preventDefault();
@@ -73,25 +82,43 @@ const ChooseType = React.createClass({
     );
   },
   componentWillMount: function() {
-    const { startData } = this.props;
-    const { current, selector } = startData;
+    const { startData, extraData } = this.props;
+
+    const { parent = {} } = extraData;
+    const { matches: parentMatches = [document] } = parent;
+
     const { type } = this.state;
     const value = type === "single" ? 0 : "name";
-    const elements = select(current.matches, selector, {type, value}, '.forager-holder');
-    highlight(elements, queryCheck);
+    
+    const elements = select(
+      parentMatches,
+      startData.selector,
+      {type, value},
+      '.forager-holder'
+    );
+    highlight(elements, currentSelector);
   },
   componentWillUpdate: function(nextProps, nextState) {
-    unhighlight(queryCheck);
+    unhighlight(currentSelector);
 
-    const { startData } = nextProps;
-    const { current, selector } = startData;
+    const { startData, extraData } = nextProps;
+
+    const { parent = {} } = extraData;
+    const { matches: parentMatches = [document] } = parent;
+
     const { type } = nextState;
     const value = type === "single" ? 0 : "name";
-    const elements = select(current.matches, selector, {type, value}, '.forager-holder');
-    highlight(elements, queryCheck);
+
+    const elements = select(
+      parentMatches,
+      startData.selector,
+      {type, value},
+      '.forager-holder'
+    );
+    highlight(elements, currentSelector);
   },
   componentWillUnmount: function() {
-    unhighlight(queryCheck);
+    unhighlight(currentSelector);
   }
 });
 

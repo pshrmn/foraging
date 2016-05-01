@@ -1,7 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
 
-import { showElementWizard, removeElement, updateElement,
+import { showElementWizard, removeElement, showEditElementWizard,
   showRuleWizard, removeRule, showEditRuleWizard } from "../../actions";
 import { PosButton, NegButton, NeutralButton } from "../common/Buttons";
 import { highlight, unhighlight } from "../../helpers/markup";
@@ -21,6 +21,7 @@ const ElementFrame = React.createClass({
     }
     removeElement();
   },
+  /*
   rename: function(event) {
     const newName = window.prompt("New name to save element's array as:");
     if ( newName === null || newName === "" ) {
@@ -34,18 +35,23 @@ const ElementFrame = React.createClass({
       }
     });
   },
+  */
+  edit: function() {
+    this.props.showEditElementWizard();
+  },
   removeRule: function(index) {
     this.props.removeRule(index);
   },
   updateRule: function(index) {
     this.props.showEditRuleWizard(index);
   },
+  /*
   toggleOptional: function(event) {
     const { updateElement, element } = this.props;
     updateElement(element.index, {
       optional: !element.optional
     });
-  },
+  },*/
   render: function() {
     const { element } = this.props;
     if ( element === undefined ) {
@@ -71,7 +77,6 @@ const ElementFrame = React.createClass({
       description = `captures all elements, groups them as "${value}"`;
       
     }
-    const renameButton = type === "all" ? <NeutralButton text="Rename" click={this.rename} /> : null;
     return (
       <div className="frame">
         <div className="info">
@@ -82,11 +87,7 @@ const ElementFrame = React.createClass({
             {description}
           </div>
           <div>
-            <button onClick={this.toggleOptional}
-                    title="click to toggle optional">
-              Optional
-              <input type="checkbox" checked={optional} onChange={() => {}} />
-            </button>
+            { optional ? "Optional" : "Required" }
           </div>
           <RuleList rules={rules}
                     remove={this.removeRule}
@@ -97,10 +98,11 @@ const ElementFrame = React.createClass({
                      click={this.addChild} />
           <PosButton text="Add Rule"
                      click={this.addRule} />
+          <NeutralButton text="Edit"
+                         click={this.edit} />
           <NegButton text="Remove"
                      title="Remove Element"
                      click={this.remove} />
-          {renameButton}
         </div>
       </div>
     );
@@ -178,9 +180,9 @@ export default connect(
   {
     showElementWizard,
     removeElement,
-    updateElement,
     showRuleWizard,
     removeRule,
-    showEditRuleWizard
+    showEditRuleWizard,
+    showEditElementWizard
   }
 )(ElementFrame);

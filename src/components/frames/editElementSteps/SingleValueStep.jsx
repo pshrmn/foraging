@@ -3,28 +3,28 @@ import React from "react";
 import { PosButton, NegButton } from "../../common/Buttons";
 import { select, count } from "../../../helpers/selection";
 import { highlight, unhighlight } from "../../../helpers/markup";
-import { queryCheck } from "../../../constants/CSSClasses";
+import { currentSelector } from "../../../constants/CSSClasses";
 
-const AllValueStep = React.createClass({
+const SingleValueStep = React.createClass({
   getInitialState: function() {
     const { startData, endData = {} } = this.props;
-    let value = "";
+    let value = 0;
     // if there is an existing value, only use it if the types match
-    if ( startData.type === endData.type && endData.value !== undefined ) {
+    if ( endData.type === startData.type && endData.value !== undefined ) {
       value = endData.value;
-    } else if ( startData.value ) {
+    } else if ( startData.value !== undefined ) {
       value = startData.value;
     }
     return {
       value: value,
-      error: value === ""
+      error: false
     };
   },
   valueHandler: function(event) {
     const { value } = event.target;
     this.setState({
-      value: value,
-      error: value === ""
+      value: parseInt(value, 10),
+      error: false
     });
   },
   nextHandler: function(event) {
@@ -44,18 +44,32 @@ const AllValueStep = React.createClass({
     event.preventDefault();
     this.props.cancel();
   },
+  renderOptions: function() {
+    const { startData, extraData } = this.props;
+    const { selector } = startData;
+    const { parent = {} } = extraData
+    const { matches = [document] } = parent;
+
+    const indices = count(matches, selector);
+    return Array.from(new Array(indices)).map((u, i) => {
+      return (
+        <option key={i} value={i}>{i}</option>
+      );
+    });
+  },
   render: function() {
     const { value, error } = this.state;
+
     return (
       <div className="info-box">
         <div className="info">
           <h3>
-            What should the array of elements be named?
+            The element at which index should be selected?
           </h3>
-          <input type="text"
-                 placeholder="e.g., names"
-                 value={value}
-                 onChange={this.valueHandler} />
+          <select value={value}
+                  onChange={this.valueHandler} >
+            { this.renderOptions() }
+          </select>
         </div>
         <div className="buttons">
           <NegButton text="Previous" click={this.previousHandler} />
@@ -63,27 +77,45 @@ const AllValueStep = React.createClass({
           <NegButton text="Cancel" click={this.cancelHandler} />
         </div>
       </div>
-    );
+    );    
   },
   componentWillMount: function() {
-    const { startData } = this.props;
-    const { current, selector } = startData;
+    const { startData, extraData } = this.props;
+
+    const { parent = {} } = extraData;
+    const { matches: parentMatches = [document] } = parent;
+
     const { value } = this.state;
-    const elements = select(current.matches, selector, {type: "all", value}, '.forager-holder');
-    highlight(elements, queryCheck);
+
+    const elements = select(
+      parentMatches,
+      startData.selector,
+      {type: "single", value},
+      '.forager-holder'
+    );
+    highlight(elements, currentSelector);
   },
   componentWillUpdate: function(nextProps, nextState) {
-    unhighlight(queryCheck);
+    unhighlight(currentSelector);
 
-    const { startData } = nextProps;
-    const { current, selector } = startData;
+    const { startData, extraData } = nextProps;
+
+    const { parent = {} } = extraData;
+    const { matches: parentMatches = [document] } = parent;
+
     const { value } = nextState;
-    const elements = select(current.matches, selector, {type: "all", value}, '.forager-holder');
-    highlight(elements, queryCheck);
+
+    const elements = select(
+      parentMatches,
+      startData.selector,
+      {type: "single", value},
+      '.forager-holder'
+    );
+    highlight(elements, currentSelector);
   },
   componentWillUnmount: function() {
-    unhighlight(queryCheck);
+    unhighlight(currentSelector);
   }
 });
 
-export default AllValueStep;
+export default SingleValueStep;

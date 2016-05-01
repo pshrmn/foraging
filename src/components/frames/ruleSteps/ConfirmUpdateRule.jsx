@@ -25,7 +25,7 @@ const ConfirmElement = React.createClass({
     const { name, attribute, type } = startData;
     return (
       <div className="info-box">
-        <h2>Confirm Rule</h2>
+        <h2>Confirm Updated Rule</h2>
         <ul>
           <li>Name: {name}</li>
           <li>Attribute: {attribute}</li>

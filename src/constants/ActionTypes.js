@@ -28,6 +28,7 @@ export const UPDATE_RULE = "UPDATE_RULE";
 // the following action types show specific frames
 export const SHOW_ELEMENT_FRAME = "SHOW_ELEMENT_FRAME";
 export const SHOW_ELEMENT_WIZARD = "SHOW_ELEMENT_WIZARD";
+export const SHOW_EDIT_ELEMENT_WIZARD = "SHOW_EDIT_ELEMENT_WIZARD";
 export const SHOW_RULE_WIZARD = "SHOW_RULE_WIZARD";
 export const SHOW_EDIT_RULE_WIZARD = "SHOW_EDIT_RULE_WIZARD";
 

@@ -3,7 +3,7 @@ import React from "react";
 import { PosButton, NegButton } from "../../common/Buttons";
 import { select } from "../../../helpers/selection";
 import { highlight, unhighlight } from "../../../helpers/markup";
-import { queryCheck } from "../../../constants/CSSClasses";
+import { currentSelector } from "../../../constants/CSSClasses";
 
 const ChooseOptional = React.createClass({
   getInitialState: function() {
@@ -63,20 +63,37 @@ const ChooseOptional = React.createClass({
     );
   },
   componentWillMount: function() {
-    const { startData } = this.props;
-    const { current, selector, type, value } = startData;
-    const elements = select(current.matches, selector, {type, value}, '.forager-holder');
-    highlight(elements, queryCheck);
+    const { startData, extraData } = this.props;
+
+    const { selector, type, value } = startData;
+    const { parent = {} } = extraData;
+    const { matches: parentMatches = [document] } = parent;
+    const elements = select(
+      parentMatches,
+      startData.selector,
+      {type, value},
+      '.forager-holder'
+    );
+    highlight(elements, currentSelector);
   },
   componentWillUpdate: function(nextProps, nextState) {
-    unhighlight(queryCheck);
-    const { startData } = nextProps;
-    const { current, selector, type, value } = startData;
-    const elements = select(current.matches, selector, {type, value}, '.forager-holder');
-    highlight(elements, queryCheck);
+    unhighlight(currentSelector);
+
+    const { startData, extraData } = this.props;
+
+    const { selector, type, value } = startData;
+    const { parent = {} } = extraData;
+    const { matches: parentMatches = [document] } = parent;
+    const elements = select(
+      parentMatches,
+      startData.selector,
+      {type, value},
+      '.forager-holder'
+    );
+    highlight(elements, currentSelector);
   },
   componentWillUnmount: function() {
-    unhighlight(queryCheck);
+    unhighlight(currentSelector);
   }
 });
 

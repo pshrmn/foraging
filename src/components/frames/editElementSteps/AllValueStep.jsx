@@ -3,16 +3,16 @@ import React from "react";
 import { PosButton, NegButton } from "../../common/Buttons";
 import { select, count } from "../../../helpers/selection";
 import { highlight, unhighlight } from "../../../helpers/markup";
-import { queryCheck } from "../../../constants/CSSClasses";
+import { currentSelector } from "../../../constants/CSSClasses";
 
 const AllValueStep = React.createClass({
   getInitialState: function() {
     const { startData, endData = {} } = this.props;
     let value = "";
     // if there is an existing value, only use it if the types match
-    if ( startData.type === endData.type && endData.value !== undefined ) {
+    if ( endData.type === startData.type && endData.value !== undefined ) {
       value = endData.value;
-    } else if ( startData.value ) {
+    } else if ( startData.value !== undefined ) {
       value = startData.value;
     }
     return {
@@ -66,23 +66,41 @@ const AllValueStep = React.createClass({
     );
   },
   componentWillMount: function() {
-    const { startData } = this.props;
-    const { current, selector } = startData;
+    const { startData, extraData } = this.props;
+
+    const { parent = {} } = extraData;
+    const { matches: parentMatches = [document] } = parent;
+
     const { value } = this.state;
-    const elements = select(current.matches, selector, {type: "all", value}, '.forager-holder');
-    highlight(elements, queryCheck);
+
+    const elements = select(
+      parentMatches,
+      startData.selector,
+      {type: "all", value},
+      '.forager-holder'
+    );
+    highlight(elements, currentSelector);
   },
   componentWillUpdate: function(nextProps, nextState) {
-    unhighlight(queryCheck);
+    unhighlight(currentSelector);
 
-    const { startData } = nextProps;
-    const { current, selector } = startData;
+    const { startData, extraData } = nextProps;
+
+    const { parent = {} } = extraData;
+    const { matches: parentMatches = [document] } = parent;
+
     const { value } = nextState;
-    const elements = select(current.matches, selector, {type: "all", value}, '.forager-holder');
-    highlight(elements, queryCheck);
+
+    const elements = select(
+      parentMatches,
+      startData.selector,
+      {type: "all", value},
+      '.forager-holder'
+    );
+    highlight(elements, currentSelector);
   },
   componentWillUnmount: function() {
-    unhighlight(queryCheck);
+    unhighlight(currentSelector);
   }
 });
 

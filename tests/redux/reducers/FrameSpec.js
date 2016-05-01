@@ -65,6 +65,18 @@ describe("frame reducer", () => {
     });
   });
 
+  describe("SHOW_EDIT_ELEMENT_WIZARD", () => {
+    it("shows the element wizard", () => {
+      const state = {
+        name: "element"
+      };
+      const newState = frame(state, {
+        type: ActionTypes.SHOW_EDIT_ELEMENT_WIZARD
+      });
+      expect(newState.name).to.equal("edit-element-wizard");
+    });
+  });
+
   describe("SHOW_RULE_WIZARD", () => {
     it("shows the rule frame", () => {
       const state = {

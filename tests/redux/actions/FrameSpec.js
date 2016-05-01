@@ -18,6 +18,13 @@ describe("frame actions", () => {
     });
   });
 
+  describe("showEditElementWizard", () => {
+    it("returns an action to show the element wizard", () => {
+      const action = actions.showEditElementWizard();
+      expect(action.type).to.equal(ActionTypes.SHOW_EDIT_ELEMENT_WIZARD);
+    });
+  });
+
   describe("showRuleWizard", () => {
     it("returns an action to show the rule frame", () => {
       const action = actions.showRuleWizard();

@@ -13,6 +13,7 @@ export default function frame(state = {name: "element"}, action) {
   case types.SET_PAGES:
   case types.REMOVE_ELEMENT:
   case types.SAVE_ELEMENT:
+  case types.UPDATE_ELEMENT:
   case types.SAVE_RULE:
   case types.REMOVE_RULE:
   case types.UPDATE_RULE:
@@ -22,8 +23,12 @@ export default function frame(state = {name: "element"}, action) {
       name: "element"
     };
   case types.SHOW_ELEMENT_WIZARD:
-    return{
+    return {
       name: "element-wizard"
+    };
+  case types.SHOW_EDIT_ELEMENT_WIZARD:
+    return {
+      name: "edit-element-wizard"
     };
   case types.SHOW_RULE_WIZARD:
     return{
