@@ -12,9 +12,6 @@ export const SET_PAGES = "SET_PAGES";
 export const SET_MATCHES = "SET_MATCHES";
 export const REFRESH_MATCHES = "REFRESH_MATCHES";
 
-export const SHOW_PREVIEW = "SHOW_PREVIEW";
-export const HIDE_PREVIEW = "HIDE_PREVIEW";
-
 export const SELECT_ELEMENT = "SELECT_ELEMENT";
 export const SAVE_ELEMENT = "SAVE_ELEMENT";
 export const REMOVE_ELEMENT = "REMOVE_ELEMENT";
@@ -31,6 +28,7 @@ export const SHOW_ELEMENT_WIZARD = "SHOW_ELEMENT_WIZARD";
 export const SHOW_EDIT_ELEMENT_WIZARD = "SHOW_EDIT_ELEMENT_WIZARD";
 export const SHOW_RULE_WIZARD = "SHOW_RULE_WIZARD";
 export const SHOW_EDIT_RULE_WIZARD = "SHOW_EDIT_RULE_WIZARD";
+export const SHOW_PREVIEW = "SHOW_PREVIEW";
 
 /* general */
 // open and close the app

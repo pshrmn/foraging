@@ -105,4 +105,16 @@ describe("frame reducer", () => {
       expect(newState.index).to.equal(index);
     });
   });
+
+  describe("SHOW_PREVIEW", () => {
+    it("shows the element wizard", () => {
+      const state = {
+        name: "element"
+      };
+      const newState = frame(state, {
+        type: ActionTypes.SHOW_PREVIEW
+      });
+      expect(newState.name).to.equal("preview");
+    });
+  });
 });

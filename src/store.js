@@ -20,9 +20,6 @@ const initialState = {
     name: "element",
     data: {}
   },
-  preview: {
-    visible: false
-  },
   messages: []
 };
 

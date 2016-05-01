@@ -39,6 +39,10 @@ export default function frame(state = {name: "element"}, action) {
       name: "edit-rule-wizard",
       index: action.index
     };
+  case types.SHOW_PREVIEW:
+    return {
+      name: "preview"
+    };
   default:
     return state;
   }

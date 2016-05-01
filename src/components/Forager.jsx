@@ -4,7 +4,6 @@ import { connect } from "react-redux";
 import Controls from "./Controls";
 import Frames from "./frames/Frames";
 import Tree from "./Tree";
-import Preview from "./Preview";
 
 function Forager(props) {
   return !props.show ? null :
@@ -22,7 +21,6 @@ function Forager(props) {
             null
           )
         }
-        <Preview />
       </div>
     );  
 }

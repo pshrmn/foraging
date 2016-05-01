@@ -60,20 +60,6 @@ describe("page actions", () => {
     });
   });
 
-  describe("showPreview", () => {
-    it("returns an action with the expected values", () => {
-      const action = actions.showPreview();
-      expect(action.type).to.equal(ActionTypes.SHOW_PREVIEW);
-    });
-  });
-
-  describe("hidePreview", () => {
-    it("returns an action with the expected values", () => {
-      const action = actions.hidePreview();
-      expect(action.type).to.equal(ActionTypes.HIDE_PREVIEW);
-    });
-  });
-
   describe("setMatches", () => {
     it("returns an action with the expected values", () => {
       const matches = {1: [1,2,3], 0: [4,5,6]}

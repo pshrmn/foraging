@@ -31,3 +31,9 @@ export const showEditRuleWizard = index => {
     index
   };
 };
+
+export const showPreview = () => {
+  return {
+    type: types.SHOW_PREVIEW
+  };
+};

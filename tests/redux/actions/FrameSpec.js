@@ -40,4 +40,11 @@ describe("frame actions", () => {
       expect(action.index).to.equal(index);
     });
   });
+
+  describe("showPreview", () => {
+    it("returns an action to show the rule frame", () => {
+      const action = actions.showPreview();
+      expect(action.type).to.equal(ActionTypes.SHOW_PREVIEW);
+    });
+  });
 });

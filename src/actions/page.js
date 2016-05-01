@@ -46,18 +46,6 @@ export const setPages = pages => {
   };
 };
 
-export const showPreview = () => {
-  return {
-    type: types.SHOW_PREVIEW
-  };
-};
-
-export const hidePreview = () => {
-  return {
-    type: types.HIDE_PREVIEW
-  };
-};
-
 // matches is an object where the keys are
 // element indices and the values are elements
 // that are matched by the element selector with

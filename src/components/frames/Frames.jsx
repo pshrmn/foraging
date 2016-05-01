@@ -6,6 +6,7 @@ import ElementWizard from "./ElementWizard";
 import EditElementWizard from "./EditElementWizard";
 import RuleWizard from "./RuleWizard";
 import EditRuleWizard from "./EditRuleWizard";
+import Preview from "./Preview";
 
 /*
  * Frames
@@ -35,6 +36,8 @@ import EditRuleWizard from "./EditRuleWizard";
   case "edit-rule-wizard":
     frameElement = <EditRuleWizard />;
     break;
+  case "preview":
+    frameElement = <Preview />;
   }
   return (
     <div className="frames">
