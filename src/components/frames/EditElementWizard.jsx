@@ -2,6 +2,7 @@ import React from "react";
 import { connect } from "react-redux";
 
 import Wizard from "simple-wizard-component";
+import Tree from "../Tree";
 
 import ChooseType from "./editElementSteps/ChooseType";
 import ChooseValue from "./editElementSteps/ChooseValue";
@@ -50,11 +51,14 @@ const EditElementWizard = React.createClass({
       ConfirmUpdate
     ];
     return (
-      <Wizard steps={steps}
-              initialData={initialData}
-              extraData={extraData}
-              save={this.save}
-              cancel={this.cancel} />
+      <div className="frame">
+        <Tree />
+        <Wizard steps={steps}
+                initialData={initialData}
+                extraData={extraData}
+                save={this.save}
+                cancel={this.cancel} />
+      </div>
     );
   }
 });

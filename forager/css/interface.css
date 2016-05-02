@@ -151,123 +151,143 @@ body.foraging {
     #forager button:disabled {
       opacity: 0.25;
       cursor: default !important; }
-  #forager .frames {
+  #forager .frame {
     background: #ffffff;
     box-sizing: border-box;
     margin-right: 3px;
     padding: 5px;
-    width: 400px;
+    width: 1000px;
     vertical-align: top;
+    min-height: 200px;
+    font-size: 16px;
+    text-align: left;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-flex-flow: row nowrap;
+        -ms-flex-flow: row nowrap;
+            flex-flow: row nowrap;
+    -webkit-justify-content: space-between;
+        -ms-flex-pack: justify;
+            justify-content: space-between; }
+    #forager .frame > * {
+      -webkit-flex-grow: 1;
+          -ms-flex-positive: 1;
+              flex-grow: 1;
+      margin: 0 15px; }
+      #forager .frame > *:first-child {
+        margin-left: 0; }
+      #forager .frame > *:last-child {
+        margin-right: 0; }
+    #forager .frame ul {
+      padding: 0;
+      overflow-wrap: break-word; }
+    #forager .frame li {
+      min-height: 1.5em; }
+  #forager .wizard {
+    width: 350px;
     min-height: 200px; }
-    #forager .frames .frame, #forager .frames .wizard {
-      background: #ffffff;
-      text-align: left;
-      padding: 5px;
-      width: 100%;
-      min-height: 200px;
-      display: -webkit-flex;
-      display: -ms-flexbox;
-      display: flex;
-      -webkit-flex-direction: column;
-          -ms-flex-direction: column;
-              flex-direction: column; }
-      #forager .frames .frame ul, #forager .frames .wizard ul {
-        padding: 0;
-        overflow-wrap: break-word; }
-      #forager .frames .frame li, #forager .frames .wizard li {
-        min-height: 1.5em; }
-    #forager .frames .choices {
-      display: -webkit-flex;
-      display: -ms-flexbox;
-      display: flex;
-      -webkit-flex-wrap: wrap;
-          -ms-flex-wrap: wrap;
-              flex-wrap: wrap; }
-    #forager .frames ul, #forager .frames ol {
-      list-style: none; }
-    #forager .frames label {
-      margin-right: 15px;
-      padding: 2px 3px;
-      border-radius: 3px;
+  #forager .preview {
+    width: 400px; }
+    #forager .preview pre {
+      white-space: pre-wrap;
       word-break: break-all;
-      border: 1px solid #898B96;
-      background: #CED1DE; }
-    #forager .frames label.selected {
-      background: #76B85C;
-      border-color: #42752E; }
-    #forager .frames .info-box {
-      display: -webkit-flex;
-      display: -ms-flexbox;
-      display: flex;
-      -webkit-flex-flow: column nowrap;
-          -ms-flex-flow: column nowrap;
-              flex-flow: column nowrap;
-      -webkit-flex-grow: 2;
-          -ms-flex-positive: 2;
-              flex-grow: 2; }
-    #forager .frames .info > div {
+      width: 400px;
+      height: 200px;
+      overflow: scroll;
+      margin: 1em 0;
+      padding: 5px;
+      border-style: inset;
+      border-color: #000000;
+      border-width: 1px;
+      border-left: 10px solid #222233;
+      background: #EFEFEF; }
+  #forager .choices {
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-flex-wrap: wrap;
+        -ms-flex-wrap: wrap;
+            flex-wrap: wrap; }
+  #forager ul, #forager ol {
+    list-style: none; }
+  #forager label {
+    margin-right: 15px;
+    padding: 2px 3px;
+    border-radius: 3px;
+    word-break: break-all;
+    border: 1px solid #898B96;
+    background: #CED1DE; }
+  #forager label.selected {
+    background: #76B85C;
+    border-color: #42752E; }
+  #forager .info-box {
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-flex-flow: column nowrap;
+        -ms-flex-flow: column nowrap;
+            flex-flow: column nowrap;
+    padding: 10px;
+    background: #EFEFEF;
+    border: 1px solid #898B96;
+    min-height: 200px; }
+    #forager .info-box .info > div {
       padding: 2px 0; }
-    #forager .frames .info .line {
+    #forager .info-box .info .line {
       padding: 2px 0; }
-    #forager .frames .info label {
+    #forager .info-box .info label {
       margin-right: 5px; }
-    #forager .frames .buttons {
-      margin: auto 0 0;
-      display: -webkit-flex;
-      display: -ms-flexbox;
-      display: flex; }
-      #forager .frames .buttons button {
-        -webkit-flex-grow: 1;
-            -ms-flex-positive: 1;
-                flex-grow: 1; }
-    #forager .frames .rules {
-      margin: 5px 0; }
-      #forager .frames .rules .rule {
-        height: inherit;
-        line-height: 1.1; }
-        #forager .frames .rules .rule > * {
-          margin: 0 3px; }
-    #forager .frames .rule-name {
-      font-weight: bold; }
-    #forager .frames .rule-attr, #forager .frames .rule-type {
-      font-size: 0.9em;
-      padding: 2px;
-      border: 1px solid #000000; }
-    #forager .frames .rule-attr {
-      color: #225683;
-      background: #BDCDDB;
-      border-color: #225683; }
-    #forager .frames .rule-type {
-      color: #42752E;
-      background: #CCE0C3;
-      border-color: #42752E; }
-  #forager .graph {
+    #forager .info-box .buttons {
+      margin: auto 0 0; }
+  #forager .rules {
+    margin: 5px 0; }
+    #forager .rules .rule {
+      height: inherit;
+      line-height: 1.1; }
+      #forager .rules .rule > * {
+        margin: 0 3px; }
+  #forager .rule-name {
+    font-weight: bold; }
+  #forager .rule-attr, #forager .rule-type {
+    font-size: 0.9em;
+    padding: 2px;
+    border: 1px solid #000000; }
+  #forager .rule-attr {
+    color: #225683;
+    background: #BDCDDB;
+    border-color: #225683; }
+  #forager .rule-type {
+    color: #42752E;
+    background: #CCE0C3;
+    border-color: #42752E; }
+  #forager .tree {
     background: #ffffff;
     box-sizing: border-box;
     margin-right: 3px;
     padding: 5px;
     min-width: 500px;
     min-height: 200px; }
-    #forager .graph svg {
+    #forager .tree svg {
       box-sizing: content-box;
       font-size: 14px;
       background: #ffffff;
       display: block; }
-      #forager .graph svg .link {
+      #forager .tree svg .link {
         fill: none;
         stroke: #323033; }
-      #forager .graph svg .node {
+      #forager .tree svg .node {
         cursor: pointer;
         fill: #42752E; }
-      #forager .graph svg .empty {
+      #forager .tree svg .empty {
         fill: #E85F88; }
-      #forager .graph svg .node text {
+      #forager .tree svg .node text {
         paint-order: stroke;
         stroke: #ffffff;
         stroke-width: 3px;
         text-anchor: middle;
         fill: inherit; }
-      #forager .graph svg .current {
+      #forager .tree svg .current {
         font-style: italic;
         fill: #323033; }
   #forager .progress-bar {
@@ -361,22 +381,6 @@ body.foraging {
       min-height: 22px;
       height: 22px;
       border-radius: 2px; }
-  #forager .preview {
-    background: #ffffff;
-    font-size: 16px;
-    font-family: sans-serif; }
-    #forager .preview pre {
-      white-space: pre-wrap;
-      width: 100%;
-      height: 200px;
-      overflow: scroll;
-      margin: 1em 0;
-      padding: 5px;
-      border-style: inset;
-      border-color: #000000;
-      border-width: 1px;
-      border-left: 10px solid #222233;
-      background: #EFEFEF; }
   #forager.hidden {
     display: none !important; }
   #forager .not-allowed {

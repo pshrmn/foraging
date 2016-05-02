@@ -11,7 +11,7 @@ import { savedPreview } from "../constants/CSSClasses";
 const Tree = React.createClass({
   getDefaultProps: function() {
     return {
-      width: 500,
+      width: 400,
       height: 150
     };
   },
@@ -75,11 +75,13 @@ const Tree = React.createClass({
      * by 100 and translating the tree 50 pixels to the right
      */
     return (
-      <svg width={width+100}
-           height={height+50}
-           className={active ? null : "not-allowed"} >
-        {this._makeNodes()}
-      </svg>
+      <div className="tree">
+        <svg width={width+100}
+             height={height+50}
+             className={active ? null : "not-allowed"} >
+          {this._makeNodes()}
+        </svg>
+      </div>
     );
   }
 });

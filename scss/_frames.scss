@@ -1,60 +1,99 @@
-.frames {
+
+.frame {
     background: $white;
     box-sizing: border-box;
     margin-right: 3px;
     padding: 5px;
-    width: 400px;
+    width: 1000px;
     vertical-align: top;
     min-height: 200px;
+    font-size: 16px;
 
-    .frame, .wizard {
-        background: $white;
-        text-align: left;
-        padding: 5px;
-        width: 100%;
-        min-height: 200px;
-        display: flex;
-        flex-direction: column;
+    text-align: left;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
 
-        ul {
-            padding: 0;
-            overflow-wrap: break-word;
+    > * {
+        flex-grow: 1;
+        margin: 0 15px;
+
+        &:first-child {
+            margin-left: 0;
         }
 
-        li {
-            min-height: 1.5em;
+        &:last-child {
+            margin-right: 0;
         }
     }
 
-    .choices {
-        display: flex;
-        flex-wrap: wrap;
 
+    ul {
+        padding: 0;
+        overflow-wrap: break-word;
     }
 
-    ul, ol {
-        list-style: none;
+    li {
+        min-height: 1.5em;
     }
 
-    label {
-        margin-right: 15px;
-        padding: 2px 3px;
-        border-radius: 3px;
+}
+
+.wizard {
+    width: 350px;
+    min-height: 200px;
+}
+
+.preview {
+    width: 400px;
+
+    pre {
+        white-space: pre-wrap;
         word-break: break-all;
-        border: 1px solid $gray;
-        background: $button-gray;
+        width: 400px;
+        height: 200px;
+        overflow: scroll;
+        margin: 1em 0;
+        padding: 5px;
+        border-style: inset;
+        border-color: $black;
+        border-width: 1px;
+        border-left: 10px solid $dark-blue;
+        background: $light-gray;
     }
+}
 
-    label.selected {
-        background: $green;
-        border-color: $dark-green;
-    }
+.choices {
+    display: flex;
+    flex-wrap: wrap;
 
-    .info-box {
-        display: flex;
-        flex-flow: column nowrap;
-        flex-grow: 2;
-    }
+}
+
+ul, ol {
+    list-style: none;
+}
+
+label {
+    margin-right: 15px;
+    padding: 2px 3px;
+    border-radius: 3px;
+    word-break: break-all;
+    border: 1px solid $gray;
+    background: $button-gray;
+}
+
+label.selected {
+    background: $green;
+    border-color: $dark-green;
+}
+
+.info-box {
+    display: flex;
+    flex-flow: column nowrap;
+    padding: 10px;
+    background: $light-gray;
+    border: 1px solid $gray;
+    min-height: 200px;
 
     .info {
 
@@ -72,46 +111,43 @@
     }
 
     .buttons {
+        // push the buttons to the bottom
         margin: auto 0 0;
-        display: flex;
+    }
+}
 
-        button {
-            flex-grow: 1;
+
+.rules {
+    margin: 5px 0;
+
+    .rule {
+        height: inherit;
+        line-height: 1.1;
+        > * {
+            margin: 0 3px;
         }
     }
+}
 
-    .rules {
-        margin: 5px 0;
+.rule-name {
+    font-weight: bold;
+}
 
-        .rule {
-            height: inherit;
-            line-height: 1.1;
-            > * {
-                margin: 0 3px;
-            }
-        }
-    }
+.rule-attr, .rule-type {
+    font-size: 0.9em;
+    padding: 2px;
+    border: 1px solid $black;
+}
 
-    .rule-name {
-        font-weight: bold;
-    }
+.rule-attr {
+    color: $blue;
+    background: $light-blue;
+    border-color: $blue;
+}
 
-    .rule-attr, .rule-type {
-        font-size: 0.9em;
-        padding: 2px;
-        border: 1px solid $black;
-    }
-
-    .rule-attr {
-        color: $blue;
-        background: $light-blue;
-        border-color: $blue;
-    }
-
-    .rule-type {
-        color: $dark-green;
-        background: $light-green;
-        border-color: $dark-green;
-    }
+.rule-type {
+    color: $dark-green;
+    background: $light-green;
+    border-color: $dark-green;
 }
 

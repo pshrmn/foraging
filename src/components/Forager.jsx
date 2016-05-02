@@ -3,24 +3,13 @@ import { connect } from "react-redux";
 
 import Controls from "./Controls";
 import Frames from "./frames/Frames";
-import Tree from "./Tree";
 
 function Forager(props) {
   return !props.show ? null :
     (
       <div id="forager">
         <Controls />
-        { props.active ? (
-          <div className="workspace">
-            <div className="graph">
-              <Tree />
-            </div>
-            <Frames />
-          </div>
-          ) : (
-            null
-          )
-        }
+        { props.active ? <Frames /> : null }
       </div>
     );  
 }

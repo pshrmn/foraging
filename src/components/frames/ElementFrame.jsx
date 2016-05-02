@@ -1,84 +1,23 @@
 import React from "react";
 import { connect } from "react-redux";
 
-import { showElementWizard, removeElement, showEditElementWizard,
-  showRuleWizard, removeRule, showEditRuleWizard } from "../../actions";
-import { PosButton, NegButton, NeutralButton } from "../common/Buttons";
+import Tree from "../Tree";
+import ElementCard from "../ElementCard";
+
 import { highlight, unhighlight } from "../../helpers/markup";
 import { currentSelector } from "../../constants/CSSClasses";
 
 const ElementFrame = React.createClass({
-  addChild: function(event) {
-    this.props.showElementWizard();
-  },
-  addRule: function(event) {
-    this.props.showRuleWizard();
-  },
-  remove: function(event) {
-    const { element, removeElement } = this.props;
-    if ( !confirm(`Are you sure you want to delete the element "${element.selector}"?`)) {
-      return;
-    }
-    removeElement();
-  },
-  edit: function() {
-    this.props.showEditElementWizard();
-  },
-  removeRule: function(index) {
-    this.props.removeRule(index);
-  },
-  updateRule: function(index) {
-    this.props.showEditRuleWizard(index);
-  },
   render: function() {
     const { element } = this.props;
     if ( element === undefined ) {
       return null;
     }
 
-    const {
-      selector,
-      rules,
-      spec,
-      optional = false
-    } = element;
-    const {
-      type = "single",
-      value = 0
-    } = spec;
-
-    let description = "";
-
-    if ( type === "single" ) {
-      description = `captures element at index ${value}`;
-    } else if ( type === "all" ) {
-      description = `captures all elements, groups them as "${value}"`;
-      
-    }
     return (
       <div className="frame">
-        <div className="info">
-          <div>
-            <span className="big bold">{selector}{optional ? <span title="optional">*</span> : null}</span>
-          </div>
-          <div>
-            {description}
-          </div>
-          <RuleList rules={rules}
-                    remove={this.removeRule}
-                    update={this.updateRule} />
-        </div>
-        <div className="buttons">
-          <PosButton text="Add Child"
-                     click={this.addChild} />
-          <PosButton text="Add Rule"
-                     click={this.addRule} />
-          <NeutralButton text="Edit"
-                         click={this.edit} />
-          <NegButton text="Remove"
-                     title="Remove Element"
-                     click={this.remove} />
-        </div>
+        <Tree />
+        <ElementCard element={element} active={true} />
       </div>
     );
   },
@@ -99,49 +38,6 @@ const ElementFrame = React.createClass({
   }
 });
 
-const RuleList = React.createClass({
-  render: function() {
-    const { rules, remove, update } = this.props;
-    if ( !rules.length ) {
-      return null;
-    }
-    return (
-      <ul className="rules">
-        {
-          rules.map((r,i) => {
-            return <Rule key={i} index={i} remove={remove} update={update} {...r}/>;
-          })
-        }
-      </ul>
-    );
-  }
-})
-
-const Rule = React.createClass({
-  handleDelete: function(event) {
-    event.preventDefault();
-    this.props.remove(this.props.index);
-  },
-  handleUpdate: function(event) {
-    event.preventDefault();
-    this.props.update(this.props.index);
-  },
-  render: function() {
-    const { name, attr, type } = this.props;
-    return (
-      <li className="rule">
-        <span className="rule-name" title="name">{name}</span>
-        <span className="rule-attr" title="attribute (or text)">{attr}</span>
-        <span className="rule-type" title="data type">{type}</span>
-        <NeutralButton text="Edit"
-                       click={this.handleUpdate} />
-        <NegButton text="Delete"
-                   click={this.handleDelete} />
-      </li>
-    );
-  }
-});
-
 export default connect(
   state => {
     const { page } = state;
@@ -151,13 +47,5 @@ export default connect(
     return {
       element: element
     }
-  },
-  {
-    showElementWizard,
-    removeElement,
-    showRuleWizard,
-    removeRule,
-    showEditRuleWizard,
-    showEditElementWizard
   }
 )(ElementFrame);

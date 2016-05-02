@@ -10,6 +10,7 @@ import * as types from "../constants/ActionTypes";
 export default function frame(state = {name: "element"}, action) {
   switch ( action.type ) {
   case types.SELECT_PAGE:
+  case types.ADD_PAGE:
   case types.SET_PAGES:
   case types.REMOVE_ELEMENT:
   case types.SAVE_ELEMENT:

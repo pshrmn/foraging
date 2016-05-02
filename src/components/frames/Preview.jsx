@@ -2,6 +2,7 @@ import React from "react";
 import { connect } from "react-redux";
 
 import { PosButton, NegButton } from "../common/Buttons";
+import Tree from "../Tree";
 
 import { fullGrow } from "../../helpers/page";
 import { preview } from "../../helpers/preview";
@@ -22,14 +23,17 @@ const Preview = React.createClass({
   },
   render: function() {
     return (
-      <div className="preview">
-        <pre>
-          {JSON.stringify(preview(this.props.tree), null, 2)}
-        </pre>
-        <div className="buttons">
-          <PosButton text="Log to Console" click={this.logHandler} />
-          <PosButton text="Pretty Log" click={this.prettyLogHandler} />
-          <NegButton text="Close" click={this.closeHandler} />
+      <div className="frame">
+        <Tree />
+        <div className="preview">
+          <pre>
+            {JSON.stringify(preview(this.props.tree), null, 2)}
+          </pre>
+          <div className="buttons">
+            <PosButton text="Log to Console" click={this.logHandler} />
+            <PosButton text="Pretty Log" click={this.prettyLogHandler} />
+            <NegButton text="Hide Preview" click={this.closeHandler} />
+          </div>
         </div>
       </div>
     );

@@ -22,28 +22,20 @@ import Preview from "./Preview";
   let frameElement = null;
   switch ( frame.name ) {
   case "element":
-    frameElement = <ElementFrame />;
-    break;
+    return <ElementFrame />;
   case "element-wizard":
-    frameElement = <ElementWizard />;
-    break;
+    return <ElementWizard />;
   case "edit-element-wizard":
-    frameElement = <EditElementWizard />;
-    break;
+    return <EditElementWizard />;
   case "rule-wizard":
-    frameElement = <RuleWizard />;
-    break;
+    return <RuleWizard />;
   case "edit-rule-wizard":
-    frameElement = <EditRuleWizard />;
-    break;
+    return <EditRuleWizard />;
   case "preview":
-    frameElement = <Preview />;
+    return <Preview />;
+  default:
+    return null
   }
-  return (
-    <div className="frames">
-      { frameElement }
-    </div>
-  );
 }
 
 export default connect(

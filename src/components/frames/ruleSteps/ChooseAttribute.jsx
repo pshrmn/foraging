@@ -55,13 +55,14 @@ const ChooseAttribute = React.createClass({
         <li key={i}>
           <label>
             <input type="radio"
-                   name="rule-attr"
                    value={a.name}
                    checked={a.name === attribute }
                    onChange={this.attributeHandler} />
             {a.name}
           </label>
-          {abbreviate(a.value, 40)}
+          <p className="line">
+            {abbreviate(a.value, 40)}
+          </p>
         </li>
       );
     });

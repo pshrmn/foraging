@@ -1,6 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
 
+import Tree from "../Tree";
 import Wizard from "simple-wizard-component";
 
 import ChooseElements from "./elementSteps/ChooseElements";
@@ -42,10 +43,13 @@ const ElementWizard = React.createClass({
       ConfirmElement
     ];
     return (
-      <Wizard steps={steps}
-              initialData={initialData}
-              save={this.save}
-              cancel={this.cancel} />
+      <div className="frame">
+        <Tree />
+        <Wizard steps={steps}
+                initialData={initialData}
+                save={this.save}
+                cancel={this.cancel} />
+      </div>
     );
   },
   componentWillMount: function() {

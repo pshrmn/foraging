@@ -2,6 +2,7 @@ import React from "react";
 import { connect } from "react-redux";
 
 import Wizard from "simple-wizard-component";
+import ElementCard from "../ElementCard";
 
 import ChooseAttribute from "./ruleSteps/ChooseAttribute";
 import ChooseType from "./ruleSteps/ChooseType";
@@ -52,15 +53,18 @@ const RuleWizard = React.createClass({
       ConfirmRule
     ];
     return (
-      <Wizard steps={steps}
-              initialData={initialData}
-              extraData={extraData}
-              save={this.save}
-              cancel={this.cancel}>
-        <Cycle index={index}
-               count={current.matches.length}
-               setIndex={this.setIndex} />
-      </Wizard>
+      <div className="frame">
+        <ElementCard active={false} element={current} />
+        <Wizard steps={steps}
+                initialData={initialData}
+                extraData={extraData}
+                save={this.save}
+                cancel={this.cancel}>
+          <Cycle index={index}
+                 count={current.matches.length}
+                 setIndex={this.setIndex} />
+        </Wizard>
+      </div>
     );
   },
   componentWillMount: function() {

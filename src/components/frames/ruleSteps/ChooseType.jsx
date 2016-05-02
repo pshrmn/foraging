@@ -53,7 +53,6 @@ const ChooseType = React.createClass({
       return (
         <label key={i}>
           <input type="radio"
-                 name="rule-type"
                  value={t}
                  checked={t === type}
                  onChange={this.typeHandler} />
@@ -88,7 +87,7 @@ const ChooseType = React.createClass({
             What type of value is this?
           </h3>
           {typeRadios}
-          <p>
+          <p className="line">
             {preview}
           </p>
           {this.props.children}
