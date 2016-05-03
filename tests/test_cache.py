@@ -5,7 +5,8 @@ import time
 
 from gatherer.cache import clean_url_filename, url_info, Cache
 
-CACHE_DIRECTORY = os.path.join(os.getcwd(), "tests", "test_cache")
+CACHE_DIRECTORY = os.path.join(os.getcwd(), "tests", "data", "test_cache")
+
 
 class CacheHelpersTestCase(unittest.TestCase):
 
@@ -92,7 +93,7 @@ class CacheTestCase(unittest.TestCase):
 
     def test_cache_max_age(self):
         # create a new cache folder
-        EXPIRE_CACHE_DIRECTORY = os.path.join(os.getcwd(), "tests", "test_cache_expire")
+        EXPIRE_CACHE_DIRECTORY = os.path.join(os.getcwd(), "tests", "data", "test_cache_expire")
         os.makedirs(EXPIRE_CACHE_DIRECTORY, exist_ok=True)
 
         # create two files, the first won't have its modified time changed and the
@@ -132,7 +133,7 @@ class CacheTestCase(unittest.TestCase):
 
     def test_cache_expire_during_get(self):
         # create a new cache folder
-        EXPIRE_CACHE_DIRECTORY = os.path.join(os.getcwd(), "tests", "test_cache_expire_during")
+        EXPIRE_CACHE_DIRECTORY = os.path.join(os.getcwd(), "tests", "data", "test_cache_expire_during")
         os.makedirs(EXPIRE_CACHE_DIRECTORY, exist_ok=True)
 
         # create two files, the first won't have its modified time changed and the
@@ -152,7 +153,7 @@ class CacheTestCase(unittest.TestCase):
 
         c = Cache(EXPIRE_CACHE_DIRECTORY, max_age=60)
         self.assertIsNotNone(c.get(first_url))
-        
+
         # modify the last modified time of the file to two minutes ago
         now = int(time.time())
         then = now - 120
@@ -162,7 +163,7 @@ class CacheTestCase(unittest.TestCase):
         self.assertIsNone(c.get(first_url))
         self.assertFalse(os.path.isfile(first_path))
 
-        shutil.rmtree(EXPIRE_CACHE_DIRECTORY)        
+        shutil.rmtree(EXPIRE_CACHE_DIRECTORY)
 
 if __name__ == "__main__":
     unittest.main()

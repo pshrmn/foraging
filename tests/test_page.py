@@ -5,7 +5,7 @@ import json
 from gatherer.page import Page
 from gatherer.errors import BadJSONError
 
-path = os.path.join(os.getcwd(), "tests", "test_json")
+path = os.path.join(os.getcwd(), "tests", "data", "test_json")
 
 
 class PageTestCase(unittest.TestCase):

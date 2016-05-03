@@ -1,74 +1,10 @@
 import time
-import os
 from urllib.parse import urlparse
-import subprocess
-import logging
 
-import requests
 from lxml import html
 from lxml.html.clean import Cleaner
 
-
-log = logging.getLogger(__name__)
-
-
-def requests_backend(url, headers):
-    """
-    requests backend
-
-    This can be directly passed to your Fetch class
-
-    Uses requests to send a GET request to the url with any
-    headers attached. If there is a connection error, if the
-    response status code is not 200, or if the text of the
-    response is blank, returns None
-    """
-    log.info("<requests> {}".format(url))
-    try:
-        resp = requests.get(url, headers=headers)
-    except requests.exceptions.ConnectionError:
-        log.warning("<requests> {} ConnectionError".format(url))
-        return None
-    if not resp.ok or resp.text == "":
-        log.warning("<requests> {} bad response".format(url))
-        return None
-    return resp.text
-
-
-def phantom_backend(phantom_path, js_path):
-    """
-    phantom backend
-
-    A closure function to create a backend, this needs to be
-    called with the correct paths, then the returned function
-    is passed to your Fetch class.
-
-    Uses PhantomJS to send a GET request to the url with the
-    User-Agent header attached. If the result from the function
-    is an empty string, returns None, otherwise returns the
-    decoded result.
-    """
-    if not os.path.exists(phantom_path):
-        err = "phantom_path ({}) does not exist"
-        raise ValueError(err.format(phantom_path))
-    if not os.path.exists(js_path):
-        err = "js_path ({}) does not exist"
-        raise ValueError(err.format(js_path))
-
-    def get(url, headers):
-        log.info("<phantomjs> {}".format(url))
-        commands = [phantom_path, js_path, url, headers['User-Agent']]
-        process = subprocess.Popen(commands, stdout=subprocess.PIPE)
-        # any errors are ignored, for better or probably for worse
-        out, _ = process.communicate()
-        text = out.decode()
-        # text will be empty string when phantom request is not successful
-        if text == "":
-            log.warning("<phantomjs> {} bad response".format(url))
-            return None
-        return text
-
-    return get
+from gatherer.backends.requests import requests_backend
 
 
 class Fetch(object):

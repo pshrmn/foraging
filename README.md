@@ -56,7 +56,8 @@ Arguments:
 * `cache`: an optional `Cache` object used to store webpages to mitigate duplicate requests (default `None`)
 
 ```python
-from gatherer import Fetch, requests_backend, phantom_backend
+from gatherer import Fetch
+from gatherer.backends import requests_backend, phantom_backend
 
 fetch = Fetch(backend=requests_backend, headers={"User-Agent": "custom-gatherer-user-agent"})
 # requests_backend is the default backend, so it doesn't

@@ -5,7 +5,7 @@ import json
 from gatherer.expect import flatten_element, compare, differences
 from gatherer.element import Element
 
-path = os.path.join(os.getcwd(), "tests", "test_expect")
+path = os.path.join(os.getcwd(), "tests", "data", "test_expect")
 
 
 def make_element(path):
