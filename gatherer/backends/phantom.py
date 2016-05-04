@@ -25,7 +25,9 @@ def phantom_backend(phantom_path, js_path):
         err = "js_path ({}) does not exist"
         raise ValueError(err.format(js_path))
 
-    def get(url, headers):
+    def get(url, headers=None):
+        if headers is None:
+            headers = {}
         log.info("<phantomjs> {}".format(url))
         commands = [phantom_path, js_path, url, headers['User-Agent']]
         process = subprocess.Popen(commands, stdout=subprocess.PIPE)

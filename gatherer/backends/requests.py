@@ -4,7 +4,7 @@ import logging
 log = logging.getLogger(__name__)
 
 
-def requests_backend(url, headers):
+def requests_backend(url, headers=None):
     """
     requests backend
 
@@ -15,6 +15,8 @@ def requests_backend(url, headers):
     response status code is not 200, or if the text of the
     response is blank, returns None
     """
+    if headers is None:
+        headers = {}
     log.info("<requests> {}".format(url))
     try:
         resp = requests.get(url, headers=headers)

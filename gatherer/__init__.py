@@ -2,7 +2,7 @@
 Gatherer
 ~~~~~~~~
 
-A tiny web scraping library. Pairs well with https://github.com/psherman/forager
+A tiny web scraping library. Pairs well with https://github.com/pshrmn/forager
 for creating rule sets to get structured data.
 
     >>> import json
@@ -22,7 +22,7 @@ for creating rule sets to get structured data.
 :license: MIT, see LICENSE for more details
 """
 
-__version__ = "1.7.0"
+__version__ = "1.7.1"
 
 from .fetch import Fetch
 from .cache import Cache

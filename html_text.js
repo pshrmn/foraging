@@ -30,6 +30,7 @@ page.open(url, function(status){
     if ( status === "fail" || wrong_url ) {
         phantom.exit();
     }
+    // the subprocess receives text that has been logged
     console.log(page.content);
     phantom.exit();
 });
