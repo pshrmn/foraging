@@ -8,5 +8,8 @@ Contents:
    :maxdepth: 2
 
    installation
+   fetch
+   backends
+   cache
    tutorial
    license
