@@ -77,19 +77,22 @@ class CacheTestCase(unittest.TestCase):
         html_string = "<html></html>".encode("utf-8")
         sample_url = "http://www.sample.com/testpage.html"
         d, f = url_info(sample_url)
-        directory = os.path.join(CACHE_DIRECTORY, d)
+        DIRECTORY = os.path.join(CACHE_DIRECTORY, d)
         # the www_sample_com directory should not exist until the file is cached
-        self.assertFalse(os.path.exists(directory))
+        self.assertFalse(os.path.exists(DIRECTORY))
         self.assertNotIn(d, c.sites)
 
         c.save(sample_url, html_string)
 
-        full_save_name = os.path.join(directory, f)
+        full_save_name = os.path.join(DIRECTORY, f)
         self.assertIn(full_save_name, c.sites[d])
         self.assertTrue(os.path.exists(full_save_name))
 
         # remove this after the test is done
-        shutil.rmtree(directory)
+        for file in os.listdir(DIRECTORY):
+            if os.path.isfile(file):
+                os.unlink(file)
+        shutil.rmtree(DIRECTORY)
 
     def test_cache_max_age(self):
         # create a new cache folder
@@ -129,6 +132,10 @@ class CacheTestCase(unittest.TestCase):
         self.assertIn(first_path, c.sites[first_info[0]])
         # and the second path should no longer exist
         self.assertFalse(os.path.isfile(second_path))
+
+        for file in os.listdir(EXPIRE_CACHE_DIRECTORY):
+            if os.path.isfile(file):
+                os.unlink(file)
         shutil.rmtree(EXPIRE_CACHE_DIRECTORY)
 
     def test_cache_expire_during_get(self):
@@ -163,6 +170,9 @@ class CacheTestCase(unittest.TestCase):
         self.assertIsNone(c.get(first_url))
         self.assertFalse(os.path.isfile(first_path))
 
+        for file in os.listdir(EXPIRE_CACHE_DIRECTORY):
+            if os.path.isfile(file):
+                os.unlink(file)
         shutil.rmtree(EXPIRE_CACHE_DIRECTORY)
 
 if __name__ == "__main__":

@@ -54,6 +54,18 @@ class RuleTestCase(unittest.TestCase):
             with self.assertRaises(BadJSONError):
                 Rule.from_json(rule_json)
 
+    def test_no_attr(self):
+        # if the attribute doesn't exist, returns None
+        example = "<a href=\"http://www.example.com\">Test</a>"
+        ele = html.fragment_fromstring(example)
+        r = Rule.from_json({
+            "name": "url",
+            "attr": "src",
+            "type": "string"
+        })
+        val = r.get(ele)
+        self.assertIsNone(val)
+
     def test_type_string(self):
         example = "<a href=\"http://www.example.com\">Test</a>"
         ele = html.fragment_fromstring(example)

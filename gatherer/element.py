@@ -6,12 +6,11 @@ from .errors import BadJSONError
 
 class Element(object):
 
-    def __init__(self, selector, sel_type, value, children, rules,
+    def __init__(self, selector, spec, children, rules,
                  optional=False):
         self.selector = selector
         self.xpath = CSSSelector(selector)
-        self.type = sel_type
-        self.value = value
+        self.spec = spec
         self.children = children
         self.rules = rules
         self.optional = optional
@@ -28,15 +27,13 @@ class Element(object):
         if spec is None:
             msg = "Element requires spec\n{}"
             raise BadJSONError(msg.format(sel))
-        sel_type = spec.get("type")
-        value = spec.get("value")
-        if sel_type is None:
+        if spec.get("type") is None:
             msg = "no Element spec type provided"
             raise BadJSONError(msg)
-        elif sel_type not in ["single", "all"]:
+        elif spec.get("type") not in ["single", "all"]:
             msg = "unexpected Element type {}"
-            raise BadJSONError(msg.format(sel_type))
-        if value is None:
+            raise BadJSONError(msg.format(spec.get("type")))
+        if spec.get("value") is None:
             msg = "no Element spec value provided"
             raise BadJSONError(msg)
 
@@ -53,7 +50,7 @@ class Element(object):
             msg = ("Element has no children or rules and "
                    "should be removed from the page")
             raise BadJSONError(msg.format(sel))
-        return cls(selector, sel_type, value, children, rules, optional)
+        return cls(selector, spec, children, rules, optional)
 
     def get(self, parent):
         """
@@ -63,20 +60,22 @@ class Element(object):
         elements and returns a list.
         """
         elements = self.xpath(parent)
-        if self.type == "single":
+        spec_type = self.spec.get("type")
+        spec_value = self.spec.get("value")
+        if spec_type == "single":
             try:
-                element = elements[self.value]
+                element = elements[spec_value]
             except IndexError:
                 # return None if element doesn't exist
                 return
-            return self.get_element_data(element)
-        elif self.type == "all":
+            return self._get_element_data(element)
+        elif spec_type == "all":
             data = [self.get_element_data(e) for e in elements]
-            return {self.value: [d for d in data if d]}
+            return {spec_value: [d for d in data if d]}
 
-    def get_element_data(self, element):
-        data = self.rule_data(element)
-        child_data = self.child_data(element)
+    def _get_element_data(self, element):
+        data = self._rule_data(element)
+        child_data = self._child_data(element)
         # if child_data does not exist, return
         if child_data is None:
             return
@@ -84,7 +83,7 @@ class Element(object):
             data[key] = val
         return data
 
-    def rule_data(self, element):
+    def _rule_data(self, element):
         """
         Return the data associated with each attribute for each Rule.
         If the element does not have the attribute for a rule, the get call
@@ -92,7 +91,7 @@ class Element(object):
         """
         return {rule.name: rule.get(element) for rule in self.rules}
 
-    def child_data(self, element):
+    def _child_data(self, element):
         """
         Get the data for all child selectors, merge that data into a dict,
         and return that dict. If a selector fails to match an element in the

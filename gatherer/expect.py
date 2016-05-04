@@ -30,11 +30,13 @@ def flatten_element(element):
             rules[rule.name] = rule_type
     for child in element.children:
         child_rules = flatten_element(child)
-        if child.type == "single":
+        child_type = child.spec.get("type")
+        if child_type == "single":
             for name, val in child_rules.items():
                 rules[name] = val
-        elif child.type == "all":
-            rules[child.value] = child_rules
+        elif child_type == "all":
+            child_value = child.spec.get("value")
+            rules[child_value] = child_rules
     return rules
 
 

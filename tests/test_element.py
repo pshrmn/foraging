@@ -33,8 +33,8 @@ class ElementTestCase(unittest.TestCase):
         self.assertIsNotNone(e)
         self.assertEqual(len(e.rules), 2)
         self.assertIsInstance(e.rules[0], Rule)
-        self.assertEqual(e.type, "single")
-        self.assertEqual(e.value, 0)
+        self.assertEqual(e.spec.get("type"), "single")
+        self.assertEqual(e.spec.get("value"), 0)
 
     def test_nested_from_json(self):
         nested_json = {

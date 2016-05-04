@@ -33,13 +33,16 @@ class Rule(object):
             val = element.text_content().strip()
         else:
             val = element.get(self.attr)
+            if val is None:
+                return None
 
         # convert to the desired format (or just return the string)
+        if self.type == "string":
+            return val
         if self.type == "int":
             return self.find_int(val)
         elif self.type == "float":
             return self.find_float(val)
-        return val
 
     @staticmethod
     def find_int(text):
