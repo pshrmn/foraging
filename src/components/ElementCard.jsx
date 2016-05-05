@@ -26,7 +26,10 @@ const ElementCard = React.createClass({
   },
   remove: function(event) {
     const { element, removeElement } = this.props;
-    if ( !confirm(`Are you sure you want to delete the element "${element.selector}"?`)) {
+    const msg = element.index === 0 ?
+      "Are you sure you want to reset the page? This will delete all rules and child elements" :
+      `Are you sure you want to delete the element "${element.selector}"?`
+    if ( !confirm(msg)) {
       return;
     }
     removeElement();
@@ -35,7 +38,8 @@ const ElementCard = React.createClass({
     this.props.showEditElementWizard();
   },
   render: function() {
-    const { element, active = true } = this.props;
+    const { element = {}, active = true } = this.props;
+    const isRoot = element.index === 0;
     return (
       <div className="info-box">
         <div className="info">
@@ -49,10 +53,10 @@ const ElementCard = React.createClass({
                      disabled={!active}
                      click={this.addRule} />
           <NeutralButton text="Edit"
-                     disabled={!active}
+                     disabled={!active || isRoot}
                          click={this.edit} />
-          <NegButton text="Delete"
-                     title="Deletee Element"
+          <NegButton text={isRoot ? "Reset" : "Delete"}
+                     title={isRoot ? "Reset Page" : "Delete Element"}
                      disabled={!active}
                      click={this.remove} />
         </div>

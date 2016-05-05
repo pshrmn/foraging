@@ -136,6 +136,11 @@ export default function page(state = {}, action) {
 
     var { index, newProps } = action;
 
+    // don't actually update the 0th Element (body)
+    if ( index === 0 ) {
+      return state;
+    }
+
     return Object.assign({}, state, {
       pages: [
         ...pages.slice(0, pageIndex),

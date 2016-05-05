@@ -313,6 +313,30 @@ describe("page reducer", () => {
       expect(current.spec.value).to.equal(newProps.spec.value);
       expect(current.optional).to.equal(newProps.optional);
     });
+
+    it("doesn't actually update the 0th Element", () => {
+      const newProps = {
+        spec: {
+          type: 'all',
+          value: 'everybody'
+        }
+      };
+      const index = 0;
+      state.elementIndex = index;
+      const newState = page(state, {
+        type: ActionTypes.UPDATE_ELEMENT,
+        index,
+        newProps
+      });
+
+      const {
+        pages: newPages,
+        pageIndex: newPageIndex
+      } = newState;
+      const current = newPages[newPageIndex].elements[index];
+      expect(current.spec.value).to.equal(0);
+      expect(current.spec.type).to.equal("single");
+    });
   });
 
   describe("REMOVE_ELEMENT", () => {
