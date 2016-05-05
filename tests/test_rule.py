@@ -63,7 +63,7 @@ class RuleTestCase(unittest.TestCase):
             "attr": "src",
             "type": "string"
         })
-        val = r.get(ele)
+        val = r.data(ele)
         self.assertIsNone(val)
 
     def test_type_string(self):
@@ -74,7 +74,7 @@ class RuleTestCase(unittest.TestCase):
             "attr": "href",
             "type": "string"
         })
-        val = r.get(ele)
+        val = r.data(ele)
         self.assertIsInstance(val, str)
         self.assertEqual(val, "http://www.example.com")
 
@@ -92,7 +92,7 @@ class RuleTestCase(unittest.TestCase):
                 "type": "int"
             })
             ele = html.fragment_fromstring(html_string)
-            val = r.get(ele)
+            val = r.data(ele)
             self.assertIsInstance(val, int)
             self.assertEqual(val, expected)
 
@@ -105,7 +105,7 @@ class RuleTestCase(unittest.TestCase):
         })
         html_string = "<div>Nothing to see here</div>"
         ele = html.fragment_fromstring(html_string)
-        val = r.get(ele)
+        val = r.data(ele)
         self.assertIsNone(val)
 
     def test_type_float(self):
@@ -122,7 +122,7 @@ class RuleTestCase(unittest.TestCase):
                 "type": "float"
             })
             ele = html.fragment_fromstring(html_string)
-            val = r.get(ele)
+            val = r.data(ele)
             self.assertIsInstance(val, float)
             self.assertEqual(val, expected)
 
@@ -135,7 +135,7 @@ class RuleTestCase(unittest.TestCase):
         })
         html_string = "<div>Nothing to see here</div>"
         ele = html.fragment_fromstring(html_string)
-        val = r.get(ele)
+        val = r.data(ele)
         self.assertIsNone(val)
 
 if __name__ == "__main__":

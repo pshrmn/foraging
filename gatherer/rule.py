@@ -23,7 +23,7 @@ class Rule(object):
             raise BadJSONError("Rule requires type, got {}".format(rule_json))
         return cls(name, attribute, _type)
 
-    def get(self, element):
+    def data(self, element):
         """
         Returns an error message and a value. If there is as error message, the
         value is None and vice versa.

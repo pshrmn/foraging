@@ -27,11 +27,11 @@ class Page(object):
 
     def gather(self, dom):
         """The gather method is syntactic sugar for the Page's Element's
-        get method. It takes an lxml.HtmlElement and returns a dict with
+        data method. It takes an lxml.HtmlElement and returns a dict with
         the data that was gathered from the dom.
 
         :param dom: An :class:`lxml.HtmlElement`
         :return: a dict with the desired data from the dom
         :rtype: dict
         """
-        return self.element.get(dom)
+        return self.element.data(dom)

@@ -52,7 +52,7 @@ class Element(object):
             raise BadJSONError(msg.format(sel))
         return cls(selector, spec, children, rules, optional)
 
-    def get(self, parent):
+    def data(self, parent):
         """
         Given a parent element, get the child element(s) using the compiled
         xpath for the selector. For "single" Elements, this will be a single
@@ -86,10 +86,10 @@ class Element(object):
     def _rule_data(self, element):
         """
         Return the data associated with each attribute for each Rule.
-        If the element does not have the attribute for a rule, the get call
+        If the element does not have the attribute for a rule, the data call
         will return None
         """
-        return {rule.name: rule.get(element) for rule in self.rules}
+        return {rule.name: rule.data(element) for rule in self.rules}
 
     def _child_data(self, element):
         """
@@ -99,7 +99,7 @@ class Element(object):
         """
         data = {}
         for child in self.children:
-            child_data = child.get(element)
+            child_data = child.data(element)
             if child_data is None:
                 if not child.optional:
                     return
