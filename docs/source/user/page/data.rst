@@ -5,7 +5,7 @@ So how does ``Gatherer`` merge the data together? In short, it performs depth fi
 
 **Note**: In order to more succinctly describe ``Elements``, they will be described using their selector and spec. ``div[0]`` means that the CSS selector is ``div``, the spec type is ``single`` and the spec value is ``0``. ``[div]`` means that the CSS selector is ``div`` and the spec type is ``all``.
 
-Walkthrough
+Basic Merge
 ^^^^^^^^^^^
 
 Below we will work through the same flow that ``Gatherer`` uses to get the desired data from a web page.
@@ -55,7 +55,7 @@ And the following ``Page``:
           {
             "selector": "a",
             "spec": {"type": "single", "value": 0},
-            "optional": false,
+            "optional": true,
             "rules": [
               {
                 "name": "url",
@@ -105,7 +105,7 @@ The root ``Element`` of a `Page`` is always ``body[0]``, so we will start by sel
 .. code-block:: python
 
   # selectAll is pseudo function that does the same
-  # thing as JavaScript's Element.querySecletorAll
+  # thing as JavaScript's Element.querySelectorAll
   bodies = DOM.selectAll("body")
   body = bodies[0]
   # body == <body></body>
@@ -148,15 +148,15 @@ Now, we iterate over that list and get data for each one. Like the ``body[0]`` s
       links = section.selectAll("a")
       link = links[0]
       return {
-        "url": link.getAttribute("href"),
-        "title": link.textContent()
+          "url": link.getAttribute("href"),
+          "title": link.textContent()
       }
 
   def get_paragraph(section):
       paragraphs = section.selectAll("p")
       paragraph = paragraphs[0]
       return {
-        "description": paragraph.textContent()
+          "description": paragraph.textContent()
       }
 
 The data from each of the child ``Elements`` can then be merged back into each section element's data dict. Then the data can be added to the list of section data.
@@ -215,3 +215,161 @@ Now, we have a dict containing the data for each
       }
     ]
   }
+
+Optional Elements
+^^^^^^^^^^^^^^^^^
+
+In the above HTML, every ``Element`` had the desired matching DOM element, but what if that was not the case? Take the following HTML:
+
+.. code-block:: html
+
+  <body>
+    <!-- other sections ... -->
+    <section>
+      <a href="/five">Five</a>
+    </section>
+  </body>
+
+That contains the ``a[0]`` child, but not the ``p[0]`` child, so lets take another look at the ``get_paragraph`` function. When ``get_paragraph`` calls ``section.selectAll("p")``, it won't match any items, so paragraph will be an empty list. Then, our ``paragraphs[0]`` call would cause an ``IndexError``. We should make a check that ``selectAll``'s result is not empty, and return ``None`` when it is.
+
+.. code-block:: python
+
+    def get_paragraph(section):
+      paragraphs = section.selectAll("p")
+      if not paragraphs:
+          return
+      paragraph = paragraphs[0]
+      return {
+          "description": paragraph.textContent()
+      }
+
+That fixes the issue in ``get_paragraph``, but what about when we merge the ``p[0]`` data back into the section's data? ``get_paragraph`` will have returned ``None``, but our code expects to call the ``items`` method of a dict. Trying to do that on a ``None`` value will cause an ``AttributeError``, so we should check for ``None`` before merging.
+
+.. code-block:: python
+
+  paragraph_data = get_paragraph(section) 
+  if paragraph_data:
+    for key, val in paragraph_data.items():
+        section_data[key] = val
+
+Just making sure that the ``paragraph_data`` is not ``None`` will result in our data dict for this section being:
+
+.. code-block:: python
+
+  section_data == {
+      "url": "/five",
+      "title": "Five"
+  }
+
+That would be fine if the ``p[0]`` ``Element`` was optional, but it is not (``optional=False``). So what should be do then? If the data for an ``Element`` is ``None`` and the ``Element`` is not optional, then its parent's data should also be ``None``, but when an ``Element`` is optional, we should just skip merging its data. In our case the ``p[0]`` ``Element`` is not optional, but the ``a[0]`` ``Element`` is.
+
+.. code-block:: python
+
+  section_list = []
+
+  for section in sections:
+      section_data = {}
+      link_data = get_link(section)
+      # when we get data, merge as usual
+      # because a[0] is optional, we do nothing
+      # when link_data is None
+      if link_data:
+          for key, val in link_data.items():
+              section_data[key] = val
+
+      paragraph_data = get_paragraph(section) 
+      # when we get data, merge as usual
+      # because p[0] is not optional, we continue
+      # to the next section when paragraph_data
+      # is None
+      if paragraph_data:
+          for key, val in paragraph_data.items():
+              section_data[key] = val
+      else:
+        continue
+
+      section_list.append(section_data)
+
+Now, because that section didn't have a ``<p>`` DOM element, ``continue`` gets called and the data for that section is not added to the list of section data.
+
+What about rules that don't exist? Rules are always required, so if 
+
+Full Example Code
+^^^^^^^^^^^^^^^^^
+
+**Note:** While the code in here looks Pythonic, it is actually pseudocode, so this can't actually be run. It should just be considered a useful reference for understanding how ``Gatherer``'s data collection works.
+
+.. code-block:: python
+
+  """
+  selectAll is pseudo function that does the same
+  thing as JavaScript's Element.querySelectorAll
+  """
+
+  def get_body(DOM):
+      bodies = DOM.selectAll("body")
+      body = bodies[0]
+      # body == <body></body>
+
+      body_data = {}
+
+      sections_data = get_sections(body)
+      for key, val in sections_data.items():
+          body_data[key] = val
+
+      return body_data
+
+
+  def get_sections(body):
+      sections = body.selectAll("section")
+      section_list = []
+
+      for section in sections:
+          section_data = {}
+          link_data = get_link(section)
+          # when we get data, merge as usual
+          # because a[0] is optional, we do nothing
+          # when link_data is None
+          if link_data:
+              for key, val in link_data.items():
+                  section_data[key] = val
+
+          paragraph_data = get_paragraph(section) 
+          # when we get data, merge as usual
+          # because p[0] is not optional, we continue
+          # to the next section when paragraph_data
+          # is None
+          if paragraph_data:
+              for key, val in paragraph_data.items():
+                  section_data[key] = val
+          else:
+            continue
+
+          section_list.append(section_data)
+
+      sections_data = {
+          "sections": section_list
+      }
+
+  def get_link(section)
+      links = section.selectAll("a")
+      if not links:
+          return
+      link = links[0]
+      return {
+          "url": link.getAttribute("href"),
+          "title": link.textContent()
+      }
+
+  def get_paragraph(section):
+      paragraphs = section.selectAll("p")
+      if not paragraphs:
+          return
+      paragraph = paragraphs[0]
+      return {
+          "description": paragraph.textContent()
+      }
+
+  url = "http://www.example.com"
+  dom = fetcher.get(url)
+  data = get_body(dom)
