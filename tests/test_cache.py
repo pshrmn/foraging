@@ -89,9 +89,6 @@ class CacheTestCase(unittest.TestCase):
         self.assertTrue(os.path.exists(full_save_name))
 
         # remove this after the test is done
-        for file in os.listdir(DIRECTORY):
-            if os.path.isfile(file):
-                os.unlink(file)
         shutil.rmtree(DIRECTORY)
 
     def test_cache_max_age(self):
@@ -133,9 +130,6 @@ class CacheTestCase(unittest.TestCase):
         # and the second path should no longer exist
         self.assertFalse(os.path.isfile(second_path))
 
-        for file in os.listdir(EXPIRE_CACHE_DIRECTORY):
-            if os.path.isfile(file):
-                os.unlink(file)
         shutil.rmtree(EXPIRE_CACHE_DIRECTORY)
 
     def test_cache_expire_during_get(self):
@@ -170,9 +164,6 @@ class CacheTestCase(unittest.TestCase):
         self.assertIsNone(c.get(first_url))
         self.assertFalse(os.path.isfile(first_path))
 
-        for file in os.listdir(EXPIRE_CACHE_DIRECTORY):
-            if os.path.isfile(file):
-                os.unlink(file)
         shutil.rmtree(EXPIRE_CACHE_DIRECTORY)
 
 if __name__ == "__main__":

@@ -75,10 +75,13 @@ class Element(object):
 
     def _get_element_data(self, element):
         data = self._rule_data(element)
+        if data is None:
+            return
         child_data = self._child_data(element)
         # if child_data does not exist, return
         if child_data is None:
             return
+        # name collisions will override existing value
         for key, val in child_data.items():
             data[key] = val
         return data
@@ -89,7 +92,13 @@ class Element(object):
         If the element does not have the attribute for a rule, the data call
         will return None
         """
-        return {rule.name: rule.data(element) for rule in self.rules}
+        data = {}
+        for rule in self.rules:
+            rule_data = rule.data(element)
+            if rule_data is None:
+                return None
+            data[rule.name] = rule_data
+        return data
 
     def _child_data(self, element):
         """
