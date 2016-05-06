@@ -5,11 +5,11 @@ Contents:
 ^^^^^^^^^
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
-   installation
-   fetch
-   backends
-   cache
-   tutorial
+   user/installation
+   user/basics
+   user/fetch/index
+   user/page/index
+   user/tutorial
    license
