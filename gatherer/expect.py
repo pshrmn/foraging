@@ -16,6 +16,23 @@ def flatten_element(element):
     :rtype: dict
     """
 
+    data = {}
+    _type = element.spec.get("type")
+    value = element.spec.get("value")
+    rule_data = flatten_rules(element)
+
+    for child in element.children:
+        for key, val in flatten_element(child).items():
+            rule_data[key] = val
+
+    if _type == "single":
+        return rule_data
+    elif _type == "all":
+        data[value] = rule_data
+        return data
+
+
+def flatten_rules(element):
     rules = {}
     for rule in element.rules:
         rule_type = rule.type
@@ -28,15 +45,6 @@ def flatten_element(element):
         else:
             # unexpected rule type
             rules[rule.name] = rule_type
-    for child in element.children:
-        child_rules = flatten_element(child)
-        child_type = child.spec.get("type")
-        if child_type == "single":
-            for name, val in child_rules.items():
-                rules[name] = val
-        elif child_type == "all":
-            child_value = child.spec.get("value")
-            rules[child_value] = child_rules
     return rules
 
 
