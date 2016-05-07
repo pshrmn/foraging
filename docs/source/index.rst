@@ -11,5 +11,6 @@ Contents:
    user/basics
    user/fetch/index
    user/page/index
+   user/expect
    user/tutorial
    license

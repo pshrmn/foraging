@@ -48,15 +48,15 @@ def flatten_rules(element):
     return rules
 
 
-def compare(values, expected):
+def compare(data, expected):
     """
     return a boolean where True means that every returned value exists and has
     the expected type, and False means that at least one unexpected value exists
 
-    :param values: Values gathered by a Page.
+    :param data: Values gathered by a Page.
     :param expected: Expected type for each value in the gathered
         Page.
-    :type values: dict
+    :type data: dict
     :type expected: dict
     :return: True if all expected types match, otherwise False
     :rtype: bool
@@ -65,7 +65,7 @@ def compare(values, expected):
     for key, exp_type in expected.items():
         if good is False:
             break
-        value = values.get(key)
+        value = data.get(key)
         if value is None:
             good = False
         elif isinstance(value, list):
@@ -75,22 +75,22 @@ def compare(values, expected):
     return good
 
 
-def differences(values, expected):
+def differences(data, expected):
     """
     return a dict representing the differences between the expected types and
     the actual types that were returned
 
-    :param values: Values gathered by a Page.
+    :param data: Values gathered by a Page.
     :param expected: Expected type for each value in the gathered
         Page.
-    :type values: dict
+    :type data: dict
     :type expected: dict
-    :return: A dict of differences in values from their expected types
+    :return: A dict of differences in value types from their expected types
     :rtype: dict
     """
     diff = {}
     for key, exp_type in expected.items():
-        value = values.get(key)
+        value = data.get(key)
         if value is None:
             diff[key] = {
                 "expected": exp_type,
