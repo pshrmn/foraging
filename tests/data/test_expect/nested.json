@@ -6,16 +6,47 @@
   },
   "children": [
     {
-      "selector": "a",
+      "selector": "a#home",
       "spec": {
-        "type": "all",
-        "value": "links"
+        "type": "single",
+        "value": 0
       },
       "children": [],
       "rules": [
         {
-          "name": "link",
+          "name": "url",
           "attr": "href",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "selector": "div.item",
+      "spec": {
+        "type": "all",
+        "value": "items"
+      },
+      "children": [
+        {
+          "selector": "a",
+          "spec": {
+            "type": "single",
+            "value": 0
+          },
+          "children": [],
+          "rules": [
+            {
+              "name": "link",
+              "attr": "href",
+              "type": "string"
+            }
+          ]
+        }
+      ],
+      "rules": [
+        {
+          "name": "text",
+          "attr": "text",
           "type": "string"
         }
       ]

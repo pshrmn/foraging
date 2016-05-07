@@ -46,7 +46,7 @@ class Element(object):
         except BadJSONError:
             raise
         # ignore if there are no rules and no children to get data from
-        if len(children) == 0 and len(rules) == 0:
+        if not children and not rules:
             msg = ("Element has no children or rules and "
                    "should be removed from the page")
             raise BadJSONError(msg.format(sel))

@@ -102,7 +102,7 @@ def differences(values, expected):
                 # differentiates from the expected
                 all_diffs = [differences(item, exp_type) for item in value]
                 real_diffs = [d for d in all_diffs if d is not None]
-                if len(real_diffs):
+                if real_diffs:
                     diff[key] = real_diffs
         else:
             if not isinstance(value, exp_type):
