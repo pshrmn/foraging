@@ -37,7 +37,7 @@ def phantom_backend(phantom_path, js_path):
         # text will be empty string when phantom request is not successful
         if text == "":
             log.warning("<phantomjs> {} bad response".format(url))
-            return None
+            return
         return text
 
     return get

@@ -44,7 +44,7 @@ class Fetch(object):
         if there is a cache, check if there is a cached copy of the url's content
         """
         if not self.cache:
-            return None
+            return
         return self.cache.get(url)
 
     def _wait(self, domain):
@@ -76,7 +76,7 @@ class Fetch(object):
         text = self.backend(url, self.headers)
         self.last[domain] = time.time()
         if text is None:
-            return None
+            return
         dom = self.parse(text, url)
         # cache after formatting
         if not no_cache and self.cache is not None:

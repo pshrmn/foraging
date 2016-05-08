@@ -2,14 +2,14 @@
   "selector": "body",
   "spec": {
     "type": "single",
-    "value": 0
+    "index": 0
   },
   "children": [
     {
       "selector": "a#home",
       "spec": {
         "type": "single",
-        "value": 0
+        "index": 0
       },
       "children": [],
       "rules": [
@@ -24,14 +24,14 @@
       "selector": "div.item",
       "spec": {
         "type": "all",
-        "value": "items"
+        "name": "items"
       },
       "children": [
         {
           "selector": "a",
           "spec": {
             "type": "single",
-            "value": 0
+            "index": 0
           },
           "children": [],
           "rules": [

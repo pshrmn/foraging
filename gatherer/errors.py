@@ -1,2 +1,0 @@
-class BadJSONError(Exception):
-    pass

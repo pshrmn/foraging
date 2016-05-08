@@ -98,7 +98,7 @@ class Cache(object):
         """
         domain, filename = url_info(url)
         if domain not in self.sites:
-            return None
+            return
         site_cache = self.sites[domain]
         full_name = os.path.join(self.folder, domain, filename)
         if full_name in site_cache:
@@ -107,12 +107,12 @@ class Cache(object):
                 log.info("<cache> expired {}".format(url))
                 os.remove(full_name)
                 del site_cache[full_name]
-                return None
+                return
             log.info("<cache> {}".format(url))
             full_name = os.path.join(self.folder, domain, filename)
             with open(full_name, "r") as fp:
                 return fp.read()
-        return None
+        return
 
     def save(self, url, text):
         """

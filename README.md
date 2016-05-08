@@ -87,7 +87,6 @@ Usage:
 ```python
 import json
 from gatherer import Page, Fetch
-from gatherer.errors import BadJSONError
 
 f = Fetch(headers={'User-Agent': 'example-agent'})
 try:
@@ -97,7 +96,7 @@ except FileNotFoundError:
     # the page json path is incorrect
 try:
     p = Page.from_json(data)
-except BadJSONError:
+except ValueError:
     # your page json isn't properly formatted
 ```
 
@@ -122,14 +121,14 @@ ele = Element.from_json({
   "selector": "div.main",
   "spec": {
     "type": "single",
-    "value": 0
+    "index": 0
   },
   "children": [
     {
       "selector": "h1",
       "spec": {
         "type": "single",
-        "value": 0
+        "index": 0
       },
       "children": [],
       "rules": [
@@ -144,7 +143,7 @@ ele = Element.from_json({
       "selector": "p.author",
       "spec": {
         "type": "single",
-        "value": 0
+        "index": 0
       },
       "children": [],
       "rules": [

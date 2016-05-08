@@ -2,7 +2,6 @@ import unittest
 from lxml import html
 
 from gatherer.rule import Rule
-from gatherer.errors import BadJSONError
 
 
 class RuleTestCase(unittest.TestCase):
@@ -51,7 +50,7 @@ class RuleTestCase(unittest.TestCase):
             {}
         ]
         for rule_json in bad_rules:
-            with self.assertRaises(BadJSONError):
+            with self.assertRaises(ValueError):
                 Rule.from_json(rule_json)
 
     def test_no_attr(self):

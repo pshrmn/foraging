@@ -4,7 +4,7 @@
     "selector": "body",
     "spec": {
         "type": "single",
-        "value": 0
+        "index": 0
     },
     "children": [],
     "rules": []

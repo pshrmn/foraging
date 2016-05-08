@@ -3,7 +3,7 @@ import os
 import json
 
 from gatherer.expect import flatten_element, compare, differences
-from gatherer.element import Element
+from gatherer.element import ElementFactory
 
 path = os.path.join(os.getcwd(), "tests", "data", "test_expect")
 
@@ -11,7 +11,7 @@ path = os.path.join(os.getcwd(), "tests", "data", "test_expect")
 def make_element(path):
     with open(path) as fp:
         element_json = json.load(fp)
-    return Element.from_json(element_json)
+    return ElementFactory.from_json(element_json)
 
 
 class ExpectTestCase(unittest.TestCase):

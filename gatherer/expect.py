@@ -18,7 +18,6 @@ def flatten_element(element):
 
     data = {}
     _type = element.spec.get("type")
-    value = element.spec.get("value")
     rule_data = flatten_rules(element)
 
     for child in element.children:
@@ -28,7 +27,8 @@ def flatten_element(element):
     if _type == "single":
         return rule_data
     elif _type == "all":
-        data[value] = rule_data
+        name = element.spec.get("name")
+        data[name] = rule_data
         return data
 
 

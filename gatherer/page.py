@@ -1,5 +1,4 @@
-from .element import Element
-from .errors import BadJSONError
+from .element import ElementFactory
 
 
 class Page(object):
@@ -20,8 +19,8 @@ class Page(object):
     def from_json(cls, page_json):
         name = page_json["name"]
         try:
-            element = Element.from_json(page_json["element"])
-        except BadJSONError:
+            element = ElementFactory.from_json(page_json["element"])
+        except ValueError:
             raise
         return cls(name, element)
 

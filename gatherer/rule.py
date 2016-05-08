@@ -1,7 +1,5 @@
 import re
 
-from .errors import BadJSONError
-
 
 class Rule(object):
 
@@ -16,11 +14,11 @@ class Rule(object):
         attribute = rule_json.get("attr")
         _type = rule_json.get("type")
         if name is None:
-            raise BadJSONError("Rule requires name, got {}".format(rule_json))
+            raise ValueError("Rule requires name, got {}".format(rule_json))
         if attribute is None:
-            raise BadJSONError("Rule requires attr, got {}".format(rule_json))
+            raise ValueError("Rule requires attr, got {}".format(rule_json))
         if _type is None:
-            raise BadJSONError("Rule requires type, got {}".format(rule_json))
+            raise ValueError("Rule requires type, got {}".format(rule_json))
         return cls(name, attribute, _type)
 
     def data(self, element):
@@ -34,7 +32,7 @@ class Rule(object):
         else:
             val = element.get(self.attr)
             if val is None:
-                return None
+                return
 
         # convert to the desired format (or just return the string)
         if self.type == "string":
@@ -53,7 +51,7 @@ class Rule(object):
         match = re.search(r"\d+", text)
         if match is not None:
             return int(match.group())
-        return None
+        return
 
     @staticmethod
     def find_float(text):
@@ -64,4 +62,4 @@ class Rule(object):
         match = re.search(r"\d+(\.\d+)?", text)
         if match is not None:
             return float(match.group())
-        return None
+        return

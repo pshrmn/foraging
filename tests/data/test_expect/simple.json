@@ -2,14 +2,14 @@
   "selector": "div.main",
   "spec": {
     "type": "single",
-    "value": 0
+    "index": 0
   },
   "children": [
     {
       "selector": "h1",
       "spec": {
         "type": "single",
-        "value": 0
+        "index": 0
       },
       "children": [],
       "rules": [
@@ -24,7 +24,7 @@
       "selector": "p.author",
       "spec": {
         "type": "single",
-        "value": 0
+        "index": 0
       },
       "children": [],
       "rules": [

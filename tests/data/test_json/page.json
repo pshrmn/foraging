@@ -4,14 +4,14 @@
     "selector": "body",
     "spec": {
       "type": "single",
-      "value": 0
+      "index": 0
     },
     "children": [
       {
         "selector": "a",
         "spec": {
           "type": "all",
-          "value": "links"
+          "name": "links"
         },
         "children": [],
         "rules": [

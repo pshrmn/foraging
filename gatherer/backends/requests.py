@@ -22,8 +22,8 @@ def requests_backend(url, headers=None):
         resp = requests.get(url, headers=headers)
     except requests.exceptions.ConnectionError:
         log.warning("<requests> {} ConnectionError".format(url))
-        return None
+        return
     if not resp.ok or resp.text == "":
         log.warning("<requests> {} bad response".format(url))
-        return None
+        return
     return resp.text
