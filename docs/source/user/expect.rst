@@ -22,7 +22,7 @@ Example
 
 .. code-block:: python
 
-  ele = Element(
+  ele = SingleElement(
       selector="a",
       spec={"type": "single", "value": 0},
       optional=False,
@@ -41,12 +41,12 @@ Example
   }
   """
 
-  nested_ele = Element(
+  nested_ele = AllElement(
       selector="div.author",
       spec={"type": "all", "value": "authors"},
       optional=False,
       children=[
-          Element(
+          SingleElement(
               selector="a",
               spec={"type": "single", "value": 0},
               optional=False,

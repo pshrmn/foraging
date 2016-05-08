@@ -22,20 +22,19 @@ Methods
 from_json(page_json)
 ++++++++++++++++++++
 
-A class method, ``from_json`` creates a new ``Page`` given a Python dict of the desired ``Page`` structure. This can be created using `Forager <https://github.com/pshrmn/forager>`_. If there is an error in creating the ``Page``, a ``BadJSONError`` will be raised.
+A class method, ``from_json`` creates a new ``Page`` given a Python dict of the desired ``Page`` structure. This can be created using `Forager <https://github.com/pshrmn/forager>`_. If there is an error in creating the ``Page``, a ``ValueError`` will be raised.
 
 .. code-block:: python
 
   import json
   from gatherer import Page
-  from gatherer.errors import BadJSONError
 
   with open("path/to/page.json") as fp:
     page_json = json.load(fp)
 
   try:
     page = Page.from_json(page_json)
-  except BadJSONError as e:
+  except ValueError as e:
     print("Error creating page", e)
 
 gather(dom)

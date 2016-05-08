@@ -121,12 +121,12 @@ The first child ``Element`` is ``[section]``, so we select all ``section`` DOM e
 
 .. code-block:: python
 
-  section_element = Element(
+  section_element = AllElement(
     selector="section",
     spec={"type": "all", "value": "sections"},
     ...
   )
-  section_data = section_element.get(parent)
+  section_data = section_element.data(parent)
   # section_data == {"sections": [...]}
 
 Now, we iterate over that list and get data for each one. Like the ``body[0]`` selector, ``[section]`` has no ``Rules``.
