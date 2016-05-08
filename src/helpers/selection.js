@@ -29,28 +29,39 @@ export const protect = selector => {
  * @param parents - an array of parent elements to search using the selector
  * @param selector - the selector to use to match children of the parent elements
  * @param spec - how to select the child element or elements of a parent element
- * @param ignored - a selector that when an element has it, the element should
- *   be ignored
+ * @param ignored - a selector that when an element has it, the element and all
+ *    of its descendents should be given the "no-select" class.
  */
 export const select = (parents, selector, spec, ignored) => {
   const sel = (selector || "*") + ":not(.no-select)";
-  const index = spec && spec.type === "single" ? spec.index : undefined;
-
-  const specElements = elements => {
-    if ( index !== undefined ) {
-      return elements[index] !== undefined ? [elements[index]] : [];
-    } else {
-      return Array.from(elements);
-    }
+  if ( !spec ) {
+    spec = {
+      type: "all"
+    };
   }
-
   if ( ignored ) {
     protect(ignored);
   }
-
+  // select the elements from each parent element
   return Array.from(parents).reduce((arr, p) => {
-    const eles = p.querySelectorAll(sel);
-    return arr.concat(specElements(eles));
+    const children = p.querySelectorAll(sel);
+    const { type } = spec;
+    let elements = [];
+    switch ( type ) {
+    case "single":
+      const index = spec.index;
+      elements =  children[index] !== undefined ? [children[index]] : [];
+      break;
+    case "all":
+      elements = Array.from(children);
+      break;
+    case "range":
+      const low = spec.low;
+      const high = spec.high;
+      elements = Array.from(children).slice(low, high || undefined);
+      break;
+    }
+    return arr.concat(elements);
   }, []);
 }
 
@@ -66,19 +77,30 @@ export const select = (parents, selector, spec, ignored) => {
  */
 export const count = (parents, selector, spec) => {
   const sel = (selector || "*") + ":not(.no-select)";
-  const index = spec && spec.type === "single" ? spec.index : undefined;
-
-  const specElements = elements => {
-    if ( index !== undefined ) {
-      return elements[index] !== undefined ? 1 :0;
-    } else {
-      return elements.length;
-    }
+  if ( !spec ) {
+    spec = {
+      type: "all"
+    };
   }
 
   return Array.from(parents).reduce((top, p) => {
-    const eles = p.querySelectorAll(sel);
-    const count = specElements(eles);
+    const children = p.querySelectorAll(sel);
+    let count = 0;
+    switch ( spec.type ) {
+    case "single":
+      const index = spec.index;
+      count = children[index] !== undefined ? 1 : 0;
+      break;
+    case "all":
+      count = children.length
+      break;
+    case "range":
+      const low = spec.low;
+      const high = spec.high;
+      count = Array.from(children).slice(low, high || undefined).length;
+      break;
+    }
+
     return top > count ? top : count;
   }, 0);
 }

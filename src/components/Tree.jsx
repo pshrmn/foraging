@@ -99,23 +99,25 @@ const Node = React.createClass({
   },
   specText: function() {
     const { selector, spec, optional } = this.props;
+    let shortSelector = abbreviate(selector, 10);
     let text = "";
     if ( !spec ) {
       return text;
     }
     switch ( spec.type ) {
     case "single":
-        text = `${selector}[${spec.index}]`;
-        break;
+      text = `${shortSelector}[${spec.index}]`;
+      break;
     case "all":
-        text = `[${selector}]`;
-        break;
+      text = `[${shortSelector}]`;
+      break;
+    case "range":
+      text = `${shortSelector}[${spec.low}:${spec.high || "end"}]`
     }
-    let shortened = abbreviate(text, 10);
     if ( optional ) {
-      shortened += "*";
+      text += "*";
     }
-    return shortened;
+    return text;
   },
   render: function() {
     const { current, hasRules, children, active } = this.props;

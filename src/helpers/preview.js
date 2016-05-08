@@ -10,15 +10,25 @@ export const preview = tree => {
     const { type } = element.spec;
     switch ( type ) {
     case "single":
-      const { index } = element.spec;
+      var { index } = element.spec;
       var ele = elements[index];
       if ( !ele) {
         return;
       }
       return getElementData(element, ele);
     case "all":
-      const { name } = element.spec;
+      var { name } = element.spec;
       var data = Array.from(elements).map(function(ele){
+        return getElementData(element, ele);
+      }).filter(function(datum){
+        return datum !== undefined;
+      });
+      var obj = {};
+      obj[name] = data;
+      return obj;
+    case "range":
+      var { name, low, high } = element.spec;
+      var data = Array.from(elements).slice(low, high || undefined).map(function(ele){
         return getElementData(element, ele);
       }).filter(function(datum){
         return datum !== undefined;

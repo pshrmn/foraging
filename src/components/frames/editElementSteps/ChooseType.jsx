@@ -28,16 +28,20 @@ const ChooseType = React.createClass({
     const newSpec = {
       type
     };
-    if ( type === "single" ) {
+    switch ( type ) {
+    case "single":
       newSpec.index = type !== spec.type ? 0 : spec.index;
-    } else {
+      break;
+    case "all":
       newSpec.name = type !== spec.type ? "" : spec.name;
+      break;
+    case "range":
+      newSpec.name = type !== spec.type ? "" : spec.name;
+      newSpec.low = type !== spec.type ? 0 : spec.low;
+      newSpec.high = type !== spec.type ? null : spec.high;
+      break;
     }
     next(Object.assign({}, startData, {spec: newSpec}));
-  },
-  previousHandler: function(event) {
-    event.preventDefault();
-    this.props.previous();
   },
   cancelHandler: function(event) {
     event.preventDefault();
@@ -50,32 +54,29 @@ const ChooseType = React.createClass({
   },
   render: function() {
     const { type } = this.state;
+    const typeInputs = ["single", "all", "range"].map(t => {
+      const selected = type === t;
+      return (
+        <label key={t}
+               className={selected ? "selected": null}>
+          <input type="radio"
+                 name="type"
+                 value={t}
+                 checked={selected}
+                 onChange={this.typeHandler} />
+          {t}
+        </label>
+      );
+    });
     return (
       <div className="info-box">
         <div className="info">
           <h3>
             Should the element target a single element or all?
           </h3>
-
-          <label className={type === "single" ? "selected": null}>
-            <input type="radio"
-                   name="type"
-                   value="single"
-                   checked={type === "single"}
-                   onChange={this.typeHandler} />
-            single
-          </label>
-          <label className={type === "all" ? "selected": null}>
-            <input type="radio"
-                   name="type"
-                   value="all"
-                   checked={type === "all"}
-                   onChange={this.typeHandler} />
-            all
-          </label>
+          {typeInputs}
         </div>
         <div className="buttons">
-          <NegButton text="Previous" click={this.previousHandler} />
           <PosButton text="Next" click={this.nextHandler} />
           <NegButton text="Cancel" click={this.cancelHandler} />
         </div>
@@ -96,6 +97,10 @@ const ChooseType = React.createClass({
     if ( type === "single" ) {
       const wasSingle = startData.spec && startData.spec.type === "single";
       spec.index = wasSingle ? startData.spec.index : 0
+    } else if ( type === "range" ) {
+      const wasRange = startData.spec && startData.spec.type === "range";
+      spec.low = wasRange ? startData.spec.low : 0;
+      spec.high = wasRange ? startData.spec.high : undefined;
     }
     
     const elements = select(
@@ -122,6 +127,10 @@ const ChooseType = React.createClass({
     if ( type === "single" ) {
       const wasSingle = startData.spec && startData.spec.type === "single";
       spec.index = wasSingle ? startData.spec.index : 0
+    } else if ( type === "range" ) {
+      const wasRange = startData.spec && startData.spec.type === "range";
+      spec.low = wasRange ? startData.spec.low : 0;
+      spec.high = wasRange ? startData.spec.high : undefined;
     }
 
     const elements = select(

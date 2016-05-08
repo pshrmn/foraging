@@ -24,10 +24,18 @@ const ChooseType = React.createClass({
     const newSpec = {
       type
     };
-    if ( type === "single" ) {
+    switch ( type ) {
+    case "single":
       newSpec.index = 0;
-    } else {
+      break;
+    case "all":
       newSpec.name = "";
+      break;
+    case "range":
+      newSpec.name = "";
+      newSpec.low = 0;
+      newSpec.high = undefined;
+      break;
     }
     next(Object.assign({}, startData, { spec: newSpec }));
   },
@@ -46,29 +54,27 @@ const ChooseType = React.createClass({
   },
   render: function() {
     const { type } = this.state;
+    const typeInputs = ["single", "all", "range"].map(t => {
+      const selected = type === t;
+      return (
+        <label key={t}
+               className={selected ? "selected": null}>
+          <input type="radio"
+                 name="type"
+                 value={t}
+                 checked={selected}
+                 onChange={this.typeHandler} />
+          {t}
+        </label>
+      );
+    });
     return (
       <div className="info-box">
         <div className="info">
           <h3>
             Should the element target a single element or all?
           </h3>
-
-          <label className={type === "single" ? "selected": null}>
-            <input type="radio"
-                   name="type"
-                   value="single"
-                   checked={type === "single"}
-                   onChange={this.typeHandler} />
-            single
-          </label>
-          <label className={type === "all" ? "selected": null}>
-            <input type="radio"
-                   name="type"
-                   value="all"
-                   checked={type === "all"}
-                   onChange={this.typeHandler} />
-            all
-          </label>
+          {typeInputs}
         </div>
         <div className="buttons">
           <NegButton text="Previous" click={this.previousHandler} />
@@ -88,6 +94,9 @@ const ChooseType = React.createClass({
     // use set single index if possible
     if ( type === "single" ) {
       spec.index = 0
+    } else if ( type === "range" ) {
+      spec.low = 0;
+      spec.high = undefined;
     }
     const elements = select(current.matches, selector, spec, '.forager-holder');
     highlight(elements, queryCheck);
@@ -104,6 +113,9 @@ const ChooseType = React.createClass({
     // use set single index if possible
     if ( type === "single" ) {
       spec.index = 0
+    } else if ( type === "range" ) {
+      spec.low = 0;
+      spec.high = undefined;
     }
     const elements = select(current.matches, selector, spec, '.forager-holder');
     highlight(elements, queryCheck);

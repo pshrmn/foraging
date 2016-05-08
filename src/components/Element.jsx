@@ -16,10 +16,15 @@ function Element(props) {
   let description = "";
   if ( type === "single" ) {
     const { index = 0 } = spec;
-    description = `captures element at index ${spec.index}`;
+    description = `captures element at index ${index}`;
   } else if ( type === "all" ) {
     const { name = "" } = spec;
-    description = `captures all elements, groups them as "${spec.name}"`;
+    description = `captures all elements, groups them as "${name}"`;
+  } else if ( type === "range" ) {
+    const { name = "", low, high } = spec;
+    const lowText = low === undefined ? "start" : low;
+    const highText = high === null ? "end" : high;
+    description = `captures elements ${lowText} to ${highText}, groups them as "${name}"`;
   }
 
   return (
