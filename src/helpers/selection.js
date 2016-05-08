@@ -34,7 +34,7 @@ export const protect = selector => {
  */
 export const select = (parents, selector, spec, ignored) => {
   const sel = (selector || "*") + ":not(.no-select)";
-  const index = spec && spec.type === "single" ? spec.value : undefined;
+  const index = spec && spec.type === "single" ? spec.index : undefined;
 
   const specElements = elements => {
     if ( index !== undefined ) {
@@ -66,7 +66,7 @@ export const select = (parents, selector, spec, ignored) => {
  */
 export const count = (parents, selector, spec) => {
   const sel = (selector || "*") + ":not(.no-select)";
-  const index = spec && spec.type === "single" ? spec.value : undefined;
+  const index = spec && spec.type === "single" ? spec.index : undefined;
 
   const specElements = elements => {
     if ( index !== undefined ) {

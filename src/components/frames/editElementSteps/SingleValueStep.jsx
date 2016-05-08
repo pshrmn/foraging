@@ -8,33 +8,37 @@ import { currentSelector } from "../../../constants/CSSClasses";
 const SingleValueStep = React.createClass({
   getInitialState: function() {
     const { startData, endData = {} } = this.props;
-    let value = 0;
-    // if there is an existing value, only use it if the types match
-    if ( endData.type === startData.type && endData.value !== undefined ) {
-      value = endData.value;
-    } else if ( startData.value !== undefined ) {
-      value = startData.value;
+    let index = 0;
+    // if there is an existing index, only use it if the types match
+    if ( endData.spec && endData.spec.index !== undefined ) {
+      index = endData.spec.index;
+    } else if ( startData.spec && startData.spec.index !== undefined ) {
+      index = startData.spec.index;
     }
     return {
-      value: value,
+      index,
       error: false
     };
   },
-  valueHandler: function(event) {
+  indexHandler: function(event) {
     const { value } = event.target;
     this.setState({
-      value: parseInt(value, 10),
+      index: parseInt(value, 10),
       error: false
     });
   },
   nextHandler: function(event) {
     event.preventDefault();
-    const { value, error } = this.state;
+    const { index, error } = this.state;
     const { startData, next } = this.props;
     if ( error ) {
       return;
     }
-    next(Object.assign({}, startData, { value }));
+    const newSpec = {
+      type: "single",
+      index
+    };
+    next(Object.assign({}, startData, { spec: newSpec }));
   },
   previousHandler: function(event) {
     event.preventDefault();
@@ -58,7 +62,7 @@ const SingleValueStep = React.createClass({
     });
   },
   render: function() {
-    const { value, error } = this.state;
+    const { index, error } = this.state;
 
     return (
       <div className="info-box">
@@ -66,8 +70,8 @@ const SingleValueStep = React.createClass({
           <h3>
             The element at which index should be selected?
           </h3>
-          <select value={value}
-                  onChange={this.valueHandler} >
+          <select value={index}
+                  onChange={this.indexHandler} >
             { this.renderOptions() }
           </select>
         </div>
@@ -85,12 +89,12 @@ const SingleValueStep = React.createClass({
     const { parent = {} } = extraData;
     const { matches: parentMatches = [document] } = parent;
 
-    const { value } = this.state;
+    const { index } = this.state;
 
     const elements = select(
       parentMatches,
       startData.selector,
-      {type: "single", value},
+      {type: "single", index},
       '.forager-holder'
     );
     highlight(elements, currentSelector);
@@ -103,12 +107,12 @@ const SingleValueStep = React.createClass({
     const { parent = {} } = extraData;
     const { matches: parentMatches = [document] } = parent;
 
-    const { value } = nextState;
+    const { index } = nextState;
 
     const elements = select(
       parentMatches,
       startData.selector,
-      {type: "single", value},
+      {type: "single", index},
       '.forager-holder'
     );
     highlight(elements, currentSelector);

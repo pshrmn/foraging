@@ -7,12 +7,10 @@ import { queryCheck } from "../../../constants/CSSClasses";
 
 const ChooseType = React.createClass({
   getInitialState: function() {
-    const { startData, endData = {} } = this.props;
+    const { endData = {} } = this.props;
     let type = "single";
-    if ( endData.type ) {
-      type = endData.type;
-    } else if ( startData.type ) {
-      type = startData.type;
+    if ( endData.spec && endData.spec.type ) {
+      type = endData.spec.type;
     }
 
     return {
@@ -23,7 +21,15 @@ const ChooseType = React.createClass({
     event.preventDefault();
     const { type } = this.state;
     const { startData, next } = this.props;
-    next(Object.assign({}, startData, { type }));
+    const newSpec = {
+      type
+    };
+    if ( type === "single" ) {
+      newSpec.index = 0;
+    } else {
+      newSpec.name = "";
+    }
+    next(Object.assign({}, startData, { spec: newSpec }));
   },
   previousHandler: function(event) {
     event.preventDefault();
@@ -76,8 +82,14 @@ const ChooseType = React.createClass({
     const { startData } = this.props;
     const { current, selector } = startData;
     const { type } = this.state;
-    const value = type === "single" ? 0 : "name";
-    const elements = select(current.matches, selector, {type, value}, '.forager-holder');
+    const spec = {
+      type
+    }
+    // use set single index if possible
+    if ( type === "single" ) {
+      spec.index = 0
+    }
+    const elements = select(current.matches, selector, spec, '.forager-holder');
     highlight(elements, queryCheck);
   },
   componentWillUpdate: function(nextProps, nextState) {
@@ -86,8 +98,14 @@ const ChooseType = React.createClass({
     const { startData } = nextProps;
     const { current, selector } = startData;
     const { type } = nextState;
-    const value = type === "single" ? 0 : "name";
-    const elements = select(current.matches, selector, {type, value}, '.forager-holder');
+    const spec = {
+      type
+    }
+    // use set single index if possible
+    if ( type === "single" ) {
+      spec.index = 0
+    }
+    const elements = select(current.matches, selector, spec, '.forager-holder');
     highlight(elements, queryCheck);
   },
   componentWillUnmount: function() {

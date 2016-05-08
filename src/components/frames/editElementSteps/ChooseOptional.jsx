@@ -65,13 +65,13 @@ const ChooseOptional = React.createClass({
   componentWillMount: function() {
     const { startData, extraData } = this.props;
 
-    const { selector, type, value } = startData;
+    const { selector, spec } = startData;
     const { parent = {} } = extraData;
     const { matches: parentMatches = [document] } = parent;
     const elements = select(
       parentMatches,
       startData.selector,
-      {type, value},
+      spec,
       '.forager-holder'
     );
     highlight(elements, currentSelector);
@@ -81,13 +81,13 @@ const ChooseOptional = React.createClass({
 
     const { startData, extraData } = this.props;
 
-    const { selector, type, value } = startData;
+    const { selector, spec } = startData;
     const { parent = {} } = extraData;
     const { matches: parentMatches = [document] } = parent;
     const elements = select(
       parentMatches,
       startData.selector,
-      {type, value},
+      spec,
       '.forager-holder'
     );
     highlight(elements, currentSelector);

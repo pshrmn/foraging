@@ -105,7 +105,7 @@ const Node = React.createClass({
     }
     switch ( spec.type ) {
     case "single":
-        text = `${selector}[${spec.value}]`;
+        text = `${selector}[${spec.index}]`;
         break;
     case "all":
         text = `[${selector}]`;

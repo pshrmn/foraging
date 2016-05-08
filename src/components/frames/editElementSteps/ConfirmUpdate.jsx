@@ -9,7 +9,11 @@ import { currentSelector } from "../../../constants/CSSClasses";
 const ConfirmElement = React.createClass({
   saveHandler: function() {
     const { startData, next: save } = this.props;
-    save(startData);
+    const { spec, optional } = startData;
+    save({
+      optional,
+      spec
+    });
   },
   previousHandler: function(event) {
     event.preventDefault();
@@ -21,14 +25,13 @@ const ConfirmElement = React.createClass({
   },
   render: function() {
     const { startData } = this.props;
-    const { selector, type, value, optional } = startData;
+    const { selector, spec, optional } = startData;
     return (
       <div className="info-box">
         <h2>Confirm Updated Element</h2>
         <ul>
           <li>Selector: {selector}</li>
-          <li>Type: {type}</li>
-          <li>Value: {value}</li>
+          <li>Spec: {JSON.stringify(spec, null, "\t")}</li>
           <li>Optional: {optional ? "Yes" : "No"}</li>
         </ul>
         <div className="buttons">
@@ -42,13 +45,13 @@ const ConfirmElement = React.createClass({
   componentWillMount: function() {
         const { startData, extraData } = this.props;
 
-    const { selector, type, value } = startData;
+    const { selector, spec } = startData;
     const { parent = {} } = extraData;
     const { matches: parentMatches = [document] } = parent;
     const elements = select(
       parentMatches,
       startData.selector,
-      {type, value},
+      spec,
       '.forager-holder'
     );
     highlight(elements, currentSelector);

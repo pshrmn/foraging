@@ -9,8 +9,8 @@ import { queryCheck } from "../../../constants/CSSClasses";
 const ConfirmElement = React.createClass({
   saveHandler: function() {
     const { startData, next: save } = this.props;
-    const { current, selector, type, value, optional } = startData;
-    const ele = createElement(selector, type, value, optional);
+    const { current, selector, spec, optional } = startData;
+    const ele = createElement(selector, spec, optional);
     save(ele);
   },
   previousHandler: function(event) {
@@ -23,14 +23,13 @@ const ConfirmElement = React.createClass({
   },
   render: function() {
     const { startData } = this.props;
-    const { selector, type, value, optional } = startData;
+    const { selector, spec, optional } = startData;
     return (
       <div className="info-box">
         <h2>Confirm Element</h2>
         <ul>
           <li>Selector: {selector}</li>
-          <li>Type: {type}</li>
-          <li>Value: {value}</li>
+          <li>Spec: {JSON.stringify(spec, null, "\t")}</li>
           <li>Optional: {optional ? "Yes" : "No"}</li>
         </ul>
         <div className="buttons">
@@ -43,8 +42,8 @@ const ConfirmElement = React.createClass({
   },
   componentWillMount: function() {
     const { startData } = this.props;
-    const { current, selector, type, value } = startData;
-    const elements = select(current.matches, selector, {type, value}, '.forager-holder');
+    const { current, selector, spec } = startData;
+    const elements = select(current.matches, selector, spec, '.forager-holder');
     highlight(elements, queryCheck);
   },
   componentWillUnmount: function() {

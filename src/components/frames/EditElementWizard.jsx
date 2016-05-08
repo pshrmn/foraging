@@ -20,12 +20,9 @@ import { updateElement, showElementFrame } from "../../actions";
 const EditElementWizard = React.createClass({
   save: function(newProps) {
     const { current, updateElement } = this.props;
-    const { type, value, optional } = newProps;
+    const { spec, optional } = newProps;
     updateElement(current.index, {
-      spec: {
-        type,
-        value
-      },
+      spec,
       optional
     });
   },
@@ -37,8 +34,7 @@ const EditElementWizard = React.createClass({
     const { selector, spec, optional } = current;
     const initialData = {
       selector,
-      type: spec.type,
-      value: spec.value,
+      spec,
       optional
     };
     const extraData = {

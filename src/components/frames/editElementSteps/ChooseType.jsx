@@ -9,10 +9,10 @@ const ChooseType = React.createClass({
   getInitialState: function() {
     const { startData, endData = {} } = this.props;
     let type = "single";
-    if ( endData.type ) {
-      type = endData.type;
-    } else if ( startData.type ) {
-      type = startData.type;
+    if ( endData.spec && endData.spec.type ) {
+      type = endData.spec.type;
+    } else if ( startData.spec && startData.spec.type ) {
+      type = startData.spec.type;
     }
 
     return {
@@ -24,15 +24,16 @@ const ChooseType = React.createClass({
     const { type } = this.state;
     const { startData, next } = this.props;
     // handle resetting the value here if the type is changing
-    let { type: originalType, value } = startData;
-    if ( type !== originalType ) {
-      if ( type === "single" ) {
-        value = 0;
-      } else {
-        value = "";
-      }
+    let { spec } = startData;
+    const newSpec = {
+      type
+    };
+    if ( type === "single" ) {
+      newSpec.index = type !== spec.type ? 0 : spec.index;
+    } else {
+      newSpec.name = type !== spec.type ? "" : spec.name;
     }
-    next(Object.assign({}, startData, { type, value }));
+    next(Object.assign({}, startData, {spec: newSpec}));
   },
   previousHandler: function(event) {
     event.preventDefault();
@@ -88,12 +89,19 @@ const ChooseType = React.createClass({
     const { matches: parentMatches = [document] } = parent;
 
     const { type } = this.state;
-    const value = type === "single" ? 0 : "name";
+    const spec = {
+      type
+    }
+    // use set single index if possible
+    if ( type === "single" ) {
+      const wasSingle = startData.spec && startData.spec.type === "single";
+      spec.index = wasSingle ? startData.spec.index : 0
+    }
     
     const elements = select(
       parentMatches,
       startData.selector,
-      {type, value},
+      spec,
       '.forager-holder'
     );
     highlight(elements, currentSelector);
@@ -107,12 +115,19 @@ const ChooseType = React.createClass({
     const { matches: parentMatches = [document] } = parent;
 
     const { type } = nextState;
-    const value = type === "single" ? 0 : "name";
+    const spec = {
+      type
+    }
+    // use set single index if possible
+    if ( type === "single" ) {
+      const wasSingle = startData.spec && startData.spec.type === "single";
+      spec.index = wasSingle ? startData.spec.index : 0
+    }
 
     const elements = select(
       parentMatches,
       startData.selector,
-      {type, value},
+      spec,
       '.forager-holder'
     );
     highlight(elements, currentSelector);

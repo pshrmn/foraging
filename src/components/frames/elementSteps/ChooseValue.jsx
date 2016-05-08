@@ -5,8 +5,8 @@ import SingleValueStep from "./SingleValueStep";
 
 export default function ChooseValue(props) {
   const { startData } = props;
-  const { type } = startData;
-  switch ( type ) {
+  const { spec } = startData;
+  switch ( spec.type ) {
   case "all":
     return <AllValueStep {...props} />
   case "single":

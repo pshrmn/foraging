@@ -1,15 +1,12 @@
 import { select } from "./selection";
 
-export const createElement = (selector, type = "single", value = 0, optional = false) => {
+export const createElement = (selector, spec = {type: "single", index: 0}, optional = false) => {
   return {
-    selector: selector,
-    spec: {
-      type: type,
-      value: value
-    },
+    selector,
+    spec,
     childIndices: [],
     rules: [],
-    optional: optional,
+    optional,
     matches: []
   };
 };

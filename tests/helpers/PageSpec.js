@@ -13,7 +13,7 @@ describe("page", () => {
         selector: "body",
         spec: {
           type: "single",
-          value: 0
+          index: 0
         },
         rules: [],
         index: 0,
@@ -24,7 +24,7 @@ describe("page", () => {
         selector: "p",
         spec: {
           type: "all",
-          value: "peas"
+          name: "peas"
         },
         rules: [],
         parent: 0,
@@ -45,7 +45,7 @@ describe("page", () => {
       const links = createElement("a");
       expect(links.selector).to.equal("a");
       expect(links.spec.type).to.equal("single");
-      expect(links.spec.value).to.equal(0);
+      expect(links.spec.index).to.equal(0);
       expect(links.childIndices).to.be.instanceof(Array);
       expect(links.optional).to.be.false;
       expect(links.matches).to.be.instanceof(Array);
@@ -54,12 +54,14 @@ describe("page", () => {
     it("sets alternate values when provided", () => {
       const links = createElement(
         "div",
-        "all",
-        "divs",
+        {
+          type: "all",
+          name: "divs"
+        },
         true
       );
       expect(links.spec.type).to.equal("all");
-      expect(links.spec.value).to.equal("divs");
+      expect(links.spec.name).to.equal("divs");
       expect(links.optional).to.be.true;
     });
   });

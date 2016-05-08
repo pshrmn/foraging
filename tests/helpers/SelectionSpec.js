@@ -51,12 +51,12 @@ describe("selector", () => {
     });
 
     it("only selects elements that match the spec", () => {
-      const elements = select([document.body], "div", {type: "single", value: 0});
+      const elements = select([document.body], "div", {type: "single", index: 0});
       expect(elements.length).to.equal(1);
     });
 
     it("adds the no-select class to ignored classes before selecting", () => {
-      const elements = select([document.body], "div", {type: "all", value: "div"}, ".third");
+      const elements = select([document.body], "div", {type: "all", name: "div"}, ".third");
       expect(elements.length).to.equal(2)
     });
   });

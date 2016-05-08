@@ -7,22 +7,24 @@ export const preview = tree => {
    */
   const getElement = (element, parent) => {
     const elements = parent.querySelectorAll(element.selector);
-    const { type, value } = element.spec;
+    const { type } = element.spec;
     switch ( type ) {
     case "single":
-      var ele = elements[value];
+      const { index } = element.spec;
+      var ele = elements[index];
       if ( !ele) {
         return;
       }
       return getElementData(element, ele);
     case "all":
+      const { name } = element.spec;
       var data = Array.from(elements).map(function(ele){
         return getElementData(element, ele);
       }).filter(function(datum){
         return datum !== undefined;
       });
       var obj = {};
-      obj[value] = data;
+      obj[name] = data;
       return obj;
     }
   }

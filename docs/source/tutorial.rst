@@ -70,12 +70,12 @@ Now that you have added a ``page``, it is time to start adding child ``elements`
 
 Note: Sometimes an ``element`` does not have any relevant data associated with it, but because of the layout of the web page, it is required (or more convenient) to create it in order to more easily select a child ``element``.
 
-Because we are getting a list of submissions, the first ``element`` that we want to create is an :code:`All element` that matches all of the submission elements in the page.
+Because we are getting a list of submissions, the first ``element`` that we want to create is an ``All element`` that matches all of the submission elements in the page.
 
 1. Add child
 ++++++++++++
 
-Before you add a child, make sure that the ``element`` you want to use as the parent of the new ``element`` is the current ``element``. By default, the root "body" ``element`` is selected when creating or loading a page. When you save a new ``element``, it is set as the current ``element``. Clicking on a node in the tree will make that node the current ``element``. When you have the desired ``element`` selected, click the :code:`Add Child` button. This will take you to the add element frame, which includes a wizard for creating a new ``element``. At any point, you can click the ``Cancel`` button and you will return to the element frame.
+Before you add a child, make sure that the ``element`` you want to use as the parent of the new ``element`` is the current ``element``. By default, the root "body" ``element`` is selected when creating or loading a page. When you save a new ``element``, it is set as the current ``element``. Clicking on a node in the tree will make that node the current ``element``. When you have the desired ``element`` selected, click the ``Add Child`` button. This will take you to the add element frame, which includes a wizard for creating a new ``element``. At any point, you can click the ``Cancel`` button and you will return to the element frame.
 
 .. image:: img/add-child.png
 
@@ -86,7 +86,7 @@ All DOM elements in the page that can be selected will have an outline and when 
 2. Select Element in the Page
 +++++++++++++++++++++++++++++
 
-Click on any outlined DOM elements in the web page. Clicking on an element will generate a list of element css selectors to choose from, starting with the element you clicked and including all of its parent elements (up to, but not including, the nearest parent element in the current selector's elements array). Each selector is a string of an element's tag, its id (if it has one) and any classes that it has. Which of these parts of the selector we actually want to use will be determined in the next step. A wildcard css selector, :code:`*`, is also provided in case you want to select all children. Also, when you create an ``element`` that matches ``select`` elements, an ``option`` css selector will be provided (because you cannot select this yourself).
+Click on any outlined DOM elements in the web page. Clicking on an element will generate a list of element css selectors to choose from, starting with the element you clicked and including all of its parent elements (up to, but not including, the nearest parent element in the current selector's elements array). Each selector is a string of an element's tag, its id (if it has one) and any classes that it has. Which of these parts of the selector we actually want to use will be determined in the next step. A wildcard css selector, ``*``, is also provided in case you want to select all children. Also, when you create an ``element`` that matches ``select`` elements, an ``option`` css selector will be provided (because you cannot select this yourself).
 
 .. image:: img/element-choices.png
 
@@ -102,7 +102,7 @@ Example:
         </div>
     </body>
 
-If the current ``element``'s css selector is ``body``, clicking on the ``a`` element will return the ``a``, ``p``, and :code:`div#main` css selectors.
+If the current ``element``'s css selector is ``body``, clicking on the ``a`` element will return the ``a``, ``p``, and ``div#main`` css selectors.
 
 
 3. Choose Element
@@ -128,7 +128,7 @@ Once you have chosen the desired selector parts, click the ``Next`` button.
 5. Choose which Element Type
 ++++++++++++++++++++++++++++
 
-Once you have chosen the selector for the new ``element``, you need to choose which type of ``element`` this is. By default, ``single`` is selected since most ``elements`` will be :code:`single elements`. However, for this ``element``, since we want to select all submissions in the page, we will be creating an :code:`all element`. Toggling between the types will highlight which elements will be selected by either type. However, in the case of :code:`single elements`, only the first DOM element will be selected since the default ``index`` for :code:`single elements` is ``0``.
+Once you have chosen the selector for the new ``element``, you need to choose which type of ``element`` this is. By default, ``single`` is selected since most ``elements`` will be ``single elements``. However, for this ``element``, since we want to select all submissions in the page, we will be creating an ``all element``. Toggling between the types will highlight which elements will be selected by either type. However, in the case of ``single elements``, only the first DOM element will be selected since the default ``index`` for ``single elements`` is ``0``.
 
 .. image:: img/choose-element-type.png
 
@@ -137,11 +137,11 @@ Once the desired type is set, click the ``Next`` button.
 6. Choose the Element's Value
 ++++++++++++++++++++++++++++
 
-Because this is an :code:`all element`, we will have to set a name for the array of data that will be created from the matching elements. Since we are matching the submissions in the page, ``submissions`` is an obvious choice for a name.
+Because this is an ``all element``, we will have to set a name for the array of data that will be created from the matching elements. Since we are matching the submissions in the page, ``submissions`` is an obvious choice for a name.
 
 .. image:: img/choose-element-name.png
 
-If we had instead created a :code:`single element`, we would instead need to choose the appropriate index value for the ``element``.
+If we had instead created a ``single element``, we would instead need to choose the appropriate index value for the ``element``.
 
 .. image:: img/choose-element-index.png
 
@@ -177,7 +177,7 @@ All of the DOM elements that match the current ``element`` will have a blue back
 10. Capture children elements
 ++++++++++++++++++++++++++++
 
-Now that we have the ``element`` to match each submission, we want to create child ``elements`` that have the data we would like to gather. If it is not the currect element, click on the :code:`[.thing]` node in the tree to make sure that it the current ``element``, then click on the :code:`Add Child` button once again. Now only child DOM elements of the current ``element`` will be outlined in the page.
+Now that we have the ``element`` to match each submission, we want to create child ``elements`` that have the data we would like to gather. If it is not the currect element, click on the ``[.thing]`` node in the tree to make sure that it the current ``element``, then click on the ``Add Child`` button once again. Now only child DOM elements of the current ``element`` will be outlined in the page.
 
 There are various datum that can be captured from here. Using the steps above, you should now create new ``elements`` to get the submission's title, its url, how many points it has, and a link to its comments. Remember that when saving a selector, it is set as the current selector, so you will have to click back on the previous parent node when you want to add multiple children to it.
 
@@ -193,7 +193,7 @@ Rules specify what data we want to get from a DOM element. These will either be 
 1. Create a Rule
 ++++++++++++++++
 
-Here we'll get the current score of the submission. Click on the node in the tree for the score (for me it is :code:`.score[1]]`) to make it the current ``element``, then click the :code:`Add Rule` button. This will open the rule wizard which will step you through creating a new rule.
+Here we'll get the current score of the submission. Click on the node in the tree for the score (for me it is ``.score[1]]``) to make it the current ``element``, then click the ``Add Rule`` button. This will open the rule wizard which will step you through creating a new rule.
 
 .. image:: img/add-rule.png
 
@@ -229,14 +229,14 @@ Verify that all of the properties of the rule are correct. You can use the ``Pre
 
 .. image:: img/confirm-rule.png
 
-You can create multiple Rules for a selector. This is commonly used for selectors that match :code:`<a>` elements where you want both the ``text`` of the anchor as well as the ``href``
+You can create multiple Rules for a selector. This is commonly used for selectors that match ``<a>`` elements where you want both the ``text`` of the anchor as well as the ``href``
 
 .. image:: img/multiple-rules.png
 
 Preview
 ^^^^^^^
 
-At any point in time, you can preview what the data collected by the page will be by clicking the ``Preview`` button. For simple data collection, you probably won't even need to use gatherer, but instead just copy and paste the preview data. The preview frame also has buttons for logging the data to the developer console. Clicking the :code:`Hide Preview` button will return you to the element frame.
+At any point in time, you can preview what the data collected by the page will be by clicking the ``Preview`` button. For simple data collection, you probably won't even need to use gatherer, but instead just copy and paste the preview data. The preview frame also has buttons for logging the data to the developer console. Clicking the ``Hide Preview`` button will return you to the element frame.
 
 .. image:: img/show-preview.png
 
@@ -259,6 +259,6 @@ Uploading is as simple as clicking the ``Upload`` button.
 
 .. image:: img/upload.png
 
-As long as the ``Granary`` server is running, the page should be saved as a json file in the :code:`rules/<domain>` folder where the server is running (unless you specify a different location). (``domain`` is the hostname of the website the page is created for, except with periods ``.`` replaced by underscores ``_``)
+As long as the ``Granary`` server is running, the page should be saved as a json file in the ``rules/<domain>`` folder where the server is running (unless you specify a different location). (``domain`` is the hostname of the website the page is created for, except with periods ``.`` replaced by underscores ``_``)
 
 Once you have a page uploaded, it is time to use `Gatherer <https://github.com/pshrmn/gatherer>`_ to collect the data.

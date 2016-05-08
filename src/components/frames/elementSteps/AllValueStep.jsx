@@ -8,33 +8,37 @@ import { queryCheck } from "../../../constants/CSSClasses";
 const AllValueStep = React.createClass({
   getInitialState: function() {
     const { startData, endData = {} } = this.props;
-    let value = "";
+    let name = "";
     // if there is an existing value, only use it if the types match
-    if ( startData.type === endData.type && endData.value !== undefined ) {
-      value = endData.value;
-    } else if ( startData.value ) {
-      value = startData.value;
+    if ( endData.spec && endData.spec.name !== undefined ) {
+      name = endData.spec.name;
+    } else if ( startData.spec && startData.spec.name ) {
+      name = startData.spec.name;
     }
     return {
-      value: value,
-      error: value === ""
+      name: name,
+      error: name === ""
     };
   },
-  valueHandler: function(event) {
+  nameHandler: function(event) {
     const { value } = event.target;
     this.setState({
-      value: value,
+      name: value,
       error: value === ""
     });
   },
   nextHandler: function(event) {
     event.preventDefault();
-    const { value, error } = this.state;
+    const { name, error } = this.state;
     const { startData, next } = this.props;
     if ( error ) {
       return;
     }
-    next(Object.assign({}, startData, { value }));
+    const newSpec = {
+      type: "all",
+      name
+    }
+    next(Object.assign({}, startData, { spec: newSpec }));
   },
   previousHandler: function(event) {
     event.preventDefault();
@@ -45,7 +49,7 @@ const AllValueStep = React.createClass({
     this.props.cancel();
   },
   render: function() {
-    const { value, error } = this.state;
+    const { name, error } = this.state;
     return (
       <div className="info-box">
         <div className="info">
@@ -54,8 +58,8 @@ const AllValueStep = React.createClass({
           </h3>
           <input type="text"
                  placeholder="e.g., names"
-                 value={value}
-                 onChange={this.valueHandler} />
+                 value={name}
+                 onChange={this.nameHandler} />
         </div>
         <div className="buttons">
           <NegButton text="Previous" click={this.previousHandler} />
@@ -68,8 +72,8 @@ const AllValueStep = React.createClass({
   componentWillMount: function() {
     const { startData } = this.props;
     const { current, selector } = startData;
-    const { value } = this.state;
-    const elements = select(current.matches, selector, {type: "all", value}, '.forager-holder');
+    const { name } = this.state;
+    const elements = select(current.matches, selector, {type: "all", name}, '.forager-holder');
     highlight(elements, queryCheck);
   },
   componentWillUpdate: function(nextProps, nextState) {
@@ -77,8 +81,8 @@ const AllValueStep = React.createClass({
 
     const { startData } = nextProps;
     const { current, selector } = startData;
-    const { value } = nextState;
-    const elements = select(current.matches, selector, {type: "all", value}, '.forager-holder');
+    const { name } = nextState;
+    const elements = select(current.matches, selector, {type: "all", name}, '.forager-holder');
     highlight(elements, queryCheck);
   },
   componentWillUnmount: function() {

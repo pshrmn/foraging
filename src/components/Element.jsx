@@ -11,16 +11,15 @@ function Element(props) {
     active = true
   } = props;
 
-  const {
-    type = "single",
-    value = 0
-  } = spec;
+  const { type = "single" } = spec;
 
   let description = "";
   if ( type === "single" ) {
-    description = `captures element at index ${value}`;
+    const { index = 0 } = spec;
+    description = `captures element at index ${spec.index}`;
   } else if ( type === "all" ) {
-    description = `captures all elements, groups them as "${value}"`;
+    const { name = "" } = spec;
+    description = `captures all elements, groups them as "${spec.name}"`;
   }
 
   return (
