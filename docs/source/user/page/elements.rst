@@ -1,7 +1,7 @@
 Elements
 ========
 
-``Elements`` are used to match DOM elements. An ``Element`` has a selector property, which is a CSS selector, to match elements in the DOM. Further, an ``Element`` has a ``spec`` which specifies which of the matched DOM elements are wanted. ``Elements``, much like the DOM, have a tree structure, so an ``Element`` keep a list of its ``children`` ``Elements``. ``Gatherer`` has different ``Element`` classes for different spec types: ``SingleElement`` for single spec type elements and ``AllElement`` for all spec type elements. ``Gatherer`` provides an ``ElementFactory`` to facilitate creating the different ``Elements`` based on the spec.
+``Elements`` are used to match DOM elements. An ``Element`` has a selector property, which is a CSS selector, to match elements in the DOM. Further, an ``Element`` has a ``spec`` which specifies which of the matched DOM elements are wanted. ``Elements``, much like the DOM, have a tree structure, so an ``Element`` keep a list of its ``children`` ``Elements``. ``Gatherer`` has different ``Element`` classes for different spec types: ``SingleElement`` for single spec type elements``AllElement`` for all spec type elements, and ``RangeElement`` for when you want a list of elements, but not all of them. ``Gatherer`` provides an ``ElementFactory`` to facilitate creating the different ``Elements`` based on the spec.
 
 ElementFactory
 ^^^^^^^^^^^^^^
@@ -86,3 +86,15 @@ Methods
 ``data(parent)``
 
 ``data`` returns the data from all elements matched by the seletor. It returns a dict with one key value pair. The key is the ``name`` from the ``spec`` and the value is a list of the data dicts from each DOM element. Any elements that return ``None`` will be filtered out.
+
+RangeElement
+^^^^^^^^^^^^
+
+A ``RangeElement`` is created for ``type="range"`` spec elements. A ``RangeElement`` requires a ``name`` string, a ``low`` int, and a ``high`` int (or ``None``).
+
+Methods
++++++++
+
+``data(parent)``
+
+``data`` returns the data from the elements within the range that are matched by the selector. The range includes the ``low`` value, but not the ``high`` value (when ``low=1`` and ``high=4``, this will includes list indices ``1,2,3``). It returns a dict with one key value pair. The key is the ``name`` from the ``spec`` and the value is a list of the data dicts from each DOM element. Any elements that return ``None`` will be filtered out.

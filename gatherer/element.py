@@ -20,7 +20,7 @@ class ElementFactory(object):
         if _type is None:
             msg = "no Element spec type provided"
             raise ValueError(msg)
-        elif _type not in ["single", "all"]:
+        elif _type not in ["single", "all", "range"]:
             msg = "unexpected Element type {}"
             raise ValueError(msg.format(spec.get("type")))
 
@@ -42,6 +42,8 @@ class ElementFactory(object):
             return SingleElement(selector, spec, children, rules, optional)
         elif _type == "all":
             return AllElement(selector, spec, children, rules, optional)
+        elif _type == "range":
+            return RangeElement(selector, spec, children, rules, optional)
         else:
             return Element(selector, spec, children, rules, optional)
 
@@ -159,6 +161,52 @@ class AllElement(Element):
         return value).
         """
         elements = self.xpath(parent)
+        data = [self._get_element_data(e) for e in elements]
+        real_data = [datum for datum in data if datum]
+        # make sure that this didn't return all None
+        if not real_data:
+            return
+        # filter out any elements that returned None
+        return {self.name: real_data}
+
+
+class RangeElement(Element):
+
+    def __init__(self, selector, spec, children, rules, optional=False):
+        super().__init__(selector, spec, children, rules, optional)
+        self.name = self.spec.get("name")
+        if not isinstance(self.name, str):
+            raise ValueError("Spec name must be a str, received {}".format(self.name))
+        elif self.name is None:
+            raise ValueError("No spec name provided")
+        elif self.name == "":
+            raise ValueError("Spec name can not be an empty string")
+
+        self.low = self.spec.get("low")
+        if not isinstance(self.low, int):
+            raise ValueError("Spec low must be an int, received {}".format(self.low))
+        elif self.low is None:
+            raise ValueError("No spec low value provided")
+
+        self.high = self.spec.get("high")
+        if not isinstance(self.high, int) and self.high is not None:
+            raise ValueError("Spec high must be an int or None, received {}".format(self.high))
+        if "high" not in self.spec:
+            raise ValueError("No spec high value provided")
+
+        # verify that high > low
+        if self.high is not None and self.high < self.low:
+            msg = "high must be lower than greater than low (low={}, high={})"
+            raise ValueError(msg.format(self.low, self.high))
+
+    def data(self, parent):
+        """
+        Return a dict with one key/value pair. The key is the spec name and the
+        value is a list of dicts, one for each DOM element selected. The dicts
+        are the merged values for the element (similar to SingleElement.data's
+        return value).
+        """
+        elements = self.xpath(parent)[self.low:self.high]
         data = [self._get_element_data(e) for e in elements]
         real_data = [datum for datum in data if datum]
         # make sure that this didn't return all None

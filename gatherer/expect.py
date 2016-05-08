@@ -26,7 +26,7 @@ def flatten_element(element):
 
     if _type == "single":
         return rule_data
-    elif _type == "all":
+    elif _type == "all" or _type == "range":
         name = element.spec.get("name")
         data[name] = rule_data
         return data
