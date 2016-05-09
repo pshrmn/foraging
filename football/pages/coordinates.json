@@ -4,7 +4,7 @@
     "selector": "body",
     "spec": {
       "type": "single",
-      "value": 0
+      "index": 0
     },
     "rules": [],
     "optional": false,
@@ -13,7 +13,7 @@
         "selector": "span.geo-dms",
         "spec": {
           "type": "single",
-          "value": 0
+          "index": 0
         },
         "rules": [],
         "optional": false,
@@ -22,7 +22,7 @@
             "selector": "span.latitude",
             "spec": {
               "type": "single",
-              "value": 0
+              "index": 0
             },
             "rules": [
               {
@@ -38,7 +38,7 @@
             "selector": "span.longitude",
             "spec": {
               "type": "single",
-              "value": 0
+              "index": 0
             },
             "rules": [
               {

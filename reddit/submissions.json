@@ -4,7 +4,7 @@
     "selector": "body",
     "spec": {
       "type": "single",
-      "value": 0
+      "index": 0
     },
     "rules": [],
     "optional": false,
@@ -13,7 +13,7 @@
         "selector": "div.thing",
         "spec": {
           "type": "all",
-          "value": "submission"
+          "name": "submission"
         },
         "rules": [],
         "optional": false,
@@ -22,7 +22,7 @@
             "selector": "div.score",
             "spec": {
               "type": "single",
-              "value": 1
+              "index": 1
             },
             "rules": [
               {
@@ -38,7 +38,7 @@
             "selector": "a.title",
             "spec": {
               "type": "single",
-              "value": 0
+              "index": 0
             },
             "rules": [
               {
@@ -59,7 +59,7 @@
             "selector": ".domain",
             "spec": {
               "type": "single",
-              "value": 0
+              "index": 0
             },
             "rules": [
               {
@@ -75,7 +75,7 @@
             "selector": "a.comments",
             "spec": {
               "type": "single",
-              "value": 0
+              "index": 0
             },
             "rules": [
               {
@@ -96,7 +96,7 @@
             "selector": "a.author",
             "spec": {
               "type": "single",
-              "value": 0
+              "index": 0
             },
             "rules": [
               {

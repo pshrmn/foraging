@@ -4,7 +4,7 @@
     "selector": "body",
     "spec": {
       "type": "single",
-      "value": 0
+      "index": 0
     },
     "rules": [],
     "optional": false,
@@ -13,7 +13,7 @@
         "selector": "li.schedules-list-matchup",
         "spec": {
           "type": "all",
-          "value": "games"
+          "name": "games"
         },
         "rules": [],
         "optional": false,
@@ -22,7 +22,7 @@
             "selector": "span.team-name.away",
             "spec": {
               "type": "single",
-              "value": 0
+              "index": 0
             },
             "rules": [
               {
@@ -38,7 +38,7 @@
             "selector": "span.team-name.home",
             "spec": {
               "type": "single",
-              "value": 0
+              "index": 0
             },
             "rules": [
               {
@@ -56,7 +56,7 @@
         "selector": "span.bye-team",
         "spec": {
           "type": "single",
-          "value": 0
+          "index": 0
         },
         "rules": [],
         "optional": true,
@@ -65,7 +65,7 @@
             "selector": "a",
             "spec": {
               "type": "all",
-              "value": "byes"
+              "name": "byes"
             },
             "rules": [
               {

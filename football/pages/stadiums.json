@@ -4,7 +4,7 @@
     "selector": "body",
     "spec": {
       "type": "single",
-      "value": 0
+      "index": 0
     },
     "rules": [],
     "optional": false,
@@ -13,7 +13,7 @@
         "selector": "table.wikitable",
         "spec": {
           "type": "single",
-          "value": 1
+          "index": 1
         },
         "rules": [],
         "optional": false,
@@ -22,7 +22,7 @@
             "selector": "tr",
             "spec": {
               "type": "all",
-              "value": "stadiums"
+              "name": "stadiums"
             },
             "rules": [],
             "optional": false,
@@ -31,7 +31,7 @@
                 "selector": "th",
                 "spec": {
                   "type": "single",
-                  "value": 0
+                  "index": 0
                 },
                 "rules": [],
                 "optional": false,
@@ -40,7 +40,7 @@
                     "selector": "a",
                     "spec": {
                       "type": "single",
-                      "value": 0
+                      "index": 0
                     },
                     "rules": [
                       {
@@ -63,7 +63,7 @@
                 "selector": "td",
                 "spec": {
                   "type": "single",
-                  "value": 5
+                  "index": 5
                 },
                 "rules": [],
                 "optional": false,
@@ -72,7 +72,7 @@
                     "selector": "a",
                     "spec": {
                       "type": "all",
-                      "value": "teams"
+                      "name": "teams"
                     },
                     "rules": [
                       {
@@ -90,7 +90,7 @@
                 "selector": "td",
                 "spec": {
                   "type": "single",
-                  "value": 1
+                  "index": 1
                 },
                 "rules": [
                   {
@@ -106,7 +106,7 @@
                 "selector": "td",
                 "spec": {
                   "type": "single",
-                  "value": 4
+                  "index": 4
                 },
                 "rules": [
                   {
@@ -122,7 +122,7 @@
                 "selector": "td",
                 "spec": {
                   "type": "single",
-                  "value": 5
+                  "index": 5
                 },
                 "rules": [
                   {
@@ -138,7 +138,7 @@
                 "selector": "td",
                 "spec": {
                   "type": "single",
-                  "value": 7
+                  "index": 7
                 },
                 "rules": [
                   {
