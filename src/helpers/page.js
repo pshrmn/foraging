@@ -52,9 +52,23 @@ export const flatten = pageTree => {
   while ( index < breadth.length ) {
     let current = breadth[index];
     current.index = index;
+
+    // add reference to child in parent element
     if ( current.parent !== null ) {
       breadth[current.parent].childIndices.push(index);
     }
+
+    // fix the spec if it uses old style (value)
+    if ( current.spec.value !== undefined ) {
+      if ( current.spec.type === "single" ) {
+        current.spec.index = current.spec.value;
+      } else if ( current.spec.type === "all" ) {
+        current.spec.name = current.spec.value;
+      }
+      delete current.spec.value;
+    }
+
+    // add all child elements to the breadth array
     current.children.forEach(c => {
       breadth.push(Object.assign({}, c, {
         parent: index,
