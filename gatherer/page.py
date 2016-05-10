@@ -1,9 +1,11 @@
 from .element import ElementFactory
+from .expect import flatten_element, compare
 
 
 class Page(object):
 
-    """A Page is made up of a Elements and Rules to capture a subset
+    """
+    A Page is made up of a Elements and Rules to capture a subset
     of an HTML DOM. Each Element has a CSS selector which is used to match
     elements in the page, a spec that designates which elements among those
     matched by the CSS selector are needed, rules to gather data from the
@@ -25,7 +27,8 @@ class Page(object):
         return cls(name, element)
 
     def gather(self, dom):
-        """The gather method is syntactic sugar for the Page's Element's
+        """
+        The gather method is syntactic sugar for the Page's Element's
         data method. It takes an lxml.HtmlElement and returns a dict with
         the data that was gathered from the dom.
 
@@ -34,6 +37,12 @@ class Page(object):
         :rtype: dict
         """
         return self.element.data(dom)
+
+    def verify(self, dom):
+        """
+        verify compares the data from the dom to the expected types
+        """
+        return compare(self.gather(dom), flatten_element(self.element))
 
     def __repr__(self):
         return """Page({}, {})""".format(self.name, self.element)

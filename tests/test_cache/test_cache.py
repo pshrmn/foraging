@@ -5,7 +5,8 @@ import time
 
 from gatherer.cache import clean_url_filename, url_info, Cache
 
-CACHE_DIRECTORY = os.path.join(os.getcwd(), "tests", "data", "test_cache")
+TEST_DIRECTORY = os.path.dirname(os.path.abspath(__file__))
+CACHE_DIRECTORY = os.path.join(TEST_DIRECTORY, "cache")
 
 
 class CacheHelpersTestCase(unittest.TestCase):
@@ -93,7 +94,7 @@ class CacheTestCase(unittest.TestCase):
 
     def test_cache_max_age(self):
         # create a new cache folder
-        EXPIRE_CACHE_DIRECTORY = os.path.join(os.getcwd(), "tests", "data", "test_cache_expire")
+        EXPIRE_CACHE_DIRECTORY = os.path.join(TEST_DIRECTORY, "test_cache_expire")
         os.makedirs(EXPIRE_CACHE_DIRECTORY, exist_ok=True)
 
         # create two files, the first won't have its modified time changed and the
@@ -134,7 +135,7 @@ class CacheTestCase(unittest.TestCase):
 
     def test_cache_expire_during_get(self):
         # create a new cache folder
-        EXPIRE_CACHE_DIRECTORY = os.path.join(os.getcwd(), "tests", "data", "test_cache_expire_during")
+        EXPIRE_CACHE_DIRECTORY = os.path.join(TEST_DIRECTORY, "test_cache_expire_during")
         os.makedirs(EXPIRE_CACHE_DIRECTORY, exist_ok=True)
 
         # create two files, the first won't have its modified time changed and the

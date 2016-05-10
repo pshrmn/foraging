@@ -1,10 +1,7 @@
 import unittest
-import os
 from lxml.html import HtmlElement
 
 from gatherer.fetch import Fetch, requests_backend
-
-file_directory = os.path.join(os.getcwd(), "tests", "data", "test_files")
 
 
 def fake_backend(url, headers):

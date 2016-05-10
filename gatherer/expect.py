@@ -4,11 +4,12 @@ as expected.
 """
 
 
-def flatten_element(element):
+def flatten_element(element, optional=False):
     """
     flatten the expected types of rules down to a nested dict. Keys are the
-    names of rules and values are either the expected type or another dict
-    which contains nested rules.
+    names of rules and values are a tuple where the first item is either the
+    expected type or another dict which contains nested rules and the second
+    item is whether or not the rule is optional.
 
     :param element: a gatherer Element
     :type element: gatherer.Element
@@ -16,35 +17,39 @@ def flatten_element(element):
     :rtype: dict
     """
 
+    # an element's rules will be optional if either it or its ancestors
+    # is optional
+    is_optional = element.optional or optional
+
     data = {}
     _type = element.spec.get("type")
-    rule_data = flatten_rules(element)
+    rule_data = flatten_rules(element, is_optional)
 
     for child in element.children:
-        for key, val in flatten_element(child).items():
+        for key, val in flatten_element(child, is_optional).items():
             rule_data[key] = val
 
     if _type == "single":
         return rule_data
     elif _type == "all" or _type == "range":
         name = element.spec.get("name")
-        data[name] = rule_data
+        data[name] = (rule_data, is_optional)
         return data
 
 
-def flatten_rules(element):
+def flatten_rules(element, optional):
     rules = {}
     for rule in element.rules:
         rule_type = rule.type
         if rule_type == "string":
-            rules[rule.name] = str
+            rules[rule.name] = (str, optional)
         elif rule_type == "int":
-            rules[rule.name] = int
+            rules[rule.name] = (int, optional)
         elif rule_type == "float":
-            rules[rule.name] = float
+            rules[rule.name] = (float, optional)
         else:
             # unexpected rule type
-            rules[rule.name] = rule_type
+            rules[rule.name] = (rule_type, optional)
     return rules
 
 
@@ -62,16 +67,25 @@ def compare(data, expected):
     :rtype: bool
     """
     good = True
-    for key, exp_type in expected.items():
+    for key, expected in expected.items():
         if good is False:
             break
         value = data.get(key)
+        _type, optional = expected
         if value is None:
-            good = False
+            if not optional:
+                good = False
+            else:
+                continue
+        # iterate over items in the list, verifying the data
+        # for each one
         elif isinstance(value, list):
-            good = all(compare(v, exp_type) for v in value)
+            # _type is a dict of rules for all/range elements
+            # and their children
+            good = all(compare(v, _type) for v in value)
+            continue
         else:
-            good = isinstance(value, exp_type)
+            good = isinstance(value, _type)
     return good
 
 
@@ -89,15 +103,20 @@ def differences(data, expected):
     :rtype: dict
     """
     diff = {}
-    for key, exp_type in expected.items():
+    for key, expected in expected.items():
         value = data.get(key)
+
+        _type, optional = expected
         if value is None:
-            diff[key] = {
-                "expected": exp_type,
-                "actual": type(value),
-                "value": value
-            }
-        elif isinstance(exp_type, dict):
+            if not optional:
+                diff[key] = {
+                    "expected": _type,
+                    "actual": type(value),
+                    "value": value
+                }
+            else:
+                continue
+        elif isinstance(_type, dict):
             # when the expected type is a dict, the value should be a list
             if not isinstance(value, list):
                 diff[key] = {
@@ -108,14 +127,15 @@ def differences(data, expected):
             else:
                 # only set a diff key when one or more of the items
                 # differentiates from the expected
-                all_diffs = [differences(item, exp_type) for item in value]
+                all_diffs = [differences(item, _type) for item in value]
                 real_diffs = [d for d in all_diffs if d is not None]
                 if real_diffs:
                     diff[key] = real_diffs
+            continue
         else:
-            if not isinstance(value, exp_type):
+            if not isinstance(value, _type):
                 diff[key] = {
-                    "expected": exp_type,
+                    "expected": _type,
                     "actual": type(value),
                     "value": value
                 }

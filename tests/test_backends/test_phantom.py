@@ -3,7 +3,8 @@ import os
 
 from gatherer.backends import phantom_backend
 
-file_directory = os.path.join(os.getcwd(), "tests", "data", "test_files")
+TEST_DIRECTORY = os.path.dirname(os.path.abspath(__file__))
+FILE_DIRECTORY = os.path.join(TEST_DIRECTORY, "fake_files")
 
 
 class PhantomBackendTestCase(unittest.TestCase):
@@ -13,8 +14,8 @@ class PhantomBackendTestCase(unittest.TestCase):
         verify that the phantom_backend closure requires that the
         phantom_path and js_path files exist
         """
-        phantom_path = os.path.join(file_directory, 'phantom.txt')
-        js_path = os.path.join(file_directory, 'getscript.js')
+        phantom_path = os.path.join(FILE_DIRECTORY, 'phantom.txt')
+        js_path = os.path.join(FILE_DIRECTORY, 'getscript.js')
         # non-existent phantomjs path
         with self.assertRaises(ValueError):
             phantom_backend('fake_path.exe', js_path)
