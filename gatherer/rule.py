@@ -63,3 +63,6 @@ class Rule(object):
         if match is not None:
             return float(match.group())
         return
+
+    def __repr__(self):
+        return """Rule("{}", "{}", "{}")""".format(self.name, self.attr, self.type)

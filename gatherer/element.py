@@ -116,6 +116,12 @@ class Element(object):
                 data[key] = val
         return data
 
+    def __repr__(self):
+        children = ", ".join([repr(c) for c in self.children])
+        rules = ", ".join([repr(r) for r in self.rules])
+        return """AllElement("{}", {}, [{}], [{}], {})""".format(
+            self.selector, self.spec, children, rules, self.optional)
+
 
 class SingleElement(Element):
 
@@ -139,6 +145,12 @@ class SingleElement(Element):
             # return None if dom_element doesn't exist
             return None
         return self._get_element_data(dom_element)
+
+    def __repr__(self):
+        children = ", ".join([repr(c) for c in self.children])
+        rules = ", ".join([repr(r) for r in self.rules])
+        return """SingleElement("{}", {}, [{}], [{}], {})""".format(
+            self.selector, self.spec, children, rules, self.optional)
 
 
 class AllElement(Element):
@@ -168,6 +180,12 @@ class AllElement(Element):
             return
         # filter out any elements that returned None
         return {self.name: real_data}
+
+    def __repr__(self):
+        children = ", ".join([repr(c) for c in self.children])
+        rules = ", ".join([repr(r) for r in self.rules])
+        return """AllElement("{}", {}, [{}], [{}], {})""".format(
+            self.selector, self.spec, children, rules, self.optional)
 
 
 class RangeElement(Element):
@@ -214,3 +232,9 @@ class RangeElement(Element):
             return
         # filter out any elements that returned None
         return {self.name: real_data}
+
+    def __repr__(self):
+        children = ", ".join([repr(c) for c in self.children])
+        rules = ", ".join([repr(r) for r in self.rules])
+        return """RangeElement("{}", {}, [{}], [{}], {})""".format(
+            self.selector, self.spec, children, rules, self.optional)

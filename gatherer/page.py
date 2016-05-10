@@ -34,3 +34,6 @@ class Page(object):
         :rtype: dict
         """
         return self.element.data(dom)
+
+    def __repr__(self):
+        return """Page({}, {})""".format(self.name, self.element)
