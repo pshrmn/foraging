@@ -16,6 +16,19 @@ SINGLE_ELEMENT = {
     ]
 }
 
+ALT_SINGLE_ELEMENT = {
+    "selector": "span",
+    "spec": {"type": "single", "index": 0},
+    "children": [],
+    "rules": [
+        {
+            "name": "text",
+            "attr": "text",
+            "type": "string"
+        }
+    ]
+}
+
 ALL_ELEMENT = {
     "selector": "div.item",
     "spec": {"type": "all", "name": "items"},
@@ -25,6 +38,19 @@ ALL_ELEMENT = {
             "name": "count",
             "attr": "data-count",
             "type": "int"
+        }
+    ]
+}
+
+ALT_ALL_ELEMENT = {
+    "selector": "p",
+    "spec": {"type": "all", "name": "paragraphs"},
+    "children": [],
+    "rules": [
+        {
+            "name": "description",
+            "attr": "text",
+            "type": "string"
         }
     ]
 }
