@@ -1,8 +1,11 @@
 import React from "react";
+import { connect } from "react-redux";
 
 import { PosButton, NegButton } from "../../common/Buttons";
 import { select, count } from "../../../helpers/selection";
 import { highlight, unhighlight } from "../../../helpers/markup";
+import { levelNames } from "../../../helpers/page";
+import { showMessage } from "expiring-redux-messages";
 import { currentSelector } from "../../../constants/CSSClasses";
 
 const AllValueStep = React.createClass({
@@ -30,7 +33,20 @@ const AllValueStep = React.createClass({
   nextHandler: function(event) {
     event.preventDefault();
     const { name, error } = this.state;
-    const { startData, next } = this.props;
+    const {
+      startData,
+      extraData,
+      next,
+      takenNames,
+      showMessage
+    } = this.props;
+    // do not do duplicate test if the name isn't changing
+    const originalName = extraData.originalSpec.name;
+    if ( name !== originalName && !takenNames.every(n => n !== name) ) {
+      showMessage(`"${name}" is a duplicate and cannot be used.`, 5000, -1);
+      return;
+    }
+
     if ( error ) {
       return;
     }
@@ -108,4 +124,23 @@ const AllValueStep = React.createClass({
   }
 });
 
-export default AllValueStep;
+export default connect(
+  state => {
+    const { page } = state;
+    const { pages, pageIndex, elementIndex } = page;
+
+    const currentPage = pages[pageIndex];
+    // use the current element's parent (if it has one) to get
+    // the level because the take names for the current element
+    // are in a different level. For the root node, use the elementIndex
+    // (but this should never happen)
+    const current = currentPage.elements[elementIndex];
+    const index = current.parent !== null ? current.parent : elementIndex;
+    return {
+      takenNames: levelNames(currentPage.elements, index)
+    };
+  },
+  {
+    showMessage
+  }
+)(AllValueStep);

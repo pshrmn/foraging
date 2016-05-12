@@ -1,6 +1,9 @@
 import React from "react";
+import { connect } from "react-redux";
 
 import { PosButton, NegButton } from "../../common/Buttons";
+import { levelNames } from "../../../helpers/page";
+import { showMessage } from "expiring-redux-messages";
 
 const ChooseName = React.createClass({
   getInitialState: function() {
@@ -21,6 +24,13 @@ const ChooseName = React.createClass({
   nextHandler: function(event) {
     event.preventDefault();
     const { name } = this.state;
+    const { takenNames, showMessage } = this.props;
+
+    if ( !takenNames.every(n => n !== name) ) {
+      showMessage(`"${name}" is a duplicate and cannot be used.`, 5000, -1);
+      return;
+    }
+
     const { startData, next } = this.props;
     next(Object.assign({}, startData, { name }));
   },
@@ -62,4 +72,17 @@ const ChooseName = React.createClass({
   }
 });
 
-export default ChooseName;
+export default connect(
+  state => {
+    const { page } = state;
+    const { pages, pageIndex, elementIndex } = page;
+
+    const currentPage = pages[pageIndex];
+    return {
+      takenNames: levelNames(currentPage.elements, elementIndex)
+    };
+  },
+  {
+    showMessage
+  }
+)(ChooseName);

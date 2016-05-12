@@ -156,3 +156,65 @@ export const simpleGrow = elementArray => {
   });
   return cleanElements[0];
 }
+
+/*
+ * Return a list of names in the same level as the current element
+ *
+ * For example, given the below rules:
+ * {
+ *   "foo": "",
+ *   "bar": 7,
+ *   "baz": {
+ *     "quux": 3.14
+ *   }
+ * }
+ *
+ * The names "foo", "bar", and "baz" are in the same level. The name "quux" is
+ * in a separate level.
+ *
+ * This is useful for verifying that a rule or spec name is not a duplicate.
+ */
+export function levelNames(elements, currentIndex) {
+  let current = elements[currentIndex];
+  // find the root element for the current level. This will either be an element
+  /// with a spec name or the root element of the whole tree
+  let rootIndex;
+  while ( rootIndex === undefined ) {
+    // check if current is a spec name element
+    if ( current.spec.name !== undefined || current.parent === null) {
+      rootIndex = current.index
+    } else {
+      current = elements[current.parent];
+    }
+  }
+
+  return childNames(elements, rootIndex, true);
+};
+
+function childNames(elements, index, isRoot) {
+  let current = elements[index];
+  let takenNames = [];
+  if ( current === undefined ) {
+    return [];
+  }
+
+  // when there is a spec name, any of that element and its childrens
+  // rules will be in another level. Do not do this for the root element.
+  if ( !isRoot && current.spec.name !== undefined ) {
+    takenNames.push(current.spec.name);
+  } else {
+    // add the name for every rule in the current element
+    current.rules.forEach(r => {
+      takenNames.push(r.name);
+    });
+
+    // and merge in the names from every child element
+    current.childIndices.forEach(c => {
+      const child = elements[c];
+      takenNames = takenNames.concat(childNames(elements, child.index, false));
+    });
+
+  }
+
+  return takenNames;
+}

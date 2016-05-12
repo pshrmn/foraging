@@ -38,7 +38,8 @@ const EditElementWizard = React.createClass({
       optional
     };
     const extraData = {
-      parent
+      parent,
+      originalSpec: spec
     };
     const steps = [
       ChooseType,
