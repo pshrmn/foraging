@@ -1,7 +1,8 @@
 import React from "react";
 
+import Controls from "../common/Controls";
 import OptionalForm from "../elementForms/OptionalForm";
-import { PosButton, NegButton } from "../../common/Buttons";
+
 import { select } from "../../../helpers/selection";
 import { highlight, unhighlight } from "../../../helpers/markup";
 import { currentSelector } from "../../../constants/CSSClasses";
@@ -39,20 +40,19 @@ const ChooseOptional = React.createClass({
     });
   },
   render: function() {
-    const { error, optional } = this.state;
+    const { optional } = this.state;
     const { startData } = this.props;
     const { current, selector } = startData
     return (
-      <div className="info-box">
+      <form className="info-box">
         <div className="info">
           <OptionalForm optional={optional} toggle={this.toggleOptional} />
         </div>
-        <div className="buttons">
-          <NegButton text="Previous" click={this.previousHandler} />
-          <PosButton text="Next" click={this.nextHandler} />
-          <NegButton text="Cancel" click={this.cancelHandler} />
-        </div>
-      </div>
+        <Controls
+          previous={this.previousHandler}
+          next={this.nextHandler}
+          cancel={this.cancelHandler} />
+      </form>
     );
   },
   componentWillMount: function() {

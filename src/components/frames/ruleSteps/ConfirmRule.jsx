@@ -1,9 +1,10 @@
 import React from "react";
 
-import { PosButton, NegButton } from "../../common/Buttons";
+import Controls from "../common/Controls";
 
 const ConfirmElement = React.createClass({
-  saveHandler: function() {
+  saveHandler: function(event) {
+    event.preventDefault();
     const { startData, next: save } = this.props;
     const { name, attribute, type } = startData;
     save({
@@ -24,19 +25,19 @@ const ConfirmElement = React.createClass({
     const { startData } = this.props;
     const { name, attribute, type } = startData;
     return (
-      <div className="info-box">
+      <form className="info-box">
         <h2>Confirm Rule</h2>
         <ul>
           <li>Name: {name}</li>
           <li>Attribute: {attribute}</li>
           <li>Type: {type}</li>
         </ul>
-        <div className="buttons">
-          <NegButton text="Previous" click={this.previousHandler} />
-          <PosButton text="Save" click={this.saveHandler} />
-          <NegButton text="Cancel" click={this.cancelHandler} />
-        </div>
-      </div>
+        <Controls
+          previous={this.previousHandler}
+          next={this.saveHandler}
+          nextText="Save"
+          cancel={this.cancelHandler} />
+      </form>
     );
   }
 });

@@ -1,7 +1,8 @@
 import React from "react";
 
+import Controls from "../common/Controls";
 import SingleForm from "../elementForms/SingleForm";
-import { PosButton, NegButton } from "../../common/Buttons";
+
 import { select, count } from "../../../helpers/selection";
 import { highlight, unhighlight } from "../../../helpers/markup";
 import { queryCheck } from "../../../constants/CSSClasses";
@@ -57,16 +58,16 @@ const SingleValueStep = React.createClass({
     const indices = count(current.matches, selector);
     
     return (
-      <div className="info-box">
+      <form className="info-box">
         <div className="info">
           <SingleForm index={index} count={indices} setIndex={this.indexHandler} />
         </div>
-        <div className="buttons">
-          <NegButton text="Previous" click={this.previousHandler} />
-          <PosButton text="Next" click={this.nextHandler} disabled={error} />
-          <NegButton text="Cancel" click={this.cancelHandler} />
-        </div>
-      </div>
+        <Controls
+          previous={this.previousHandler}
+          next={this.nextHandler}
+          cancel={this.cancelHandler}
+          error={error} />
+      </form>
     );    
   },
   componentWillMount: function() {

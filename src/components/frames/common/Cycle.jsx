@@ -1,5 +1,7 @@
 import React from "react"
 
+import { NeutralButton } from "../../common/Buttons";
+
 const Cycle = React.createClass({
   previousElement: function() {
     const { setIndex, index, count } = this.props;
@@ -16,13 +18,13 @@ const Cycle = React.createClass({
     const { index, count } = this.props;
     return (
       <div>
-        <button onClick={this.previousElement}>
-          {"<"}
-        </button>
+        <NeutralButton
+          onClick={this.previousElement}
+          text="<" />
         {index + 1} / {count}
-        <button onClick={this.nextElement}>
-          {">"}
-        </button>
+        <NeutralButton
+          onClick={this.nextElement}
+          text=">" />
       </div>
     );
   }

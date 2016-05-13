@@ -1,6 +1,6 @@
 import React from "react";
 
-import { PosButton, NegButton } from "../../common/Buttons";
+import Controls from "../common/Controls";
 
 import { parts, select, count, allSelect } from "../../../helpers/selection";
 import { stripEvents } from "../../../helpers/attributes";
@@ -102,7 +102,7 @@ const ChooseElement = React.createClass({
     const { next, previous } = this.props;
     const { selectors, checked, eleCount, error } = this.state;
     return (
-      <div className="info-box">
+      <form className="info-box">
         <div className="info">
           <h3>Select Relevant Element(s)</h3>
           <div className="choices">
@@ -117,11 +117,11 @@ const ChooseElement = React.createClass({
           </div>
           <h5>Count: {eleCount}</h5>
         </div>
-        <div className="buttons">
-          <PosButton text="Next" disabled={error} click={this.nextHandler} />
-          <NegButton text="Cancel" click={this.cancelHandler} />
-        </div>
-      </div>
+        <Controls
+          next={this.nextHandler}
+          cancel={this.cancelHandler}
+          error={error} />
+      </form>
     );
   },
   /*

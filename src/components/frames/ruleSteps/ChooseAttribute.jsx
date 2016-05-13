@@ -1,8 +1,9 @@
 import React from "react";
 
+import Controls from "../common/Controls";
+
 import { attributes } from "../../../helpers/attributes";
 import { abbreviate } from "../../../helpers/text";
-import { PosButton, NegButton } from "../../common/Buttons";
 
 const ChooseAttribute = React.createClass({
   getInitialState: function() {
@@ -30,10 +31,6 @@ const ChooseAttribute = React.createClass({
 
     const { startData, next } = this.props;
     next(Object.assign({}, startData, { attribute }));
-  },
-  previousHandler: function(event) {
-    event.preventDefault();
-    this.props.previous();
   },
   cancelHandler: function(event) {
     event.preventDefault();
@@ -67,7 +64,7 @@ const ChooseAttribute = React.createClass({
       );
     });
     return (
-      <div className="info-box">
+      <form className="info-box">
         <div className="info">
           <h3>
             Which attribute has the value that you want?
@@ -77,12 +74,11 @@ const ChooseAttribute = React.createClass({
           </ul>
           {this.props.children}
         </div>
-        <div className="buttons">
-          <NegButton text="Previous" click={this.previousHandler} />
-          <PosButton text="Next" click={this.nextHandler} disabled={error} />
-          <NegButton text="Cancel" click={this.cancelHandler} />
-        </div>
-      </div>
+        <Controls
+          next={this.nextHandler}
+          cancel={this.cancelHandler}
+          error={error} />
+      </form>
     );
   }
 });

@@ -1,8 +1,9 @@
 import React from "react";
 import { connect } from "react-redux";
 
+import Controls from "../common/Controls";
 import RangeForm from "../elementForms/RangeForm";
-import { PosButton, NegButton } from "../../common/Buttons";
+
 import { select, count } from "../../../helpers/selection";
 import { highlight, unhighlight } from "../../../helpers/markup";
 import { levelNames } from "../../../helpers/page";
@@ -123,7 +124,7 @@ const RangeValueStep = React.createClass({
     const indices = count(current.matches, selector);
 
     return (
-      <div className="info-box">
+      <form className="info-box">
         <div className="info">
           <RangeForm name={name}
                      low={low}
@@ -133,12 +134,12 @@ const RangeValueStep = React.createClass({
                      setLow={this.lowHandler}
                      setHigh={this.highHandler} />
         </div>
-        <div className="buttons">
-          <NegButton text="Previous" click={this.previousHandler} />
-          <PosButton text="Next" click={this.nextHandler} disabled={error} />
-          <NegButton text="Cancel" click={this.cancelHandler} />
-        </div>
-      </div>
+        <Controls
+          previous={this.previousHandler}
+          next={this.nextHandler}
+          cancel={this.cancelHandler}
+          error={error} />
+      </form>
     );
   },
   componentWillMount: function() {

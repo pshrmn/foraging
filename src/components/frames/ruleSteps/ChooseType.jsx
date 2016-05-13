@@ -1,6 +1,7 @@
 import React from "react";
 
-import { PosButton, NegButton } from "../../common/Buttons";
+import Controls from "../common/Controls";
+
 import { abbreviate } from "../../../helpers/text";
 import { integer, float } from "../../../helpers/parse";
 
@@ -81,7 +82,7 @@ const ChooseType = React.createClass({
     }
 
     return (
-      <div className="info-box">
+      <form className="info-box">
         <div className="info">
           <h3>
             What type of value is this?
@@ -92,12 +93,11 @@ const ChooseType = React.createClass({
           </p>
           {this.props.children}
         </div>
-        <div className="buttons">
-          <NegButton text="Previous" click={this.previousHandler} />
-          <PosButton text="Next" click={this.nextHandler} />
-          <NegButton text="Cancel" click={this.cancelHandler} />
-        </div>
-      </div>
+        <Controls
+          previous={this.previousHandler}
+          next={this.nextHandler}
+          cancel={this.cancelHandler} />
+      </form>
     );
   }
 });

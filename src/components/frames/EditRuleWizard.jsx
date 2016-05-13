@@ -8,7 +8,7 @@ import ChooseAttribute from "./ruleSteps/ChooseAttribute";
 import ChooseType from "./ruleSteps/ChooseType";
 import ChooseName from "./ruleSteps/ChooseName";
 import ConfirmUpdateRule from "./ruleSteps/ConfirmUpdateRule";
-import Cycle from "./ruleSteps/Cycle";
+import Cycle from "./common/Cycle";
 
 import { updateRule, showElementFrame } from "../../actions";
 import { highlight, unhighlight} from "../../helpers/markup";

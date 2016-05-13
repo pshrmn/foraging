@@ -1,6 +1,6 @@
 import React from "react";
 
-import { PosButton, NegButton } from "../../common/Buttons";
+import Controls from "../common/Controls";
 
 import { select, count } from "../../../helpers/selection";
 import { highlight, unhighlight} from "../../../helpers/markup";
@@ -92,7 +92,7 @@ const ChooseParts = React.createClass({
       );
     });
     return (
-      <div className="info-box">
+      <form className="info-box">
         <div className="info">
           <h3>Select Relevant Part(s) of the CSS selector</h3>
           <div className="choices">
@@ -100,12 +100,12 @@ const ChooseParts = React.createClass({
           </div>
           <h5>Count: {this.state.eleCount}</h5>
         </div>
-        <div className="buttons">
-          <NegButton text="Previous" click={this.previousHander} />
-          <PosButton text="Next" disabled={error} click={this.nextHandler} />
-          <NegButton text="Cancel" click={this.cancelHandler} />
-        </div>
-      </div>
+        <Controls
+          previous={this.previousHandler}
+          next={this.nextHandler}
+          cancel={this.cancelHandler}
+          error={error} />
+      </form>
     );
   },
   componentWillUnmount: function() {

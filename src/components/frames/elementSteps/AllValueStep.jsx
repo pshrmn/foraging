@@ -2,7 +2,8 @@ import React from "react";
 import { connect } from "react-redux";
 
 import AllForm from "../elementForms/AllForm";
-import { PosButton, NegButton } from "../../common/Buttons";
+import Controls from "../common/Controls";
+
 import { select, count } from "../../../helpers/selection";
 import { highlight, unhighlight } from "../../../helpers/markup";
 import { levelNames } from "../../../helpers/page";
@@ -65,16 +66,16 @@ const AllValueStep = React.createClass({
   render: function() {
     const { name, error } = this.state;
     return (
-      <div className="info-box">
+      <form className="info-box">
         <div className="info">
           <AllForm name={name} setName={this.nameHandler} />
         </div>
-        <div className="buttons">
-          <NegButton text="Previous" click={this.previousHandler} />
-          <PosButton text="Next" click={this.nextHandler} disabled={error} />
-          <NegButton text="Cancel" click={this.cancelHandler} />
-        </div>
-      </div>
+        <Controls
+          previous={this.previousHandler}
+          next={this.nextHandler}
+          cancel={this.cancelHandler}
+          error={error} />
+      </form>
     );
   },
   componentWillMount: function() {

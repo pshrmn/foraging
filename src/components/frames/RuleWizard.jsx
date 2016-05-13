@@ -8,8 +8,8 @@ import ChooseAttribute from "./ruleSteps/ChooseAttribute";
 import ChooseType from "./ruleSteps/ChooseType";
 import ChooseName from "./ruleSteps/ChooseName";
 import ConfirmRule from "./ruleSteps/ConfirmRule";
+import Cycle from "./common/Cycle";
 
-import Cycle from "./ruleSteps/Cycle";
 import { saveRule, showElementFrame } from "../../actions";
 import { highlight, unhighlight} from "../../helpers/markup";
 import { currentSelector } from "../../constants/CSSClasses";

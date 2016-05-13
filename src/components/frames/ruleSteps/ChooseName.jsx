@@ -1,7 +1,8 @@
 import React from "react";
 import { connect } from "react-redux";
 
-import { PosButton, NegButton } from "../../common/Buttons";
+import Controls from "../common/Controls";
+
 import { levelNames } from "../../../helpers/page";
 import { showMessage } from "expiring-redux-messages";
 
@@ -52,7 +53,7 @@ const ChooseName = React.createClass({
   render: function() {
     const { name, error } = this.state;
     return (
-      <div className="info-box">
+      <form className="info-box">
         <div className="info">
           <h3>
             What should the rule be named?
@@ -62,12 +63,12 @@ const ChooseName = React.createClass({
                  value={name}
                  onChange={this.nameHandler} />
         </div>
-        <div className="buttons">
-          <NegButton text="Previous" click={this.previousHandler} />
-          <PosButton text="Next" click={this.nextHandler} disabled={error} />
-          <NegButton text="Cancel" click={this.cancelHandler} />
-        </div>
-      </div>
+        <Controls
+          previous={this.previousHandler}
+          next={this.nextHandler}
+          cancel={this.cancelHandler}
+          error={error} />
+      </form>
     );
   }
 });

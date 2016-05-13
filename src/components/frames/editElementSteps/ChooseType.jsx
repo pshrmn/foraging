@@ -1,7 +1,8 @@
 import React from "react";
 
+import Controls from "../common/Controls";
 import TypeForm from "../elementForms/TypeForm.jsx";
-import { PosButton, NegButton } from "../../common/Buttons";
+
 import { select } from "../../../helpers/selection";
 import { highlight, unhighlight } from "../../../helpers/markup";
 import { currentSelector } from "../../../constants/CSSClasses";
@@ -45,15 +46,14 @@ const ChooseType = React.createClass({
     const types = ["single", "all", "range"];
 
     return (
-      <div className="info-box">
+      <form className="info-box">
         <div className="info">
           <TypeForm types={types} current={type} setType={this.typeHandler} />
         </div>
-        <div className="buttons">
-          <PosButton text="Next" click={this.nextHandler} />
-          <NegButton text="Cancel" click={this.cancelHandler} />
-        </div>
-      </div>
+        <Controls
+          next={this.nextHandler}
+          cancel={this.cancelHandler} />
+      </form>
     );
   },
   componentWillMount: function() {
