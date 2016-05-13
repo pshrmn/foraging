@@ -1,6 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
 
+import RangeForm from "../elementForms/RangeForm";
 import { PosButton, NegButton } from "../../common/Buttons";
 import { select, count } from "../../../helpers/selection";
 import { highlight, unhighlight } from "../../../helpers/markup";
@@ -125,40 +126,17 @@ const RangeValueStep = React.createClass({
     const { matches = [document] } = parent;
 
     const indices = count(matches, selector);
-    const lowOptions = Array.from(new Array(indices)).map((u, i) => {
-      return (
-        <option key={i} value={i}>{i}</option>
-      );
-    });
-    const lowSelect = (
-      <select value={low} onChange={this.lowHandler}>{lowOptions}</select>
-    );
-    const highOptions = Array.from(new Array(indices)).map((u, i) => {
-      return (
-        <option key={i} value={i}>{i}</option>
-      );
-    });
-    const highSelect = (
-      <select value={high} onChange={this.highHandler}>
-        {highOptions.concat([<option key="end" value="end">end</option>])}
-      </select>
-    );
 
     return (
       <div className="info-box">
         <div className="info">
-          <h3>
-            What should the array of elements be named?
-          </h3>
-          <input type="text"
-                 placeholder="e.g., names"
-                 value={name}
-                 onChange={this.nameHandler} />
-
-          <h3>
-            Which elements should be selected?
-          </h3>
-          {lowSelect} - {highSelect}
+          <RangeForm name={name}
+                     low={low}
+                     high={high}
+                     count={indices}
+                     setName={this.nameHandler}
+                     setLow={this.lowHandler}
+                     setHigh={this.highHandler} />
         </div>
         <div className="buttons">
           <NegButton text="Previous" click={this.previousHandler} />

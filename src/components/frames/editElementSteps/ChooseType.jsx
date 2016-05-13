@@ -1,5 +1,6 @@
 import React from "react";
 
+import TypeForm from "../elementForms/TypeForm.jsx";
 import { PosButton, NegButton } from "../../common/Buttons";
 import { select } from "../../../helpers/selection";
 import { highlight, unhighlight } from "../../../helpers/markup";
@@ -54,27 +55,12 @@ const ChooseType = React.createClass({
   },
   render: function() {
     const { type } = this.state;
-    const typeInputs = ["single", "all", "range"].map(t => {
-      const selected = type === t;
-      return (
-        <label key={t}
-               className={selected ? "selected": null}>
-          <input type="radio"
-                 name="type"
-                 value={t}
-                 checked={selected}
-                 onChange={this.typeHandler} />
-          {t}
-        </label>
-      );
-    });
+    const types = ["single", "all", "range"];
+
     return (
       <div className="info-box">
         <div className="info">
-          <h3>
-            Should the element target a single element or all?
-          </h3>
-          {typeInputs}
+          <TypeForm types={types} current={type} setType={this.typeHandler} />
         </div>
         <div className="buttons">
           <PosButton text="Next" click={this.nextHandler} />

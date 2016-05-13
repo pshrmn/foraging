@@ -1,5 +1,6 @@
 import React from "react";
 
+import SingleForm from "../elementForms/SingleForm";
 import { PosButton, NegButton } from "../../common/Buttons";
 import { select, count } from "../../../helpers/selection";
 import { highlight, unhighlight } from "../../../helpers/markup";
@@ -20,7 +21,7 @@ const SingleValueStep = React.createClass({
       error: false
     };
   },
-  valueHandler: function(event) {
+  indexHandler: function(event) {
     const { value } = event.target;
     this.setState({
       index: parseInt(value, 10),
@@ -54,22 +55,11 @@ const SingleValueStep = React.createClass({
     const { current, selector } = startData;
 
     const indices = count(current.matches, selector);
-    const options = Array.from(new Array(indices)).map((u, i) => {
-      return (
-        <option key={i} value={i}>{i}</option>
-      );
-    });
-
+    
     return (
       <div className="info-box">
         <div className="info">
-          <h3>
-            The element at which index should be selected?
-          </h3>
-          <select value={index}
-                  onChange={this.valueHandler} >
-            {options}
-          </select>
+          <SingleForm index={index} count={indices} setIndex={this.indexHandler} />
         </div>
         <div className="buttons">
           <NegButton text="Previous" click={this.previousHandler} />

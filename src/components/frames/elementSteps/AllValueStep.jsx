@@ -1,6 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
 
+import AllForm from "../elementForms/AllForm";
 import { PosButton, NegButton } from "../../common/Buttons";
 import { select, count } from "../../../helpers/selection";
 import { highlight, unhighlight } from "../../../helpers/markup";
@@ -66,13 +67,7 @@ const AllValueStep = React.createClass({
     return (
       <div className="info-box">
         <div className="info">
-          <h3>
-            What should the array of elements be named?
-          </h3>
-          <input type="text"
-                 placeholder="e.g., names"
-                 value={name}
-                 onChange={this.nameHandler} />
+          <AllForm name={name} setName={this.nameHandler} />
         </div>
         <div className="buttons">
           <NegButton text="Previous" click={this.previousHandler} />

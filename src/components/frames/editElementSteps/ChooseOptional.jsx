@@ -1,5 +1,6 @@
 import React from "react";
 
+import OptionalForm from "../elementForms/OptionalForm";
 import { PosButton, NegButton } from "../../common/Buttons";
 import { select } from "../../../helpers/selection";
 import { highlight, unhighlight } from "../../../helpers/markup";
@@ -44,15 +45,7 @@ const ChooseOptional = React.createClass({
     return (
       <div className="info-box">
         <div className="info">
-          <h3>
-            Is this element optional?
-          </h3>
-          <label className={optional ? "selected" : null}>
-            <input type="checkbox"
-                   checked={optional}
-                   onChange={this.toggleOptional} />
-            { optional ? "Yes" : "No" }
-          </label>
+          <OptionalForm optional={optional} toggle={this.toggleOptional} />
         </div>
         <div className="buttons">
           <NegButton text="Previous" click={this.previousHandler} />
