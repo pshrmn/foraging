@@ -29,19 +29,6 @@ const ChooseType = React.createClass({
     const newSpec = {
       type
     };
-    switch ( type ) {
-    case "single":
-      newSpec.index = type !== spec.type ? 0 : spec.index;
-      break;
-    case "all":
-      newSpec.name = type !== spec.type ? "" : spec.name;
-      break;
-    case "range":
-      newSpec.name = type !== spec.type ? "" : spec.name;
-      newSpec.low = type !== spec.type ? 0 : spec.low;
-      newSpec.high = type !== spec.type ? null : spec.high;
-      break;
-    }
     next(Object.assign({}, startData, {spec: newSpec}));
   },
   cancelHandler: function(event) {

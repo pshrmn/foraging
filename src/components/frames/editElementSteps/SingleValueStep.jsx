@@ -8,13 +8,13 @@ import { currentSelector } from "../../../constants/CSSClasses";
 
 const SingleValueStep = React.createClass({
   getInitialState: function() {
-    const { startData, endData = {} } = this.props;
+    const { extraData, endData = {} } = this.props;
     let index = 0;
     // if there is an existing index, only use it if the types match
     if ( endData.spec && endData.spec.index !== undefined ) {
       index = endData.spec.index;
-    } else if ( startData.spec && startData.spec.index !== undefined ) {
-      index = startData.spec.index;
+    } else if ( extraData.originalSpec && extraData.originalSpec.index !== undefined ) {
+      index = extraData.originalSpec.index;
     }
     return {
       index,

@@ -11,13 +11,13 @@ import { currentSelector } from "../../../constants/CSSClasses";
 
 const AllValueStep = React.createClass({
   getInitialState: function() {
-    const { startData, endData = {} } = this.props;
+    const { extraData, endData = {} } = this.props;
     let name = "";
 
     if ( endData.spec && endData.spec.name !== undefined ) {
       name = endData.spec.name;
-    } else if ( startData.spec && startData.spec.name !== undefined ) {
-      name = startData.spec.name;
+    } else if ( extraData.originalSpec && extraData.originalSpec.name !== undefined ) {
+      name = extraData.originalSpec.name;
     }
     return {
       name,

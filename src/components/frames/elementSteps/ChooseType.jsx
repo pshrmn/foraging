@@ -25,6 +25,7 @@ const ChooseType = React.createClass({
     const newSpec = {
       type
     };
+    // populate initial spec data based on the type
     switch ( type ) {
     case "single":
       newSpec.index = 0;

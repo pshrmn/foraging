@@ -11,30 +11,32 @@ import { currentSelector } from "../../../constants/CSSClasses";
 
 const RangeValueStep = React.createClass({
   getInitialState: function() {
-    const { startData, endData = {} } = this.props;
+    const { extraData, endData = {} } = this.props;
     let name = "";
     let low = 0;
     let high = "end";
     // if there is an existing value, only use it if the types match
     if ( endData.spec ) {
-      if ( endData.spec.name ) {
-        name = endData.spec.name;
+      const spec = endData.spec;
+      if ( spec.name ) {
+        name = spec.name;
       }
-      if ( endData.spec.low !== undefined) {
-        low = endData.spec.low;
+      if ( spec.low !== undefined) {
+        low = spec.low;
       }
-      if ( endData.spec.high !== undefined ) {
-        high = endData.spec.high === null ? "end" : endData.spec.high;
+      if ( spec.high !== undefined ) {
+        high = spec.high === null ? "end" : spec.high;
       }
-    } else if ( startData.spec ) {
-      if ( startData.spec.name ) {
-        name = startData.spec.name;
+    } else if ( extraData.originalSpec ) {
+      const spec = extraData.originalSpec;
+      if ( spec.name ) {
+        name = spec.name;
       }
-      if ( startData.spec.low !== undefined) {
-        low = startData.spec.low;
+      if ( spec.low !== undefined) {
+        low = spec.low;
       }
-      if ( startData.spec.high !== undefined ) {
-        high = startData.spec.high === null ? "end" : startData.spec.high;
+      if ( spec.high !== undefined ) {
+        high = spec.high === null ? "end" : spec.high;
       }
     }
     return {
