@@ -44,6 +44,7 @@ Backend functions take a url and return the text of the returned web page. There
 
 * `requests_backend` (default) uses the `requests` module to make the request. This function can be passed directly to the `Fetch` class.
 * `phantom_backend` is a closure that takes two paths, the first to the `phantomjs` executable and the second to a JavaScript script that `phantomjs` uses to get the content of a web page from a url. The closure returns a function that is passed to the Fetch class. This backend is most useful when you have pages whose content isn't given with the base HTML and relies on JavaScript to render the page.
+* `session_backend` is a closure that takes a `requests.Session`. Any requests made with this backend will use the provided session. This is useful if you need to be authenticated when making requests.
 
 ###Fetch
 A fetcher takes a url and return the DOM (as parsed by `lxml`) of the corresponding web page. Requests can either be static (default) or dynamic. In order to make dynamic requests, the `make_dynamic` function needs to be called on the fetcher.

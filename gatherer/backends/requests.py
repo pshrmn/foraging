@@ -27,3 +27,39 @@ def requests_backend(url, headers=None):
         log.warning("<requests> {} bad response".format(url))
         return
     return resp.text
+
+
+def session_backend(session):
+    """
+    session backend
+
+    The session backend is useful if you want requests to be made
+    with the same session. This can be useful if you need to have
+    an authenticated session for your requests.
+
+    >>> session = requests.Session()
+    >>> credentials = {"username": "username", "password": "password"}
+    >>> session.post("https://www.example.com/login", data=credentials)
+    >>> backend = session_backend(session)
+    >>> f = Fetch(backend=backend)
+    """
+    # basic verification of the sessions by making
+    # sure that it has a get method
+    if not hasattr(session, "get"):
+        raise ValueError("invalid session")
+
+    def get(url, headers=None):
+        if headers is None:
+            headers = {}
+        log.info("<session> {}".format(url))
+        try:
+            resp = session.get(url, headers=headers)
+        except requests.exceptions.ConnectionError:
+            log.warning("<session> {} ConnectionError".format(url))
+            return
+        if not resp.ok or resp.text == "":
+            log.warning("<session> {} bad response".format(url))
+            return
+        return resp.text
+
+    return get

@@ -7,11 +7,16 @@ response. The backend returns the text content of the response
 when the request is successful, otherwise it returns None.
 
 requests_backend returns the static html that is returned by the
-response. phantom_backend makes use of phantomjs to run any initial
+response.
+
+session_backend is similar to requests_backend, but always uses
+the same session. This is useful for authenticated requests.
+
+phantom_backend makes use of phantomjs to run any initial
 scripts and returns the html text content of the page after those
 scripts have executed. This is useful for pages that dynamically
 load data.
 """
 
-from .requests import requests_backend
+from .requests import requests_backend, session_backend
 from .phantom import phantom_backend
