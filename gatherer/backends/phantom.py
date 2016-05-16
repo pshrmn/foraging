@@ -29,7 +29,7 @@ def phantom_backend(phantom_path, js_path):
         if headers is None:
             headers = {}
         log.info("<phantomjs> {}".format(url))
-        commands = [phantom_path, js_path, url, headers['User-Agent']]
+        commands = [phantom_path, js_path, url, headers.get('User-Agent')]
         process = subprocess.Popen(commands, stdout=subprocess.PIPE)
         # any errors are ignored, for better or probably for worse
         out, _ = process.communicate()
