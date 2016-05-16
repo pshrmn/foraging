@@ -22,7 +22,7 @@ There are two main situations when it comes to the response content. The first o
 Builtin Backends
 ^^^^^^^^^^^^^^^^
 
-``Gatherer`` comes with two ``backends``, one for each of the situations described above.
+``Gatherer`` comes with three ``backends``.
 
 requests_backend
 ++++++++++++++++
@@ -36,6 +36,31 @@ requests_backend
   url = "https://www.example.com"
 
   html_text = requests_backend(url)
+
+session_backend
++++++++++++++++
+
+``session_backend`` is used to make requests with the same session. This is most useful for making authenticated requests.
+
+.. code-block:: python
+
+  import requests
+  from gatherer.backends import session_backend
+
+  session = requests.Session()
+  # authenticate
+  credentials = {
+    "username": "username",
+    "password": "password"
+  }
+  auth_url = "https://www.example.com/login"
+  session.post(auth_url, data=credentials)
+  session_get = session_backend(session)
+
+  url = "https://www.example.com/authenticated/path"
+
+  html_text = session_get(url)
+
 
 phantom_backend
 +++++++++++++++

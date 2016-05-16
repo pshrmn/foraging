@@ -92,6 +92,80 @@ RangeElement
 
 A ``RangeElement`` is created for ``type="range"`` spec elements. A ``RangeElement`` requires a ``name`` string, a ``low`` int, and a ``high`` int (or ``None``).
 
+When the ``RangeElement`` selects DOM elements, it will only get data from those within the range. The range include the low boundary and excludes the high boundary. This is useful when DOM elements near the beginning of end of a selection aren't needed for the data. For example, if inside of a ``<table>`` the HTML doesn't use ``<thead>`` and ``<th>`` elements, you may inadvertently be including the header row with your data. You can use a ``RangeElement`` to prevent selecting the header row.
+
+.. code-block:: html
+
+  <table>
+    <tr>
+      <td>Name</td>
+      <td>Color</td>
+    </tr>
+    <tr>
+      <td>Wilson</td>
+      <td>Blue</td>
+    </tr>
+    <tr>
+      <td>Rita</td>
+      <td>Red</td>
+    </tr>
+    <tr>
+      <td>Bonnie</td>
+      <td>Green</td>
+    </tr>
+  </table>
+
+.. code-block:: python
+
+  from gatherer.element import AllElement, RangeElement
+  from gatherer.rule import Rule
+
+  name = SingleElement(
+      "td",
+      {"type": "single", index: 0},
+      [],
+      [Rule("name", "text", "string")]
+  )
+  color = SingleElement(
+      "td",
+      {"type": "single", index: 1},
+      [],
+      [Rule("color", "text", "string")]
+  )
+
+  all_rows = AllElement(
+      "tr",
+      {"type": "all", "name": "rows"},
+      [name, age],
+      []
+  )
+
+  select_rows = AllElement(
+      "tr",
+      {"type": "range", "name": "rows", low=1, high=None},
+      [name, age],
+      []
+  )
+
+  # given the above table element...
+  # all rows will include the header elements
+  all_rows.data(table) == {
+      "rows": [
+        {"name": "Name", "color": "Color"},
+        {"name": "Wilson", "color": "Blue"},
+        {"name": "", "color": "Red"},
+        {"name": "Name", "color": "Green"},
+      ]
+  }
+  # but select_rows will not
+  select_rows.data(table) == {
+      "rows": [
+        {"name": "Wilson", "color": "Blue"},
+        {"name": "", "color": "Red"},
+        {"name": "Name", "color": "Green"},
+      ]
+  }
+
 Methods
 +++++++
 
