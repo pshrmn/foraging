@@ -6,7 +6,7 @@ with open("pages/stadiums.json") as fp:
     stadium_data = json.load(fp)
 
 c = Cache("cache")
-f = Fetch(cache=c)
+f = Fetch(headers={'User-Agent': 'gatherer agent'}, cache=c)
 
 stadiums = Page.from_json(stadium_data, f)
 
