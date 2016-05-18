@@ -1,6 +1,6 @@
 #Forager
 
-A Chrome extension to determine how to gather data from a web page. 
+A Chrome extension to determine how to gather data from a web page. Built with [React](https://facebook.github.io/react/), [Redux](http://rackt.org/redux/index.html), and [d3](http://d3js.org/). Useful in conjunction with [Gatherer](https://github.com/pshrmn/gatherer).
 
 ##[Tutorial](http://www.pshrmn.com/tutorials/forager/)
 
@@ -8,7 +8,7 @@ A Chrome extension to determine how to gather data from a web page.
 
 #####Page
 
-A page is made up of `Element`s which contain `Rule`s. When a `Page` is created, a root `Element` with a `selector` of the document's `body` is made. Any `Element`s that you make will be children (or granchildren) of this root `Element`.
+A page is made up of `Element`s which contain `Rule`s. When a `Page` is created, a root `Element` with a `selector` of the document's `body` is made. Any `Element`s that you make will be children (or grandchildren) of this root `Element`.
 
 ```javascript
 page = {
@@ -44,7 +44,7 @@ rule = {
 
 #####Element
 
-An `Element` is made up of a css `selector` to match elements in the page, `children` Elements, a `rules` array of `Rule`s, and a `spec` with a `type` (`single` or `all`) and a `value` (an integer to target a specific element for `single` types and a string name to save the array as for `all` types). There is also an `optional` boolean property to handle cases where an `Element` might not match any exist, but you still want to gather other data.
+An `Element` is made up of a css `selector` to match elements in the page, `children` Elements, a `rules` array of `Rule`s, and a `spec` with a `type` (`single`, `all`, or `range`) and a other values that are specific to the spec. There is also an `optional` boolean property to handle cases where an `Element` might not match any exist, but you still want to gather other data.
 
 ```javascript
 element = {
@@ -62,7 +62,7 @@ element = {
             ],
             spec: {
                 type: "all",
-                value: "urls"
+                name: "urls"
             }
         }
     ],
@@ -75,37 +75,51 @@ element = {
     ],
     spec: {
         type: "single",
-        value: 2
+        index: 2
     }
 }
 ```
 
 The above `Element` will select the second `p` element in the page and capture its `textContent`, saving it as the `description`. Any `a` elements that are children of the paragraph will have their `href` attribute captured and stored in a `urls` array.
 
-######Spec
+#####Spec
 
 A `Spec` describes what to do with the elements that are matched by a selector. In both cases, the selector gives you an array of matched elements.
 
-#######Single
+######Single
 
 ```javascript
-let single = {
+const single = {
     type: "single",
-    value: <int>
+    index: <int>
 }
 ```
 
-A `single` spec returns a data object containing data captured by the `Element`'s rules and the rules of its children. The spec's `value` is used to select the element at the `value` index in the array of matched elements and only that element will be used to get rule data from.
+A `single` spec returns a data object containing data captured by the `Element`'s rules and the rules of its children. The spec's `index` is used to select the element at the given index in the array of matched elements and only that element will be used to get rule data from.
 
-#######All
+######All
 
 ```javascript
-let all = {
+const all = {
     type: "all",
-    value: <string>
+    name: <string>
 }
 ```
-An `all` spec returns an array of data objects. The name of the array is the `value` of the spec. Each item in the array will correspond to an element that was matched by the selector.
+An `all` spec returns an array of data objects. The name of the array is the `name` from the spec. Each item in the array will correspond to an element that was matched by the selector.
+
+######Range
+
+```javascript
+const range = {
+    type: "range",
+    name: <string>,
+    low: <int>
+    high: <int> || null
+}
+```
+
+A `range` spec is similar to an `all` spec, but instead of returning an array of all matched elements, it only includes the ones that are within the range. The range is specified by `low` and `high` values. The low value is included in the selection and the high value is not. If `high` is `null`, then the range goes through the to the end of the array.
+
 
 #####How to Use
 To pack extension and use:
@@ -116,4 +130,6 @@ To pack extension and use:
 4. Drag the .crx file to the Chrome extensions page
 5. Accept the extension's permissions
 
-Built with [React](https://facebook.github.io/react/), [Redux](http://rackt.org/redux/index.html), and [d3](http://d3js.org/).
+######Uploading Pages
+
+Once you have completed creating a page, you will probably want to upload it to use with [Gatherer](https://github.com/pshrmn/gatherer). The easiest way to do this is to install [Granary](https://github.com/pshrmn/granary), which is a simple Flask server that listens for requests to `localhost:5000`.
