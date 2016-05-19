@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 export default function OptionalForm(props) {
   const { optional, toggle } = props;
@@ -7,11 +7,12 @@ export default function OptionalForm(props) {
       <h3>
         Is this element optional?
       </h3>
-      <label className={optional ? "selected" : null}>
-        <input type="checkbox"
-               checked={optional}
-               onChange={toggle} />
-        { optional ? "Yes" : "No" }
+      <label className={optional ? 'selected' : null}>
+        <input
+          type='checkbox'
+          checked={optional}
+          onChange={toggle} />
+        { optional ? 'Yes' : 'No' }
       </label>
     </div>
   );

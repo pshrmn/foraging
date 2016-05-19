@@ -1,12 +1,12 @@
-import React from "react";
-import { connect } from "react-redux";
+import React from 'react';
+import { connect } from 'react-redux';
 
 function MessageBoard(props) {
-  const messages = props.messages.map(
-    m => <Message key={m.id} message={m.message} rating={m.rating} />
+  const messages = props.messages.map(m =>
+    <Message key={m.id} message={m.message} rating={m.rating} />
   );
   return (
-    <div className="message-board">
+    <div className='message-board'>
       { messages }
     </div>
   );
@@ -15,15 +15,15 @@ function MessageBoard(props) {
 function Message(props) {
   const { message, rating } = props;
   const classes = [
-    "message"
+    'message'
   ];
   if ( rating < 0 ) {
-    classes.push("neg");
+    classes.push('neg');
   } else if ( rating > 0 ) {
-    classes.push("pos");
+    classes.push('pos');
   }
   return (
-    <div className={classes.join(" ")}>
+    <div className={classes.join(' ')}>
       { message }
     </div>
   );

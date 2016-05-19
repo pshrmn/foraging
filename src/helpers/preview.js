@@ -1,4 +1,4 @@
-import { integer, float } from "./parse";
+import { integer, float } from './parse';
 
 export const preview = tree => {
   /*
@@ -8,34 +8,32 @@ export const preview = tree => {
   const getElement = (element, parent) => {
     const elements = parent.querySelectorAll(element.selector);
     const { type } = element.spec;
+
     switch ( type ) {
-    case "single":
+    case 'single':
       var { index } = element.spec;
       var ele = elements[index];
       if ( !ele) {
         return;
       }
       return getElementData(element, ele);
-    case "all":
+    case 'all':
       var { name } = element.spec;
-      var data = Array.from(elements).map(function(ele){
-        return getElementData(element, ele);
-      }).filter(function(datum){
-        return datum !== undefined;
-      });
-      var obj = {};
-      obj[name] = data;
-      return obj;
-    case "range":
+      var data = Array.from(elements)
+        .map(ele => getElementData(element, ele))
+        .filter(datum => datum !== undefined);
+      return {
+        [name]: data
+      }
+    case 'range':
       var { name, low, high } = element.spec;
-      var data = Array.from(elements).slice(low, high || undefined).map(function(ele){
-        return getElementData(element, ele);
-      }).filter(function(datum){
-        return datum !== undefined;
-      });
-      var obj = {};
-      obj[name] = data;
-      return obj;
+      var data = Array.from(elements)
+        .slice(low, high || undefined)
+        .map(ele => getElementData(element, ele))
+        .filter(datum => datum !== undefined);
+      return {
+        [name]: data
+      };
     }
   }
 
@@ -43,22 +41,21 @@ export const preview = tree => {
    * Get data for each rule and each child. Merge the child data into the
    * rule data.
    */
-  const getElementData = (element, htmlElement) => {
-    const data = getRuleData(element.rules, htmlElement);
-    const childData = getChildData(element.children, htmlElement);
+  const getElementData = (element, domElement) => {
+    const data = getRuleData(element.rules, domElement);
+    const childData = getChildData(element.children, domElement);
     if ( !childData ) {
       return;
     }
-    for ( const key in childData ) {
-      data[key] = childData[key];
-    }
-    return data;
+    return Object.assign({}, data, childData);
   }
 
-  const getChildData = (children, htmlElement) => {
+  const getChildData = (children, domElement) => {
     let data = {};
-    children.some(function(child){
-      const childData = getElement(child, htmlElement);
+    // iterate through the children until one fails
+    children.some(child => {
+      const childData = getElement(child, domElement);
+      // when some child data does not exist, clear the lot
       if ( !childData && !child.optional ) {
         data = undefined;
         return true;
@@ -71,24 +68,24 @@ export const preview = tree => {
     return data;
   }
 
-  const getRuleData = (rules, htmlElement) => {
+  const getRuleData = (rules, domElement) => {
     const data = {};
-    rules.forEach(function(rule){
+    rules.forEach(rule => {
       let val;
       let match;
-      if ( rule.attr === "text" ) {
-         val = htmlElement.textContent.replace(/\s+/g, " ");
+      if ( rule.attr === 'text' ) {
+        val = domElement.textContent.replace(/\s+/g, ' ');
       } else {
-        var attr = htmlElement.getAttribute(rule.attr);
+        var attr = domElement.getAttribute(rule.attr);
         // attributes that don't exist will return null
         // just use empty string for now
-        val = attr || "";
+        val = attr || '';
       }
       switch (rule.type) {
-      case "int":
+      case 'int':
         val = integer(val);
         break;
-      case "float":
+      case 'float':
         val = float(val);
         break;
       }
@@ -97,6 +94,6 @@ export const preview = tree => {
     return data;
   }
 
-  return tree === undefined ? "" : getElement(tree, document);
+  return tree === undefined ? '' : getElement(tree, document);
 }
 

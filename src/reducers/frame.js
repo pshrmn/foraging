@@ -1,13 +1,13 @@
-import * as types from "../constants/ActionTypes";
+import * as types from '../constants/ActionTypes';
 
 /*
  * frame
  * -----
  *
- * Which frame to show. In the majority of cases, the "element" frame should
+ * Which frame to show. In the majority of cases, the 'element' frame should
  * be shown.
  */
-export default function frame(state = {name: "element"}, action) {
+export default function frame(state = {name: 'element'}, action) {
   switch ( action.type ) {
   case types.SELECT_PAGE:
   case types.ADD_PAGE:
@@ -21,28 +21,28 @@ export default function frame(state = {name: "element"}, action) {
   case types.CLOSE_FORAGER:
   case types.SHOW_ELEMENT_FRAME:
     return {
-      name: "element"
+      name: 'element'
     };
   case types.SHOW_ELEMENT_WIZARD:
     return {
-      name: "element-wizard"
+      name: 'element-wizard'
     };
   case types.SHOW_EDIT_ELEMENT_WIZARD:
     return {
-      name: "edit-element-wizard"
+      name: 'edit-element-wizard'
     };
   case types.SHOW_RULE_WIZARD:
     return{
-      name: "rule-wizard"
+      name: 'rule-wizard'
     };
   case types.SHOW_EDIT_RULE_WIZARD:
     return {
-      name: "edit-rule-wizard",
+      name: 'edit-rule-wizard',
       index: action.index
     };
   case types.SHOW_PREVIEW:
     return {
-      name: "preview"
+      name: 'preview'
     };
   default:
     return state;

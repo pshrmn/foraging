@@ -1,15 +1,15 @@
-import React from "react";
+import React from 'react';
 
-import Controls from "../common/Controls";
+import Controls from '../common/Controls';
 
-import { attributes } from "../../../helpers/attributes";
-import { abbreviate } from "../../../helpers/text";
+import { attributes } from '../../../helpers/attributes';
+import { abbreviate } from '../../../helpers/text';
 
 const ChooseAttribute = React.createClass({
   getInitialState: function() {
     const { startData, endData = {} } = this.props;
   
-    let attribute = "";
+    let attribute = '';
     if ( endData.attribute ) {
       attribute = endData.attribute;
     } else if ( startData.attr ) {
@@ -18,7 +18,7 @@ const ChooseAttribute = React.createClass({
 
     return {
       attribute,
-      error: attribute === ""
+      error: attribute === ''
     };
   },
   nextHandler: function(event) {
@@ -51,21 +51,22 @@ const ChooseAttribute = React.createClass({
       return (
         <li key={i}>
           <label>
-            <input type="radio"
-                   value={a.name}
-                   checked={a.name === attribute }
-                   onChange={this.attributeHandler} />
+            <input
+              type='radio'
+              value={a.name}
+              checked={a.name === attribute }
+              onChange={this.attributeHandler} />
             {a.name}
           </label>
-          <p className="line">
+          <p className='line'>
             {abbreviate(a.value, 40)}
           </p>
         </li>
       );
     });
     return (
-      <form className="info-box">
-        <div className="info">
+      <form className='info-box'>
+        <div className='info'>
           <h3>
             Which attribute has the value that you want?
           </h3>

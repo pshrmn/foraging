@@ -1,21 +1,21 @@
-import React from "react";
-import { connect } from "react-redux";
+import React from 'react';
+import { connect } from 'react-redux';
 
-import Controls from "../common/Controls";
-import RangeForm from "../elementForms/RangeForm";
+import Controls from '../common/Controls';
+import RangeForm from '../elementForms/RangeForm';
 
-import { select, count } from "../../../helpers/selection";
-import { highlight, unhighlight } from "../../../helpers/markup";
-import { levelNames } from "../../../helpers/page";
-import { showMessage } from "expiring-redux-messages";
-import { queryCheck } from "../../../constants/CSSClasses";
+import { select, count } from '../../../helpers/selection';
+import { highlight, unhighlight } from '../../../helpers/markup';
+import { levelNames } from '../../../helpers/page';
+import { showMessage } from 'expiring-redux-messages';
+import { queryCheck } from '../../../constants/CSSClasses';
 
 const RangeValueStep = React.createClass({
   getInitialState: function() {
     const { startData, endData = {} } = this.props;
-    let name = "";
+    let name = '';
     let low = 0;
-    let high = "end";
+    let high = 'end';
 
     if ( endData.spec ) {
       if ( endData.spec.name ) {
@@ -25,7 +25,7 @@ const RangeValueStep = React.createClass({
         low = endData.spec.low;
       }
       if ( endData.spec.high !== undefined ) {
-        high = endData.spec.high === null ? "end" : endData.spec.high;
+        high = endData.spec.high === null ? 'end' : endData.spec.high;
       }
     } else if ( startData.spec ) {
       if ( startData.spec.name ) {
@@ -35,21 +35,21 @@ const RangeValueStep = React.createClass({
         low = startData.spec.low;
       }
       if ( startData.spec.high !== undefined ) {
-        high = startData.spec.high === null ? "end" : startData.spec.high;
+        high = startData.spec.high === null ? 'end' : startData.spec.high;
       }
     }
     return {
       name,
       low,
       high,
-      error: name === ""
+      error: name === ''
     };
   },
   nameHandler: function(event) {
     const { value } = event.target;
     this.setState({
       name: value,
-      error: value === ""
+      error: value === ''
     });
   },
   lowHandler: function(event) {
@@ -66,7 +66,7 @@ const RangeValueStep = React.createClass({
   },
   highHandler: function(event) {
     const { value } = event.target;
-    if ( value === "end" ) {
+    if ( value === 'end' ) {
       this.setState({
         high: value
       });
@@ -93,7 +93,7 @@ const RangeValueStep = React.createClass({
     } = this.props;
 
     if ( !takenNames.every(n => n !== name) ) {
-      showMessage(`"${name}" is a duplicate and cannot be used.`, 5000, -1);
+      showMessage(`"${name}" is a duplicate name and cannot be used.`, 5000, -1);
       return;
     }
 
@@ -101,10 +101,10 @@ const RangeValueStep = React.createClass({
       return;
     }
     const newSpec = {
-      type: "range",
+      type: 'range',
       name,
       low,
-      high: high === "end"? null : high, // convert "end" to null
+      high: high === 'end'? null : high, // convert 'end' to null
     };
     next(Object.assign({}, startData, { spec: newSpec }));
   },
@@ -124,15 +124,16 @@ const RangeValueStep = React.createClass({
     const indices = count(current.matches, selector);
 
     return (
-      <form className="info-box">
-        <div className="info">
-          <RangeForm name={name}
-                     low={low}
-                     high={high}
-                     count={indices}
-                     setName={this.nameHandler}
-                     setLow={this.lowHandler}
-                     setHigh={this.highHandler} />
+      <form className='info-box'>
+        <div className='info'>
+          <RangeForm
+            name={name}
+            low={low}
+            high={high}
+            count={indices}
+            setName={this.nameHandler}
+            setLow={this.lowHandler}
+            setHigh={this.highHandler} />
         </div>
         <Controls
           previous={this.previousHandler}
@@ -147,13 +148,13 @@ const RangeValueStep = React.createClass({
     const { current, selector } = startData;
     const { name, low } = this.state;
     let { high } = this.state;
-    if ( high === "end" ) {
+    if ( high === 'end' ) {
       high = null;
     }
     const elements = select(
       current.matches,
       selector,
-      {type: "range", name, low, high},
+      {type: 'range', name, low, high},
       '.forager-holder'
     );
     highlight(elements, queryCheck);
@@ -165,13 +166,13 @@ const RangeValueStep = React.createClass({
     const { current, selector } = startData;
     const { name, low } = nextState;
     let { high } = nextState;
-    if ( high === "end" ) {
+    if ( high === 'end' ) {
       high = null;
     }
     const elements = select(
       current.matches,
       selector,
-      {type: "range", name, low, high},
+      {type: 'range', name, low, high},
       '.forager-holder'
     );
     highlight(elements, queryCheck);

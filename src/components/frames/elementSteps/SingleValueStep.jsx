@@ -1,11 +1,11 @@
-import React from "react";
+import React from 'react';
 
-import Controls from "../common/Controls";
-import SingleForm from "../elementForms/SingleForm";
+import Controls from '../common/Controls';
+import SingleForm from '../elementForms/SingleForm';
 
-import { select, count } from "../../../helpers/selection";
-import { highlight, unhighlight } from "../../../helpers/markup";
-import { queryCheck } from "../../../constants/CSSClasses";
+import { select, count } from '../../../helpers/selection';
+import { highlight, unhighlight } from '../../../helpers/markup';
+import { queryCheck } from '../../../constants/CSSClasses';
 
 const SingleValueStep = React.createClass({
   getInitialState: function() {
@@ -37,7 +37,7 @@ const SingleValueStep = React.createClass({
       return;
     }
     const newSpec = {
-      type: "single",
+      type: 'single',
       index
     }
     next(Object.assign({}, startData, { spec: newSpec }));
@@ -58,8 +58,8 @@ const SingleValueStep = React.createClass({
     const indices = count(current.matches, selector);
     
     return (
-      <form className="info-box">
-        <div className="info">
+      <form className='info-box'>
+        <div className='info'>
           <SingleForm index={index} count={indices} setIndex={this.indexHandler} />
         </div>
         <Controls
@@ -74,7 +74,7 @@ const SingleValueStep = React.createClass({
     const { startData } = this.props;
     const { current, selector } = startData;
     const { index } = this.state;
-    const elements = select(current.matches, selector, {type: "single", index}, '.forager-holder');
+    const elements = select(current.matches, selector, {type: 'single', index}, '.forager-holder');
     highlight(elements, queryCheck);
   },
   componentWillUpdate: function(nextProps, nextState) {
@@ -83,7 +83,7 @@ const SingleValueStep = React.createClass({
     const { startData } = nextProps;
     const { current, selector } = startData;
     const { index } = nextState;
-    const elements = select(current.matches, selector, {type: "single", index}, '.forager-holder');
+    const elements = select(current.matches, selector, {type: 'single', index}, '.forager-holder');
     highlight(elements, queryCheck);
   },
   componentWillUnmount: function() {

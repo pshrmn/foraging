@@ -4,42 +4,43 @@ import {
   queryCheck,
   hoverClass,
   savedPreview
-} from "../constants/CSSClasses";
+} from '../constants/CSSClasses';
 
 // return an object mapping attribute names to their value
 // for all attributes of an element
 export const attributes = (element, ignored = {}) => {
-  const attrs = Array.from(element.attributes).reduce((stored, attr) => {
-    let { name, value } = attr;
-    if ( ignored[name] ) {
+  const ignoredClasses = [
+    currentSelector,
+    potentialSelector,
+    queryCheck,
+    hoverClass,
+    savedPreview
+  ];
+
+  const attrs = Array.from(element.attributes)
+    .reduce((stored, attr) => {
+      let { name, value } = attr;
+      if ( ignored[name] ) {
+        return stored;
+      }
+      // don't include forager specific classes
+      if ( name === 'class' ) {
+        value = value
+          .split(' ')
+          .filter(c => !ignoredClasses.includes(c))
+          .join(' ');
+      }
+      // don't include empty attrs
+      if ( value !== '' ) {
+        stored.push({name: name, value: value});
+      }
       return stored;
-    }
-    // don't include current-element class
-    if ( name === "class" ) {
-      const ignoredClasses = [
-        currentSelector,
-        potentialSelector,
-        queryCheck,
-        hoverClass,
-        savedPreview
-      ]
-      const classes = value.split(" ");
-      const goodClasses = classes.filter(c => {
-        return !ignoredClasses.includes(c);
-      });
-      value = goodClasses.join(" ");
-    }
-    // don't include empty attrs
-    if ( value !== "" ) {
-      stored.push({name: name, value: value});
-    }
-    return stored;
-  }, []);
+    }, []);
 
   // include text if it exists
   const text = element.textContent.trim();
-  if ( text !== "" ) {
-    attrs.push({name: "text", value: text});
+  if ( text !== '' ) {
+    attrs.push({name: 'text', value: text});
   }
 
   return attrs;
@@ -54,10 +55,10 @@ export const attributes = (element, ignored = {}) => {
  */
 export const stripEvents = element => {
   const attrs = Array.from(element.attributes);
-  if ( attrs.some(a => a.name.startsWith("on")) ) {
+  if ( attrs.some(a => a.name.startsWith('on')) ) {
     attrs.forEach(attr => {
       const name = attr.name;
-      if ( name.startsWith("on") ) {
+      if ( name.startsWith('on') ) {
         element.removeAttribute(name);
       }
     });

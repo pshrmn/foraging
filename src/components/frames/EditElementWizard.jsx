@@ -1,15 +1,15 @@
-import React from "react";
-import { connect } from "react-redux";
+import React from 'react';
+import { connect } from 'react-redux';
 
-import Wizard from "simple-wizard-component";
-import Tree from "../Tree";
+import Wizard from 'simple-wizard-component';
+import Tree from '../Tree';
 
-import ChooseType from "./editElementSteps/ChooseType";
-import ChooseValue from "./editElementSteps/ChooseValue";
-import ChooseOptional from "./editElementSteps/ChooseOptional";
-import ConfirmUpdate from "./editElementSteps/ConfirmUpdate";
+import ChooseType from './editElementSteps/ChooseType';
+import ChooseValue from './editElementSteps/ChooseValue';
+import ChooseOptional from './editElementSteps/ChooseOptional';
+import ConfirmUpdate from './editElementSteps/ConfirmUpdate';
 
-import { updateElement, showElementFrame } from "../../actions";
+import { updateElement, showElementFrame } from '../../actions';
 
 /*
  * ChooseType -> ChooseValue -> ChooseOptional -> ConfirmUpdate
@@ -48,13 +48,14 @@ const EditElementWizard = React.createClass({
       ConfirmUpdate
     ];
     return (
-      <div className="frame">
+      <div className='frame'>
         <Tree />
-        <Wizard steps={steps}
-                initialData={initialData}
-                extraData={extraData}
-                save={this.save}
-                cancel={this.cancel} />
+        <Wizard
+          steps={steps}
+          initialData={initialData}
+          extraData={extraData}
+          save={this.save}
+          cancel={this.cancel} />
       </div>
     );
   }

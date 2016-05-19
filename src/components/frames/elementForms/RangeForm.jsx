@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 export default function RangeForm(props) {
   const {
@@ -11,7 +11,6 @@ export default function RangeForm(props) {
     setHigh
   } = props;
 
-  
   const lowOptions = Array.from(new Array(count)).map((u, i) => {
     return (
       <option key={i} value={i}>{i}</option>
@@ -31,22 +30,20 @@ export default function RangeForm(props) {
 
   const highSelect = (
     <select value={high} onChange={setHigh}>
-      {highOptions.concat([<option key="end" value="end">end</option>])}
+      {highOptions.concat([<option key='end' value='end'>end</option>])}
     </select>
   );
-
-
 
   return (
     <div>
       <h3>
         What should the array of elements be named?
       </h3>
-      <input type="text"
-             placeholder="e.g., names"
-             value={name}
-             onChange={setName} />
-
+      <input
+        type='text'
+        placeholder='e.g., names'
+        value={name}
+        onChange={setName} />
       <h3>
         Which elements should be selected?
       </h3>

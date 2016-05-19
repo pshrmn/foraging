@@ -1,19 +1,19 @@
-import React from "react";
-import { connect } from "react-redux";
+import React from 'react';
+import { connect } from 'react-redux';
 
-import AllForm from "../elementForms/AllForm";
-import Controls from "../common/Controls";
+import AllForm from '../elementForms/AllForm';
+import Controls from '../common/Controls';
 
-import { select, count } from "../../../helpers/selection";
-import { highlight, unhighlight } from "../../../helpers/markup";
-import { levelNames } from "../../../helpers/page";
-import { showMessage } from "expiring-redux-messages";
-import { queryCheck } from "../../../constants/CSSClasses";
+import { select, count } from '../../../helpers/selection';
+import { highlight, unhighlight } from '../../../helpers/markup';
+import { levelNames } from '../../../helpers/page';
+import { showMessage } from 'expiring-redux-messages';
+import { queryCheck } from '../../../constants/CSSClasses';
 
 const AllValueStep = React.createClass({
   getInitialState: function() {
     const { startData, endData = {} } = this.props;
-    let name = "";
+    let name = '';
     // if there is an existing value, only use it if the types match
     if ( endData.spec && endData.spec.name !== undefined ) {
       name = endData.spec.name;
@@ -22,14 +22,14 @@ const AllValueStep = React.createClass({
     }
     return {
       name: name,
-      error: name === ""
+      error: name === ''
     };
   },
   nameHandler: function(event) {
     const { value } = event.target;
     this.setState({
       name: value,
-      error: value === ""
+      error: value === ''
     });
   },
   nextHandler: function(event) {
@@ -43,14 +43,14 @@ const AllValueStep = React.createClass({
     } = this.props;
 
     if ( !takenNames.every(n => n !== name) ) {
-      showMessage(`"${name}" is a duplicate and cannot be used.`, 5000, -1);
+      showMessage(`"${name}" is a duplicate name and cannot be used.`, 5000, -1);
       return;
     }
     if ( error ) {
       return;
     }
     const newSpec = {
-      type: "all",
+      type: 'all',
       name
     }
     next(Object.assign({}, startData, { spec: newSpec }));
@@ -66,8 +66,8 @@ const AllValueStep = React.createClass({
   render: function() {
     const { name, error } = this.state;
     return (
-      <form className="info-box">
-        <div className="info">
+      <form className='info-box'>
+        <div className='info'>
           <AllForm name={name} setName={this.nameHandler} />
         </div>
         <Controls
@@ -82,7 +82,7 @@ const AllValueStep = React.createClass({
     const { startData } = this.props;
     const { current, selector } = startData;
     const { name } = this.state;
-    const elements = select(current.matches, selector, {type: "all", name}, '.forager-holder');
+    const elements = select(current.matches, selector, {type: 'all', name}, '.forager-holder');
     highlight(elements, queryCheck);
   },
   componentWillUpdate: function(nextProps, nextState) {
@@ -91,7 +91,7 @@ const AllValueStep = React.createClass({
     const { startData } = nextProps;
     const { current, selector } = startData;
     const { name } = nextState;
-    const elements = select(current.matches, selector, {type: "all", name}, '.forager-holder');
+    const elements = select(current.matches, selector, {type: 'all', name}, '.forager-holder');
     highlight(elements, queryCheck);
   },
   componentWillUnmount: function() {

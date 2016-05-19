@@ -1,19 +1,19 @@
-import React from "react";
-import { connect } from "react-redux";
+import React from 'react';
+import { connect } from 'react-redux';
 
-import Tree from "../Tree";
-import Wizard from "simple-wizard-component";
+import Tree from '../Tree';
+import Wizard from 'simple-wizard-component';
 
-import ChooseElements from "./elementSteps/ChooseElements";
-import ChooseParts from "./elementSteps/ChooseParts";
-import ChooseType from "./elementSteps/ChooseType";
-import ChooseValue from "./elementSteps/ChooseValue";
-import ChooseOptional from "./elementSteps/ChooseOptional";
-import ConfirmElement from "./elementSteps/ConfirmElement";
+import ChooseElements from './elementSteps/ChooseElements';
+import ChooseParts from './elementSteps/ChooseParts';
+import ChooseType from './elementSteps/ChooseType';
+import ChooseValue from './elementSteps/ChooseValue';
+import ChooseOptional from './elementSteps/ChooseOptional';
+import ConfirmElement from './elementSteps/ConfirmElement';
 
-import { saveElement, showElementFrame } from "../../actions";
-import { highlight, unhighlight} from "../../helpers/markup";
-import { currentSelector } from "../../constants/CSSClasses";
+import { saveElement, showElementFrame } from '../../actions';
+import { highlight, unhighlight} from '../../helpers/markup';
+import { currentSelector } from '../../constants/CSSClasses';
 
 /*
  * ChooseElements -> ChooseParts -> ChooseType ->
@@ -43,12 +43,13 @@ const ElementWizard = React.createClass({
       ConfirmElement
     ];
     return (
-      <div className="frame">
+      <div className='frame'>
         <Tree />
-        <Wizard steps={steps}
-                initialData={initialData}
-                save={this.save}
-                cancel={this.cancel} />
+        <Wizard
+          steps={steps}
+          initialData={initialData}
+          save={this.save}
+          cancel={this.cancel} />
       </div>
     );
   },

@@ -1,15 +1,15 @@
-import React from "react";
+import React from 'react';
 
-import Controls from "../common/Controls";
+import Controls from '../common/Controls';
 
-import { abbreviate } from "../../../helpers/text";
-import { integer, float } from "../../../helpers/parse";
+import { abbreviate } from '../../../helpers/text';
+import { integer, float } from '../../../helpers/parse';
 
 const ChooseType = React.createClass({
   getInitialState: function() {
     const { startData, endData = {} } = this.props;
     
-    let type = "string";
+    let type = 'string';
     if ( endData.type ) {
       type = endData.type;
     } else if ( startData.type ) {
@@ -47,16 +47,17 @@ const ChooseType = React.createClass({
     const { extraData } = this.props;
     const { element } = extraData;
 
-    const value = attribute === "text" ?
+    const value = attribute === 'text' ?
       element.innerText : element.getAttribute(attribute);
 
-    const typeRadios = ["string", "int", "float"].map((t,i) => {
+    const typeRadios = ['string', 'int', 'float'].map((t,i) => {
       return (
         <label key={i}>
-          <input type="radio"
-                 value={t}
-                 checked={t === type}
-                 onChange={this.typeHandler} />
+          <input
+            type='radio'
+            value={t}
+            checked={t === type}
+            onChange={this.typeHandler} />
           {t}
         </label>
       );
@@ -64,31 +65,31 @@ const ChooseType = React.createClass({
 
     let preview;
     switch (type) {
-    case "string":
+    case 'string':
       preview = abbreviate(value, 40);
       break;
-    case "int":
+    case 'int':
       preview = integer(value);
       if ( preview === null ) {
-        preview = "No int detected";
+        preview = 'No int detected';
       }
       break;
-    case "float":
+    case 'float':
       preview = float(value);
       if ( preview === null ) {
-        preview = "No float detected";
+        preview = 'No float detected';
       }
       break;
     }
 
     return (
-      <form className="info-box">
-        <div className="info">
+      <form className='info-box'>
+        <div className='info'>
           <h3>
             What type of value is this?
           </h3>
           {typeRadios}
-          <p className="line">
+          <p className='line'>
             {preview}
           </p>
           {this.props.children}

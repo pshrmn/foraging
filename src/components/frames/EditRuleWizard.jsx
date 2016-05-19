@@ -1,18 +1,18 @@
-import React from "react";
-import { connect } from "react-redux";
+import React from 'react';
+import { connect } from 'react-redux';
 
-import Wizard from "simple-wizard-component";
-import ElementCard from "../ElementCard";
+import Wizard from 'simple-wizard-component';
+import ElementCard from '../ElementCard';
 
-import ChooseAttribute from "./ruleSteps/ChooseAttribute";
-import ChooseType from "./ruleSteps/ChooseType";
-import ChooseName from "./ruleSteps/ChooseName";
-import ConfirmUpdateRule from "./ruleSteps/ConfirmUpdateRule";
-import Cycle from "./common/Cycle";
+import ChooseAttribute from './ruleSteps/ChooseAttribute';
+import ChooseType from './ruleSteps/ChooseType';
+import ChooseName from './ruleSteps/ChooseName';
+import ConfirmUpdateRule from './ruleSteps/ConfirmUpdateRule';
+import Cycle from './common/Cycle';
 
-import { updateRule, showElementFrame } from "../../actions";
-import { highlight, unhighlight} from "../../helpers/markup";
-import { currentSelector } from "../../constants/CSSClasses";
+import { updateRule, showElementFrame } from '../../actions';
+import { highlight, unhighlight} from '../../helpers/markup';
+import { currentSelector } from '../../constants/CSSClasses';
 
 /*
  * ChooseAttribute -> ChooseType -> ChooseName -> ConfirmRule
@@ -63,16 +63,18 @@ const EditRuleWizard = React.createClass({
       ConfirmUpdateRule
     ];
     return (
-      <div className="frame">
+      <div className='frame'>
         <ElementCard active={false} element={current} />
-        <Wizard steps={steps}
-                initialData={initialData}
-                extraData={extraData}
-                save={this.save}
-                cancel={this.cancel}>
-          <Cycle index={index}
-                 count={current.matches.length}
-                 setIndex={this.setIndex} />
+        <Wizard
+          steps={steps}
+          initialData={initialData}
+          extraData={extraData}
+          save={this.save}
+          cancel={this.cancel}>
+          <Cycle
+            index={index}
+            count={current.matches.length}
+            setIndex={this.setIndex} />
         </Wizard>
       </div>
     );

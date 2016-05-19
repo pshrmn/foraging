@@ -1,16 +1,16 @@
-import React from "react";
-import { connect } from "react-redux";
+import React from 'react';
+import { connect } from 'react-redux';
 
-import Controls from "../common/Controls";
+import Controls from '../common/Controls';
 
-import { levelNames } from "../../../helpers/page";
-import { showMessage } from "expiring-redux-messages";
+import { levelNames } from '../../../helpers/page';
+import { showMessage } from 'expiring-redux-messages';
 
 const ChooseName = React.createClass({
   getInitialState: function() {
     const { startData, endData = {} } = this.props;
     
-    let name = "";
+    let name = '';
     if ( endData.name ) {
       name = endData.name;
     } else if ( startData.name ) {
@@ -19,7 +19,7 @@ const ChooseName = React.createClass({
 
     return {
       name,
-      error: name === ""
+      error: name === ''
     };
   },
   nextHandler: function(event) {
@@ -28,7 +28,7 @@ const ChooseName = React.createClass({
     const { takenNames, showMessage } = this.props;
 
     if ( !takenNames.every(n => n !== name) ) {
-      showMessage(`"${name}" is a duplicate and cannot be used.`, 5000, -1);
+      showMessage(`"${name}" is a duplicate name and cannot be used.`, 5000, -1);
       return;
     }
 
@@ -47,21 +47,22 @@ const ChooseName = React.createClass({
     const name = event.target.value
     this.setState({
       name: name,
-      error: name === ""
+      error: name === ''
     });
   },
   render: function() {
     const { name, error } = this.state;
     return (
-      <form className="info-box">
-        <div className="info">
+      <form className='info-box'>
+        <div className='info'>
           <h3>
             What should the rule be named?
           </h3>
-          <input type="text"
-                 placeholder="e.g., name"
-                 value={name}
-                 onChange={this.nameHandler} />
+          <input
+            type='text'
+            placeholder='e.g., name'
+            value={name}
+            onChange={this.nameHandler} />
         </div>
         <Controls
           previous={this.previousHandler}

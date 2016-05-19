@@ -1,12 +1,12 @@
-import React from "react";
-import { connect } from "react-redux";
+import React from 'react';
+import { connect } from 'react-redux';
 
-import { PosButton, NegButton } from "../common/Buttons";
-import Tree from "../Tree";
+import { PosButton, NegButton } from '../common/Buttons';
+import Tree from '../Tree';
 
-import { fullGrow } from "../../helpers/page";
-import { preview } from "../../helpers/preview";
-import { showElementFrame } from "../../actions";
+import { fullGrow } from '../../helpers/page';
+import { preview } from '../../helpers/preview';
+import { showElementFrame } from '../../actions';
 
 const Preview = React.createClass({
   closeHandler: function(event) {
@@ -23,16 +23,16 @@ const Preview = React.createClass({
   },
   render: function() {
     return (
-      <div className="frame">
+      <div className='frame'>
         <Tree />
-        <div className="preview">
+        <div className='preview'>
           <pre>
             {JSON.stringify(preview(this.props.tree), null, 2)}
           </pre>
-          <div className="buttons">
-            <PosButton text="Log to Console" click={this.logHandler} />
-            <PosButton text="Pretty Log" click={this.prettyLogHandler} />
-            <NegButton text="Hide Preview" click={this.closeHandler} />
+          <div className='buttons'>
+            <PosButton text='Log to Console' click={this.logHandler} />
+            <PosButton text='Pretty Log' click={this.prettyLogHandler} />
+            <NegButton text='Hide Preview' click={this.closeHandler} />
           </div>
         </div>
       </div>

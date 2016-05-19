@@ -1,12 +1,12 @@
-import React from "react";
-import { connect } from "react-redux";
+import React from 'react';
+import { connect } from 'react-redux';
 
-import ElementFrame from "./ElementFrame";
-import ElementWizard from "./ElementWizard";
-import EditElementWizard from "./EditElementWizard";
-import RuleWizard from "./RuleWizard";
-import EditRuleWizard from "./EditRuleWizard";
-import Preview from "./Preview";
+import ElementFrame from './ElementFrame';
+import ElementWizard from './ElementWizard';
+import EditElementWizard from './EditElementWizard';
+import RuleWizard from './RuleWizard';
+import EditRuleWizard from './EditRuleWizard';
+import Preview from './Preview';
 
 /*
  * Frames
@@ -21,17 +21,17 @@ import Preview from "./Preview";
   const { frame } = props;
   let frameElement = null;
   switch ( frame.name ) {
-  case "element":
+  case 'element':
     return <ElementFrame />;
-  case "element-wizard":
+  case 'element-wizard':
     return <ElementWizard />;
-  case "edit-element-wizard":
+  case 'edit-element-wizard':
     return <EditElementWizard />;
-  case "rule-wizard":
+  case 'rule-wizard':
     return <RuleWizard />;
-  case "edit-rule-wizard":
+  case 'edit-rule-wizard':
     return <EditRuleWizard />;
-  case "preview":
+  case 'preview':
     return <Preview />;
   default:
     return null

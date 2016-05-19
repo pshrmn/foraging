@@ -1,14 +1,14 @@
-import * as ActionTypes from "../constants/ActionTypes";
+import * as ActionTypes from '../constants/ActionTypes';
 
-import { showMessage } from "expiring-redux-messages";
-import { setPages } from "../actions";
+import { showMessage } from 'expiring-redux-messages';
+import { setPages } from '../actions';
 
 import {
   chromeSave,
   chromeDelete,
   chromeUpload,
   chromeRename,
-  chromeSync } from "../helpers/chrome";
+  chromeSync } from '../helpers/chrome';
 
 export default fullStore => next => action => {
   const current = fullStore.getState();

@@ -5,7 +5,7 @@ export function PosButton(props) {
   return (
     <NeutralButton
       {...rest}
-      classes={["pos"].concat(classes)} />
+      classes={['pos'].concat(classes)} />
   );
 }
 
@@ -14,23 +14,23 @@ export function NegButton(props) {
   return (
     <NeutralButton
       {...rest}
-      classes={["neg"].concat(classes)} />
+      classes={['neg'].concat(classes)} />
   );
 }
 
 export function NeutralButton(props) {
   const {
-    text = "",
+    text = '',
     click = () => {},
     classes = [],
-    title = "",
+    title = '',
     disabled = false,
-    type = "button"
+    type = 'button'
   } = props;
 
   return (
     <button
-      className={classes.join(" ")}
+      className={classes.join(' ')}
       title={title}
       disabled={disabled}
       type={type}

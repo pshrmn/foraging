@@ -1,12 +1,12 @@
-import React from "react";
-import { connect } from "react-redux";
-import d3 from "d3";
+import React from 'react';
+import { connect } from 'react-redux';
+import d3 from 'd3';
 
-import { abbreviate } from "../helpers/text";
-import { simpleGrow } from "../helpers/page";
-import { highlight, unhighlight } from "../helpers/markup";
-import { selectElement } from "../actions";
-import { savedPreview } from "../constants/CSSClasses";
+import { shortElement } from '../helpers/text';
+import { simpleGrow } from '../helpers/page';
+import { highlight, unhighlight } from '../helpers/markup';
+import { selectElement } from '../actions';
+import { savedPreview } from '../constants/CSSClasses';
 
 const Tree = React.createClass({
   getDefaultProps: function() {
@@ -39,25 +39,25 @@ const Tree = React.createClass({
     const links = tree.links(nodes);
 
     return (
-      <g transform="translate(50,25)" >
-        <g className="links">
+      <g transform='translate(50,25)' >
+        <g className='links'>
           {
             links.map((link, i) => {
               return <path key={i}
-                           className="link"
+                           className='link'
                            d={diagonal(link)} />
             })
           }
         </g>
-        <g className="nodes">
+        <g className='nodes'>
           {
-            nodes.map((n, i) => {
-              return <Node key={i} 
-                           current={n.index === elementIndex}
-                           select={selectElement}
-                           active={active}
-                           {...n} />
-            })
+            nodes.map((n, i) => <Node
+              key={i} 
+              current={n.index === elementIndex}
+              select={selectElement}
+              active={active}
+              {...n} />
+            )
           }
         </g>
       </g>
@@ -75,10 +75,11 @@ const Tree = React.createClass({
      * by 100 and translating the tree 50 pixels to the right
      */
     return (
-      <div className="tree">
-        <svg width={width+100}
-             height={height+50}
-             className={active ? null : "not-allowed"} >
+      <div className='tree'>
+        <svg
+          width={width+100}
+          height={height+50}
+          className={active ? null : 'not-allowed'} >
           {this._makeNodes()}
         </svg>
       </div>
@@ -97,53 +98,44 @@ const Node = React.createClass({
   handleMouseout: function(event) {
     unhighlight(savedPreview);
   },
-  specText: function() {
-    const { selector, spec, optional } = this.props;
-    let shortSelector = abbreviate(selector, 10);
-    let text = "";
-    if ( !spec ) {
-      return text;
-    }
-    switch ( spec.type ) {
-    case "single":
-      text = `${shortSelector}[${spec.index}]`;
-      break;
-    case "all":
-      text = `[${shortSelector}]`;
-      break;
-    case "range":
-      text = `${shortSelector}[${spec.low}:${spec.high || "end"}]`
-    }
-    if ( optional ) {
-      text += "*";
-    }
-    return text;
-  },
   render: function() {
-    const { current, hasRules, children, active } = this.props;
+    const {
+      current,
+      hasRules,
+      children,
+      active,
+      selector,
+      spec,
+      optional
+    } = this.props;
     const empty = !hasRules && !(children && children.length);
-    const text = this.specText();
+
     // nodes with rules drawn as rect, nodes with no rules drawn as circles
     const marker = hasRules ? (
-      <rect width="6" height="6" x="-3" y="-3"></rect>
+      <rect width='6' height='6' x='-3' y='-3'></rect>
     ) : (
-      <circle r="3"></circle>
+      <circle r='3'></circle>
     );
 
-    const classNames = ["node"];
-    classNames.push(current ? "current" : null);
-    classNames.push(empty ? "empty" : null);
-    // only apply events when the node is "active"
+    const classNames = [
+      'node',
+      current ? 'current' : null,
+      empty ? 'empty' : null
+    ];
+    // only apply events when the node is 'active'
     const events = active ? {
       onClick: this.handleClick,
       onMouseOver: this.handleMouseover,
       onMouseOut: this.handleMouseout
     } : {};
     return (
-      <g className={classNames.join(" ")}
-         transform={`translate(${this.props.y},${this.props.x})`}
-         {...events} >
-        <text y="-10" >{text}</text>
+      <g
+        className={classNames.join(' ')}
+        transform={`translate(${this.props.y},${this.props.x})`}
+        {...events} >
+        <text y='-10'>
+          {shortElement(selector, spec, optional)}
+        </text>
         {marker}
       </g>
     );
@@ -160,7 +152,7 @@ export default connect(
     const currentPage = pages[pageIndex];
     return {
       page: currentPage,
-      active: frame.name === "element",
+      active: frame.name === 'element',
       elementIndex
     };
   },

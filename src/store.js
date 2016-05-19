@@ -1,9 +1,9 @@
-import { createStore, combineReducers, applyMiddleware } from "redux";
-import { messages, messagesMiddleware } from "expiring-redux-messages";
+import { createStore, combineReducers, applyMiddleware } from 'redux';
+import { messages, messagesMiddleware } from 'expiring-redux-messages';
 
 import reducers from './reducers';
-import chromeMiddleware from "./middleware/chromeMiddleware";
-import selectMiddleware from "./middleware/selectMiddleware";
+import chromeMiddleware from './middleware/chromeMiddleware';
+import selectMiddleware from './middleware/selectMiddleware';
 
 const reducer = combineReducers(Object.assign({}, reducers, {
   messages
@@ -17,7 +17,7 @@ const initialState = {
     elementIndex: 0
   },
   frame: {
-    name: "element",
+    name: 'element',
     data: {}
   },
   messages: []

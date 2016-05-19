@@ -1,11 +1,11 @@
-import React from "react";
+import React from 'react';
 
-import Controls from "../common/Controls";
+import Controls from '../common/Controls';
 
-import { createElement } from "../../../helpers/page";
-import { select } from "../../../helpers/selection";
-import { highlight, unhighlight } from "../../../helpers/markup";
-import { currentSelector } from "../../../constants/CSSClasses";
+import { createElement } from '../../../helpers/page';
+import { select } from '../../../helpers/selection';
+import { highlight, unhighlight } from '../../../helpers/markup';
+import { currentSelector } from '../../../constants/CSSClasses';
 
 const ConfirmElement = React.createClass({
   saveHandler: function(event) {
@@ -29,17 +29,17 @@ const ConfirmElement = React.createClass({
     const { startData } = this.props;
     const { selector, spec, optional } = startData;
     return (
-      <form className="info-box">
+      <form className='info-box'>
         <h2>Confirm Updated Element</h2>
         <ul>
           <li>Selector: {selector}</li>
-          <li>Spec: {JSON.stringify(spec, null, "\t")}</li>
-          <li>Optional: {optional ? "Yes" : "No"}</li>
+          <li>Spec: {JSON.stringify(spec, null, '\t')}</li>
+          <li>Optional: {optional ? 'Yes' : 'No'}</li>
         </ul>
         <Controls
           previous={this.previousHandler}
           next={this.saveHandler}
-          nextText="Upate"
+          nextText='Upate'
           cancel={this.cancelHandler} />
       </form>
     );

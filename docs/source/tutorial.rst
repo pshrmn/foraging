@@ -13,7 +13,7 @@ When opening Forager, no pages will be selected.
 Before You Get Started
 ^^^^^^^^^^^^^^^^^^^^^^
 
-One thing to keep in mind is that the page that you're seeing isn't necessarily the web page that `Gatherer <https://github.com/pshrmn/gatherer>`_ (the library used to gather data using the rules we are creating) will see. ``Gatherer`` will be receiving the html of the site as a non-logged in user, as well as having no extensions modifying the page. When creating a Page you should log out and disable any extensions that are running (eg. Reddit Enhancement Suite) if you want to see what ``Gatherer`` will.
+One thing to keep in mind is that the page that you're seeing isn't necessarily the web page that `Gatherer <https://github.com/pshrmn/gatherer>`_ (the library used to gather data using the rules we are creating) will see. Any extensions that you have running which modify the page won't be present when ``Gatherer`` makes a request. You will also have to make sure to authenticate with the server (using a ``requests.Session``) if you need to make authenticated requests. When creating a Page you should log out and disable any extensions that are running (eg. Reddit Enhancement Suite) if you want to see what ``Gatherer`` will.
 
 Create Page
 ^^^^^^^^^^^^

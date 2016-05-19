@@ -18,7 +18,7 @@ export const highlight = (elements, className) => {
  * @param className - the className to remove from all elements that have it
  */
 export const unhighlight = className => {
-  Array.from(document.getElementsByClassName((className))).forEach(e => {
+  Array.from(document.getElementsByClassName(className)).forEach(e => {
     e.classList.remove(className);
   });
 }
@@ -36,9 +36,9 @@ export const unhighlight = className => {
 export const iHighlight = (elements, className, over, out, click) => {
   Array.from(elements).forEach(e => {
     e.classList.add(className);
-    e.addEventListener("mouseover", over, false);
-    e.addEventListener("mouseout", out, false);
-    e.addEventListener("click", click, false);
+    e.addEventListener('mouseover', over, false);
+    e.addEventListener('mouseout', out, false);
+    e.addEventListener('click', click, false);
   });
 };
 
@@ -52,10 +52,10 @@ export const iHighlight = (elements, className, over, out, click) => {
  * @param click - click function to remove
  */
 export const iUnhighlight = (className, over, out, click) => {
-  Array.from(document.getElementsByClassName((className))).forEach(e => {
+  Array.from(document.getElementsByClassName(className)).forEach(e => {
     e.classList.remove(className);
-    e.removeEventListener("mouseover", over, false);
-    e.removeEventListener("mouseout", out, false);
-    e.removeEventListener("click", click, false);
+    e.removeEventListener('mouseover', over, false);
+    e.removeEventListener('mouseout', out, false);
+    e.removeEventListener('click', click, false);
   });   
 };

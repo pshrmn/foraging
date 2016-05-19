@@ -1,16 +1,16 @@
-import React from "react";
+import React from 'react';
 
-import Controls from "../common/Controls";
-import TypeForm from "../elementForms/TypeForm.jsx";
+import Controls from '../common/Controls';
+import TypeForm from '../elementForms/TypeForm.jsx';
 
-import { select } from "../../../helpers/selection";
-import { highlight, unhighlight } from "../../../helpers/markup";
-import { currentSelector } from "../../../constants/CSSClasses";
+import { select } from '../../../helpers/selection';
+import { highlight, unhighlight } from '../../../helpers/markup';
+import { currentSelector } from '../../../constants/CSSClasses';
 
 const ChooseType = React.createClass({
   getInitialState: function() {
     const { startData, endData = {} } = this.props;
-    let type = "single";
+    let type = 'single';
     if ( endData.spec && endData.spec.type ) {
       type = endData.spec.type;
     } else if ( startData.spec && startData.spec.type ) {
@@ -43,11 +43,11 @@ const ChooseType = React.createClass({
   },
   render: function() {
     const { type } = this.state;
-    const types = ["single", "all", "range"];
+    const types = ['single', 'all', 'range'];
 
     return (
-      <form className="info-box">
-        <div className="info">
+      <form className='info-box'>
+        <div className='info'>
           <TypeForm types={types} current={type} setType={this.typeHandler} />
         </div>
         <Controls
@@ -67,11 +67,11 @@ const ChooseType = React.createClass({
       type
     }
     // use set single index if possible
-    if ( type === "single" ) {
-      const wasSingle = startData.spec && startData.spec.type === "single";
+    if ( type === 'single' ) {
+      const wasSingle = startData.spec && startData.spec.type === 'single';
       spec.index = wasSingle ? startData.spec.index : 0
-    } else if ( type === "range" ) {
-      const wasRange = startData.spec && startData.spec.type === "range";
+    } else if ( type === 'range' ) {
+      const wasRange = startData.spec && startData.spec.type === 'range';
       spec.low = wasRange ? startData.spec.low : 0;
       spec.high = wasRange ? startData.spec.high : undefined;
     }
@@ -97,11 +97,11 @@ const ChooseType = React.createClass({
       type
     }
     // use set single index if possible
-    if ( type === "single" ) {
-      const wasSingle = startData.spec && startData.spec.type === "single";
+    if ( type === 'single' ) {
+      const wasSingle = startData.spec && startData.spec.type === 'single';
       spec.index = wasSingle ? startData.spec.index : 0
-    } else if ( type === "range" ) {
-      const wasRange = startData.spec && startData.spec.type === "range";
+    } else if ( type === 'range' ) {
+      const wasRange = startData.spec && startData.spec.type === 'range';
       spec.low = wasRange ? startData.spec.low : 0;
       spec.high = wasRange ? startData.spec.high : undefined;
     }

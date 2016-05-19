@@ -1,10 +1,10 @@
-import React from "react";
+import React from 'react';
 
-import Controls from "../common/Controls";
+import Controls from '../common/Controls';
 
-import { select, count } from "../../../helpers/selection";
-import { highlight, unhighlight} from "../../../helpers/markup";
-import { queryCheck } from "../../../constants/CSSClasses";
+import { select, count } from '../../../helpers/selection';
+import { highlight, unhighlight} from '../../../helpers/markup';
+import { queryCheck } from '../../../constants/CSSClasses';
 
 function joinParts(parts) {
   return parts.reduce((str, curr) => {
@@ -12,7 +12,7 @@ function joinParts(parts) {
       str += curr.name;
     }
     return str;
-  }, "");
+  }, '');
 }
 
 const ChooseParts = React.createClass({
@@ -28,7 +28,7 @@ const ChooseParts = React.createClass({
     const { parts } = this.state;
     const { next, startData } = this.props;
     const selector = joinParts(parts);
-    if ( selector !== "" ) {
+    if ( selector !== '' ) {
       next({
         selector,
         current: startData.current
@@ -58,15 +58,15 @@ const ChooseParts = React.createClass({
     const { startData } = this.props;
     this.setState({
       parts: parts,
-      eleCount: fullSelector === "" ? 0 : count(startData.current.matches, fullSelector),
-      error: fullSelector === ""
+      eleCount: fullSelector === '' ? 0 : count(startData.current.matches, fullSelector),
+      error: fullSelector === ''
     });
   },
   componentWillMount: function() {
     const { startData } = this.props;
     const { parts, current } = startData;
 
-    const fullSelector = parts.join("");
+    const fullSelector = parts.join('');
     this._setupHighlights(fullSelector);
 
     this.setState({
@@ -80,22 +80,24 @@ const ChooseParts = React.createClass({
     const opts = parts.map((part, index) => {
       const { name, checked } = part;
       return (
-        <label key={index}
-               className={checked ? "selected" : ""}>
-          <input type="checkbox"
-                 name="selector-part"
-                 value={index}
-                 checked={checked}
-                 onChange={this.toggleRadio} />
+        <label
+          key={index}
+          className={checked ? 'selected' : ''}>
+          <input
+            type='checkbox'
+            name='selector-part'
+            value={index}
+            checked={checked}
+            onChange={this.toggleRadio} />
           {name}
         </label>
       );
     });
     return (
-      <form className="info-box">
-        <div className="info">
+      <form className='info-box'>
+        <div className='info'>
           <h3>Select Relevant Part(s) of the CSS selector</h3>
-          <div className="choices">
+          <div className='choices'>
             {opts}
           </div>
           <h5>Count: {this.state.eleCount}</h5>
@@ -113,7 +115,7 @@ const ChooseParts = React.createClass({
   },
   _setupHighlights: function(cssSelector) {
     unhighlight(queryCheck);
-    if ( cssSelector !== "" ) {
+    if ( cssSelector !== '' ) {
       const { startData } = this.props;
       const elements = select(startData.current.matches, cssSelector, null, '.forager-holder');
       highlight(elements, queryCheck);

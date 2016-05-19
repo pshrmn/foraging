@@ -1,18 +1,18 @@
-import React from "react";
-import { connect } from "react-redux";
+import React from 'react';
+import { connect } from 'react-redux';
 
-import Wizard from "simple-wizard-component";
-import ElementCard from "../ElementCard";
+import Wizard from 'simple-wizard-component';
+import ElementCard from '../ElementCard';
 
-import ChooseAttribute from "./ruleSteps/ChooseAttribute";
-import ChooseType from "./ruleSteps/ChooseType";
-import ChooseName from "./ruleSteps/ChooseName";
-import ConfirmRule from "./ruleSteps/ConfirmRule";
-import Cycle from "./common/Cycle";
+import ChooseAttribute from './ruleSteps/ChooseAttribute';
+import ChooseType from './ruleSteps/ChooseType';
+import ChooseName from './ruleSteps/ChooseName';
+import ConfirmRule from './ruleSteps/ConfirmRule';
+import Cycle from './common/Cycle';
 
-import { saveRule, showElementFrame } from "../../actions";
-import { highlight, unhighlight} from "../../helpers/markup";
-import { currentSelector } from "../../constants/CSSClasses";
+import { saveRule, showElementFrame } from '../../actions';
+import { highlight, unhighlight} from '../../helpers/markup';
+import { currentSelector } from '../../constants/CSSClasses';
 
 /*
  * ChooseAttribute -> ChooseType -> ChooseName -> ConfirmRule
@@ -53,7 +53,7 @@ const RuleWizard = React.createClass({
       ConfirmRule
     ];
     return (
-      <div className="frame">
+      <div className='frame'>
         <ElementCard active={false} element={current} />
         <Wizard steps={steps}
                 initialData={initialData}

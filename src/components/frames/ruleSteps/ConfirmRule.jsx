@@ -1,6 +1,6 @@
-import React from "react";
+import React from 'react';
 
-import Controls from "../common/Controls";
+import Controls from '../common/Controls';
 
 const ConfirmElement = React.createClass({
   saveHandler: function(event) {
@@ -25,7 +25,7 @@ const ConfirmElement = React.createClass({
     const { startData } = this.props;
     const { name, attribute, type } = startData;
     return (
-      <form className="info-box">
+      <form className='info-box'>
         <h2>Confirm Rule</h2>
         <ul>
           <li>Name: {name}</li>
@@ -35,7 +35,7 @@ const ConfirmElement = React.createClass({
         <Controls
           previous={this.previousHandler}
           next={this.saveHandler}
-          nextText="Save"
+          nextText='Save'
           cancel={this.cancelHandler} />
       </form>
     );

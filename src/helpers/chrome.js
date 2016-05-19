@@ -1,5 +1,5 @@
-import { select } from "./selection";
-import { preparePages, clean } from "./page"
+import { select } from './selection';
+import { preparePages, clean } from './page'
 
 /*
  * any time that the page is updated, the stored page should be updated
@@ -10,11 +10,11 @@ export const chromeSave = page => {
       reject('No page to save');
     }
     const cleaned = clean(page);
-    chrome.storage.local.get("sites", function saveSchemaChrome(storage){
+    chrome.storage.local.get('sites', function saveSchemaChrome(storage){
       const host = window.location.hostname;
       storage.sites[host] = storage.sites[host] || {};
       storage.sites[host][cleaned.name] = cleaned;
-      chrome.storage.local.set({"sites": storage.sites});
+      chrome.storage.local.set({'sites': storage.sites});
       resolve('Saved');
     });
   })
@@ -22,7 +22,7 @@ export const chromeSave = page => {
 
 export const chromeRename = (newName, oldName) => {
   return new Promise((resolve, reject) => {
-    chrome.storage.local.get("sites", function saveSchemaChrome(storage){
+    chrome.storage.local.get('sites', function saveSchemaChrome(storage){
       const host = window.location.hostname;
       const page = storage.sites[host][oldName];
       if ( page === undefined ) {
@@ -31,7 +31,7 @@ export const chromeRename = (newName, oldName) => {
       page.name = newName;
       storage.sites[host][newName] = page;
       delete storage.sites[host][oldName];
-      chrome.storage.local.set({"sites": storage.sites});
+      chrome.storage.local.set({'sites': storage.sites});
       resolve(`Renamed "${oldName}" to "${newName}"`);
     });
   });
@@ -45,10 +45,10 @@ export const chromeDelete = name => {
     if ( name === undefined ) {
       reject('No page to delete');
     }
-    chrome.storage.local.get("sites", function saveSchemaChrome(storage){
+    chrome.storage.local.get('sites', function saveSchemaChrome(storage){
       const host = window.location.hostname;
       delete storage.sites[host][name];
-      chrome.storage.local.set({"sites": storage.sites});
+      chrome.storage.local.set({'sites': storage.sites});
       resolve(`Deleted page ${name}`);
     });
   });
@@ -65,7 +65,7 @@ If the site object exists for a host, load the saved rules
 */
 export const chromeLoad = () => {
   return new Promise((resolve, reject) => {
-    chrome.storage.local.get("sites", function setupHostnameChrome(storage){
+    chrome.storage.local.get('sites', function setupHostnameChrome(storage){
       const host = window.location.hostname;
       const current = storage.sites[host] || {};
       const pages = preparePages(current);
@@ -84,7 +84,7 @@ export const chromeUpload = page => {
     }
     chrome.runtime.sendMessage(
       {
-        type: "upload",
+        type: 'upload',
         data: {
           name: page.name,
           site: window.location.hostname,
@@ -108,7 +108,7 @@ export const chromeSync = () => {
     const host = window.location.hostname;
     chrome.runtime.sendMessage(
       {
-        type: "sync",
+        type: 'sync',
         site: host
       },
       function saveSyncedPages(response) {
@@ -118,12 +118,12 @@ export const chromeSync = () => {
         } else {
           const syncedPages = response.pages;
 
-          chrome.storage.local.get("sites", function mergeSyncedPagesChrome(storage){
+          chrome.storage.local.get('sites', function mergeSyncedPagesChrome(storage){
             const currentPages = storage.sites[host] || {};
             // merge the synced pages with the current pages and save them
             const allPages = Object.assign({}, currentPages, syncedPages);
             storage.sites[host] = allPages;
-            chrome.storage.local.set({"sites": storage.sites});
+            chrome.storage.local.set({'sites': storage.sites});
 
             const parsedPages = preparePages(allPages);
             resolve(parsedPages);

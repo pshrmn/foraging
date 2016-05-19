@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 export default function SingleForm(props) {
 
@@ -19,8 +19,9 @@ export default function SingleForm(props) {
       <h3>
         The element at which index should be selected?
       </h3>
-      <select value={index}
-              onChange={setIndex} >
+      <select
+        value={index}
+        onChange={setIndex} >
         {options}
       </select>
     </div>

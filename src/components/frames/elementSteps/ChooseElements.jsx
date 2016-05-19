@@ -1,11 +1,11 @@
-import React from "react";
+import React from 'react';
 
-import Controls from "../common/Controls";
+import Controls from '../common/Controls';
 
-import { parts, select, count, allSelect } from "../../../helpers/selection";
-import { stripEvents } from "../../../helpers/attributes";
-import { highlight, unhighlight, iHighlight, iUnhighlight } from "../../../helpers/markup";
-import { queryCheck, potentialSelector, hoverClass } from "../../../constants/CSSClasses";
+import { parts, select, count, allSelect } from '../../../helpers/selection';
+import { stripEvents } from '../../../helpers/attributes';
+import { highlight, unhighlight, iHighlight, iUnhighlight } from '../../../helpers/markup';
+import { queryCheck, potentialSelector, hoverClass } from '../../../constants/CSSClasses';
 
 /*
  * This step is used select an element within the page. An elements props is
@@ -22,13 +22,13 @@ const ChooseElement = React.createClass({
     previous: React.PropTypes.func
   },
   getInitialState: function() {
-    const selectors = [["*"]];
+    const selectors = [['*']];
     const { startData } = this.props;
     const { current } = startData;
-    // when current's elements are select elements, automatically add "option"
+    // when current's elements are select elements, automatically add 'option'
     // to the selectors array since it cannot be selected by the user
     if ( allSelect(current.matches) ) {
-      selectors.push(["option"]);
+      selectors.push(['option']);
     }
     return {
       // the index of the selected selector
@@ -62,14 +62,14 @@ const ChooseElement = React.createClass({
         .map(ele => parts(ele));
       this.setState({
         // maintain the wildcard selector
-        selectors: [["*"]].concat(selectors),
+        selectors: [['*']].concat(selectors),
         checked: undefined,
         error: true
       });
     }
   },
   setRadio: function(i) {
-    const selector = this.state.selectors[i].join("");
+    const selector = this.state.selectors[i].join('');
     const { startData } = this.props;
     const { current } = startData;
     this.setState({
@@ -102,10 +102,10 @@ const ChooseElement = React.createClass({
     const { next, previous } = this.props;
     const { selectors, checked, eleCount, error } = this.state;
     return (
-      <form className="info-box">
-        <div className="info">
+      <form className='info-box'>
+        <div className='info'>
           <h3>Select Relevant Element(s)</h3>
-          <div className="choices">
+          <div className='choices'>
             {selectors.map((s, i) =>
               <SelectorRadio key={i}
                 selector={s}
@@ -132,6 +132,7 @@ const ChooseElement = React.createClass({
     // get all child elements of the parents
     const elements = select(startData.current.matches, null, null, '.forager-holder')
       .map(ele => stripEvents(ele));
+
     this.events.boundClick = this.events.click.bind(this);
     iHighlight(
       elements,
@@ -164,7 +165,7 @@ const ChooseElement = React.createClass({
     unhighlight(queryCheck);
     const clickedSelector = nextState.selectors[nextState.checked];
     if ( clickedSelector !== undefined ) {
-      const fullSelector = clickedSelector.join("");
+      const fullSelector = clickedSelector.join('');
       const { startData } = nextProps;
       const elements = select(startData.current.matches, fullSelector, null, '.forager-holder');
       highlight(elements, queryCheck);
@@ -192,12 +193,12 @@ const SelectorRadio = React.createClass({
   render: function() {
     const { selector, checked } = this.props;
     return (
-      <label className={checked ? "selected" : ""}>
-        <input type="radio"
-               name="css-selector"
+      <label className={checked ? 'selected' : ''}>
+        <input type='radio'
+               name='css-selector'
                checked={checked}
                onChange={this.setRadio} />
-        {selector.join("")}
+        {selector.join('')}
       </label>
     );
   }

@@ -1,11 +1,11 @@
-import React from "react";
+import React from 'react';
 
-import Controls from "../common/Controls";
-import OptionalForm from "../elementForms/OptionalForm";
+import Controls from '../common/Controls';
+import OptionalForm from '../elementForms/OptionalForm';
 
-import { select } from "../../../helpers/selection";
-import { highlight, unhighlight } from "../../../helpers/markup";
-import { currentSelector } from "../../../constants/CSSClasses";
+import { select } from '../../../helpers/selection';
+import { highlight, unhighlight } from '../../../helpers/markup';
+import { currentSelector } from '../../../constants/CSSClasses';
 
 const ChooseOptional = React.createClass({
   getInitialState: function() {
@@ -44,8 +44,8 @@ const ChooseOptional = React.createClass({
     const { startData } = this.props;
     const { current, selector } = startData
     return (
-      <form className="info-box">
-        <div className="info">
+      <form className='info-box'>
+        <div className='info'>
           <OptionalForm optional={optional} toggle={this.toggleOptional} />
         </div>
         <Controls

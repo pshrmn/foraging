@@ -1,11 +1,11 @@
-import React from "react";
-import { connect } from "react-redux";
+import React from 'react';
+import { connect } from 'react-redux';
 
-import Tree from "../Tree";
-import ElementCard from "../ElementCard";
+import Tree from '../Tree';
+import ElementCard from '../ElementCard';
 
-import { highlight, unhighlight } from "../../helpers/markup";
-import { currentSelector } from "../../constants/CSSClasses";
+import { highlight, unhighlight } from '../../helpers/markup';
+import { currentSelector } from '../../constants/CSSClasses';
 
 const ElementFrame = React.createClass({
   render: function() {
@@ -15,7 +15,7 @@ const ElementFrame = React.createClass({
     }
 
     return (
-      <div className="frame">
+      <div className='frame'>
         <Tree />
         <ElementCard element={element} active={true} />
       </div>

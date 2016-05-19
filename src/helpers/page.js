@@ -1,15 +1,13 @@
-import { select } from "./selection";
+import { select } from './selection';
 
-export const createElement = (selector, spec = {type: "single", index: 0}, optional = false) => {
-  return {
-    selector,
-    spec,
-    childIndices: [],
-    rules: [],
-    optional,
-    matches: []
-  };
-};
+export const createElement = (selector, spec = {type: 'single', index: 0}, optional = false) => ({
+  selector,
+  spec,
+  childIndices: [],
+  rules: [],
+  optional,
+  matches: []
+});
 
 /*
  * Iterate over the array of page tree, setting each up for use
@@ -28,6 +26,31 @@ export const preparePages = pages => {
   //preppedPages.forEach(p => selectElements(p.elements));
   return preppedPages;
 };
+
+/*
+ * because specs have been re-implemented to not just use
+ * a single "value" property, return the new style spec
+ * for ones that still have a "value" property
+ */
+function fixSpec(oldSpec) {
+  if ( !oldSpec ) {
+    return {};
+  } else if ( oldSpec.value === undefined ) {
+    return oldSpec;
+  } else {
+    if ( oldSpec.type === 'single' ) {
+      return {
+        type: 'single',
+        index: oldSpec.value
+      }
+    } else if ( oldSpec.type === 'all' ) {
+      return {
+        type: 'all',
+        name: oldSpec.value
+      }
+    }
+  }
+}
 
 /*
  * flatten a page object's nested selectors into an array. each item
@@ -58,15 +81,7 @@ export const flatten = pageTree => {
       breadth[current.parent].childIndices.push(index);
     }
 
-    // fix the spec if it uses old style (value)
-    if ( current.spec.value !== undefined ) {
-      if ( current.spec.type === "single" ) {
-        current.spec.index = current.spec.value;
-      } else if ( current.spec.type === "all" ) {
-        current.spec.name = current.spec.value;
-      }
-      delete current.spec.value;
-    }
+    current.spec = fixSpec(current.spec);
 
     // add all child elements to the breadth array
     current.children.forEach(c => {
@@ -84,12 +99,10 @@ export const flatten = pageTree => {
 /* 
  * return a version of the page with elements as a tree for saving/uploading
  */
-export const clean = page => {
-  return {
-    name: page.name,
-    element: fullGrow(page.elements)
-  };
-};
+export const clean = page => ({
+  name: page.name,
+  element: fullGrow(page.elements)
+});
 
 /*
  * create a tree for saving a page
@@ -145,13 +158,11 @@ export const simpleGrow = elementArray => {
       optional: e.optional
     };
   });
+
   cleanElements.forEach(e => {
-    if ( e === null ) {
-      return null
-    };
-    if ( e.parent === null ) {
+    if ( e === null || e.parent === null) {
       return;
-    }
+    };
     cleanElements[e.parent].children.push(e);
   });
   return cleanElements[0];
@@ -162,14 +173,14 @@ export const simpleGrow = elementArray => {
  *
  * For example, given the below rules:
  * {
- *   "foo": "",
- *   "bar": 7,
- *   "baz": {
- *     "quux": 3.14
+ *   'foo': '',
+ *   'bar': 7,
+ *   'baz': {
+ *     'quux': 3.14
  *   }
  * }
  *
- * The names "foo", "bar", and "baz" are in the same level. The name "quux" is
+ * The names 'foo', 'bar', and 'baz' are in the same level. The name 'quux' is
  * in a separate level.
  *
  * This is useful for verifying that a rule or spec name is not a duplicate.
