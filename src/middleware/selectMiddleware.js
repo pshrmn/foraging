@@ -12,6 +12,7 @@ export default store => next => action => {
     types.UPDATE_ELEMENT,
     types.REFRESH_MATCHES
   ];
+
   if ( !selectActions.includes(action.type) ) {
     return next(action);
   }

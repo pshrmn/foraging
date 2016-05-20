@@ -20,19 +20,25 @@ import {
   showPreview
 } from '../actions';
 
+function promptName() {
+  return window.prompt('Page Name:\nCannot contain the following characters: < > : \' \\ / | ? * ');
+}
+
+function pageNames(pages) {
+  return pages
+    .filter(p => p !== undefined)
+    .map(p => p.name);
+}
+
 const Controls = React.createClass({
   addHandler: function(event) {
     const { pages, showMessage, addPage } = this.props;
-    const name = window.prompt('Page Name:\nCannot contain the following characters: < > : \' \\ / | ? * ');
-    const pageNames = pages
-      .filter(p => p !== undefined)
-      .map(p => p.name);
-    if ( !validName(name, pageNames) ) {
-      showMessage(`Invalid Name: "${name}"`, 5000, -1);
+    const name = promptName();
+    if ( !validName(name, pageNames(pages)) ) {
+      showMessage(`Cannot Use Name: "${name}"`, 5000, -1);
     } else {
-      
       let body = createElement('body');
-      // initial values for the body selector
+      // initial values for the body element
       body = Object.assign({}, body, {
         index: 0,
         parent: null,
@@ -43,62 +49,30 @@ const Controls = React.createClass({
         name: name,
         elements: [body]
       });
-      
     }
-  },
-  syncHandler: function(event) {
-    if (!window.confirm('Syncing pages will overwrite duplicate pages. Continue?')) {
-      return;
-    }
-    this.props.syncPages();
-  },
-  closeHandler: function(event){
-    document.body.classList.remove('foraging');
-    this.props.closeForager();
-  },
-  pageSelect: function() {
-    const { pages, currentIndex, selectPage } = this.props;
-    const options = pages.map((p, i) => {
-      return (
-        <option key={i} value={i}>{p === undefined ? '' : p.name}</option>
-      );
-    });
-    return (
-      <select value={currentIndex}
-              onChange={event => { selectPage(parseInt(event.target.value, 10)); }} >>
-        {options}
-      </select>
-    );
   },
   renameHandler: function(event) {
-    const name = window.prompt('Page Name:\nCannot contain the following characters: < > : \' \\ / | ? * ');
+    const name = promptName();
     const { pages, showMessage, renamePage } = this.props;
-    const pageNames = pages
-      .filter(p => p !== undefined)
-      .map(p => p.name);
     // do nothing if the user cancels, does not enter a name, or enter the same name as the current one
-    if ( !validName(name, pageNames)) {
-      showMessage(`Invalid Name: "${name}"`, 5000, -1);
+    if ( !validName(name, pageNames(pages))) {
+      showMessage(`Cannot Use Name: "${name}"`, 5000, -1);
     } else {
       renamePage(name);
     }
   },
-  deleteHandler: function(event) {
-    const { pages, currentIndex, removePage } = this.props;
-    const currentPage = pages[currentIndex];
-    if ( !confirm(`Are you sure you want to delete the page "${currentPage.name}"?`)) {
-      return;
-    }
-    // report the current page index
-    this.props.removePage();
-  },
   render: function() {
     const {
+      pages,
       message,
       currentIndex,
+      selectPage,
       uploadPage,
       showPreview,
-      refreshMatches
+      refreshMatches,
+      syncPages,
+      removePage,
+      closeForager
     } = this.props;
     const active = currentIndex !== 0;
     return (
@@ -106,32 +80,51 @@ const Controls = React.createClass({
         <div className='controls'>
           <div className='page-controls'>
             {'Page '}
-            {this.pageSelect()}
-            <PosButton text='Add Page'
-                       click={this.addHandler} />
-            <NeutralButton text='Refresh'
-                           title='Refresh the list of matched elements'
-                           click={() => { refreshMatches(); }}
-                           disabled={!active} />
-            <PosButton text='Preview'
-                       click={() => { showPreview() }} 
-                       disabled={!active} />
-            <NegButton text='Delete'
-                       click={this.deleteHandler}
-                       disabled={!active} />
-            <PosButton text='Rename'
-                       click={this.renameHandler}
-                       disabled={!active} />
-            <PosButton text='Upload'
-                       click={() => { uploadPage(); }}
-                       disabled={!active} />
-            <PosButton text='Sync Pages'
-                       click={this.syncHandler} />
+            <select
+              value={currentIndex}
+              onChange={event => { selectPage(parseInt(event.target.value, 10)); }} >
+              {
+                pages.map((p, i) =>
+                  <option key={i} value={i}>{p === undefined ? '' : p.name}</option>
+                )
+              }
+            </select>
+            <PosButton
+              text='Add Page'
+              click={this.addHandler} />
+            <NeutralButton
+              text='Refresh'
+              title='Refresh the list of matched elements'
+              click={() => { refreshMatches(); }}
+              disabled={!active} />
+            <PosButton
+              text='Preview'
+              click={() => { showPreview() }} 
+              disabled={!active} />
+            <NegButton
+              text='Delete'
+              click={() => { removePage(); }}
+              disabled={!active} />
+            <PosButton
+              text='Rename'
+              click={this.renameHandler}
+              disabled={!active} />
+            <PosButton
+              text='Upload'
+              click={() => { uploadPage(); }}
+              disabled={!active} />
+            <PosButton
+              text='Sync Pages'
+              click={() => { syncPages(); }} />
           </div>
           <div className='app-controls'>
-            <NegButton text={String.fromCharCode(215)}
-                           classes={['transparent']}
-                           click={this.closeHandler} />
+            <NegButton
+              text={String.fromCharCode(215)}
+              classes={['transparent']}
+              click={() => {
+                document.body.classList.remove('foraging');
+                closeForager();
+              }} />
           </div>
         </div>
         <MessageBoard />
