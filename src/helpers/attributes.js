@@ -27,7 +27,7 @@ export const attributes = (element, ignored = {}) => {
       if ( name === 'class' ) {
         value = value
           .split(' ')
-          .filter(c => !ignoredClasses.includes(c))
+          .filter(c => !ignoredClasses.includes(c) && c !== '')
           .join(' ');
       }
       // don't include empty attrs
@@ -51,7 +51,8 @@ export const attributes = (element, ignored = {}) => {
  * -----------
  * If an element has no on* attributes, it is returned. Otherwise, all on* attrs
  * are removed from the element and a clone is made. The element is replaced in
- * the dom by the clone and the clone is returned.
+ * the dom by the clone and the clone is returned. This breaks the page
+ * (so that Forager events can dispatch uninterrupted)
  */
 export const stripEvents = element => {
   const attrs = Array.from(element.attributes);
@@ -62,7 +63,6 @@ export const stripEvents = element => {
         element.removeAttribute(name);
       }
     });
-    // this breaks the page (so that Forager events can dispatch uninterrupted)
     const clone = element.cloneNode(true);
     element.parentNode.replaceChild(clone, element);
     return clone;

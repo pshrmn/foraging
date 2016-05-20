@@ -37,8 +37,7 @@ export default function frame(state = {name: 'element'}, action) {
     };
   case types.SHOW_EDIT_RULE_WIZARD:
     return {
-      name: 'edit-rule-wizard',
-      index: action.index
+      name: 'edit-rule-wizard'
     };
   case types.SHOW_PREVIEW:
     return {

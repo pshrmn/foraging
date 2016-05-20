@@ -118,9 +118,9 @@ export const chromeSync = () => {
         } else {
           const syncedPages = response.pages;
 
+          // merge the synced pages with the current pages and save them
           chrome.storage.local.get('sites', function mergeSyncedPagesChrome(storage){
             const currentPages = storage.sites[host] || {};
-            // merge the synced pages with the current pages and save them
             const allPages = Object.assign({}, currentPages, syncedPages);
             storage.sites[host] = allPages;
             chrome.storage.local.set({'sites': storage.sites});
@@ -131,6 +131,5 @@ export const chromeSync = () => {
         }
       }
     );
-    
-  })
+  });
 };

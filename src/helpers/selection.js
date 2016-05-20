@@ -44,26 +44,27 @@ export const select = (parents, selector, spec, ignored) => {
   }
 
   // select the elements from each parent element
-  return Array.from(parents).reduce((arr, p) => {
-    const children = p.querySelectorAll(sel);
-    const { type } = spec;
-    let elements = [];
-    switch ( type ) {
-    case 'single':
-      const index = spec.index;
-      elements =  children[index] !== undefined ? [children[index]] : [];
-      break;
-    case 'all':
-      elements = Array.from(children);
-      break;
-    case 'range':
-      const low = spec.low;
-      const high = spec.high || undefined; // slice undefined, not null
-      elements = Array.from(children).slice(low, high);
-      break;
-    }
-    return arr.concat(elements);
-  }, []);
+  return Array.from(parents)
+    .reduce((arr, p) => {
+      const children = p.querySelectorAll(sel);
+      const { type } = spec;
+      let elements = [];
+      switch ( type ) {
+      case 'single':
+        const index = spec.index;
+        elements =  children[index] !== undefined ? [children[index]] : [];
+        break;
+      case 'all':
+        elements = Array.from(children);
+        break;
+      case 'range':
+        const low = spec.low;
+        const high = spec.high || undefined; // slice undefined, not null
+        elements = Array.from(children).slice(low, high);
+        break;
+      }
+      return arr.concat(elements);
+    }, []);
 }
 
 
@@ -83,26 +84,27 @@ export const count = (parents, selector, spec) => {
       type: 'all'
     };
   }
-  return Array.from(parents).reduce((top, p) => {
-    const children = p.querySelectorAll(sel);
-    let count = 0;
-    switch ( spec.type ) {
-    case 'single':
-      const index = spec.index;
-      count = children[index] !== undefined ? 1 : 0;
-      break;
-    case 'all':
-      count = children.length
-      break;
-    case 'range':
-      const low = spec.low;
-      const high = spec.high;
-      count = Array.from(children).slice(low, high || undefined).length;
-      break;
-    }
+  return Array.from(parents)
+    .reduce((top, p) => {
+      const children = p.querySelectorAll(sel);
+      let count = 0;
+      switch ( spec.type ) {
+      case 'single':
+        const index = spec.index;
+        count = children[index] !== undefined ? 1 : 0;
+        break;
+      case 'all':
+        count = children.length
+        break;
+      case 'range':
+        const low = spec.low;
+        const high = spec.high;
+        count = Array.from(children).slice(low, high || undefined).length;
+        break;
+      }
 
-    return top > count ? top : count;
-  }, 0);
+      return top > count ? top : count;
+    }, 0);
 }
 
 /*
