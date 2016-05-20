@@ -38,7 +38,8 @@ export default store => next => action => {
       `Are you sure you want to delete the element "${element.selector}"?`
     break;
   }
-  if ( !confirm(confirmMessage) ) {
+
+  if ( !window.confirm(confirmMessage) ) {
     return;
   }
   next(action);
