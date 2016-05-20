@@ -62,9 +62,8 @@ function describeAll(spec) {
 
 function describeRange(spec) {
   const { name = '', low, high } = spec;
-  const lowText = low === undefined ? 'start' : low;
   const highText = high === null ? 'end' : high;
-  return `captures elements ${lowText} to ${highText}, groups them as "${name}"`;
+  return `captures elements ${low} to ${highText}, groups them as "${name}"`;
 }
 
 /*
@@ -75,7 +74,7 @@ export function shortElement(selector, spec, optional = false) {
   let text = '';
 
   if ( !spec ) {
-    return text;
+    return shortSelector;
   }
 
   switch ( spec.type ) {
@@ -86,12 +85,10 @@ export function shortElement(selector, spec, optional = false) {
     text = `[${shortSelector}]`;
     break;
   case 'range':
-    text = `${shortSelector}[${spec.low}:${spec.high || 'end'}]`
+    text = `${shortSelector}[${spec.low}:${spec.high || 'end'}]`;
   }
-
   if ( optional ) {
     text += '*';
   }
-
   return text;
 }
