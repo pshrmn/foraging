@@ -4,7 +4,7 @@ import { Provider } from 'react-redux';
 
 import Forager from './components/Forager';
 import { openForager, setPages } from './actions';
-import { chromeLoad } from './helpers/chrome';
+import { load as chromeLoad } from './helpers/chrome';
 import makeStore from './store';
 
 // the foraging class adds a margin to the bottom of the page, which

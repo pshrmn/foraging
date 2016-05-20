@@ -4,7 +4,7 @@ import { preparePages, clean } from './page'
 /*
  * any time that the page is updated, the stored page should be updated
  */
-export const chromeSave = page => {
+export const save = page => {
   return new Promise((resolve, reject) => {
     if ( page === undefined ) {
       reject('No page to save');
@@ -20,7 +20,7 @@ export const chromeSave = page => {
   })
 }
 
-export const chromeRename = (newName, oldName) => {
+export const rename = (newName, oldName) => {
   return new Promise((resolve, reject) => {
     chrome.storage.local.get('sites', function saveSchemaChrome(storage){
       const host = window.location.hostname;
@@ -40,7 +40,7 @@ export const chromeRename = (newName, oldName) => {
 /*
  * remove the page with the given name from storage
  */
-export const chromeDelete = name => {
+export const remove = name => {
   return new Promise((resolve, reject) => {
     if ( name === undefined ) {
       reject('No page to delete');
@@ -63,7 +63,7 @@ the object is:
 
 If the site object exists for a host, load the saved rules
 */
-export const chromeLoad = () => {
+export const load = () => {
   return new Promise((resolve, reject) => {
     chrome.storage.local.get('sites', function setupHostnameChrome(storage){
       const host = window.location.hostname;
@@ -77,7 +77,7 @@ export const chromeLoad = () => {
 /*
  * formats the page and sends it to the background script, which will upload it to the server
  */
-export const chromeUpload = page => {
+export const upload = page => {
   return new Promise((resolve, reject) => {
     if ( page === undefined ) {
       reject('No page to upload');
@@ -103,7 +103,7 @@ export const chromeUpload = page => {
   });
 };
 
-export const chromeSync = () => {
+export const sync = () => {
   return new Promise((resolve, reject) => {
     const host = window.location.hostname;
     chrome.runtime.sendMessage(

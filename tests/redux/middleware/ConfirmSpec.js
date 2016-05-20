@@ -4,6 +4,11 @@ import { jsdom } from 'jsdom';
 import sinon from 'sinon';
 
 import confirmMiddleware from '../../../src/middleware/confirmMiddleware';
+import {
+  SYNC_PAGES,
+  REMOVE_PAGE,
+  REMOVE_ELEMENT
+} from '../../../src/constants/ActionTypes';
 
 const mockStore = configureStore([confirmMiddleware])
 
@@ -52,16 +57,16 @@ describe('confirmMiddleware', () => {
     it('reaches store when window.confirm=true', () => {
       sinon.stub(global.window, 'confirm', () => true);
       store.dispatch({
-        type: 'SYNC_PAGES'
+        type: SYNC_PAGES
       });
       const [first] = store.getActions();
-      expect(first.type).to.equal('SYNC_PAGES');
+      expect(first.type).to.equal(SYNC_PAGES);
     });
 
     it('stops when window.confirm=false', () => {
       sinon.stub(global.window, 'confirm', () => false);
       store.dispatch({
-        type: 'SYNC_PAGES'
+        type: SYNC_PAGES
       });
       const [first] = store.getActions();
       expect(first).to.be.undefined;
@@ -72,16 +77,16 @@ describe('confirmMiddleware', () => {
     it('reaches store when window.confirm=true', () => {
       sinon.stub(global.window, 'confirm', () => true);
       store.dispatch({
-        type: 'REMOVE_PAGE'
+        type: REMOVE_PAGE
       });
       const [first] = store.getActions();
-      expect(first.type).to.equal('REMOVE_PAGE');
+      expect(first.type).to.equal(REMOVE_PAGE);
     });
 
     it('stops when window.confirm=false', () => {
       sinon.stub(global.window, 'confirm', () => false);
       store.dispatch({
-        type: 'REMOVE_PAGE'
+        type: REMOVE_PAGE
       });
       const [first] = store.getActions();
       expect(first).to.be.undefined;
@@ -92,16 +97,16 @@ describe('confirmMiddleware', () => {
     it('reaches store when window.confirm=true', () => {
       sinon.stub(global.window, 'confirm', () => true);
       store.dispatch({
-        type: 'REMOVE_ELEMENT'
+        type: REMOVE_ELEMENT
       });
       const [first] = store.getActions();
-      expect(first.type).to.equal('REMOVE_ELEMENT');
+      expect(first.type).to.equal(REMOVE_ELEMENT);
     });
 
     it('stops when window.confirm=false', () => {
       sinon.stub(global.window, 'confirm', () => false);
       store.dispatch({
-        type: 'REMOVE_ELEMENT'
+        type: REMOVE_ELEMENT
       });
       const [first] = store.getActions();
       expect(first).to.be.undefined;
