@@ -83,7 +83,13 @@ body.foraging {
     float: none !important;
     color: #000000 !important; }
   #forager label {
-    font-weight: normal; }
+    font-weight: normal;
+    margin-right: 15px;
+    padding: 2px 3px;
+    border-radius: 3px;
+    word-break: break-all;
+    border: 1px solid #898B96;
+    background: #CED1DE; }
   #forager input {
     box-shadow: none;
     border-radius: 0;
@@ -209,15 +215,6 @@ body.foraging {
     -webkit-flex-wrap: wrap;
         -ms-flex-wrap: wrap;
             flex-wrap: wrap; }
-  #forager ul, #forager ol {
-    list-style: none; }
-  #forager label {
-    margin-right: 15px;
-    padding: 2px 3px;
-    border-radius: 3px;
-    word-break: break-all;
-    border: 1px solid #898B96;
-    background: #CED1DE; }
   #forager label.selected {
     background: #76B85C;
     border-color: #42752E; }
@@ -320,21 +317,6 @@ body.foraging {
     margin-bottom: 10px;
     min-width: 650px;
     background: #222233; }
-    #forager .topbar .page-controls {
-      color: #EFEFEF; }
-    #forager .topbar .controls {
-      display: -webkit-flex;
-      display: -ms-flexbox;
-      display: flex; }
-    #forager .topbar .message-board {
-      margin: 0;
-      padding: 0; }
-      #forager .topbar .message-board .message {
-        color: #EFEFEF; }
-        #forager .topbar .message-board .message.pos {
-          color: #76B85C; }
-        #forager .topbar .message-board .message.neg {
-          color: #E85F88; }
     #forager .topbar button {
       display: inline-block;
       line-height: 1.25 !important;
@@ -381,6 +363,31 @@ body.foraging {
       min-height: 22px;
       height: 22px;
       border-radius: 2px; }
+  #forager .page-controls {
+    display: inline-block;
+    color: #EFEFEF; }
+  #forager .app-controls {
+    display: inline-block;
+    /* this pushes the .app-controls to the right edge */
+    margin-left: auto; }
+    #forager .app-controls button {
+      color: #ffffff !important;
+      margin: 0 !important; }
+      #forager .app-controls button:hover {
+        background: #222233 !important; }
+  #forager .controls {
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex; }
+  #forager .message-board {
+    margin: 0;
+    padding: 0; }
+  #forager .message {
+    color: #EFEFEF; }
+    #forager .message.pos {
+      color: #76B85C; }
+    #forager .message.neg {
+      color: #E85F88; }
   #forager.hidden {
     display: none !important; }
   #forager .not-allowed {
@@ -399,17 +406,6 @@ body.foraging {
     display: -webkit-flex;
     display: -ms-flexbox;
     display: flex; }
-  #forager .page-controls {
-    display: inline-block; }
-  #forager .app-controls {
-    display: inline-block;
-    /* this pushes the .app-controls to the right edge */
-    margin-left: auto; }
-    #forager .app-controls button {
-      color: #ffffff !important;
-      margin: 0 !important; }
-      #forager .app-controls button:hover {
-        background: #222233 !important; }
 
 /*
  * the selectable-element class is added to all children of the elements in the
@@ -462,21 +458,3 @@ img.saved-preview {
 
 img.current-element {
   border: 1px dotted #225683 !important; }
-
-.options-modal {
-  color: #323033; }
-  .options-modal h2 {
-    margin: 5px 0;
-    font-size: 1.25em; }
-  .options-modal h3 {
-    margin: 5px 0;
-    font-size: 1.1em; }
-  .options-modal .note {
-    font-style: italic;
-    font-size: 0.9em;
-    margin: 3px 0; }
-  .options-modal label {
-    font-weight: normal;
-    margin-right: 25px; }
-    .options-modal label input[type=checkbox] {
-      margin-left: 5px; }

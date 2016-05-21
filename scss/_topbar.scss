@@ -4,31 +4,6 @@
     min-width: 650px;
     background: $dark-blue;
 
-    .page-controls {
-        color: $light-gray
-    }
-
-    .controls {
-        display: flex;
-    }
-
-    .message-board {
-        margin: 0;
-        padding: 0;
-
-        .message {
-            color: $light-gray;
-
-            &.pos {
-                color: $green;
-            }
-
-            &.neg {
-                color: $red;
-            }
-        }
-    }
-
     button{
         display: inline-block;
         line-height: 1.25 !important;
@@ -98,5 +73,47 @@
         min-height: 22px;
         height: 22px;
         border-radius: 2px;
+    }
+}
+
+.page-controls {
+    display: inline-block;
+    color: $light-gray
+}
+
+.app-controls {
+    display: inline-block;
+    /* this pushes the .app-controls to the right edge */
+    margin-left: auto;
+    
+    button {
+        color: $white !important;
+        margin: 0 !important;
+
+        &:hover {
+            background: $dark-blue !important;
+        }
+    }
+}
+
+.controls {
+    display: flex;
+}
+
+.message-board {
+    margin: 0;
+    padding: 0;
+
+}
+
+.message {
+    color: $light-gray;
+
+    &.pos {
+        color: $green;
+    }
+
+    &.neg {
+        color: $red;
     }
 }

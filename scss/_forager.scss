@@ -70,23 +70,4 @@
         display: flex;
     }
 
-    .page-controls {
-        display: inline-block;
-    }
-
-    .app-controls {
-        display: inline-block;
-        /* this pushes the .app-controls to the right edge */
-        margin-left: auto;
-        
-        button {
-            color: $white !important;
-            margin: 0 !important;
-
-            &:hover {
-                background: $dark-blue !important;
-            }
-        }
-    }
-
 }
