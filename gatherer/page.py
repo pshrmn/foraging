@@ -45,4 +45,4 @@ class Page(object):
         return compare(self.gather(dom), flatten_element(self.element))
 
     def __repr__(self):
-        return """Page({}, {})""".format(self.name, self.element)
+        return """Page("{}", {})""".format(self.name, self.element)
