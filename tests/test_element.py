@@ -1,7 +1,8 @@
 import unittest
 from lxml import html
 
-from gatherer.element import ElementFactory, SingleElement, AllElement, RangeElement
+from gatherer.element import (ElementFactory, Element,
+                                SingleElement, AllElement, RangeElement)
 from gatherer.rule import Rule
 
 SINGLE_JSON = {
@@ -154,6 +155,17 @@ class ElementFactoryTestCase(unittest.TestCase):
         single_copy["optional"] = True
         e = ElementFactory.from_json(single_copy)
         self.assertTrue(e.optional)
+
+
+class ElementTestCase(unittest.TestCase):
+
+    def test_children_is_none(self):
+        ele = Element("selector", {"type": "single", "index": 0}, rules=[])
+        self.assertIsInstance(ele.children, list)
+
+    def test_rules_is_none(self):
+        ele = Element("selector", {"type": "single", "index": 0}, children=[])
+        self.assertIsInstance(ele.rules, list)
 
 
 class SingleElementTestCase(unittest.TestCase):

@@ -50,12 +50,12 @@ class ElementFactory(object):
 
 class Element(object):
 
-    def __init__(self, selector, spec, children, rules, optional=False):
+    def __init__(self, selector, spec, children=None, rules=None, optional=False):
         self.selector = selector
         self.xpath = CSSSelector(selector)
         self.spec = spec
-        self.children = children
-        self.rules = rules
+        self.children = children if children is not None else []
+        self.rules = rules if rules is not None else []
         self.optional = optional
 
     def data(self, parent):
