@@ -82,6 +82,6 @@ if __name__ == "__main__":
     # default to current working directory
     directory = args.directory or os.path.join(os.getcwd(), 'rules')
     set_directory(directory)
-    app.run(debug=True)
+    app.run(debug=False)
 else:
     set_directory(os.path.join(os.getcwd(), 'rules'))
