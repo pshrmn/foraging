@@ -11,7 +11,7 @@ const ElementFrame = React.createClass({
   render: function() {
     const { element } = this.props;
     if ( element === undefined ) {
-      return null;
+      return <div className='frame'></div>;
     }
 
     return (

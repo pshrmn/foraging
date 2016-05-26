@@ -57,26 +57,24 @@ describe("markup", () => {
     it("adds the class to all elements", () => {
       const elements = document.querySelectorAll("div");
       const className = "highlighted";
-      const over = () => {};
-      const out = () => {};
-      const click = () => {};
+      const e = () => {};
       expect(document.getElementsByClassName(className).length).to.equal(0);
-      iHighlight(elements, className, over, out, click);
+      const iUn = iHighlight(elements, className, e, e, e);
       expect(document.getElementsByClassName(className).length).to.equal(3);
-    });
-  });
 
-  describe("iUnhighlight", () => {
-    it("remove the class from all elements", () => {
+      
+    });
+
+    it("returns a function that removes the class", () => {
       const elements = document.querySelectorAll("div");
       const className = "highlighted";
-      const over = () => {};
-      const out = () => {};
-      const click = () => {};
-      iHighlight(elements, className, over, out, click);
+      const e = () => {};
+      const iUn = iHighlight(elements, className, e, e, e);
       expect(document.getElementsByClassName(className).length).to.equal(3);
-      iUnhighlight(className);
+      expect(iUn.call).to.be.defined;
+      // this should now remove the className
+      iUn();
       expect(document.getElementsByClassName(className).length).to.equal(0);
-    });
+    })
   });
 });

@@ -39,7 +39,7 @@ const ChooseParts = React.createClass({
       });
     }
   },
-  previousHander: function(event) {
+  previousHandler: function(event) {
     event.preventDefault();
     this.props.previous();
   },

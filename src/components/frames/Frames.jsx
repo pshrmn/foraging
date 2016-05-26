@@ -34,7 +34,7 @@ import Preview from './Preview';
   case 'preview':
     return <Preview />;
   default:
-    return null
+    return null;
   }
 }
 

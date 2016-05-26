@@ -9,14 +9,13 @@ function Forager(props) {
     (
       <div id='forager'>
         <Controls />
-        { props.active ? <Frames /> : null }
+        <Frames />
       </div>
     );  
 }
 
 export default connect(
   state => ({
-    show: state.show,
-    active: state.page.pageIndex !== 0
+    show: state.show
   })
 )(Forager);

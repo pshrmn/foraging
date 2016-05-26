@@ -36,26 +36,33 @@ export const unhighlight = className => {
 export const iHighlight = (elements, className, over, out, click) => {
   Array.from(elements).forEach(e => {
     e.classList.add(className);
-    e.addEventListener('mouseover', over, false);
-    e.addEventListener('mouseout', out, false);
-    e.addEventListener('click', click, false);
   });
-};
 
-/*
- * iUnhighlight
- * ---------
- *
- * @param className - the className to remove from all elements that have it
- * @param over - mouseover function to remove
- * @param out - mouseout function to remove
- * @param click - click function to remove
- */
-export const iUnhighlight = (className, over, out, click) => {
-  Array.from(document.getElementsByClassName(className)).forEach(e => {
-    e.classList.remove(className);
-    e.removeEventListener('mouseover', over, false);
-    e.removeEventListener('mouseout', out, false);
-    e.removeEventListener('click', click, false);
-  });   
+  function checkEvent(fn) {
+    return function(event) {
+      if ( event.target.classList.contains(className) ) {
+        event.stopPropagation();
+        fn(event);
+      }  
+    }
+  }
+
+  const checkOver = checkEvent(over);
+  const checkOut = checkEvent(out);
+  const checkClick = checkEvent(click);
+
+  document.body.addEventListener('mouseover', checkOver, false);
+  document.body.addEventListener('mouseout', checkOut, false);
+  document.body.addEventListener('click', checkClick, false);
+
+  return function iUnhighlight() {
+
+    Array.from(elements).forEach(e => {
+      e.classList.remove(className);
+    });
+
+    document.body.removeEventListener('mouseover', checkOver, false);
+    document.body.removeEventListener('mouseout', checkOut, false);
+    document.body.removeEventListener('click', checkClick, false);    
+  }
 };

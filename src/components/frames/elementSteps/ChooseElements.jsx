@@ -4,7 +4,7 @@ import Controls from '../common/Controls';
 
 import { parts, select, count, allSelect } from '../../../helpers/selection';
 import { stripEvents } from '../../../helpers/attributes';
-import { highlight, unhighlight, iHighlight, iUnhighlight } from '../../../helpers/markup';
+import { highlight, unhighlight, iHighlight } from '../../../helpers/markup';
 import { queryCheck, potentialSelector, hoverClass } from '../../../constants/CSSClasses';
 
 /*
@@ -129,26 +129,25 @@ const ChooseElement = React.createClass({
    */
   componentWillMount: function() {
     const { startData } = this.props;
+    this.addEvents(startData);
+  },
+  componentWillReceiveNewProps: function(nextProps) {
+    const { startData } = nextProps;
+    this.addEvents(startData);
+  },
+  addEvents: function(startData) {
     // get all child elements of the parents
     const elements = select(startData.current.matches, null, null, '.forager-holder')
       .map(ele => stripEvents(ele));
 
+    // remove any existing events
+    if ( this.iUnhighlight ) {
+      this.iUnhighlight();
+    }
+
+    // need to bind so that this.setState is callable
     this.events.boundClick = this.events.click.bind(this);
-    iHighlight(
-      elements,
-      potentialSelector,
-      this.events.mouseover,
-      this.events.mouseout,
-      this.events.boundClick
-    );
-  },
-  componentWillReceiveNewProps: function(nextProps) {
-    const { startData } = nextProps;
-    // get all child elements of the parents
-    const elements = select(startData.current.matches, null, null, '.forager-holder')
-      .map(ele => stripEvents(ele));
-    this.events.boundClick = this.events.click.bind(this);
-    iHighlight(
+    this.iUnhighlight = iHighlight(
       elements,
       potentialSelector,
       this.events.mouseover,
@@ -176,12 +175,7 @@ const ChooseElement = React.createClass({
    */
   componentWillUnmount: function() {
     unhighlight(queryCheck);
-    iUnhighlight(
-      potentialSelector,
-      this.events.mouseover,
-      this.events.mouseout,
-      this.events.boundClick
-    );
+    this.iUnhighlight();
   }
 });
 
