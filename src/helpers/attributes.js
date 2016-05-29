@@ -51,8 +51,15 @@ export const attributes = (element, ignored = {}) => {
  * -----------
  * If an element has no on* attributes, it is returned. Otherwise, all on* attrs
  * are removed from the element and a clone is made. The element is replaced in
- * the dom by the clone and the clone is returned. This breaks the page
- * (so that Forager events can dispatch uninterrupted)
+ * the dom by the clone and the clone is returned.
+ *
+ * This breaks the page (so that Forager events can dispatch uninterrupted)
+ * but makes it so that you don't have to worry about accidentally navigating,
+ * submitting, or anythign else while trying to select an element. A refresh
+ * of the page will be necessary to restore the page's default functionality.
+ *
+ * Because there isn't a good reason to capture data from on* attributes, they
+ * are removed instead of just replacing the event function.
  */
 export const stripEvents = element => {
   const attrs = Array.from(element.attributes);

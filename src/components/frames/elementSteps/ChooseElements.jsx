@@ -3,7 +3,7 @@ import React from 'react';
 import Controls from '../common/Controls';
 
 import { parts, select, count, allSelect } from '../../../helpers/selection';
-import { stripEvents } from '../../../helpers/attributes';
+
 import { highlight, unhighlight, iHighlight } from '../../../helpers/markup';
 import { queryCheck, potentialSelector, hoverClass } from '../../../constants/CSSClasses';
 
@@ -137,12 +137,12 @@ const ChooseElement = React.createClass({
   },
   addEvents: function(startData) {
     // get all child elements of the parents
-    const elements = select(startData.current.matches, null, null, '.forager-holder')
-      .map(ele => stripEvents(ele));
+    const elements = select(startData.current.matches, null, null, '.forager-holder');
 
     // remove any existing events
     if ( this.iUnhighlight ) {
       this.iUnhighlight();
+      delete this.iUnhighlight;
     }
 
     // need to bind so that this.setState is callable

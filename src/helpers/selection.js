@@ -44,7 +44,7 @@ export const select = (parents, selector, spec, ignored) => {
   }
 
   // select the elements from each parent element
-  return Array.from(parents)
+  const childElements = Array.from(parents)
     .reduce((arr, p) => {
       const children = p.querySelectorAll(sel);
       const { type } = spec;
@@ -65,6 +65,7 @@ export const select = (parents, selector, spec, ignored) => {
       }
       return arr.concat(elements);
     }, []);
+    return [...new Set(childElements)];
 }
 
 

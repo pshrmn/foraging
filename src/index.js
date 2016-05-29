@@ -5,11 +5,16 @@ import { Provider } from 'react-redux';
 import Forager from './components/Forager';
 import { openForager, setPages } from './actions';
 import { load as chromeLoad } from './helpers/chrome';
+import { stripEvents } from './helpers/attributes';
 import makeStore from './store';
 
 // the foraging class adds a margin to the bottom of the page, which
 // is helpful in preventing the app from overlapping content
-document.body.classList.add('foraging');
+{
+  document.body.classList.add('foraging');
+  stripEvents(document.body);
+  Array.from(document.querySelectorAll("*")).forEach(e => { stripEvents(e)});
+}
 
 /*
  * check if the forager holder exists. If it doesn't, mount the app. If it does,
@@ -22,6 +27,8 @@ if ( !document.querySelector('.forager-holder') ) {
   document.body.appendChild(holder);
 
   const store = makeStore();
+
+  // remove any event (on*) attributes on load
 
   chromeLoad()
     .then(pages => {
