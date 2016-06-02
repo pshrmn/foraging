@@ -39,7 +39,7 @@ const ConfirmElement = React.createClass({
         <Controls
           previous={this.previousHandler}
           next={this.saveHandler}
-          nextText='Upate'
+          nextText='Update'
           cancel={this.cancelHandler} />
       </form>
     );
