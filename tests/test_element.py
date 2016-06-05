@@ -248,7 +248,7 @@ class AllElementTestCase(unittest.TestCase):
 
     def test_all_data_none(self):
         """
-        when every element returns None, data will be None
+        when every element returns None, data will be an empty list
         """
         e = ElementFactory.from_json(ALL_JSON)
         parent = html.fragment_fromstring("""
@@ -260,7 +260,9 @@ class AllElementTestCase(unittest.TestCase):
         </section>
         """)
         data = e.data(parent)
-        self.assertIsNone(data)
+        divs = data.get("divs")
+        self.assertIsInstance(divs, list)
+        self.assertEqual(len(divs), 0)
 
     def test_children_data(self):
         """
@@ -374,8 +376,7 @@ class RangeElementTestCase(unittest.TestCase):
 
     def test_all_data_doesnt_exist(self):
         """
-        when all matched elements return None, data
-        will return None
+        when all matched elements return None, return an empty list
         """
         e = ElementFactory.from_json(RANGE_JSON)
         parent = html.fragment_fromstring("""
@@ -387,7 +388,9 @@ class RangeElementTestCase(unittest.TestCase):
         </section>
         """)
         data = e.data(parent)
-        self.assertIsNone(data)
+        divs = data.get("divs")
+        self.assertIsInstance(divs, list)
+        self.assertEqual(len(divs), 0)
 
 if __name__ == "__main__":
     unittest.main()

@@ -174,12 +174,8 @@ class AllElement(Element):
         """
         elements = self.xpath(parent)
         data = [self._get_element_data(e) for e in elements]
-        real_data = [datum for datum in data if datum]
-        # make sure that this didn't return all None
-        if not real_data:
-            return
         # filter out any elements that returned None
-        return {self.name: real_data}
+        return {self.name: [datum for datum in data if datum]}
 
     def __repr__(self):
         children = ", ".join([repr(c) for c in self.children])
@@ -226,12 +222,8 @@ class RangeElement(Element):
         """
         elements = self.xpath(parent)[self.low:self.high]
         data = [self._get_element_data(e) for e in elements]
-        real_data = [datum for datum in data if datum]
-        # make sure that this didn't return all None
-        if not real_data:
-            return
         # filter out any elements that returned None
-        return {self.name: real_data}
+        return {self.name: [datum for datum in data if datum]}
 
     def __repr__(self):
         children = ", ".join([repr(c) for c in self.children])
