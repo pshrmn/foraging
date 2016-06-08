@@ -1,10 +1,10 @@
 import glob
 import os
+import shutil
 import time
 import re
 from urllib.parse import urlparse
 import logging
-
 
 log = logging.getLogger(__name__)
 
@@ -68,9 +68,9 @@ class Cache(object):
         iterates over the folders in the cache to create a lookup dict to
         quickly check whether a url is cached
         """
-        self.sites = self.parse_files()
+        self.sites = self._load_from_cache()
 
-    def parse_files(self):
+    def _load_from_cache(self):
         sites = {}
         for f in os.listdir(self.folder):
             dir_path = os.path.join(self.folder, f)
@@ -90,6 +90,16 @@ class Cache(object):
                             site_urls[fp] = True
                 sites[f] = site_urls
         return sites
+
+    def clear_domain(self, domain):
+        """
+        delete all the files from a given domain and remove them from the
+        cache dict
+        """
+        formatted_domain = domain.replace(".", "_")
+        if formatted_domain in self.sites:
+            shutil.rmtree(os.path.join(self.folder, formatted_domain))
+            del self.sites[formatted_domain]
 
     def get(self, url):
         """

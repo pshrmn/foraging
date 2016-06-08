@@ -167,5 +167,39 @@ class CacheTestCase(unittest.TestCase):
 
         shutil.rmtree(EXPIRE_CACHE_DIRECTORY)
 
+    def test_cache_clear_domain(self):
+        CLEAR_CACHE_DIRECTORY = os.path.join(TEST_DIRECTORY, "test_cache_clear_domain")
+        os.makedirs(CLEAR_CACHE_DIRECTORY, exist_ok=True)
+
+        html_string = "<html></html>".encode("utf-8")
+        example_urls = [
+            "http://www.example.com/testpage.html",
+            "http://www.example.com/testpage2.html"
+        ]
+
+        test_cache = Cache(CLEAR_CACHE_DIRECTORY)
+
+        # add all of the files
+        for url in example_urls:
+            test_cache.save(url, html_string)
+        # verify that the files exist
+        domain_folder = os.path.join(CLEAR_CACHE_DIRECTORY, "www_example_com")
+
+        self.assertTrue(os.path.exists(domain_folder))
+        for url in example_urls:
+            domain, filename = url_info(url)
+            self.assertIn(domain, test_cache.sites)
+            domain_urls = test_cache.sites[domain]
+            filename_path = os.path.join(domain_folder, filename)
+            self.assertIn(filename_path, domain_urls)
+            self.assertTrue(os.path.isfile(filename_path))
+
+        # now delete them
+        test_cache.clear_domain("www.example.com")
+
+        # and verify that they no longer exist
+        self.assertNotIn("www_example_com", test_cache.sites)
+        self.assertFalse(os.path.exists(domain_folder))
+
 if __name__ == "__main__":
     unittest.main()
