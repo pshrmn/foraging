@@ -36,6 +36,8 @@ class Page(object):
         :return: a dict with the desired data from the dom
         :rtype: dict
         """
+        if dom is None:
+            return
         return self.element.data(dom)
 
     def verify(self, dom):

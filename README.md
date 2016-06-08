@@ -24,12 +24,21 @@ A cache is a folder where static copies of the html for a page are stored to pre
 Arguments:
 
 * `folder`: folder to store the cached pages in.
+* `hasher`: a function used to create a filename from a url
 * `max_age`: the maximum time (in seconds) that a cached page should be considered valid.
 
 ```python
 from gatherer import Cache
 
 cache = Cache("cache_folder")
+```
+
+By default, the `Cache` will use save file using filenames created using `clean_url_hash` which works by removing any illegal filename characters (for Windows) from a url. However, you can provide it any function that you would like (which returns a legal filename string). A function `md5_hash` is also provided which hashes the url using md5 and returns the result as a hexadecimal string.
+
+```python
+from gatherer import Cache, md5_hash
+
+cache = Cache("cache_folder", hasher=md5_hash)
 ```
 
 You can pass the `Cache` a `max_age` to specify that files that were last modified longer than `max_age` seconds ago are removed from the cache folder. Each time that you call the `get` method of the cache, the associated file will be checked to see if it has expired.

@@ -4,12 +4,22 @@ import shutil
 import time
 import re
 from urllib.parse import urlparse
+from hashlib import md5
 import logging
 
 log = logging.getLogger(__name__)
 
 
-def clean_url_filename(url):
+def md5_hash(url):
+    """
+    Hash a url using md5.
+    This is useful for long urls that would mess with Window's path limitations
+    but removes the ability to manually identify a URL while browsing the files.
+    """
+    return md5(url.encode("utf-8")).hexdigest()
+
+
+def clean_url_hash(url):
     """
     strip illegal filename characters out of urls to return a string that can
     be used as a filename
@@ -18,16 +28,12 @@ def clean_url_filename(url):
     return re.sub(illegal_chars, "", url)
 
 
-def url_info(url):
+def dir_domain(url):
     """
-    for a given url, returns the domain with periods to converted underscores
-    and a filename made by stripping illegal characters from the url. The domain
-    will be used for caching a page to a specific folder, and the filename is
-    used for finding the page in that domain folder.
+    replace the periods in a domain with an underscore so that it can be used
+    as the name of a directory
     """
-    domain = urlparse(url).netloc.replace(".", "_")
-    filename = clean_url_filename(url)
-    return domain, filename
+    return urlparse(url).netloc.replace(".", "_")
 
 
 def should_expire(path, max_age):
@@ -56,13 +62,14 @@ class Cache(object):
 
     :param folder: the location of the folder where cached files should
         be saved
+    :param hasher: a function used to derive the filename from a url
     :param max_age: the maximum age of the file, in seconds, since last modification
-
     """
 
-    def __init__(self, folder, max_age=None):
+    def __init__(self, folder, hasher=clean_url_hash, max_age=None):
         self.folder = folder
         self.max_age = max_age
+        self.hasher = hasher
         os.makedirs(self.folder, exist_ok=True)
         """
         iterates over the folders in the cache to create a lookup dict to
@@ -106,7 +113,8 @@ class Cache(object):
         returns a string of the html for a url if it has been cached,
         otherwise None
         """
-        domain, filename = url_info(url)
+        domain = dir_domain(url)
+        filename = self.hasher(url)
         if domain not in self.sites:
             return
         site_cache = self.sites[domain]
@@ -129,7 +137,9 @@ class Cache(object):
         saves the text in the cache folder and adds the path to the
         lookup dict
         """
-        domain, filename = url_info(url)
+        domain = dir_domain(url)
+        filename = self.hasher(url)
+
         domain_folder = os.path.join(self.folder, domain)
         output_name = os.path.join(domain_folder, filename)
         if domain not in self.sites:

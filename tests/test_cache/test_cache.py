@@ -3,7 +3,7 @@ import os
 import shutil
 import time
 
-from gatherer.cache import clean_url_filename, url_info, Cache
+from gatherer.cache import Cache, dir_domain, clean_url_hash, md5_hash
 
 TEST_DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 CACHE_DIRECTORY = os.path.join(TEST_DIRECTORY, "cache")
@@ -11,7 +11,16 @@ CACHE_DIRECTORY = os.path.join(TEST_DIRECTORY, "cache")
 
 class CacheHelpersTestCase(unittest.TestCase):
 
-    def test_clean_url_filename(self):
+    def test_dir_domain(self):
+        cases = [
+            ("http://www.example.com", "www_example_com"),
+            ("http://www.example.com/foo?bar=quux", "www_example_com"),
+            ("https://en.wikipedia.org/wiki/Foobar", "en_wikipedia_org")
+        ]
+        for url, domain in cases:
+            self.assertEqual(dir_domain(url), domain)
+
+    def test_clean_url_hash(self):
         # \ / : * ? " < > |
         cases = [
             ("http://www.example.com", "httpwww.example.com"),
@@ -19,20 +28,28 @@ class CacheHelpersTestCase(unittest.TestCase):
             ("test\\*\"\<\>\|", "test")
         ]
         for dirty, clean in cases:
-            self.assertEqual(clean_url_filename(dirty), clean)
+            self.assertEqual(clean_url_hash(dirty), clean)
 
-    def test_url_info(self):
+    def test_md5_hash(self):
         cases = [
-            ("http://www.example.com", ("www_example_com", "httpwww.example.com")),
-            ("http://www.example.com/somepage.html", ("www_example_com", "httpwww.example.comsomepage.html")),
-            ("http://www.example.com/otherpage", ("www_example_com", "httpwww.example.comotherpage")),
-            ("http://www.example.com/foo?bar=quux", ("www_example_com", "httpwww.example.comfoobar=quux"))
+            ("http://www.example.com", "847310eb455f9ae37cb56962213c491d"),
+            ("url?query=string", "e7bc49cda835dd118f5f3cbb82a62c99"),
+            ("test\\*\"\<\>\|", "659f174e639aa1e2232f778552cfcaca")
         ]
+
         for dirty, clean in cases:
-            self.assertEqual(url_info(dirty), clean)
+            self.assertEqual(md5_hash(dirty), clean)
 
 
 class CacheTestCase(unittest.TestCase):
+
+    def test_init(self):
+        # it uses clean_url_hash by default
+        clean_cache = Cache(CACHE_DIRECTORY)
+        self.assertEqual(clean_cache.hasher, clean_url_hash)
+        # or the specified hasher if provided
+        md5_cache = Cache(CACHE_DIRECTORY, hasher=md5_hash)
+        self.assertEqual(md5_cache.hasher, md5_hash)
 
     def test_cache_setup(self):
         c = Cache(CACHE_DIRECTORY)
@@ -62,7 +79,8 @@ class CacheTestCase(unittest.TestCase):
         # verify that it adds a file to a pre-existing cached site
         html_string = "<html></html>".encode("utf-8")
         example_url = "http://www.example.com/testpage.html"
-        d, f = url_info(example_url)
+        d = dir_domain(example_url)
+        f = clean_url_hash(example_url)
         full_save_name = os.path.join(CACHE_DIRECTORY, d, f)
         self.assertNotIn(full_save_name, c.sites[d])
 
@@ -77,7 +95,8 @@ class CacheTestCase(unittest.TestCase):
         c = Cache(CACHE_DIRECTORY)
         html_string = "<html></html>".encode("utf-8")
         sample_url = "http://www.sample.com/testpage.html"
-        d, f = url_info(sample_url)
+        d = dir_domain(sample_url)
+        f = clean_url_hash(sample_url)
         DIRECTORY = os.path.join(CACHE_DIRECTORY, d)
         # the www_sample_com directory should not exist until the file is cached
         self.assertFalse(os.path.exists(DIRECTORY))
@@ -100,16 +119,19 @@ class CacheTestCase(unittest.TestCase):
         # create two files, the first won't have its modified time changed and the
         # second will have its last modified time to be more than 60 seconds ago
         html_string = "<html></html>".encode("utf-8")
+
         first_url = "http://www.example.com/testpage.html"
         second_url = "http://www.example.com/testpage2.html"
-        first_info = url_info(first_url)
-        second_info = url_info(second_url)
+
+        first_domain = dir_domain(first_url)
+        first_filename = clean_url_hash(first_url)
+        second_filename = clean_url_hash(second_url)
 
         # the two urls share the same domain, so only need to create first
-        full_domain_path = os.path.join(EXPIRE_CACHE_DIRECTORY, first_info[0])
+        full_domain_path = os.path.join(EXPIRE_CACHE_DIRECTORY, first_domain)
         os.makedirs(full_domain_path, exist_ok=True)
-        first_path = os.path.join(full_domain_path, first_info[1])
-        second_path = os.path.join(full_domain_path, second_info[1])
+        first_path = os.path.join(full_domain_path, first_filename)
+        second_path = os.path.join(full_domain_path, second_filename)
         with open(first_path, "wb") as fp:
             fp.write(html_string)
         with open(second_path, "wb") as fp:
@@ -127,7 +149,7 @@ class CacheTestCase(unittest.TestCase):
         # now that thats all taken care of, actually create the cache
         c = Cache(EXPIRE_CACHE_DIRECTORY, max_age=60)
         # only the first url should exist in the cache
-        self.assertIn(first_path, c.sites[first_info[0]])
+        self.assertIn(first_path, c.sites[first_domain])
         # and the second path should no longer exist
         self.assertFalse(os.path.isfile(second_path))
 
@@ -142,12 +164,12 @@ class CacheTestCase(unittest.TestCase):
         # second will have its last modified time to be more than 60 seconds ago
         html_string = "<html></html>".encode("utf-8")
         first_url = "http://www.example.com/testpage.html"
-        first_info = url_info(first_url)
+        first_domain, first_filename = dir_domain(first_url), clean_url_hash(first_url)
 
         # the two urls share the same domain, so only need to create first
-        full_domain_path = os.path.join(EXPIRE_CACHE_DIRECTORY, first_info[0])
+        full_domain_path = os.path.join(EXPIRE_CACHE_DIRECTORY, first_domain)
         os.makedirs(full_domain_path, exist_ok=True)
-        first_path = os.path.join(full_domain_path, first_info[1])
+        first_path = os.path.join(full_domain_path, first_filename)
         with open(first_path, "wb") as fp:
             fp.write(html_string)
 
@@ -187,7 +209,8 @@ class CacheTestCase(unittest.TestCase):
 
         self.assertTrue(os.path.exists(domain_folder))
         for url in example_urls:
-            domain, filename = url_info(url)
+            domain = dir_domain(url)
+            filename = clean_url_hash(url)
             self.assertIn(domain, test_cache.sites)
             domain_urls = test_cache.sites[domain]
             filename_path = os.path.join(domain_folder, filename)
