@@ -112,6 +112,7 @@ body.foraging {
     color: #000000 !important;
     font-weight: normal !important;
     text-transform: capitalize !important;
+    text-shadow: none;
     border-radius: 2px;
     border-width: 1px;
     border-style: solid;
