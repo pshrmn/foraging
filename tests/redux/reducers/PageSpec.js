@@ -1,7 +1,7 @@
 import {expect} from "chai";
 
-import page from "../../../src/reducers/page";
-import * as ActionTypes from "../../../src/constants/ActionTypes";
+import page from "reducers/page";
+import * as ActionTypes from "constants/ActionTypes";
 
 describe("page reducer", () => {
   const initialState = {

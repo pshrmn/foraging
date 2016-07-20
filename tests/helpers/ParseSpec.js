@@ -1,6 +1,6 @@
 import { expect } from "chai";
 
-import { integer, float } from "../../src/helpers/parse";
+import { integer, float } from "helpers/parse";
 
 describe("parse", () => {
   describe("integer", () => {

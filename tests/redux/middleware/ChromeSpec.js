@@ -2,7 +2,7 @@ import {expect} from 'chai';
 import configureStore from 'redux-mock-store';
 import sinon from 'sinon';
 
-import chromeMiddleware from '../../../src/middleware/chromeMiddleware';
+import chromeMiddleware from 'middleware/chromeMiddleware';
 import {
   RENAME_PAGE,
   REMOVE_PAGE,
@@ -14,8 +14,8 @@ import {
   UPDATE_ELEMENT,
   SAVE_RULE,
   REMOVE_RULE
-} from '../../../src/constants/ActionTypes';
-import * as chrome from '../../../src/helpers/chrome';
+} from 'constants/ActionTypes';
+import * as chrome from 'helpers/chrome';
 
 const mockStore = configureStore([chromeMiddleware])
 

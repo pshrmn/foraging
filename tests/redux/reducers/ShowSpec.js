@@ -1,7 +1,7 @@
 import {expect} from "chai";
 
-import show from "../../../src/reducers/show";
-import * as ActionTypes from "../../../src/constants/ActionTypes";
+import show from "reducers/show";
+import * as ActionTypes from "constants/ActionTypes";
 
 describe("show reducer", () => {
 

@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { jsdom } from "jsdom";
 
-import { protect, select, count, parts, allSelect } from "../../src/helpers/selection";
+import { protect, select, count, parts, allSelect } from "helpers/selection";
 
 describe("selector", () => {
 

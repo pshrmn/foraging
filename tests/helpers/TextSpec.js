@@ -1,6 +1,6 @@
 import { expect } from "chai";
 
-import { validName, abbreviate, describeSpec, shortElement } from "../../src/helpers/text";
+import { validName, abbreviate, describeSpec, shortElement } from "helpers/text";
 
 describe("text", () => {
 

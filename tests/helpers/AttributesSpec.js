@@ -1,8 +1,8 @@
 import { expect } from "chai";
 import { jsdom } from "jsdom";
 
-import { attributes, stripEvents } from "../../src/helpers/attributes";
-import * as classNames from "../../src/constants/CSSClasses";
+import { attributes, stripEvents } from "helpers/attributes";
+import * as classNames from "constants/CSSClasses";
 
 describe("attribute", () => {
 

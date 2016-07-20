@@ -3,12 +3,12 @@ import configureStore from 'redux-mock-store';
 import { jsdom } from 'jsdom';
 import sinon from 'sinon';
 
-import confirmMiddleware from '../../../src/middleware/confirmMiddleware';
+import confirmMiddleware from 'middleware/confirmMiddleware';
 import {
   SYNC_PAGES,
   REMOVE_PAGE,
   REMOVE_ELEMENT
-} from '../../../src/constants/ActionTypes';
+} from 'constants/ActionTypes';
 
 const mockStore = configureStore([confirmMiddleware])
 

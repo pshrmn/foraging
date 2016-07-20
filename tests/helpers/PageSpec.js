@@ -2,7 +2,7 @@ import { expect } from "chai";
 import { jsdom } from "jsdom";
 
 import { createElement, flatten, clean,
-  fullGrow, simpleGrow } from "../../src/helpers/page";
+  fullGrow, simpleGrow } from "helpers/page";
 
 describe("page", () => {
 

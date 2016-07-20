@@ -1,7 +1,7 @@
 import {expect} from "chai";
 
-import frame from "../../../src/reducers/frame";
-import * as ActionTypes from "../../../src/constants/ActionTypes";
+import frame from "reducers/frame";
+import * as ActionTypes from "constants/ActionTypes";
 
 describe("frame reducer", () => {
 

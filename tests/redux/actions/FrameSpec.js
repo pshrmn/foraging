@@ -1,6 +1,6 @@
 import {expect} from "chai";
-import * as actions from "../../../src/actions/frame";
-import * as ActionTypes from "../../../src/constants/ActionTypes";
+import * as actions from "actions/frame";
+import * as ActionTypes from "constants/ActionTypes";
 
 describe("frame actions", () => {
 
