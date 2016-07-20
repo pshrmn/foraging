@@ -2,17 +2,18 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import Wizard from 'simple-wizard-component';
-import ElementCard from '../ElementCard';
+import ElementCard from 'components/ElementCard';
+import {
+  ChooseAttribute,
+  ChooseType,
+  ChooseName,
+  ConfirmUpdateRule
+} from 'components/steps/rule';
+import Cycle from 'components/common/Cycle';
 
-import ChooseAttribute from './ruleSteps/ChooseAttribute';
-import ChooseType from './ruleSteps/ChooseType';
-import ChooseName from './ruleSteps/ChooseName';
-import ConfirmUpdateRule from './ruleSteps/ConfirmUpdateRule';
-import Cycle from './common/Cycle';
-
-import { updateRule, showElementFrame } from '../../actions';
-import { highlight, unhighlight} from '../../helpers/markup';
-import { currentSelector } from '../../constants/CSSClasses';
+import { updateRule, showElementFrame } from 'actions';
+import { highlight, unhighlight} from 'helpers/markup';
+import { currentSelector } from 'constants/CSSClasses';
 
 /*
  * ChooseAttribute -> ChooseType -> ChooseName -> ConfirmRule

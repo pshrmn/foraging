@@ -1,8 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import Controls from './Controls';
-import Frames from './frames/Frames';
+import Controls from 'components/Controls';
+import Frames from 'components/frames/Frames';
 
 function Forager(props) {
   return !props.show ? null :

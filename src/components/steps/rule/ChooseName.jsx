@@ -1,9 +1,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import Controls from '../common/Controls';
+import Controls from 'components/common/StepControls';
 
-import { levelNames } from '../../../helpers/page';
+import { levelNames } from 'helpers/page';
 import { showMessage } from 'expiring-redux-messages';
 
 const ChooseName = React.createClass({

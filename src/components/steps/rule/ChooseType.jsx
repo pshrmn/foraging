@@ -1,9 +1,9 @@
 import React from 'react';
 
-import Controls from '../common/Controls';
+import Controls from 'components/common/StepControls';
 
-import { abbreviate } from '../../../helpers/text';
-import { integer, float } from '../../../helpers/parse';
+import { abbreviate } from 'helpers/text';
+import { integer, float } from 'helpers/parse';
 
 const ChooseType = React.createClass({
   getInitialState: function() {

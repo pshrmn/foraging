@@ -1,11 +1,11 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import Tree from '../Tree';
-import ElementCard from '../ElementCard';
+import Tree from 'components/Tree';
+import ElementCard from 'components/ElementCard';
 
-import { highlight, unhighlight } from '../../helpers/markup';
-import { currentSelector } from '../../constants/CSSClasses';
+import { highlight, unhighlight } from 'helpers/markup';
+import { currentSelector } from 'constants/CSSClasses';
 
 const ElementFrame = React.createClass({
   render: function() {

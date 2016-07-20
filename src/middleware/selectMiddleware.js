@@ -1,9 +1,9 @@
 /*
  * handle the selecting of elements that match element selectors here
  */
-import { select } from '../helpers/selection';
-import * as types from '../constants/ActionTypes';
-import { setMatches } from '../actions';
+import { select } from 'helpers/selection';
+import * as types from 'constants/ActionTypes';
+import { setMatches } from 'actions';
 
 export default store => next => action => {
   const selectActions = [

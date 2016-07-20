@@ -2,14 +2,15 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import Wizard from 'simple-wizard-component';
-import Tree from '../Tree';
+import Tree from 'components/Tree';
+import { 
+  ChooseType,
+  ChooseValue,
+  ChooseOptional,
+  ConfirmUpdate
+} from 'components/steps/editElement';
 
-import ChooseType from './editElementSteps/ChooseType';
-import ChooseValue from './editElementSteps/ChooseValue';
-import ChooseOptional from './editElementSteps/ChooseOptional';
-import ConfirmUpdate from './editElementSteps/ConfirmUpdate';
-
-import { updateElement, showElementFrame } from '../../actions';
+import { updateElement, showElementFrame } from 'actions';
 
 /*
  * ChooseType -> ChooseValue -> ChooseOptional -> ConfirmUpdate

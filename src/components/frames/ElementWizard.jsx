@@ -1,19 +1,20 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import Tree from '../Tree';
+import Tree from 'components/Tree';
 import Wizard from 'simple-wizard-component';
+import {
+  ChooseElements,
+  ChooseParts,
+  ChooseType,
+  ChooseValue,
+  ChooseOptional,
+  ConfirmElement
+} from 'components/steps/element';
 
-import ChooseElements from './elementSteps/ChooseElements';
-import ChooseParts from './elementSteps/ChooseParts';
-import ChooseType from './elementSteps/ChooseType';
-import ChooseValue from './elementSteps/ChooseValue';
-import ChooseOptional from './elementSteps/ChooseOptional';
-import ConfirmElement from './elementSteps/ConfirmElement';
-
-import { saveElement, showElementFrame } from '../../actions';
-import { highlight, unhighlight} from '../../helpers/markup';
-import { currentSelector } from '../../constants/CSSClasses';
+import { saveElement, showElementFrame } from 'actions';
+import { highlight, unhighlight} from 'helpers/markup';
+import { currentSelector } from 'constants/CSSClasses';
 
 /*
  * ChooseElements -> ChooseParts -> ChooseType ->

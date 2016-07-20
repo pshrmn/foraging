@@ -1,10 +1,10 @@
 import React from 'react';
 
-import Controls from '../common/Controls';
+import Controls from 'components/common/StepControls';
 
-import { select, count } from '../../../helpers/selection';
-import { highlight, unhighlight} from '../../../helpers/markup';
-import { queryCheck } from '../../../constants/CSSClasses';
+import { select, count } from 'helpers/selection';
+import { highlight, unhighlight} from 'helpers/markup';
+import { queryCheck } from 'constants/CSSClasses';
 
 function joinParts(parts) {
   return parts.reduce((str, curr) => {

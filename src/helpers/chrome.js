@@ -1,5 +1,5 @@
-import { select } from './selection';
-import { preparePages, clean } from './page'
+import { select } from 'helpers/selection';
+import { preparePages, clean } from 'helpers/page'
 
 /*
  * any time that the page is updated, the stored page should be updated

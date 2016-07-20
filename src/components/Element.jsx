@@ -1,8 +1,8 @@
 import React from 'react';
 
-import Rule from './Rule';
+import Rule from 'components/Rule';
 
-import { describeSpec } from '../helpers/text';
+import { describeSpec } from 'helpers/text';
 
 function Element(props) {
   const {

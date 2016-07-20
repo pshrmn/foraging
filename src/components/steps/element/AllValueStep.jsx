@@ -1,14 +1,14 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import AllForm from '../elementForms/AllForm';
-import Controls from '../common/Controls';
+import AllForm from 'components/forms/AllForm';
+import Controls from 'components/common/StepControls';
 
-import { select, count } from '../../../helpers/selection';
-import { highlight, unhighlight } from '../../../helpers/markup';
-import { levelNames } from '../../../helpers/page';
+import { select, count } from 'helpers/selection';
+import { highlight, unhighlight } from 'helpers/markup';
+import { levelNames } from 'helpers/page';
 import { showMessage } from 'expiring-redux-messages';
-import { queryCheck } from '../../../constants/CSSClasses';
+import { queryCheck } from 'constants/CSSClasses';
 
 const AllValueStep = React.createClass({
   getInitialState: function() {

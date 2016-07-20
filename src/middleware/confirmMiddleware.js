@@ -2,8 +2,8 @@
  * intercept some actions that can remove pages/elements and force
  * the user to confirm that they want to complete the action
  */
-import * as types from '../constants/ActionTypes';
-import { syncPages, removePage, removeElement } from '../actions';
+import * as types from 'constants/ActionTypes';
+import { syncPages, removePage, removeElement } from 'actions';
 
 export default store => next => action => {
   const selectActions = [

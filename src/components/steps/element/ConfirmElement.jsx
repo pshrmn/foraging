@@ -1,11 +1,11 @@
 import React from 'react';
 
-import Controls from '../common/Controls';
+import Controls from 'components/common/StepControls';
 
-import { createElement } from '../../../helpers/page';
-import { select } from '../../../helpers/selection';
-import { highlight, unhighlight } from '../../../helpers/markup';
-import { queryCheck } from '../../../constants/CSSClasses';
+import { createElement } from 'helpers/page';
+import { select } from 'helpers/selection';
+import { highlight, unhighlight } from 'helpers/markup';
+import { queryCheck } from 'constants/CSSClasses';
 
 const ConfirmElement = React.createClass({
   saveHandler: function(event) {

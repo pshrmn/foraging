@@ -2,11 +2,11 @@ import React from 'react';
 import { connect } from 'react-redux';
 import d3 from 'd3';
 
-import { shortElement } from '../helpers/text';
-import { simpleGrow } from '../helpers/page';
-import { highlight, unhighlight } from '../helpers/markup';
-import { selectElement } from '../actions';
-import { savedPreview } from '../constants/CSSClasses';
+import { shortElement } from 'helpers/text';
+import { simpleGrow } from 'helpers/page';
+import { highlight, unhighlight } from 'helpers/markup';
+import { selectElement } from 'actions';
+import { savedPreview } from 'constants/CSSClasses';
 
 const Tree = React.createClass({
   getDefaultProps: function() {

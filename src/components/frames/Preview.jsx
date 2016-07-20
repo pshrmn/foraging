@@ -1,12 +1,12 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { PosButton, NegButton } from '../common/Buttons';
-import Tree from '../Tree';
+import { PosButton, NegButton } from 'components/common/Buttons';
+import Tree from 'components/Tree';
 
-import { fullGrow } from '../../helpers/page';
-import { preview } from '../../helpers/preview';
-import { showElementFrame } from '../../actions';
+import { fullGrow } from 'helpers/page';
+import { preview } from 'helpers/preview';
+import { showElementFrame } from 'actions';
 
 const Preview = React.createClass({
   closeHandler: function(event) {

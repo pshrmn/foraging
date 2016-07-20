@@ -4,7 +4,7 @@ import {
   queryCheck,
   hoverClass,
   savedPreview
-} from '../constants/CSSClasses';
+} from 'constants/CSSClasses';
 
 /*
  * add the no-select class to all elements that are selected by the selector

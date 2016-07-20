@@ -4,7 +4,7 @@ import {
   queryCheck,
   hoverClass,
   savedPreview
-} from '../constants/CSSClasses';
+} from 'constants/CSSClasses';
 
 // return an object mapping attribute names to their value
 // for all attributes of an element

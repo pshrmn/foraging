@@ -1,9 +1,9 @@
 import React from 'react';
 
-import Controls from '../common/Controls';
+import Controls from 'components/common/StepControls';
 
-import { attributes } from '../../../helpers/attributes';
-import { abbreviate } from '../../../helpers/text';
+import { attributes } from 'helpers/attributes';
+import { abbreviate } from 'helpers/text';
 
 const ChooseAttribute = React.createClass({
   getInitialState: function() {

@@ -1,12 +1,12 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { PosButton, NegButton, NeutralButton } from './common/Buttons';
-import MessageBoard from './MessageBoard';
+import { PosButton, NegButton, NeutralButton } from 'components/common/Buttons';
+import MessageBoard from 'components/MessageBoard';
 
-import { validName } from '../helpers/text';
-import { select } from '../helpers/selection';
-import { createElement } from '../helpers/page';
+import { validName } from 'helpers/text';
+import { select } from 'helpers/selection';
+import { createElement } from 'helpers/page';
 import { showMessage } from 'expiring-redux-messages';
 import {
   addPage,
@@ -18,7 +18,7 @@ import {
   removePage,
   uploadPage,
   showPreview
-} from '../actions';
+} from 'actions';
 
 function promptName() {
   return window.prompt('Page Name:\nCannot contain the following characters: < > : \' \\ / | ? * ');

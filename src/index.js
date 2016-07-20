@@ -2,11 +2,11 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 
-import Forager from './components/Forager';
-import { openForager, setPages } from './actions';
-import { load as chromeLoad } from './helpers/chrome';
-import { stripEvents } from './helpers/attributes';
-import makeStore from './store';
+import Forager from 'components/Forager';
+import { openForager, setPages } from 'actions';
+import { load as chromeLoad } from 'helpers/chrome';
+import { stripEvents } from 'helpers/attributes';
+import makeStore from 'store';
 
 // the foraging class adds a margin to the bottom of the page, which
 // is helpful in preventing the app from overlapping content

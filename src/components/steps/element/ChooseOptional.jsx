@@ -1,11 +1,11 @@
 import React from 'react';
 
-import Controls from '../common/Controls';
-import OptionalForm from '../elementForms/OptionalForm';
+import Controls from 'components/common/StepControls';
+import OptionalForm from 'components/forms/OptionalForm';
 
-import { select } from '../../../helpers/selection';
-import { highlight, unhighlight } from '../../../helpers/markup';
-import { queryCheck } from '../../../constants/CSSClasses';
+import { select } from 'helpers/selection';
+import { highlight, unhighlight } from 'helpers/markup';
+import { queryCheck } from 'constants/CSSClasses';
 
 const ChooseOptional = React.createClass({
   getInitialState: function() {

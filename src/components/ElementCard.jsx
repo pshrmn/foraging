@@ -1,14 +1,14 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import Element from './Element';
-import { PosButton, NegButton, NeutralButton } from './common/Buttons';
+import Element from 'components/Element';
+import { PosButton, NegButton, NeutralButton } from 'components/common/Buttons';
 import {
   showElementWizard,
   removeElement,
   showRuleWizard,
   showEditElementWizard
-} from '../actions';
+} from 'actions';
 
 /*
  * An ElementCard is used to display a selector Element and its control functions

@@ -1,4 +1,4 @@
-import { integer, float } from './parse';
+import { integer, float } from 'helpers/parse';
 
 /*
  * Given a parent element, get all children that match the selector

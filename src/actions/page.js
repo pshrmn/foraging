@@ -1,4 +1,4 @@
-import * as types from '../constants/ActionTypes';
+import * as types from 'constants/ActionTypes';
 
 export const selectPage = index => ({
   type: types.SELECT_PAGE,

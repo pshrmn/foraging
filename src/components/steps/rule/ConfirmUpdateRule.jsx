@@ -1,6 +1,6 @@
 import React from 'react';
 
-import Controls from '../common/Controls';
+import Controls from 'components/common/StepControls';
 
 const ConfirmElement = React.createClass({
   saveHandler: function(event) {

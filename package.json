@@ -1,6 +1,6 @@
 {
   "name": "Forager",
-  "version": "2.25.0",
+  "version": "2.26.0",
   "license": "MIT",
   "author": "Paul Sherman",
   "repository": {
@@ -14,8 +14,8 @@
     "build-prod": "npm run webpack-prod & npm run css",
     "sass": "node-sass scss/** -o forager/css/**",
     "test": "mocha tests --harmony_array_includes --compilers js:babel-core/register --recursive",
-    "webpack-dev": "webpack && rm -f forager/bundle.js.map",
-    "webpack-prod": "webpack --config=webpack.config.min.js"
+    "webpack-dev": "webpack",
+    "webpack-prod": "webpack"
   },
   "devDependencies": {
     "autoprefixer": "^6.1.0",

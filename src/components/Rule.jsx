@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { NegButton, NeutralButton } from './common/Buttons';
+import { NegButton, NeutralButton } from 'components/common/Buttons';
 
 import {
   removeRule,

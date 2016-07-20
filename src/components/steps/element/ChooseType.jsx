@@ -1,11 +1,11 @@
 import React from 'react';
 
-import Controls from '../common/Controls';
-import TypeForm from '../elementForms/TypeForm.jsx';
+import Controls from 'components/common/StepControls';
+import TypeForm from 'components/forms/TypeForm';
 
-import { select } from '../../../helpers/selection';
-import { highlight, unhighlight } from '../../../helpers/markup';
-import { queryCheck } from '../../../constants/CSSClasses';
+import { select } from 'helpers/selection';
+import { highlight, unhighlight } from 'helpers/markup';
+import { queryCheck } from 'constants/CSSClasses';
 
 const ChooseType = React.createClass({
   getInitialState: function() {

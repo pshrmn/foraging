@@ -1,4 +1,4 @@
-import { select } from './selection';
+import { select } from 'helpers/selection';
 
 export const createElement = (selector, spec = {type: 'single', index: 0}, optional = false) => ({
   selector,

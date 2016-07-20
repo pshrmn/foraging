@@ -1,11 +1,11 @@
 import React from 'react';
 
-import Controls from '../common/Controls';
+import Controls from 'components/common/StepControls';
 
-import { parts, select, count, allSelect } from '../../../helpers/selection';
+import { parts, select, count, allSelect } from 'helpers/selection';
 
-import { highlight, unhighlight, iHighlight } from '../../../helpers/markup';
-import { queryCheck, potentialSelector, hoverClass } from '../../../constants/CSSClasses';
+import { highlight, unhighlight, iHighlight } from 'helpers/markup';
+import { queryCheck, potentialSelector, hoverClass } from 'constants/CSSClasses';
 
 /*
  * This step is used select an element within the page. An elements props is

@@ -1,14 +1,14 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import Controls from '../common/Controls';
-import RangeForm from '../elementForms/RangeForm';
+import Controls from 'components/common/StepControls';
+import RangeForm from 'components/forms/RangeForm';
 
-import { select, count } from '../../../helpers/selection';
-import { highlight, unhighlight } from '../../../helpers/markup';
-import { levelNames } from '../../../helpers/page';
+import { select, count } from 'helpers/selection';
+import { highlight, unhighlight } from 'helpers/markup';
+import { levelNames } from 'helpers/page';
 import { showMessage } from 'expiring-redux-messages';
-import { queryCheck } from '../../../constants/CSSClasses';
+import { queryCheck } from 'constants/CSSClasses';
 
 const RangeValueStep = React.createClass({
   getInitialState: function() {

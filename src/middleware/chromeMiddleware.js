@@ -1,9 +1,9 @@
-import * as ActionTypes from '../constants/ActionTypes';
+import * as ActionTypes from 'constants/ActionTypes';
 
 import { showMessage } from 'expiring-redux-messages';
-import { setPages } from '../actions';
+import { setPages } from 'actions';
 
-import * as chrome from '../helpers/chrome';
+import * as chrome from 'helpers/chrome';
 
 export default fullStore => next => action => {
   const current = fullStore.getState();
