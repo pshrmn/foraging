@@ -1,12 +1,21 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import d3 from 'd3';
+import { hierarchy, tree } from 'd3-hierarchy';
 
 import { shortElement } from 'helpers/text';
 import { simpleGrow } from 'helpers/page';
 import { highlight, unhighlight } from 'helpers/markup';
 import { selectElement } from 'actions';
 import { savedPreview } from 'constants/CSSClasses';
+
+// d3 dropped svg.diagonal, but this is the equivalent path function
+// https://github.com/d3/d3-shape/issues/27#issuecomment-227839157
+function linkPath(d) {
+  return "M" + d.y + "," + d.x
+      + "C" + (d.y + d.parent.y) / 2 + "," + d.x
+      + " " + (d.y + d.parent.y) / 2 + "," + d.parent.x
+      + " " + d.parent.y + "," + d.parent.x;
+}
 
 const Tree = React.createClass({
   getDefaultProps: function() {
@@ -15,50 +24,50 @@ const Tree = React.createClass({
       height: 150
     };
   },
-  getInitialState: function() {
-    return {
-      // used to draw link paths
-      diagonal: d3.svg.diagonal().projection(d => [d.y, d.x])
-    };
-  },
   componentWillMount: function() {
     const { width, height } = this.props;
     this.setState({
       // tree layout
-      tree: d3.layout.tree().size([height, width])
+      tree: tree().size([height, width])
     });
   },
   _makeNodes: function() {
     const { page, elementIndex, active, selectElement } = this.props;
-    const { tree, diagonal } = this.state;
+    const { tree } = this.state;
 
+    // clone the page data so that data isn't interfered with
+    // this might not be necessary with d3 v4 since all of the
+    // data is moved to a data object.
     const clonedPage = simpleGrow(page.elements);
-
-    // generate the tree's nodes and links
-    const nodes = tree.nodes(clonedPage);
-    const links = tree.links(nodes);
+    // hierarchy sets up the nested information
+    const treeRoot = hierarchy(clonedPage);
+    // determine the layout of the tree
+    tree(treeRoot);
+    // descendants is all of the nodes in the tree
+    const descendants = treeRoot.descendants();
+    // we draw a node for each node
+    const nodes = descendants.map((n, i) =>
+      <Node key={i} 
+            current={n.index === elementIndex}
+            select={selectElement}
+            active={active}
+            {...n} />
+    );
+    // but the root node doesn't have a link
+    // (links are drawn from child to parent)
+    const links = descendants.slice(1).map((link, i) => 
+      <path key={i}
+            className='link'
+            d={linkPath(link)} />
+    );
 
     return (
       <g transform='translate(50,25)' >
         <g className='links'>
-          {
-            links.map((link, i) => {
-              return <path key={i}
-                           className='link'
-                           d={diagonal(link)} />
-            })
-          }
+          { links }
         </g>
         <g className='nodes'>
-          {
-            nodes.map((n, i) => <Node
-              key={i} 
-              current={n.index === elementIndex}
-              select={selectElement}
-              active={active}
-              {...n} />
-            )
-          }
+          { nodes }
         </g>
       </g>
     );
@@ -90,10 +99,10 @@ const Tree = React.createClass({
 const Node = React.createClass({
   handleClick: function(event) {
     event.preventDefault();
-    this.props.select(this.props.index);
+    this.props.select(this.props.data.index);
   },
   handleMouseover: function(event) {
-    highlight(this.props.matches, savedPreview);
+    highlight(this.props.data.matches, savedPreview);
   },
   handleMouseout: function(event) {
     unhighlight(savedPreview);
@@ -101,13 +110,18 @@ const Node = React.createClass({
   render: function() {
     const {
       current,
-      hasRules,
-      children,
+      data,
       active,
+      children,
+      x,
+      y
+    } = this.props;
+    const {
+      hasRules,
       selector,
       spec,
       optional
-    } = this.props;
+    } = data;
     const empty = !hasRules && !(children && children.length);
 
     // nodes with rules drawn as rect, nodes with no rules drawn as circles
@@ -131,7 +145,7 @@ const Node = React.createClass({
     return (
       <g
         className={classNames.join(' ')}
-        transform={`translate(${this.props.y},${this.props.x})`}
+        transform={`translate(${y},${x})`}
         {...events} >
         <text y='-10'>
           {shortElement(selector, spec, optional)}

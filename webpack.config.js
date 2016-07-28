@@ -5,7 +5,7 @@ const config = {
   context: path.join(__dirname, 'src'),
   entry: {
     app: './index.js',
-    vendor: ['react', 'react-dom', 'd3']
+    vendor: ['react', 'react-dom', 'd3-hierarchy']
   },
   resolve: {
     extensions: ['', '.js', '.jsx'],
@@ -37,9 +37,9 @@ const config = {
 };
 
 switch ( process.env.npm_lifecycle_event) {
-case "webpack-dev":
+case "webpack:dev":
   break;
-case "webpack-prod":
+case "webpack:prod":
   config.plugins = config.plugins.concat([
     new webpack.DefinePlugin({
         'process.env': {
