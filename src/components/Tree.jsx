@@ -1,6 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { hierarchy, tree } from 'd3-hierarchy';
+import { path } from 'd3-path';
 
 import { shortElement } from 'helpers/text';
 import { simpleGrow } from 'helpers/page';
@@ -10,11 +11,16 @@ import { savedPreview } from 'constants/CSSClasses';
 
 // d3 dropped svg.diagonal, but this is the equivalent path function
 // https://github.com/d3/d3-shape/issues/27#issuecomment-227839157
-function linkPath(d) {
-  return "M" + d.y + "," + d.x
-      + "C" + (d.y + d.parent.y) / 2 + "," + d.x
-      + " " + (d.y + d.parent.y) / 2 + "," + d.parent.x
-      + " " + d.parent.y + "," + d.parent.x;
+function drawLink(node) {
+  const context = path();
+  const { source, target } = node;
+  context.moveTo(target.y, target.x);
+  context.bezierCurveTo(
+    (target.y + source.y)/2, target.x,
+    (target.y + source.y)/2, source.x,
+    source.y, source.x
+  );
+  return context.toString();
 }
 
 const Tree = React.createClass({
@@ -44,21 +50,19 @@ const Tree = React.createClass({
     // determine the layout of the tree
     tree(treeRoot);
     // descendants is all of the nodes in the tree
-    const descendants = treeRoot.descendants();
     // we draw a node for each node
-    const nodes = descendants.map((n, i) =>
+    const nodes = treeRoot.descendants().map((n, i) =>
       <Node key={i} 
             current={n.index === elementIndex}
             select={selectElement}
             active={active}
             {...n} />
     );
-    // but the root node doesn't have a link
-    // (links are drawn from child to parent)
-    const links = descendants.slice(1).map((link, i) => 
+    // each link has a source and a target
+    const links = treeRoot.links().map((link, i) => 
       <path key={i}
             className='link'
-            d={linkPath(link)} />
+            d={drawLink(link)} />
     );
 
     return (
