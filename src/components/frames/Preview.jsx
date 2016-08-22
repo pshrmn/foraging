@@ -21,6 +21,15 @@ const Preview = React.createClass({
     event.preventDefault();
     console.log(JSON.stringify(preview(this.props.tree), null, 2));
   },
+  varHandler: function(event) {
+    event.preventDefault();
+    console.log([
+      'The current preview data can be accessed using the %c"pageData"%c variable.',
+      'Make sure that the Forager extension\'s context is selected.',
+      '(This will be a string using the extension\'s ID that starts with "chrome-extensions://". Open the chrome://extensions tab and look for the Forager extension to determine the extension ID)'
+      ].join(' '), 'font-weight: bold; font-size: 1.5em;', '')
+    window.pageData = preview(this.props.tree);
+  },
   render: function() {
     return (
       <div className='frame'>
@@ -32,6 +41,7 @@ const Preview = React.createClass({
           <div className='buttons'>
             <PosButton text='Log to Console' click={this.logHandler} />
             <PosButton text='Pretty Log' click={this.prettyLogHandler} />
+            <PosButton text='Use as Variable' click={this.varHandler} />
             <NegButton text='Hide Preview' click={this.closeHandler} />
           </div>
         </div>
