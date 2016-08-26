@@ -22,8 +22,8 @@ for creating rule sets to get structured data.
 :license: MIT, see LICENSE for more details
 """
 
-__version__ = "1.16.0"
+__version__ = "1.16.1"
 
 from .fetch import Fetch
-from .cache import Cache
+from .cache import Cache, GzipCache
 from .page import Page
