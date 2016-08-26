@@ -56,6 +56,8 @@ from Gatherer import GzipCache
 compress_cache = GzipCache("cache_folder")
 ```
 
+If you have an existing cache directory that you would like to convert to a `GzipCache`, you can use the `dangerously_convert_cache_to_gzip` function. As the name implies, you should be careful with this because it will gzip all of the files in the provided folder and remove the originals.
+
 ###Backends
 Backend functions take a url and return the text of the returned web page. There are two built-in backends, `requests_backend` and `phantom_backend`.
 

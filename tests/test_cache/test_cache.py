@@ -3,12 +3,14 @@ import os
 import shutil
 import time
 
-from gatherer.cache import Cache, GzipCache, dir_domain, clean_url_hash, md5_hash, is_compressed
+from gatherer.cache import (Cache, GzipCache,
+                            dir_domain, clean_url_hash, md5_hash,
+                            dangerously_convert_cache_to_gzip)
 
 TEST_DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 CACHE_DIRECTORY = os.path.join(TEST_DIRECTORY, "cache")
 COMPRESS_CACHE_DIRECTORY = os.path.join(TEST_DIRECTORY, "compress_cache")
-
+CONVERT_DIRECTORY = os.path.join(TEST_DIRECTORY, "convert_cache")
 
 class CacheHelpersTestCase(unittest.TestCase):
 
@@ -41,14 +43,20 @@ class CacheHelpersTestCase(unittest.TestCase):
         for dirty, clean in cases:
             self.assertEqual(md5_hash(dirty), clean)
 
-    def test_is_compressed(self):
-        cases = [
-            ("httpwww.example.com.gz", True),
-            ("httpwww.example.comfoobar=quux.gz", True),
-            ("httpsen.wikipedia.orgwikiFoobar", False)
-        ]
-        pass
+    def test_dangerously_convert_cache_to_gzip(self):
+        html_string = "<html></html>".encode("utf-8")
+        example_url = "http://www.example.com/testpage.html"
+        cache = Cache(CONVERT_DIRECTORY)
+        cache.save(example_url, html_string)
+        self.assertTrue(cache.has(example_url))
 
+        dangerously_convert_cache_to_gzip(CONVERT_DIRECTORY)
+
+        gcache = GzipCache(CONVERT_DIRECTORY)
+        self.assertTrue(gcache.has(example_url))
+
+        for name in os.listdir(CONVERT_DIRECTORY):
+            shutil.rmtree(os.path.join(CONVERT_DIRECTORY, name))
 
 class CacheTestCase(unittest.TestCase):
 

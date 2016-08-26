@@ -49,16 +49,24 @@ def should_expire(path, max_age):
     return modified < oldest
 
 
-def is_compressed(path):
+def dangerously_convert_cache_to_gzip(folder):
     """
-    A file is considered compressed if it ends with the .gz extension
-    This only works so long as gatherer is the only thing modifying these files,
-    so compressed files will always have the .gz extension and non-compressed
-    files will not. An alternative way to do this would be to use the 
-    python-magic library, but that requires DLLs to be installed to replicate
-    the unix "file" command
+    WARNING: This will gzip all of the files in a folder and remove the
+    originals. This is only meant to convert a Cache to a GzipCache.
     """
-    return path.endswith(".gz")
+    for f in os.listdir(folder):
+        dir_path = os.path.join(folder, f)
+        if os.path.isdir(dir_path):
+            site_urls = {}
+            
+            path = os.path.join(dir_path, "*")
+            for fp in glob.glob(path):
+                # don't try to convert folders or already gzipped files
+                # (using a gzip test that isn't necessarily accurate)
+                if not os.path.isdir(fp) and not fp.endswith(".gz"):
+                    with open(fp, "rb") as rp, gzip.open("{}.gz".format(fp), "wb") as wp:
+                        shutil.copyfileobj(rp, wp)
+                    os.remove(fp)
 
 
 class Cache(object):
@@ -136,10 +144,15 @@ class Cache(object):
                 site_urls[fp] = True
         return site_urls
 
-    def get(self, url):
+    def has(self, url):
         """
-        returns a string of the html for a url if it has been cached,
-        otherwise None
+        Verify whether there is a cached file for a given url. If a cached
+        version of the file exists, but it is older than max age, it will
+        be removed and has will report that it does not exist.
+
+        Returns a tuple where the first value is a boolean of whether or not
+        the cached version exists and the second is the path to the cached
+        version, or None if the cached version doesn't exist.
         """
         domain = dir_domain(url)
         filename = self.hasher(url)
@@ -147,15 +160,25 @@ class Cache(object):
             return
         site_cache = self.sites[domain]
         full_name = os.path.join(self.folder, domain, filename)
+        
+        if should_expire(full_name, self.max_age):
+            log.info("<cache> expired {}".format(url))
+            os.remove(full_name)
+            del site_cache[full_name]
+            return False, None
         if full_name in site_cache:
-            # test the file to see if it should be expired
-            if should_expire(full_name, self.max_age):
-                log.info("<cache> expired {}".format(url))
-                os.remove(full_name)
-                del site_cache[full_name]
-                return
+            return True, full_name
+        else:
+            return False, None
+
+    def get(self, url):
+        """
+        returns a string of the html for a url if it has been cached,
+        otherwise None
+        """
+        exists, full_name = self.has(url)
+        if exists:
             log.info("<cache> {}".format(url))
-            full_name = os.path.join(self.folder, domain, filename)
             return self._read(full_name)
         return
 
