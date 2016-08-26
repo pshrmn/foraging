@@ -131,7 +131,8 @@ class SingleElement(Element):
         if self.index is None:
             raise ValueError("No spec index provided")
         elif not isinstance(self.index, int):
-            raise ValueError("Spec index must be an int, received {}".format(self.index))
+            index_error = "Spec index must be an int, received {} (type {})"
+            raise ValueError(index_error.format(self.index, type(self.index)))
 
     def data(self, parent):
         """
@@ -159,7 +160,8 @@ class AllElement(Element):
         super().__init__(selector, spec, children, rules, optional)
         self.name = self.spec.get("name")
         if not isinstance(self.name, str):
-            raise ValueError("Spec name must be a str, received {}".format(self.name))
+            name_error = "Spec name must be a str, received {} (type {})"
+            raise ValueError(name_error.format(self.name, type(self.name)))
         elif self.name is None:
             raise ValueError("No spec name provided")
         elif self.name == "":
@@ -190,7 +192,8 @@ class RangeElement(Element):
         super().__init__(selector, spec, children, rules, optional)
         self.name = self.spec.get("name")
         if not isinstance(self.name, str):
-            raise ValueError("Spec name must be a str, received {}".format(self.name))
+            name_error = "Spec name must be a str, received {} (type {})"
+            raise ValueError(name_error.format(self.name, type(self.name)))
         elif self.name is None:
             raise ValueError("No spec name provided")
         elif self.name == "":
@@ -198,13 +201,15 @@ class RangeElement(Element):
 
         self.low = self.spec.get("low")
         if not isinstance(self.low, int):
-            raise ValueError("Spec low must be an int, received {}".format(self.low))
+            low_error = "Spec low must be an int, received {} (type {})"
+            raise ValueError(low_error.format(self.low, type(self.low)))
         elif self.low is None:
             raise ValueError("No spec low value provided")
 
         self.high = self.spec.get("high")
         if not isinstance(self.high, int) and self.high is not None:
-            raise ValueError("Spec high must be an int or None, received {}".format(self.high))
+            high_error = "Spec high must be an int or None, received {} (type {})"
+            raise ValueError(high_error.format(self.high, type(self.high)))
         if "high" not in self.spec:
             raise ValueError("No spec high value provided")
 

@@ -18,11 +18,11 @@ for creating rule sets to get structured data.
     >>>     data = p.gather(dom)
     >>>     # do something with the data
 
-:copyright: (c) 2015 by Paul Sherman
+:copyright: (c) 2015-present by Paul Sherman
 :license: MIT, see LICENSE for more details
 """
 
-__version__ = "1.14.0"
+__version__ = "1.14.1"
 
 from .fetch import Fetch
 from .cache import Cache
