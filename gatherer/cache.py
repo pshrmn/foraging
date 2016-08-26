@@ -5,6 +5,7 @@ import time
 import re
 from urllib.parse import urlparse
 from hashlib import md5
+import gzip
 import logging
 
 log = logging.getLogger(__name__)
@@ -37,11 +38,54 @@ def dir_domain(url):
 
 
 def should_expire(path, max_age):
+    """
+    check a file's last modified time to determine whether it is older than
+    the max age
+    """
     if max_age is None:
         return False
     oldest = time.time() - max_age
     modified = os.path.getmtime(path)
     return modified < oldest
+
+
+def is_compressed(path):
+    """
+    A file is considered compressed if it ends with the .gz extension
+    This only works so long as gatherer is the only thing modifying these files,
+    so compressed files will always have the .gz extension and non-compressed
+    files will not. An alternative way to do this would be to use the 
+    python-magic library, but that requires DLLs to be installed to replicate
+    the unix "file" command
+    """
+    return path.endswith(".gz")
+
+
+def dir_pages(directory, max_age):
+    """
+    Returns a site_urls dict where the keys are urls (which have been formatted
+    to remove invalid filename characters) and the keys are the boolean True.
+
+    Iterate over all of the files in a directory. For each file, if it is
+    older than max_age, remove it from the directory. Otherwise, add it to
+    the site_urls dict.
+    """
+    path = os.path.join(directory, "*")
+    site_urls = {}
+    for fp in glob.glob(path):
+        if not os.path.isdir(fp):
+            # if max_age is set, delete the file if it was last
+            # modified before max_age
+            if should_expire(fp, max_age):
+                log.info("<cache> removed {}".format(fp))
+                os.remove(fp)
+                continue
+            # True if compressed, otherwise False
+            if is_compressed(fp):
+                site_urls[fp[:-3]] = True
+            else:
+                site_urls[fp] = False
+    return site_urls
 
 
 class Cache(object):
@@ -66,10 +110,11 @@ class Cache(object):
     :param max_age: the maximum age of the file, in seconds, since last modification
     """
 
-    def __init__(self, folder, hasher=clean_url_hash, max_age=None):
+    def __init__(self, folder, hasher=clean_url_hash, max_age=None, compress=False):
         self.folder = folder
         self.max_age = max_age
         self.hasher = hasher
+        self.compress = compress
         os.makedirs(self.folder, exist_ok=True)
         """
         iterates over the folders in the cache to create a lookup dict to
@@ -80,22 +125,12 @@ class Cache(object):
     def _load_from_cache(self):
         sites = {}
         for f in os.listdir(self.folder):
+            """
+            f is the domain of a website with periods replaced by underscores
+            """
             dir_path = os.path.join(self.folder, f)
             if os.path.isdir(dir_path):
-                path = os.path.join(dir_path, "*")
-                site_urls = {}
-                for fp in glob.glob(path):
-                    if not os.path.isdir(fp):
-                        removed = False
-                        # if max_age is set, delete the file if it was last
-                        # modified before max_age
-                        if should_expire(fp, self.max_age):
-                            log.info("<cache> removed {}".format(fp))
-                            os.remove(fp)
-                            removed = True
-                        if not removed:
-                            site_urls[fp] = True
-                sites[f] = site_urls
+                sites[f] = dir_pages(dir_path, self.max_age)
         return sites
 
     def clear_domain(self, domain):
@@ -128,8 +163,14 @@ class Cache(object):
                 return
             log.info("<cache> {}".format(url))
             full_name = os.path.join(self.folder, domain, filename)
-            with open(full_name, "r") as fp:
-                return fp.read()
+            # compressed when True. This might be different from
+            # the self.compress value, so that cannot be used here
+            if site_cache[full_name]:
+                with gzip.open("{}.gz".format(full_name), "rb") as fp:
+                    return fp.read().decode("utf-8")
+            else:
+                with open(full_name, "r") as fp:
+                    return fp.read()
         return
 
     def save(self, url, text):
@@ -143,10 +184,14 @@ class Cache(object):
         domain_folder = os.path.join(self.folder, domain)
         output_name = os.path.join(domain_folder, filename)
         if domain not in self.sites:
-            self.sites[domain] = {output_name: True}
+            self.sites[domain] = {}
             os.makedirs(domain_folder, exist_ok=True)
-        else:
-            self.sites[domain][output_name] = True
+
+        self.sites[domain][output_name] = self.compress
         # lxml outputs bytes
-        with open(output_name, "wb") as fp:
-            fp.write(text)
+        if self.compress:
+            with gzip.open("{}.gz".format(output_name), "wb") as fp:
+                fp.write(text)
+        else:
+            with open(output_name, "wb") as fp:
+                fp.write(text)
