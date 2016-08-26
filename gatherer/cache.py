@@ -61,33 +61,6 @@ def is_compressed(path):
     return path.endswith(".gz")
 
 
-def dir_pages(directory, max_age):
-    """
-    Returns a site_urls dict where the keys are urls (which have been formatted
-    to remove invalid filename characters) and the keys are the boolean True.
-
-    Iterate over all of the files in a directory. For each file, if it is
-    older than max_age, remove it from the directory. Otherwise, add it to
-    the site_urls dict.
-    """
-    path = os.path.join(directory, "*")
-    site_urls = {}
-    for fp in glob.glob(path):
-        if not os.path.isdir(fp):
-            # if max_age is set, delete the file if it was last
-            # modified before max_age
-            if should_expire(fp, max_age):
-                log.info("<cache> removed {}".format(fp))
-                os.remove(fp)
-                continue
-            # True if compressed, otherwise False
-            if is_compressed(fp):
-                site_urls[fp[:-3]] = True
-            else:
-                site_urls[fp] = False
-    return site_urls
-
-
 class Cache(object):
 
     """
@@ -110,11 +83,10 @@ class Cache(object):
     :param max_age: the maximum age of the file, in seconds, since last modification
     """
 
-    def __init__(self, folder, hasher=clean_url_hash, max_age=None, compress=False):
+    def __init__(self, folder, hasher=clean_url_hash, max_age=None):
         self.folder = folder
         self.max_age = max_age
         self.hasher = hasher
-        self.compress = compress
         os.makedirs(self.folder, exist_ok=True)
         """
         iterates over the folders in the cache to create a lookup dict to
@@ -130,18 +102,39 @@ class Cache(object):
             """
             dir_path = os.path.join(self.folder, f)
             if os.path.isdir(dir_path):
-                sites[f] = dir_pages(dir_path, self.max_age)
+                sites[f] = self._dir_pages(dir_path)
         return sites
 
-    def clear_domain(self, domain):
+    def _read(self, filename):
+        with open(filename, "r") as fp:
+            return fp.read()
+
+    def _write(self, filename, text):
+        # lxml outputs bytes
+        with open(filename, "wb") as fp:
+            fp.write(text)
+
+    def _dir_pages(self, directory):
         """
-        delete all the files from a given domain and remove them from the
-        cache dict
+        Returns a site_urls dict where the keys are urls (which have been formatted
+        to remove invalid filename characters) and the keys are the boolean True.
+
+        Iterate over all of the files in a directory. For each file, if it is
+        older than max_age, remove it from the directory. Otherwise, add it to
+        the site_urls dict.
         """
-        formatted_domain = domain.replace(".", "_")
-        if formatted_domain in self.sites:
-            shutil.rmtree(os.path.join(self.folder, formatted_domain))
-            del self.sites[formatted_domain]
+        path = os.path.join(directory, "*")
+        site_urls = {}
+        for fp in glob.glob(path):
+            if not os.path.isdir(fp):
+                # if max_age is set, delete the file if it was last
+                # modified before max_age
+                if should_expire(fp, self.max_age):
+                    log.info("<cache> removed {}".format(fp))
+                    os.remove(fp)
+                    continue
+                site_urls[fp] = True
+        return site_urls
 
     def get(self, url):
         """
@@ -163,14 +156,7 @@ class Cache(object):
                 return
             log.info("<cache> {}".format(url))
             full_name = os.path.join(self.folder, domain, filename)
-            # compressed when True. This might be different from
-            # the self.compress value, so that cannot be used here
-            if site_cache[full_name]:
-                with gzip.open("{}.gz".format(full_name), "rb") as fp:
-                    return fp.read().decode("utf-8")
-            else:
-                with open(full_name, "r") as fp:
-                    return fp.read()
+            return self._read(full_name)
         return
 
     def save(self, url, text):
@@ -187,11 +173,50 @@ class Cache(object):
             self.sites[domain] = {}
             os.makedirs(domain_folder, exist_ok=True)
 
-        self.sites[domain][output_name] = self.compress
-        # lxml outputs bytes
-        if self.compress:
-            with gzip.open("{}.gz".format(output_name), "wb") as fp:
+        self.sites[domain][output_name] = True
+        self._write(output_name, text)
+
+    def clear_domain(self, domain):
+        """
+        delete all the files from a given domain and remove them from the
+        cache dict
+        """
+        formatted_domain = domain.replace(".", "_")
+        if formatted_domain in self.sites:
+            shutil.rmtree(os.path.join(self.folder, formatted_domain))
+            del self.sites[formatted_domain]
+
+class GzipCache(Cache):
+    """
+    The GzipCache 
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def _read(self, filename):
+        with gzip.open("{}.gz".format(filename), "rb") as fp:
+            return fp.read().decode("utf-8")
+
+    def _write(self, filename, text):
+        with gzip.open("{}.gz".format(filename), "wb") as fp:
                 fp.write(text)
-        else:
-            with open(output_name, "wb") as fp:
-                fp.write(text)
+
+    def _dir_pages(self, directory):
+        """
+        Similar to the Cache's _dir_pages method, but only checks
+        for files with the .gz extension
+        """
+        path = os.path.join(directory, "*.gz")
+        site_urls = {}
+        for fp in glob.glob(path):
+            if not os.path.isdir(fp):
+                # if max_age is set, delete the file if it was last
+                # modified before max_age
+                if should_expire(fp, self.max_age):
+                    log.info("<cache> removed {}".format(fp))
+                    os.remove(fp)
+                    continue
+                non_zipped_filename = fp[:-3]
+                site_urls[non_zipped_filename] = True
+        return site_urls

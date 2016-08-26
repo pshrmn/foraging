@@ -3,7 +3,7 @@ import os
 import shutil
 import time
 
-from gatherer.cache import Cache, dir_domain, clean_url_hash, md5_hash, is_compressed
+from gatherer.cache import Cache, GzipCache, dir_domain, clean_url_hash, md5_hash, is_compressed
 
 TEST_DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 CACHE_DIRECTORY = os.path.join(TEST_DIRECTORY, "cache")
@@ -68,14 +68,6 @@ class CacheTestCase(unittest.TestCase):
             if os.path.isdir(os.path.join(CACHE_DIRECTORY, name)):
                 self.assertIn(name, c.sites)
 
-    def test_compress_cache_setup(self):
-        c = Cache(COMPRESS_CACHE_DIRECTORY, compress=True)
-        self.assertEqual(c.folder, COMPRESS_CACHE_DIRECTORY)
-        # verify that each folder has been loaded
-        for name in os.listdir(os.path.join(COMPRESS_CACHE_DIRECTORY)):
-            if os.path.isdir(os.path.join(COMPRESS_CACHE_DIRECTORY, name)):
-                self.assertIn(name, c.sites)
-
     def test_cache_get(self):
         c = Cache(CACHE_DIRECTORY)
         exists = [
@@ -91,20 +83,6 @@ class CacheTestCase(unittest.TestCase):
         for filename in does_not_exist:
             self.assertIsNone(c.get(filename))
 
-    def test_compress_cache_get(self):
-        c = Cache(COMPRESS_CACHE_DIRECTORY, compress=True)
-        exists = [
-            "http://www.example.com/somepage.html",
-            "http://www.example.com/otherpage"
-        ]
-        for filename in exists:
-            self.assertIsNotNone(c.get(filename))
-        does_not_exist = [
-            "http://www.example.com/doesnotexist.html",
-            "https://en.wikipedia.org/wiki/Python_(programming_language)"
-        ]
-        for filename in does_not_exist:
-            self.assertIsNone(c.get(filename))
 
     def test_cache_save_existing(self):
         c = Cache(CACHE_DIRECTORY)
@@ -119,29 +97,9 @@ class CacheTestCase(unittest.TestCase):
         c.save(example_url, html_string)
 
         self.assertTrue(os.path.exists(full_save_name))
-        # not compressed, so False
-        self.assertFalse(c.sites[d][full_save_name])
+        self.assertIn(full_save_name, c.sites[d])
         # cleanup
         os.remove(full_save_name)
-
-    def test_compress_cache_save_existing(self):
-        c = Cache(COMPRESS_CACHE_DIRECTORY, compress=True)
-        # verify that it adds a file to a pre-existing cached site
-        html_string = "<html></html>".encode("utf-8")
-        example_url = "http://www.example.com/testpage.html"
-        d = dir_domain(example_url)
-        f = clean_url_hash(example_url)
-        full_save_name = os.path.join(COMPRESS_CACHE_DIRECTORY, d, f)
-        self.assertNotIn(full_save_name, c.sites[d])
-
-        c.save(example_url, html_string)
-
-        zip_name = "{}.gz".format(full_save_name)
-        self.assertTrue(os.path.exists(zip_name))
-        # compressed, so True
-        self.assertTrue(c.sites[d][full_save_name])
-        # cleanup
-        os.remove(zip_name)
 
     def test_cache_save_new(self):
         c = Cache(CACHE_DIRECTORY)
@@ -159,27 +117,6 @@ class CacheTestCase(unittest.TestCase):
         full_save_name = os.path.join(DIRECTORY, f)
         self.assertIn(full_save_name, c.sites[d])
         self.assertTrue(os.path.exists(full_save_name))
-
-        # remove this after the test is done
-        shutil.rmtree(DIRECTORY)
-
-    def test_compress_cache_save_new(self):
-        c = Cache(COMPRESS_CACHE_DIRECTORY, compress=True)
-        html_string = "<html></html>".encode("utf-8")
-        sample_url = "http://www.sample.com/testpage.html"
-        d = dir_domain(sample_url)
-        f = clean_url_hash(sample_url)
-        DIRECTORY = os.path.join(COMPRESS_CACHE_DIRECTORY, d)
-        # the www_sample_com directory should not exist until the file is cached
-        self.assertFalse(os.path.exists(DIRECTORY))
-        self.assertNotIn(d, c.sites)
-
-        c.save(sample_url, html_string)
-
-        full_save_name = os.path.join(DIRECTORY, f)
-        zip_name = "{}.gz".format(full_save_name)
-        self.assertIn(full_save_name, c.sites[d])
-        self.assertTrue(os.path.exists(zip_name))
 
         # remove this after the test is done
         shutil.rmtree(DIRECTORY)
@@ -296,6 +233,80 @@ class CacheTestCase(unittest.TestCase):
         # and verify that they no longer exist
         self.assertNotIn("www_example_com", test_cache.sites)
         self.assertFalse(os.path.exists(domain_folder))
+
+
+class GzipCacheTestCase(unittest.TestCase):
+    
+    def test_init(self):
+        # it uses clean_url_hash by default
+        clean_cache = Cache(COMPRESS_CACHE_DIRECTORY)
+        self.assertEqual(clean_cache.hasher, clean_url_hash)
+        # or the specified hasher if provided
+        md5_cache = Cache(COMPRESS_CACHE_DIRECTORY, hasher=md5_hash)
+        self.assertEqual(md5_cache.hasher, md5_hash)
+
+    def test_cache_setup(self):
+        c = GzipCache(COMPRESS_CACHE_DIRECTORY)
+        self.assertEqual(c.folder, COMPRESS_CACHE_DIRECTORY)
+        # verify that each folder has been loaded
+        for name in os.listdir(os.path.join(COMPRESS_CACHE_DIRECTORY)):
+            if os.path.isdir(os.path.join(COMPRESS_CACHE_DIRECTORY, name)):
+                self.assertIn(name, c.sites)
+
+    def test_cache_get(self):
+        c = GzipCache(COMPRESS_CACHE_DIRECTORY)
+        exists = [
+            "http://www.example.com/somepage.html",
+            "http://www.example.com/otherpage"
+        ]
+        for filename in exists:
+            self.assertIsNotNone(c.get(filename))
+        does_not_exist = [
+            "http://www.example.com/doesnotexist.html",
+            "https://en.wikipedia.org/wiki/Python_(programming_language)"
+        ]
+        for filename in does_not_exist:
+            self.assertIsNone(c.get(filename))
+
+
+    def test_cache_save_existing(self):
+        c = GzipCache(COMPRESS_CACHE_DIRECTORY)
+        # verify that it adds a file to a pre-existing cached site
+        html_string = "<html></html>".encode("utf-8")
+        example_url = "http://www.example.com/testpage.html"
+        d = dir_domain(example_url)
+        f = clean_url_hash(example_url)
+        full_save_name = os.path.join(COMPRESS_CACHE_DIRECTORY, d, f)
+        self.assertNotIn(full_save_name, c.sites[d])
+
+        c.save(example_url, html_string)
+
+        zip_name = "{}.gz".format(full_save_name)
+        self.assertTrue(os.path.exists(zip_name))
+        self.assertIn(full_save_name, c.sites[d])
+        # cleanup
+        os.remove(zip_name)
+
+    def test_cache_save_new(self):
+        c = GzipCache(COMPRESS_CACHE_DIRECTORY)
+        html_string = "<html></html>".encode("utf-8")
+        sample_url = "http://www.sample.com/testpage.html"
+        d = dir_domain(sample_url)
+        f = clean_url_hash(sample_url)
+        DIRECTORY = os.path.join(COMPRESS_CACHE_DIRECTORY, d)
+        # the www_sample_com directory should not exist until the file is cached
+        self.assertFalse(os.path.exists(DIRECTORY))
+        self.assertNotIn(d, c.sites)
+
+        c.save(sample_url, html_string)
+
+        full_save_name = os.path.join(DIRECTORY, f)
+        zip_name = "{}.gz".format(full_save_name)
+        self.assertIn(full_save_name, c.sites[d])
+        self.assertTrue(os.path.exists(zip_name))
+
+        # remove this after the test is done
+        shutil.rmtree(DIRECTORY)
 
 
 if __name__ == "__main__":
