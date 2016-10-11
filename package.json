@@ -40,10 +40,10 @@
     "d3-hierarchy": "^1.0.2",
     "d3-path": "^1.0.1",
     "expiring-redux-messages": "^0.3.0",
-    "react": "^15.0.1",
-    "react-dom": "^15.0.1",
-    "react-redux": "^4.4.0",
-    "redux": "^3.3.1",
+    "react": "^15.3.2",
+    "react-dom": "^15.3.2",
+    "react-redux": "^4.4.5",
+    "redux": "^3.6.0",
     "simple-wizard-component": "^0.5.1"
   }
 }
