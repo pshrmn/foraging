@@ -12,6 +12,7 @@ export default function frame(state = {name: 'element'}, action) {
   case types.SELECT_PAGE:
   case types.ADD_PAGE:
   case types.SET_PAGES:
+  case types.REMOVE_PAGE:
   case types.REMOVE_ELEMENT:
   case types.SAVE_ELEMENT:
   case types.UPDATE_ELEMENT:
