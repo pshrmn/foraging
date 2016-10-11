@@ -2,8 +2,16 @@ import React from 'react';
 
 import Controls from 'components/common/StepControls';
 
-const ConfirmElement = React.createClass({
-  saveHandler: function(event) {
+class ConfirmElement extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.saveHandler = this.saveHandler.bind(this);
+    this.previousHandler = this.previousHandler.bind(this);
+    this.cancelHandler = this.cancelHandler.bind(this);
+  }
+
+  saveHandler(event) {
     event.preventDefault();
     const { startData, next: save } = this.props;
     const { name, attribute, type } = startData;
@@ -12,16 +20,19 @@ const ConfirmElement = React.createClass({
       type: type,
       attr: attribute
     });
-  },
-  previousHandler: function(event) {
+  }
+
+  previousHandler(event) {
     event.preventDefault();
     this.props.previous();
-  },
-  cancelHandler: function(event) {
+  }
+
+  cancelHandler(event) {
     event.preventDefault();
     this.props.cancel();
-  },
-  render: function() {
+  }
+
+  render() {
     const { startData } = this.props;
     const { name, attribute, type } = startData;
     return (
@@ -40,6 +51,6 @@ const ConfirmElement = React.createClass({
       </form>
     );
   }
-});
+}
 
 export default ConfirmElement;

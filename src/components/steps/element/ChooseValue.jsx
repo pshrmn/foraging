@@ -5,8 +5,7 @@ import SingleValueStep from './SingleValueStep';
 import RangeValueStep from './RangeValueStep';
 
 export default function ChooseValue(props) {
-  const { startData } = props;
-  const { spec } = startData;
+  const { spec } = props.startData;
   switch ( spec.type ) {
   case 'all':
     return <AllValueStep {...props} />;

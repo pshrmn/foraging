@@ -10,51 +10,65 @@ import { levelNames } from 'helpers/page';
 import { showMessage } from 'expiring-redux-messages';
 import { currentSelector } from 'constants/CSSClasses';
 
-const RangeValueStep = React.createClass({
-  getInitialState: function() {
-    const { extraData, endData = {} } = this.props;
-    let name = '';
-    let low = 0;
-    let high = 'end';
-    // if there is an existing value, only use it if the types match
-    if ( endData.spec ) {
-      const spec = endData.spec;
-      if ( spec.name ) {
-        name = spec.name;
-      }
-      if ( spec.low !== undefined) {
-        low = spec.low;
-      }
-      if ( spec.high !== undefined ) {
-        high = spec.high === null ? 'end' : spec.high;
-      }
-    } else if ( extraData.originalSpec ) {
-      const spec = extraData.originalSpec;
-      if ( spec.name ) {
-        name = spec.name;
-      }
-      if ( spec.low !== undefined) {
-        low = spec.low;
-      }
-      if ( spec.high !== undefined ) {
-        high = spec.high === null ? 'end' : spec.high;
-      }
+function initialState(props) {
+  const { extraData, endData = {} } = props;
+  let name = '';
+  let low = 0;
+  let high = 'end';
+  // if there is an existing value, only use it if the types match
+  if ( endData.spec ) {
+    const spec = endData.spec;
+    if ( spec.name ) {
+      name = spec.name;
     }
-    return {
-      name,
-      low,
-      high,
-      error: name === ''
-    };
-  },
-  nameHandler: function(event) {
+    if ( spec.low !== undefined) {
+      low = spec.low;
+    }
+    if ( spec.high !== undefined ) {
+      high = spec.high === null ? 'end' : spec.high;
+    }
+  } else if ( extraData.originalSpec ) {
+    const spec = extraData.originalSpec;
+    if ( spec.name ) {
+      name = spec.name;
+    }
+    if ( spec.low !== undefined) {
+      low = spec.low;
+    }
+    if ( spec.high !== undefined ) {
+      high = spec.high === null ? 'end' : spec.high;
+    }
+  }
+  return {
+    name,
+    low,
+    high,
+    error: name === ''
+  };
+}
+
+class RangeValueStep extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = initialState(props);
+
+    this.nameHandler = this.nameHandler.bind(this);
+    this.lowHandler = this.lowHandler.bind(this);
+    this.highHandler = this.highHandler.bind(this);
+    this.nextHandler = this.nextHandler.bind(this);
+    this.previousHandler = this.previousHandler.bind(this);
+    this.cancelHandler = this.cancelHandler.bind(this);
+  }
+
+  nameHandler(event) {
     const { value } = event.target;
     this.setState({
       name: value,
       error: value === ''
     });
-  },
-  lowHandler: function(event) {
+  }
+
+  lowHandler(event) {
     const { value } = event.target;
     let low = parseInt(value, 10);
     let { high } = this.state;
@@ -65,8 +79,9 @@ const RangeValueStep = React.createClass({
       low,
       high
     });
-  },
-  highHandler: function(event) {
+  }
+
+  highHandler(event) {
     const { value } = event.target;
     if ( value === 'end' ) {
       this.setState({
@@ -83,8 +98,9 @@ const RangeValueStep = React.createClass({
       low,
       high
     });
-  },
-  nextHandler: function(event) {
+  }
+
+  nextHandler(event) {
     event.preventDefault();
     const { name, low, high, error } = this.state;
     const {
@@ -111,16 +127,19 @@ const RangeValueStep = React.createClass({
       high: high === 'end'? null : high, // convert 'end' to null
     };
     next(Object.assign({}, startData, { spec: newSpec }));
-  },
-  previousHandler: function(event) {
+  }
+
+  previousHandler(event) {
     event.preventDefault();
     this.props.previous();
-  },
-  cancelHandler: function(event) {
+  }
+
+  cancelHandler(event) {
     event.preventDefault();
     this.props.cancel();
-  },
-  render: function() {
+  }
+
+  render() {
     const { name, low, high, error } = this.state;
     const { startData, extraData } = this.props;
 
@@ -149,8 +168,9 @@ const RangeValueStep = React.createClass({
           error={error} />
       </form>
     );
-  },
-  componentWillMount: function() {
+  }
+
+  componentWillMount() {
     const { startData, extraData } = this.props;
 
     const { parent = {} } = extraData;
@@ -168,8 +188,9 @@ const RangeValueStep = React.createClass({
       '.forager-holder'
     );
     highlight(elements, currentSelector);
-  },
-  componentWillUpdate: function(nextProps, nextState) {
+  }
+
+  componentWillUpdate(nextProps, nextState) {
     unhighlight(currentSelector);
     const { startData, extraData } = nextProps;
 
@@ -188,11 +209,12 @@ const RangeValueStep = React.createClass({
       '.forager-holder'
     );
     highlight(elements, currentSelector);
-  },
-  componentWillUnmount: function() {
+  }
+
+  componentWillUnmount() {
     unhighlight(currentSelector);
   }
-});
+}
 
 export default connect(
   state => {

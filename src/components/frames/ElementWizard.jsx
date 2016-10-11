@@ -16,6 +16,15 @@ import { saveElement, showElementFrame } from 'actions';
 import { highlight, unhighlight} from 'helpers/markup';
 import { currentSelector } from 'constants/CSSClasses';
 
+const steps = [
+  ChooseElements,
+  ChooseParts,
+  ChooseType,
+  ChooseValue,
+  ChooseOptional,
+  ConfirmElement
+];
+
 /*
  * ChooseElements -> ChooseParts -> ChooseType ->
  *   ChooseValue -> ChooseOptional -> ConfirmElement
@@ -23,26 +32,27 @@ import { currentSelector } from 'constants/CSSClasses';
  * selected element selector) as a property of the object returned
  * in its next call
  */
-const ElementWizard = React.createClass({
-  save: function(ele) {
+class ElementWizard extends React.Component {
+  constructor(props) {
+    super(props);
+    this.save = this.save.bind(this);
+    this.cancel = this.cancel.bind(this);
+  }
+
+  save(ele) {
     this.props.saveElement(ele);
-  },
-  cancel: function() {
+  }
+
+  cancel() {
     this.props.cancel();
-  },
-  render: function() {
+  }
+
+  render() {
     const { current } = this.props;
     const initialData = {
       current
     };
-    const steps = [
-      ChooseElements,
-      ChooseParts,
-      ChooseType,
-      ChooseValue,
-      ChooseOptional,
-      ConfirmElement
-    ];
+
     return (
       <div className='frame'>
         <Tree />
@@ -53,20 +63,23 @@ const ElementWizard = React.createClass({
           cancel={this.cancel} />
       </div>
     );
-  },
-  componentWillMount: function() {
+  }
+
+  componentWillMount() {
     const { current } = this.props;
     highlight(current.matches, currentSelector);
-  },
-  componentWillUpdate: function(nextProps, nextState) {
+  }
+
+  componentWillUpdate(nextProps, nextState) {
     unhighlight(currentSelector);
     const { current } = this.props;
     highlight(current.matches, currentSelector);
-  },
-  componentWillUnmount: function() {
+  }
+
+  componentWillUnmount() {
     unhighlight(currentSelector);
   }
-});
+}
 
 export default connect(
   state => {

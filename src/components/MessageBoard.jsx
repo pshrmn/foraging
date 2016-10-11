@@ -1,16 +1,15 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-function MessageBoard(props) {
-  const messages = props.messages.map(m =>
-    <Message key={m.id} message={m.message} rating={m.rating} />
-  );
-  return (
-    <div className='message-board'>
-      { messages }
-    </div>
-  );
-}
+const MessageBoard = (props) => (
+  <div className='message-board'>
+    {
+      props.messages.map(m =>
+        <Message key={m.id} message={m.message} rating={m.rating} />
+      )
+    }
+  </div>
+);
 
 function Message(props) {
   const { message, rating } = props;

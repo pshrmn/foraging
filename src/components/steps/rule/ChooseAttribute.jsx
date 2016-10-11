@@ -5,23 +5,33 @@ import Controls from 'components/common/StepControls';
 import { attributes } from 'helpers/attributes';
 import { abbreviate } from 'helpers/text';
 
-const ChooseAttribute = React.createClass({
-  getInitialState: function() {
-    const { startData, endData = {} } = this.props;
+function initialAttribute(props) {
+  const { startData, endData = {} } = props;
   
-    let attribute = '';
-    if ( endData.attribute ) {
-      attribute = endData.attribute;
-    } else if ( startData.attr ) {
-      attribute = startData.attr;
-    }
+  let attribute = '';
+  if ( endData.attribute ) {
+    attribute = endData.attribute;
+  } else if ( startData.attr ) {
+    attribute = startData.attr;
+  }
+  return attribute;
+}
 
-    return {
+class ChooseAttribute extends React.Component {
+  constructor(props) {
+    super(props);
+    const attribute = initialAttribute(props);
+    this.state = {
       attribute,
       error: attribute === ''
     };
-  },
-  nextHandler: function(event) {
+
+    this.nextHandler = this.nextHandler.bind(this);
+    this.cancelHandler = this.cancelHandler.bind(this);
+    this.attributeHandler = this.attributeHandler.bind(this);
+  }
+
+  nextHandler(event) {
     event.preventDefault();
     const { attribute, error } = this.state;
 
@@ -31,39 +41,25 @@ const ChooseAttribute = React.createClass({
 
     const { startData, next } = this.props;
     next(Object.assign({}, startData, { attribute }));
-  },
-  cancelHandler: function(event) {
+  }
+
+  cancelHandler(event) {
     event.preventDefault();
     this.props.cancel();
-  },
-  attributeHandler: function(event) {
+  }
+
+  attributeHandler(event) {
     this.setState({
       attribute: event.target.value,
       error: false
     });
-  },
-  render: function() {
+  }
+
+  render() {
     const { attribute, index, error } = this.state;
     const { extraData } = this.props;
     const { element } = extraData;
 
-    const attrs = attributes(element).map((a,i) => {
-      return (
-        <li key={i}>
-          <label>
-            <input
-              type='radio'
-              value={a.name}
-              checked={a.name === attribute }
-              onChange={this.attributeHandler} />
-            {a.name}
-          </label>
-          <p className='line'>
-            {abbreviate(a.value, 40)}
-          </p>
-        </li>
-      );
-    });
     return (
       <form className='info-box'>
         <div className='info'>
@@ -71,7 +67,23 @@ const ChooseAttribute = React.createClass({
             Which attribute has the value that you want?
           </h3>
           <ul>
-            {attrs}
+            {
+              attributes(element).map((a,i) => (
+                <li key={i}>
+                  <label>
+                    <input
+                      type='radio'
+                      value={a.name}
+                      checked={a.name === attribute }
+                      onChange={this.attributeHandler} />
+                    {a.name}
+                  </label>
+                  <p className='line'>
+                    {abbreviate(a.value, 40)}
+                  </p>
+                </li>
+              ))
+            }
           </ul>
           {this.props.children}
         </div>
@@ -82,6 +94,6 @@ const ChooseAttribute = React.createClass({
       </form>
     );
   }
-});
+}
 
 export default ChooseAttribute;

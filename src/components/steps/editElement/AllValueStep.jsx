@@ -10,29 +10,45 @@ import { levelNames } from 'helpers/page';
 import { showMessage } from 'expiring-redux-messages';
 import { currentSelector } from 'constants/CSSClasses';
 
-const AllValueStep = React.createClass({
-  getInitialState: function() {
-    const { extraData, endData = {} } = this.props;
-    let name = '';
+/*
+ * determine the name to pre-load using endData and extraData
+ */
+function initialName(props) {
+  const { extraData, endData = {} } = props;
+  let name = '';
+  if ( endData.spec && endData.spec.name !== undefined ) {
+    name = endData.spec.name;
+  } else if ( extraData.originalSpec && extraData.originalSpec.name !== undefined ) {
+    name = extraData.originalSpec.name;
+  }
+  return name;
+}
 
-    if ( endData.spec && endData.spec.name !== undefined ) {
-      name = endData.spec.name;
-    } else if ( extraData.originalSpec && extraData.originalSpec.name !== undefined ) {
-      name = extraData.originalSpec.name;
-    }
-    return {
+class AllValueStep extends React.Component {
+  constructor(props) {
+    super(props);
+
+    const name = initialName(props)
+    this.state = {
       name,
       error: name === ''
     };
-  },
-  nameHandler: function(event) {
+
+    this.nameHandler = this.nameHandler.bind(this);
+    this.nextHandler = this.nextHandler.bind(this);
+    this.previousHandler = this.previousHandler.bind(this);
+    this.cancelHandler = this.cancelHandler.bind(this);
+  }
+
+  nameHandler(event) {
     const { value } = event.target;
     this.setState({
       name: value,
       error: value === ''
     });
-  },
-  nextHandler: function(event) {
+  }
+
+  nextHandler(event) {
     event.preventDefault();
     const { name, error } = this.state;
     const {
@@ -57,16 +73,19 @@ const AllValueStep = React.createClass({
         spec: {type: 'all', name}
       })
     );
-  },
-  previousHandler: function(event) {
+  }
+
+  previousHandler(event) {
     event.preventDefault();
     this.props.previous();
-  },
-  cancelHandler: function(event) {
+  }
+
+  cancelHandler(event) {
     event.preventDefault();
     this.props.cancel();
-  },
-  render: function() {
+  }
+
+  render() {
     const { name, error } = this.state;
     return (
       <form className='info-box'>
@@ -80,8 +99,9 @@ const AllValueStep = React.createClass({
           error={error} />
       </form>
     );
-  },
-  componentWillMount: function() {
+  }
+
+  componentWillMount() {
     const { startData, extraData } = this.props;
 
     const { parent = {} } = extraData;
@@ -96,8 +116,9 @@ const AllValueStep = React.createClass({
       '.forager-holder'
     );
     highlight(elements, currentSelector);
-  },
-  componentWillUpdate: function(nextProps, nextState) {
+  }
+
+  componentWillUpdate(nextProps, nextState) {
     unhighlight(currentSelector);
 
     const { startData, extraData } = nextProps;
@@ -114,11 +135,12 @@ const AllValueStep = React.createClass({
       '.forager-holder'
     );
     highlight(elements, currentSelector);
-  },
-  componentWillUnmount: function() {
+  }
+
+  componentWillUnmount() {
     unhighlight(currentSelector);
   }
-});
+}
 
 export default connect(
   state => {

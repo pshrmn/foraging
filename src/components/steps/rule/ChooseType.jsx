@@ -5,63 +5,62 @@ import Controls from 'components/common/StepControls';
 import { abbreviate } from 'helpers/text';
 import { integer, float } from 'helpers/parse';
 
-const ChooseType = React.createClass({
-  getInitialState: function() {
-    const { startData, endData = {} } = this.props;
-    
-    let type = 'string';
-    if ( endData.type ) {
-      type = endData.type;
-    } else if ( startData.type ) {
-      type = startData.type;
-    }
+function initialType(props) {
+  const { startData, endData = {} } = props;
+  let type = 'string';
+  if ( endData.type ) {
+    type = endData.type;
+  } else if ( startData.type ) {
+    type = startData.type;
+  }
+  return type;
+}
 
-    return {
-      type
+class ChooseType extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      type: initialType(props)
     };
-  },
-  nextHandler: function(event) {
+
+    this.nextHandler = this.nextHandler.bind(this);
+    this.previousHandler = this.previousHandler.bind(this);
+    this.cancelHandler = this.cancelHandler.bind(this);
+    this.typeHandler = this.typeHandler.bind(this);
+  }
+
+  nextHandler(event) {
     event.preventDefault();
     const { type } = this.state;
     const { startData, next } = this.props;
     next(Object.assign({}, startData, { type }));
-  },
-  previousHandler: function(event) {
+  }
+
+  previousHandler(event) {
     event.preventDefault();
     this.props.previous();
-  },
-  cancelHandler: function(event) {
+  }
+
+  cancelHandler(event) {
     event.preventDefault();
     this.props.cancel();
-  },
-  typeHandler: function(event) {
+  }
+
+  typeHandler(event) {
     this.setState({
       type: event.target.value
     });
-  },
-  render: function() {
+  }
+
+  render() {
     const { type } = this.state;
-    const { startData } = this.props;
+    const { startData, children } = this.props;
     const { attribute } = startData;
 
     const { extraData } = this.props;
     const { element } = extraData;
 
-    const value = attribute === 'text' ?
-      element.innerText : element.getAttribute(attribute);
-
-    const typeRadios = ['string', 'int', 'float'].map((t,i) => {
-      return (
-        <label key={i}>
-          <input
-            type='radio'
-            value={t}
-            checked={t === type}
-            onChange={this.typeHandler} />
-          {t}
-        </label>
-      );
-    });
+    const value = attribute === 'text' ? element.innerText : element.getAttribute(attribute);
 
     let preview;
     switch (type) {
@@ -88,11 +87,22 @@ const ChooseType = React.createClass({
           <h3>
             What type of value is this?
           </h3>
-          {typeRadios}
+          {
+            ['string', 'int', 'float'].map((t,i) => (
+              <label key={i}>
+                <input
+                  type='radio'
+                  value={t}
+                  checked={t === type}
+                  onChange={this.typeHandler} />
+                {t}
+              </label>
+            ))
+          }
           <p className='line'>
             {preview}
           </p>
-          {this.props.children}
+          {children}
         </div>
         <Controls
           previous={this.previousHandler}
@@ -101,6 +111,6 @@ const ChooseType = React.createClass({
       </form>
     );
   }
-});
+}
 
 export default ChooseType;

@@ -30,8 +30,15 @@ function pageNames(pages) {
     .map(p => p.name);
 }
 
-const Controls = React.createClass({
-  addHandler: function(event) {
+class Controls extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.addHandler = this.addHandler.bind(this);
+    this.renameHandler = this.renameHandler.bind(this);
+  }
+
+  addHandler(event) {
     const { pages, showMessage, addPage } = this.props;
     const name = promptName();
     if ( !validName(name, pageNames(pages)) ) {
@@ -50,8 +57,9 @@ const Controls = React.createClass({
         elements: [body]
       });
     }
-  },
-  renameHandler: function(event) {
+  }
+
+  renameHandler(event) {
     const name = promptName();
     const { pages, showMessage, renamePage } = this.props;
     // do nothing if the user cancels, does not enter a name, or enter the same name as the current one
@@ -60,8 +68,9 @@ const Controls = React.createClass({
     } else {
       renamePage(name);
     }
-  },
-  render: function() {
+  }
+
+  render() {
     const {
       pages,
       message,
@@ -131,7 +140,7 @@ const Controls = React.createClass({
       </div>
     );
   }
-});
+}
 
 export default connect(
   state => {

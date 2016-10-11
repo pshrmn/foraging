@@ -14,14 +14,10 @@ import { queryCheck, potentialSelector, hoverClass } from 'constants/CSSClasses'
  * is clicked, an array of css selector options (from the clicked element to the
  * parent) will be rendered.
  */
-const ChooseElement = React.createClass({
-  propTypes: {
-    startData: React.PropTypes.object,
-    endData: React.PropTypes.object,
-    next: React.PropTypes.func,
-    previous: React.PropTypes.func
-  },
-  getInitialState: function() {
+class ChooseElement extends React.Component {
+  constructor(props) {
+    super(props);
+
     const selectors = [['*']];
     const { startData } = this.props;
     const { current } = startData;
@@ -30,7 +26,7 @@ const ChooseElement = React.createClass({
     if ( allSelect(current.matches) ) {
       selectors.push(['option']);
     }
-    return {
+    this.state = {
       // the index of the selected selector
       checked: undefined,
       // the array of possible selectors. each selector is an array of selector parts
@@ -40,35 +36,63 @@ const ChooseElement = React.createClass({
       eleCount: 0,
       error: true
     };
-  },
-  events: {
-    mouseover(event) {
-      event.target.classList.add(hoverClass);
-    },
 
-    mouseout(event) {
-      event.target.classList.remove(hoverClass);
-    },
+    this.mouseover = this.mouseover.bind(this);
+    this.mouseout = this.mouseout.bind(this);
+    this.click = this.click.bind(this);
+    this.addEvents = this.addEvents.bind(this);
 
-    // requires a component to be bound to this in order to call setState
-    click(event) {
-      // preventDefault & stopPropagation to deal with
-      // any real events from the page
-      event.preventDefault();
-      event.stopPropagation();
-      const selectors = Array.from(event.path)
-        .filter(ele => ele.classList && ele.classList.contains(potentialSelector))
-        .reverse()
-        .map(ele => parts(ele));
-      this.setState({
-        // maintain the wildcard selector
-        selectors: [['*']].concat(selectors),
-        checked: undefined,
-        error: true
-      });
+    this.setRadio = this.setRadio.bind(this);
+    this.nextHandler = this.nextHandler.bind(this);
+    this.cancelHandler = this.cancelHandler.bind(this);
+  }
+
+  mouseover(event) {
+    event.target.classList.add(hoverClass);
+  }
+
+  mouseout(event) {
+    event.target.classList.remove(hoverClass);
+  }
+
+  // requires a component to be bound to this in order to call setState
+  click(event) {
+    // preventDefault & stopPropagation to deal with
+    // any real events from the page
+    event.preventDefault();
+    event.stopPropagation();
+    const selectors = Array.from(event.path)
+      .filter(ele => ele.classList && ele.classList.contains(potentialSelector))
+      .reverse()
+      .map(ele => parts(ele));
+    this.setState({
+      // maintain the wildcard selector
+      selectors: [['*']].concat(selectors),
+      checked: undefined,
+      error: true
+    });
+  }
+
+  addEvents(startData) {
+    // get all child elements of the parents
+    const elements = select(startData.current.matches, null, null, '.forager-holder');
+
+    // remove any existing events
+    if ( this.iUnhighlight ) {
+      this.iUnhighlight();
+      delete this.iUnhighlight;
     }
-  },
-  setRadio: function(i) {
+
+    this.iUnhighlight = iHighlight(
+      elements,
+      potentialSelector,
+      this.mouseover,
+      this.mouseout,
+      this.click
+    );
+  }
+
+  setRadio(i) {
     const selector = this.state.selectors[i].join('');
     const { startData } = this.props;
     const { current } = startData;
@@ -77,8 +101,9 @@ const ChooseElement = React.createClass({
       eleCount: count(current.matches, selector),
       error: false
     });
-  },
-  nextHandler: function(event) {
+  }
+
+  nextHandler(event) {
     event.preventDefault();
     const { checked, selectors } = this.state;
     const { next, startData } = this.props;
@@ -93,12 +118,14 @@ const ChooseElement = React.createClass({
         error: true
       });
     }
-  },
-  cancelHandler: function(event) {
+  }
+
+  cancelHandler(event) {
     event.preventDefault();
     this.props.cancel();
-  },
-  render: function() {
+  }
+
+  render() {
     const { next, previous } = this.props;
     const { selectors, checked, eleCount, error } = this.state;
     return (
@@ -123,43 +150,26 @@ const ChooseElement = React.createClass({
           error={error} />
       </form>
     );
-  },
+  }
+
   /*
    * below here are the functions for interacting with the non-Forager part of the page
    */
-  componentWillMount: function() {
+  componentWillMount() {
     const { startData } = this.props;
     this.addEvents(startData);
-  },
-  componentWillReceiveNewProps: function(nextProps) {
+  }
+
+  componentWillReceiveNewProps(nextProps) {
     const { startData } = nextProps;
     this.addEvents(startData);
-  },
-  addEvents: function(startData) {
-    // get all child elements of the parents
-    const elements = select(startData.current.matches, null, null, '.forager-holder');
+  }
 
-    // remove any existing events
-    if ( this.iUnhighlight ) {
-      this.iUnhighlight();
-      delete this.iUnhighlight;
-    }
-
-    // need to bind so that this.setState is callable
-    this.events.boundClick = this.events.click.bind(this);
-    this.iUnhighlight = iHighlight(
-      elements,
-      potentialSelector,
-      this.events.mouseover,
-      this.events.mouseout,
-      this.events.boundClick
-    );
-  },
   /*
    * when a selector possibility is chosen, add a class to all matching elements
    * to show what that selector could match
    */
-  componentWillUpdate: function(nextProps, nextState) {
+  componentWillUpdate(nextProps, nextState) {
     // remove any highlights from a previously selected selector
     unhighlight(queryCheck);
     const clickedSelector = nextState.selectors[nextState.checked];
@@ -169,34 +179,33 @@ const ChooseElement = React.createClass({
       const elements = select(startData.current.matches, fullSelector, null, '.forager-holder');
       highlight(elements, queryCheck);
     }
-  },
+  }
+
   /*
    * remove any classes and event listeners from the page when the frame is unmounted
    */
-  componentWillUnmount: function() {
+  componentWillUnmount() {
     unhighlight(queryCheck);
     this.iUnhighlight();
   }
-});
+}
 
-const SelectorRadio = React.createClass({
-  setRadio: function(event) {
-    // do not call event.preventDefault() here or the checked dot will fail to render
-    this.props.select(this.props.index);
-  },
-  render: function() {
-    const { selector, checked } = this.props;
-    return (
-      <label className={checked ? 'selected' : ''}>
-        <input type='radio'
-               name='css-selector'
-               checked={checked}
-               onChange={this.setRadio} />
-        {selector.join('')}
-      </label>
-    );
-  }
-});
+ChooseElement.propTypes = {
+  startData: React.PropTypes.object,
+  endData: React.PropTypes.object,
+  next: React.PropTypes.func,
+  previous: React.PropTypes.func
+}
+
+// do not call event.preventDefault() here or the checked dot will fail to render
+const SelectorRadio = ({ selector, checked, select, index }) => (
+  <label className={checked ? 'selected' : ''}>
+    <input type='radio'
+           name='css-selector'
+           checked={checked}
+           onChange={() => select(index) } />
+    {selector.join('')}
+  </label>
+)
 
 export default ChooseElement
-

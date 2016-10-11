@@ -6,24 +6,34 @@ import { select, count } from 'helpers/selection';
 import { highlight, unhighlight} from 'helpers/markup';
 import { queryCheck } from 'constants/CSSClasses';
 
-function joinParts(parts) {
-  return parts.reduce((str, curr) => {
-    if ( curr.checked ) {
-      str += curr.name;
-    }
-    return str;
-  }, '');
+const joinParts = (parts) => (
+  parts.reduce((str, curr) => str + (curr.checked ? curr.name : ''), '')
+);
+
+function setupHighlights(cssSelector, matches) {
+  unhighlight(queryCheck);
+  if ( cssSelector !== '' ) {
+    const elements = select(matches, cssSelector, null, '.forager-holder');
+    highlight(elements, queryCheck);
+  }
 }
 
-const ChooseParts = React.createClass({
-  getInitialState: function() {
-    return {
+class ChooseParts extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
       parts: [],
       eleCount: 0,
       error: true
     };
-  },
-  nextHandler: function(event) {
+
+    this.nextHandler = this.nextHandler.bind(this);
+    this.previousHandler = this.previousHandler.bind(this);
+    this.cancelHandler = this.cancelHandler.bind(this);
+    this.toggleRadio = this.toggleRadio.bind(this);
+  }
+
+  nextHandler(event) {
     event.preventDefault();
     const { parts } = this.state;
     const { next, startData } = this.props;
@@ -38,44 +48,49 @@ const ChooseParts = React.createClass({
         error: true
       });
     }
-  },
-  previousHandler: function(event) {
+  }
+
+  previousHandler(event) {
     event.preventDefault();
     this.props.previous();
-  },
-  cancelHandler: function(event) {
+  }
+
+  cancelHandler(event) {
     event.preventDefault();
     this.props.cancel();
-  },
-  toggleRadio: function(event) {
+  }
+
+  toggleRadio(event) {
     // don't prevent default
     const index = event.target.value;
     const parts = this.state.parts;
     parts[index].checked = !parts[index].checked;
     const fullSelector = joinParts(parts);
-
-    this._setupHighlights(fullSelector);
     const { startData } = this.props;
+    const matches = startData.current.matches;
+
+    setupHighlights(fullSelector, matches);
     this.setState({
       parts: parts,
-      eleCount: fullSelector === '' ? 0 : count(startData.current.matches, fullSelector),
+      eleCount: fullSelector === '' ? 0 : count(matches, fullSelector),
       error: fullSelector === ''
     });
-  },
-  componentWillMount: function() {
+  }
+
+  componentWillMount() {
     const { startData } = this.props;
     const { parts, current } = startData;
-
     const fullSelector = parts.join('');
-    this._setupHighlights(fullSelector);
 
+    setupHighlights(fullSelector, current.matches);
     this.setState({
       parts: parts.map(name => ({name: name, checked: true})),
       eleCount: count(current.matches, fullSelector),
       error: false
     });
-  },
-  render: function() {
+  }
+
+  render() {
     const { parts, eleCount, error } = this.state;
     const opts = parts.map((part, index) => {
       const { name, checked } = part;
@@ -109,18 +124,11 @@ const ChooseParts = React.createClass({
           error={error} />
       </form>
     );
-  },
-  componentWillUnmount: function() {
-    unhighlight(queryCheck);
-  },
-  _setupHighlights: function(cssSelector) {
-    unhighlight(queryCheck);
-    if ( cssSelector !== '' ) {
-      const { startData } = this.props;
-      const elements = select(startData.current.matches, cssSelector, null, '.forager-holder');
-      highlight(elements, queryCheck);
-    }
   }
-});
+
+  componentWillUnmount() {
+    unhighlight(queryCheck);
+  }
+}
 
 export default ChooseParts;

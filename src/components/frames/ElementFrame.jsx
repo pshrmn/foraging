@@ -7,8 +7,12 @@ import ElementCard from 'components/ElementCard';
 import { highlight, unhighlight } from 'helpers/markup';
 import { currentSelector } from 'constants/CSSClasses';
 
-const ElementFrame = React.createClass({
-  render: function() {
+class ElementFrame extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
     const { element } = this.props;
     if ( element === undefined ) {
       return <div className='frame'></div>;
@@ -20,23 +24,26 @@ const ElementFrame = React.createClass({
         <ElementCard element={element} active={true} />
       </div>
     );
-  },
-  componentWillMount: function() {
+  }
+
+  componentWillMount() {
     unhighlight(currentSelector);
     if ( this.props.element ) {
       highlight(this.props.element.matches, currentSelector);
     }
-  },
-  componentWillReceiveProps: function(nextProps) {
+  }
+
+  componentWillReceiveProps(nextProps) {
     unhighlight(currentSelector);
     if ( nextProps.element !== undefined && nextProps.element !== this.props.element ) {
       highlight(nextProps.element.matches, currentSelector);
     }
-  },
-  componentWillUnmount: function() {
+  }
+
+  componentWillUnmount() {
     unhighlight(currentSelector);
   }
-});
+}
 
 export default connect(
   state => {

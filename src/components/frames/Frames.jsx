@@ -17,9 +17,7 @@ import Preview from './Preview';
  * and creating elements.
  *
  */
- function Frames(props) {
-  const { frame } = props;
-  let frameElement = null;
+ const Frames = ({frame}) => {
   switch ( frame.name ) {
   case 'element':
     return <ElementFrame />;
@@ -43,4 +41,3 @@ export default connect(
     frame: state.frame
   })
 )(Frames);
-

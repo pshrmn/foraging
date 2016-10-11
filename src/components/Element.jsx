@@ -26,23 +26,20 @@ function Element(props) {
   );
 }
 
-function RuleList(props) {
-  const { rules, active } = props;
-  if ( !rules.length ) {
-    return null;
-  }
-  return (
+const RuleList = ({ rules, active }) => (
+  !rules.length ? null : (
     <ul className='rules'>
       {
-        rules.map((r,i) => <Rule
-          key={i}
-          index={i}
-          active={active}
-          {...r} />
-        )
+        rules.map((r,i) => (
+          <Rule
+            key={i}
+            index={i}
+            active={active}
+            {...r} />
+        ))
       }
     </ul>
-  );
-}
+  )
+);
 
 export default Element;

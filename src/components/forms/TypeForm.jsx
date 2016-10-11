@@ -1,7 +1,6 @@
 import React from 'react';
 
-export default function TypeForm(props) {
-  const { types, current, setType } = props;
+export default function TypeForm({ types, current, setType }) {
 
   const typeInputs = types.map(t => {
     const selected = current === t;

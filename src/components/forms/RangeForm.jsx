@@ -11,29 +11,6 @@ export default function RangeForm(props) {
     setHigh
   } = props;
 
-  const lowOptions = Array.from(new Array(count)).map((u, i) => {
-    return (
-      <option key={i} value={i}>{i}</option>
-    );
-  });
-  const lowSelect = (
-    <select value={low} onChange={setLow}>
-      {lowOptions}
-    </select>
-  );
-
-  const highOptions = Array.from(new Array(count)).map((u, i) => {
-    return (
-      <option key={i} value={i}>{i}</option>
-    );
-  });
-
-  const highSelect = (
-    <select value={high} onChange={setHigh}>
-      {highOptions.concat([<option key='end' value='end'>end</option>])}
-    </select>
-  );
-
   return (
     <div>
       <h3>
@@ -47,7 +24,20 @@ export default function RangeForm(props) {
       <h3>
         Which elements should be selected?
       </h3>
-      {lowSelect} - {highSelect}
+      <select value={low} onChange={setLow}>
+        {
+          Array.from(new Array(count))
+            .map((u, i) => (<option key={i} value={i}>{i}</option>))
+        }
+      </select>
+      {' - '}
+      <select value={high} onChange={setHigh}>
+        {
+          Array.from(new Array(count))
+            .map((u, i) => (<option key={i} value={i}>{i}</option>))
+        }
+        <option key='end' value='end'>end</option>
+      </select>
     </div>
   );
 }

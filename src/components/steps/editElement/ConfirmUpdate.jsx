@@ -7,8 +7,16 @@ import { select } from 'helpers/selection';
 import { highlight, unhighlight } from 'helpers/markup';
 import { currentSelector } from 'constants/CSSClasses';
 
-const ConfirmElement = React.createClass({
-  saveHandler: function(event) {
+class ConfirmElement extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.saveHandler = this.saveHandler.bind(this);
+    this.previousHandler = this.previousHandler.bind(this);
+    this.cancelHandler = this.cancelHandler.bind(this);
+  }
+
+  saveHandler(event) {
     event.preventDefault();
     const { startData, next: save } = this.props;
     const { spec, optional } = startData;
@@ -16,16 +24,19 @@ const ConfirmElement = React.createClass({
       optional,
       spec
     });
-  },
-  previousHandler: function(event) {
+  }
+
+  previousHandler(event) {
     event.preventDefault();
     this.props.previous();
-  },
-  cancelHandler: function(event) {
+  }
+
+  cancelHandler(event) {
     event.preventDefault();
     this.props.cancel();
-  },
-  render: function() {
+  }
+
+  render() {
     const { startData } = this.props;
     const { selector, spec, optional } = startData;
     return (
@@ -43,9 +54,10 @@ const ConfirmElement = React.createClass({
           cancel={this.cancelHandler} />
       </form>
     );
-  },
-  componentWillMount: function() {
-        const { startData, extraData } = this.props;
+  }
+
+  componentWillMount() {
+    const { startData, extraData } = this.props;
 
     const { selector, spec } = startData;
     const { parent = {} } = extraData;
@@ -57,10 +69,11 @@ const ConfirmElement = React.createClass({
       '.forager-holder'
     );
     highlight(elements, currentSelector);
-  },
-  componentWillUnmount: function() {
+  }
+
+  componentWillUnmount() {
     unhighlight(currentSelector);
   }
-});
+}
 
 export default ConfirmElement;

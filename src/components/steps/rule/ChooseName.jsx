@@ -6,23 +6,33 @@ import Controls from 'components/common/StepControls';
 import { levelNames } from 'helpers/page';
 import { showMessage } from 'expiring-redux-messages';
 
-const ChooseName = React.createClass({
-  getInitialState: function() {
-    const { startData, endData = {} } = this.props;
-    
-    let name = '';
-    if ( endData.name ) {
-      name = endData.name;
-    } else if ( startData.name ) {
-      name = startData.name;
-    }
+function initialName(props) {
+  const { startData, endData = {} } = props;    
+  let name = '';
+  if ( endData.name ) {
+    name = endData.name;
+  } else if ( startData.name ) {
+    name = startData.name;
+  }
+  return name;
+}
 
-    return {
+class ChooseName extends React.Component {
+  constructor(props) {
+    super(props);
+    const name = initialName(props);
+    this.state = {
       name,
       error: name === ''
     };
-  },
-  nextHandler: function(event) {
+
+    this.nextHandler = this.nextHandler.bind(this);
+    this.previousHandler = this.previousHandler.bind(this);
+    this.cancelHandler = this.cancelHandler.bind(this);
+    this.nameHandler = this.nameHandler.bind(this);
+  }
+
+  nextHandler(event) {
     event.preventDefault();
     const { name } = this.state;
     const { takenNames, showMessage } = this.props;
@@ -34,23 +44,27 @@ const ChooseName = React.createClass({
 
     const { startData, next } = this.props;
     next(Object.assign({}, startData, { name }));
-  },
-  previousHandler: function(event) {
+  }
+
+  previousHandler(event) {
     event.preventDefault();
     this.props.previous();
-  },
-  cancelHandler: function(event) {
+  }
+
+  cancelHandler(event) {
     event.preventDefault();
     this.props.cancel();
-  },
-  nameHandler: function(event) {
+  }
+
+  nameHandler(event) {
     const name = event.target.value
     this.setState({
       name: name,
       error: name === ''
     });
-  },
-  render: function() {
+  }
+
+  render() {
     const { name, error } = this.state;
     return (
       <form className='info-box'>
@@ -72,7 +86,7 @@ const ChooseName = React.createClass({
       </form>
     );
   }
-});
+}
 
 export default connect(
   state => {

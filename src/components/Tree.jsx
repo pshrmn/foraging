@@ -23,21 +23,21 @@ function drawLink(node) {
   return context.toString();
 }
 
-const Tree = React.createClass({
-  getDefaultProps: function() {
-    return {
-      width: 400,
-      height: 150
-    };
-  },
-  componentWillMount: function() {
+class Tree extends React.Component {
+  constructor(props) {
+    super(props);
+    this._makeNodes = this._makeNodes.bind(this);
+  }
+
+  componentWillMount() {
     const { width, height } = this.props;
     this.setState({
       // tree layout
       tree: tree().size([height, width])
     });
-  },
-  _makeNodes: function() {
+  }
+
+  _makeNodes() {
     const { page, elementIndex, active, selectElement } = this.props;
     const { tree } = this.state;
 
@@ -75,8 +75,9 @@ const Tree = React.createClass({
         </g>
       </g>
     );
-  },  
-  render: function() {
+  }
+
+  render() {
     if ( this.props.page === undefined ) {
       return null;
     }
@@ -98,20 +99,36 @@ const Tree = React.createClass({
       </div>
     );
   }
-});
+}
 
-const Node = React.createClass({
-  handleClick: function(event) {
+Tree.defaultProps = {
+  width: 400,
+  height: 150
+};
+
+class Node extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.handleClick = this.handleClick.bind(this);
+    this.handleMouseover = this.handleMouseover.bind(this);
+    this.handleMouseout = this.handleMouseout.bind(this);
+  }
+
+  handleClick(event) {
     event.preventDefault();
     this.props.select(this.props.data.index);
-  },
-  handleMouseover: function(event) {
+  }
+
+  handleMouseover(event) {
     highlight(this.props.data.matches, savedPreview);
-  },
-  handleMouseout: function(event) {
+  }
+
+  handleMouseout(event) {
     unhighlight(savedPreview);
-  },
-  render: function() {
+  }
+
+  render() {
     const {
       current,
       data,
@@ -157,11 +174,12 @@ const Node = React.createClass({
         {marker}
       </g>
     );
-  },
-  componentWillUnmount: function() {
+  }
+
+  componentWillUnmount() {
     unhighlight(savedPreview);
   }
-});
+}
 
 export default connect(
   state => {

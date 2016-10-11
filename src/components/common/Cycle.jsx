@@ -14,8 +14,7 @@ import { NeutralButton } from 'components/common/Buttons';
  * list has been reached. When decrementing, automatically
  * jumps to end of list after 0.
  */
-export default function Cycle(props) {
-  const { index, count, setIndex } = props;
+const Cycle = ({ index, count, setIndex }) => {
   const nextIndex = (index+1) % count;
   const prevIndex = ((index-1) + count) % count;
   return (
@@ -30,3 +29,5 @@ export default function Cycle(props) {
     </div>
   );
 }
+
+export default Cycle;

@@ -7,21 +7,30 @@ import { select } from 'helpers/selection';
 import { highlight, unhighlight } from 'helpers/markup';
 import { currentSelector } from 'constants/CSSClasses';
 
-const ChooseType = React.createClass({
-  getInitialState: function() {
-    const { startData, endData = {} } = this.props;
-    let type = 'single';
-    if ( endData.spec && endData.spec.type ) {
-      type = endData.spec.type;
-    } else if ( startData.spec && startData.spec.type ) {
-      type = startData.spec.type;
-    }
+function initialType(props) {
+  const { startData, endData = {} } = props;
+  let type = 'single';
+  if ( endData.spec && endData.spec.type ) {
+    type = endData.spec.type;
+  } else if ( startData.spec && startData.spec.type ) {
+    type = startData.spec.type;
+  }
+  return type;
+}
 
-    return {
-      type
+class ChooseType extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      type: initialType(props)
     };
-  },
-  nextHandler: function(event) {
+
+    this.nextHandler = this.nextHandler.bind(this);
+    this.cancelHandler = this.cancelHandler.bind(this);
+    this.typeHandler = this.typeHandler.bind(this);
+  }
+
+  nextHandler(event) {
     event.preventDefault();
     const { type } = this.state;
     const { startData, next } = this.props;
@@ -31,17 +40,20 @@ const ChooseType = React.createClass({
       type
     };
     next(Object.assign({}, startData, {spec: newSpec}));
-  },
-  cancelHandler: function(event) {
+  }
+
+  cancelHandler(event) {
     event.preventDefault();
     this.props.cancel();
-  },
-  typeHandler: function(event) {
+  }
+
+  typeHandler(event) {
     this.setState({
       type: event.target.value
     });
-  },
-  render: function() {
+  }
+
+  render() {
     const { type } = this.state;
     const types = ['single', 'all', 'range'];
 
@@ -55,8 +67,9 @@ const ChooseType = React.createClass({
           cancel={this.cancelHandler} />
       </form>
     );
-  },
-  componentWillMount: function() {
+  }
+
+  componentWillMount() {
     const { startData, extraData } = this.props;
 
     const { parent = {} } = extraData;
@@ -83,8 +96,9 @@ const ChooseType = React.createClass({
       '.forager-holder'
     );
     highlight(elements, currentSelector);
-  },
-  componentWillUpdate: function(nextProps, nextState) {
+  }
+
+  componentWillUpdate(nextProps, nextState) {
     unhighlight(currentSelector);
 
     const { startData, extraData } = nextProps;
@@ -113,10 +127,11 @@ const ChooseType = React.createClass({
       '.forager-holder'
     );
     highlight(elements, currentSelector);
-  },
-  componentWillUnmount: function() {
+  }
+
+  componentWillUnmount() {
     unhighlight(currentSelector);
   }
-});
+}
 
 export default ChooseType;

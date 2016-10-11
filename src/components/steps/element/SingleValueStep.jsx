@@ -7,29 +7,41 @@ import { select, count } from 'helpers/selection';
 import { highlight, unhighlight } from 'helpers/markup';
 import { queryCheck } from 'constants/CSSClasses';
 
-const SingleValueStep = React.createClass({
-  getInitialState: function() {
-    const { startData, endData = {} } = this.props;
-    let index = 0;
-    // if there is an existing value, only use it if the types match
-    if ( endData.spec && endData.spec.index !== undefined ) {
-      index = endData.spec.index;
-    } else if ( startData.spec && startData.spec.index !== undefined ) {
-      index = startData.spec.index;
-    }
-    return {
-      index,
+function initialIndex(props) {
+  const { startData, endData = {} } = props;
+  let index = 0;
+  // if there is an existing value, only use it if the types match
+  if ( endData.spec && endData.spec.index !== undefined ) {
+    index = endData.spec.index;
+  } else if ( startData.spec && startData.spec.index !== undefined ) {
+    index = startData.spec.index;
+  }
+  return index;
+}
+
+class SingleValueStep extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      index: initialIndex(props),
       error: false
     };
-  },
-  indexHandler: function(event) {
+
+    this.indexHandler = this.indexHandler.bind(this);
+    this.nextHandler = this.nextHandler.bind(this);
+    this.previousHandler = this.previousHandler.bind(this);
+    this.cancelHandler = this.cancelHandler.bind(this);
+  }
+
+  indexHandler(event) {
     const { value } = event.target;
     this.setState({
       index: parseInt(value, 10),
       error: false
     });
-  },
-  nextHandler: function(event) {
+  }
+
+  nextHandler(event) {
     event.preventDefault();
     const { index, error } = this.state;
     const { startData, next } = this.props;
@@ -41,16 +53,19 @@ const SingleValueStep = React.createClass({
       index
     }
     next(Object.assign({}, startData, { spec: newSpec }));
-  },
-  previousHandler: function(event) {
+  }
+
+  previousHandler(event) {
     event.preventDefault();
     this.props.previous();
-  },
-  cancelHandler: function(event) {
+  }
+
+  cancelHandler(event) {
     event.preventDefault();
     this.props.cancel();
-  },
-  render: function() {
+  }
+
+  render() {
     const { index, error } = this.state;
     const { startData } = this.props;
     const { current, selector } = startData;
@@ -69,15 +84,17 @@ const SingleValueStep = React.createClass({
           error={error} />
       </form>
     );    
-  },
-  componentWillMount: function() {
+  }
+
+  componentWillMount() {
     const { startData } = this.props;
     const { current, selector } = startData;
     const { index } = this.state;
     const elements = select(current.matches, selector, {type: 'single', index}, '.forager-holder');
     highlight(elements, queryCheck);
-  },
-  componentWillUpdate: function(nextProps, nextState) {
+  }
+
+  componentWillUpdate(nextProps, nextState) {
     unhighlight(queryCheck);
 
     const { startData } = nextProps;
@@ -85,10 +102,11 @@ const SingleValueStep = React.createClass({
     const { index } = nextState;
     const elements = select(current.matches, selector, {type: 'single', index}, '.forager-holder');
     highlight(elements, queryCheck);
-  },
-  componentWillUnmount: function() {
+  }
+
+  componentWillUnmount() {
     unhighlight(queryCheck);
   }
-});
+}
 
 export default SingleValueStep;

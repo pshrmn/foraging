@@ -15,61 +15,67 @@ import { updateRule, showElementFrame } from 'actions';
 import { highlight, unhighlight} from 'helpers/markup';
 import { currentSelector } from 'constants/CSSClasses';
 
+const steps = [
+  ChooseAttribute,
+  ChooseType,
+  ChooseName,
+  ConfirmUpdateRule
+];
+
 /*
  * ChooseAttribute -> ChooseType -> ChooseName -> ConfirmRule
  */
-const EditRuleWizard = React.createClass({
-  getInitialState: function() {
-    return {
+class EditRuleWizard extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
       index: 0
     };
-  },
-  setIndex: function(index) {
+    this.setIndex = this.setIndex.bind(this);
+    this.save = this.save.bind(this);
+    this.cancel = this.cancel.bind(this);
+  }
+
+  setIndex(index) {
     this.setState({
       index
     });
-  },
-  save: function(rule) {
+  }
+
+  save(rule) {
     const { updateRule, ruleIndex } = this.props;
     updateRule(ruleIndex, rule);
-  },
-  cancel: function() {
+  }
+
+  cancel() {
     this.props.cancel();
-  },
-  render: function() {
+  }
+
+  render() {
     const { current, ruleIndex } = this.props;
     // make sure that the rule exists
     const rule = current.rules[ruleIndex];
     if ( ruleIndex === undefined || ruleIndex === undefined) {
       return null;
     }
-
     const { index } = this.state;
-
     const { name, attr, type } = rule;
-    const initialData = {
-      current,
-      index: 0,
-      name,
-      attr,
-      type
-    };
-    const extraData = {
-      element: current.matches[index]
-    };
-    const steps = [
-      ChooseAttribute,
-      ChooseType,
-      ChooseName,
-      ConfirmUpdateRule
-    ];
+
     return (
       <div className='frame'>
         <ElementCard active={false} element={current} />
         <Wizard
           steps={steps}
-          initialData={initialData}
-          extraData={extraData}
+          initialData={{
+            current,
+            index: 0,
+            name,
+            attr,
+            type
+          }}
+          extraData={{
+            element: current.matches[index]
+          }}
           save={this.save}
           cancel={this.cancel}>
           <Cycle
@@ -79,20 +85,23 @@ const EditRuleWizard = React.createClass({
         </Wizard>
       </div>
     );
-  },
-  componentWillMount: function() {
+  }
+
+  componentWillMount() {
     const { current } = this.props;
     highlight(current.matches, currentSelector);
-  },
-  componentWillUpdate: function(nextProps, nextState) {
+  }
+
+  componentWillUpdate(nextProps, nextState) {
     unhighlight(currentSelector);
     const { current } = this.props;
     highlight(current.matches, currentSelector);
-  },
-  componentWillUnmount: function() {
+  }
+
+  componentWillUnmount() {
     unhighlight(currentSelector);
   }
-});
+}
 
 export default connect(
   state => {

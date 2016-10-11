@@ -8,20 +8,31 @@ import { fullGrow } from 'helpers/page';
 import { preview } from 'helpers/preview';
 import { showElementFrame } from 'actions';
 
-const Preview = React.createClass({
-  closeHandler: function(event) {
+class Preview extends React.Component {
+  constructor(props) {
+    super(props);
+    this.closeHandler = this.closeHandler.bind(this);
+    this.logHandler = this.logHandler.bind(this);
+    this.prettyLogHandler = this.prettyLogHandler.bind(this);
+    this.varHandler = this.varHandler.bind(this);
+  }
+
+  closeHandler(event) {
     event.preventDefault();
     this.props.close();
-  },
-  logHandler: function(event) {
+  }
+
+  logHandler(event) {
     event.preventDefault();
     console.log(JSON.stringify(preview(this.props.tree)));
-  },
-  prettyLogHandler: function(event) {
+  }
+
+  prettyLogHandler(event) {
     event.preventDefault();
     console.log(JSON.stringify(preview(this.props.tree), null, 2));
-  },
-  varHandler: function(event) {
+  }
+
+  varHandler(event) {
     event.preventDefault();
     console.log([
       'The current preview data can be accessed using the %c"pageData"%c variable.',
@@ -29,8 +40,9 @@ const Preview = React.createClass({
       '(This will be a string using the extension\'s ID that starts with "chrome-extensions://". Open the chrome://extensions tab and look for the Forager extension to determine the extension ID)'
       ].join(' '), 'font-weight: bold; font-size: 1.5em;', '')
     window.pageData = preview(this.props.tree);
-  },
-  render: function() {
+  }
+
+  render() {
     return (
       <div className='frame'>
         <Tree />
@@ -48,7 +60,7 @@ const Preview = React.createClass({
       </div>
     );
   }
-});
+}
 
 export default connect(
   state => {

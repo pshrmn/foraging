@@ -12,55 +12,62 @@ import {
 
 import { updateElement, showElementFrame } from 'actions';
 
+const steps = [
+  ChooseType,
+  ChooseValue,
+  ChooseOptional,
+  ConfirmUpdate
+];
+
 /*
  * ChooseType -> ChooseValue -> ChooseOptional -> ConfirmUpdate
  * each step should make sure to pass the current object (the currently
  * selected element selector) as a property of the object returned
  * in its next call
  */
-const EditElementWizard = React.createClass({
-  save: function(newProps) {
+class EditElementWizard extends React.Component {
+  constructor(props) {
+    super(props);
+    this.save = this.save.bind(this);
+    this.cancel = this.cancel.bind(this);
+  }
+
+  save(newProps) {
     const { current, updateElement } = this.props;
     const { spec, optional } = newProps;
     updateElement(current.index, {
       spec,
       optional
     });
-  },
-  cancel: function() {
+  }
+
+  cancel() {
     this.props.cancel();
-  },
-  render: function() {
+  }
+
+  render() {
     const { current, parent } = this.props;
     const { selector, spec, optional } = current;
-    const initialData = {
-      selector,
-      spec,
-      optional
-    };
-    const extraData = {
-      parent,
-      originalSpec: spec
-    };
-    const steps = [
-      ChooseType,
-      ChooseValue,
-      ChooseOptional,
-      ConfirmUpdate
-    ];
     return (
       <div className='frame'>
         <Tree />
         <Wizard
           steps={steps}
-          initialData={initialData}
-          extraData={extraData}
+          initialData={{
+            selector,
+            spec,
+            optional
+          }}
+          extraData={{
+            parent,
+            originalSpec: spec
+          }}
           save={this.save}
           cancel={this.cancel} />
       </div>
     );
   }
-});
+}
 
 export default connect(
   state => {

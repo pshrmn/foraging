@@ -29,12 +29,14 @@ function Rule(props) {
         <NeutralButton
           text='Edit'
           click={() => { updateRule(index); }} />
-        : null }
+        : null
+      }
       { active ?
         <NegButton
           text='Delete'
           click={() => { removeRule(index) }} />
-        : null }
+        : null
+      }
     </li>
   ); 
 }
