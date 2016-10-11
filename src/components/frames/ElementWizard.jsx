@@ -14,6 +14,7 @@ import {
 
 import { saveElement, showElementFrame } from 'actions';
 import { highlight, unhighlight} from 'helpers/markup';
+import { currentElement } from 'helpers/store';
 import { currentSelector } from 'constants/CSSClasses';
 
 const steps = [
@@ -84,12 +85,8 @@ class ElementWizard extends React.Component {
 export default connect(
   state => {
     const { page } = state;
-    const { pages, pageIndex, elementIndex } = page;
-
-    const currentPage = pages[pageIndex];
-    const element = currentPage === undefined ? undefined : currentPage.elements[elementIndex];
     return {
-      current: element
+      current: currentElement(page)
     };
   },
   {

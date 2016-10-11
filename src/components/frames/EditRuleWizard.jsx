@@ -13,6 +13,7 @@ import Cycle from 'components/common/Cycle';
 
 import { updateRule, showElementFrame } from 'actions';
 import { highlight, unhighlight} from 'helpers/markup';
+import { currentElement } from 'helpers/store';
 import { currentSelector } from 'constants/CSSClasses';
 
 const steps = [
@@ -106,12 +107,8 @@ class EditRuleWizard extends React.Component {
 export default connect(
   state => {
     const { page, frame } = state;
-    const { pages, pageIndex, elementIndex } = page;
-
-    const currentPage = pages[pageIndex];
-    const current = currentPage === undefined ? undefined : currentPage.elements[elementIndex];
     return {
-      current,
+      current: currentElement(page),
       ruleIndex: frame.index
     };
   },

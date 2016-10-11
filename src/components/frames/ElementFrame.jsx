@@ -5,6 +5,7 @@ import Tree from 'components/Tree';
 import ElementCard from 'components/ElementCard';
 
 import { highlight, unhighlight } from 'helpers/markup';
+import { currentElement } from 'helpers/store';
 import { currentSelector } from 'constants/CSSClasses';
 
 class ElementFrame extends React.Component {
@@ -48,11 +49,8 @@ class ElementFrame extends React.Component {
 export default connect(
   state => {
     const { page } = state;
-    const { pages, pageIndex, elementIndex } = page;
-    const currentPage = pages[pageIndex];
-    const element = currentPage === undefined ? undefined : currentPage.elements[elementIndex];
     return {
-      element: element
+      element: currentElement(page)
     }
   }
 )(ElementFrame);

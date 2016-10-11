@@ -6,7 +6,8 @@ import AllForm from 'components/forms/AllForm';
 
 import { select, count } from 'helpers/selection';
 import { highlight, unhighlight } from 'helpers/markup';
-import { levelNames } from 'helpers/page';
+import { takenNames } from 'helpers/store';
+
 import { showMessage } from 'expiring-redux-messages';
 import { currentSelector } from 'constants/CSSClasses';
 
@@ -145,17 +146,8 @@ class AllValueStep extends React.Component {
 export default connect(
   state => {
     const { page } = state;
-    const { pages, pageIndex, elementIndex } = page;
-
-    const currentPage = pages[pageIndex];
-    // use the current element's parent (if it has one) to get
-    // the level because the take names for the current element
-    // are in a different level. For the root node, use the elementIndex
-    // (but this should never happen)
-    const current = currentPage.elements[elementIndex];
-    const index = current.parent !== null ? current.parent : elementIndex;
     return {
-      takenNames: levelNames(currentPage.elements, index)
+      takenNames: takenNames(page)
     };
   },
   {

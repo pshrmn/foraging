@@ -11,7 +11,7 @@ import {
 } from 'components/steps/editElement';
 
 import { updateElement, showElementFrame } from 'actions';
-
+import { currentElement, currentParent } from 'helpers/store';
 const steps = [
   ChooseType,
   ChooseValue,
@@ -72,14 +72,9 @@ class EditElementWizard extends React.Component {
 export default connect(
   state => {
     const { page } = state;
-    const { pages, pageIndex, elementIndex } = page;
-
-    const currentPage = pages[pageIndex];
-    const current = currentPage === undefined ? undefined : currentPage.elements[elementIndex];
-    const parent = current === undefined ? undefined : currentPage.elements[current.parent];
     return {
-      current,
-      parent
+      current: currentElement(page),
+      parent: currentParent(page)
     };
   },
   {

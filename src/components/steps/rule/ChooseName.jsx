@@ -92,8 +92,11 @@ export default connect(
   state => {
     const { page } = state;
     const { pages, pageIndex, elementIndex } = page;
-
     const currentPage = pages[pageIndex];
+    /*
+     * NOTE: this is different than other takenNames because it wants
+     * the names within the current element
+     */
     return {
       takenNames: levelNames(currentPage.elements, elementIndex)
     };
