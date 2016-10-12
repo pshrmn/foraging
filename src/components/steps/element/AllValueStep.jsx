@@ -9,39 +9,12 @@ import { highlight, unhighlight } from 'helpers/markup';
 import { takenNames } from 'helpers/store';
 
 import { showMessage } from 'expiring-redux-messages';
-import { queryCheck } from 'constants/CSSClasses';
-
-function initialName(props) {
-  const { startData, endData = {} } = props;
-  let name = '';
-  // if there is an existing value, only use it if the types match
-  if ( endData.spec && endData.spec.name !== undefined ) {
-    name = endData.spec.name;
-  } else if ( startData.spec && startData.spec.name ) {
-    name = startData.spec.name;
-  }
-  return name;
-}
-
-function highlightElements(props, state) {
-  const { startData, staticData } = props;
-  const { name } = state;
-
-  const { selector } = startData;
-  const { parent } = staticData;
-  const elements = select(
-    parent.matches,
-    selector,
-    {type: 'all', name},
-    '.forager-holder'
-  );
-  highlight(elements, queryCheck);
-}
+import { queryCheck, currentSelector } from 'constants/CSSClasses';
 
 class AllValueStep extends React.Component {
   constructor(props) {
     super(props);
-    const name = initialName(props);
+    const name = props.setupState(props);
     this.state = {
       name,
       error: name === ''
@@ -67,17 +40,21 @@ class AllValueStep extends React.Component {
     const {
       startData,
       next,
-      takenNames,
-      showMessage
+      showMessage,
+      validate
     } = this.props;
 
-    if ( !takenNames.every(n => n !== name) ) {
-      showMessage(`"${name}" is a duplicate name and cannot be used.`, 5000, -1);
-      return;
-    }
+
     if ( error ) {
       return;
     }
+
+    const ok = validate(this.props, this.state);
+    if ( !ok ) {
+      showMessage(`"${name}" is a duplicate name and cannot be used.`, 5000, -1);
+      return;
+    }
+
     const newSpec = {
       type: 'all',
       name
@@ -112,16 +89,17 @@ class AllValueStep extends React.Component {
   }
 
   componentWillMount() {
-    highlightElements(this.props, this.state);
+    highlightElements(this.props, this.state, this.props.highlightClass);
   }
 
   componentWillUpdate(nextProps, nextState) {
-    unhighlight(queryCheck);
-    highlightElements(nextProps, nextState);
+    // remove the highlight based on previous highlightClass
+    unhighlight(this.props.highlightClass);
+    highlightElements(nextProps, nextState, nextProps.highlightClass);
   }
 
   componentWillUnmount() {
-    unhighlight(queryCheck);
+    unhighlight(this.props.highlightClass);
   }
 }
 
@@ -133,7 +111,8 @@ AllValueStep.propTypes = {
   previous: React.PropTypes.func
 };
 
-export default connect(
+
+const ConnectedAllValueStep = connect(
   state => {
     const { page } = state;
     return {
@@ -144,4 +123,80 @@ export default connect(
     showMessage
   }
 )(AllValueStep);
+
+export const CreateAllValueStep = props => (
+  <ConnectedAllValueStep
+    setupState={initialCreateName}
+    highlightClass={queryCheck}
+    validate={validateCreate}
+    {...props} />
+);
+
+export const EditAllValueStep = props => (
+  <ConnectedAllValueStep
+    setupState={initialEditName}
+    highlightClass={currentSelector}
+    validate={validateEdit}
+    {...props} />
+);
+
+/*
+ * when creating an All value, use endData and then startData to
+ * set an initial name
+ */
+function initialCreateName(props) {
+  const { startData, endData = {} } = props;
+  let name = '';
+  // if there is an existing value, only use it if the types match
+  if ( endData.spec && endData.spec.name !== undefined ) {
+    name = endData.spec.name;
+  } else if ( startData.spec && startData.spec.name ) {
+    name = startData.spec.name;
+  }
+  return name;
+}
+
+/*
+ * when editing an All value, use endData and then staticData to
+ * set an initial name
+ */
+function initialEditName(props) {
+  const { staticData, endData = {} } = props;
+  let name = '';
+  if ( endData.spec && endData.spec.name !== undefined ) {
+    name = endData.spec.name;
+  } else if ( staticData.originalSpec && staticData.originalSpec.name !== undefined ) {
+    name = staticData.originalSpec.name;
+  }
+  return name;
+}
+
+function validateCreate(props, state) {
+  const { name } = state;
+  const { takenNames } = props;
+  return takenNames.every(n => n !== name);
+}
+
+function validateEdit(props, state) {
+  const { name } = state;
+  const { takenNames, staticData } = props;
+  const originalName = staticData.originalSpec.name;
+  // name is taken if we're keeping the same name
+  return name === originalName || takenNames.every(n => n !== name);
+}
+
+function highlightElements(props, state, highlightClass) {
+  const { startData, staticData } = props;
+  const { name } = state;
+
+  const { selector } = startData;
+  const { parent } = staticData;
+  const elements = select(
+    parent.matches,
+    selector,
+    {type: 'all', name},
+    '.forager-holder'
+  );
+  highlight(elements, highlightClass);
+}
 

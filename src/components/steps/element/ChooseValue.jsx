@@ -1,18 +1,32 @@
 import React from 'react';
 
-import AllValueStep from './AllValueStep';
-import SingleValueStep from './SingleValueStep';
-import RangeValueStep from './RangeValueStep';
+import { CreateAllValueStep, EditAllValueStep } from './AllValueStep'
+import { CreateSingleValueStep, EditSingleValueStep } from './SingleValueStep';
+import { CreateRangeValueStep, EditRangeValueStep } from './RangeValueStep'
 
-export default function ChooseValue(props) {
+export function ChooseCreateValue(props) {
   const { spec } = props.startData;
   switch ( spec.type ) {
   case 'all':
-    return <AllValueStep {...props} />;
+    return <CreateAllValueStep {...props} />;
   case 'single':
-    return <SingleValueStep {...props} />;
+    return <CreateSingleValueStep {...props} />;
   case 'range':
-    return <RangeValueStep {...props} />;
+    return <CreateRangeValueStep {...props} />;
+  default:
+    return null;
+  }
+}
+
+export function ChooseEditValue(props) {
+  const { spec } = props.startData;
+  switch ( spec.type ) {
+  case 'all':
+    return <EditAllValueStep {...props} />;
+  case 'single':
+    return <EditSingleValueStep {...props} />;
+  case 'range':
+    return <EditRangeValueStep {...props} />;
   default:
     return null;
   }

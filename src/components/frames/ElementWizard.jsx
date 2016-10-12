@@ -6,9 +6,9 @@ import Wizard from 'simple-wizard-component';
 import {
   ChooseElements,
   ChooseParts,
-  ChooseType,
-  ChooseValue,
-  ChooseOptional,
+  ChooseCreateType,
+  ChooseCreateValue,
+  ChooseCreateOptional,
   ConfirmElement
 } from 'components/steps/element';
 
@@ -20,15 +20,15 @@ import { currentSelector } from 'constants/CSSClasses';
 const steps = [
   ChooseElements,
   ChooseParts,
-  ChooseType,
-  ChooseValue,
-  ChooseOptional,
+  ChooseCreateType,
+  ChooseCreateValue,
+  ChooseCreateOptional,
   ConfirmElement
 ];
 
 /*
- * ChooseElements -> ChooseParts -> ChooseType ->
- *   ChooseValue -> ChooseOptional -> ConfirmElement
+ * ChooseElements -> ChooseParts -> ChooseCreateType ->
+ *   ChooseCreateValue -> ChooseCreateOptional -> ConfirmElement
  * each step should make sure to pass the current object (the currently
  * selected element selector) as a property of the object returned
  * in its next call

@@ -3,24 +3,24 @@ import { connect } from 'react-redux';
 
 import Wizard from 'simple-wizard-component';
 import Tree from 'components/Tree';
-import { 
-  ChooseType,
-  ChooseValue,
-  ChooseOptional,
+import {
+  ChooseEditValue,
+  ChooseEditOptional,
+  ChooseEditType,
   ConfirmUpdate
-} from 'components/steps/editElement';
+} from 'components/steps/element';
 
 import { updateElement, showElementFrame } from 'actions';
 import { currentElement, currentParent } from 'helpers/store';
 const steps = [
-  ChooseType,
-  ChooseValue,
-  ChooseOptional,
+  ChooseEditType,
+  ChooseEditValue,
+  ChooseEditOptional,
   ConfirmUpdate
 ];
 
 /*
- * ChooseType -> ChooseValue -> ChooseOptional -> ConfirmUpdate
+ * ChooseEditType -> ChooseEditValue -> ChooseEditOptional -> ConfirmUpdate
  * each step should make sure to pass the current object (the currently
  * selected element selector) as a property of the object returned
  * in its next call

@@ -9,67 +9,12 @@ import { highlight, unhighlight } from 'helpers/markup';
 import { takenNames } from 'helpers/store';
 
 import { showMessage } from 'expiring-redux-messages';
-import { queryCheck } from 'constants/CSSClasses';
-
-function initialState(props) {
-  const { startData, endData = {} } = props;
-  let name = '';
-  let low = 0;
-  let high = 'end';
-
-  if ( endData.spec ) {
-    if ( endData.spec.name ) {
-      name = endData.spec.name;
-    }
-    if ( endData.spec.low !== undefined) {
-      low = endData.spec.low;
-    }
-    if ( endData.spec.high !== undefined ) {
-      high = endData.spec.high === null ? 'end' : endData.spec.high;
-    }
-  } else if ( startData.spec ) {
-    if ( startData.spec.name ) {
-      name = startData.spec.name;
-    }
-    if ( startData.spec.low !== undefined) {
-      low = startData.spec.low;
-    }
-    if ( startData.spec.high !== undefined ) {
-      high = startData.spec.high === null ? 'end' : startData.spec.high;
-    }
-  }
-
-  return {
-    name,
-    low,
-    high,
-    error: name === ''
-  };
-}
-
-function highlightElements(props, state) {
-  const { startData, staticData } = props;
-  const { name, low } = state;
-  let { high } = state;
-
-  const { selector } = startData;
-  const { parent } = staticData;
-  if ( high === 'end' ) {
-    high = null;
-  }
-  const elements = select(
-    parent.matches,
-    selector,
-    {type: 'range', name, low, high},
-    '.forager-holder'
-  );
-  highlight(elements, queryCheck);
-}
+import { queryCheck, currentSelector } from 'constants/CSSClasses';
 
 class RangeValueStep extends React.Component {
   constructor(props) {
     super(props);
-    this.state = initialState(props);
+    this.state = props.setupState(props);
 
     this.nameHandler = this.nameHandler.bind(this);
     this.lowHandler = this.lowHandler.bind(this);
@@ -126,10 +71,12 @@ class RangeValueStep extends React.Component {
       startData,
       next,
       takenNames,
-      showMessage
+      showMessage,
+      validate
     } = this.props;
 
-    if ( !takenNames.every(n => n !== name) ) {
+    const ok = validate(this.props, this.state);
+    if ( !ok ) {
       showMessage(`"${name}" is a duplicate name and cannot be used.`, 5000, -1);
       return;
     }
@@ -186,16 +133,16 @@ class RangeValueStep extends React.Component {
   }
 
   componentWillMount() {
-    highlightElements(this.props, this.state);
+    highlightElements(this.props, this.state, this.props.highlightClass);
   }
 
   componentWillUpdate(nextProps, nextState) {
-    unhighlight(queryCheck);
-    highlightElements(nextProps, nextState);
+    unhighlight(this.props.highlightClass);
+    highlightElements(nextProps, nextState, this.props.highlightClass);
   }
 
   componentWillUnmount() {
-    unhighlight(queryCheck);
+    unhighlight(this.props.highlightClass);
   }
 }
 
@@ -207,7 +154,7 @@ RangeValueStep.propTypes = {
   previous: React.PropTypes.func
 };
 
-export default connect(
+const ConnectedRangeValueStep = connect(
   state => {
     const { page } = state;
     return {
@@ -218,3 +165,125 @@ export default connect(
     showMessage
   }
 )(RangeValueStep);
+
+export const CreateRangeValueStep = props => (
+  <ConnectedRangeValueStep
+    setupState={initialCreateState}
+    highlightClass={queryCheck}
+    validate={validateCreate}
+    {...props} />
+);
+
+export const EditRangeValueStep = props => (
+  <ConnectedRangeValueStep
+    setupState={initialEditState}
+    highlightClass={currentSelector}
+    validate={validateEdit}
+    {...props} />
+);
+
+function initialCreateState(props) {
+  const { startData, endData = {} } = props;
+  let name = '';
+  let low = 0;
+  let high = 'end';
+
+  if ( endData.spec ) {
+    if ( endData.spec.name ) {
+      name = endData.spec.name;
+    }
+    if ( endData.spec.low !== undefined) {
+      low = endData.spec.low;
+    }
+    if ( endData.spec.high !== undefined ) {
+      high = endData.spec.high === null ? 'end' : endData.spec.high;
+    }
+  } else if ( startData.spec ) {
+    if ( startData.spec.name ) {
+      name = startData.spec.name;
+    }
+    if ( startData.spec.low !== undefined) {
+      low = startData.spec.low;
+    }
+    if ( startData.spec.high !== undefined ) {
+      high = startData.spec.high === null ? 'end' : startData.spec.high;
+    }
+  }
+
+  return {
+    name,
+    low,
+    high,
+    error: name === ''
+  };
+}
+
+function initialEditState(props) {
+  const { staticData, endData = {} } = props;
+  let name = '';
+  let low = 0;
+  let high = 'end';
+  // if there is an existing value, only use it if the types match
+  if ( endData.spec ) {
+    const spec = endData.spec;
+    if ( spec.name ) {
+      name = spec.name;
+    }
+    if ( spec.low !== undefined) {
+      low = spec.low;
+    }
+    if ( spec.high !== undefined ) {
+      high = spec.high === null ? 'end' : spec.high;
+    }
+  } else if ( staticData.originalSpec ) {
+    const spec = staticData.originalSpec;
+    if ( spec.name ) {
+      name = spec.name;
+    }
+    if ( spec.low !== undefined) {
+      low = spec.low;
+    }
+    if ( spec.high !== undefined ) {
+      high = spec.high === null ? 'end' : spec.high;
+    }
+  }
+  return {
+    name,
+    low,
+    high,
+    error: name === ''
+  };
+}
+
+function validateCreate(props, state) {
+  const { name } = state;
+  const { takenNames } = props;
+  return takenNames.every(n => n !== name)
+}
+
+function validateEdit(props, state) {
+  const { name } = state;
+  const { takenNames, staticData } = props;
+  const originalName = staticData.originalSpec.name;
+  // name is taken if we're keeping the same name
+  return name === originalName || takenNames.every(n => n !== name);
+}
+
+function highlightElements(props, state, highlightClass) {
+  const { startData, staticData } = props;
+  const { name, low } = state;
+  let { high } = state;
+
+  const { selector } = startData;
+  const { parent } = staticData;
+  if ( high === 'end' ) {
+    high = null;
+  }
+  const elements = select(
+    parent.matches,
+    selector,
+    {type: 'range', name, low, high},
+    '.forager-holder'
+  );
+  highlight(elements, highlightClass);
+}

@@ -1,6 +1,16 @@
 export { default as ChooseElements } from './ChooseElements';
 export { default as ChooseParts } from './ChooseParts';
-export { default as ChooseType } from './ChooseType';
-export { default as ChooseValue } from './ChooseValue';
-export { default as ChooseOptional } from './ChooseOptional';
+export {
+  ChooseCreateType,
+  ChooseEditType
+} from './ChooseType';
+export { 
+  ChooseCreateValue,
+  ChooseEditValue
+} from './ChooseValue';
+export {
+  ChooseCreateOptional,
+  ChooseEditOptional
+} from './ChooseOptional';
 export { default as ConfirmElement } from './ConfirmElement';
+export { default as ConfirmUpdate } from './ConfirmUpdate';

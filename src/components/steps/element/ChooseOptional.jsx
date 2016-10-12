@@ -5,18 +5,7 @@ import OptionalForm from 'components/forms/OptionalForm';
 
 import { select } from 'helpers/selection';
 import { highlight, unhighlight } from 'helpers/markup';
-import { queryCheck } from 'constants/CSSClasses';
-
-function initialOptional(props) {
-  const { startData, endData = {} } = props;
-  let optional = false;
-  if ( endData.optional !== undefined ) {
-    optional = endData.optional;
-  } else if ( startData.optional !== undefined ) {
-    optional = startData.optional;
-  }
-  return optional;
-}
+import { queryCheck, currentSelector } from 'constants/CSSClasses';
 
 class ChooseOptional extends React.Component {
   constructor(props) {
@@ -73,24 +62,17 @@ class ChooseOptional extends React.Component {
   }
 
   componentWillMount() {
-    const { startData, staticData } = this.props;
-    const { selector, spec } = startData;
-    const { parent } = staticData;
-    const elements = select(parent.matches, selector, spec, '.forager-holder');
-    highlight(elements, queryCheck);
+    highlightElements(this.props, this.state, this.props.highlightClass);
   }
 
   componentWillUpdate(nextProps, nextState) {
-    unhighlight(queryCheck);
-    const { startData, staticData } = nextProps;
-    const { selector, spec } = startData;
-    const { parent } = staticData;
-    const elements = select(parent.matches, selector, spec, '.forager-holder');
-    highlight(elements, queryCheck);
+    // remove the highlight based on previous highlightClass
+    unhighlight(this.props.highlightClass);
+    highlightElements(nextProps, nextState, nextProps.highlightClass);
   }
 
   componentWillUnmount() {
-    unhighlight(queryCheck);
+    unhighlight(this.props.highlightClass);
   }
 }
 
@@ -99,7 +81,40 @@ ChooseOptional.propTypes = {
   endData: React.PropTypes.object,
   staticData: React.PropTypes.object,
   next: React.PropTypes.func,
-  previous: React.PropTypes.func
+  previous: React.PropTypes.func,
+  highlightClass: React.PropTypes.string.isRequired
 };
 
-export default ChooseOptional;
+export const ChooseCreateOptional = props => (
+  <ChooseOptional highlightClass={queryCheck} {...props} />
+);
+
+export const ChooseEditOptional = props => (
+  <ChooseOptional highlightClass={currentSelector} {...props} />
+);
+
+function initialOptional(props) {
+  const { startData, endData = {} } = props;
+  let optional = false;
+  if ( endData.optional !== undefined ) {
+    optional = endData.optional;
+  } else if ( startData.optional !== undefined ) {
+    optional = startData.optional;
+  }
+  return optional;
+}
+
+function highlightElements(props, state, highlightClass) {
+  const { startData, staticData } = props;
+
+  const { selector, spec } = startData;
+  const { parent = {} } = staticData;
+  const { matches: parentMatches = [document] } = parent;
+  const elements = select(
+    parentMatches,
+    startData.selector,
+    spec,
+    '.forager-holder'
+  );
+  highlight(elements, highlightClass);
+}
