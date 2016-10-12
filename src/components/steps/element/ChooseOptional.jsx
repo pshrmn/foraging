@@ -85,11 +85,11 @@ ChooseOptional.propTypes = {
   highlightClass: React.PropTypes.string.isRequired
 };
 
-export const ChooseCreateOptional = props => (
+export const CreateOptional = props => (
   <ChooseOptional highlightClass={queryCheck} {...props} />
 );
 
-export const ChooseEditOptional = props => (
+export const EditOptional = props => (
   <ChooseOptional highlightClass={currentSelector} {...props} />
 );
 

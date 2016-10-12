@@ -4,7 +4,7 @@ import { CreateAllValueStep, EditAllValueStep } from './AllValueStep'
 import { CreateSingleValueStep, EditSingleValueStep } from './SingleValueStep';
 import { CreateRangeValueStep, EditRangeValueStep } from './RangeValueStep'
 
-export function ChooseCreateValue(props) {
+export function CreateValue(props) {
   const { spec } = props.startData;
   switch ( spec.type ) {
   case 'all':
@@ -18,7 +18,7 @@ export function ChooseCreateValue(props) {
   }
 }
 
-export function ChooseEditValue(props) {
+export function EditValue(props) {
   const { spec } = props.startData;
   switch ( spec.type ) {
   case 'all':

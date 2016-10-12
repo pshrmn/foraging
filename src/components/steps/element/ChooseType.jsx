@@ -105,7 +105,7 @@ ChooseType.propTypes = {
   previous: React.PropTypes.func
 };
 
-export const ChooseCreateType = props => (
+export const CreateType = props => (
   <ChooseType
     highlight={createHighlightElements}
     highlightClass={queryCheck}
@@ -113,7 +113,7 @@ export const ChooseCreateType = props => (
     {...props} />
 );
 
-export const ChooseEditType = props => (
+export const EditType = props => (
   <ChooseType
     highlight={editHighlightElements}
     highlightClass={currentSelector}
