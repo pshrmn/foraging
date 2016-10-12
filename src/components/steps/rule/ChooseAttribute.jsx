@@ -57,8 +57,8 @@ class ChooseAttribute extends React.Component {
 
   render() {
     const { attribute, index, error } = this.state;
-    const { extraData } = this.props;
-    const { element } = extraData;
+    const { staticData } = this.props;
+    const { element } = staticData;
 
     return (
       <form className='info-box'>

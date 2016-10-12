@@ -8,15 +8,31 @@ import { highlight, unhighlight } from 'helpers/markup';
 import { currentSelector } from 'constants/CSSClasses';
 
 function initialIndex(props) {
-  const { extraData, endData = {} } = props;
+  const { staticData, endData = {} } = props;
   let index = 0;
   // if there is an existing index, only use it if the types match
   if ( endData.spec && endData.spec.index !== undefined ) {
     index = endData.spec.index;
-  } else if ( extraData.originalSpec && extraData.originalSpec.index !== undefined ) {
-    index = extraData.originalSpec.index;
+  } else if ( staticData.originalSpec && staticData.originalSpec.index !== undefined ) {
+    index = staticData.originalSpec.index;
   }
   return index;
+}
+
+function highlightElements(props, state) {
+  const { startData, staticData } = props;
+  const { index } = state;
+
+  const { parent = {} } = staticData;
+  const { matches: parentMatches = [document] } = parent;
+
+  const elements = select(
+    parentMatches,
+    startData.selector,
+    {type: 'single', index},
+    '.forager-holder'
+  );
+  highlight(elements, currentSelector);
 }
 
 class SingleValueStep extends React.Component {
@@ -67,9 +83,9 @@ class SingleValueStep extends React.Component {
 
   render() {
     const { index, error } = this.state;
-    const { startData, extraData } = this.props;
+    const { startData, staticData } = this.props;
     const { selector } = startData;
-    const { parent = {} } = extraData
+    const { parent = {} } = staticData
     const { matches = [document] } = parent;
 
     const indices = count(matches, selector);
@@ -88,44 +104,25 @@ class SingleValueStep extends React.Component {
   }
 
   componentWillMount() {
-    const { startData, extraData } = this.props;
-
-    const { parent = {} } = extraData;
-    const { matches: parentMatches = [document] } = parent;
-
-    const { index } = this.state;
-
-    const elements = select(
-      parentMatches,
-      startData.selector,
-      {type: 'single', index},
-      '.forager-holder'
-    );
-    highlight(elements, currentSelector);
+    highlightElements(this.props, this.state);
   }
 
   componentWillUpdate(nextProps, nextState) {
     unhighlight(currentSelector);
-
-    const { startData, extraData } = nextProps;
-
-    const { parent = {} } = extraData;
-    const { matches: parentMatches = [document] } = parent;
-
-    const { index } = nextState;
-
-    const elements = select(
-      parentMatches,
-      startData.selector,
-      {type: 'single', index},
-      '.forager-holder'
-    );
-    highlight(elements, currentSelector);
+    highlightElements(nextProps, nextState);
   }
 
   componentWillUnmount() {
     unhighlight(currentSelector);
   }
 }
+
+SingleValueStep.propTypes = {
+  startData: React.PropTypes.object,
+  endData: React.PropTypes.object,
+  staticData: React.PropTypes.object,
+  next: React.PropTypes.func,
+  previous: React.PropTypes.func
+};
 
 export default SingleValueStep;

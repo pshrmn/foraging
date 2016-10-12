@@ -74,7 +74,7 @@ class EditRuleWizard extends React.Component {
             attr,
             type
           }}
-          extraData={{
+          staticData={{
             element: current.matches[index]
           }}
           save={this.save}

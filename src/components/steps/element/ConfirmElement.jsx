@@ -19,7 +19,7 @@ class ConfirmElement extends React.Component {
   saveHandler(event) {
     event.preventDefault();
     const { startData, next: save } = this.props;
-    const { current, selector, spec, optional } = startData;
+    const { selector, spec, optional } = startData;
     const ele = createElement(selector, spec, optional);
     save(ele);
   }
@@ -55,9 +55,10 @@ class ConfirmElement extends React.Component {
   }
 
   componentWillMount() {
-    const { startData } = this.props;
-    const { current, selector, spec } = startData;
-    const elements = select(current.matches, selector, spec, '.forager-holder');
+    const { startData, staticData } = this.props;
+    const { selector, spec } = startData;
+    const { parent } = staticData;
+    const elements = select(parent.matches, selector, spec, '.forager-holder');
     highlight(elements, queryCheck);
   }
 
@@ -65,5 +66,13 @@ class ConfirmElement extends React.Component {
     unhighlight(queryCheck);
   }
 }
+
+ConfirmElement.propTypes = {
+  startData: React.PropTypes.object,
+  endData: React.PropTypes.object,
+  staticData: React.PropTypes.object,
+  next: React.PropTypes.func,
+  previous: React.PropTypes.func
+};
 
 export default ConfirmElement;

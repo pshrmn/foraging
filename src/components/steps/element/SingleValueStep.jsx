@@ -19,6 +19,22 @@ function initialIndex(props) {
   return index;
 }
 
+function highlightElements(props, state) {
+  const { startData, staticData } = props;
+  const { index } = state;
+
+  const { selector } = startData;
+  const { parent } = staticData;
+
+  const elements = select(
+    parent.matches,
+    selector,
+    {type: 'single', index},
+    '.forager-holder'
+  );
+  highlight(elements, queryCheck);
+}
+
 class SingleValueStep extends React.Component {
   constructor(props) {
     super(props);
@@ -67,10 +83,11 @@ class SingleValueStep extends React.Component {
 
   render() {
     const { index, error } = this.state;
-    const { startData } = this.props;
-    const { current, selector } = startData;
+    const { startData, staticData } = this.props;
+    const { selector } = startData;
+    const { parent } = staticData;
 
-    const indices = count(current.matches, selector);
+    const indices = count(parent.matches, selector);
     
     return (
       <form className='info-box'>
@@ -87,26 +104,25 @@ class SingleValueStep extends React.Component {
   }
 
   componentWillMount() {
-    const { startData } = this.props;
-    const { current, selector } = startData;
-    const { index } = this.state;
-    const elements = select(current.matches, selector, {type: 'single', index}, '.forager-holder');
-    highlight(elements, queryCheck);
+    highlightElements(this.props, this.state);
   }
 
   componentWillUpdate(nextProps, nextState) {
     unhighlight(queryCheck);
-
-    const { startData } = nextProps;
-    const { current, selector } = startData;
-    const { index } = nextState;
-    const elements = select(current.matches, selector, {type: 'single', index}, '.forager-holder');
-    highlight(elements, queryCheck);
+    highlightElements(nextProps, nextState);
   }
 
   componentWillUnmount() {
     unhighlight(queryCheck);
   }
 }
+
+SingleValueStep.propTypes = {
+  startData: React.PropTypes.object,
+  endData: React.PropTypes.object,
+  staticData: React.PropTypes.object,
+  next: React.PropTypes.func,
+  previous: React.PropTypes.func
+};
 
 export default SingleValueStep;

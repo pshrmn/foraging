@@ -23,6 +23,21 @@ function initialName(props) {
   return name;
 }
 
+function highlightElements(props, state) {
+  const { startData, staticData } = props;
+  const { name } = state;
+
+  const { selector } = startData;
+  const { parent } = staticData;
+  const elements = select(
+    parent.matches,
+    selector,
+    {type: 'all', name},
+    '.forager-holder'
+  );
+  highlight(elements, queryCheck);
+}
+
 class AllValueStep extends React.Component {
   constructor(props) {
     super(props);
@@ -97,27 +112,26 @@ class AllValueStep extends React.Component {
   }
 
   componentWillMount() {
-    const { startData } = this.props;
-    const { current, selector } = startData;
-    const { name } = this.state;
-    const elements = select(current.matches, selector, {type: 'all', name}, '.forager-holder');
-    highlight(elements, queryCheck);
+    highlightElements(this.props, this.state);
   }
 
   componentWillUpdate(nextProps, nextState) {
     unhighlight(queryCheck);
-
-    const { startData } = nextProps;
-    const { current, selector } = startData;
-    const { name } = nextState;
-    const elements = select(current.matches, selector, {type: 'all', name}, '.forager-holder');
-    highlight(elements, queryCheck);
+    highlightElements(nextProps, nextState);
   }
 
   componentWillUnmount() {
     unhighlight(queryCheck);
   }
 }
+
+AllValueStep.propTypes = {
+  startData: React.PropTypes.object,
+  endData: React.PropTypes.object,
+  staticData: React.PropTypes.object,
+  next: React.PropTypes.func,
+  previous: React.PropTypes.func
+};
 
 export default connect(
   state => {

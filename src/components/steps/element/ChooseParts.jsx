@@ -36,12 +36,11 @@ class ChooseParts extends React.Component {
   nextHandler(event) {
     event.preventDefault();
     const { parts } = this.state;
-    const { next, startData } = this.props;
+    const { next } = this.props;
     const selector = joinParts(parts);
     if ( selector !== '' ) {
       next({
-        selector,
-        current: startData.current
+        selector
       });
     } else {
       this.setState({
@@ -66,8 +65,8 @@ class ChooseParts extends React.Component {
     const parts = this.state.parts;
     parts[index].checked = !parts[index].checked;
     const fullSelector = joinParts(parts);
-    const { startData } = this.props;
-    const matches = startData.current.matches;
+    const { staticData } = this.props;
+    const matches = staticData.parent.matches;
 
     setupHighlights(fullSelector, matches);
     this.setState({
@@ -78,14 +77,15 @@ class ChooseParts extends React.Component {
   }
 
   componentWillMount() {
-    const { startData } = this.props;
-    const { parts, current } = startData;
+    const { startData, staticData } = this.props;
+    const { parts } = startData;
+    const { parent } = staticData;
     const fullSelector = parts.join('');
 
-    setupHighlights(fullSelector, current.matches);
+    setupHighlights(fullSelector, parent.matches);
     this.setState({
       parts: parts.map(name => ({name: name, checked: true})),
-      eleCount: count(current.matches, fullSelector),
+      eleCount: count(parent.matches, fullSelector),
       error: false
     });
   }
@@ -130,5 +130,13 @@ class ChooseParts extends React.Component {
     unhighlight(queryCheck);
   }
 }
+
+ChooseParts.propTypes = {
+  startData: React.PropTypes.object,
+  endData: React.PropTypes.object,
+  staticData: React.PropTypes.object,
+  next: React.PropTypes.func,
+  previous: React.PropTypes.func
+};
 
 export default ChooseParts;

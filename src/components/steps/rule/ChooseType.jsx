@@ -57,8 +57,8 @@ class ChooseType extends React.Component {
     const { startData, children } = this.props;
     const { attribute } = startData;
 
-    const { extraData } = this.props;
-    const { element } = extraData;
+    const { staticData } = this.props;
+    const { element } = staticData;
 
     const value = attribute === 'text' ? element.innerText : element.getAttribute(attribute);
 

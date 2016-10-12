@@ -47,6 +47,25 @@ function initialState(props) {
   };
 }
 
+function highlightElements(props, state) {
+  const { startData, staticData } = props;
+  const { name, low } = state;
+  let { high } = state;
+
+  const { selector } = startData;
+  const { parent } = staticData;
+  if ( high === 'end' ) {
+    high = null;
+  }
+  const elements = select(
+    parent.matches,
+    selector,
+    {type: 'range', name, low, high},
+    '.forager-holder'
+  );
+  highlight(elements, queryCheck);
+}
+
 class RangeValueStep extends React.Component {
   constructor(props) {
     super(props);
@@ -139,10 +158,11 @@ class RangeValueStep extends React.Component {
 
   render() {
     const { name, low, high, error } = this.state;
-    const { startData } = this.props;
-    const { current, selector } = startData;
+    const { startData, staticData } = this.props;
+    const { selector } = startData;
+    const { parent } = staticData;
 
-    const indices = count(current.matches, selector);
+    const indices = count(parent.matches, selector);
 
     return (
       <form className='info-box'>
@@ -166,45 +186,26 @@ class RangeValueStep extends React.Component {
   }
 
   componentWillMount() {
-    const { startData } = this.props;
-    const { current, selector } = startData;
-    const { name, low } = this.state;
-    let { high } = this.state;
-    if ( high === 'end' ) {
-      high = null;
-    }
-    const elements = select(
-      current.matches,
-      selector,
-      {type: 'range', name, low, high},
-      '.forager-holder'
-    );
-    highlight(elements, queryCheck);
+    highlightElements(this.props, this.state);
   }
 
   componentWillUpdate(nextProps, nextState) {
     unhighlight(queryCheck);
-
-    const { startData } = nextProps;
-    const { current, selector } = startData;
-    const { name, low } = nextState;
-    let { high } = nextState;
-    if ( high === 'end' ) {
-      high = null;
-    }
-    const elements = select(
-      current.matches,
-      selector,
-      {type: 'range', name, low, high},
-      '.forager-holder'
-    );
-    highlight(elements, queryCheck);
+    highlightElements(nextProps, nextState);
   }
 
   componentWillUnmount() {
     unhighlight(queryCheck);
   }
 }
+
+RangeValueStep.propTypes = {
+  startData: React.PropTypes.object,
+  endData: React.PropTypes.object,
+  staticData: React.PropTypes.object,
+  next: React.PropTypes.func,
+  previous: React.PropTypes.func
+};
 
 export default connect(
   state => {

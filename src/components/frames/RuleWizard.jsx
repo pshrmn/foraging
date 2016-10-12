@@ -63,7 +63,7 @@ class RuleWizard extends React.Component {
         <ElementCard active={false} element={current} />
         <Wizard steps={steps}
                 initialData={{}}
-                extraData={{
+                staticData={{
                   element: current.matches[index]
                 }}
                 save={this.save}

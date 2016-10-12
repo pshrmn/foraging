@@ -16,6 +16,27 @@ function initialType(props) {
   return type;
 }
 
+function highlightElements(props, state) {
+  const { startData, staticData } = props;
+  const { type } = state;
+
+  const { selector } = startData;
+  const { parent } = staticData;
+
+  const spec = {
+    type
+  }
+  // use set single index if possible
+  if ( type === 'single' ) {
+    spec.index = 0
+  } else if ( type === 'range' ) {
+    spec.low = 0;
+    spec.high = undefined;
+  }
+  const elements = select(parent.matches, selector, spec, '.forager-holder');
+  highlight(elements, queryCheck); 
+}
+
 class ChooseType extends React.Component {
   constructor(props) {
     super(props);
@@ -85,46 +106,25 @@ class ChooseType extends React.Component {
   }
 
   componentWillMount() {
-    const { startData } = this.props;
-    const { current, selector } = startData;
-    const { type } = this.state;
-    const spec = {
-      type
-    }
-    // use set single index if possible
-    if ( type === 'single' ) {
-      spec.index = 0
-    } else if ( type === 'range' ) {
-      spec.low = 0;
-      spec.high = undefined;
-    }
-    const elements = select(current.matches, selector, spec, '.forager-holder');
-    highlight(elements, queryCheck);
+    highlightElements(this.props, this.state);
   }
 
   componentWillUpdate(nextProps, nextState) {
     unhighlight(queryCheck);
-
-    const { startData } = nextProps;
-    const { current, selector } = startData;
-    const { type } = nextState;
-    const spec = {
-      type
-    }
-    // use set single index if possible
-    if ( type === 'single' ) {
-      spec.index = 0
-    } else if ( type === 'range' ) {
-      spec.low = 0;
-      spec.high = undefined;
-    }
-    const elements = select(current.matches, selector, spec, '.forager-holder');
-    highlight(elements, queryCheck);
+    highlightElements(nextProps, nextState);
   }
 
   componentWillUnmount() {
     unhighlight(queryCheck);
   }
 }
+
+ChooseType.propTypes = {
+  startData: React.PropTypes.object,
+  endData: React.PropTypes.object,
+  staticData: React.PropTypes.object,
+  next: React.PropTypes.func,
+  previous: React.PropTypes.func
+};
 
 export default ChooseType;

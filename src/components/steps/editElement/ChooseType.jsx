@@ -18,6 +18,35 @@ function initialType(props) {
   return type;
 }
 
+function highlightElements(props, state) {
+  const { startData, staticData } = props;
+  const { type } = state;
+  
+  const { parent = {} } = staticData;
+  const { matches: parentMatches = [document] } = parent;
+
+  const spec = {
+    type
+  }
+  // use set single index if possible
+  if ( type === 'single' ) {
+    const wasSingle = startData.spec && startData.spec.type === 'single';
+    spec.index = wasSingle ? startData.spec.index : 0
+  } else if ( type === 'range' ) {
+    const wasRange = startData.spec && startData.spec.type === 'range';
+    spec.low = wasRange ? startData.spec.low : 0;
+    spec.high = wasRange ? startData.spec.high : undefined;
+  }
+  
+  const elements = select(
+    parentMatches,
+    startData.selector,
+    spec,
+    '.forager-holder'
+  );
+  highlight(elements, currentSelector);
+}
+
 class ChooseType extends React.Component {
   constructor(props) {
     super(props);
@@ -70,68 +99,25 @@ class ChooseType extends React.Component {
   }
 
   componentWillMount() {
-    const { startData, extraData } = this.props;
-
-    const { parent = {} } = extraData;
-    const { matches: parentMatches = [document] } = parent;
-
-    const { type } = this.state;
-    const spec = {
-      type
-    }
-    // use set single index if possible
-    if ( type === 'single' ) {
-      const wasSingle = startData.spec && startData.spec.type === 'single';
-      spec.index = wasSingle ? startData.spec.index : 0
-    } else if ( type === 'range' ) {
-      const wasRange = startData.spec && startData.spec.type === 'range';
-      spec.low = wasRange ? startData.spec.low : 0;
-      spec.high = wasRange ? startData.spec.high : undefined;
-    }
-    
-    const elements = select(
-      parentMatches,
-      startData.selector,
-      spec,
-      '.forager-holder'
-    );
-    highlight(elements, currentSelector);
+    highlightElements(this.props, this.state);
   }
 
   componentWillUpdate(nextProps, nextState) {
     unhighlight(currentSelector);
-
-    const { startData, extraData } = nextProps;
-
-    const { parent = {} } = extraData;
-    const { matches: parentMatches = [document] } = parent;
-
-    const { type } = nextState;
-    const spec = {
-      type
-    }
-    // use set single index if possible
-    if ( type === 'single' ) {
-      const wasSingle = startData.spec && startData.spec.type === 'single';
-      spec.index = wasSingle ? startData.spec.index : 0
-    } else if ( type === 'range' ) {
-      const wasRange = startData.spec && startData.spec.type === 'range';
-      spec.low = wasRange ? startData.spec.low : 0;
-      spec.high = wasRange ? startData.spec.high : undefined;
-    }
-
-    const elements = select(
-      parentMatches,
-      startData.selector,
-      spec,
-      '.forager-holder'
-    );
-    highlight(elements, currentSelector);
+    highlightElements(nextProps, nextState);
   }
 
   componentWillUnmount() {
     unhighlight(currentSelector);
   }
 }
+
+ChooseType.propTypes = {
+  startData: React.PropTypes.object,
+  endData: React.PropTypes.object,
+  staticData: React.PropTypes.object,
+  next: React.PropTypes.func,
+  previous: React.PropTypes.func
+};
 
 export default ChooseType;

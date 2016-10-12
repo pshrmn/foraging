@@ -18,6 +18,21 @@ function initialOptional(props) {
   return optional;
 }
 
+function highlightElements(props, state) {
+  const { startData, staticData } = props;
+
+  const { selector, spec } = startData;
+  const { parent = {} } = staticData;
+  const { matches: parentMatches = [document] } = parent;
+  const elements = select(
+    parentMatches,
+    startData.selector,
+    spec,
+    '.forager-holder'
+  );
+  highlight(elements, currentSelector);
+}
+
 class ChooseOptional extends React.Component {
   constructor(props) {
     super(props);
@@ -57,7 +72,7 @@ class ChooseOptional extends React.Component {
   render() {
     const { optional } = this.state;
     const { startData } = this.props;
-    const { current, selector } = startData
+    const { selector } = startData
     return (
       <form className='info-box'>
         <div className='info'>
@@ -72,40 +87,26 @@ class ChooseOptional extends React.Component {
   }
 
   componentWillMount() {
-    const { startData, extraData } = this.props;
-
-    const { selector, spec } = startData;
-    const { parent = {} } = extraData;
-    const { matches: parentMatches = [document] } = parent;
-    const elements = select(
-      parentMatches,
-      startData.selector,
-      spec,
-      '.forager-holder'
-    );
-    highlight(elements, currentSelector);
+    highlightElements(this.props, this.state);
+    
   }
 
   componentWillUpdate(nextProps, nextState) {
     unhighlight(currentSelector);
-
-    const { startData, extraData } = this.props;
-
-    const { selector, spec } = startData;
-    const { parent = {} } = extraData;
-    const { matches: parentMatches = [document] } = parent;
-    const elements = select(
-      parentMatches,
-      startData.selector,
-      spec,
-      '.forager-holder'
-    );
-    highlight(elements, currentSelector);
+    highlightElements(nextProps,nextState);
   }
 
   componentWillUnmount() {
     unhighlight(currentSelector);
   }
 }
+
+ChooseOptional.propTypes = {
+  startData: React.PropTypes.object,
+  endData: React.PropTypes.object,
+  staticData: React.PropTypes.object,
+  next: React.PropTypes.func,
+  previous: React.PropTypes.func
+};
 
 export default ChooseOptional;

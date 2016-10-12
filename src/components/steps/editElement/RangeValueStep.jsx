@@ -12,7 +12,7 @@ import { showMessage } from 'expiring-redux-messages';
 import { currentSelector } from 'constants/CSSClasses';
 
 function initialState(props) {
-  const { extraData, endData = {} } = props;
+  const { staticData, endData = {} } = props;
   let name = '';
   let low = 0;
   let high = 'end';
@@ -28,8 +28,8 @@ function initialState(props) {
     if ( spec.high !== undefined ) {
       high = spec.high === null ? 'end' : spec.high;
     }
-  } else if ( extraData.originalSpec ) {
-    const spec = extraData.originalSpec;
+  } else if ( staticData.originalSpec ) {
+    const spec = staticData.originalSpec;
     if ( spec.name ) {
       name = spec.name;
     }
@@ -46,6 +46,26 @@ function initialState(props) {
     high,
     error: name === ''
   };
+}
+
+function highlightElements(props, state) {
+  const { startData, staticData } = props;
+  const { name, low } = state;
+  let { high } = state;
+
+  const { parent = {} } = staticData;
+  const { matches: parentMatches = [document] } = parent;
+
+  if ( high === 'end' ) {
+    high = null;
+  }
+  const elements = select(
+    parentMatches,
+    startData.selector,
+    {type: 'range', name, low, high},
+    '.forager-holder'
+  );
+  highlight(elements, currentSelector);
 }
 
 class RangeValueStep extends React.Component {
@@ -106,14 +126,14 @@ class RangeValueStep extends React.Component {
     const { name, low, high, error } = this.state;
     const {
       startData,
-      extraData,
+      staticData,
       next,
       takenNames,
       showMessage
     } = this.props;
 
     // do not do duplicate test if the name isn't changing
-    const originalName = extraData.originalSpec.name;
+    const originalName = staticData.originalSpec.name;
     if ( name !== originalName && !takenNames.every(n => n !== name) ) {
       showMessage(`"${name}" is a duplicate name and cannot be used.`, 5000, -1);
       return;
@@ -142,10 +162,10 @@ class RangeValueStep extends React.Component {
 
   render() {
     const { name, low, high, error } = this.state;
-    const { startData, extraData } = this.props;
+    const { startData, staticData } = this.props;
 
     const { selector } = startData;
-    const { parent = {} } = extraData
+    const { parent = {} } = staticData
     const { matches = [document] } = parent;
 
     const indices = count(matches, selector);
@@ -172,50 +192,26 @@ class RangeValueStep extends React.Component {
   }
 
   componentWillMount() {
-    const { startData, extraData } = this.props;
-
-    const { parent = {} } = extraData;
-    const { matches: parentMatches = [document] } = parent;
-
-    const { name, low } = this.state;
-    let { high } = this.state;
-    if ( high === 'end' ) {
-      high = null;
-    }
-    const elements = select(
-      parentMatches,
-      startData.selector,
-      {type: 'range', name, low, high},
-      '.forager-holder'
-    );
-    highlight(elements, currentSelector);
+    highlightElements(this.props, this.state);
   }
 
   componentWillUpdate(nextProps, nextState) {
     unhighlight(currentSelector);
-    const { startData, extraData } = nextProps;
-
-    const { parent = {} } = extraData;
-    const { matches: parentMatches = [document] } = parent;
-
-    const { name, low } = nextState;
-    let { high } = nextState;
-    if ( high === 'end' ) {
-      high = null;
-    }
-    const elements = select(
-      parentMatches,
-      startData.selector,
-      {type: 'range', name, low, high},
-      '.forager-holder'
-    );
-    highlight(elements, currentSelector);
+    highlightElements(nextProps, nextState);
   }
 
   componentWillUnmount() {
     unhighlight(currentSelector);
   }
 }
+
+RangeValueStep.propTypes = {
+  startData: React.PropTypes.object,
+  endData: React.PropTypes.object,
+  staticData: React.PropTypes.object,
+  next: React.PropTypes.func,
+  previous: React.PropTypes.func
+};
 
 export default connect(
   state => {

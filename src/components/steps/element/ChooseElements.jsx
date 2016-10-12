@@ -19,11 +19,11 @@ class ChooseElement extends React.Component {
     super(props);
 
     const selectors = [['*']];
-    const { startData } = this.props;
-    const { current } = startData;
+    const { staticData } = this.props;
+    const { parent } = staticData;
     // when current's elements are select elements, automatically add 'option'
     // to the selectors array since it cannot be selected by the user
-    if ( allSelect(current.matches) ) {
+    if ( allSelect(parent.matches) ) {
       selectors.push(['option']);
     }
     this.state = {
@@ -73,9 +73,14 @@ class ChooseElement extends React.Component {
     });
   }
 
-  addEvents(startData) {
+  addEvents(staticData) {
     // get all child elements of the parents
-    const elements = select(startData.current.matches, null, null, '.forager-holder');
+    const elements = select(
+      staticData.parent.matches,
+      null,
+      null,
+      '.forager-holder'
+    );
 
     // remove any existing events
     if ( this.iUnhighlight ) {
@@ -94,11 +99,11 @@ class ChooseElement extends React.Component {
 
   setRadio(i) {
     const selector = this.state.selectors[i].join('');
-    const { startData } = this.props;
-    const { current } = startData;
+    const { staticData } = this.props;
+    const { parent } = staticData;
     this.setState({
       checked: i,
-      eleCount: count(current.matches, selector),
+      eleCount: count(parent.matches, selector),
       error: false
     });
   }
@@ -106,12 +111,11 @@ class ChooseElement extends React.Component {
   nextHandler(event) {
     event.preventDefault();
     const { checked, selectors } = this.state;
-    const { next, startData } = this.props;
+    const { next } = this.props;
     const selectedSelector = selectors[checked];
     if ( checked !== undefined && selectedSelector !== undefined ) {
       next({
-        parts: selectedSelector,
-        current: startData.current
+        parts: selectedSelector
       });
     } else {
       this.setState({
@@ -156,13 +160,13 @@ class ChooseElement extends React.Component {
    * below here are the functions for interacting with the non-Forager part of the page
    */
   componentWillMount() {
-    const { startData } = this.props;
-    this.addEvents(startData);
+    const { staticData } = this.props;
+    this.addEvents(staticData);
   }
 
   componentWillReceiveNewProps(nextProps) {
-    const { startData } = nextProps;
-    this.addEvents(startData);
+    const { staticData } = nextProps;
+    this.addEvents(staticData);
   }
 
   /*
@@ -175,8 +179,13 @@ class ChooseElement extends React.Component {
     const clickedSelector = nextState.selectors[nextState.checked];
     if ( clickedSelector !== undefined ) {
       const fullSelector = clickedSelector.join('');
-      const { startData } = nextProps;
-      const elements = select(startData.current.matches, fullSelector, null, '.forager-holder');
+      const { staticData } = nextProps;
+      const elements = select(
+        staticData.parent.matches,
+        fullSelector,
+        null,
+        '.forager-holder'
+      );
       highlight(elements, queryCheck);
     }
   }
@@ -193,9 +202,10 @@ class ChooseElement extends React.Component {
 ChooseElement.propTypes = {
   startData: React.PropTypes.object,
   endData: React.PropTypes.object,
+  staticData: React.PropTypes.object,
   next: React.PropTypes.func,
   previous: React.PropTypes.func
-}
+};
 
 // do not call event.preventDefault() here or the checked dot will fail to render
 const SelectorRadio = ({ selector, checked, select, index }) => (

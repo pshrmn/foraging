@@ -50,16 +50,16 @@ class ElementWizard extends React.Component {
 
   render() {
     const { current } = this.props;
-    const initialData = {
-      current
-    };
 
     return (
       <div className='frame'>
         <Tree />
         <Wizard
           steps={steps}
-          initialData={initialData}
+          initialData={{}}
+          staticData={{
+            parent: current
+          }}
           save={this.save}
           cancel={this.cancel} />
       </div>

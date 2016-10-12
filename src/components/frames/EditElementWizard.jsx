@@ -58,7 +58,7 @@ class EditElementWizard extends React.Component {
             spec,
             optional
           }}
-          extraData={{
+          staticData={{
             parent,
             originalSpec: spec
           }}

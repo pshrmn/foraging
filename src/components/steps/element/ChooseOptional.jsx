@@ -57,7 +57,8 @@ class ChooseOptional extends React.Component {
   render() {
     const { optional } = this.state;
     const { startData } = this.props;
-    const { current, selector } = startData
+    const { selector } = startData;
+    
     return (
       <form className='info-box'>
         <div className='info'>
@@ -72,17 +73,19 @@ class ChooseOptional extends React.Component {
   }
 
   componentWillMount() {
-    const { startData } = this.props;
-    const { current, selector, spec } = startData;
-    const elements = select(current.matches, selector, spec, '.forager-holder');
+    const { startData, staticData } = this.props;
+    const { selector, spec } = startData;
+    const { parent } = staticData;
+    const elements = select(parent.matches, selector, spec, '.forager-holder');
     highlight(elements, queryCheck);
   }
 
   componentWillUpdate(nextProps, nextState) {
     unhighlight(queryCheck);
-    const { startData } = nextProps;
-    const { current, selector, spec } = startData;
-    const elements = select(current.matches, selector, spec, '.forager-holder');
+    const { startData, staticData } = nextProps;
+    const { selector, spec } = startData;
+    const { parent } = staticData;
+    const elements = select(parent.matches, selector, spec, '.forager-holder');
     highlight(elements, queryCheck);
   }
 
@@ -90,5 +93,13 @@ class ChooseOptional extends React.Component {
     unhighlight(queryCheck);
   }
 }
+
+ChooseOptional.propTypes = {
+  startData: React.PropTypes.object,
+  endData: React.PropTypes.object,
+  staticData: React.PropTypes.object,
+  next: React.PropTypes.func,
+  previous: React.PropTypes.func
+};
 
 export default ChooseOptional;

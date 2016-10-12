@@ -57,10 +57,10 @@ class ConfirmElement extends React.Component {
   }
 
   componentWillMount() {
-    const { startData, extraData } = this.props;
+    const { startData, staticData } = this.props;
 
     const { selector, spec } = startData;
-    const { parent = {} } = extraData;
+    const { parent = {} } = staticData;
     const { matches: parentMatches = [document] } = parent;
     const elements = select(
       parentMatches,
@@ -75,5 +75,13 @@ class ConfirmElement extends React.Component {
     unhighlight(currentSelector);
   }
 }
+
+ConfirmElement.propTypes = {
+  startData: React.PropTypes.object,
+  endData: React.PropTypes.object,
+  staticData: React.PropTypes.object,
+  next: React.PropTypes.func,
+  previous: React.PropTypes.func
+};
 
 export default ConfirmElement;
