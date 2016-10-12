@@ -35,14 +35,21 @@ class ChooseName extends React.Component {
   nextHandler(event) {
     event.preventDefault();
     const { name } = this.state;
-    const { takenNames, showMessage } = this.props;
+    const {
+      takenNames,
+      showMessage,
+      startData,
+      next
+    } = this.props;
+    const {
+      name: existingName
+    } = startData;
 
-    if ( !takenNames.every(n => n !== name) ) {
+    if ( name !== existingName && !takenNames.every(n => n !== name) ) {
       showMessage(`"${name}" is a duplicate name and cannot be used.`, 5000, -1);
       return;
     }
 
-    const { startData, next } = this.props;
     next(Object.assign({}, startData, { name }));
   }
 

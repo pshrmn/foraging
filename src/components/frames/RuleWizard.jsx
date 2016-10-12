@@ -4,9 +4,9 @@ import { connect } from 'react-redux';
 import Wizard from 'simple-wizard-component';
 import ElementCard from 'components/ElementCard';
 import {
-  ChooseAttribute,
-  ChooseType,
-  ChooseName,
+  Attribute,
+  Type,
+  Name,
   ConfirmRule
 } from 'components/steps/rule';
 import Cycle from 'components/common/Cycle';
@@ -17,14 +17,14 @@ import { currentElement } from 'helpers/store';
 import { currentSelector } from 'constants/CSSClasses';
 
 const steps = [
-  ChooseAttribute,
-  ChooseType,
-  ChooseName,
+  Attribute,
+  Type,
+  Name,
   ConfirmRule
 ];
 
 /*
- * ChooseAttribute -> ChooseType -> ChooseName -> ConfirmRule
+ * ttribute -> Type -> Name -> ConfirmRule
  *
  * The RuleWizard is used to create a rule for an element. A Cycle is
  * used to cycle through the DOM elements that the element matches while

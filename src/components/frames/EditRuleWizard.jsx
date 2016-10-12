@@ -4,9 +4,9 @@ import { connect } from 'react-redux';
 import Wizard from 'simple-wizard-component';
 import ElementCard from 'components/ElementCard';
 import {
-  ChooseAttribute,
-  ChooseType,
-  ChooseName,
+  Attribute,
+  Type,
+  Name,
   ConfirmUpdateRule
 } from 'components/steps/rule';
 import Cycle from 'components/common/Cycle';
@@ -17,14 +17,14 @@ import { currentElement } from 'helpers/store';
 import { currentSelector } from 'constants/CSSClasses';
 
 const steps = [
-  ChooseAttribute,
-  ChooseType,
-  ChooseName,
+  Attribute,
+  Type,
+  Name,
   ConfirmUpdateRule
 ];
 
 /*
- * ChooseAttribute -> ChooseType -> ChooseName -> ConfirmRule
+ * Attribute -> Type -> Name -> ConfirmRule
  */
 class EditRuleWizard extends React.Component {
   constructor(props) {

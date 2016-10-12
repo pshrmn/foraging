@@ -61,6 +61,9 @@ class ChooseType extends React.Component {
 
   render() {
     const { type } = this.state;
+    const {
+      noPrevious = false
+    } = this.props;
     const types = ['single', 'all', 'range'];
     return (
       <form className='info-box'>
@@ -68,7 +71,7 @@ class ChooseType extends React.Component {
           <TypeForm types={types} current={type} setType={this.typeHandler} />
         </div>
         <Controls
-          previous={this.previousHandler}
+          previous={noPrevious ? undefined : this.previousHandler}
           next={this.nextHandler}
           cancel={this.cancelHandler} />
       </form>
@@ -102,7 +105,8 @@ ChooseType.propTypes = {
   endData: React.PropTypes.object,
   staticData: React.PropTypes.object,
   next: React.PropTypes.func,
-  previous: React.PropTypes.func
+  previous: React.PropTypes.func,
+  noPrevious: React.PropTypes.bool
 };
 
 export const CreateType = props => (
@@ -118,6 +122,7 @@ export const EditType = props => (
     highlight={editHighlightElements}
     highlightClass={currentSelector}
     setupState={initialEditType}
+    noPrevious
     {...props} />
 );
 

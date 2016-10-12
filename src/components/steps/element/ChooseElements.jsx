@@ -130,7 +130,6 @@ class ChooseElement extends React.Component {
   }
 
   render() {
-    const { next, previous } = this.props;
     const { selectors, checked, eleCount, error } = this.state;
     return (
       <form className='info-box'>
