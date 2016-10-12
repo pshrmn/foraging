@@ -1,7 +1,4 @@
-import {expect} from 'chai';
 import configureStore from 'redux-mock-store';
-import { jsdom } from 'jsdom';
-import sinon from 'sinon';
 
 import confirmMiddleware from 'middleware/confirmMiddleware';
 import {
@@ -15,6 +12,8 @@ const mockStore = configureStore([confirmMiddleware])
 describe('confirmMiddleware', () => {
 
   let store;
+  let confirmMock;
+  const originalMock = window.confirm;
   beforeEach(() => {
     store = mockStore({
       page: {
@@ -29,19 +28,12 @@ describe('confirmMiddleware', () => {
         elementIndex: 0
       }
     });
-    const doc = jsdom(`<!doctype html><html><body></body></html>`,
-      {
-        url: 'http://localhost:8000/',
-      }
-    );
-    global.document = doc;
-    global.window = doc.defaultView;
+    confirmMock = jest.fn()
   });
 
   afterEach(() => {
-    delete global.document;
-    delete global.window;
-  });
+    window.confirm = originalMock;
+  })
 
   describe('unknown', () => {
     it('ignores unknown actions', () => {
@@ -49,67 +41,67 @@ describe('confirmMiddleware', () => {
         type: 'UNKNOWN_ACTION_TYPE'
       });
       const [first] = store.getActions();
-      expect(first.type).to.equal('UNKNOWN_ACTION_TYPE');
+      expect(first.type).toBe('UNKNOWN_ACTION_TYPE');
     });
   });
 
   describe('SYNC_PAGES', () => {
     it('reaches store when window.confirm=true', () => {
-      sinon.stub(global.window, 'confirm', () => true);
+      window.confirm = confirmMock.mockReturnValue(true);
       store.dispatch({
         type: SYNC_PAGES
       });
       const [first] = store.getActions();
-      expect(first.type).to.equal(SYNC_PAGES);
+      expect(first.type).toBe(SYNC_PAGES);
     });
 
     it('stops when window.confirm=false', () => {
-      sinon.stub(global.window, 'confirm', () => false);
+      window.confirm = confirmMock.mockReturnValue(false);
       store.dispatch({
         type: SYNC_PAGES
       });
       const [first] = store.getActions();
-      expect(first).to.be.undefined;
+      expect(first).toBeUndefined();
     });
   });
 
   describe('REMOVE_PAGE', () => {
     it('reaches store when window.confirm=true', () => {
-      sinon.stub(global.window, 'confirm', () => true);
+      window.confirm = confirmMock.mockReturnValue(true);
       store.dispatch({
         type: REMOVE_PAGE
       });
       const [first] = store.getActions();
-      expect(first.type).to.equal(REMOVE_PAGE);
+      expect(first.type).toBe(REMOVE_PAGE);
     });
 
     it('stops when window.confirm=false', () => {
-      sinon.stub(global.window, 'confirm', () => false);
+      window.confirm = confirmMock.mockReturnValue(false);
       store.dispatch({
         type: REMOVE_PAGE
       });
       const [first] = store.getActions();
-      expect(first).to.be.undefined;
+      expect(first).toBeUndefined();
     });
   });
 
   describe('REMOVE_ELEMENT', () => {
     it('reaches store when window.confirm=true', () => {
-      sinon.stub(global.window, 'confirm', () => true);
+      window.confirm = confirmMock.mockReturnValue(true);
       store.dispatch({
         type: REMOVE_ELEMENT
       });
       const [first] = store.getActions();
-      expect(first.type).to.equal(REMOVE_ELEMENT);
+      expect(first.type).toBe(REMOVE_ELEMENT);
     });
 
     it('stops when window.confirm=false', () => {
-      sinon.stub(global.window, 'confirm', () => false);
+      window.confirm = confirmMock.mockReturnValue(false);
       store.dispatch({
         type: REMOVE_ELEMENT
       });
       const [first] = store.getActions();
-      expect(first).to.be.undefined;
+      expect(first).toBeUndefined();
     });
   });
 });

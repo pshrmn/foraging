@@ -1,6 +1,4 @@
-import {expect} from 'chai';
 import configureStore from 'redux-mock-store';
-import sinon from 'sinon';
 
 import chromeMiddleware from 'middleware/chromeMiddleware';
 import {
@@ -22,7 +20,6 @@ const mockStore = configureStore([chromeMiddleware])
 describe('chromeMiddleware', () => {
 
   let store;
-  let sandbox;
   beforeEach(() => {
     store = mockStore({
       page: {
@@ -37,12 +34,6 @@ describe('chromeMiddleware', () => {
         elementIndex: 0
       }
     });
-
-    sandbox = sinon.sandbox.create();
-  });
-
-  afterEach(() => {
-    sandbox.restore();
   });
 
   describe('unknown', () => {
@@ -51,123 +42,143 @@ describe('chromeMiddleware', () => {
         type: 'UNKNOWN_ACTION_TYPE'
       });
       const [first] = store.getActions();
-      expect(first.type).to.equal('UNKNOWN_ACTION_TYPE');
+      expect(first.type).toBe('UNKNOWN_ACTION_TYPE');
     });
   });
 
   describe('RENAME_PAGE', () => {
     it('calls chrome.rename', () => {
-      const renameStub = sandbox.stub(chrome, 'rename', () => Promise.resolve('Renamed'));
+      const spy = jest.fn()
+        .mockReturnValue(Promise.resolve('renamed'));
+      chrome.rename = spy;
       store.dispatch({
         type: RENAME_PAGE
       });
       const [first] = store.getActions();
-      expect(first.type).to.equal(RENAME_PAGE);
-      expect(renameStub.called).to.be.true;
+      expect(first.type).toBe(RENAME_PAGE);
+      expect(spy.mock.calls.length).toBe(1);
     });
   });
 
   describe('REMOVE_PAGE', () => {
     it('calls chrome.remove', () => {
-      const removeStub = sandbox.stub(chrome, 'remove', () => Promise.resolve('Removed'));
+      const spy = jest.fn()
+        .mockReturnValue(Promise.resolve('removed'));
+      chrome.remove = spy;
       store.dispatch({
         type: REMOVE_PAGE
       });
       const [first] = store.getActions();
-      expect(first.type).to.equal(REMOVE_PAGE);
-      expect(removeStub.called).to.be.true;
+      expect(first.type).toBe(REMOVE_PAGE);
+      expect(spy.mock.calls.length).toBe(1);
     });
   });
 
   describe('UPLOAD_PAGE', () => {
     it('calls chrome.upload', () => {
-      const uploadStub = sandbox.stub(chrome, 'upload', () => Promise.resolve('Uploaded'));
+      const spy = jest.fn()
+        .mockReturnValue(Promise.resolve('uploaded'));
+      chrome.upload = spy;
       store.dispatch({
         type: UPLOAD_PAGE
       });
-      expect(uploadStub.called).to.be.true;
+      expect(spy.mock.calls.length).toBe(1);
     });
   });
 
   describe('SYNC_PAGES', () => {
     it('calls chrome.sync', () => {
-      const syncStub = sandbox.stub(chrome, 'sync', () => Promise.resolve('Synced'));
+      const spy = jest.fn()
+        .mockReturnValue(Promise.resolve('synced'));
+      chrome.sync = spy;
       store.dispatch({
         type: SYNC_PAGES
       });
-      expect(syncStub.called).to.be.true;
+      expect(spy.mock.calls.length).toBe(1);
     });
   });
 
   describe('ADD_PAGE', () => {
     it('calls chrome.save', () => {
-      const saveStub = sandbox.stub(chrome, 'save', () => Promise.resolve('Saved'));
+      const spy = jest.fn()
+        .mockReturnValue(Promise.resolve('saved'));
+      chrome.save = spy;
       store.dispatch({
         type: ADD_PAGE
       });
       const [first] = store.getActions();
-      expect(first.type).to.equal(ADD_PAGE);
-      expect(saveStub.called).to.be.true;
+      expect(first.type).toBe(ADD_PAGE);
+      expect(spy.mock.calls.length).toBe(1);
     });
   });
 
   describe('SAVE_ELEMENT', () => {
     it('calls chrome.save', () => {
-      const saveStub = sandbox.stub(chrome, 'save', () => Promise.resolve('Saved'));
+      const spy = jest.fn()
+        .mockReturnValue(Promise.resolve('saved'));
+      chrome.save = spy;
       store.dispatch({
         type: SAVE_ELEMENT
       });
       const [first] = store.getActions();
-      expect(first.type).to.equal(SAVE_ELEMENT);
-      expect(saveStub.called).to.be.true;
+      expect(first.type).toBe(SAVE_ELEMENT);
+      expect(spy.mock.calls.length).toBe(1);
     });
   });
 
   describe('REMOVE_ELEMENT', () => {
     it('calls chrome.save', () => {
-      const saveStub = sandbox.stub(chrome, 'save', () => Promise.resolve('Saved'));
+      const spy = jest.fn()
+        .mockReturnValue(Promise.resolve('saved'));
+      chrome.save = spy;
       store.dispatch({
         type: REMOVE_ELEMENT
       });
       const [first] = store.getActions();
-      expect(first.type).to.equal(REMOVE_ELEMENT);
-      expect(saveStub.called).to.be.true;
+      expect(first.type).toBe(REMOVE_ELEMENT);
+      expect(spy.mock.calls.length).toBe(1);
     });
   });
 
   describe('UPDATE_ELEMENT', () => {
     it('calls chrome.save', () => {
-      const saveStub = sandbox.stub(chrome, 'save', () => Promise.resolve('Saved'));
+      const spy = jest.fn()
+        .mockReturnValue(Promise.resolve('saved'));
+      chrome.save = spy;
       store.dispatch({
         type: UPDATE_ELEMENT
       });
       const [first] = store.getActions();
-      expect(first.type).to.equal(UPDATE_ELEMENT);
-      expect(saveStub.called).to.be.true;
+      expect(first.type).toBe(UPDATE_ELEMENT);
+      expect(spy.mock.calls.length).toBe(1);
     });
   });
 
   describe('SAVE_RULE', () => {
     it('calls chrome.save', () => {
-      const saveStub = sandbox.stub(chrome, 'save', () => Promise.resolve('Saved'));
+      const spy = jest.fn()
+        .mockReturnValue(Promise.resolve('saved'));
+      chrome.save = spy;
       store.dispatch({
         type: SAVE_RULE
       });
       const [first] = store.getActions();
-      expect(first.type).to.equal(SAVE_RULE);
-      expect(saveStub.called).to.be.true;
+      expect(first.type).toBe(SAVE_RULE);
+      expect(spy.mock.calls.length).toBe(1);
     });
   });
 
   describe('REMOVE_RULE', () => {
-    it('calls chrome.rename', () => {
-      const saveStub = sandbox.stub(chrome, 'save', () => Promise.resolve('Saved'));
+    it('calls chrome.save', () => {
+      const spy = jest.fn()
+        .mockReturnValue(Promise.resolve('saved'));
+      chrome.save = spy;
       store.dispatch({
         type: REMOVE_RULE
       });
       const [first] = store.getActions();
-      expect(first.type).to.equal(REMOVE_RULE);
-      expect(saveStub.called).to.be.true;
+      expect(first.type).toBe(REMOVE_RULE);
+      expect(spy.mock.calls.length).toBe(1);
     });
   });
 

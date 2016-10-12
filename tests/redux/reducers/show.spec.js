@@ -1,5 +1,3 @@
-import {expect} from "chai";
-
 import show from "reducers/show";
 import * as ActionTypes from "constants/ActionTypes";
 
@@ -12,7 +10,7 @@ describe("show reducer", () => {
         type: "UNKNOWN_ACTION_TYPE"
       };
       const newState = show(state, action);
-      expect(newState).to.deep.equal(state);
+      expect(newState).toEqual(state);
     });
   });
 
@@ -23,7 +21,7 @@ describe("show reducer", () => {
         type: ActionTypes.CLOSE_FORAGER
       };
       const newState = show(state, action);
-      expect(newState).to.be.false;
+      expect(newState).toBe(false);
     });
   });
 
@@ -34,7 +32,7 @@ describe("show reducer", () => {
         type: ActionTypes.OPEN_FORAGER
       };
       const newState = show(state, action);
-      expect(newState).to.be.true;
+      expect(newState).toBe(true);
     });
   });
 });  

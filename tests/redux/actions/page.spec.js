@@ -1,4 +1,3 @@
-import {expect} from "chai";
 import * as actions from "actions/page";
 import * as ActionTypes from "constants/ActionTypes";
 
@@ -7,8 +6,8 @@ describe("page actions", () => {
   describe("selectPage", () => {
     it("returns an action with the expected values", () => {
       const action = actions.selectPage(1);
-      expect(action.type).to.equal(ActionTypes.SELECT_PAGE);
-      expect(action.index).to.equal(1);
+      expect(action.type).toBe(ActionTypes.SELECT_PAGE);
+      expect(action.index).toBe(1);
     });
   });
 
@@ -16,15 +15,15 @@ describe("page actions", () => {
     it("returns an action with the expected values", () => {
       const page = {name: "fake page"};
       const action = actions.addPage(page);
-      expect(action.type).to.equal(ActionTypes.ADD_PAGE);
-      expect(action.page).to.deep.equal(page);
+      expect(action.type).toBe(ActionTypes.ADD_PAGE);
+      expect(action.page).toEqual(page);
     })
   });
 
   describe("removePage", () => {
     it("returns an action with the expected values", () => {
       const action = actions.removePage();
-      expect(action.type).to.equal(ActionTypes.REMOVE_PAGE);
+      expect(action.type).toBe(ActionTypes.REMOVE_PAGE);
     });
   });
 
@@ -32,22 +31,22 @@ describe("page actions", () => {
     it("returns an action with the expected values", () => {
       const newName = "new name";
       const action = actions.renamePage(newName);
-      expect(action.type).to.equal(ActionTypes.RENAME_PAGE);
-      expect(action.name).to.equal(newName);
+      expect(action.type).toBe(ActionTypes.RENAME_PAGE);
+      expect(action.name).toBe(newName);
     })
   });
 
   describe("uploadPage", () => {
     it("returns an action with the expected values", () => {
       const action = actions.uploadPage();
-      expect(action.type).to.equal(ActionTypes.UPLOAD_PAGE);
+      expect(action.type).toBe(ActionTypes.UPLOAD_PAGE);
     });
   });
 
   describe("syncPages", () => {
     it("returns an action with the expected values", () => {
       const action = actions.syncPages();
-      expect(action.type).to.equal(ActionTypes.SYNC_PAGES);
+      expect(action.type).toBe(ActionTypes.SYNC_PAGES);
     });
   });
 
@@ -55,8 +54,8 @@ describe("page actions", () => {
     it("returns an action with the expected values", () => {
       const pages = [1,2,3];
       const action = actions.setPages(pages);
-      expect(action.type).to.equal(ActionTypes.SET_PAGES);
-      expect(action.pages).to.deep.equal(pages);
+      expect(action.type).toBe(ActionTypes.SET_PAGES);
+      expect(action.pages).toEqual(pages);
     });
   });
 
@@ -64,15 +63,15 @@ describe("page actions", () => {
     it("returns an action with the expected values", () => {
       const matches = {1: [1,2,3], 0: [4,5,6]}
       const action = actions.setMatches(matches);
-      expect(action.type).to.equal(ActionTypes.SET_MATCHES);
-      expect(action.matches).to.deep.equal(matches);
+      expect(action.type).toBe(ActionTypes.SET_MATCHES);
+      expect(action.matches).toEqual(matches);
     });
   });
 
   describe("refreshMatches", () => {
     it("returns an action with the expected values", () => {
       const action = actions.refreshMatches();
-      expect(action.type).to.equal(ActionTypes.REFRESH_MATCHES);
+      expect(action.type).toBe(ActionTypes.REFRESH_MATCHES);
     });
   });
 
@@ -80,8 +79,8 @@ describe("page actions", () => {
     it("returns an action with the expected values", () => {
       const index = 2;
       const action = actions.selectElement(index);
-      expect(action.type).to.equal(ActionTypes.SELECT_ELEMENT);
-      expect(action.index).to.equal(index);
+      expect(action.type).toBe(ActionTypes.SELECT_ELEMENT);
+      expect(action.index).toBe(index);
     });
   });
 
@@ -89,8 +88,8 @@ describe("page actions", () => {
     it("returns an action with the expected values", () => {
       const element = {selector: "p.info"};
       const action = actions.saveElement(element);
-      expect(action.type).to.equal(ActionTypes.SAVE_ELEMENT);
-      expect(action.element).to.deep.equal(element);
+      expect(action.type).toBe(ActionTypes.SAVE_ELEMENT);
+      expect(action.element).toEqual(element);
     });
   });
 
@@ -99,16 +98,16 @@ describe("page actions", () => {
       const index = 2;
       const newProps = {optional: true};
       const action = actions.updateElement(index, newProps);
-      expect(action.type).to.equal(ActionTypes.UPDATE_ELEMENT);
-      expect(action.index).to.equal(index);
-      expect(action.newProps).to.deep.equal(newProps);
+      expect(action.type).toBe(ActionTypes.UPDATE_ELEMENT);
+      expect(action.index).toBe(index);
+      expect(action.newProps).toEqual(newProps);
     });
   });
 
   describe("removeElement", () => {
     it("returns an action with the expected values", () => {
       const action = actions.removeElement();
-      expect(action.type).to.equal(ActionTypes.REMOVE_ELEMENT);
+      expect(action.type).toBe(ActionTypes.REMOVE_ELEMENT);
     });
   });
 
@@ -118,8 +117,8 @@ describe("page actions", () => {
         selector: "*"
       }
       const action = actions.saveRule(rule);
-      expect(action.type).to.equal(ActionTypes.SAVE_RULE);
-      expect(action.rule).to.deep.equal(rule);
+      expect(action.type).toBe(ActionTypes.SAVE_RULE);
+      expect(action.rule).toEqual(rule);
     });
   });
 
@@ -127,8 +126,8 @@ describe("page actions", () => {
     it("returns an action to remove a rule from the current element", () => {
       const index = 3;
       const action = actions.removeRule(index);
-      expect(action.type).to.equal(ActionTypes.REMOVE_RULE);
-      expect(action.index).to.equal(index);
+      expect(action.type).toBe(ActionTypes.REMOVE_RULE);
+      expect(action.index).toBe(index);
     });
   });
 
@@ -137,9 +136,9 @@ describe("page actions", () => {
       const index = 0;
       const rule = {name: "foo", attr: "text", type: "string"};
       const action = actions.updateRule(index, rule);
-      expect(action.type).to.equal(ActionTypes.UPDATE_RULE);
-      expect(action.index).to.equal(index);
-      expect(action.rule).to.deep.equal(rule);
+      expect(action.type).toBe(ActionTypes.UPDATE_RULE);
+      expect(action.index).toBe(index);
+      expect(action.rule).toEqual(rule);
     });
   });
 

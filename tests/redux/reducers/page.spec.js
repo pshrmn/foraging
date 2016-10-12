@@ -1,5 +1,3 @@
-import {expect} from "chai";
-
 import page from "reducers/page";
 import * as ActionTypes from "constants/ActionTypes";
 
@@ -99,7 +97,7 @@ describe("page reducer", () => {
       const newState = page(state, {
         type: "UNKNOWN_ACTION_TYPE"
       });
-      expect(newState).to.deep.equal(state);
+      expect(newState).toEqual(state);
     });
   });
 
@@ -111,8 +109,8 @@ describe("page reducer", () => {
         type: ActionTypes.SELECT_PAGE,
         index: index
       });
-      expect(newState.pageIndex).to.equal(index);
-      expect(newState.elementIndex).to.equal(0);
+      expect(newState.pageIndex).toBe(index);
+      expect(newState.elementIndex).toBe(0);
     });
 
     it("sets pageIndex to 0 when action.index is < 0", () => {
@@ -120,7 +118,7 @@ describe("page reducer", () => {
         type: ActionTypes.SELECT_PAGE,
         index: -1
       });
-      expect(newState.pageIndex).to.equal(0);
+      expect(newState.pageIndex).toBe(0);
     });
 
     it("sets pageIndex to 0 when action.index is >= pages.length", () => {
@@ -128,7 +126,7 @@ describe("page reducer", () => {
         type: ActionTypes.SELECT_PAGE,
         index: 3
       });
-      expect(newState.pageIndex).to.equal(0);
+      expect(newState.pageIndex).toBe(0);
     });
   });
 
@@ -142,9 +140,9 @@ describe("page reducer", () => {
       });
       const { pages, pageIndex, elementIndex } = newState
       // last page
-      expect(pageIndex).to.equal(pages.length-1);
-      expect(pages[pageIndex]).to.deep.equal(newPage);
-      expect(elementIndex).to.equal(0);
+      expect(pageIndex).toBe(pages.length-1);
+      expect(pages[pageIndex]).toEqual(newPage);
+      expect(elementIndex).toBe(0);
     });
 
     it("sets the pageIndex to the index of the added page", () => {
@@ -155,7 +153,7 @@ describe("page reducer", () => {
         page: newPage
       };
       const newState = page(state, action);
-      expect(newState.pageIndex).to.equal(newState.pages.length - 1);
+      expect(newState.pageIndex).toBe(newState.pages.length - 1);
 
     });
   });
@@ -163,21 +161,21 @@ describe("page reducer", () => {
   describe("REMOVE_PAGE", () => {
 
     it("removes the page at pageIndex", () => {
-      expect(state.pages.length).to.equal(3);
+      expect(state.pages.length).toBe(3);
       const newState = page(state, {
         type: ActionTypes.REMOVE_PAGE
       });
-      expect(newState.pages.length).to.equal(2);
+      expect(newState.pages.length).toBe(2);
     });
 
     it("does nothing when pageIndex === 0", () => {
       // change the pageIndex for this test
       state.pageIndex = 0;
-      expect(state.pages.length).to.equal(3);
+      expect(state.pages.length).toBe(3);
       const newState = page(state, {
         type: ActionTypes.REMOVE_PAGE
       });
-      expect(newState.pages.length).to.equal(3);
+      expect(newState.pages.length).toBe(3);
     });
   });
 
@@ -189,7 +187,7 @@ describe("page reducer", () => {
         name: newName
       });
       const { pages, pageIndex } = newState;
-      expect(pages[pageIndex].name).to.equal(newName);
+      expect(pages[pageIndex].name).toBe(newName);
     });
   });
 
@@ -201,9 +199,9 @@ describe("page reducer", () => {
         pages: newPages
       });
       const { pages, pageIndex, elementIndex } = newState;
-      expect(pageIndex).to.equal(0)
-      expect(elementIndex).to.equal(0);
-      expect(pages.slice(1)).to.deep.equal(newPages);
+      expect(pageIndex).toBe(0)
+      expect(elementIndex).toBe(0);
+      expect(pages.slice(1)).toEqual(newPages);
     });
   });
 
@@ -221,7 +219,7 @@ describe("page reducer", () => {
       pages[pageIndex].elements.forEach(element => {
         const { index } = element;
         if ( matches[index] !== undefined ) {
-          expect(element.matches).to.deep.equal(matches[index]);
+          expect(element.matches).toEqual(matches[index]);
         }
       });
     });
@@ -235,7 +233,7 @@ describe("page reducer", () => {
         index: index
       });
       const { elementIndex } = newState;
-      expect(elementIndex).to.equal(index);
+      expect(elementIndex).toBe(index);
     });
 
     it("reverts to 0 for bad index values", () => {
@@ -247,7 +245,7 @@ describe("page reducer", () => {
           index: i
         });
         const { elementIndex } = newState;
-        expect(elementIndex).to.equal(0);
+        expect(elementIndex).toBe(0);
       });
     });
   });
@@ -271,9 +269,9 @@ describe("page reducer", () => {
       } = newState;
       const current = newPages[newPageIndex].elements[newElementIndex];
       const parent = newPages[newPageIndex].elements[current.parent];
-      expect(newElementIndex).to.equal(current.index);
-      expect(current.parent).to.equal(oldElementIndex);
-      expect(parent.childIndices.includes(current.index)).to.be.true;
+      expect(newElementIndex).toBe(current.index);
+      expect(current.parent).toBe(oldElementIndex);
+      expect(parent.childIndices.includes(current.index)).toBe(true);
     });
   });
 
@@ -296,8 +294,8 @@ describe("page reducer", () => {
         pageIndex: initPageIndex
       } = state;
       const initElement = initPages[initPageIndex].elements[index];
-      expect(initElement.spec.value).to.equal('links');
-      expect(initElement.optional).to.be.false;
+      expect(initElement.spec.value).toBe('links');
+      expect(initElement.optional).toBe(false);
 
       const newState = page(state, {
         type: ActionTypes.UPDATE_ELEMENT,
@@ -310,8 +308,8 @@ describe("page reducer", () => {
         pageIndex: newPageIndex
       } = newState;
       const current = newPages[newPageIndex].elements[index];
-      expect(current.spec.value).to.equal(newProps.spec.value);
-      expect(current.optional).to.equal(newProps.optional);
+      expect(current.spec.value).toBe(newProps.spec.value);
+      expect(current.optional).toBe(newProps.optional);
     });
 
     it("doesn't actually update the 0th Element", () => {
@@ -334,8 +332,8 @@ describe("page reducer", () => {
         pageIndex: newPageIndex
       } = newState;
       const current = newPages[newPageIndex].elements[index];
-      expect(current.spec.value).to.equal(0);
-      expect(current.spec.type).to.equal("single");
+      expect(current.spec.value).toBe(0);
+      expect(current.spec.type).toBe("single");
     });
   });
 
@@ -346,7 +344,7 @@ describe("page reducer", () => {
         type: ActionTypes.REMOVE_ELEMENT
       });
       const { pages, pageIndex, elementIndex } = newState;
-      expect(pages[pageIndex].elements[1]).to.be.null;
+      expect(pages[pageIndex].elements[1]).toBeNull();
     });
 
     it("doesn't actually remove the 0th element", () => {
@@ -354,8 +352,8 @@ describe("page reducer", () => {
         type: ActionTypes.REMOVE_ELEMENT
       });
       const { pages, pageIndex, elementIndex } = newState;
-      expect(pages[pageIndex].elements[0]).to.not.be.null;
-      expect(elementIndex).to.equal(0);
+      expect(pages[pageIndex].elements[0]).not.toBeNull();
+      expect(elementIndex).toBe(0);
     });
 
     it("ignores null elements", () => {
@@ -368,7 +366,7 @@ describe("page reducer", () => {
         type: ActionTypes.REMOVE_ELEMENT
       });
       const { pages, pageIndex, elementIndex } = newerState;
-      expect(pages[pageIndex].elements[2]).to.be.null;
+      expect(pages[pageIndex].elements[2]).toBeNull();
     });
 
     it("also removes child elements", () => {
@@ -379,8 +377,8 @@ describe("page reducer", () => {
       });
       const { pages, pageIndex, elementIndex } = newState;
       const currentPage = pages[pageIndex];
-      expect(currentPage.elements[2]).to.be.null;
-      expect(currentPage.elements[3]).to.be.null;
+      expect(currentPage.elements[2]).toBeNull();
+      expect(currentPage.elements[3]).toBeNull();
     });
 
     it("sets the elementIndex to the element's parent's index", () => {
@@ -390,7 +388,7 @@ describe("page reducer", () => {
         type: ActionTypes.REMOVE_ELEMENT
       });
       const { pages, pageIndex, elementIndex } = newState;
-      expect(elementIndex).to.equal(2);
+      expect(elementIndex).toBe(2);
     });
   });
 
@@ -408,7 +406,7 @@ describe("page reducer", () => {
 
       const { pages, pageIndex, elementIndex } = newState;
       const current = pages[pageIndex].elements[elementIndex];
-      expect(current.rules[current.rules.length-1]).to.deep.equal(rule);
+      expect(current.rules[current.rules.length-1]).toEqual(rule);
     });
   });
 
@@ -421,7 +419,7 @@ describe("page reducer", () => {
       });
       const { pages, pageIndex, elementIndex } = newState;
       const current = pages[pageIndex].elements[elementIndex];
-      expect(current.rules.length).to.equal(0);
+      expect(current.rules.length).toBe(0);
     });
   });
 
@@ -442,16 +440,18 @@ describe("page reducer", () => {
       const { pages, pageIndex, elementIndex } = newState;
       const current = pages[pageIndex].elements[elementIndex];
       const updatedRule = current.rules[ruleIndex];
-      expect(updatedRule).to.deep.equal(newRule);
+      expect(updatedRule).toEqual(newRule);
     });
   });
 
   describe("CLOSE_FORAGER", () => {
-    const newState = page(state, {
-      type: ActionTypes.CLOSE_FORAGER
+    it("sets pageIndex and elementIndex to 0", () => {
+      const newState = page(state, {
+        type: ActionTypes.CLOSE_FORAGER
+      });
+      expect(newState.pageIndex).toBe(0);
+      expect(newState.elementIndex).toBe(0);
     });
-    expect(newState.pageIndex).to.equal(0);
-    expect(newState.elementIndex).to.equal(0);
   });
 });
 

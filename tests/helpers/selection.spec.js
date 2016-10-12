@@ -1,33 +1,20 @@
-import { expect } from "chai";
 import { jsdom } from "jsdom";
 
 import { protect, select, count, parts, allSelect } from "helpers/selection";
 
 describe("selector", () => {
 
-    beforeEach(() => {
-    const doc = jsdom(`<!doctype html>
-      <html>
-      <body>
-        <div>
-          <p>One</p>
-          <p>Two</p>
-        </div>
-        <div></div>
-        <div class='third'>
-          <p>Three</p>
-          <p class='no-select'>Ignore</p>
-        </div>
-      </body>
-    </html>`);
-    const win = doc.defaultView;
-    global.document = doc;
-    global.window = win;
-  });
-
-  afterEach(() => {
-    delete global.document;
-    delete global.window;
+  beforeEach(() => {
+    document.body.innerHTML = `
+      <div>
+        <p>One</p>
+        <p>Two</p>
+      </div>
+      <div></div>
+      <div class="third">
+        <p>Three</p>
+        <p class='no-select'>Ignore</p>
+      </div>`;
   });
 
   describe("protect", () => {
@@ -35,9 +22,9 @@ describe("selector", () => {
 
       protect('.third');
       Array.from(document.querySelectorAll('.third')).forEach(ele => {
-        expect(ele.classList.contains('no-select')).to.be.true;
+        expect(ele.classList.contains('no-select')).toBe(true);
         Array.from(ele.querySelectorAll('*')).forEach(child => {
-          expect(child.classList.contains('no-select')).to.be.true;
+          expect(child.classList.contains('no-select')).toBe(true);
         });
       });
     });
@@ -47,17 +34,17 @@ describe("selector", () => {
     it("matches all child elements, ignores .no-select elements", () => {
       const divs = document.querySelectorAll("div");
       const elements = select(divs, "p");
-      expect(elements.length).to.equal(3);
+      expect(elements.length).toBe(3);
     });
 
     it("only selects elements that match the spec", () => {
       const elements = select([document.body], "div", {type: "single", index: 0});
-      expect(elements.length).to.equal(1);
+      expect(elements.length).toBe(1);
     });
 
     it("adds the no-select class to ignored classes before selecting", () => {
       const elements = select([document.body], "div", {type: "all", name: "div"}, ".third");
-      expect(elements.length).to.equal(2)
+      expect(elements.length).toBe(2)
     });
   });
 
@@ -65,7 +52,7 @@ describe("selector", () => {
     it("returns the maximum number of elements for a parent", () => {
       const divs = document.querySelectorAll("div");
       const max = count(divs, "p");
-      expect(max).to.equal(2);
+      expect(max).toBe(2);
     });
   });
 
@@ -73,21 +60,21 @@ describe("selector", () => {
     it("returns an array with the element's tag", () => {
       const element = document.createElement("div");
       const tags = parts(element);
-      expect(tags).to.eql(["div"]);
+      expect(tags).toEqual(["div"]);
     });
 
     it("includes the id if there is one", () => {
       const element = document.createElement("div");
       element.id = "example";
       const tags = parts(element);
-      expect(tags).to.eql(["div", "#example"]);
+      expect(tags).toEqual(["div", "#example"]);
     });
 
     it("includes classes", () => {
       const element = document.createElement("div");
       element.classList.add("example");
       const tags = parts(element);
-      expect(tags).to.eql(["div", ".example"]);
+      expect(tags).toEqual(["div", ".example"]);
     })
 
     it("ignores undesired classes", () => {
@@ -97,19 +84,19 @@ describe("selector", () => {
       element.classList.add("forager-highlight");
       element.classList.add("forager-highlight");
       const tags= parts(element);
-      expect(tags).to.eql(["span"]);
+      expect(tags).toEqual(["span"]);
     });
   });
 
   describe("allSelect", () => {
     it("returns true when all elements are select elements", () => {
       const elements = ["select", "select", "select"].map(t => document.createElement(t));
-      expect(allSelect(elements)).to.be.true;
+      expect(allSelect(elements)).toBe(true);
     });
 
     it("returns false if any elements are not select elements", () => {
       const elements = ["select", "div", "select"].map(t => document.createElement(t));
-      expect(allSelect(elements)).to.be.false;
+      expect(allSelect(elements)).toBe(false);
     });
   });
 });

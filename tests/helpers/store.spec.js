@@ -1,5 +1,3 @@
-import { expect } from 'chai';
-
 import { currentElement, currentParent, takenNames } from 'helpers/store';
 
 describe('store', () => {
@@ -122,7 +120,7 @@ describe('store', () => {
       const index = 1;
       pageCopy.elementIndex = index;
       const current = currentElement(pageCopy);
-      expect(current.index).to.equal(index);
+      expect(current.index).toBe(index);
     })
   });
 
@@ -138,9 +136,9 @@ describe('store', () => {
         pageCopy.elementIndex = index;
         const element = currentParent(pageCopy);
         if ( parent !== null ) {
-          expect(element.index).to.equal(parent);
+          expect(element.index).toBe(parent);
         } else {
-          expect(element).to.be.undefined;
+          expect(element).toBeUndefined();
         }
       })
     })
@@ -157,7 +155,7 @@ describe('store', () => {
         pageCopy.elementIndex = index;
         const levelNames = takenNames(pageCopy);
         const sameNames = levelNames.every((n,i) => n === names[i])
-        expect(sameNames).to.be.true;
+        expect(sameNames).toBe(true);
       })
     });
   });

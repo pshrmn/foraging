@@ -1,42 +1,27 @@
-import { expect } from "chai";
-import { jsdom } from "jsdom";
-
 import { highlight, unhighlight, iHighlight, iUnhighlight } from "helpers/markup";
 
 describe("markup", () => {
   
-    beforeEach(() => {
-    const doc = jsdom(`<!doctype html>
-      <html>
-      <body>
-        <div>
-          <p>One</p>
-          <p>Two</p>
-        </div>
-        <div></div>
-        <div>
-          <p>Three</p>
-          <p class='no-select'>Ignore</p>
-        </div>
-      </body>
-    </html>`);
-    const win = doc.defaultView;
-    global.document = doc;
-    global.window = win;
-  });
-
-  afterEach(() => {
-    delete global.document;
-    delete global.window;
+  beforeEach(() => {
+    document.body.innerHTML = `
+      <div>
+        <p>One</p>
+        <p>Two</p>
+      </div>
+      <div></div>
+      <div>
+        <p>Three</p>
+        <p class='no-select'>Ignore</p>
+      </div>`;
   });
 
   describe("highlight", () => {
     it("adds the class to all elements", () => {
       const elements = document.querySelectorAll("div");
       const className = "highlighted";
-      expect(document.getElementsByClassName(className).length).to.equal(0);
+      expect(document.getElementsByClassName(className).length).toBe(0);
       highlight(elements, className);
-      expect(document.getElementsByClassName(className).length).to.equal(3);
+      expect(document.getElementsByClassName(className).length).toBe(3);
     });
   });
 
@@ -45,9 +30,9 @@ describe("markup", () => {
       const elements = document.querySelectorAll("div");
       const className = "highlighted";
       highlight(elements, className);
-      expect(document.getElementsByClassName(className).length).to.equal(3);
+      expect(document.getElementsByClassName(className).length).toBe(3);
       unhighlight(className);
-      expect(document.getElementsByClassName(className).length).to.equal(0);
+      expect(document.getElementsByClassName(className).length).toBe(0);
     });
   });
 
@@ -58,9 +43,9 @@ describe("markup", () => {
       const elements = document.querySelectorAll("div");
       const className = "highlighted";
       const e = () => {};
-      expect(document.getElementsByClassName(className).length).to.equal(0);
+      expect(document.getElementsByClassName(className).length).toBe(0);
       const iUn = iHighlight(elements, className, e, e, e);
-      expect(document.getElementsByClassName(className).length).to.equal(3);
+      expect(document.getElementsByClassName(className).length).toBe(3);
 
       
     });
@@ -70,11 +55,11 @@ describe("markup", () => {
       const className = "highlighted";
       const e = () => {};
       const iUn = iHighlight(elements, className, e, e, e);
-      expect(document.getElementsByClassName(className).length).to.equal(3);
-      expect(iUn.call).to.be.defined;
+      expect(document.getElementsByClassName(className).length).toBe(3);
+      expect(iUn.call).toBeDefined();
       // this should now remove the className
       iUn();
-      expect(document.getElementsByClassName(className).length).to.equal(0);
+      expect(document.getElementsByClassName(className).length).toBe(0);
     })
   });
 });

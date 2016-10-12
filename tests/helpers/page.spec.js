@@ -1,6 +1,3 @@
-import { expect } from "chai";
-import { jsdom } from "jsdom";
-
 import { createElement, flatten, clean,
   fullGrow, simpleGrow } from "helpers/page";
 
@@ -43,12 +40,12 @@ describe("page", () => {
   describe("createElement", () => {
     it("returns an element object with default values", () => {
       const links = createElement("a");
-      expect(links.selector).to.equal("a");
-      expect(links.spec.type).to.equal("single");
-      expect(links.spec.index).to.equal(0);
-      expect(links.childIndices).to.be.instanceof(Array);
-      expect(links.optional).to.be.false;
-      expect(links.matches).to.be.instanceof(Array);
+      expect(links.selector).toBe("a");
+      expect(links.spec.type).toBe("single");
+      expect(links.spec.index).toBe(0);
+      expect(links.childIndices).toBeInstanceOf(Array);
+      expect(links.optional).toBe(false);
+      expect(links.matches).toBeInstanceOf(Array);
     });
 
     it("sets alternate values when provided", () => {
@@ -60,15 +57,15 @@ describe("page", () => {
         },
         true
       );
-      expect(links.spec.type).to.equal("all");
-      expect(links.spec.name).to.equal("divs");
-      expect(links.optional).to.be.true;
+      expect(links.spec.type).toBe("all");
+      expect(links.spec.name).toBe("divs");
+      expect(links.optional).toBe(true);
     });
   });
 
   describe("flatten", () => {
     it("returns empty array when tree is undefined", () => {
-      expect(flatten().length).to.equal(0);
+      expect(flatten().length).toBe(0);
     });
 
     it("returns an array representation of the tree", () => {
@@ -86,13 +83,13 @@ describe("page", () => {
         ]
       };
       const arr = flatten(tree);
-      expect(arr.length).to.equal(3);
-      expect(arr[0].parent).to.be.null;
+      expect(arr.length).toBe(3);
+      expect(arr[0].parent).toBeNull();
       arr.forEach((a,i) => {
         // index should be the same as array index
-        expect(a.index).to.equal(i);
-        expect(a.parent).to.be.defined;
-        expect(a.childIndices).to.be.instanceof(Array);
+        expect(a.index).toBe(i);
+        expect(a.parent).toBeDefined();
+        expect(a.childIndices).toBeInstanceOf(Array);
       })
     });
   });
@@ -100,8 +97,8 @@ describe("page", () => {
   describe("clean", () => {
     it("returns a \"clean\" version of the page", () => {
       const cleanPage = clean(examplePage);
-      expect(cleanPage.element).to.be.instanceof(Object);
-      expect(cleanPage.elements).to.be.undefined;
+      expect(cleanPage.element).toBeInstanceOf(Object);
+      expect(cleanPage.elements).toBeUndefined();
     });
   });
 
@@ -109,18 +106,18 @@ describe("page", () => {
     it("converts an elements array to a tree", () => {
       const tree = fullGrow(examplePage.elements);
       // tree is the root element
-      expect(tree.children).to.be.instanceof(Array);
-      expect(tree.childIndices).to.be.undefined;
-      expect(tree.parent).to.be.undefined;
+      expect(tree.children).toBeInstanceOf(Array);
+      expect(tree.childIndices).toBeUndefined();
+      expect(tree.parent).toBeUndefined();
     });
   });
 
   describe("simpleGrow", () => {
     it("converts an elements array to a tree for d3", () => {
       const tree = simpleGrow(examplePage.elements);
-      expect(tree.hasRules).to.be.false;
-      expect(tree.hasChildren).to.be.true;
-      expect(tree.children).to.be.instanceof(Array);
+      expect(tree.hasRules).toBe(false);
+      expect(tree.hasChildren).toBe(true);
+      expect(tree.children).toBeInstanceOf(Array);
     });
   });
 });

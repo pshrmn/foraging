@@ -1,5 +1,3 @@
-import {expect} from "chai";
-
 import frame from "reducers/frame";
 import * as ActionTypes from "constants/ActionTypes";
 
@@ -14,7 +12,7 @@ describe("frame reducer", () => {
         type: "UNKNOWN_ACTION_TYPE"
       };
       const newState = frame(state, action);
-      expect(newState).to.deep.equal(state);
+      expect(newState).toEqual(state);
     });
   });
 
@@ -35,7 +33,7 @@ describe("frame reducer", () => {
         const newState = frame(state, {
           type: t
         });
-        expect(newState.name).to.equal("element");
+        expect(newState.name).toBe("element");
       });
     });
   });
@@ -49,7 +47,7 @@ describe("frame reducer", () => {
         type: ActionTypes.SHOW_ELEMENT_FRAME
       };
       const newState = frame(state, action);
-      expect(newState.name).to.equal("element");
+      expect(newState.name).toBe("element");
     });
   });
 
@@ -61,7 +59,7 @@ describe("frame reducer", () => {
       const newState = frame(state, {
         type: ActionTypes.SHOW_ELEMENT_WIZARD
       });
-      expect(newState.name).to.equal("element-wizard");
+      expect(newState.name).toBe("element-wizard");
     });
   });
 
@@ -73,7 +71,7 @@ describe("frame reducer", () => {
       const newState = frame(state, {
         type: ActionTypes.SHOW_EDIT_ELEMENT_WIZARD
       });
-      expect(newState.name).to.equal("edit-element-wizard");
+      expect(newState.name).toBe("edit-element-wizard");
     });
   });
 
@@ -86,7 +84,7 @@ describe("frame reducer", () => {
         type: ActionTypes.SHOW_RULE_WIZARD
       };
       const newState = frame(state, action);
-      expect(newState.name).to.equal("rule-wizard");
+      expect(newState.name).toBe("rule-wizard");
     });
   });
 
@@ -101,8 +99,8 @@ describe("frame reducer", () => {
         index
       };
       const newState = frame(state, action);
-      expect(newState.name).to.equal("edit-rule-wizard");
-      expect(newState.index).to.equal(index);
+      expect(newState.name).toBe("edit-rule-wizard");
+      expect(newState.index).toBe(index);
     });
   });
 
@@ -114,7 +112,7 @@ describe("frame reducer", () => {
       const newState = frame(state, {
         type: ActionTypes.SHOW_PREVIEW
       });
-      expect(newState.name).to.equal("preview");
+      expect(newState.name).toBe("preview");
     });
   });
 });
