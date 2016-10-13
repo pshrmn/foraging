@@ -7,3 +7,4 @@ overview.txt
 docs/build
 *.log
 *.map
+coverage

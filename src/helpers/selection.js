@@ -78,13 +78,8 @@ export const select = (parents, selector, spec, ignored) => {
  * @param selector - the selector to use to match children of the parent elements
  * @param spec - how to select the child element or elements of a parent element
  */
-export const count = (parents, selector, spec) => {
+export const count = (parents, selector, spec = { type: 'all' }) => {
   const sel = `${selector || '*'}:not(.no-select)`;
-  if ( !spec ) {
-    spec = {
-      type: 'all'
-    };
-  }
   return Array.from(parents)
     .reduce((top, p) => {
       const children = p.querySelectorAll(sel);

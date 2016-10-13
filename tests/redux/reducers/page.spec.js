@@ -61,7 +61,8 @@ describe("page reducer", () => {
                 parent: 2,
                 index: 3,
                 childIndices: []
-              }
+              },
+              null
             ]
           },
           {
@@ -217,6 +218,9 @@ describe("page reducer", () => {
       });
       const { pages, pageIndex } = newState;
       pages[pageIndex].elements.forEach(element => {
+        if ( element === null ) {
+          return;
+        }
         const { index } = element;
         if ( matches[index] !== undefined ) {
           expect(element.matches).toEqual(matches[index]);

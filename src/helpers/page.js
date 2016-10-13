@@ -23,34 +23,9 @@ export const preparePages = pages => {
         elements: flatten(p.element)
       };
     });
-  //preppedPages.forEach(p => selectElements(p.elements));
   return preppedPages;
 };
 
-/*
- * because specs have been re-implemented to not just use
- * a single "value" property, return the new style spec
- * for ones that still have a "value" property
- */
-function fixSpec(oldSpec) {
-  if ( !oldSpec ) {
-    return {};
-  } else if ( oldSpec.value === undefined ) {
-    return oldSpec;
-  } else {
-    if ( oldSpec.type === 'single' ) {
-      return {
-        type: 'single',
-        index: oldSpec.value
-      }
-    } else if ( oldSpec.type === 'all' ) {
-      return {
-        type: 'all',
-        name: oldSpec.value
-      }
-    }
-  }
-}
 
 /*
  * flatten a page object's nested selectors into an array. each item
@@ -80,8 +55,6 @@ export const flatten = pageTree => {
     if ( current.parent !== null ) {
       breadth[current.parent].childIndices.push(index);
     }
-
-    current.spec = fixSpec(current.spec);
 
     // add all child elements to the breadth array
     current.children.forEach(c => {
@@ -150,7 +123,6 @@ export const simpleGrow = elementArray => {
       selector: e.selector,
       spec: Object.assign({}, e.spec),
       hasRules: e.rules.length > 0,
-      hasChildren: e.childIndices.length > 0,
       children: [],
       index: e.index,
       parent: e.parent,
@@ -165,6 +137,13 @@ export const simpleGrow = elementArray => {
     };
     cleanElements[e.parent].children.push(e);
   });
+  // determine hasChildren based on its children array, not childIndices
+  cleanElements.forEach(e => {
+    if ( e === null ) {
+      return;
+    }
+    e.hasChildren = e.children.length > 0
+  })
   return cleanElements[0];
 }
 
@@ -186,19 +165,22 @@ export const simpleGrow = elementArray => {
  * This is useful for verifying that a rule or spec name is not a duplicate.
  */
 export function levelNames(elements, currentIndex) {
-  let current = elements[currentIndex];
   // find the root element for the current level. This will either be an element
-  /// with a spec name or the root element of the whole tree
-  let rootIndex;
-  while ( rootIndex === undefined ) {
-    // check if current is a spec name element
-    if ( current.spec.name !== undefined || current.parent === null) {
-      rootIndex = current.index
+  // with a spec name or the root element of the whole tree
+  function searchForRoot(element) {
+    // this shouldn't happen
+    if ( element === null ) {
+      return null;
+    }
+    // stop when the element's spec has a name property or if the
+    // element has no parent
+    if ( element.spec.name !== undefined || element.parent === null) {
+      return element.index;
     } else {
-      current = elements[current.parent];
+      return searchForRoot(elements[element.parent])
     }
   }
-
+  const rootIndex = searchForRoot(elements[currentIndex]);
   return childNames(elements, rootIndex, true);
 };
 

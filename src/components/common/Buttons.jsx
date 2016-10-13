@@ -12,10 +12,12 @@ export const NegButton = ({ classes, ...rest }) => (
     classes={['neg'].concat(classes)} />
 );
 
+const defaultClick = () => {};
+
 export const NeutralButton = (props) => {
   const {
     text = '',
-    click = () => {},
+    click = defaultClick,
     classes = [],
     title = '',
     disabled = false,

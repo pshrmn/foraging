@@ -1,6 +1,6 @@
 {
   "name": "Forager",
-  "version": "2.32.2",
+  "version": "2.32.3",
   "license": "MIT",
   "author": "Paul Sherman",
   "repository": {
@@ -15,6 +15,7 @@
     "sass": "node-sass scss/** -o forager/css/**",
     "test": "cross-env NODE_PATH=src jest",
     "test:watch": "npm run test -- --watch",
+    "coverage": "npm run test -- --coverage",
     "webpack:dev": "webpack",
     "webpack:prod": "webpack",
     "webpack:watch": "webpack --watch"
@@ -32,6 +33,7 @@
     "jest": "^16.0.1",
     "node-sass": "^3.10.1",
     "postcss-cli": "^2.3.2",
+    "react-test-renderer": "^15.3.2",
     "redux-mock-store": "^1.0.3",
     "webpack": "^1.12.14"
   },

@@ -1,5 +1,12 @@
-import { createElement, flatten, clean,
-  fullGrow, simpleGrow } from "helpers/page";
+import {
+  createElement,
+  preparePages,
+  flatten,
+  clean,
+  fullGrow,
+  simpleGrow,
+  levelNames
+} from "helpers/page";
 
 describe("page", () => {
 
@@ -18,13 +25,33 @@ describe("page", () => {
         childIndices: [1]
       },
       {
+        selector: "div",
+        spec: {
+          type: "single",
+          index: 0
+        },
+        rules: [{
+          name: "id",
+          attr: "id",
+          type: "string"
+        }],
+        index: 1,
+        parent: 0,
+        childIndices: [2]
+      },
+      {
         selector: "p",
         spec: {
           type: "all",
           name: "peas"
         },
-        rules: [],
-        parent: 0,
+        rules: [{
+          name: "description",
+          attr: "text",
+          type: "string"
+        }],
+        index: 2,
+        parent: 1,
         childIndices: []
       }
     ]    
@@ -60,6 +87,18 @@ describe("page", () => {
       expect(links.spec.type).toBe("all");
       expect(links.spec.name).toBe("divs");
       expect(links.optional).toBe(true);
+    });
+  });
+
+  describe("preparePages", () => {
+    it("prepares each page in the pages array", () => {
+      const preppedPages = preparePages([examplePage]);
+      expect(preppedPages.length).toBe(1);
+    })
+
+    it("ignored null pages", () => {
+      const preppedPages = preparePages([null, examplePage]);
+      expect(preppedPages.length).toBe(1);
     });
   });
 
@@ -110,6 +149,21 @@ describe("page", () => {
       expect(tree.childIndices).toBeUndefined();
       expect(tree.parent).toBeUndefined();
     });
+
+    it("doesn't add null elements to the tree", () => {
+      examplePage.elements.push(null);
+      expect(examplePage.elements.length).toBe(4);
+      const tree = fullGrow(examplePage.elements);
+
+      // traverse the tree and count the number of elements
+      let elementCount = 0;
+      function traverse(element) {
+        elementCount += 1;
+        element.children.forEach(c => traverse(c));
+      }
+      traverse(tree);
+      expect(elementCount).toBe(3);
+    });
   });
 
   describe("simpleGrow", () => {
@@ -119,5 +173,44 @@ describe("page", () => {
       expect(tree.hasChildren).toBe(true);
       expect(tree.children).toBeInstanceOf(Array);
     });
+
+    it("doesn't add null elements to the tree", () => {
+      // when the child is set to null, the tree shouldn't have any children
+      examplePage.elements[2] = null;
+      const nullElements = [
+        examplePage.elements[0],
+        null
+      ]
+      const nullTree = simpleGrow(nullElements);
+      expect(nullTree.hasChildren).toBe(false);
+      expect(nullTree.children).toBeInstanceOf(Array);
+      expect(nullTree.children.length).toBe(0)
+    });
+
   });
+
+  describe("levelNames", () => {
+    it("returns a list of taken names for elements with spec name", () => {
+      const names = levelNames(examplePage.elements, 2);
+      const expectedNames = ["description"];
+      names.forEach(n => {
+        expect(expectedNames.includes(n)).toBe(true);
+      });
+    });
+
+    it("returns a list of taken names beginning with the root element", () => {
+      const names = levelNames(examplePage.elements, 1);
+      const expectedNames = ["id", "peas"];
+      names.forEach(n => {
+        expect(expectedNames.includes(n)).toBe(true);
+      });
+    });
+
+    it("returns an empty list if current element is null", () => {
+      examplePage.elements.push(null);
+      const names = levelNames(examplePage.elements, 3);
+      expect(names.length).toBe(0);
+    })
+  });
+
 });

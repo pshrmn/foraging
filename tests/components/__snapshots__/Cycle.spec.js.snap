@@ -1,0 +1,71 @@
+exports[`Cycle calls setIndex when left button is clicked 1`] = `
+<div>
+  <button
+    className=""
+    disabled={false}
+    onClick={[Function]}
+    title=""
+    type="button">
+    <
+  </button>
+  6
+   / 
+  10
+  <button
+    className=""
+    disabled={false}
+    onClick={[Function]}
+    title=""
+    type="button">
+    >
+  </button>
+</div>
+`;
+
+exports[`Cycle calls setIndex when right button is clicked 1`] = `
+<div>
+  <button
+    className=""
+    disabled={false}
+    onClick={[Function]}
+    title=""
+    type="button">
+    <
+  </button>
+  6
+   / 
+  10
+  <button
+    className=""
+    disabled={false}
+    onClick={[Function]}
+    title=""
+    type="button">
+    >
+  </button>
+</div>
+`;
+
+exports[`Cycle create a Cycle component 1`] = `
+<div>
+  <button
+    className=""
+    disabled={false}
+    onClick={[Function]}
+    title=""
+    type="button">
+    <
+  </button>
+  1
+   / 
+  10
+  <button
+    className=""
+    disabled={false}
+    onClick={[Function]}
+    title=""
+    type="button">
+    >
+  </button>
+</div>
+`;

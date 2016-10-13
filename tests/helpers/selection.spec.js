@@ -46,6 +46,18 @@ describe("selector", () => {
       const elements = select([document.body], "div", {type: "all", name: "div"}, ".third");
       expect(elements.length).toBe(2)
     });
+
+    it("selects with range spec", () => {
+      const divs = document.querySelectorAll("div");
+      const elements = select(divs, "p", {type: 'range', low: 0, high: 1});
+      expect(elements.length).toBe(2);
+    });
+
+    it("selects with single spec", () => {
+      const divs = document.querySelectorAll("div");
+      const elements = select(divs, "p", {type: 'single', index: 1});
+      expect(elements.length).toBe(1);
+    })
   });
 
   describe("count", () => {
@@ -54,6 +66,18 @@ describe("selector", () => {
       const max = count(divs, "p");
       expect(max).toBe(2);
     });
+
+    it("counts with range spec", () => {
+      const divs = document.querySelectorAll("div");
+      const max = count(divs, "p", {type: 'range', low: 0, high: 1})
+      expect(max).toBe(1)
+    });
+
+    it("counts with single spec", () => {
+      const divs = document.querySelectorAll("div");
+      const max = count(divs, "p", {type: 'single', index: 0})
+      expect(max).toBe(1)
+    })
   });
 
   describe("parts", () => {
