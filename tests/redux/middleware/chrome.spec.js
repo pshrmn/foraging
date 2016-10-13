@@ -15,6 +15,11 @@ import {
 } from 'constants/ActionTypes';
 import * as chrome from 'helpers/chrome';
 
+// mock each chrome function to return a Promise
+Object.keys(chrome).forEach(key => {
+  chrome[key] = jest.fn().mockReturnValue(Promise.resolve(key))
+});
+
 const mockStore = configureStore([chromeMiddleware])
 
 describe('chromeMiddleware', () => {
@@ -36,6 +41,10 @@ describe('chromeMiddleware', () => {
     });
   });
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   describe('unknown', () => {
     it('ignores unknown actions', () => {
       store.dispatch({
@@ -48,137 +57,107 @@ describe('chromeMiddleware', () => {
 
   describe('RENAME_PAGE', () => {
     it('calls chrome.rename', () => {
-      const spy = jest.fn()
-        .mockReturnValue(Promise.resolve('renamed'));
-      chrome.rename = spy;
       store.dispatch({
         type: RENAME_PAGE
       });
       const [first] = store.getActions();
       expect(first.type).toBe(RENAME_PAGE);
-      expect(spy.mock.calls.length).toBe(1);
+      expect(chrome.rename.mock.calls.length).toBe(1);
     });
   });
 
   describe('REMOVE_PAGE', () => {
     it('calls chrome.remove', () => {
-      const spy = jest.fn()
-        .mockReturnValue(Promise.resolve('removed'));
-      chrome.remove = spy;
       store.dispatch({
         type: REMOVE_PAGE
       });
       const [first] = store.getActions();
       expect(first.type).toBe(REMOVE_PAGE);
-      expect(spy.mock.calls.length).toBe(1);
+      expect(chrome.remove.mock.calls.length).toBe(1);
     });
   });
 
   describe('UPLOAD_PAGE', () => {
     it('calls chrome.upload', () => {
-      const spy = jest.fn()
-        .mockReturnValue(Promise.resolve('uploaded'));
-      chrome.upload = spy;
       store.dispatch({
         type: UPLOAD_PAGE
       });
-      expect(spy.mock.calls.length).toBe(1);
+      expect(chrome.upload.mock.calls.length).toBe(1);
     });
   });
 
   describe('SYNC_PAGES', () => {
     it('calls chrome.sync', () => {
-      const spy = jest.fn()
-        .mockReturnValue(Promise.resolve('synced'));
-      chrome.sync = spy;
       store.dispatch({
         type: SYNC_PAGES
       });
-      expect(spy.mock.calls.length).toBe(1);
+      expect(chrome.sync.mock.calls.length).toBe(1);
     });
   });
 
   describe('ADD_PAGE', () => {
     it('calls chrome.save', () => {
-      const spy = jest.fn()
-        .mockReturnValue(Promise.resolve('saved'));
-      chrome.save = spy;
       store.dispatch({
         type: ADD_PAGE
       });
       const [first] = store.getActions();
       expect(first.type).toBe(ADD_PAGE);
-      expect(spy.mock.calls.length).toBe(1);
+      expect(chrome.save.mock.calls.length).toBe(1);
     });
   });
 
   describe('SAVE_ELEMENT', () => {
     it('calls chrome.save', () => {
-      const spy = jest.fn()
-        .mockReturnValue(Promise.resolve('saved'));
-      chrome.save = spy;
       store.dispatch({
         type: SAVE_ELEMENT
       });
       const [first] = store.getActions();
       expect(first.type).toBe(SAVE_ELEMENT);
-      expect(spy.mock.calls.length).toBe(1);
+      expect(chrome.save.mock.calls.length).toBe(1);
     });
   });
 
   describe('REMOVE_ELEMENT', () => {
     it('calls chrome.save', () => {
-      const spy = jest.fn()
-        .mockReturnValue(Promise.resolve('saved'));
-      chrome.save = spy;
       store.dispatch({
         type: REMOVE_ELEMENT
       });
       const [first] = store.getActions();
       expect(first.type).toBe(REMOVE_ELEMENT);
-      expect(spy.mock.calls.length).toBe(1);
+      expect(chrome.save.mock.calls.length).toBe(1);
     });
   });
 
   describe('UPDATE_ELEMENT', () => {
     it('calls chrome.save', () => {
-      const spy = jest.fn()
-        .mockReturnValue(Promise.resolve('saved'));
-      chrome.save = spy;
       store.dispatch({
         type: UPDATE_ELEMENT
       });
       const [first] = store.getActions();
       expect(first.type).toBe(UPDATE_ELEMENT);
-      expect(spy.mock.calls.length).toBe(1);
+      expect(chrome.save.mock.calls.length).toBe(1);
     });
   });
 
   describe('SAVE_RULE', () => {
     it('calls chrome.save', () => {
-      const spy = jest.fn()
-        .mockReturnValue(Promise.resolve('saved'));
-      chrome.save = spy;
       store.dispatch({
         type: SAVE_RULE
       });
       const [first] = store.getActions();
       expect(first.type).toBe(SAVE_RULE);
-      expect(spy.mock.calls.length).toBe(1);
+      expect(chrome.save.mock.calls.length).toBe(1);
     });
   });
 
   describe('REMOVE_RULE', () => {
     it('calls chrome.save', () => {
-      const spy = jest.fn()
-        .mockReturnValue(Promise.resolve('saved'));
-      chrome.save = spy;
       store.dispatch({
         type: REMOVE_RULE
       });
       const [first] = store.getActions();
       expect(first.type).toBe(REMOVE_RULE);
-      expect(spy.mock.calls.length).toBe(1);
+      expect(chrome.save.mock.calls.length).toBe(1);
     });
   });
 
