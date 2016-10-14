@@ -1,5 +1,4 @@
-import { select } from 'helpers/selection';
-import { preparePages, clean } from 'helpers/page'
+import { preparePages, clean } from 'helpers/page';
 
 /*
  * any time that the page is updated, the stored page should be updated
@@ -17,8 +16,8 @@ export const save = page => {
       chrome.storage.local.set({'sites': storage.sites});
       resolve('Saved');
     });
-  })
-}
+  });
+};
 
 export const rename = (newName, oldName) => {
   return new Promise((resolve, reject) => {
@@ -35,7 +34,7 @@ export const rename = (newName, oldName) => {
       resolve(`Renamed "${oldName}" to "${newName}"`);
     });
   });
-}
+};
 
 /*
  * remove the page with the given name from storage
@@ -52,7 +51,7 @@ export const remove = name => {
       resolve(`Deleted page ${name}`);
     });
   });
-}
+};
 
 /*
 creates an object representing a site and saves it to chrome.storage.local
@@ -64,7 +63,7 @@ the object is:
 If the site object exists for a host, load the saved rules
 */
 export const load = () => {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     chrome.storage.local.get('sites', function setupHostnameChrome(storage){
       const host = window.location.hostname;
       const current = storage.sites[host] || {};

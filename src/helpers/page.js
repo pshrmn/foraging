@@ -1,5 +1,3 @@
-import { select } from 'helpers/selection';
-
 export const createElement = (selector, spec = {type: 'single', index: 0}, optional = false) => ({
   selector,
   spec,
@@ -69,7 +67,7 @@ export const flatten = pageTree => {
   return breadth;
 };
 
-/* 
+/*
  * return a version of the page with elements as a tree for saving/uploading
  */
 export const clean = page => ({
@@ -83,8 +81,8 @@ export const clean = page => ({
 export const fullGrow = elementArray => {
   const cleanElements = elementArray.map(e => {
     if ( e === null ) {
-      return null
-    };
+      return null;
+    }
     return {
       selector: e.selector,
       spec: Object.assign({}, e.spec),
@@ -93,7 +91,7 @@ export const fullGrow = elementArray => {
       optional: e.optional,
       // preserve for tree building
       parent: e.parent
-    }
+    };
   });
   cleanElements.forEach(e => {
     if ( e === null ) {
@@ -117,8 +115,8 @@ export const fullGrow = elementArray => {
 export const simpleGrow = elementArray => {
   const cleanElements = elementArray.map(e => {
     if ( e === null ) {
-      return null
-    };
+      return null;
+    }
     return {
       selector: e.selector,
       spec: Object.assign({}, e.spec),
@@ -134,7 +132,7 @@ export const simpleGrow = elementArray => {
   cleanElements.forEach(e => {
     if ( e === null || e.parent === null) {
       return;
-    };
+    }
     cleanElements[e.parent].children.push(e);
   });
   // determine hasChildren based on its children array, not childIndices
@@ -142,10 +140,10 @@ export const simpleGrow = elementArray => {
     if ( e === null ) {
       return;
     }
-    e.hasChildren = e.children.length > 0
-  })
+    e.hasChildren = e.children.length > 0;
+  });
   return cleanElements[0];
-}
+};
 
 /*
  * Return a list of names in the same level as the current element
@@ -177,12 +175,12 @@ export function levelNames(elements, currentIndex) {
     if ( element.spec.name !== undefined || element.parent === null) {
       return element.index;
     } else {
-      return searchForRoot(elements[element.parent])
+      return searchForRoot(elements[element.parent]);
     }
   }
   const rootIndex = searchForRoot(elements[currentIndex]);
   return childNames(elements, rootIndex, true);
-};
+}
 
 function childNames(elements, index, isRoot) {
   let current = elements[index];

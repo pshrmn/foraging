@@ -1,4 +1,4 @@
-import { levelNames } from 'helpers/page'
+import { levelNames } from 'helpers/page';
 
 /*
  * returns the currently selected element
@@ -28,5 +28,5 @@ export function takenNames(page) {
   const current = currentElement(page);
   const index = current.parent !== null ? current.parent : page.elementIndex;
   const currentPage = page.pages[page.pageIndex].elements;
-  return levelNames(currentPage, index)
+  return levelNames(currentPage, index);
 }

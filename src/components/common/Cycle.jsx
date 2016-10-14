@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 
 import { NeutralButton } from 'components/common/Buttons';
 
@@ -28,6 +28,12 @@ const Cycle = ({ index, count, setIndex }) => {
         text='>' />
     </div>
   );
-}
+};
+
+Cycle.propTypes = {
+  index: React.PropTypes.number.isRequired,
+  count: React.PropTypes.number.isRequired,
+  setIndex: React.PropTypes.func.isRequired
+};
 
 export default Cycle;

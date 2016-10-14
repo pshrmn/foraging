@@ -1,8 +1,8 @@
 import React from 'react';
 
-import { CreateAllValueStep, EditAllValueStep } from './AllValueStep'
+import { CreateAllValueStep, EditAllValueStep } from './AllValueStep';
 import { CreateSingleValueStep, EditSingleValueStep } from './SingleValueStep';
-import { CreateRangeValueStep, EditRangeValueStep } from './RangeValueStep'
+import { CreateRangeValueStep, EditRangeValueStep } from './RangeValueStep';
 
 export function CreateValue(props) {
   const { spec } = props.startData;
@@ -31,3 +31,11 @@ export function EditValue(props) {
     return null;
   }
 }
+
+CreateValue.propTypes = {
+  startData: React.PropTypes.object.isRequired
+};
+
+EditValue.propTypes = {
+  startData: React.PropTypes.object.isRequired
+};

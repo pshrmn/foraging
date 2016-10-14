@@ -26,6 +26,14 @@ function Element(props) {
   );
 }
 
+Element.propTypes = {
+  selector: React.PropTypes.string.isRequired,
+  rules: React.PropTypes.array,
+  spec: React.PropTypes.object,
+  optional: React.PropTypes.bool,
+  active: React.PropTypes.bool
+};
+
 const RuleList = ({ rules, active }) => (
   !rules.length ? null : (
     <ul className='rules'>
@@ -41,5 +49,10 @@ const RuleList = ({ rules, active }) => (
     </ul>
   )
 );
+
+RuleList.propTypes = {
+  rules: React.PropTypes.array,
+  active: React.PropTypes.bool.isRequired
+};
 
 export default Element;

@@ -1,3 +1,4 @@
+/* eslint-disable no-redeclare */
 import * as types from 'constants/ActionTypes';
 
 /*
@@ -92,7 +93,7 @@ export default function page(state = {}, action) {
           })
         }),
         ...pages.slice(pageIndex+1)]
-    });    
+    });
 
   case types.SELECT_ELEMENT:
     var { pages, pageIndex, elementIndex } = state;
@@ -172,7 +173,7 @@ export default function page(state = {}, action) {
       });
       return Object.assign({}, state, {
         pages: [
-        ...pages.slice(0, pageIndex),
+          ...pages.slice(0, pageIndex),
           Object.assign({}, currentPage, {
             elements: [cleanedBody]
           }),
@@ -207,7 +208,7 @@ export default function page(state = {}, action) {
 
     return Object.assign({}, state, {
       pages: [
-      ...pages.slice(0, pageIndex),
+        ...pages.slice(0, pageIndex),
         updatedPage,
         ...pages.slice(pageIndex+1)
       ],
@@ -222,12 +223,12 @@ export default function page(state = {}, action) {
 
     return Object.assign({}, state, {
       pages: [
-      ...pages.slice(0, pageIndex),
+        ...pages.slice(0, pageIndex),
         Object.assign({}, currentPage, {
           elements: currentPage.elements.map(s => {
             // set the new name for the element matching elementIndex
             if ( s !== null && s.index === elementIndex ) {
-              s.rules = s.rules.concat([rule])
+              s.rules = s.rules.concat([rule]);
             }
             return s;
           })
@@ -244,7 +245,7 @@ export default function page(state = {}, action) {
 
     return Object.assign({}, state, {
       pages: [
-      ...pages.slice(0, pageIndex),
+        ...pages.slice(0, pageIndex),
         Object.assign({}, currentPage, {
           elements: currentPage.elements.map(s => {
             // remove the rule from the current element
@@ -258,7 +259,7 @@ export default function page(state = {}, action) {
         }),
         ...pages.slice(pageIndex+1)
       ]
-    });  
+    });
 
   case types.UPDATE_RULE:
     var { pages, pageIndex, elementIndex } = state;
@@ -268,14 +269,12 @@ export default function page(state = {}, action) {
 
     return Object.assign({}, state, {
       pages: [
-      ...pages.slice(0, pageIndex),
+        ...pages.slice(0, pageIndex),
         Object.assign({}, currentPage, {
           elements: currentPage.elements.map(s => {
             // set the new name for the element matching elementIndex
             if ( s !== null && s.index === elementIndex ) {
-              s.rules = s.rules.map((r,i) => {
-                return i === index ? rule : r
-              });
+              s.rules = s.rules.map((r,i) => i === index ? rule : r);
             }
             return s;
           })

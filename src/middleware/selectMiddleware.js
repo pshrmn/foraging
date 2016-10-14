@@ -39,11 +39,11 @@ export default store => next => action => {
       matchObject[element.index] = select(parentElements, element.selector, element.spec, '.forager-holder');
       return matchObject;
     }, {});
-    
+
     // gets matches for all of the elements in the newly loaded page
     store.dispatch(
       setMatches(matchesObject)
     );
     return result;
   }
-}
+};

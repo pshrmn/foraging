@@ -42,7 +42,7 @@ export const setMatches = matches => ({
 });
 
 // trigger the matches to be re-selected
-export const refreshMatches = matches => ({
+export const refreshMatches = () => ({
   type: types.REFRESH_MATCHES
 });
 

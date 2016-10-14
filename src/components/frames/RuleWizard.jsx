@@ -81,9 +81,9 @@ class RuleWizard extends React.Component {
     highlight(current.matches, currentSelector);
   }
 
-  componentWillUpdate(nextProps, nextState) {
+  componentWillUpdate(nextProps) {
     unhighlight(currentSelector);
-    const { current } = this.props;
+    const { current } = nextProps;
     highlight(current.matches, currentSelector);
   }
 
@@ -91,6 +91,12 @@ class RuleWizard extends React.Component {
     unhighlight(currentSelector);
   }
 }
+
+RuleWizard.propTypes = {
+  saveRule: React.PropTypes.func.isRequired,
+  cancel: React.PropTypes.func.isRequired,
+  current: React.PropTypes.object
+};
 
 export default connect(
   state => {

@@ -38,7 +38,7 @@ class Controls extends React.Component {
     this.renameHandler = this.renameHandler.bind(this);
   }
 
-  addHandler(event) {
+  addHandler() {
     const { pages, showMessage, addPage } = this.props;
     const name = promptName();
     if ( !validName(name, pageNames(pages)) ) {
@@ -59,7 +59,7 @@ class Controls extends React.Component {
     }
   }
 
-  renameHandler(event) {
+  renameHandler() {
     const name = promptName();
     const { pages, showMessage, renamePage } = this.props;
     // do nothing if the user cancels, does not enter a name, or enter the same name as the current one
@@ -73,7 +73,6 @@ class Controls extends React.Component {
   render() {
     const {
       pages,
-      message,
       currentIndex,
       selectPage,
       uploadPage,
@@ -108,7 +107,7 @@ class Controls extends React.Component {
               disabled={!active} />
             <PosButton
               text='Preview'
-              click={() => { showPreview() }} 
+              click={() => { showPreview(); }}
               disabled={!active} />
             <NegButton
               text='Delete'
@@ -142,6 +141,21 @@ class Controls extends React.Component {
   }
 }
 
+Controls.propTypes = {
+  currentIndex: React.PropTypes.number.isRequired,
+  pages: React.PropTypes.object,
+  addPage: React.PropTypes.func.isRequired,
+  selectPage: React.PropTypes.func.isRequired,
+  closeForager: React.PropTypes.func.isRequired,
+  showMessage: React.PropTypes.func.isRequired,
+  syncPages: React.PropTypes.func.isRequired,
+  refreshMatches: React.PropTypes.func.isRequired,
+  renamePage: React.PropTypes.func.isRequired,
+  removePage: React.PropTypes.func.isRequired,
+  uploadPage: React.PropTypes.func.isRequired,
+  showPreview: React.PropTypes.func.isRequired
+};
+
 export default connect(
   state => {
     const { page } = state;
@@ -149,7 +163,7 @@ export default connect(
     return {
       currentIndex: pageIndex,
       pages
-    }
+    };
   },
   {
     addPage,

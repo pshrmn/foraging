@@ -15,4 +15,9 @@ const OptionalForm = ({ optional, toggle }) => (
   </div>
 );
 
+OptionalForm.propTypes = {
+  optional: React.PropTypes.bool,
+  toggle: React.PropTypes.func
+};
+
 export default OptionalForm;

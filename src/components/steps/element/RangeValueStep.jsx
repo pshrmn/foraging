@@ -70,7 +70,6 @@ class RangeValueStep extends React.Component {
     const {
       startData,
       next,
-      takenNames,
       showMessage,
       validate
     } = this.props;
@@ -151,7 +150,12 @@ RangeValueStep.propTypes = {
   endData: React.PropTypes.object,
   staticData: React.PropTypes.object,
   next: React.PropTypes.func,
-  previous: React.PropTypes.func
+  previous: React.PropTypes.func,
+  cancel: React.PropTypes.func,
+  setupState: React.PropTypes.func,
+  highlightClass: React.PropTypes.string,
+  validate: React.PropTypes.func,
+  showMessage: React.PropTypes.func
 };
 
 const ConnectedRangeValueStep = connect(
@@ -258,7 +262,7 @@ function initialEditState(props) {
 function validateCreate(props, state) {
   const { name } = state;
   const { takenNames } = props;
-  return takenNames.every(n => n !== name)
+  return takenNames.every(n => n !== name);
 }
 
 function validateEdit(props, state) {

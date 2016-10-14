@@ -28,3 +28,9 @@ export default function TypeForm({ types, current, setType }) {
     </div>
   );
 }
+
+TypeForm.propTypes = {
+  types: React.PropTypes.array,
+  current: React.PropTypes.string,
+  setType: React.PropTypes.func
+};

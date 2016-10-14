@@ -18,7 +18,7 @@ export const protect = selector => {
       c.classList.add('no-select');
     });
   });
-}
+};
 
 /*
  * select
@@ -65,9 +65,8 @@ export const select = (parents, selector, spec, ignored) => {
       }
       return arr.concat(elements);
     }, []);
-    return [...new Set(childElements)];
-}
-
+  return [...new Set(childElements)];
+};
 
 /*
  * count
@@ -90,7 +89,7 @@ export const count = (parents, selector, spec = { type: 'all' }) => {
         count = children[index] !== undefined ? 1 : 0;
         break;
       case 'all':
-        count = children.length
+        count = children.length;
         break;
       case 'range':
         const low = spec.low;
@@ -101,7 +100,7 @@ export const count = (parents, selector, spec = { type: 'all' }) => {
 
       return top > count ? top : count;
     }, 0);
-}
+};
 
 /*
  * parts
@@ -145,7 +144,7 @@ export const parts = element =>{
   Array.from(element.classList).forEach(c => {
     if ( classAllowed(c) ) {
       pieces.push(`.${c}`);
-    }  
+    }
   });
   return pieces;
 };

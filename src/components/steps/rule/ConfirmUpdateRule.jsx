@@ -53,4 +53,11 @@ class ConfirmElement extends React.Component {
   }
 }
 
+ConfirmElement.propTypes = {
+  startData: React.PropTypes.object.isRequired,
+  next: React.PropTypes.func.isRequired,
+  previous: React.PropTypes.func.isRequired,
+  cancel: React.PropTypes.func.isRequired
+};
+
 export default ConfirmElement;

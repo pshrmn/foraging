@@ -55,7 +55,11 @@ function ElementCard(props) {
 
 ElementCard.propTypes = {
   element: React.PropTypes.object,
-  active: React.PropTypes.bool
+  active: React.PropTypes.bool,
+  showElementWizard: React.PropTypes.func.isRequired,
+  showRuleWizard: React.PropTypes.func.isRequired,
+  showEditElementWizard: React.PropTypes.func.isRequired,
+  removeElement: React.PropTypes.func.isRequired
 };
 
 export default connect(

@@ -72,7 +72,8 @@ ConfirmElement.propTypes = {
   endData: React.PropTypes.object,
   staticData: React.PropTypes.object,
   next: React.PropTypes.func,
-  previous: React.PropTypes.func
+  previous: React.PropTypes.func,
+  cancel: React.PropTypes.func
 };
 
 export default ConfirmElement;

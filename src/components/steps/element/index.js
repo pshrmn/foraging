@@ -4,7 +4,7 @@ export {
   CreateType,
   EditType
 } from './ChooseType';
-export { 
+export {
   CreateValue,
   EditValue
 } from './ChooseValue';

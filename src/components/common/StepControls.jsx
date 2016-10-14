@@ -24,3 +24,11 @@ export default function Controls(props) {
     </div>
   );
 }
+
+Controls.propTypes = {
+  previous: React.PropTypes.func,
+  next: React.PropTypes.func,
+  cancel: React.PropTypes.func,
+  nextText: React.PropTypes.string,
+  error: React.PropTypes.bool
+};

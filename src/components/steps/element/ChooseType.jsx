@@ -106,7 +106,11 @@ ChooseType.propTypes = {
   staticData: React.PropTypes.object,
   next: React.PropTypes.func,
   previous: React.PropTypes.func,
-  noPrevious: React.PropTypes.bool
+  cancel: React.PropTypes.func,
+  noPrevious: React.PropTypes.bool,
+  setupState: React.PropTypes.func.isRequired,
+  highlight: React.PropTypes.func.isRequired,
+  highlightClass: React.PropTypes.string.isRequired
 };
 
 export const CreateType = props => (
@@ -154,40 +158,36 @@ function createHighlightElements(props, state, highlightClass) {
   const { selector } = startData;
   const { parent } = staticData;
 
-  const spec = {
-    type
-  }
+  const spec = { type };
   // use set single index if possible
   if ( type === 'single' ) {
-    spec.index = 0
+    spec.index = 0;
   } else if ( type === 'range' ) {
     spec.low = 0;
     spec.high = undefined;
   }
   const elements = select(parent.matches, selector, spec, '.forager-holder');
-  highlight(elements, highlightClass); 
+  highlight(elements, highlightClass);
 }
 
 function editHighlightElements(props, state, highlightClass) {
   const { startData, staticData } = props;
   const { type } = state;
-  
+
   const { parent = {} } = staticData;
   const { matches: parentMatches = [document] } = parent;
 
-  const spec = {
-    type
-  }
+  const spec = { type };
   // use set single index if possible
   if ( type === 'single' ) {
     const wasSingle = startData.spec && startData.spec.type === 'single';
-    spec.index = wasSingle ? startData.spec.index : 0
+    spec.index = wasSingle ? startData.spec.index : 0;
   } else if ( type === 'range' ) {
     const wasRange = startData.spec && startData.spec.type === 'range';
     spec.low = wasRange ? startData.spec.low : 0;
     spec.high = wasRange ? startData.spec.high : undefined;
   }
-  
+
   const elements = select(
     parentMatches,
     startData.selector,

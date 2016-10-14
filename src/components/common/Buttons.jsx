@@ -33,5 +33,17 @@ export const NeutralButton = (props) => {
       onClick={click} >
       {text}
     </button>
-  );  
-}
+  );
+};
+
+NeutralButton.propTypes = {
+  text: React.PropTypes.string,
+  click: React.PropTypes.func,
+  classes: React.PropTypes.array,
+  title: React.PropTypes.string,
+  disabled: React.PropTypes.bool,
+  type: React.PropTypes.string
+};
+
+PosButton.propTypes = NeutralButton.propTypes;
+NegButton.propTypes = NeutralButton.propTypes;

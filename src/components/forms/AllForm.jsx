@@ -15,3 +15,8 @@ export default function AllForm(props) {
     </div>
   );
 }
+
+AllForm.propTypes = {
+  name: React.PropTypes.string,
+  setName: React.PropTypes.func
+};

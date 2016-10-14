@@ -2,7 +2,6 @@ import React from 'react';
 
 import Controls from 'components/common/StepControls';
 
-import { createElement } from 'helpers/page';
 import { select } from 'helpers/selection';
 import { highlight, unhighlight } from 'helpers/markup';
 import { currentSelector } from 'constants/CSSClasses';
@@ -59,7 +58,7 @@ class ConfirmElement extends React.Component {
   componentWillMount() {
     const { startData, staticData } = this.props;
 
-    const { selector, spec } = startData;
+    const { spec } = startData;
     const { parent = {} } = staticData;
     const { matches: parentMatches = [document] } = parent;
     const elements = select(
@@ -81,7 +80,8 @@ ConfirmElement.propTypes = {
   endData: React.PropTypes.object,
   staticData: React.PropTypes.object,
   next: React.PropTypes.func,
-  previous: React.PropTypes.func
+  previous: React.PropTypes.func,
+  cancel: React.PropTypes.func
 };
 
 export default ConfirmElement;

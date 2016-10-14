@@ -113,4 +113,13 @@ class ChooseType extends React.Component {
   }
 }
 
+ChooseType.propTypes = {
+  startData: React.PropTypes.object.isRequired,
+  staticData: React.PropTypes.object,
+  next: React.PropTypes.func.isRequired,
+  previous: React.PropTypes.func,
+  cancel: React.PropTypes.func.isRequired,
+  children: React.PropTypes.element
+};
+
 export default ChooseType;

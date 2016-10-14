@@ -1,9 +1,10 @@
+/* eslint-disable no-redeclare */
+
 /*
  * intercept some actions that can remove pages/elements and force
  * the user to confirm that they want to complete the action
  */
 import * as types from 'constants/ActionTypes';
-import { syncPages, removePage, removeElement } from 'actions';
 
 export default store => next => action => {
   const selectActions = [
@@ -35,7 +36,7 @@ export default store => next => action => {
     var element = currentPage.elements[elementIndex];
     confirmMessage = element.index === 0 ?
       'Are you sure you want to reset the page? This will delete all rules and child elements' :
-      `Are you sure you want to delete the element "${element.selector}"?`
+      `Are you sure you want to delete the element "${element.selector}"?`;
     break;
   }
 
@@ -43,4 +44,4 @@ export default store => next => action => {
     return;
   }
   next(action);
-}
+};

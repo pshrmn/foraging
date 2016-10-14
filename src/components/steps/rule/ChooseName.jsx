@@ -7,7 +7,7 @@ import { levelNames } from 'helpers/page';
 import { showMessage } from 'expiring-redux-messages';
 
 function initialName(props) {
-  const { startData, endData = {} } = props;    
+  const { startData, endData = {} } = props;
   let name = '';
   if ( endData.name ) {
     name = endData.name;
@@ -64,7 +64,7 @@ class ChooseName extends React.Component {
   }
 
   nameHandler(event) {
-    const name = event.target.value
+    const name = event.target.value;
     this.setState({
       name: name,
       error: name === ''
@@ -94,6 +94,15 @@ class ChooseName extends React.Component {
     );
   }
 }
+
+ChooseName.propTypes = {
+  startData: React.PropTypes.object.isRequired,
+  next: React.PropTypes.func.isRequired,
+  previous: React.PropTypes.func,
+  cancel: React.PropTypes.func.isRequired,
+  takenNames: React.PropTypes.func.isRequired,
+  showMessage: React.PropTypes.func.isRequired
+};
 
 export default connect(
   state => {

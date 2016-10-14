@@ -93,9 +93,9 @@ class EditRuleWizard extends React.Component {
     highlight(current.matches, currentSelector);
   }
 
-  componentWillUpdate(nextProps, nextState) {
+  componentWillUpdate(nextProps) {
     unhighlight(currentSelector);
-    const { current } = this.props;
+    const { current } = nextProps;
     highlight(current.matches, currentSelector);
   }
 
@@ -103,6 +103,13 @@ class EditRuleWizard extends React.Component {
     unhighlight(currentSelector);
   }
 }
+
+EditRuleWizard.propTypes = {
+  updateRule: React.PropTypes.func.isRequired,
+  cancel: React.PropTypes.func.isRequired,
+  current: React.PropTypes.object,
+  ruleIndex: React.PropTypes.number
+};
 
 export default connect(
   state => {

@@ -69,6 +69,13 @@ class EditElementWizard extends React.Component {
   }
 }
 
+EditElementWizard.propTypes = {
+  current: React.PropTypes.object,
+  parent: React.PropTypes.object,
+  updateElement: React.PropTypes.func.isRequired,
+  cancel: React.PropTypes.func.isRequired
+};
+
 export default connect(
   state => {
     const { page } = state;

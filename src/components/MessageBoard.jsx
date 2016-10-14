@@ -1,15 +1,19 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-const MessageBoard = (props) => (
+const MessageBoard = ({ messages }) => (
   <div className='message-board'>
     {
-      props.messages.map(m =>
+      messages.map(m =>
         <Message key={m.id} message={m.message} rating={m.rating} />
       )
     }
   </div>
 );
+
+MessageBoard.propTypes = {
+  messages: React.PropTypes.array.isRequired
+};
 
 function Message(props) {
   const { message, rating } = props;
@@ -27,6 +31,11 @@ function Message(props) {
     </div>
   );
 }
+
+Message.propTypes = {
+  message: React.PropTypes.string,
+  rating: React.PropTypes.number
+};
 
 export default connect(
   state => ({

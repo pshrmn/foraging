@@ -46,11 +46,15 @@ class ElementFrame extends React.Component {
   }
 }
 
+ElementFrame.propTypes = {
+  element: React.PropTypes.object
+};
+
 export default connect(
   state => {
     const { page } = state;
     return {
       element: currentElement(page)
-    }
+    };
   }
 )(ElementFrame);

@@ -4,14 +4,18 @@ import { connect } from 'react-redux';
 import Controls from 'components/Controls';
 import Frames from 'components/frames/Frames';
 
-const Forager = (props) => (
-  !props.show ? null : (
+const Forager = ({ show }) => (
+  !show ? null : (
     <div id='forager'>
       <Controls />
       <Frames />
     </div>
   )
 );
+
+Forager.propTypes = {
+  show: React.PropTypes.bool.isRequired
+};
 
 export default connect(
   state => ({

@@ -203,7 +203,8 @@ ChooseElement.propTypes = {
   endData: React.PropTypes.object,
   staticData: React.PropTypes.object,
   next: React.PropTypes.func,
-  previous: React.PropTypes.func
+  previous: React.PropTypes.func,
+  cancel: React.PropTypes.func
 };
 
 // do not call event.preventDefault() here or the checked dot will fail to render
@@ -215,6 +216,13 @@ const SelectorRadio = ({ selector, checked, select, index }) => (
            onChange={() => select(index) } />
     {selector.join('')}
   </label>
-)
+);
 
-export default ChooseElement
+SelectorRadio.propTypes = {
+  selector: React.PropTypes.array.isRequired,
+  checked: React.PropTypes.bool.isRequired,
+  select: React.PropTypes.func.isRequired,
+  index: React.PropTypes.number.isRequired
+};
+
+export default ChooseElement;

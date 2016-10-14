@@ -19,7 +19,7 @@ class ChooseOptional extends React.Component {
     this.cancelHandler = this.cancelHandler.bind(this);
     this.toggleOptional = this.toggleOptional.bind(this);
   }
-  
+
   nextHandler(event) {
     event.preventDefault();
     const { optional } = this.state;
@@ -45,9 +45,7 @@ class ChooseOptional extends React.Component {
 
   render() {
     const { optional } = this.state;
-    const { startData } = this.props;
-    const { selector } = startData;
-    
+
     return (
       <form className='info-box'>
         <div className='info'>
@@ -77,11 +75,12 @@ class ChooseOptional extends React.Component {
 }
 
 ChooseOptional.propTypes = {
-  startData: React.PropTypes.object,
+  startData: React.PropTypes.object.isRequired,
   endData: React.PropTypes.object,
   staticData: React.PropTypes.object,
   next: React.PropTypes.func,
   previous: React.PropTypes.func,
+  cancel: React.PropTypes.func,
   highlightClass: React.PropTypes.string.isRequired
 };
 
@@ -112,7 +111,7 @@ function highlightElements(props, state, highlightClass) {
   const { matches: parentMatches = [document] } = parent;
   const elements = select(
     parentMatches,
-    startData.selector,
+    selector,
     spec,
     '.forager-holder'
   );

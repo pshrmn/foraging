@@ -70,9 +70,9 @@ class ElementWizard extends React.Component {
     highlight(current.matches, currentSelector);
   }
 
-  componentWillUpdate(nextProps, nextState) {
+  componentWillUpdate(nextProps) {
     unhighlight(currentSelector);
-    const { current } = this.props;
+    const { current } = nextProps;
     highlight(current.matches, currentSelector);
   }
 
@@ -80,6 +80,12 @@ class ElementWizard extends React.Component {
     unhighlight(currentSelector);
   }
 }
+
+ElementWizard.propTypes = {
+  current: React.PropTypes.object,
+  saveElement: React.PropTypes.func.isRequired,
+  cancel: React.PropTypes.func.isRequired
+};
 
 export default connect(
   state => {

@@ -21,7 +21,7 @@ export const unhighlight = className => {
   Array.from(document.getElementsByClassName(className)).forEach(e => {
     e.classList.remove(className);
   });
-}
+};
 
 /*
  * iHighlight
@@ -43,8 +43,8 @@ export const iHighlight = (elements, className, over, out, click) => {
       if ( event.target.classList.contains(className) ) {
         event.stopPropagation();
         fn(event);
-      }  
-    }
+      }
+    };
   }
 
   const checkOver = checkEvent(over);
@@ -63,6 +63,6 @@ export const iHighlight = (elements, className, over, out, click) => {
 
     document.body.removeEventListener('mouseover', checkOver, false);
     document.body.removeEventListener('mouseout', checkOut, false);
-    document.body.removeEventListener('click', checkClick, false);    
-  }
+    document.body.removeEventListener('click', checkClick, false);
+  };
 };

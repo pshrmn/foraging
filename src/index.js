@@ -13,7 +13,7 @@ import makeStore from 'store';
 {
   document.body.classList.add('foraging');
   stripEvents(document.body);
-  Array.from(document.querySelectorAll("*")).forEach(e => { stripEvents(e)});
+  Array.from(document.querySelectorAll("*")).forEach(e => { stripEvents(e); });
 }
 
 /*
@@ -48,7 +48,7 @@ if ( !document.querySelector('.forager-holder') ) {
     if ( !store.getState().show ) {
       store.dispatch(openForager());
     }
-  }
+  };
 } else {
   document.body.classList.add('foraging');
   window.restore();

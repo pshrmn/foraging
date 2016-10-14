@@ -18,23 +18,25 @@ const getElement = (element, parent) => {
     return getElementData(element, ele);
   case 'all':
     var { name } = element.spec;
-    var data = Array.from(elements)
+    var allData = Array.from(elements)
       .map(ele => getElementData(element, ele))
       .filter(datum => datum !== undefined);
     return {
-      [name]: data
-    }
+      [name]: allData
+    };
   case 'range':
+    /* eslint-disable no-redeclare */
     var { name, low, high } = element.spec;
-    var data = Array.from(elements)
+    /* eslint-enable no-redeclare */
+    var rangeData = Array.from(elements)
       .slice(low, high || undefined)
       .map(ele => getElementData(element, ele))
       .filter(datum => datum !== undefined);
     return {
-      [name]: data
+      [name]: rangeData
     };
   }
-}
+};
 
 /*
  * Get data for each rule and each child. Merge the child data into the
@@ -53,7 +55,7 @@ const getElementData = (element, domElement) => {
     return;
   }
   return Object.assign({}, data, childData);
-}
+};
 
 const getChildData = (children, domElement) => {
   let data = {};
@@ -71,14 +73,13 @@ const getChildData = (children, domElement) => {
     return false;
   });
   return data;
-}
+};
 
 const getRuleData = (rules, domElement) => {
   let data = {};
   // break when some rule's attribute does not exist
   rules.some(rule => {
     let val;
-    let match;
     if ( rule.attr === 'text' ) {
       val = domElement.textContent.replace(/\s+/g, ' ');
     } else {
@@ -103,7 +104,7 @@ const getRuleData = (rules, domElement) => {
     return false;
   });
   return data;
-}
+};
 
 export const preview = tree => tree === undefined ? '' : getElement(tree, document);
 

@@ -3,7 +3,7 @@ import * as ActionTypes from 'constants/ActionTypes';
 import { showMessage } from 'expiring-redux-messages';
 import { setPages } from 'actions';
 
-import * as chrome from 'helpers/chrome';
+import * as chromeExt from 'helpers/chrome';
 
 export default fullStore => next => action => {
   const current = fullStore.getState();
@@ -12,7 +12,7 @@ export default fullStore => next => action => {
   switch ( action.type ) {
   case ActionTypes.RENAME_PAGE:
     // new name, old name
-    chrome.rename(action.name, page.name)
+    chromeExt.rename(action.name, page.name)
       .then(resp => {
         fullStore.dispatch(
           showMessage(resp, 1000, 1)
@@ -27,7 +27,7 @@ export default fullStore => next => action => {
 
   case ActionTypes.REMOVE_PAGE:
     var nameToRemove = pages[pageIndex].name;
-    chrome.remove(nameToRemove)
+    chromeExt.remove(nameToRemove)
       .then(resp => {
         fullStore.dispatch(
           showMessage(resp, 1000, 1)
@@ -41,8 +41,8 @@ export default fullStore => next => action => {
     return next(action);
 
   case ActionTypes.UPLOAD_PAGE:
-    chrome.upload(pages[pageIndex])
-      .then(resp => {
+    chromeExt.upload(pages[pageIndex])
+      .then(() => {
         fullStore.dispatch(
           showMessage('Upload Successful', 5000, 1)
         );
@@ -55,7 +55,7 @@ export default fullStore => next => action => {
     break;
 
   case ActionTypes.SYNC_PAGES:
-    chrome.sync()
+    chromeExt.sync()
       .then(pages => {
         fullStore.dispatch(
           setPages(pages)
@@ -64,7 +64,7 @@ export default fullStore => next => action => {
           showMessage('Pages synced', 5000, 1)
         );
       })
-      .catch(error => {
+      .catch(() => {
         fullStore.dispatch(
           showMessage('Failed to sync pages', 5000, -1)
         );
@@ -83,7 +83,7 @@ export default fullStore => next => action => {
     const newState = fullStore.getState();
     const { page: newPage } = newState;
     const { pages: newPages, pageIndex: newPageIndex } = newPage;
-    chrome.save(newPages[newPageIndex])
+    chromeExt.save(newPages[newPageIndex])
       .then(resp => {
         fullStore.dispatch(
           showMessage(resp, 1000, 1)
@@ -92,11 +92,11 @@ export default fullStore => next => action => {
       .catch(error => {
         fullStore.dispatch(
           showMessage(error, 1000, -1)
-        )
-      })
+        );
+      });
     return retVal;
 
   default:
     return next(action);
   }
-}
+};

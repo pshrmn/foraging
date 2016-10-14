@@ -40,10 +40,7 @@ class SingleValueStep extends React.Component {
     if ( !ok ) {
       return;
     }
-    const newSpec = {
-      type: 'single',
-      index
-    }
+    const newSpec = { type: 'single', index };
     next(Object.assign({}, startData, { spec: newSpec }));
   }
 
@@ -64,7 +61,7 @@ class SingleValueStep extends React.Component {
     const { parent } = staticData;
 
     const indices = count(parent.matches, selector);
-    
+
     return (
       <form className='info-box'>
         <div className='info'>
@@ -76,7 +73,7 @@ class SingleValueStep extends React.Component {
           cancel={this.cancelHandler}
           error={error} />
       </form>
-    );    
+    );
   }
 
   componentWillMount() {
@@ -98,7 +95,11 @@ SingleValueStep.propTypes = {
   endData: React.PropTypes.object,
   staticData: React.PropTypes.object,
   next: React.PropTypes.func,
-  previous: React.PropTypes.func
+  previous: React.PropTypes.func,
+  cancel: React.PropTypes.func,
+  setupState: React.PropTypes.func,
+  validate: React.PropTypes.func,
+  highlightClass: React.PropTypes.string
 };
 
 export const CreateSingleValueStep = props => (

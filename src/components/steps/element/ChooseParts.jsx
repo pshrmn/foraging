@@ -115,7 +115,7 @@ class ChooseParts extends React.Component {
           <div className='choices'>
             {opts}
           </div>
-          <h5>Count: {this.state.eleCount}</h5>
+          <h5>Count: {eleCount}</h5>
         </div>
         <Controls
           previous={this.previousHandler}
@@ -136,7 +136,8 @@ ChooseParts.propTypes = {
   endData: React.PropTypes.object,
   staticData: React.PropTypes.object,
   next: React.PropTypes.func,
-  previous: React.PropTypes.func
+  previous: React.PropTypes.func,
+  cancel: React.PropTypes.func
 };
 
 export default ChooseParts;

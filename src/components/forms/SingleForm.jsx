@@ -16,4 +16,10 @@ const SingleForm = ({index, count, setIndex}) => (
   </div>
 );
 
+SingleForm.propTypes = {
+  index: React.PropTypes.number,
+  count: React.PropTypes.number,
+  setIndex: React.PropTypes.func
+};
+
 export default SingleForm;

@@ -44,7 +44,7 @@ export const attributes = (element, ignored = {}) => {
   }
 
   return attrs;
-}
+};
 
 /*
  * stripEvents
@@ -76,4 +76,4 @@ export const stripEvents = element => {
   } else {
     return element;
   }
-}
+};

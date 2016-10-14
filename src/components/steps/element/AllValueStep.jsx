@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import AllForm from 'components/forms/AllForm';
 import Controls from 'components/common/StepControls';
 
-import { select, count } from 'helpers/selection';
+import { select } from 'helpers/selection';
 import { highlight, unhighlight } from 'helpers/markup';
 import { takenNames } from 'helpers/store';
 
@@ -55,10 +55,7 @@ class AllValueStep extends React.Component {
       return;
     }
 
-    const newSpec = {
-      type: 'all',
-      name
-    }
+    const newSpec = { type: 'all', name };
     next(Object.assign({}, startData, { spec: newSpec }));
   }
 
@@ -108,7 +105,12 @@ AllValueStep.propTypes = {
   endData: React.PropTypes.object,
   staticData: React.PropTypes.object,
   next: React.PropTypes.func,
-  previous: React.PropTypes.func
+  previous: React.PropTypes.func,
+  cancel: React.PropTypes.func,
+  setupState: React.PropTypes.func,
+  showMessage: React.PropTypes.func,
+  validate: React.PropTypes.func,
+  highlightClass: React.PropTypes.string
 };
 
 

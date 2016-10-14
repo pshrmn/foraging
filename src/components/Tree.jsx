@@ -52,14 +52,14 @@ class Tree extends React.Component {
     // descendants is all of the nodes in the tree
     // we draw a node for each node
     const nodes = treeRoot.descendants().map((n, i) =>
-      <Node key={i} 
+      <Node key={i}
             current={n.index === elementIndex}
             select={selectElement}
             active={active}
             {...n} />
     );
     // each link has a source and a target
-    const links = treeRoot.links().map((link, i) => 
+    const links = treeRoot.links().map((link, i) =>
       <path key={i}
             className='link'
             d={drawLink(link)} />
@@ -106,6 +106,15 @@ Tree.defaultProps = {
   height: 150
 };
 
+Tree.propTypes = {
+  width: React.PropTypes.number,
+  height: React.PropTypes.number,
+  page: React.PropTypes.object.isRequired,
+  elementIndex: React.PropTypes.number.isRequired,
+  active: React.PropTypes.bool,
+  selectElement: React.PropTypes.func.isRequired
+};
+
 class Node extends React.Component {
   constructor(props) {
     super(props);
@@ -120,11 +129,11 @@ class Node extends React.Component {
     this.props.select(this.props.data.index);
   }
 
-  handleMouseover(event) {
+  handleMouseover() {
     highlight(this.props.data.matches, savedPreview);
   }
 
-  handleMouseout(event) {
+  handleMouseout() {
     unhighlight(savedPreview);
   }
 
@@ -180,6 +189,16 @@ class Node extends React.Component {
     unhighlight(savedPreview);
   }
 }
+
+Node.propTypes = {
+  select: React.PropTypes.func.isRequired,
+  data: React.PropTypes.object.isRequired,
+  current: React.PropTypes.bool,
+  active: React.PropTypes.bool,
+  children: React.PropTypes.array,
+  x: React.PropTypes.number.isRequired,
+  y: React.PropTypes.number.isRequired
+};
 
 export default connect(
   state => {

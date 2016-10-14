@@ -7,7 +7,7 @@ import { abbreviate } from 'helpers/text';
 
 function initialAttribute(props) {
   const { startData, endData = {} } = props;
-  
+
   let attribute = '';
   if ( endData.attribute ) {
     attribute = endData.attribute;
@@ -56,7 +56,7 @@ class ChooseAttribute extends React.Component {
   }
 
   render() {
-    const { attribute, index, error } = this.state;
+    const { attribute, error } = this.state;
     const { staticData } = this.props;
     const { element } = staticData;
 
@@ -95,5 +95,13 @@ class ChooseAttribute extends React.Component {
     );
   }
 }
+
+ChooseAttribute.propTypes = {
+  startData: React.PropTypes.object.isRequired,
+  staticData: React.PropTypes.object,
+  next: React.PropTypes.func.isRequired,
+  cancel: React.PropTypes.func.isRequired,
+  children: React.PropTypes.element
+};
 
 export default ChooseAttribute;
