@@ -53,7 +53,7 @@ class Tree extends React.Component {
     // we draw a node for each node
     const nodes = treeRoot.descendants().map((n, i) =>
       <Node key={i}
-            current={n.index === elementIndex}
+            current={n.data.index === elementIndex}
             select={selectElement}
             active={active}
             {...n} />

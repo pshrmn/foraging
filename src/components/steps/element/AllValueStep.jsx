@@ -110,7 +110,8 @@ AllValueStep.propTypes = {
   setupState: React.PropTypes.func,
   showMessage: React.PropTypes.func,
   validate: React.PropTypes.func,
-  highlightClass: React.PropTypes.string
+  highlightClass: React.PropTypes.string,
+  takenNames: React.PropTypes.array
 };
 
 

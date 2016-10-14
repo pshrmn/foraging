@@ -100,7 +100,7 @@ ChooseName.propTypes = {
   next: React.PropTypes.func.isRequired,
   previous: React.PropTypes.func,
   cancel: React.PropTypes.func.isRequired,
-  takenNames: React.PropTypes.func.isRequired,
+  takenNames: React.PropTypes.array.isRequired,
   showMessage: React.PropTypes.func.isRequired
 };
 

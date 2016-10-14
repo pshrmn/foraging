@@ -143,7 +143,7 @@ class Controls extends React.Component {
 
 Controls.propTypes = {
   currentIndex: React.PropTypes.number.isRequired,
-  pages: React.PropTypes.object,
+  pages: React.PropTypes.array,
   addPage: React.PropTypes.func.isRequired,
   selectPage: React.PropTypes.func.isRequired,
   closeForager: React.PropTypes.func.isRequired,

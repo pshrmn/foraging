@@ -155,7 +155,8 @@ RangeValueStep.propTypes = {
   setupState: React.PropTypes.func,
   highlightClass: React.PropTypes.string,
   validate: React.PropTypes.func,
-  showMessage: React.PropTypes.func
+  showMessage: React.PropTypes.func,
+  takenNames: React.PropTypes.array
 };
 
 const ConnectedRangeValueStep = connect(

@@ -70,7 +70,7 @@ class Preview extends React.Component {
 
 Preview.propTypes = {
   close: React.PropTypes.func.isRequired,
-  tree: React.PropTypes.Object.isRequired,
+  tree: React.PropTypes.object.isRequired,
 };
 
 export default connect(

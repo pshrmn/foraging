@@ -45,7 +45,10 @@ export default function RangeForm(props) {
 RangeForm.propTypes = {
   name: React.PropTypes.string,
   low: React.PropTypes.number,
-  high: React.PropTypes.number,
+  high: React.PropTypes.oneOfType([
+    React.PropTypes.string,
+    React.PropTypes.number
+  ]),
   count: React.PropTypes.number,
   setName: React.PropTypes.func,
   setLow: React.PropTypes.func,
