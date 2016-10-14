@@ -5,7 +5,14 @@ const config = {
   context: path.join(__dirname, 'src'),
   entry: {
     app: './index.js',
-    vendor: ['react', 'react-dom', 'd3-hierarchy', 'd3-path']
+    vendor: [
+      'react',
+      'react-dom',
+      'redux',
+      'react-redux',
+      'd3-hierarchy',
+      'd3-path'
+    ]
   },
   resolve: {
     extensions: ['', '.js', '.jsx'],
