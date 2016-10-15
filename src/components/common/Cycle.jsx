@@ -33,7 +33,7 @@ const Cycle = ({ index, count, setIndex }) => {
 Cycle.propTypes = {
   index: React.PropTypes.number.isRequired,
   count: React.PropTypes.number.isRequired,
-  setIndex: React.PropTypes.func.isRequired
+  setIndex: React.PropTypes.func
 };
 
 export default Cycle;

@@ -102,7 +102,7 @@ class Controls extends React.Component {
               click={this.addHandler} />
             <NeutralButton
               text='Refresh'
-              title='Refresh the list of matched elements'
+              title='Refresh the list of matched elements. This is useful if more content has been dynamically loaded'
               click={() => { refreshMatches(); }}
               disabled={!active} />
             <PosButton

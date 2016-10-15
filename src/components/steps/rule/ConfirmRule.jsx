@@ -2,7 +2,7 @@ import React from 'react';
 
 import Controls from 'components/common/StepControls';
 
-class ConfirmElement extends React.Component {
+class Confirm extends React.Component {
   constructor(props) {
     super(props);
 
@@ -33,11 +33,15 @@ class ConfirmElement extends React.Component {
   }
 
   render() {
-    const { startData } = this.props;
+    const {
+      startData,
+      buttonText,
+      title
+    } = this.props;
     const { name, attribute, type } = startData;
     return (
       <form className='info-box'>
-        <h2>Confirm Rule</h2>
+        <h2>{title}</h2>
         <ul>
           <li>Name: {name}</li>
           <li>Attribute: {attribute}</li>
@@ -46,18 +50,32 @@ class ConfirmElement extends React.Component {
         <Controls
           previous={this.previousHandler}
           next={this.saveHandler}
-          nextText='Save'
+          nextText={buttonText}
           cancel={this.cancelHandler} />
       </form>
     );
   }
 }
 
-ConfirmElement.propTypes = {
+Confirm.propTypes = {
   startData: React.PropTypes.object.isRequired,
+  title: React.PropTypes.string.isRequired,
+  buttonText: React.PropTypes.string.isRequired,
   next: React.PropTypes.func.isRequired,
   previous: React.PropTypes.func.isRequired,
   cancel: React.PropTypes.func.isRequired
 };
 
-export default ConfirmElement;
+export const ConfirmSaveRule = props => (
+  <Confirm
+    title='Confirm Rule'
+    buttonText='Save'
+    {...props} />
+);
+
+export const ConfirmUpdateRule = props => (
+  <Confirm
+    title='Confirm Update Rule'
+    buttonText='Update'
+    {...props} />
+);

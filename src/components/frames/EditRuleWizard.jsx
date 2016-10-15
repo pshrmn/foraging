@@ -24,7 +24,7 @@ const steps = [
 ];
 
 /*
- * Attribute -> Type -> Name -> ConfirmRule
+ * Attribute -> Type -> Name -> ConfirmUpdateRule
  */
 class EditRuleWizard extends React.Component {
   constructor(props) {

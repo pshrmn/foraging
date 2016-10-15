@@ -58,7 +58,12 @@ class ConfirmElement extends React.Component {
     const { startData, staticData } = this.props;
     const { selector, spec } = startData;
     const { parent } = staticData;
-    const elements = select(parent.matches, selector, spec, '.forager-holder');
+    const elements = select(
+      parent.matches,
+      selector,
+      spec,
+      '.forager-holder'
+    );
     highlight(elements, queryCheck);
   }
 

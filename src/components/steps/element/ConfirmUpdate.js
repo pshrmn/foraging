@@ -57,7 +57,6 @@ class ConfirmElement extends React.Component {
 
   componentWillMount() {
     const { startData, staticData } = this.props;
-
     const { spec } = startData;
     const { parent = {} } = staticData;
     const { matches: parentMatches = [document] } = parent;

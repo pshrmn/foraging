@@ -7,7 +7,7 @@ import {
   Attribute,
   Type,
   Name,
-  ConfirmRule
+  ConfirmSaveRule
 } from 'components/steps/rule';
 import Cycle from 'components/common/Cycle';
 
@@ -20,11 +20,11 @@ const steps = [
   Attribute,
   Type,
   Name,
-  ConfirmRule
+  ConfirmSaveRule
 ];
 
 /*
- * ttribute -> Type -> Name -> ConfirmRule
+ * ttribute -> Type -> Name -> ConfirmSaveRule
  *
  * The RuleWizard is used to create a rule for an element. A Cycle is
  * used to cycle through the DOM elements that the element matches while
