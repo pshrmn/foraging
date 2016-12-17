@@ -168,19 +168,15 @@ body.foraging {
     min-height: 200px;
     font-size: 16px;
     text-align: left;
-    display: -webkit-flex;
     display: -ms-flexbox;
     display: flex;
-    -webkit-flex-flow: row nowrap;
-        -ms-flex-flow: row nowrap;
-            flex-flow: row nowrap;
-    -webkit-justify-content: space-between;
-        -ms-flex-pack: justify;
-            justify-content: space-between; }
+    -ms-flex-flow: row nowrap;
+        flex-flow: row nowrap;
+    -ms-flex-pack: justify;
+        justify-content: space-between; }
     #forager .frame > * {
-      -webkit-flex-grow: 1;
-          -ms-flex-positive: 1;
-              flex-grow: 1;
+      -ms-flex-positive: 1;
+          flex-grow: 1;
       margin: 0 15px; }
       #forager .frame > *:first-child {
         margin-left: 0; }
@@ -210,22 +206,18 @@ body.foraging {
       border-left: 10px solid #222233;
       background: #EFEFEF; }
   #forager .choices {
-    display: -webkit-flex;
     display: -ms-flexbox;
     display: flex;
-    -webkit-flex-wrap: wrap;
-        -ms-flex-wrap: wrap;
-            flex-wrap: wrap; }
+    -ms-flex-wrap: wrap;
+        flex-wrap: wrap; }
   #forager label.selected {
     background: #76B85C;
     border-color: #42752E; }
   #forager .info-box {
-    display: -webkit-flex;
     display: -ms-flexbox;
     display: flex;
-    -webkit-flex-flow: column nowrap;
-        -ms-flex-flow: column nowrap;
-            flex-flow: column nowrap;
+    -ms-flex-flow: column nowrap;
+        flex-flow: column nowrap;
     padding: 10px;
     background: #EFEFEF;
     border: 1px solid #898B96;
@@ -289,21 +281,17 @@ body.foraging {
         font-style: italic;
         fill: #323033; }
   #forager .progress-bar {
-    display: -webkit-flex;
     display: -ms-flexbox;
     display: flex;
-    -webkit-flex-flow: row nowrap;
-        -ms-flex-flow: row nowrap;
-            flex-flow: row nowrap;
-    -webkit-justify-content: space-between;
-        -ms-flex-pack: justify;
-            justify-content: space-between; }
+    -ms-flex-flow: row nowrap;
+        flex-flow: row nowrap;
+    -ms-flex-pack: justify;
+        justify-content: space-between; }
     #forager .progress-bar .marker {
       height: 10px;
       background: #F799B5;
-      -webkit-flex-grow: 1;
-          -ms-flex-positive: 1;
-              flex-grow: 1;
+      -ms-flex-positive: 1;
+          flex-grow: 1;
       border: 1px solid #ffffff; }
       #forager .progress-bar .marker.active {
         background: #225683; }
@@ -377,7 +365,6 @@ body.foraging {
       #forager .app-controls button:hover {
         background: #222233 !important; }
   #forager .controls {
-    display: -webkit-flex;
     display: -ms-flexbox;
     display: flex; }
   #forager .message-board {
@@ -404,7 +391,6 @@ body.foraging {
   #forager .bold {
     font-weight: bold; }
   #forager .workspace {
-    display: -webkit-flex;
     display: -ms-flexbox;
     display: flex; }
 
