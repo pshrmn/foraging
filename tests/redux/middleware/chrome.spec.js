@@ -42,7 +42,11 @@ describe('chromeMiddleware', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    // jest.resetAllMocks() removed the mocked return values, which
+    // is undesirable, so instead just clear each individually
+    Object.keys(chrome).forEach(key => {
+      chrome[key].mockClear()
+    });
   });
 
   describe('unknown', () => {
