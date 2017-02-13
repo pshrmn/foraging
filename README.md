@@ -3,7 +3,7 @@
 [![Travis][build-badge]][build]
 
 [build-badge]: https://img.shields.io/travis/pshrmn/gatherer/master.svg?style=flat-square
-[build]: https://travis-ci.org/pshrmn/gatherer.svg?branch=master
+[build]: https://travis-ci.org/pshrmn/gatherer
 
 
 Gather data from web pages. Works with pages created by [Forager](https://github.com/pshrmn/forager). For the data format, refer to that project's README.
