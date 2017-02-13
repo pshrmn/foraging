@@ -49,7 +49,7 @@ week_in_seconds = 7*24*60*60
 cache = Cache("cache_folder", max_age=week_in_seconds)
 ```
 
-There is also a `GzipCache` which will compress the files before saving them to disk and decompress them when reading. If you want to minimize the amoutn of disk space used by the cache, use the `GzipCache`.
+There is also a `GzipCache` which will compress the files before saving them to disk and decompress them when reading. If you want to minimize the amount of disk space used by the cache, use the `GzipCache`.
 
 ```python
 from Gatherer import GzipCache
