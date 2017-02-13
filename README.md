@@ -3,6 +3,7 @@
 Gather data from web pages. Works with pages created by [Forager](https://github.com/pshrmn/forager). For the data format, refer to that project's README.
 
 ##[Tutorial](http://www.pshrmn.com/tutorials/gatherer/)
+##[Examples](https://github.com/pshrmn/gatherer-examples)
 
 ##Install
 
