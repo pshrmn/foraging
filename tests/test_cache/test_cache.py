@@ -82,6 +82,7 @@ class CacheTestCase(unittest.TestCase):
             "http://www.example.com/somepage.html",
             "http://www.example.com/otherpage"
         ]
+        print(c.sites)
         for filename in exists:
             self.assertIsNotNone(c.get(filename))
         does_not_exist = [
@@ -100,6 +101,11 @@ class CacheTestCase(unittest.TestCase):
         d = dir_domain(example_url)
         f = clean_url_hash(example_url)
         full_save_name = os.path.join(CACHE_DIRECTORY, d, f)
+        print('full save name')
+        print(full_save_name)
+        print('dir domain')
+        print(d)
+        print(c.sites[d])
         self.assertNotIn(full_save_name, c.sites[d])
 
         c.save(example_url, html_string)
