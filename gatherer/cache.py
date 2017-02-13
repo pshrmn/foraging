@@ -156,7 +156,7 @@ class Cache(object):
         domain = dir_domain(url)
         filename = self.hasher(url)
         if domain not in self.sites:
-            return
+            return False, None
         site_cache = self.sites[domain]
         full_name = os.path.join(self.folder, domain, filename)
         
