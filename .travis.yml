@@ -2,7 +2,7 @@ sudo: false
 language: python
 python:
   - "3.6"
-script: python run_tests.py
+script: python -m unittest discover -s tests
 branches:
   only:
   - master
