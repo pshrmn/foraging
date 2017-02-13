@@ -52,13 +52,12 @@ def should_expire(path, max_age):
 def dangerously_convert_cache_to_gzip(folder):
     """
     WARNING: This will gzip all of the files in a folder and remove the
-    originals. This is only meant to convert a Cache to a GzipCache.
+    originals. This is only meant to convert a cache folder created using Cache
+    to one that can be used by GzipCache.
     """
     for f in os.listdir(folder):
         dir_path = os.path.join(folder, f)
         if os.path.isdir(dir_path):
-            site_urls = {}
-            
             path = os.path.join(dir_path, "*")
             for fp in glob.glob(path):
                 # don't try to convert folders or already gzipped files
