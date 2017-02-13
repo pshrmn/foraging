@@ -11,3 +11,5 @@ gatherer.egg-info
 phantomjs
 phantomjs.exe
 ghostdriver.log
+
+!tests/test_cache/cache/
