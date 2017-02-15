@@ -2,7 +2,10 @@
 
 A Chrome extension to determine how to gather data from a web page. Built with [React](https://facebook.github.io/react/), [Redux](http://rackt.org/redux/index.html), and [d3](http://d3js.org/). Useful in conjunction with [Gatherer](https://github.com/pshrmn/gatherer).
 
-##[Tutorial](http://www.pshrmn.com/tutorials/forager/)
+<img src="/preview/forager-ui-preview.gif" width="450"/>
+
+###Resources
+* [Tutorial](http://www.pshrmn.com/tutorials/forager/)
 
 ###Format
 
