@@ -5,7 +5,7 @@ A Chrome extension to determine how to gather data from a web page. Built with [
 <img src="/preview/forager-ui-preview.gif" width="450"/>
 
 ###Resources
-* [Tutorial](http://www.pshrmn.com/tutorials/forager/)
+* [Tutorial](/docs/tutorial.md)
 
 ###Format
 
