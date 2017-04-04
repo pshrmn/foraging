@@ -1,4 +1,4 @@
-#gatherer
+# gatherer
 
 [![Travis][build-badge]][build]
 
@@ -8,11 +8,11 @@
 
 Gather data from web pages. Works with pages created by [Forager](https://github.com/pshrmn/forager). For the data format, refer to that project's README.
 
-###Resources
+### Resources
 * [Tutorial](http://www.pshrmn.com/tutorials/gatherer/)
 * [Examples](https://github.com/pshrmn/gatherer-examples)
 
-##Install
+## Install
 
 Install gatherer using pip
 
@@ -24,9 +24,9 @@ Example: (the filename will vary depending on your system and python version)
 
     pip install lxml-3.4.4-cp34-none-win_amd64.whl
 
-##Usage
+## Usage
 
-###Cache
+### Cache
 A cache is a folder where static copies of the html for a page are stored to prevent multiple unnecessary requests to a server for a page. Currently the cache is very simple, storing a page the first time it is encountered.
 
 Arguments:
@@ -66,14 +66,14 @@ compress_cache = GzipCache("cache_folder")
 
 If you have an existing cache directory that you would like to convert to a `GzipCache`, you can use the `dangerously_convert_cache_to_gzip` function. As the name implies, you should be careful with this because it will gzip all of the files in the provided folder and remove the originals.
 
-###Backends
+### Backends
 Backend functions take a url and return the text of the returned web page. There are two built-in backends, `requests_backend` and `phantom_backend`.
 
 * `requests_backend` (default) uses the `requests` module to make the request. This function can be passed directly to the `Fetch` class.
 * `phantom_backend` is a closure that takes two paths, the first to the `phantomjs` executable and the second to a JavaScript script that `phantomjs` uses to get the content of a web page from a url. The closure returns a function that is passed to the Fetch class. This backend is most useful when you have pages whose content isn't given with the base HTML and relies on JavaScript to render the page.
 * `session_backend` is a closure that takes a `requests.Session`. Any requests made with this backend will use the provided session. This is useful if you need to be authenticated when making requests.
 
-###Fetch
+### Fetch
 A fetcher takes a url and return the DOM (as parsed by `lxml`) of the corresponding web page. Requests can either be static (default) or dynamic. In order to make dynamic requests, the `make_dynamic` function needs to be called on the fetcher.
 
 Arguments:
@@ -96,17 +96,17 @@ phantom_get = phantom_backend('./phantomjs.exe', './getScript.js')
 dynamic_fetch = Fetch(backend=phantom_get, headers={"User-Agent": "custom-gatherer-user-agent"})
 ```
 
-######get(url, dynamic=False)
+###### get(url, dynamic=False)
 Takes a url and if the request was successful it returns an lxml html element, otherwise it returns `None`
 
 ```python
 fetch.get("http://www.example.com")
 ```
 
-###Pages
+### Pages
 Pages are collections of rules to gather data from elements in a web page. For a better explanation of the makeup of a Page, read the README for [Forager](https://github.com/pshrmn/forager)
 
-####Page
+#### Page
 
 `Page`s are used to gather data from a specific page (url).
 
@@ -135,11 +135,11 @@ dom = f.get(url)
 data = p.gather(dom)
 ```
 
-####expect
+#### expect
 
 When the HTML of a web page is changed unexpected results can happen when gathering data. To verify that a Page's schema should still match data as expected, use `gatherer.expect`.
 
-#####flatten_element(element)
+##### flatten_element(element)
 
 `flatten_element` returns a dict of the expected structure of data fetched by the `Element`. In the structure dict, the keys are rule names and the values are the type that is returned by that rule (`str`, `int`, or `float`). A fourth value is also possible: for elements whose `spec` `type` is `all`, a `dict` containing the rule name/types for that element's rules and its children is returned.
 
@@ -202,7 +202,7 @@ page = Page.from_json(some_page_json)
 flattened = flatten_element(page.element)
 ```
 
-#####compare(values, expected)
+##### compare(values, expected)
 
 `compare` compares the types of values returned from a page to their expected type, returning a boolean `True` if everything matches, and `False` if anything is wrong.
 
@@ -230,7 +230,7 @@ bad_values = {
 compare(bad_values, flattened) # False
 ```
 
-#####differences(values, expected)
+##### differences(values, expected)
 
 `differences` is similar to `compare` but returns a `dict` telling you which values are missing or have unexpected types. If everything is as expected, it returns None.
 
