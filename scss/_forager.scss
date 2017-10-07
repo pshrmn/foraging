@@ -1,73 +1,109 @@
-// because forager is injected into a page, we need to be
-// careful about not affecting the rest of the page
-// these are nested under #forager to prevent inadvertently
-// styling other elements (unless for some reason the page has
-// a #forager element already). What this doesn't do is prevent
-// a pages existing rules from affecting elements inside of the
-// #forager element. To avoid that, a lot of rules have to be reset
-// explicitly, and even then there will probably always be
-// styles leaking through.
-#forager{
+ol, ul {
+  list-style: none; }
+  ol li, ul li {
+    margin: 0; }
 
-    word-wrap: normal;
-    z-index: 2147483637;
-    position: fixed;
-    left: 0;
-    bottom: 0;
-    min-width: 1000px;
-    min-height: 30px;
-    background: $dark-blue;
-    font-size: 16px;
-    font-family: sans-serif;
-    color: $black;
-    text-align: left;
-    border: 10px solid $dark-blue;
-    box-sizing: border-box;
+h1, h2, h3, h4, h5, h6, p {
+  margin: 2px 0;
+  padding: 0; }
 
-    * {
-        color: $dark-blue;
-        box-sizing: border-box;
-        line-height: 1.1 !important;
-    }
+h1 {
+  font-size: 1.5em; }
 
-    // nested imports
-    @import 'reset';
-    @import 'common';
-    @import 'frames';
-    @import 'graph';
-    @import 'wizard';
-    @import 'topbar';
+h2 {
+  font-size: 1.25em; }
 
-    &.hidden {
-        display: none !important;
-    }
+h3 {
+  font-size: 1.2em; }
 
-    .not-allowed{
-        cursor: no-drop;
+h4, h5, h6 {
+  font-size: 1.1em; }
 
-        * {
-            cursor: no-drop;
-        }
-    }
+input, select, option, textarea, button {
+  line-height: 1.1 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  font-size: 1em !important;
+  float: none !important;
+  color: #000000 !important; }
 
-    .inline{
-        display: inline-block;
-    }
+label {
+  font-weight: normal;
+  margin-right: 15px;
+  padding: 2px 3px;
+  border-radius: 3px;
+  word-break: break-all;
+  border: 1px solid #898B96;
+  background: #CED1DE; }
 
-    .hidden{
-        display: none !important;
-    }
+input {
+  box-shadow: none;
+  border-radius: 0;
+  background: #ffffff;
+  line-height: 1.2; }
 
-    .big {
-        font-size: 1.1em;
-    }
+input[type=text] {
+  height: 25px;
+  max-height: 25px;
+  min-height: 25px;
+  padding: 5px;
+  font-family: sans-serif; }
 
-    .bold {
-        font-weight: bold;
-    }
+select {
+  display: inline-block !important;
+  border: 1px solid #a9a9a9 !important;
+  background: #ffffff !important;
+  margin: 2px !important; }
 
-    .workspace {
-        display: flex;
-    }
-
-}
+button {
+  text-align: center;
+  background: #CED1DE;
+  color: #000000 !important;
+  font-weight: normal !important;
+  text-transform: capitalize !important;
+  text-shadow: none;
+  border-radius: 2px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #CED1DE;
+  box-shadow: inset 0 1px 0 #ffffff !important;
+  margin: 2px !important;
+  padding: 3px 6px !important;
+  min-width: initial !important;
+  transition: border-color 0.5s; }
+  button:hover, button:active, button:focus {
+    color: #000000 !important;
+    border-color: #898B96;
+    transition: border-color 0.5s; }
+  button.transparent {
+    background: transparent !important;
+    border: 0 !important;
+    font-weight: bold !important;
+    box-shadow: none !important; }
+    button.transparent:hover {
+      background: transparent !important; }
+  button.neg {
+    background: #E85F88 !important;
+    border-color: #E85F88 !important;
+    box-shadow: inset 0 1px 0 #F799B5 !important;
+    transition: border-color 0.5s; }
+    button.neg:hover, button.neg:active, button.neg:focus {
+      border-color: #D02357 !important;
+      transition: border-color 0.5s; }
+  button.pos {
+    background: #76B85C !important;
+    border-color: #76B85C !important;
+    box-shadow: inset 0 1px 0 #CCE0C3 !important;
+    transition: border-color 0.5s; }
+    button.pos:hover, button.pos:active, button.pos:focus {
+      border-color: #42752E !important;
+      transition: border-color 0.5s; }
+  button.neg.transparent {
+    background: transparent !important;
+    color: #D02357 !important;
+    box-shadow: none !important; }
+    button.neg.transparent:hover, button.neg.transparent:active, button.neg.transparent:focus {
+      color: #E85F88 !important; }
+  button:disabled {
+    opacity: 0.25;
+    cursor: default !important; }
