@@ -12,7 +12,7 @@
     "css": "npm run sass & npm run autoprefix",
     "build:dev": "npm run webpack:dev & npm run css",
     "build:prod": "npm run webpack:prod & npm run css",
-    "sass": "node-sass scss/** -o forager/css/**",
+    "sass": "node-sass scss/interface.scss -o forager/css",
     "test": "cross-env NODE_PATH=src jest",
     "coverage": "npm run test -- --coverage",
     "webpack:dev": "webpack",

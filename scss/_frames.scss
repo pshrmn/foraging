@@ -1,140 +1,139 @@
 
 .frame {
-    background: $white;
-    box-sizing: border-box;
-    margin-right: 3px;
-    padding: 5px;
-    width: 1000px;
-    vertical-align: top;
-    min-height: 200px;
-    font-size: 16px;
+  background: $white;
+  box-sizing: border-box;
+  margin-right: 3px;
+  padding: 5px;
+  width: 1000px;
+  vertical-align: top;
+  min-height: 200px;
+  font-size: 16px;
 
-    text-align: left;
-    display: flex;
-    flex-flow: row nowrap;
-    justify-content: space-between;
+  text-align: left;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
 
-    > * {
-        flex-grow: 1;
-        margin: 0 15px;
+  > * {
+      flex-grow: 1;
+      margin: 0 15px;
 
-        &:first-child {
-            margin-left: 0;
-        }
+      &:first-child {
+          margin-left: 0;
+      }
 
-        &:last-child {
-            margin-right: 0;
-        }
-    }
+      &:last-child {
+          margin-right: 0;
+      }
+  }
 
 
-    ul {
-        padding: 0;
-        overflow-wrap: break-word;
-    }
+  ul {
+      padding: 0;
+      overflow-wrap: break-word;
+  }
 
-    li {
-        min-height: 1.5em;
-    }
+  li {
+      min-height: 1.5em;
+  }
 
 }
 
 .wizard {
-    width: 350px;
-    min-height: 200px;
+  width: 350px;
+  min-height: 200px;
 }
 
 .preview {
-    width: 400px;
+  width: 400px;
 
-    pre {
-        white-space: pre-wrap;
-        word-break: break-all;
-        width: 400px;
-        height: 200px;
-        overflow: scroll;
-        margin: 1em 0;
-        padding: 5px;
-        border-style: inset;
-        border-color: $black;
-        border-width: 1px;
-        border-left: 10px solid $dark-blue;
-        background: $light-gray;
-    }
+  pre {
+      white-space: pre-wrap;
+      word-break: break-all;
+      width: 400px;
+      height: 200px;
+      overflow: scroll;
+      margin: 1em 0;
+      padding: 5px;
+      border-style: inset;
+      border-color: $black;
+      border-width: 1px;
+      border-left: 10px solid $dark-blue;
+      background: $light-gray;
+  }
 }
 
 .choices {
-    display: flex;
-    flex-wrap: wrap;
+  display: flex;
+  flex-wrap: wrap;
 
 }
 
 label.selected {
-    background: $green;
-    border-color: $dark-green;
+  background: $green;
+  border-color: $dark-green;
 }
 
 .info-box {
-    display: flex;
-    flex-flow: column nowrap;
-    padding: 10px;
-    background: $light-gray;
-    border: 1px solid $gray;
-    min-height: 200px;
+  display: flex;
+  flex-flow: column nowrap;
+  padding: 10px;
+  background: $light-gray;
+  border: 1px solid $gray;
+  min-height: 200px;
 
-    .info {
+  .info {
 
-        > div {
-            padding: 2px 0;
-        }
+      > div {
+          padding: 2px 0;
+      }
 
-        .line {
-            padding: 2px 0;
-        }
+      .line {
+          padding: 2px 0;
+      }
 
-        label {
-            margin-right: 5px;
-        }
-    }
+      label {
+          margin-right: 5px;
+      }
+  }
 
-    .buttons {
-        // push the buttons to the bottom
-        margin: auto 0 0;
-    }
+  .buttons {
+      // push the buttons to the bottom
+      margin: auto 0 0;
+  }
 }
 
 
 .rules {
-    margin: 5px 0;
+  margin: 5px 0;
 
-    .rule {
-        height: inherit;
-        line-height: 1.1;
-        > * {
-            margin: 0 3px;
-        }
-    }
+  .rule {
+      height: inherit;
+      line-height: 1.1;
+      > * {
+          margin: 0 3px;
+      }
+  }
 }
 
 .rule-name {
-    font-weight: bold;
+  font-weight: bold;
 }
 
 .rule-attr, .rule-type {
-    font-size: 0.9em;
-    padding: 2px;
-    border: 1px solid $black;
+  font-size: 0.9em;
+  padding: 2px;
+  border: 1px solid $black;
 }
 
 .rule-attr {
-    color: $blue;
-    background: $light-blue;
-    border-color: $blue;
+  color: $blue;
+  background: $light-blue;
+  border-color: $blue;
 }
 
 .rule-type {
-    color: $dark-green;
-    background: $light-green;
-    border-color: $dark-green;
+  color: $dark-green;
+  background: $light-green;
+  border-color: $dark-green;
 }
-
