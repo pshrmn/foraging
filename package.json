@@ -47,6 +47,7 @@
     "d3-hierarchy": "^1.0.3",
     "d3-path": "^1.0.3",
     "expiring-redux-messages": "^0.3.0",
+    "prop-types": "^15.6.0",
     "react": "^15.4.1",
     "react-dom": "^15.4.1",
     "react-redux": "^5.0.1",

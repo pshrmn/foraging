@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { hierarchy, tree } from 'd3-hierarchy';
 import { path } from 'd3-path';
@@ -107,12 +108,12 @@ Tree.defaultProps = {
 };
 
 Tree.propTypes = {
-  width: React.PropTypes.number,
-  height: React.PropTypes.number,
-  page: React.PropTypes.object.isRequired,
-  elementIndex: React.PropTypes.number.isRequired,
-  active: React.PropTypes.bool,
-  selectElement: React.PropTypes.func.isRequired
+  width: PropTypes.number,
+  height: PropTypes.number,
+  page: PropTypes.object.isRequired,
+  elementIndex: PropTypes.number.isRequired,
+  active: PropTypes.bool,
+  selectElement: PropTypes.func.isRequired
 };
 
 class Node extends React.Component {
@@ -191,13 +192,13 @@ class Node extends React.Component {
 }
 
 Node.propTypes = {
-  select: React.PropTypes.func.isRequired,
-  data: React.PropTypes.object.isRequired,
-  current: React.PropTypes.bool,
-  active: React.PropTypes.bool,
-  children: React.PropTypes.array,
-  x: React.PropTypes.number.isRequired,
-  y: React.PropTypes.number.isRequired
+  select: PropTypes.func.isRequired,
+  data: PropTypes.object.isRequired,
+  current: PropTypes.bool,
+  active: PropTypes.bool,
+  children: PropTypes.array,
+  x: PropTypes.number.isRequired,
+  y: PropTypes.number.isRequired
 };
 
 export default connect(

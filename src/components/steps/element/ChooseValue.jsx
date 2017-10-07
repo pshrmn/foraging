@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import { CreateAllValueStep, EditAllValueStep } from './AllValueStep';
 import { CreateSingleValueStep, EditSingleValueStep } from './SingleValueStep';
@@ -33,9 +34,9 @@ export function EditValue(props) {
 }
 
 CreateValue.propTypes = {
-  startData: React.PropTypes.object.isRequired
+  startData: PropTypes.object.isRequired
 };
 
 EditValue.propTypes = {
-  startData: React.PropTypes.object.isRequired
+  startData: PropTypes.object.isRequired
 };

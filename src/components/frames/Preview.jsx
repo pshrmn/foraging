@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import { PosButton, NegButton } from 'components/common/Buttons';
@@ -69,8 +70,8 @@ class Preview extends React.Component {
 }
 
 Preview.propTypes = {
-  close: React.PropTypes.func.isRequired,
-  tree: React.PropTypes.object.isRequired,
+  close: PropTypes.func.isRequired,
+  tree: PropTypes.object.isRequired,
 };
 
 export default connect(

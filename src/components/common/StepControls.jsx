@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import { PosButton, NegButton } from 'components/common/Buttons';
 
@@ -26,9 +27,9 @@ export default function Controls(props) {
 }
 
 Controls.propTypes = {
-  previous: React.PropTypes.func,
-  next: React.PropTypes.func,
-  cancel: React.PropTypes.func,
-  nextText: React.PropTypes.string,
-  error: React.PropTypes.bool
+  previous: PropTypes.func,
+  next: PropTypes.func,
+  cancel: PropTypes.func,
+  nextText: PropTypes.string,
+  error: PropTypes.bool
 };

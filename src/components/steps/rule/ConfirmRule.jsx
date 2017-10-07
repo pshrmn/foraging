@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import Controls from 'components/common/StepControls';
 
@@ -58,12 +59,12 @@ class Confirm extends React.Component {
 }
 
 Confirm.propTypes = {
-  startData: React.PropTypes.object.isRequired,
-  title: React.PropTypes.string.isRequired,
-  buttonText: React.PropTypes.string.isRequired,
-  next: React.PropTypes.func.isRequired,
-  previous: React.PropTypes.func.isRequired,
-  cancel: React.PropTypes.func.isRequired
+  startData: PropTypes.object.isRequired,
+  title: PropTypes.string.isRequired,
+  buttonText: PropTypes.string.isRequired,
+  next: PropTypes.func.isRequired,
+  previous: PropTypes.func.isRequired,
+  cancel: PropTypes.func.isRequired
 };
 
 export const ConfirmSaveRule = props => (

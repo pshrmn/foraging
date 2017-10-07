@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import Tree from 'components/Tree';
@@ -47,7 +48,7 @@ class ElementFrame extends React.Component {
 }
 
 ElementFrame.propTypes = {
-  element: React.PropTypes.object
+  element: PropTypes.object
 };
 
 export default connect(

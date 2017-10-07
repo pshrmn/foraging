@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import Controls from 'components/Controls';
@@ -14,7 +15,7 @@ const Forager = ({ show }) => (
 );
 
 Forager.propTypes = {
-  show: React.PropTypes.bool.isRequired
+  show: PropTypes.bool.isRequired
 };
 
 export default connect(

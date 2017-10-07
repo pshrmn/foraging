@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import Controls from 'components/common/StepControls';
 import OptionalForm from 'components/forms/OptionalForm';
@@ -75,13 +76,13 @@ class ChooseOptional extends React.Component {
 }
 
 ChooseOptional.propTypes = {
-  startData: React.PropTypes.object.isRequired,
-  endData: React.PropTypes.object,
-  staticData: React.PropTypes.object,
-  next: React.PropTypes.func,
-  previous: React.PropTypes.func,
-  cancel: React.PropTypes.func,
-  highlightClass: React.PropTypes.string.isRequired
+  startData: PropTypes.object.isRequired,
+  endData: PropTypes.object,
+  staticData: PropTypes.object,
+  next: PropTypes.func,
+  previous: PropTypes.func,
+  cancel: PropTypes.func,
+  highlightClass: PropTypes.string.isRequired
 };
 
 export const CreateOptional = props => (

@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import Controls from 'components/common/StepControls';
 
@@ -199,12 +200,12 @@ class ChooseElement extends React.Component {
 }
 
 ChooseElement.propTypes = {
-  startData: React.PropTypes.object,
-  endData: React.PropTypes.object,
-  staticData: React.PropTypes.object,
-  next: React.PropTypes.func,
-  previous: React.PropTypes.func,
-  cancel: React.PropTypes.func
+  startData: PropTypes.object,
+  endData: PropTypes.object,
+  staticData: PropTypes.object,
+  next: PropTypes.func,
+  previous: PropTypes.func,
+  cancel: PropTypes.func
 };
 
 // do not call event.preventDefault() here or the checked dot will fail to render
@@ -219,10 +220,10 @@ const SelectorRadio = ({ selector, checked, select, index }) => (
 );
 
 SelectorRadio.propTypes = {
-  selector: React.PropTypes.array.isRequired,
-  checked: React.PropTypes.bool.isRequired,
-  select: React.PropTypes.func.isRequired,
-  index: React.PropTypes.number.isRequired
+  selector: PropTypes.array.isRequired,
+  checked: PropTypes.bool.isRequired,
+  select: PropTypes.func.isRequired,
+  index: PropTypes.number.isRequired
 };
 
 export default ChooseElement;

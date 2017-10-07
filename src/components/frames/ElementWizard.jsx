@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import Tree from 'components/Tree';
@@ -82,9 +83,9 @@ class ElementWizard extends React.Component {
 }
 
 ElementWizard.propTypes = {
-  current: React.PropTypes.object,
-  saveElement: React.PropTypes.func.isRequired,
-  cancel: React.PropTypes.func.isRequired
+  current: PropTypes.object,
+  saveElement: PropTypes.func.isRequired,
+  cancel: PropTypes.func.isRequired
 };
 
 export default connect(

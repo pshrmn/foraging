@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import Controls from 'components/common/StepControls';
 
@@ -97,11 +98,11 @@ class ChooseAttribute extends React.Component {
 }
 
 ChooseAttribute.propTypes = {
-  startData: React.PropTypes.object.isRequired,
-  staticData: React.PropTypes.object,
-  next: React.PropTypes.func.isRequired,
-  cancel: React.PropTypes.func.isRequired,
-  children: React.PropTypes.element
+  startData: PropTypes.object.isRequired,
+  staticData: PropTypes.object,
+  next: PropTypes.func.isRequired,
+  cancel: PropTypes.func.isRequired,
+  children: PropTypes.element
 };
 
 export default ChooseAttribute;

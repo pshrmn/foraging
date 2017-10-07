@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import AllForm from 'components/forms/AllForm';
@@ -101,17 +102,17 @@ class AllValueStep extends React.Component {
 }
 
 AllValueStep.propTypes = {
-  startData: React.PropTypes.object,
-  endData: React.PropTypes.object,
-  staticData: React.PropTypes.object,
-  next: React.PropTypes.func,
-  previous: React.PropTypes.func,
-  cancel: React.PropTypes.func,
-  setupState: React.PropTypes.func,
-  showMessage: React.PropTypes.func,
-  validate: React.PropTypes.func,
-  highlightClass: React.PropTypes.string,
-  takenNames: React.PropTypes.array
+  startData: PropTypes.object,
+  endData: PropTypes.object,
+  staticData: PropTypes.object,
+  next: PropTypes.func,
+  previous: PropTypes.func,
+  cancel: PropTypes.func,
+  setupState: PropTypes.func,
+  showMessage: PropTypes.func,
+  validate: PropTypes.func,
+  highlightClass: PropTypes.string,
+  takenNames: PropTypes.array
 };
 
 

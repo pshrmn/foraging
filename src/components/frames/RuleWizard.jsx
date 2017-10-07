@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import Wizard from 'simple-wizard-component';
@@ -93,9 +94,9 @@ class RuleWizard extends React.Component {
 }
 
 RuleWizard.propTypes = {
-  saveRule: React.PropTypes.func.isRequired,
-  cancel: React.PropTypes.func.isRequired,
-  current: React.PropTypes.object
+  saveRule: PropTypes.func.isRequired,
+  cancel: PropTypes.func.isRequired,
+  current: PropTypes.object
 };
 
 export default connect(

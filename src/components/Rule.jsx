@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import { NegButton, NeutralButton } from 'components/common/Buttons';
@@ -42,13 +43,13 @@ function Rule(props) {
 }
 
 Rule.propTypes = {
-  removeRule: React.PropTypes.func.isRequired,
-  updateRule: React.PropTypes.func.isRequired,
-  name: React.PropTypes.string.isRequired,
-  attr: React.PropTypes.string.isRequired,
-  type: React.PropTypes.string.isRequired,
-  active: React.PropTypes.bool,
-  index: React.PropTypes.number
+  removeRule: PropTypes.func.isRequired,
+  updateRule: PropTypes.func.isRequired,
+  name: PropTypes.string.isRequired,
+  attr: PropTypes.string.isRequired,
+  type: PropTypes.string.isRequired,
+  active: PropTypes.bool,
+  index: PropTypes.number
 };
 
 export default connect(

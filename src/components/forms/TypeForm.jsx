@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 export default function TypeForm({ types, current, setType }) {
 
@@ -30,7 +31,7 @@ export default function TypeForm({ types, current, setType }) {
 }
 
 TypeForm.propTypes = {
-  types: React.PropTypes.array,
-  current: React.PropTypes.string,
-  setType: React.PropTypes.func
+  types: PropTypes.array,
+  current: PropTypes.string,
+  setType: PropTypes.func
 };

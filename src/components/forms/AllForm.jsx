@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 export default function AllForm(props) {
   const { name, setName } = props;
@@ -17,6 +18,6 @@ export default function AllForm(props) {
 }
 
 AllForm.propTypes = {
-  name: React.PropTypes.string,
-  setName: React.PropTypes.func
+  name: PropTypes.string,
+  setName: PropTypes.func
 };

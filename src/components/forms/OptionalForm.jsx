@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 const OptionalForm = ({ optional, toggle }) => (
   <div>
@@ -16,8 +17,8 @@ const OptionalForm = ({ optional, toggle }) => (
 );
 
 OptionalForm.propTypes = {
-  optional: React.PropTypes.bool,
-  toggle: React.PropTypes.func
+  optional: PropTypes.bool,
+  toggle: PropTypes.func
 };
 
 export default OptionalForm;

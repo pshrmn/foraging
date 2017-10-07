@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import Wizard from 'simple-wizard-component';
@@ -70,10 +71,10 @@ class EditElementWizard extends React.Component {
 }
 
 EditElementWizard.propTypes = {
-  current: React.PropTypes.object,
-  parent: React.PropTypes.object,
-  updateElement: React.PropTypes.func.isRequired,
-  cancel: React.PropTypes.func.isRequired
+  current: PropTypes.object,
+  parent: PropTypes.object,
+  updateElement: PropTypes.func.isRequired,
+  cancel: PropTypes.func.isRequired
 };
 
 export default connect(

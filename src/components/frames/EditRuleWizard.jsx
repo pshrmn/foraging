@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import Wizard from 'simple-wizard-component';
@@ -105,10 +106,10 @@ class EditRuleWizard extends React.Component {
 }
 
 EditRuleWizard.propTypes = {
-  updateRule: React.PropTypes.func.isRequired,
-  cancel: React.PropTypes.func.isRequired,
-  current: React.PropTypes.object,
-  ruleIndex: React.PropTypes.number
+  updateRule: PropTypes.func.isRequired,
+  cancel: PropTypes.func.isRequired,
+  current: PropTypes.object,
+  ruleIndex: PropTypes.number
 };
 
 export default connect(

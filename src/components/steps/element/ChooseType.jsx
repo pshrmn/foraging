@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import Controls from 'components/common/StepControls';
 import TypeForm from 'components/forms/TypeForm';
@@ -101,16 +102,16 @@ class ChooseType extends React.Component {
 }
 
 ChooseType.propTypes = {
-  startData: React.PropTypes.object,
-  endData: React.PropTypes.object,
-  staticData: React.PropTypes.object,
-  next: React.PropTypes.func,
-  previous: React.PropTypes.func,
-  cancel: React.PropTypes.func,
-  noPrevious: React.PropTypes.bool,
-  setupState: React.PropTypes.func.isRequired,
-  highlight: React.PropTypes.func.isRequired,
-  highlightClass: React.PropTypes.string.isRequired
+  startData: PropTypes.object,
+  endData: PropTypes.object,
+  staticData: PropTypes.object,
+  next: PropTypes.func,
+  previous: PropTypes.func,
+  cancel: PropTypes.func,
+  noPrevious: PropTypes.bool,
+  setupState: PropTypes.func.isRequired,
+  highlight: PropTypes.func.isRequired,
+  highlightClass: PropTypes.string.isRequired
 };
 
 export const CreateType = props => (

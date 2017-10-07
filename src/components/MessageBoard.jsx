@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 const MessageBoard = ({ messages }) => (
@@ -12,7 +13,7 @@ const MessageBoard = ({ messages }) => (
 );
 
 MessageBoard.propTypes = {
-  messages: React.PropTypes.array.isRequired
+  messages: PropTypes.array.isRequired
 };
 
 function Message(props) {
@@ -33,8 +34,8 @@ function Message(props) {
 }
 
 Message.propTypes = {
-  message: React.PropTypes.string,
-  rating: React.PropTypes.number
+  message: PropTypes.string,
+  rating: PropTypes.number
 };
 
 export default connect(

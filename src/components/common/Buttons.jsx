@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 export const PosButton = ({ classes, ...rest }) => (
   <NeutralButton
@@ -37,12 +38,12 @@ export const NeutralButton = (props) => {
 };
 
 NeutralButton.propTypes = {
-  text: React.PropTypes.string,
-  click: React.PropTypes.func,
-  classes: React.PropTypes.array,
-  title: React.PropTypes.string,
-  disabled: React.PropTypes.bool,
-  type: React.PropTypes.string
+  text: PropTypes.string,
+  click: PropTypes.func,
+  classes: PropTypes.array,
+  title: PropTypes.string,
+  disabled: PropTypes.bool,
+  type: PropTypes.string
 };
 
 PosButton.propTypes = NeutralButton.propTypes;

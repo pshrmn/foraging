@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import Element from 'components/Element';
@@ -54,12 +55,12 @@ function ElementCard(props) {
 }
 
 ElementCard.propTypes = {
-  element: React.PropTypes.object,
-  active: React.PropTypes.bool,
-  showElementWizard: React.PropTypes.func.isRequired,
-  showRuleWizard: React.PropTypes.func.isRequired,
-  showEditElementWizard: React.PropTypes.func.isRequired,
-  removeElement: React.PropTypes.func.isRequired
+  element: PropTypes.object,
+  active: PropTypes.bool,
+  showElementWizard: PropTypes.func.isRequired,
+  showRuleWizard: PropTypes.func.isRequired,
+  showEditElementWizard: PropTypes.func.isRequired,
+  removeElement: PropTypes.func.isRequired
 };
 
 export default connect(

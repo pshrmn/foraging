@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import { NeutralButton } from 'components/common/Buttons';
 
@@ -31,9 +32,9 @@ const Cycle = ({ index, count, setIndex }) => {
 };
 
 Cycle.propTypes = {
-  index: React.PropTypes.number.isRequired,
-  count: React.PropTypes.number.isRequired,
-  setIndex: React.PropTypes.func
+  index: PropTypes.number.isRequired,
+  count: PropTypes.number.isRequired,
+  setIndex: PropTypes.func
 };
 
 export default Cycle;

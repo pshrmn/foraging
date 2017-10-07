@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import { PosButton, NegButton, NeutralButton } from 'components/common/Buttons';
@@ -142,18 +143,18 @@ class Controls extends React.Component {
 }
 
 Controls.propTypes = {
-  currentIndex: React.PropTypes.number.isRequired,
-  pages: React.PropTypes.array,
-  addPage: React.PropTypes.func.isRequired,
-  selectPage: React.PropTypes.func.isRequired,
-  closeForager: React.PropTypes.func.isRequired,
-  showMessage: React.PropTypes.func.isRequired,
-  syncPages: React.PropTypes.func.isRequired,
-  refreshMatches: React.PropTypes.func.isRequired,
-  renamePage: React.PropTypes.func.isRequired,
-  removePage: React.PropTypes.func.isRequired,
-  uploadPage: React.PropTypes.func.isRequired,
-  showPreview: React.PropTypes.func.isRequired
+  currentIndex: PropTypes.number.isRequired,
+  pages: PropTypes.array,
+  addPage: PropTypes.func.isRequired,
+  selectPage: PropTypes.func.isRequired,
+  closeForager: PropTypes.func.isRequired,
+  showMessage: PropTypes.func.isRequired,
+  syncPages: PropTypes.func.isRequired,
+  refreshMatches: PropTypes.func.isRequired,
+  renamePage: PropTypes.func.isRequired,
+  removePage: PropTypes.func.isRequired,
+  uploadPage: PropTypes.func.isRequired,
+  showPreview: PropTypes.func.isRequired
 };
 
 export default connect(

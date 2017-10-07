@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import Controls from 'components/common/StepControls';
 
@@ -114,12 +115,12 @@ class ChooseType extends React.Component {
 }
 
 ChooseType.propTypes = {
-  startData: React.PropTypes.object.isRequired,
-  staticData: React.PropTypes.object,
-  next: React.PropTypes.func.isRequired,
-  previous: React.PropTypes.func,
-  cancel: React.PropTypes.func.isRequired,
-  children: React.PropTypes.element
+  startData: PropTypes.object.isRequired,
+  staticData: PropTypes.object,
+  next: PropTypes.func.isRequired,
+  previous: PropTypes.func,
+  cancel: PropTypes.func.isRequired,
+  children: PropTypes.element
 };
 
 export default ChooseType;

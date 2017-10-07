@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import ElementFrame from './ElementFrame';
@@ -37,7 +38,7 @@ const Frames = ({ frame }) => {
 };
 
 Frames.propTypes = {
-  frame: React.PropTypes.object
+  frame: PropTypes.object
 };
 
 export default connect(

@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import Rule from 'components/Rule';
 
@@ -27,11 +28,11 @@ function Element(props) {
 }
 
 Element.propTypes = {
-  selector: React.PropTypes.string.isRequired,
-  rules: React.PropTypes.array,
-  spec: React.PropTypes.object,
-  optional: React.PropTypes.bool,
-  active: React.PropTypes.bool
+  selector: PropTypes.string.isRequired,
+  rules: PropTypes.array,
+  spec: PropTypes.object,
+  optional: PropTypes.bool,
+  active: PropTypes.bool
 };
 
 const RuleList = ({ rules, active }) => (
@@ -51,8 +52,8 @@ const RuleList = ({ rules, active }) => (
 );
 
 RuleList.propTypes = {
-  rules: React.PropTypes.array,
-  active: React.PropTypes.bool.isRequired
+  rules: PropTypes.array,
+  active: PropTypes.bool.isRequired
 };
 
 export default Element;

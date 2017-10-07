@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import Controls from 'components/common/StepControls';
@@ -96,12 +97,12 @@ class ChooseName extends React.Component {
 }
 
 ChooseName.propTypes = {
-  startData: React.PropTypes.object.isRequired,
-  next: React.PropTypes.func.isRequired,
-  previous: React.PropTypes.func,
-  cancel: React.PropTypes.func.isRequired,
-  takenNames: React.PropTypes.array.isRequired,
-  showMessage: React.PropTypes.func.isRequired
+  startData: PropTypes.object.isRequired,
+  next: PropTypes.func.isRequired,
+  previous: PropTypes.func,
+  cancel: PropTypes.func.isRequired,
+  takenNames: PropTypes.array.isRequired,
+  showMessage: PropTypes.func.isRequired
 };
 
 export default connect(

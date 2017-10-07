@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import Controls from 'components/common/StepControls';
@@ -146,17 +147,17 @@ class RangeValueStep extends React.Component {
 }
 
 RangeValueStep.propTypes = {
-  startData: React.PropTypes.object,
-  endData: React.PropTypes.object,
-  staticData: React.PropTypes.object,
-  next: React.PropTypes.func,
-  previous: React.PropTypes.func,
-  cancel: React.PropTypes.func,
-  setupState: React.PropTypes.func,
-  highlightClass: React.PropTypes.string,
-  validate: React.PropTypes.func,
-  showMessage: React.PropTypes.func,
-  takenNames: React.PropTypes.array
+  startData: PropTypes.object,
+  endData: PropTypes.object,
+  staticData: PropTypes.object,
+  next: PropTypes.func,
+  previous: PropTypes.func,
+  cancel: PropTypes.func,
+  setupState: PropTypes.func,
+  highlightClass: PropTypes.string,
+  validate: PropTypes.func,
+  showMessage: PropTypes.func,
+  takenNames: PropTypes.array
 };
 
 const ConnectedRangeValueStep = connect(

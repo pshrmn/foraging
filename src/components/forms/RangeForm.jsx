@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 export default function RangeForm(props) {
   const {
@@ -43,14 +44,14 @@ export default function RangeForm(props) {
 }
 
 RangeForm.propTypes = {
-  name: React.PropTypes.string,
-  low: React.PropTypes.number,
-  high: React.PropTypes.oneOfType([
-    React.PropTypes.string,
-    React.PropTypes.number
+  name: PropTypes.string,
+  low: PropTypes.number,
+  high: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.number
   ]),
-  count: React.PropTypes.number,
-  setName: React.PropTypes.func,
-  setLow: React.PropTypes.func,
-  setHigh: React.PropTypes.func
+  count: PropTypes.number,
+  setName: PropTypes.func,
+  setLow: PropTypes.func,
+  setHigh: PropTypes.func
 };

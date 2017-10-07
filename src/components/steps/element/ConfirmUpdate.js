@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import Controls from 'components/common/StepControls';
 
@@ -75,12 +76,12 @@ class ConfirmElement extends React.Component {
 }
 
 ConfirmElement.propTypes = {
-  startData: React.PropTypes.object,
-  endData: React.PropTypes.object,
-  staticData: React.PropTypes.object,
-  next: React.PropTypes.func,
-  previous: React.PropTypes.func,
-  cancel: React.PropTypes.func
+  startData: PropTypes.object,
+  endData: PropTypes.object,
+  staticData: PropTypes.object,
+  next: PropTypes.func,
+  previous: PropTypes.func,
+  cancel: PropTypes.func
 };
 
 export default ConfirmElement;

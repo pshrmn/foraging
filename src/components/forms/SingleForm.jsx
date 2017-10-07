@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 const SingleForm = ({index, count, setIndex}) => (
   <div>
@@ -17,9 +18,9 @@ const SingleForm = ({index, count, setIndex}) => (
 );
 
 SingleForm.propTypes = {
-  index: React.PropTypes.number,
-  count: React.PropTypes.number,
-  setIndex: React.PropTypes.func
+  index: PropTypes.number,
+  count: PropTypes.number,
+  setIndex: PropTypes.func
 };
 
 export default SingleForm;
