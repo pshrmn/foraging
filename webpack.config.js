@@ -15,7 +15,7 @@ const config = {
     ]
   },
   resolve: {
-    extensions: ['', '.js', '.jsx'],
+    extensions: ['', '.js'],
     root: path.join(__dirname, 'src')
   },
   externals: {
@@ -28,14 +28,14 @@ const config = {
   module: {
     preLoaders: [
       {
-        test: /\.jsx?$/,
+        test: /\.js$/,
         exclude: '/node_modules/',
         loader: 'eslint-loader'
       }
     ],
     loaders: [
      {
-        test: /\.jsx?$/,
+        test: /\.js$/,
         exclude: /node_modules/,
         loader: 'babel-loader'
       }
