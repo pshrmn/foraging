@@ -4,15 +4,7 @@ const webpack = require('webpack');
 const config = {
   context: path.join(__dirname, 'src'),
   entry: {
-    app: './index.js',
-    vendor: [
-      'react',
-      'react-dom',
-      'redux',
-      'react-redux',
-      'd3-hierarchy',
-      'd3-path'
-    ]
+    app: './index.js'
   },
   resolve: {
     modules: [path.join(__dirname, 'src'), 'node_modules']
@@ -39,13 +31,7 @@ const config = {
       }
     ]
   },
-  plugins: [
-    new webpack.optimize.CommonsChunkPlugin({
-      name: 'vendor',
-      filename: 'vendor.bundle.js',
-      minChunks: Infinity
-    })
-  ]
+  plugins: []
 };
 
 switch ( process.env.npm_lifecycle_event) {
