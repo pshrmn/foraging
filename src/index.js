@@ -1,8 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
+import InMemory from '@hickory/in-memory';
+import createConfig from '@curi/core';
+import { Navigator } from '@curi/react';
 
-import Forager from 'components/Forager';
+import routes from 'routes';
+import Forager from 'components/NewForager';
+// import Forager from 'components/Forager';
 import { openForager, setPages } from 'actions';
 import { load as chromeLoad } from 'helpers/chrome';
 import { stripEvents } from 'helpers/attributes';
@@ -15,6 +20,10 @@ import makeStore from 'store';
   stripEvents(document.body);
   Array.from(document.querySelectorAll("*")).forEach(e => { stripEvents(e); });
 }
+
+
+const history = InMemory();
+const config = createConfig(history, routes);
 
 /*
  * check if the forager holder exists. If it doesn't, mount the app. If it does,
@@ -30,17 +39,18 @@ if ( !document.querySelector('.forager-holder') ) {
 
   // remove any event (on*) attributes on load
 
-  chromeLoad()
-    .then(pages => {
+  Promise.all([chromeLoad(), config.ready()])
+    .then(([ pages ]) => {
       store.dispatch(
         setPages(pages)
       );
-      ReactDOM.render(
+      ReactDOM.render((
         <Provider store={store}>
-          <Forager />
+          <Navigator config={config} render={(response) => {
+            return <Forager response={response} />;
+          }} />
         </Provider>
-        , holder
-      );
+      ), holder);
 
     });
   // a function to re-show the app if it has been closed
