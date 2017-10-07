@@ -52,7 +52,7 @@
     "react-dom": "^16.0.0",
     "react-redux": "^5.0.1",
     "redux": "^3.6.0",
-    "simple-wizard-component": "^0.6.1"
+    "simple-wizard-component": "^0.7.0"
   },
   "jest": {
     "modulePaths": [
