@@ -16,7 +16,7 @@
     "test": "cross-env NODE_PATH=src jest",
     "coverage": "npm run test -- --coverage",
     "webpack:dev": "webpack",
-    "webpack:prod": "cross-env BABEL_ENV=production webpack",
+    "webpack:prod": "cross-env BABEL_ENV=production webpack"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.5",
