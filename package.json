@@ -14,11 +14,9 @@
     "build:prod": "npm run webpack:prod & npm run css",
     "sass": "node-sass scss/** -o forager/css/**",
     "test": "cross-env NODE_PATH=src jest",
-    "test:watch": "npm run test -- --watch",
     "coverage": "npm run test -- --coverage",
     "webpack:dev": "webpack",
     "webpack:prod": "cross-env BABEL_ENV=production webpack",
-    "webpack:watch": "webpack --watch"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.5",
