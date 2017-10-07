@@ -1,14 +1,17 @@
 import { createStore, combineReducers, applyMiddleware } from 'redux';
 import { messages, messagesMiddleware } from 'expiring-redux-messages';
 
-import reducers from 'reducers';
+import { frame, show, page } from 'reducers';
 import chromeMiddleware from 'middleware/chromeMiddleware';
 import selectMiddleware from 'middleware/selectMiddleware';
 import confirmMiddleware from 'middleware/confirmMiddleware';
 
-const reducer = combineReducers(Object.assign({}, reducers, {
+const reducer = combineReducers({
+  frame,
+  show,
+  page,
   messages
-}));
+});
 
 const initialState = {
   show: true,
