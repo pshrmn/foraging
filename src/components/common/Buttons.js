@@ -4,13 +4,15 @@ import PropTypes from 'prop-types';
 export const PosButton = ({ classes, ...rest }) => (
   <NeutralButton
     {...rest}
-    classes={['pos'].concat(classes)} />
+    classes={['pos'].concat(classes)}
+  />
 );
 
 export const NegButton = ({ classes, ...rest }) => (
   <NeutralButton
     {...rest}
-    classes={['neg'].concat(classes)} />
+    classes={['neg'].concat(classes)}
+  />
 );
 
 const defaultClick = () => {};
@@ -31,7 +33,8 @@ export const NeutralButton = (props) => {
       title={title}
       disabled={disabled}
       type={type}
-      onClick={click} >
+      onClick={click}
+    >
       {text}
     </button>
   );

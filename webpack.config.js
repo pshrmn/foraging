@@ -15,8 +15,7 @@ const config = {
     ]
   },
   resolve: {
-    extensions: ['', '.js'],
-    root: path.join(__dirname, 'src')
+    modules: [path.join(__dirname, 'src'), 'node_modules']
   },
   externals: {
     'chrome': 'chrome'
@@ -26,15 +25,14 @@ const config = {
     filename: 'bundle.js',
   },
   module: {
-    preLoaders: [
+    rules: [
       {
         test: /\.js$/,
         exclude: '/node_modules/',
-        loader: 'eslint-loader'
-      }
-    ],
-    loaders: [
-     {
+        loader: 'eslint-loader',
+        enforce: 'pre'
+      },
+      {
         test: /\.js$/,
         exclude: /node_modules/,
         loader: 'babel-loader'

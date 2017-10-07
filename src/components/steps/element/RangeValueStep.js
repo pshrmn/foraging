@@ -121,13 +121,15 @@ class RangeValueStep extends React.Component {
             count={indices}
             setName={this.nameHandler}
             setLow={this.lowHandler}
-            setHigh={this.highHandler} />
+            setHigh={this.highHandler}
+          />
         </div>
         <Controls
           previous={this.previousHandler}
           next={this.nextHandler}
           cancel={this.cancelHandler}
-          error={error} />
+          error={error}
+        />
       </form>
     );
   }
@@ -177,7 +179,8 @@ export const CreateRangeValueStep = props => (
     setupState={initialCreateState}
     highlightClass={queryCheck}
     validate={validateCreate}
-    {...props} />
+    {...props}
+  />
 );
 
 export const EditRangeValueStep = props => (
@@ -185,7 +188,8 @@ export const EditRangeValueStep = props => (
     setupState={initialEditState}
     highlightClass={currentSelector}
     validate={validateEdit}
-    {...props} />
+    {...props}
+  />
 );
 
 function initialCreateState(props) {

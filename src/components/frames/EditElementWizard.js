@@ -64,7 +64,8 @@ class EditElementWizard extends React.Component {
             originalSpec: spec
           }}
           save={this.save}
-          cancel={this.cancel} />
+          cancel={this.cancel}
+        />
       </div>
     );
   }

@@ -4,13 +4,15 @@
     "browser": true,
     "es6": true
   },
-  "sourceType": "module",
+  "parserOptions": {
+    "sourceType": "module"
+  },
   "plugins": [
     "import",
     "react"
   ],
   "globals": {
-    "chrome": true,
+    "chrome": true
   },
   "extends": [
     "eslint:recommended",

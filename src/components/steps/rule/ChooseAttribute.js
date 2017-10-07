@@ -76,7 +76,8 @@ class ChooseAttribute extends React.Component {
                       type='radio'
                       value={a.name}
                       checked={a.name === attribute }
-                      onChange={this.attributeHandler} />
+                      onChange={this.attributeHandler}
+                    />
                     {a.name}
                   </label>
                   <p className='line'>

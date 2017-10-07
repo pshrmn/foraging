@@ -79,11 +79,13 @@ class EditRuleWizard extends React.Component {
             element: current.matches[index]
           }}
           save={this.save}
-          cancel={this.cancel}>
+          cancel={this.cancel}
+        >
           <Cycle
             index={index}
             count={current.matches.length}
-            setIndex={this.setIndex} />
+            setIndex={this.setIndex}
+          />
         </Wizard>
       </div>
     );

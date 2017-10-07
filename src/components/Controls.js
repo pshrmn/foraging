@@ -100,31 +100,38 @@ class Controls extends React.Component {
             </select>
             <PosButton
               text='Add Page'
-              click={this.addHandler} />
+              click={this.addHandler}
+            />
             <NeutralButton
               text='Refresh'
               title='Refresh the list of matched elements. This is useful if more content has been dynamically loaded'
               click={() => { refreshMatches(); }}
-              disabled={!active} />
+              disabled={!active}
+            />
             <PosButton
               text='Preview'
               click={() => { showPreview(); }}
-              disabled={!active} />
+              disabled={!active}
+            />
             <NegButton
               text='Delete'
               click={() => { removePage(); }}
-              disabled={!active} />
+              disabled={!active}
+            />
             <PosButton
               text='Rename'
               click={this.renameHandler}
-              disabled={!active} />
+              disabled={!active}
+            />
             <PosButton
               text='Upload'
               click={() => { uploadPage(); }}
-              disabled={!active} />
+              disabled={!active}
+            />
             <PosButton
               text='Sync Pages'
-              click={() => { syncPages(); }} />
+              click={() => { syncPages(); }}
+            />
           </div>
           <div className='app-controls'>
             <NegButton
@@ -133,7 +140,8 @@ class Controls extends React.Component {
               click={() => {
                 document.body.classList.remove('foraging');
                 closeForager();
-              }} />
+              }}
+            />
           </div>
         </div>
         <MessageBoard />

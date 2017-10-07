@@ -81,7 +81,8 @@ class AllValueStep extends React.Component {
           previous={this.previousHandler}
           next={this.nextHandler}
           cancel={this.cancelHandler}
-          error={error} />
+          error={error}
+        />
       </form>
     );
   }

@@ -51,7 +51,8 @@ class ConfirmElement extends React.Component {
           previous={this.previousHandler}
           next={this.saveHandler}
           nextText='Update'
-          cancel={this.cancelHandler} />
+          cancel={this.cancelHandler}
+        />
       </form>
     );
   }

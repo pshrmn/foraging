@@ -137,12 +137,14 @@ class ChooseElement extends React.Component {
         <div className='info'>
           <h3>Select Relevant Element(s)</h3>
           <div className='choices'>
-            {selectors.map((s, i) =>
-              <SelectorRadio key={i}
-                selector={s}
-                index={i}
-                checked={i===checked}
-                select={this.setRadio} />
+            {
+              selectors.map((s, i) =>
+                <SelectorRadio key={i}
+                  selector={s}
+                  index={i}
+                  checked={i===checked}
+                  select={this.setRadio}
+                />
               )
             }
           </div>
@@ -151,7 +153,8 @@ class ChooseElement extends React.Component {
         <Controls
           next={this.nextHandler}
           cancel={this.cancelHandler}
-          error={error} />
+          error={error}
+        />
       </form>
     );
   }
@@ -211,10 +214,12 @@ ChooseElement.propTypes = {
 // do not call event.preventDefault() here or the checked dot will fail to render
 const SelectorRadio = ({ selector, checked, select, index }) => (
   <label className={checked ? 'selected' : ''}>
-    <input type='radio'
-           name='css-selector'
-           checked={checked}
-           onChange={() => select(index) } />
+    <input
+      type='radio'
+      name='css-selector'
+      checked={checked}
+      onChange={() => select(index) }
+    />
     {selector.join('')}
   </label>
 );

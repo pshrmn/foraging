@@ -52,7 +52,8 @@ class Confirm extends React.Component {
           previous={this.previousHandler}
           next={this.saveHandler}
           nextText={buttonText}
-          cancel={this.cancelHandler} />
+          cancel={this.cancelHandler}
+        />
       </form>
     );
   }

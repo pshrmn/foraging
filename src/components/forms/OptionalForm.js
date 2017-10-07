@@ -10,7 +10,8 @@ const OptionalForm = ({ optional, toggle }) => (
       <input
         type='checkbox'
         checked={optional}
-        onChange={toggle} />
+        onChange={toggle}
+      />
       { optional ? 'Yes' : 'No' }
     </label>
   </div>

@@ -53,17 +53,20 @@ class Tree extends React.Component {
     // descendants is all of the nodes in the tree
     // we draw a node for each node
     const nodes = treeRoot.descendants().map((n, i) =>
-      <Node key={i}
-            current={n.data.index === elementIndex}
-            select={selectElement}
-            active={active}
-            {...n} />
+      <Node
+        key={i}
+        current={n.data.index === elementIndex}
+        select={selectElement}
+        active={active}
+        {...n}
+      />
     );
     // each link has a source and a target
     const links = treeRoot.links().map((link, i) =>
       <path key={i}
-            className='link'
-            d={drawLink(link)} />
+        className='link'
+        d={drawLink(link)}
+      />
     );
 
     return (
@@ -94,7 +97,8 @@ class Tree extends React.Component {
         <svg
           width={width+100}
           height={height+50}
-          className={active ? null : 'not-allowed'} >
+          className={active ? null : 'not-allowed'}
+        >
           {this._makeNodes()}
         </svg>
       </div>
@@ -177,7 +181,8 @@ class Node extends React.Component {
       <g
         className={classNames.join(' ')}
         transform={`translate(${y},${x})`}
-        {...events} >
+        {...events}
+      >
         <text y='-10'>
           {shortElement(selector, spec, optional)}
         </text>

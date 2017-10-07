@@ -95,7 +95,8 @@ class ChooseType extends React.Component {
                   type='radio'
                   value={t}
                   checked={t === type}
-                  onChange={this.typeHandler} />
+                  onChange={this.typeHandler}
+                />
                 {t}
               </label>
             ))

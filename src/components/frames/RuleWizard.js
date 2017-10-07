@@ -62,16 +62,20 @@ class RuleWizard extends React.Component {
     return (
       <div className='frame'>
         <ElementCard active={false} element={current} />
-        <Wizard steps={steps}
-                initialData={{}}
-                staticData={{
-                  element: current.matches[index]
-                }}
-                save={this.save}
-                cancel={this.cancel}>
-          <Cycle index={index}
-                 count={current.matches.length}
-                 setIndex={this.setIndex} />
+        <Wizard
+          steps={steps}
+          initialData={{}}
+          staticData={{
+            element: current.matches[index]
+          }}
+          save={this.save}
+          cancel={this.cancel}
+        >
+          <Cycle
+            index={index}
+            count={current.matches.length}
+            setIndex={this.setIndex}
+          />
         </Wizard>
       </div>
     );

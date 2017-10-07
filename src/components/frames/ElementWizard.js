@@ -61,7 +61,8 @@ class ElementWizard extends React.Component {
             parent: current
           }}
           save={this.save}
-          cancel={this.cancel} />
+          cancel={this.cancel}
+        />
       </div>
     );
   }

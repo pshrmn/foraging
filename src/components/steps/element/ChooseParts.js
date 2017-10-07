@@ -104,7 +104,8 @@ class ChooseParts extends React.Component {
             name='selector-part'
             value={index}
             checked={checked}
-            onChange={this.toggleRadio} />
+            onChange={this.toggleRadio}
+          />
           {name}
         </label>
       );
@@ -122,7 +123,8 @@ class ChooseParts extends React.Component {
           previous={this.previousHandler}
           next={this.nextHandler}
           cancel={this.cancelHandler}
-          error={error} />
+          error={error}
+        />
       </form>
     );
   }

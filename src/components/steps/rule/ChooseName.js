@@ -84,13 +84,15 @@ class ChooseName extends React.Component {
             type='text'
             placeholder='e.g., name'
             value={name}
-            onChange={this.nameHandler} />
+            onChange={this.nameHandler}
+          />
         </div>
         <Controls
           previous={this.previousHandler}
           next={this.nextHandler}
           cancel={this.cancelHandler}
-          error={error} />
+          error={error}
+        />
       </form>
     );
   }

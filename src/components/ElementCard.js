@@ -35,20 +35,24 @@ function ElementCard(props) {
         <PosButton
           text='Add Child'
           disabled={!active}
-          click={() => { showElementWizard(); }} />
+          click={() => { showElementWizard(); }}
+        />
         <PosButton
           text='Add Rule'
           disabled={!active}
-          click={() => { showRuleWizard(); }} />
+          click={() => { showRuleWizard(); }}
+        />
         <NeutralButton
           text='Edit'
           disabled={!active || isRoot}
-          click={() => { showEditElementWizard(); }} />
+          click={() => { showEditElementWizard(); }}
+        />
         <NegButton
           text={isRoot ? 'Reset' : 'Delete'}
           title={isRoot ? 'Reset Page' : 'Delete Element'}
           disabled={!active}
-          click={() => { removeElement(); }} />
+          click={() => { removeElement(); }}
+        />
       </div>
     </div>
   );

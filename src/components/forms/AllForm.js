@@ -12,7 +12,8 @@ export default function AllForm(props) {
         type='text'
         placeholder='e.g., names'
         value={name}
-        onChange={setName} />
+        onChange={setName}
+      />
     </div>
   );
 }

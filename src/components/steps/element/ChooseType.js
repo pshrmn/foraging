@@ -74,7 +74,8 @@ class ChooseType extends React.Component {
         <Controls
           previous={noPrevious ? undefined : this.previousHandler}
           next={this.nextHandler}
-          cancel={this.cancelHandler} />
+          cancel={this.cancelHandler}
+        />
       </form>
     );
   }
@@ -119,7 +120,8 @@ export const CreateType = props => (
     highlight={createHighlightElements}
     highlightClass={queryCheck}
     setupState={initialCreateType}
-    {...props} />
+    {...props}
+  />
 );
 
 export const EditType = props => (
@@ -128,7 +130,8 @@ export const EditType = props => (
     highlightClass={currentSelector}
     setupState={initialEditType}
     noPrevious
-    {...props} />
+    {...props}
+  />
 );
 
 function initialCreateType(props) {

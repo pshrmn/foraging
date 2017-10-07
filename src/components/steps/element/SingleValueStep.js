@@ -72,7 +72,8 @@ class SingleValueStep extends React.Component {
           previous={this.previousHandler}
           next={this.nextHandler}
           cancel={this.cancelHandler}
-          error={error} />
+          error={error}
+        />
       </form>
     );
   }
@@ -108,7 +109,8 @@ export const CreateSingleValueStep = props => (
     setupState={initialCreateIndex}
     highlightClass={queryCheck}
     validate={() => true}
-    {...props} />
+    {...props}
+  />
 );
 
 export const EditSingleValueStep = props => (
@@ -116,7 +118,8 @@ export const EditSingleValueStep = props => (
     setupState={initialEditIndex}
     highlightClass={currentSelector}
     validate={() => true}
-    {...props} />
+    {...props}
+  />
 );
 
 

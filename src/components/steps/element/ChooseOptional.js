@@ -55,7 +55,8 @@ class ChooseOptional extends React.Component {
         <Controls
           previous={this.previousHandler}
           next={this.nextHandler}
-          cancel={this.cancelHandler} />
+          cancel={this.cancelHandler}
+        />
       </form>
     );
   }

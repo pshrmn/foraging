@@ -14,7 +14,8 @@ export default function TypeForm({ types, current, setType }) {
           name='type'
           value={t}
           checked={selected}
-          onChange={setType} />
+          onChange={setType}
+        />
         {t}
       </label>
     );
