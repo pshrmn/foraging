@@ -9,7 +9,6 @@ import * as types from 'constants/ActionTypes';
 export default store => next => action => {
   const selectActions = [
     types.SYNC_PAGES,
-    types.REMOVE_PAGE,
     types.REMOVE_ELEMENT
   ];
 
@@ -22,17 +21,11 @@ export default store => next => action => {
   case types.SYNC_PAGES:
     confirmMessage = 'Syncing pages will overwrite duplicate pages. Continue?';
     break;
-  case types.REMOVE_PAGE:
-    var { page } = store.getState();
-    var { pages, pageIndex } = page;
-    var currentPage = pages[pageIndex];
-    confirmMessage = `Are you sure you want to delete the page "${currentPage.name}"?`;
-    break;
   case types.REMOVE_ELEMENT:
     // this relies on the fact that we only ever can remove the current element
     var { page } = store.getState();
-    var { pages, pageIndex, elementIndex } = page;
-    var currentPage = pages[pageIndex];
+    var { pages, current, elementIndex } = page;
+    var currentPage = pages.find(p => p.name === current);
     var element = currentPage.elements[elementIndex];
     confirmMessage = element.index === 0 ?
       'Are you sure you want to reset the page? This will delete all rules and child elements' :
@@ -41,7 +34,7 @@ export default store => next => action => {
   }
 
   if ( !window.confirm(confirmMessage) ) {
-    return;
+    return false;
   }
   next(action);
 };

@@ -6,9 +6,9 @@ import { setPages } from 'actions';
 import * as chromeExt from 'helpers/chrome';
 
 export default fullStore => next => action => {
-  const current = fullStore.getState();
-  const { pages, pageIndex } = current.page;
-  const page = pages[pageIndex];
+  const store = fullStore.getState();
+  const { pages, current } = store.page;
+  const page = pages.find(p => p.name === current);
   switch ( action.type ) {
   case ActionTypes.RENAME_PAGE:
     // new name, old name
@@ -26,7 +26,7 @@ export default fullStore => next => action => {
     return next(action);
 
   case ActionTypes.REMOVE_PAGE:
-    var nameToRemove = pages[pageIndex].name;
+    var nameToRemove = page.name;
     chromeExt.remove(nameToRemove)
       .then(resp => {
         fullStore.dispatch(
@@ -41,7 +41,7 @@ export default fullStore => next => action => {
     return next(action);
 
   case ActionTypes.UPLOAD_PAGE:
-    chromeExt.upload(pages[pageIndex])
+    chromeExt.upload(page)
       .then(() => {
         fullStore.dispatch(
           showMessage('Upload Successful', 5000, 1)
@@ -79,11 +79,14 @@ export default fullStore => next => action => {
   case ActionTypes.UPDATE_ELEMENT:
   case ActionTypes.SAVE_RULE:
   case ActionTypes.REMOVE_RULE:
+    /* eslint-disable no-console */
+    console.log("CHROME MIDDLEWARE", action);
     const retVal = next(action);
     const newState = fullStore.getState();
-    const { page: newPage } = newState;
-    const { pages: newPages, pageIndex: newPageIndex } = newPage;
-    chromeExt.save(newPages[newPageIndex])
+    const { page: newPageObj } = newState;
+    const { pages: newPages, current: newPageName } = newPageObj;
+    const newPage = newPages.find(p => p.name === newPageName);
+    chromeExt.save(newPage)
       .then(resp => {
         fullStore.dispatch(
           showMessage(resp, 1000, 1)

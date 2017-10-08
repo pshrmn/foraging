@@ -112,7 +112,7 @@ Tree.defaultProps = {
 Tree.propTypes = {
   width: PropTypes.number,
   height: PropTypes.number,
-  page: PropTypes.object.isRequired,
+  page: PropTypes.object,
   elementIndex: PropTypes.number.isRequired,
   active: PropTypes.bool,
   selectElement: PropTypes.func.isRequired

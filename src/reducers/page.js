@@ -33,6 +33,8 @@ export default function page(state = {}, action) {
       ...pages,
       action.page
     ];
+    /* eslint-disable no-console */
+    console.log("NEW PAGES", newPages);
     return Object.assign({}, state, {
       pages: newPages,
       current: action.page.name,
@@ -42,7 +44,7 @@ export default function page(state = {}, action) {
   case types.REMOVE_PAGE:
     var { pages, current } = state;
     return Object.assign({}, state, {
-      pages: pages.find(p => p.name !== current),
+      pages: pages.filter(p => p.name !== current),
       current: undefined,
       elementIndex: 0
     });

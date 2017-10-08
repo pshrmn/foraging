@@ -16,6 +16,7 @@ const Home = ({ pages }) => (
           ))
         }
       </ul>
+      <Link to='Add Page' anchor='button' className='pos'>Add a page</Link>
     </section>
   </div>
 );
