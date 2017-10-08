@@ -1,5 +1,6 @@
 import { createStore, combineReducers, applyMiddleware } from 'redux';
 import { messages, messagesMiddleware } from 'expiring-redux-messages';
+import { responseReducer } from '@curi/redux';
 
 import { frame, show, page } from 'reducers';
 import chromeMiddleware from 'middleware/chromeMiddleware';
@@ -10,14 +11,15 @@ const reducer = combineReducers({
   frame,
   show,
   page,
-  messages
+  messages,
+  response: responseReducer
 });
 
 const initialState = {
   show: true,
   page: {
-    pages: [undefined],
-    pageIndex: 0,
+    pages: [],
+    current: undefined,
     elementIndex: 0
   },
   frame: {
@@ -27,16 +29,13 @@ const initialState = {
   messages: []
 };
 
-export default function makeStore() {
-  const store = createStore(
-    reducer,
-    initialState,
-    applyMiddleware(
-      confirmMiddleware,
-      selectMiddleware,
-      chromeMiddleware,
-      messagesMiddleware
-    )
-  );
-  return store;
-}
+export default createStore(
+  reducer,
+  initialState,
+  applyMiddleware(
+    confirmMiddleware,
+    selectMiddleware,
+    chromeMiddleware,
+    messagesMiddleware
+  )
+);

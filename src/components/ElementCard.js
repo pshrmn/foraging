@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import Element from 'components/Element';
+/*
 import { PosButton, NegButton, NeutralButton } from 'components/common/Buttons';
 import {
   showElementWizard,
@@ -10,6 +11,7 @@ import {
   showRuleWizard,
   showEditElementWizard
 } from 'actions';
+*/
 
 /*
  * An ElementCard is used to display a selector Element and its control functions
@@ -18,19 +20,20 @@ function ElementCard(props) {
   const {
     element = {},
     active = true,
-    showElementWizard,
+    /*showElementWizard,
     showRuleWizard,
     showEditElementWizard,
-    removeElement
+    removeElement*/
   } = props;
 
-  const isRoot = element.index === 0;
+  //const isRoot = element.index === 0;
 
   return (
     <div className='info-box'>
       <div className='info'>
         <Element active={active} {...element} />
       </div>
+      {/*
       <div className='buttons'>
         <PosButton
           text='Add Child'
@@ -54,6 +57,7 @@ function ElementCard(props) {
           click={() => { removeElement(); }}
         />
       </div>
+      */}
     </div>
   );
 }
@@ -61,13 +65,23 @@ function ElementCard(props) {
 ElementCard.propTypes = {
   element: PropTypes.object,
   active: PropTypes.bool,
+  /*
   showElementWizard: PropTypes.func.isRequired,
   showRuleWizard: PropTypes.func.isRequired,
   showEditElementWizard: PropTypes.func.isRequired,
   removeElement: PropTypes.func.isRequired
+  */
 };
 
 export default connect(
+  state => {
+    const { pages, current, elementIndex } = state.page;
+    const page = pages.find(p => p.name === current);
+    return {
+      element: page.elements[elementIndex]
+    };
+  }
+)(ElementCard); /*connect(
   null,
   {
     showElementWizard,
@@ -76,3 +90,4 @@ export default connect(
     showEditElementWizard
   }
 )(ElementCard);
+*/

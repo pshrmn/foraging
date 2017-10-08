@@ -1,7 +1,29 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { Link } from '@curi/react';
 
-const Home = () => (
-  <div className='frame'>Forager</div>
+const Home = ({ pages }) => (
+  <div className='frame'>
+    <section>
+      <h2>Pages</h2>
+      <ul>
+        {
+          pages.map(page => (
+            <li key={page.name}>
+              <Link to='Page' params={{ name: page.name }}>{page.name}</Link>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+  </div>
 );
 
-export default Home;
+Home.propTypes = {
+  pages: PropTypes.array
+};
+
+export default connect(
+  state => ({ pages: state.page.pages })
+)(Home);

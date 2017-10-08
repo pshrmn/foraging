@@ -1,17 +1,16 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
-import InMemory from '@hickory/in-memory';
-import createConfig from '@curi/core';
 import { Navigator } from '@curi/react';
+import { syncResponses } from '@curi/redux';
 
-import routes from 'routes';
-import Forager from 'components/NewForager';
-// import Forager from 'components/Forager';
+import config from 'config';
+import store from 'store';
+
+import Forager from 'components/Forager';
 import { openForager, setPages } from 'actions';
 import { load as chromeLoad } from 'helpers/chrome';
 import { stripEvents } from 'helpers/attributes';
-import makeStore from 'store';
 
 // the foraging class adds a margin to the bottom of the page, which
 // is helpful in preventing the app from overlapping content
@@ -20,10 +19,6 @@ import makeStore from 'store';
   stripEvents(document.body);
   Array.from(document.querySelectorAll("*")).forEach(e => { stripEvents(e); });
 }
-
-
-const history = InMemory();
-const config = createConfig(history, routes);
 
 /*
  * check if the forager holder exists. If it doesn't, mount the app. If it does,
@@ -35,15 +30,12 @@ if ( !document.querySelector('.forager-holder') ) {
   holder.classList.add('forager-holder');
   document.body.appendChild(holder);
 
-  const store = makeStore();
-
-  // remove any event (on*) attributes on load
-
   Promise.all([chromeLoad(), config.ready()])
     .then(([ pages ]) => {
-      store.dispatch(
-        setPages(pages)
-      );
+
+      syncResponses(store, config);
+      store.dispatch(setPages(pages));
+
       ReactDOM.render((
         <Provider store={store}>
           <Navigator config={config} render={(response) => {

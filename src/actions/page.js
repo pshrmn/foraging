@@ -1,8 +1,8 @@
 import * as types from 'constants/ActionTypes';
 
-export const selectPage = index => ({
+export const selectPage = name => ({
   type: types.SELECT_PAGE,
-  index: index
+  name
 });
 
 export const addPage = page => ({
