@@ -39,20 +39,31 @@ class PreviewControls extends React.Component {
   }
 
   render() {
-    return (
-      <div className='buttons'>
-        <PosButton text='Log to Console' click={this.logHandler} />
-        <PosButton text='Pretty Log' click={this.prettyLogHandler} />
-        <PosButton text='Use as Variable' click={this.varHandler} />
-        <Link
-          to='Page'
-          params={{ name: this.props.data.name }}
-          anchor='button'
-        >
-          Back
-        </Link>
-      </div>
-    );
+    return [
+      <PosButton
+        key='log'
+        text='Log to Console'
+        click={this.logHandler}
+      />,
+      <PosButton
+        key='pretty-log'
+        text='Pretty Log'
+        click={this.prettyLogHandler}
+      />,
+      <PosButton
+        key='variable'
+        text='Use as Variable'
+        click={this.varHandler}
+      />,
+      <Link
+        key='back'
+        to='Page'
+        params={{ name: this.props.data.name }}
+        anchor='button'
+      >
+        Back
+      </Link>
+    ];
   }
 }
 

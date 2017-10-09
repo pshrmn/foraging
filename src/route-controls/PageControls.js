@@ -58,28 +58,35 @@ class PageControls extends React.Component {
 
   render() {
     const { params } = this.props;
-    return (
-      <div className='controls'>
-        <Link to='Preview' params={params} anchor='button' className='pos'>
-          Preview
-        </Link>
-        <PosButton
-          text='Upload'
-          click={this.upload}
-          title="Upload the current page's rules to your server"
-        />
-        <NeutralButton
-          text='Rename Page'
-          click={this.handleRename}
-          title='Rename the current page'
-        />
-        <NegButton
-          text='Delete Page'
-          click={this.handleDelete}
-          title='Delete the current page'
-        />
-      </div>
-    );
+    return [
+      <Link
+        key='preview'
+        to='Preview'
+        params={params}
+        anchor='button'
+        className='pos'
+      >
+        Preview
+      </Link>,
+      <PosButton
+        key='upload'
+        text='Upload'
+        click={this.upload}
+        title="Upload the current page's rules to your server"
+      />,
+      <NeutralButton
+        key='rename'
+        text='Rename Page'
+        click={this.handleRename}
+        title='Rename the current page'
+      />,
+      <NegButton
+        key='delete'
+        text='Delete Page'
+        click={this.handleDelete}
+        title='Delete the current page'
+      />
+    ];
   }
 }
 

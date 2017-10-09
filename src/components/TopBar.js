@@ -13,8 +13,10 @@ const TopBar = ({ response, children } ) => {
     : 'loading...';
   return (
     <div className='topbar'>
-      <Link to='Home' anchor='button'>Forager</Link>
-      {children}
+      <div>
+        <Link to='Home' anchor='button'>Forager</Link>
+        {children}
+      </div>
       {DEBUG
         ? <div className='address-bar'>
           {pathname}
