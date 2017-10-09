@@ -1,12 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
-import { Navigator } from '@curi/react';
 import { syncResponses } from '@curi/redux';
 
 import config from 'config';
 import store from 'store';
 
+import ConnectedNavigator from 'components/ConnectedNavigator';
 import Forager from 'components/Forager';
 import { openForager, setPages } from 'actions';
 import { load as chromeLoad } from 'helpers/chrome';
@@ -38,9 +38,9 @@ if ( !document.querySelector('.forager-holder') ) {
 
       ReactDOM.render((
         <Provider store={store}>
-          <Navigator config={config} render={(response) => {
-            return <Forager response={response} />;
-          }} />
+          <ConnectedNavigator config={config}>
+            <Forager />
+          </ConnectedNavigator>
         </Provider>
       ), holder);
 

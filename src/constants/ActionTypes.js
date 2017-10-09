@@ -8,6 +8,8 @@ export const UPLOAD_PAGE = 'UPLOAD_PAGE';
 export const SYNC_PAGES = 'SYNC_PAGES';
 export const SET_PAGES = 'SET_PAGES';
 
+export const UPDATE_PAGE = 'UPDATE_PAGE';
+
 // set the matches property of multiple elements
 export const SET_MATCHES = 'SET_MATCHES';
 export const REFRESH_MATCHES = 'REFRESH_MATCHES';

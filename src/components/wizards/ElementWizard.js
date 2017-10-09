@@ -13,9 +13,9 @@ import {
   ConfirmElement
 } from 'components/steps/element';
 
-import { saveElement } from 'actions';
+import { updatePage } from 'actions';
 import { highlight, unhighlight} from 'helpers/markup';
-import { currentElement } from 'helpers/store';
+import { select } from 'helpers/selection';
 import { currentSelector } from 'constants/CSSClasses';
 
 const steps = [
@@ -41,12 +41,23 @@ class ElementWizard extends React.Component {
   }
 
   save(ele) {
-    const { curi, response, saveElement } = this.props;
+    const { curi, response, updatePage, page, parent } = this.props;
 
-    saveElement(ele);
+    // more setup
+    ele.parent = parent.index;
+    ele.index = page.elements.length;
+    page.elements.push(ele);
+
+    const parentElements = parent ? [document] : parent.matches;
+    ele.matches = select(parentElements, ele.selector, ele.spec, '.forager-holder');
+
+    updatePage(page);
     const { name } = response.params;
     const pathname = curi.addons.pathname('Page', { name });
-    curi.history.push(pathname);
+    curi.history.push({
+      pathname,
+      query: { element: ele.index }
+    });
   }
 
   cancel() {
@@ -57,14 +68,14 @@ class ElementWizard extends React.Component {
   }
 
   render() {
-    const { current } = this.props;
+    const { parent } = this.props;
 
     return (
       <Wizard
         steps={steps}
         initialData={{}}
         staticData={{
-          parent: current
+          parent
         }}
         save={this.save}
         cancel={this.cancel}
@@ -73,14 +84,14 @@ class ElementWizard extends React.Component {
   }
 
   componentDidMount() {
-    const { current } = this.props;
-    highlight(current.matches, currentSelector);
+    const { parent } = this.props;
+    highlight(parent.matches, currentSelector);
   }
 
   componentDidUpdate() {
     unhighlight(currentSelector);
-    const { current } = this.props;
-    highlight(current.matches, currentSelector);
+    const { parent } = this.props;
+    highlight(parent.matches, currentSelector);
   }
 
   componentWillUnmount() {
@@ -89,22 +100,18 @@ class ElementWizard extends React.Component {
 }
 
 ElementWizard.propTypes = {
+  parent: PropTypes.object,
+  page: PropTypes.object,
   /* curious */
   curi: PropTypes.object,
   response: PropTypes.object,
   /* connect */
-  current: PropTypes.object,
-  saveElement: PropTypes.func.isRequired,
+  updatePage: PropTypes.func.isRequired,
 };
 
 export default curious(connect(
-  state => {
-    const { page } = state;
-    return {
-      current: currentElement(page)
-    };
-  },
+  null,
   {
-    saveElement
+    updatePage
   }
 )(ElementWizard));

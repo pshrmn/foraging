@@ -5,12 +5,12 @@ import { connect } from 'react-redux';
 import AddressBar from 'components/AddressBar';
 
 const Forager = ({ show, response }) => {
-  const { body:Body, params } = response;
+  const { body:Body } = response;
   return (
     !show ? null : (
       <div id='forager'>
         <AddressBar />
-        <Body params={params} />
+        <Body />
       </div>
     )
   );
@@ -26,6 +26,7 @@ Forager.propTypes = {
 
 export default connect(
   state => ({
-    show: state.show
+    show: state.show,
+    response: state.response
   })
 )(Forager);

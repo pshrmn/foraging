@@ -32,6 +32,11 @@ export const setPages = pages => ({
   pages
 });
 
+export const updatePage = page => ({
+  type: types.UPDATE_PAGE,
+  page
+});
+
 // matches is an object where the keys are
 // element indices and the values are elements
 // that are matched by the element selector with

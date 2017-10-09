@@ -63,6 +63,18 @@ export default function page(state = {}, action) {
       current: action.name
     });
 
+  case types.UPDATE_PAGE:
+    var { pages, current } = state;
+    return Object.assign({}, state, {
+      pages: pages.map(p => {
+        if (p.name === current) {
+          return action.page;
+        } else {
+          return p;
+        }
+      })
+    });
+
   case types.SET_MATCHES:
     var { pages, current } = state;
     var { matches } = action;

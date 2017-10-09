@@ -6,7 +6,6 @@ import { path } from 'd3-path';
 
 import Node from './Node';
 import { simpleGrow } from 'helpers/page';
-import { selectElement } from 'actions';
 
 // d3 dropped svg.diagonal, but this is the equivalent path function
 // https://github.com/d3/d3-shape/issues/27#issuecomment-227839157
@@ -34,7 +33,7 @@ class Tree extends React.Component {
   }
 
   _makeNodes() {
-    const { page, elementIndex, active, selectElement } = this.props;
+    const { page, current, active } = this.props;
     const { tree } = this.state;
 
     // clone the page data so that data isn't interfered with
@@ -50,8 +49,8 @@ class Tree extends React.Component {
     const nodes = treeRoot.descendants().map((n, i) =>
       <Node
         key={i}
-        current={n.data.index === elementIndex}
-        select={selectElement}
+        current={n.data.index === current}
+        select={this.selectNode}
         active={active}
         {...n}
       />
@@ -74,6 +73,10 @@ class Tree extends React.Component {
         </g>
       </g>
     );
+  }
+
+  selectNode = (id) => {
+    this.props.select(id);
   }
 
   render() {
@@ -110,24 +113,20 @@ Tree.propTypes = {
   width: PropTypes.number,
   height: PropTypes.number,
   page: PropTypes.object,
-  elementIndex: PropTypes.number.isRequired,
+  current: PropTypes.number,
   active: PropTypes.bool,
-  selectElement: PropTypes.func.isRequired
+  select: PropTypes.func
 };
 
 export default connect(
   state => {
     const { response, page } = state;
     const { name } = response.params;
-    const { pages, elementIndex } = page;
+    const { pages } = page;
     const currentPage = pages.find(p => p.name === name);
     return {
       page: currentPage,
-      active: response.name === 'Page',
-      elementIndex
+      active: response.name === 'Page'
     };
-  },
-  {
-    selectElement,
   }
 )(Tree);

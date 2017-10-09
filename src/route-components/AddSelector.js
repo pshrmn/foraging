@@ -2,25 +2,29 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
+import { currentPage } from 'helpers/store';
 import ElementWizard from 'components/wizards/ElementWizard';
 
-const AddSelector = () => (
+const AddSelector = ({ page, element }) => (
   <div className='frame'>
     Add Selector
-    <ElementWizard />
+    <ElementWizard page={page} parent={element} />
   </div>
 );
 
 AddSelector.propTypes = {
+  page: PropTypes.object,
   element: PropTypes.object
 };
 
 export default connect(
   state => {
-    const { pages, current, elementIndex } = state.page;
-    const page = pages.find(p => p.name === current);
+    const { params } = state.response;
+    const index = parseInt(params.index);
+    const page = currentPage(state);
     return {
-      element: page.elements[elementIndex]
+      element: page.elements[index],
+      page
     };
   }
 )(AddSelector);

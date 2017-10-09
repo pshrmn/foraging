@@ -4,6 +4,8 @@ import { connect } from 'react-redux';
 import { Link } from '@curi/react';
 
 import Element from 'components/Element';
+import { NegButton } from 'components/common/Buttons';
+
 
 /*
  * An ElementCard is used to display a selector Element and its control functions
@@ -12,7 +14,7 @@ function ElementCard(props) {
   const {
     element,
     active = true,
-    name,
+    params: { name },
     index
   } = props;
 
@@ -39,26 +41,32 @@ function ElementCard(props) {
         >
           Add Child
         </Link>
+        <NegButton
+          text='Remove Element'
+          click={() => {
+            /* eslint-disable */
+            console.log('Removing element is not enabled');
+          }}
+        />
       </div>
     </div>
   );
 }
 
 ElementCard.propTypes = {
+  params: PropTypes.object,
+  index: PropTypes.number,
   element: PropTypes.object,
-  active: PropTypes.bool,
-  name: PropTypes.string,
-  index: PropTypes.number
+  active: PropTypes.bool
 };
 
 export default connect(
-  state => {
-    const { pages, current, elementIndex } = state.page;
-    const page = pages.find(p => p.name === current);
+  (state, ownProps) => {
+    const { params, index } = ownProps;
+    const { pages } = state.page;
+    const page = pages.find(p => p.name === params.name);
     return {
-      element: page ? page.elements[elementIndex] : null,
-      name: current,
-      index: elementIndex
+      element: page ? page.elements[index] : null
     };
   }
 )(ElementCard);

@@ -10,6 +10,25 @@ import { highlight, unhighlight } from 'helpers/markup';
 import { currentSelector } from 'constants/CSSClasses';
 
 class Page extends React.Component {
+  constructor(props) {
+    super(props);
+
+    const { query } = props.response.location;
+    const index = query.element || 0;
+
+    this.state = {
+      index,
+      element: this.props.page.elements[index]
+    };
+  }
+
+  select = (index) => {
+    this.setState({
+      index,
+      element: this.props.page.elements[index]
+    });
+  }
+
   componentDidMount() {
     unhighlight(currentSelector);
     if ( this.props.element ) {
@@ -29,14 +48,14 @@ class Page extends React.Component {
   }
 
   render() {
-    const { params } = this.props;
+    const { response: { params } } = this.props;
     return (
       <div className='frame'>
         <h1>Page {params.name}</h1>
         <PageControls params={params} />
         <div className='content'>
-          <Tree />
-          <ElementCard />
+          <Tree current={this.state.index} select={this.select} />
+          <ElementCard params={params} index={this.state.index}/>
         </div>
       </div>
     );
@@ -44,16 +63,18 @@ class Page extends React.Component {
 }
 
 Page.propTypes = {
-  params: PropTypes.object.isRequired,
-  element: PropTypes.object
+  response: PropTypes.object.isRequired,
+  element: PropTypes.object,
+  page: PropTypes.object
 };
 
 export default connect(
   state => {
-    const { pages, current, elementIndex } = state.page;
+    const { pages, current } = state.page;
     const page = pages.find(p => p.name === current);
     return {
-      element: page && page.elements[elementIndex]
+      response: state.response,
+      page
     };
   }
 )(Page);

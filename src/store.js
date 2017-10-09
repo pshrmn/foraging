@@ -18,8 +18,7 @@ const initialState = {
   show: true,
   page: {
     pages: [],
-    current: undefined,
-    elementIndex: 0
+    current: undefined
   },
   messages: []
 };

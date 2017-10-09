@@ -1,2 +1,6 @@
 import InMemory from '@hickory/in-memory';
-export default InMemory();
+import { parse, stringify } from 'qs';
+
+export default InMemory({
+  query: { stringify, parse }
+});

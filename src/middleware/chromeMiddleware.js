@@ -74,7 +74,7 @@ export default fullStore => next => action => {
   // for chromeSave actions, save after the action has reached the reducer
   // so that we are saving the updated state of the store
   case ActionTypes.ADD_PAGE:
-  case ActionTypes.SAVE_ELEMENT:
+  case ActionTypes.UPDATE_PAGE:
   case ActionTypes.REMOVE_ELEMENT:
   case ActionTypes.UPDATE_ELEMENT:
   case ActionTypes.SAVE_RULE:
