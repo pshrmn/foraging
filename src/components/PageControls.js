@@ -25,7 +25,7 @@ class PageControls extends React.Component {
     if (confirmed) {
       const pathname = curi.addons.pathname('Home');
       curi.history.push(pathname);
-      removePage();
+      removePage(page.name);
     }
   }
 
@@ -36,7 +36,7 @@ class PageControls extends React.Component {
     if ( !validName(name, pageNames(pages))) {
       showMessage(`Cannot Use Name: "${name}"`, 5000, -1);
     } else {
-      renamePage(name);
+      renamePage(name, this.props.page.name);
       const pathname = curi.addons.pathname('Page', { name });
       curi.history.push(pathname);
     }

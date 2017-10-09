@@ -5,24 +5,16 @@ import * as types from 'constants/ActionTypes';
  * page
  * ----
  *
- * a page is made up of an array of pages, a current name string to indicate the
- * current page within the array, and an elementIndex to indicate the current
+ * a page is made up of an array of pages and an elementIndex to indicate the current
  * selector within the current page
  */
 export default function page(state = {}, action) {
   switch ( action.type ) {
-  case types.SELECT_PAGE:
-    return Object.assign({}, state, {
-      current: action.name,
-      elementIndex: 0
-    });
-
   /*
    * when setting pages, reset to empty page
    */
   case types.SET_PAGES:
     return Object.assign({}, state, {
-      current: undefined,
       pages: action.pages,
       elementIndex: 0
     });
@@ -33,23 +25,21 @@ export default function page(state = {}, action) {
         ...state.pages,
         action.page
       ],
-      current: action.page.name,
       elementIndex: 0
     });
 
   case types.REMOVE_PAGE:
-    var { pages, current } = state;
+    var { pages } = state;
     return Object.assign({}, state, {
-      pages: pages.filter(p => p.name !== current),
-      current: undefined,
+      pages: pages.filter(p => p.name !== action.name),
       elementIndex: 0
     });
 
   case types.RENAME_PAGE:
-    var { pages, current } = state;
+    var { pages } = state;
     return Object.assign({}, state, {
       pages: pages.map(p => {
-        if (p.name === current) {
+        if (p.name === action.oldName) {
           return {
             ...p,
             name: action.name
@@ -57,47 +47,19 @@ export default function page(state = {}, action) {
         } else {
           return p;
         }
-      }),
-      current: action.name
+      })
     });
 
   case types.UPDATE_PAGE:
-    var { pages, current } = state;
+    var { pages } = state;
+    var name = action.page.name;
     return Object.assign({}, state, {
       pages: pages.map(p => {
-        if (p.name === current) {
+        if (p.name === name) {
           return action.page;
         } else {
           return p;
         }
-      })
-    });
-
-  case types.SET_MATCHES:
-    var { pages, current } = state;
-    var { matches } = action;
-    return Object.assign({}, state, {
-      pages: pages.map(p => {
-        if (p.name !== current) {
-          return p;
-        }
-
-        return {
-          ...p,
-          elements: p.elements.map(element => {
-            if ( element === null ) {
-              return null;
-            }
-            const eleMatches = matches[element.index];
-            if ( eleMatches !== undefined ) {
-              return Object.assign({}, element, {
-                matches: eleMatches
-              });
-            } else {
-              return element;
-            }
-          })
-        };
       })
     });
 
@@ -173,12 +135,6 @@ export default function page(state = {}, action) {
           })
         };
       })
-    });
-
-  case types.CLOSE_FORAGER:
-    return Object.assign({}, state, {
-      currentPage: undefined,
-      elementIndex: 0
     });
 
   default:

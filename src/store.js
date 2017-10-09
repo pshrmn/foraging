@@ -4,7 +4,6 @@ import { responseReducer } from '@curi/redux';
 
 import { show, page } from 'reducers';
 import chromeMiddleware from 'middleware/chromeMiddleware';
-import selectMiddleware from 'middleware/selectMiddleware';
 import confirmMiddleware from 'middleware/confirmMiddleware';
 
 const reducer = combineReducers({
@@ -28,7 +27,6 @@ export default createStore(
   initialState,
   applyMiddleware(
     confirmMiddleware,
-    selectMiddleware,
     chromeMiddleware,
     messagesMiddleware
   )

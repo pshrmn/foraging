@@ -7,6 +7,7 @@ import ElementCard from 'components/ElementCard';
 import PageControls from 'components/PageControls';
 
 import { currentPage } from 'helpers/store';
+import { selectPage } from 'helpers/selection';
 import { highlight, unhighlight } from 'helpers/markup';
 import { currentSelector } from 'constants/CSSClasses';
 
@@ -31,6 +32,8 @@ class Page extends React.Component {
   }
 
   componentDidMount() {
+    selectPage(this.props.page);
+
     unhighlight(currentSelector);
     if ( this.state.element ) {
       highlight(this.state.element.matches, currentSelector);

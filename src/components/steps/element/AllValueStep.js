@@ -112,12 +112,7 @@ AllValueStep.propTypes = {
 
 
 const ConnectedAllValueStep = connect(
-  state => {
-    const { page } = state;
-    return {
-      takenNames: takenNames(page)
-    };
-  },
+  state => ({ takenNames: takenNames(state) }),
   {
     showMessage
   }

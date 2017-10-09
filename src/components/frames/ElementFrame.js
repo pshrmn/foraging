@@ -53,9 +53,8 @@ ElementFrame.propTypes = {
 
 export default connect(
   state => {
-    const { page } = state;
     return {
-      element: currentElement(page)
+      element: currentElement(state)
     };
   }
 )(ElementFrame);

@@ -1,12 +1,9 @@
-import store from 'store';
 import Home from 'route-components/Home';
 import AddPage from 'route-components/AddPage';
 import Page from 'route-components/Page';
 import Preview from 'route-components/Preview';
 import AddSelector from 'route-components/AddSelector';
 import EditSelector from 'route-components/EditSelector';
-
-import { selectPage } from 'actions';
 
 export default [
   {
@@ -23,10 +20,6 @@ export default [
     name: 'Page',
     path: 'page/:name',
     body: () => Page,
-    load: (params) => {
-      const { name } = params;
-      store.dispatch(selectPage(name));
-    },
     children: [
       {
         name: 'Preview',

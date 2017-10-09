@@ -6,6 +6,7 @@ import { path } from 'd3-path';
 
 import Node from './Node';
 import { simpleGrow } from 'helpers/page';
+import { currentPage } from 'helpers/store';
 
 // d3 dropped svg.diagonal, but this is the equivalent path function
 // https://github.com/d3/d3-shape/issues/27#issuecomment-227839157
@@ -119,14 +120,8 @@ Tree.propTypes = {
 };
 
 export default connect(
-  state => {
-    const { response, page } = state;
-    const { name } = response.params;
-    const { pages } = page;
-    const currentPage = pages.find(p => p.name === name);
-    return {
-      page: currentPage,
-      active: response.name === 'Page'
-    };
-  }
+  state => ({
+    page: currentPage(state),
+    active: state.response.name === 'Page'
+  })
 )(Tree);

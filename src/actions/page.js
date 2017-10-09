@@ -1,22 +1,19 @@
 import * as types from 'constants/ActionTypes';
 
-export const selectPage = name => ({
-  type: types.SELECT_PAGE,
-  name
-});
-
 export const addPage = page => ({
   type: types.ADD_PAGE,
   page: page
 });
 
-export const removePage = () => ({
-  type: types.REMOVE_PAGE
+export const removePage = name => ({
+  type: types.REMOVE_PAGE,
+  name
 });
 
-export const renamePage = name => ({
+export const renamePage = (name, oldName) => ({
   type: types.RENAME_PAGE,
-  name: name
+  name,
+  oldName
 });
 
 export const uploadPage = () => ({
@@ -35,15 +32,6 @@ export const setPages = pages => ({
 export const updatePage = page => ({
   type: types.UPDATE_PAGE,
   page
-});
-
-// matches is an object where the keys are
-// element indices and the values are elements
-// that are matched by the element selector with
-// the same index
-export const setMatches = matches => ({
-  type: types.SET_MATCHES,
-  matches
 });
 
 // trigger the matches to be re-selected

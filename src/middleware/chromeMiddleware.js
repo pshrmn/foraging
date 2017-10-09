@@ -7,7 +7,9 @@ import * as chromeExt from 'helpers/chrome';
 
 export default fullStore => next => action => {
   const store = fullStore.getState();
-  const { pages, current } = store.page;
+  const { pages } = store.page;
+  const { params } = store.response || {};
+  const current = params && params.name;
   const page = pages.find(p => p.name === current);
   switch ( action.type ) {
   case ActionTypes.RENAME_PAGE:
@@ -79,8 +81,9 @@ export default fullStore => next => action => {
   case ActionTypes.REMOVE_RULE:
     const retVal = next(action);
     const newState = fullStore.getState();
-    const { page: newPageObj } = newState;
-    const { pages: newPages, current: newPageName } = newPageObj;
+    const { page: newPageObj, response } = newState;
+    const { pages: newPages } = newPageObj;
+    const newPageName = response.params.name;
     const newPage = newPages.find(p => p.name === newPageName);
     chromeExt.save(newPage)
       .then(resp => {

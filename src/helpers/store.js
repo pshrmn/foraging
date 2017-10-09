@@ -3,35 +3,35 @@ import { levelNames } from 'helpers/page';
 /*
  * returns the currently selected element
  */
-export function currentElement(page, index) {
-  const { pages, current } = page;
-  const currentPage = pages.find(p => p.name === current);
-  return currentPage && currentPage.elements[index];
+export function currentElement(state) {
+  const page = currentPage(state);
+  const { response } = state;
+  const index = parseInt(response.params.index, 10);
+  return page && page.elements[index];
 }
 
 /*
  * returns the parent element of the currently selected element
  * or undefined if either the current element does not exist
  */
-export function currentParent(page) {
-  const { pages, current, elementIndex } = page;
-  const currentPage = pages.find(p => p.name === current);
-  const currentElement = currentPage && currentPage.elements[elementIndex];
-  return currentElement && currentPage.elements[currentElement.parent];
+export function currentParent(state) {
+  const page = currentPage(state);
+  const element = currentElement(state);
+  return element && page.elements[element.parent];
 }
 
 /*
  * return a list of names for all elements in the same level as
  * the current element
  */
-export function takenNames(page) {
-  const { pages, current, elementIndex } = page;
-  const currentEle = currentElement(page, elementIndex);
-  const index = currentEle !== null ? currentEle.parent : elementIndex;
+export function takenNames(state) {
+  const currentEle = currentElement(state);
+  const index = currentEle != null ? currentEle.parent : null;
   if (index === null) {
     return [];
   }
-  const currentPageElements = pages.find(p => p.name === current).elements;
+  const page = currentPage(state);
+  const currentPageElements = page.elements;
   return levelNames(currentPageElements, index);
 }
 

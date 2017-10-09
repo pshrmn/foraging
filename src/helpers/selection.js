@@ -162,3 +162,15 @@ function validID(id) {
  * check if all elements matched by the selector are 'select' elements
  */
 export const allSelect = s => s.every(ele => ele.tagName === 'SELECT');
+
+/*
+ * Iterate over all of the elements in a page and select the matching DOM nodes
+ */
+export function selectPage(page) {
+  const matches = [];
+  page.elements.forEach(element => {
+    const parentElements = element.parent === null ? [document] : matches[element.parent];
+    element.matches = select(parentElements, element.selector, element.spec, '.forager-holder');
+    matches[element.index] = element.matches;
+  });
+}

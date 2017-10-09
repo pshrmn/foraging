@@ -114,9 +114,8 @@ EditRuleWizard.propTypes = {
 
 export default connect(
   state => {
-    const { page } = state;
     return {
-      current: currentElement(page),
+      current: currentElement(state),
       ruleIndex: 0
     };
   },

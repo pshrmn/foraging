@@ -163,12 +163,7 @@ RangeValueStep.propTypes = {
 };
 
 const ConnectedRangeValueStep = connect(
-  state => {
-    const { page } = state;
-    return {
-      takenNames: takenNames(page)
-    };
-  },
+  state => ({ takenNames: takenNames(state) }),
   {
     showMessage
   }
