@@ -36,6 +36,13 @@ const config = {
 
 switch ( process.env.npm_lifecycle_event) {
 case "webpack:dev":
+  config.plugins = config.plugins.concat([
+    new webpack.DefinePlugin({
+        'process.env': {
+          'NODE_ENV': JSON.stringify('dev')
+        }
+    }),
+  ]);
   break;
 case "webpack:prod":
   config.plugins = config.plugins.concat([

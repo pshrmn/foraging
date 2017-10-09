@@ -25,7 +25,7 @@
   text-align: left;
   border-style: solid;
   border-color: $dark-blue;
-  border-width: 10px 1px 0 1px;;
+  border-width: 1px 1px 0 1px;;
   box-sizing: border-box;
 
   * {
@@ -41,7 +41,6 @@
   @import 'graph';
   @import 'wizard';
   @import 'topbar';
-  @import 'addressBar';
 
   &.hidden {
       display: none !important;

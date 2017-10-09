@@ -1,52 +1,98 @@
 import Home from 'route-components/Home';
+
 import AddPage from 'route-components/AddPage';
+
 import Page from 'route-components/Page';
+import PageControls from 'route-controls/PageControls';
+
 import Preview from 'route-components/Preview';
+import PreviewControls from 'route-controls/PreviewControls';
+
 import AddSelector from 'route-components/AddSelector';
+
 import EditSelector from 'route-components/EditSelector';
+
 import AddRule from 'route-components/AddRule';
+
 import EditRule from 'route-components/EditRule';
+
+import store from 'store';
+import { fullGrow } from 'helpers/page';
+import { preview } from 'helpers/preview';
+
+const NoControls = () => null;
 
 export default [
   {
     name: 'Home',
     path: '',
-    body: () => Home
+    body: () => ({
+      main: Home,
+      controls: NoControls
+    })
   },
   {
     name: 'Add Page',
     path: 'add-page',
-    body: () => AddPage
+    body: () => ({
+      main: AddPage,
+      controls: NoControls
+    })
   },
   {
     name: 'Page',
     path: 'page/:name',
-    body: () => Page,
+    body: () => ({
+      main: Page,
+      controls: PageControls
+    }),
     children: [
       {
         name: 'Preview',
         path: 'preview',
-        body: () => Preview
+        body: () => ({
+          main: Preview,
+          controls: PreviewControls
+        }),
+        load: (params, location, mods) => {
+          // generate the preview tree
+          const { pages } = store.getState();
+          const page = pages.find(p => p.name === params.name);
+          const tree = preview(fullGrow(page.elements));
+          mods.setData({ tree, name: page.name });
+        }
       },
       {
         name: 'Add Selector',
         path: 'add/:index',
-        body: () => AddSelector
+        body: () => ({
+          main: AddSelector,
+          controls: NoControls
+        })
       },
       {
         name: 'Edit Selector',
         path: 'edit/:index',
-        body: () => EditSelector
+        body: () => ({
+          main: EditSelector,
+          controls: NoControls
+        })
       },
       {
         name: 'Add Rule',
         path: 'add-rule/:index',
-        body: () => AddRule
+        body: () => ({
+          main: AddRule,
+          controls: NoControls
+        })
       },
       {
         name: 'Edit Rule',
         path: 'Edit-rule/:index/:ruleIndex',
-        body: () => EditRule
+        body: () => ({
+          main: EditRule,
+          controls: NoControls
+        })
       }
     ]
   }

@@ -4,7 +4,6 @@ import { connect } from 'react-redux';
 
 import Tree from 'components/tree/Tree';
 import ElementCard from 'components/ElementCard';
-import PageControls from 'components/PageControls';
 
 import { currentPage } from 'helpers/store';
 import { selectPage } from 'helpers/selection';
@@ -59,7 +58,6 @@ class Page extends React.Component {
     return (
       <div className='frame'>
         <h1>Page {params.name}</h1>
-        <PageControls params={params} />
         <div className='content'>
           <Tree current={this.state.index} select={this.select} />
           <ElementCard

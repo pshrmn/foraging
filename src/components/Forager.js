@@ -2,15 +2,18 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import AddressBar from 'components/AddressBar';
+import TopBar from 'components/TopBar';
 
 const Forager = ({ show, response }) => {
-  const { body:Body } = response;
+  const { body, data } = response;
+  const { main:Main, controls:Controls} = body;
   return (
     !show ? null : (
       <div id='forager'>
-        <AddressBar />
-        <Body />
+        <TopBar>
+          <Controls data={data} />
+        </TopBar>
+        <Main data={data} />
       </div>
     )
   );
