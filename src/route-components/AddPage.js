@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Link, curious } from '@curi/react';
+import { curious } from '@curi/react';
 
 import { addPage } from 'actions';
 import { createElement } from 'helpers/page';
@@ -20,7 +20,8 @@ class AddPage extends React.Component {
     });
   }
 
-  addPage = () => {
+  addPage = (event) => {
+    event.preventDefault();
     const { curi, addPage } = this.props;
     const { name, allowed } = this.state;
 
@@ -46,7 +47,7 @@ class AddPage extends React.Component {
     return (
       <div className='frame'>
         <h1>Add a new page</h1>
-        <form>
+        <form onSubmit={this.addPage}>
           <label>
             {'Name '}
             <input type='text' value={name} onChange={this.handleName} />
@@ -56,8 +57,7 @@ class AddPage extends React.Component {
               ? null
               : <p className='warning'>This name is already in use.</p>
           }
-          <button type='button' onClick={this.addPage}>Add Page</button>
-          <Link to='Home' anchor='button' className='neg'>Cancel</Link>
+          <button>Add Page</button>
         </form>
       </div>
     );

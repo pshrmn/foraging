@@ -59,16 +59,9 @@ export default fullStore => next => action => {
       });
     break;
 
-  // for chromeSave actions, save after the action has reached the reducer
-  // so that we are saving the updated state of the store
   case ActionTypes.ADD_PAGE:
   case ActionTypes.UPDATE_PAGE:
-    const retVal = next(action);
-    const newState = fullStore.getState();
-    const { pages: newPages, response } = newState;
-    const newPageName = response.params.name;
-    const newPage = newPages.find(p => p.name === newPageName);
-    chromeExt.save(newPage)
+    chromeExt.save(action.page)
       .then(resp => {
         fullStore.dispatch(
           showMessage(resp, 1000, 1)
@@ -79,7 +72,7 @@ export default fullStore => next => action => {
           showMessage(error, 1000, -1)
         );
       });
-    return retVal;
+    return next(action);
 
   default:
     return next(action);

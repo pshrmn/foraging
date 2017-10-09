@@ -1,6 +1,7 @@
 import Home from 'route-components/Home';
 
 import AddPage from 'route-components/AddPage';
+import AddPageControls from 'route-controls/AddPageControls';
 
 import Page from 'route-components/Page';
 import PageControls from 'route-controls/PageControls';
@@ -36,7 +37,7 @@ export default [
     path: 'add-page',
     body: () => ({
       main: AddPage,
-      controls: NoControls
+      controls: AddPageControls
     })
   },
   {
