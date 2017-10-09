@@ -4,6 +4,7 @@ import AddPage from 'route-components/AddPage';
 import Page from 'route-components/Page';
 import Preview from 'route-components/Preview';
 import AddSelector from 'route-components/AddSelector';
+import EditSelector from 'route-components/EditSelector';
 
 import { selectPage } from 'actions';
 
@@ -36,6 +37,11 @@ export default [
         name: 'Add Selector',
         path: 'add/:index',
         body: () => AddSelector
+      },
+      {
+        name: 'Edit Selector',
+        path: 'edit/:index',
+        body: () => EditSelector
       }
     ]
   }

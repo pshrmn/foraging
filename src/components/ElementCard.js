@@ -56,6 +56,13 @@ function ElementCard(props) {
             }
           }}
         />
+        <Link
+          to='Edit Selector'
+          params={{ name: page.name, index: element.index }}
+          anchor='button'
+        >
+          Edit
+        </Link>
       </div>
     </div>
   );

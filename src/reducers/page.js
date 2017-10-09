@@ -28,13 +28,11 @@ export default function page(state = {}, action) {
     });
 
   case types.ADD_PAGE:
-    var pages = state.pages;
-    var newPages = [
-      ...pages,
-      action.page
-    ];
     return Object.assign({}, state, {
-      pages: newPages,
+      pages: [
+        ...state.pages,
+        action.page
+      ],
       current: action.page.name,
       elementIndex: 0
     });
