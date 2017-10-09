@@ -25,8 +25,8 @@ export default store => next => action => {
   case types.REFRESH_MATCHES:
     var result = next(action);
     var page = store.getState().page;
-    var { pages, pageIndex } = page;
-    var currentPage = pages[pageIndex];
+    var { pages, current } = page;
+    var currentPage = pages.find(p => p.name === current);
     if ( currentPage === undefined ) {
       return;
     }
