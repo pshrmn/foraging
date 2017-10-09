@@ -42,20 +42,6 @@ export default fullStore => next => action => {
       });
     return next(action);
 
-  case ActionTypes.UPLOAD_PAGE:
-    chromeExt.upload(page)
-      .then(() => {
-        fullStore.dispatch(
-          showMessage('Upload Successful', 5000, 1)
-        );
-      })
-      .catch(error => {
-        fullStore.dispatch(
-          showMessage(error, 5000, -1)
-        );
-      });
-    break;
-
   case ActionTypes.SYNC_PAGES:
     chromeExt.sync()
       .then(pages => {
