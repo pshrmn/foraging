@@ -18,7 +18,7 @@ function ElementCard(props) {
     element
   } = props;
 
-  //const isRoot = element.index === 0;
+  const isRoot = element.index === 0;
 
   if (!element) {
     return (
@@ -41,16 +41,35 @@ function ElementCard(props) {
           params={params}
           anchor='button'
           className='pos'
+          title='Add a child element to this element'
         >
-          Add Child
+          +Child
+        </Link>
+        <Link
+          to='Add Rule'
+          params={params}
+          anchor='button'
+          className='pos'
+          title='Add a rule to capture attribute/text values for this element'
+        >
+          +Rule
+        </Link>
+        <Link
+          to='Edit Selector'
+          params={params}
+          anchor='button'
+          title="Edit this element's selector rules"
+          disabled={isRoot}
+        >
+          Edit
         </Link>
         <NegButton
-          text='Remove Element'
+          text={isRoot ? 'Reset Element' : 'Remove Element'}
           click={() => {
             const { page, element, select, updatePage } = props;
-            const confirmMessage = element.index === 0
+            const confirmMessage = isRoot === 0
               ? 'Are you sure you want to reset the page? This will delete all rules and child elements'
-              : `Are you sure you want to delete the element "${element.selector}"?`;
+              : `Are you sure you want to delete the element "${element.selector}"? This will also delete any child elements.`;
             const confirmed = window.confirm(confirmMessage);
             if (confirmed) {
               const { newPage, newElementIndex } = removeElement(page, element);
@@ -59,25 +78,6 @@ function ElementCard(props) {
             }
           }}
         />
-        {
-          element.index !== 0
-            ? <Link
-              to='Edit Selector'
-              params={params}
-              anchor='button'
-            >
-              Edit
-            </Link>
-            : null
-        }
-        <Link
-          to='Add Rule'
-          params={params}
-          anchor='button'
-          className='pos'
-        >
-          Add Rule
-        </Link>
       </div>
     </div>
   );
