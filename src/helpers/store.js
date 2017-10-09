@@ -26,8 +26,11 @@ export function currentParent(page) {
  */
 export function takenNames(page) {
   const { pages, current, elementIndex } = page;
-  const currentEle = currentElement(page);
+  const currentEle = currentElement(page, elementIndex);
   const index = currentEle !== null ? currentEle.parent : elementIndex;
+  if (index === null) {
+    return [];
+  }
   const currentPageElements = pages.find(p => p.name === current).elements;
   return levelNames(currentPageElements, index);
 }

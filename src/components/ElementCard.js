@@ -5,6 +5,7 @@ import { Link } from '@curi/react';
 
 import Element from 'components/Element';
 import { NegButton } from 'components/common/Buttons';
+import { updatePage } from 'actions';
 
 
 /*
@@ -44,8 +45,56 @@ function ElementCard(props) {
         <NegButton
           text='Remove Element'
           click={() => {
-            /* eslint-disable */
-            console.log('Removing element is not enabled');
+            const { page, element, select, updatePage } = props;
+            const confirmMessage = element.index === 0
+              ? 'Are you sure you want to reset the page? This will delete all rules and child elements'
+              : `Are you sure you want to delete the element "${element.selector}"?`;
+            const confirmed = window.confirm(confirmMessage);
+            if (confirmed) {
+
+              // currentPage = page
+              // currentSelector = element
+
+              let newPage;
+              let newElementIndex = 0;
+              // clear everything else out, but don't remove the body selector
+              if ( element.index === 0 ) {
+                newPage = {
+                  ...page,
+                  elements: [{
+                    ...element,
+                    childIndices: []
+                  }]
+                };
+              } else {
+                // index values of elements that should be removed
+                let removeIndex = [element.index];
+                newElementIndex = page.elements[element.index].parent || 0;
+
+                newPage = {
+                  ...page,
+                  elements: page.elements.map(s => {
+                    if ( s === null ) {
+                      return null;
+                    }
+                    // remove any elements being removed from child indices
+                    s.childIndices = s.childIndices.filter(c => {
+                      return !removeIndex.includes(c);
+                    });
+                    if ( removeIndex.includes(s.index) ) {
+                      // if removing the selector element, remove any of its children
+                      // as well
+                      removeIndex = removeIndex.concat(s.childIndices);
+                      // replace with null so we don't have to recalculate references
+                      return null;
+                    }
+                    return s;
+                  })
+                };
+              }
+              updatePage(newPage);
+              select(newElementIndex);
+            }
           }}
         />
       </div>
@@ -54,19 +103,19 @@ function ElementCard(props) {
 }
 
 ElementCard.propTypes = {
+  element: PropTypes.object,
+  page: PropTypes.object,
   params: PropTypes.object,
   index: PropTypes.number,
-  element: PropTypes.object,
-  active: PropTypes.bool
+  active: PropTypes.bool,
+  select: PropTypes.func,
+  /* connect */
+  updatePage: PropTypes.func,
 };
 
 export default connect(
-  (state, ownProps) => {
-    const { params, index } = ownProps;
-    const { pages } = state.page;
-    const page = pages.find(p => p.name === params.name);
-    return {
-      element: page ? page.elements[index] : null
-    };
+  null,
+  {
+    updatePage
   }
 )(ElementCard);

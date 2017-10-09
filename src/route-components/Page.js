@@ -6,6 +6,7 @@ import Tree from 'components/tree/Tree';
 import ElementCard from 'components/ElementCard';
 import PageControls from 'components/PageControls';
 
+import { currentPage } from 'helpers/store';
 import { highlight, unhighlight } from 'helpers/markup';
 import { currentSelector } from 'constants/CSSClasses';
 
@@ -31,15 +32,15 @@ class Page extends React.Component {
 
   componentDidMount() {
     unhighlight(currentSelector);
-    if ( this.props.element ) {
-      highlight(this.props.element.matches, currentSelector);
+    if ( this.state.element ) {
+      highlight(this.state.element.matches, currentSelector);
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  componentDidUpdate(prevProps, prevState) {
     unhighlight(currentSelector);
-    if ( nextProps.element !== undefined && nextProps.element !== this.props.element ) {
-      highlight(nextProps.element.matches, currentSelector);
+    if ( this.state.element !== undefined && this.state.element !== prevState.element ) {
+      highlight(this.state.element.matches, currentSelector);
     }
   }
 
@@ -55,7 +56,13 @@ class Page extends React.Component {
         <PageControls params={params} />
         <div className='content'>
           <Tree current={this.state.index} select={this.select} />
-          <ElementCard params={params} index={this.state.index}/>
+          <ElementCard
+            element={this.state.element}
+            page={this.props.page}
+            params={params}
+            index={this.state.index}
+            select={this.select}
+          />
         </div>
       </div>
     );
@@ -64,14 +71,12 @@ class Page extends React.Component {
 
 Page.propTypes = {
   response: PropTypes.object.isRequired,
-  element: PropTypes.object,
   page: PropTypes.object
 };
 
 export default connect(
   state => {
-    const { pages, current } = state.page;
-    const page = pages.find(p => p.name === current);
+    const page = currentPage(state);
     return {
       response: state.response,
       page
