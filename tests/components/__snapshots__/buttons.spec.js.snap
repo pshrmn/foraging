@@ -1,10 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
 exports[`buttons NegButton creates a <button> element 1`] = `
 <button
   className="neg "
   disabled={false}
   onClick={[Function]}
   title=""
-  type="button">
+  type="button"
+>
   
 </button>
 `;
@@ -15,7 +18,8 @@ exports[`buttons NeutralButton creates a <button> element 1`] = `
   disabled={false}
   onClick={[Function]}
   title=""
-  type="button">
+  type="button"
+>
   
 </button>
 `;
@@ -26,7 +30,8 @@ exports[`buttons NeutralButton sets the button type 1`] = `
   disabled={false}
   onClick={[Function]}
   title=""
-  type="submit">
+  type="submit"
+>
   
 </button>
 `;
@@ -37,7 +42,8 @@ exports[`buttons NeutralButton sets the disabled attribute 1`] = `
   disabled={true}
   onClick={[Function]}
   title=""
-  type="button">
+  type="button"
+>
   
 </button>
 `;
@@ -48,7 +54,8 @@ exports[`buttons NeutralButton sets the onClick event using the click prop 1`] =
   disabled={false}
   onClick={[Function]}
   title=""
-  type="button">
+  type="button"
+>
   
 </button>
 `;
@@ -59,7 +66,8 @@ exports[`buttons NeutralButton sets the title attribute 1`] = `
   disabled={false}
   onClick={[Function]}
   title="foo"
-  type="button">
+  type="button"
+>
   
 </button>
 `;
@@ -70,7 +78,8 @@ exports[`buttons PosButton creates a <button> element 1`] = `
   disabled={false}
   onClick={[Function]}
   title=""
-  type="button">
+  type="button"
+>
   
 </button>
 `;

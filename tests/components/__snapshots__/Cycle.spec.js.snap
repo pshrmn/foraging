@@ -1,12 +1,17 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
 exports[`Cycle calls setIndex when left button is clicked 1`] = `
-<div>
+<div
+  className="cycle"
+>
   <button
     className=""
     disabled={false}
     onClick={[Function]}
     title=""
-    type="button">
-    <
+    type="button"
+  >
+    &lt;
   </button>
   6
    / 
@@ -16,21 +21,25 @@ exports[`Cycle calls setIndex when left button is clicked 1`] = `
     disabled={false}
     onClick={[Function]}
     title=""
-    type="button">
-    >
+    type="button"
+  >
+    &gt;
   </button>
 </div>
 `;
 
 exports[`Cycle calls setIndex when right button is clicked 1`] = `
-<div>
+<div
+  className="cycle"
+>
   <button
     className=""
     disabled={false}
     onClick={[Function]}
     title=""
-    type="button">
-    <
+    type="button"
+  >
+    &lt;
   </button>
   6
    / 
@@ -40,21 +49,25 @@ exports[`Cycle calls setIndex when right button is clicked 1`] = `
     disabled={false}
     onClick={[Function]}
     title=""
-    type="button">
-    >
+    type="button"
+  >
+    &gt;
   </button>
 </div>
 `;
 
 exports[`Cycle create a Cycle component 1`] = `
-<div>
+<div
+  className="cycle"
+>
   <button
     className=""
     disabled={false}
     onClick={[Function]}
     title=""
-    type="button">
-    <
+    type="button"
+  >
+    &lt;
   </button>
   1
    / 
@@ -64,8 +77,9 @@ exports[`Cycle create a Cycle component 1`] = `
     disabled={false}
     onClick={[Function]}
     title=""
-    type="button">
-    >
+    type="button"
+  >
+    &gt;
   </button>
 </div>
 `;

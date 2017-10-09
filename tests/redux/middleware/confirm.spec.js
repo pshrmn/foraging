@@ -16,17 +16,12 @@ describe('confirmMiddleware', () => {
   const originalMock = window.confirm;
   beforeEach(() => {
     store = mockStore({
-      page: {
-        pages: [
-          undefined,
-          {
-            name: 'foo',
-            elements: [0,1]
-          }
-        ],
-        pageIndex: 1,
-        elementIndex: 0
-      }
+      pages: [
+        {
+          name: 'foo',
+          elements: [0,1]
+        }
+      ]
     });
     confirmMock = jest.fn()
   });
@@ -59,46 +54,6 @@ describe('confirmMiddleware', () => {
       window.confirm = confirmMock.mockReturnValue(false);
       store.dispatch({
         type: SYNC_PAGES
-      });
-      const [first] = store.getActions();
-      expect(first).toBeUndefined();
-    });
-  });
-
-  describe('REMOVE_PAGE', () => {
-    it('reaches store when window.confirm=true', () => {
-      window.confirm = confirmMock.mockReturnValue(true);
-      store.dispatch({
-        type: REMOVE_PAGE
-      });
-      const [first] = store.getActions();
-      expect(first.type).toBe(REMOVE_PAGE);
-    });
-
-    it('stops when window.confirm=false', () => {
-      window.confirm = confirmMock.mockReturnValue(false);
-      store.dispatch({
-        type: REMOVE_PAGE
-      });
-      const [first] = store.getActions();
-      expect(first).toBeUndefined();
-    });
-  });
-
-  describe('REMOVE_ELEMENT', () => {
-    it('reaches store when window.confirm=true', () => {
-      window.confirm = confirmMock.mockReturnValue(true);
-      store.dispatch({
-        type: REMOVE_ELEMENT
-      });
-      const [first] = store.getActions();
-      expect(first.type).toBe(REMOVE_ELEMENT);
-    });
-
-    it('stops when window.confirm=false', () => {
-      window.confirm = confirmMock.mockReturnValue(false);
-      store.dispatch({
-        type: REMOVE_ELEMENT
       });
       const [first] = store.getActions();
       expect(first).toBeUndefined();

@@ -2,7 +2,7 @@ export const validName = (name, takenNames = []) => {
   if ( name === null || name === '' ) {
     return false;
   }
-  const badCharacters = /[<>:'/|?*]/;
+  const badCharacters = /[<>:'/\\|?*]/;
   if ( name.match(badCharacters) !== null ) {
     return false;
   }

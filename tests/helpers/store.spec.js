@@ -2,9 +2,11 @@ import { currentElement, currentParent, takenNames } from 'helpers/store';
 
 describe('store', () => {
 
-  const pageStore = {
+  const fakeStore = {
+    response: {
+      params: { name: 'projects' }
+    },
     pages: [
-      null,
       {
         name: 'projects',
         elements: [
@@ -105,23 +107,21 @@ describe('store', () => {
           }
         ]
       }
-    ],
-    pageIndex: 1,
-    elementIndex: 0
-  }
+    ]
+  };
 
   let pageCopy;
   beforeEach(() => {
-    pageCopy = Object.assign({}, pageStore)
-  })
+    pageCopy = Object.assign({}, fakeStore);
+  });
 
   describe('currentElement', () => {
     it('returns the currently selected element', () => {
       const index = 1;
-      pageCopy.elementIndex = index;
+      pageCopy.response.params.index = index;
       const current = currentElement(pageCopy);
       expect(current.index).toBe(index);
-    })
+    });
   });
 
   describe('currentParent', () => {
@@ -133,7 +133,7 @@ describe('store', () => {
       ];
       pairs.forEach(p => {
         const {index, parent} = p;
-        pageCopy.elementIndex = index;
+        pageCopy.response.params.index = index;
         const element = currentParent(pageCopy);
         if ( parent !== null ) {
           expect(element.index).toBe(parent);
@@ -152,7 +152,7 @@ describe('store', () => {
       ];
       pairs.forEach(p => {
         const {index, names} = p;
-        pageCopy.elementIndex = index;
+        pageCopy.response.params.index = index;
         const levelNames = takenNames(pageCopy);
         const sameNames = levelNames.every((n,i) => n === names[i])
         expect(sameNames).toBe(true);

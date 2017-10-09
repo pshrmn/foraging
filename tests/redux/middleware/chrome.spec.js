@@ -27,17 +27,13 @@ describe('chromeMiddleware', () => {
   let store;
   beforeEach(() => {
     store = mockStore({
-      page: {
-        pages: [
-          undefined,
-          {
-            name: 'foo',
-            elements: [0,1]
-          }
-        ],
-        pageIndex: 1,
-        elementIndex: 0
-      }
+      response: { params: { name: 'foo' }},
+      pages: [
+        {
+          name: 'foo',
+          elements: [0,1]
+        }
+      ]
     });
   });
 
@@ -62,7 +58,9 @@ describe('chromeMiddleware', () => {
   describe('RENAME_PAGE', () => {
     it('calls chrome.rename', () => {
       store.dispatch({
-        type: RENAME_PAGE
+        type: RENAME_PAGE,
+        name: 'test',
+        oldName: 'foo'
       });
       const [first] = store.getActions();
       expect(first.type).toBe(RENAME_PAGE);
@@ -78,15 +76,6 @@ describe('chromeMiddleware', () => {
       const [first] = store.getActions();
       expect(first.type).toBe(REMOVE_PAGE);
       expect(chrome.remove.mock.calls.length).toBe(1);
-    });
-  });
-
-  describe('UPLOAD_PAGE', () => {
-    it('calls chrome.upload', () => {
-      store.dispatch({
-        type: UPLOAD_PAGE
-      });
-      expect(chrome.upload.mock.calls.length).toBe(1);
     });
   });
 
@@ -106,61 +95,6 @@ describe('chromeMiddleware', () => {
       });
       const [first] = store.getActions();
       expect(first.type).toBe(ADD_PAGE);
-      expect(chrome.save.mock.calls.length).toBe(1);
-    });
-  });
-
-  describe('SAVE_ELEMENT', () => {
-    it('calls chrome.save', () => {
-      store.dispatch({
-        type: SAVE_ELEMENT
-      });
-      const [first] = store.getActions();
-      expect(first.type).toBe(SAVE_ELEMENT);
-      expect(chrome.save.mock.calls.length).toBe(1);
-    });
-  });
-
-  describe('REMOVE_ELEMENT', () => {
-    it('calls chrome.save', () => {
-      store.dispatch({
-        type: REMOVE_ELEMENT
-      });
-      const [first] = store.getActions();
-      expect(first.type).toBe(REMOVE_ELEMENT);
-      expect(chrome.save.mock.calls.length).toBe(1);
-    });
-  });
-
-  describe('UPDATE_ELEMENT', () => {
-    it('calls chrome.save', () => {
-      store.dispatch({
-        type: UPDATE_ELEMENT
-      });
-      const [first] = store.getActions();
-      expect(first.type).toBe(UPDATE_ELEMENT);
-      expect(chrome.save.mock.calls.length).toBe(1);
-    });
-  });
-
-  describe('SAVE_RULE', () => {
-    it('calls chrome.save', () => {
-      store.dispatch({
-        type: SAVE_RULE
-      });
-      const [first] = store.getActions();
-      expect(first.type).toBe(SAVE_RULE);
-      expect(chrome.save.mock.calls.length).toBe(1);
-    });
-  });
-
-  describe('REMOVE_RULE', () => {
-    it('calls chrome.save', () => {
-      store.dispatch({
-        type: REMOVE_RULE
-      });
-      const [first] = store.getActions();
-      expect(first.type).toBe(REMOVE_RULE);
       expect(chrome.save.mock.calls.length).toBe(1);
     });
   });
