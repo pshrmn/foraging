@@ -3,19 +3,34 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Link } from '@curi/react';
 
+import { NegButton } from 'components/common/Buttons';
+import { closeForager } from 'actions';
+
 /* eslint-disable no-process-env */
 const DEBUG = process.env.NODE_ENV !== 'production';
 /* eslint-enable no-process-env */
 
-const TopBar = ({ response, children } ) => {
+const TopBar = ({ response, children, closeForager } ) => {
   const pathname = response
     ? response.location.pathname
     : 'loading...';
   return (
     <div className='topbar'>
-      <div>
-        <Link to='Home' anchor='button'>Forager</Link>
-        {children}
+      <div className='controls'>
+        <div className='page-controls'>
+          <Link to='Home' anchor='button'>Forager</Link>
+          {children}
+        </div>
+        <div className='app-controls'>
+          <NegButton
+            text={String.fromCharCode(215)}
+            classes={['transparent']}
+            click={() => {
+              document.body.classList.remove('foraging');
+              closeForager();
+            }}
+          />
+        </div>
       </div>
       {DEBUG
         ? <div className='address-bar'>
@@ -29,9 +44,13 @@ const TopBar = ({ response, children } ) => {
 
 TopBar.propTypes = {
   response: PropTypes.object,
-  children: PropTypes.any
+  children: PropTypes.any,
+  closeForager: PropTypes.func
 };
 
 export default connect(
-  state => ({ response: state.response })
+  state => ({ response: state.response }),
+  {
+    closeForager
+  }
 )(TopBar);
