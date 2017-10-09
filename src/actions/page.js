@@ -54,13 +54,6 @@ export const refreshMatches = () => ({
 /*
  * ELEMENT/RULE ACTIONS
  */
-// update the properties of the element at index
-export const updateElement = (index, newProps) => ({
-  type: types.UPDATE_ELEMENT,
-  index,
-  newProps
-});
-
 export const saveRule = rule => ({
   type: types.SAVE_RULE,
   rule

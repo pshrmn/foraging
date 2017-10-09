@@ -8,7 +8,6 @@ import { setMatches } from 'actions';
 export default store => next => action => {
   const selectActions = [
     types.SELECT_PAGE,
-    types.UPDATE_ELEMENT,
     types.UPDATE_PAGE,
     types.REFRESH_MATCHES
   ];
@@ -20,7 +19,6 @@ export default store => next => action => {
   switch ( action.type ) {
   // casting a wide net and reselecting everything
   case types.SELECT_PAGE:
-  case types.UPDATE_ELEMENT:
   case types.UPDATE_PAGE:
   case types.REFRESH_MATCHES:
     var result = next(action);

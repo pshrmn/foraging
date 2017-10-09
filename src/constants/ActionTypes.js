@@ -14,7 +14,6 @@ export const UPDATE_PAGE = 'UPDATE_PAGE';
 export const SET_MATCHES = 'SET_MATCHES';
 export const REFRESH_MATCHES = 'REFRESH_MATCHES';
 
-export const UPDATE_ELEMENT = 'UPDATE_ELEMENT';
 export const SAVE_RULE = 'SAVE_RULE';
 export const REMOVE_RULE = 'REMOVE_RULE';
 export const UPDATE_RULE = 'UPDATE_RULE';

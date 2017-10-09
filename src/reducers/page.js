@@ -101,37 +101,6 @@ export default function page(state = {}, action) {
       })
     });
 
-  case types.UPDATE_ELEMENT:
-    var { pages, current, elementIndex } = state;
-    var currentPage = pages.map(p => p.name === current);
-
-    var { index, newProps } = action;
-
-    // don't actually update the 0th Element (body)
-    if ( index === 0 ) {
-      return state;
-    }
-
-    return Object.assign({}, state, {
-      pages: pages.map(p => {
-        if (p.name !== current) {
-          return p;
-        }
-        return {
-          ...p,
-          elements: currentPage.elements.map(e => {
-            if ( e === null ) {
-              return null;
-            } else if ( e.index !== index ) {
-              return e;
-            } else {
-              return Object.assign({}, e, newProps);
-            }
-          })
-        };
-      })
-    });
-
   case types.SAVE_RULE:
     var { pages, current, elementIndex } = state;
     var { rule } = action;
