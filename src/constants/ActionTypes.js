@@ -11,8 +11,6 @@ export const UPDATE_PAGE = 'UPDATE_PAGE';
 
 // set the matches property of multiple elements
 export const REFRESH_MATCHES = 'REFRESH_MATCHES';
-
-export const SAVE_RULE = 'SAVE_RULE';
 export const REMOVE_RULE = 'REMOVE_RULE';
 export const UPDATE_RULE = 'UPDATE_RULE';
 

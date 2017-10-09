@@ -4,6 +4,7 @@ import Page from 'route-components/Page';
 import Preview from 'route-components/Preview';
 import AddSelector from 'route-components/AddSelector';
 import EditSelector from 'route-components/EditSelector';
+import AddRule from 'route-components/AddRule';
 
 export default [
   {
@@ -35,6 +36,11 @@ export default [
         name: 'Edit Selector',
         path: 'edit/:index',
         body: () => EditSelector
+      },
+      {
+        name: 'Add Rule',
+        path: 'add-rule/:index',
+        body: () => AddRule
       }
     ]
   }

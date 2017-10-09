@@ -42,11 +42,6 @@ export const refreshMatches = () => ({
 /*
  * ELEMENT/RULE ACTIONS
  */
-export const saveRule = rule => ({
-  type: types.SAVE_RULE,
-  rule
-});
-
 export const removeRule = index => ({
   type: types.REMOVE_RULE,
   index

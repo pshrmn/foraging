@@ -59,7 +59,7 @@ class ChooseAttribute extends React.Component {
   render() {
     const { attribute, error } = this.state;
     const { staticData } = this.props;
-    const { element } = staticData;
+    const { current } = staticData;
 
     return (
       <form className='info-box'>
@@ -69,7 +69,7 @@ class ChooseAttribute extends React.Component {
           </h3>
           <ul>
             {
-              attributes(element).map((a,i) => (
+              attributes(current).map((a,i) => (
                 <li key={i}>
                   <label>
                     <input

@@ -53,6 +53,9 @@ class Page extends React.Component {
 
   render() {
     const { response: { params } } = this.props;
+    if (!this.props.page) {
+      return null;
+    }
     return (
       <div className='frame'>
         <h1>Page {params.name}</h1>

@@ -108,16 +108,14 @@ ChooseName.propTypes = {
 };
 
 export default connect(
-  state => {
-    const { page } = state;
-    const { pages, pageIndex, elementIndex } = page;
-    const currentPage = pages[pageIndex];
+  (state, ownProps) => {
+    const { page, element } = ownProps.staticData;
     /*
      * NOTE: this is different than other takenNames because it wants
      * the names within the current element
      */
     return {
-      takenNames: levelNames(currentPage.elements, elementIndex)
+      takenNames: levelNames(page.elements, element.index)
     };
   },
   {

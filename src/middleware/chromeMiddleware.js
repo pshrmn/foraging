@@ -77,7 +77,6 @@ export default fullStore => next => action => {
   // so that we are saving the updated state of the store
   case ActionTypes.ADD_PAGE:
   case ActionTypes.UPDATE_PAGE:
-  case ActionTypes.SAVE_RULE:
   case ActionTypes.REMOVE_RULE:
     const retVal = next(action);
     const newState = fullStore.getState();

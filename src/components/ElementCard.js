@@ -28,6 +28,8 @@ function ElementCard(props) {
     );
   }
 
+  const params = { name: page.name, index: element.index };
+
   return (
     <div className='info-box'>
       <div className='info'>
@@ -36,8 +38,9 @@ function ElementCard(props) {
       <div className='buttons'>
         <Link
           to='Add Selector'
-          params={{ name: page.name, index: element.index }}
+          params={params}
           anchor='button'
+          className='pos'
         >
           Add Child
         </Link>
@@ -60,13 +63,21 @@ function ElementCard(props) {
           element.index !== 0
             ? <Link
               to='Edit Selector'
-              params={{ name: page.name, index: element.index }}
+              params={params}
               anchor='button'
             >
               Edit
             </Link>
             : null
         }
+        <Link
+          to='Add Rule'
+          params={params}
+          anchor='button'
+          className='pos'
+        >
+          Add Rule
+        </Link>
       </div>
     </div>
   );

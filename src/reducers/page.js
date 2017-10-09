@@ -63,30 +63,6 @@ export default function page(state = {}, action) {
       })
     });
 
-  case types.SAVE_RULE:
-    var { pages, current, elementIndex } = state;
-    var { rule } = action;
-
-    var currentPage = pages.find(p => p.name === current);
-
-    return Object.assign({}, state, {
-      pages: pages.map(p => {
-        if (p.name !== current) {
-          return p;
-        }
-        return {
-          ...p,
-          elements: currentPage.elements.map(s => {
-            // set the new name for the element matching elementIndex
-            if ( s !== null && s.index === elementIndex ) {
-              s.rules = s.rules.concat([rule]);
-            }
-            return s;
-          })
-        };
-      })
-    });
-
   case types.REMOVE_RULE:
     var { pages, current, elementIndex } = state;
     var { index } = action;

@@ -19,7 +19,7 @@ const Cycle = ({ index, count, setIndex }) => {
   const nextIndex = (index+1) % count;
   const prevIndex = ((index-1) + count) % count;
   return (
-    <div>
+    <div className='cycle'>
       <NeutralButton
         click={() => { setIndex(prevIndex); }}
         text='<'
