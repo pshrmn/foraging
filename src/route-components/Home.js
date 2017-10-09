@@ -26,5 +26,5 @@ Home.propTypes = {
 };
 
 export default connect(
-  state => ({ pages: state.page.pages })
+  state => ({ pages: state.pages })
 )(Home);

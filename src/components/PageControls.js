@@ -88,9 +88,8 @@ PageControls.propTypes = {
 
 export default curious(connect(
   state => {
-    const { response } = state;
+    const { response, pages } = state;
     const current = response.params.name;
-    const { pages } = state.page;
     return {
       pages: pages,
       page: pages.find(p => p.name === current)

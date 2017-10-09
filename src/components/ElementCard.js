@@ -94,7 +94,7 @@ ElementCard.propTypes = {
 
 export default connect(
   (state, ownProps) => {
-    const page = state.page.pages.find(p => p.name === state.response.params.name);
+    const page = state.pages.find(p => p.name === state.response.params.name);
     return {
       element: page.elements[ownProps.index]
     };

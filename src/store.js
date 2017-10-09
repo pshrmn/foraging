@@ -2,23 +2,20 @@ import { createStore, combineReducers, applyMiddleware } from 'redux';
 import { messages, messagesMiddleware } from 'expiring-redux-messages';
 import { responseReducer } from '@curi/redux';
 
-import { show, page } from 'reducers';
+import { show, pages } from 'reducers';
 import chromeMiddleware from 'middleware/chromeMiddleware';
 import confirmMiddleware from 'middleware/confirmMiddleware';
 
 const reducer = combineReducers({
   show,
-  page,
+  pages,
   messages,
   response: responseReducer
 });
 
 const initialState = {
   show: true,
-  page: {
-    pages: [],
-    current: undefined
-  },
+  pages: [],
   messages: []
 };
 

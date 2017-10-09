@@ -36,10 +36,10 @@ export function takenNames(state) {
 }
 
 export function currentPage(state) {
-  const { page, response } = state;
+  const { pages, response } = state;
   const { name } = response.params;
   if (!name) {
     return;
   }
-  return page.pages.find(p => p.name === name);
+  return pages.find(p => p.name === name);
 }

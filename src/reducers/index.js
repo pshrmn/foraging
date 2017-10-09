@@ -1,4 +1,4 @@
 import show from './show';
-import page from './page';
+import pages from './pages';
 
-export { show, page };
+export { show, pages };

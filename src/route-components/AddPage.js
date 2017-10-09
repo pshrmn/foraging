@@ -74,9 +74,8 @@ AddPage.propTypes = {
 
 export default curious(connect(
   state => {
-    const { pages } = state.page;
     return {
-      takenNames: pages.map(p => p.name)
+      takenNames: state.pages.map(p => p.name)
     };
   },
   {

@@ -56,7 +56,7 @@ export default connect(
   (state, ownProps) => {
     const { name } = state.response.params;
     const { index } = ownProps.params;
-    const { pages } = state.page;
+    const { pages } = state;
     const page = pages.find(p => p.name === name);
     const element = page.elements[index];
     return {
