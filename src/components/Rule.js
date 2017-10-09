@@ -19,6 +19,8 @@ function Rule(props) {
     element
   } = props;
 
+  const canEdit = element.matches.length !== 0;
+
   return (
     <li className='rule'>
       <span className='rule-name' title='name'>{name}</span>
@@ -28,6 +30,8 @@ function Rule(props) {
         to='Edit Rule'
         params={{ ...params, ruleIndex: index }}
         anchor='button'
+        disabled={!canEdit}
+        title={canEdit ? 'Edit the rule' : 'Cannot edit the rule because no elements in the current page match this element.'}
       >
         Edit
       </Link>
