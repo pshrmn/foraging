@@ -59,8 +59,6 @@ class Page extends React.Component {
           <ElementCard
             element={this.state.element}
             page={this.props.page}
-            params={params}
-            index={this.state.index}
             select={this.select}
           />
         </div>

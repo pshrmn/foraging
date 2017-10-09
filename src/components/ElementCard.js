@@ -14,9 +14,8 @@ import { removeElement } from 'helpers/page';
 function ElementCard(props) {
   const {
     element,
-    active = true,
-    params: { name },
-    index
+    page,
+    active = true
   } = props;
 
   //const isRoot = element.index === 0;
@@ -37,7 +36,7 @@ function ElementCard(props) {
       <div className='buttons'>
         <Link
           to='Add Selector'
-          params={{ name, index }}
+          params={{ name: page.name, index: element.index }}
           anchor='button'
         >
           Add Child
@@ -65,8 +64,6 @@ function ElementCard(props) {
 ElementCard.propTypes = {
   element: PropTypes.object,
   page: PropTypes.object,
-  params: PropTypes.object,
-  index: PropTypes.number,
   active: PropTypes.bool,
   select: PropTypes.func,
   /* connect */

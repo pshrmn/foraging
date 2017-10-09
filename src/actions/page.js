@@ -73,11 +73,6 @@ export const updateElement = (index, newProps) => ({
   newProps
 });
 
-// remove the currently selected element selector
-export const removeElement = () => ({
-  type: types.REMOVE_ELEMENT
-});
-
 export const saveRule = rule => ({
   type: types.SAVE_RULE,
   rule

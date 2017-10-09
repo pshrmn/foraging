@@ -173,59 +173,6 @@ export default function page(state = {}, action) {
       })
     });
 
-  case types.REMOVE_ELEMENT:
-    var { pages, current, elementIndex } = state;
-    // elementIndex will be the parent index
-    var currentPage = pages.find(p => p.name === current);
-    var currentSelector = currentPage.elements[elementIndex];
-
-    // clear everything else out, but don't remove the body selector
-    if ( elementIndex === 0 ) {
-      const cleanedBody = Object.assign({}, currentPage.elements[0], {
-        childIndices: []
-      });
-      return Object.assign({}, state, {
-        pages: pages.map(p => {
-          if (p.name !== current) {
-            return p;
-          }
-          return {
-            ...p,
-            element: [cleanedBody]
-          };
-        }),
-        elementIndex: 0
-      });
-    }
-
-    // index values of elements that should be removed
-    let removeIndex = [elementIndex];
-    let newElementIndex = currentPage.elements[elementIndex].parent || 0;
-    var updatedPage = Object.assign({}, currentPage, {
-      elements: currentPage.elements.map(s => {
-        if ( s === null ) {
-          return null;
-        }
-        // remove any elements being removed from child indices
-        s.childIndices = s.childIndices.filter(c => {
-          return !removeIndex.includes(c);
-        });
-        if ( removeIndex.includes(s.index) ) {
-          // if removing the selector element, remove any of its children
-          // as well
-          removeIndex = removeIndex.concat(s.childIndices);
-          // replace with null so we don't have to recalculate references
-          return null;
-        }
-        return s;
-      })
-    });
-
-    return Object.assign({}, state, {
-      pages: pages.map(p => p.name === current ? updatedPage : p),
-      elementIndex: newElementIndex
-    });
-
   case types.SAVE_RULE:
     var { pages, current, elementIndex } = state;
     var { rule } = action;
