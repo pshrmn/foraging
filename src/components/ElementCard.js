@@ -6,7 +6,7 @@ import { Link } from '@curi/react';
 import Element from 'components/Element';
 import { NegButton } from 'components/common/Buttons';
 import { updatePage } from 'actions';
-
+import { removeElement } from 'helpers/page';
 
 /*
  * An ElementCard is used to display a selector Element and its control functions
@@ -51,47 +51,7 @@ function ElementCard(props) {
               : `Are you sure you want to delete the element "${element.selector}"?`;
             const confirmed = window.confirm(confirmMessage);
             if (confirmed) {
-
-              // currentPage = page
-              // currentSelector = element
-
-              let newPage;
-              let newElementIndex = 0;
-              // clear everything else out, but don't remove the body selector
-              if ( element.index === 0 ) {
-                newPage = {
-                  ...page,
-                  elements: [{
-                    ...element,
-                    childIndices: []
-                  }]
-                };
-              } else {
-                // index values of elements that should be removed
-                let removeIndex = [element.index];
-                newElementIndex = page.elements[element.index].parent || 0;
-
-                newPage = {
-                  ...page,
-                  elements: page.elements.map(s => {
-                    if ( s === null ) {
-                      return null;
-                    }
-                    // remove any elements being removed from child indices
-                    s.childIndices = s.childIndices.filter(c => {
-                      return !removeIndex.includes(c);
-                    });
-                    if ( removeIndex.includes(s.index) ) {
-                      // if removing the selector element, remove any of its children
-                      // as well
-                      removeIndex = removeIndex.concat(s.childIndices);
-                      // replace with null so we don't have to recalculate references
-                      return null;
-                    }
-                    return s;
-                  })
-                };
-              }
+              const { newPage, newElementIndex } = removeElement(page, element);
               updatePage(newPage);
               select(newElementIndex);
             }
