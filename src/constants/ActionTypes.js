@@ -20,16 +20,6 @@ export const SAVE_RULE = 'SAVE_RULE';
 export const REMOVE_RULE = 'REMOVE_RULE';
 export const UPDATE_RULE = 'UPDATE_RULE';
 
-/* frame */
-// the app is made up of frames,
-// the following action types show specific frames
-export const SHOW_ELEMENT_FRAME = 'SHOW_ELEMENT_FRAME';
-export const SHOW_ELEMENT_WIZARD = 'SHOW_ELEMENT_WIZARD';
-export const SHOW_EDIT_ELEMENT_WIZARD = 'SHOW_EDIT_ELEMENT_WIZARD';
-export const SHOW_RULE_WIZARD = 'SHOW_RULE_WIZARD';
-export const SHOW_EDIT_RULE_WIZARD = 'SHOW_EDIT_RULE_WIZARD';
-export const SHOW_PREVIEW = 'SHOW_PREVIEW';
-
 /* general */
 // open and close the app
 export const CLOSE_FORAGER = 'CLOSE_FORAGER';

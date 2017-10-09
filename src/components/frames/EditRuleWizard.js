@@ -12,7 +12,7 @@ import {
 } from 'components/steps/rule';
 import Cycle from 'components/common/Cycle';
 
-import { updateRule, showElementFrame } from 'actions';
+import { updateRule } from 'actions';
 import { highlight, unhighlight} from 'helpers/markup';
 import { currentElement } from 'helpers/store';
 import { currentSelector } from 'constants/CSSClasses';
@@ -50,7 +50,6 @@ class EditRuleWizard extends React.Component {
   }
 
   cancel() {
-    this.props.cancel();
   }
 
   render() {
@@ -109,21 +108,19 @@ class EditRuleWizard extends React.Component {
 
 EditRuleWizard.propTypes = {
   updateRule: PropTypes.func.isRequired,
-  cancel: PropTypes.func.isRequired,
   current: PropTypes.object,
   ruleIndex: PropTypes.number
 };
 
 export default connect(
   state => {
-    const { page, frame } = state;
+    const { page } = state;
     return {
       current: currentElement(page),
-      ruleIndex: frame.index
+      ruleIndex: 0
     };
   },
   {
-    updateRule,
-    cancel: showElementFrame
+    updateRule
   }
 )(EditRuleWizard);

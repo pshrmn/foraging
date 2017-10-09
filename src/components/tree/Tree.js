@@ -120,13 +120,13 @@ Tree.propTypes = {
 
 export default connect(
   state => {
-    const { response, page, frame } = state;
+    const { response, page } = state;
     const { name } = response.params;
     const { pages, elementIndex } = page;
     const currentPage = pages.find(p => p.name === name);
     return {
       page: currentPage,
-      active: frame.name === 'element',
+      active: response.name === 'Page',
       elementIndex
     };
   },

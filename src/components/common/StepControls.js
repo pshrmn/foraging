@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { PosButton, NegButton } from 'components/common/Buttons';
 
 /*
- * Controls are a set of buttons used by frames to either:
+ * Controls are a set of buttons used to either:
  *  1. advance to the next step
  *  2. go back to the previous step
  *  3. cancel out of the current cycle of steps

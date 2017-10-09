@@ -11,7 +11,7 @@ import {
   ConfirmUpdate
 } from 'components/steps/element';
 
-import { updateElement, showElementFrame } from 'actions';
+import { updateElement } from 'actions';
 import { currentElement, currentParent } from 'helpers/store';
 const steps = [
   Type,
@@ -30,7 +30,7 @@ class EditElementWizard extends React.Component {
   constructor(props) {
     super(props);
     this.save = this.save.bind(this);
-    this.cancel = this.cancel.bind(this);
+    //this.cancel = this.cancel.bind(this);
   }
 
   save(newProps) {
@@ -43,7 +43,7 @@ class EditElementWizard extends React.Component {
   }
 
   cancel() {
-    this.props.cancel();
+    // this.props.cancel();
   }
 
   render() {
@@ -74,8 +74,7 @@ class EditElementWizard extends React.Component {
 EditElementWizard.propTypes = {
   current: PropTypes.object,
   parent: PropTypes.object,
-  updateElement: PropTypes.func.isRequired,
-  cancel: PropTypes.func.isRequired
+  updateElement: PropTypes.func.isRequired
 };
 
 export default connect(
@@ -87,7 +86,6 @@ export default connect(
     };
   },
   {
-    updateElement,
-    cancel: showElementFrame
+    updateElement
   }
 )(EditElementWizard);
