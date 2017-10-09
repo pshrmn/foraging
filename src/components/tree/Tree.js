@@ -26,14 +26,11 @@ class Tree extends React.Component {
   constructor(props) {
     super(props);
     this._makeNodes = this._makeNodes.bind(this);
-  }
 
-  componentWillMount() {
     const { width, height } = this.props;
-    this.setState({
-      // tree layout
+    this.state = {
       tree: tree().size([height, width])
-    });
+    };
   }
 
   _makeNodes() {

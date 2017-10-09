@@ -27,6 +27,7 @@ class ChooseElement extends React.Component {
     if ( allSelect(parent.matches) ) {
       selectors.push(['option']);
     }
+
     this.state = {
       // the index of the selected selector
       checked: undefined,
@@ -46,6 +47,8 @@ class ChooseElement extends React.Component {
     this.setRadio = this.setRadio.bind(this);
     this.nextHandler = this.nextHandler.bind(this);
     this.cancelHandler = this.cancelHandler.bind(this);
+
+    this.addEvents(staticData);
   }
 
   mouseover(event) {
@@ -162,11 +165,6 @@ class ChooseElement extends React.Component {
   /*
    * below here are the functions for interacting with the non-Forager part of the page
    */
-  componentWillMount() {
-    const { staticData } = this.props;
-    this.addEvents(staticData);
-  }
-
   componentWillReceiveNewProps(nextProps) {
     const { staticData } = nextProps;
     this.addEvents(staticData);

@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { curious } from '@curi/react';
 
-import Tree from 'components/Tree';
 import Wizard from 'simple-wizard-component';
 import {
   Elements,
@@ -13,7 +13,7 @@ import {
   ConfirmElement
 } from 'components/steps/element';
 
-import { saveElement, showElementFrame } from 'actions';
+import { saveElement } from 'actions';
 import { highlight, unhighlight} from 'helpers/markup';
 import { currentElement } from 'helpers/store';
 import { currentSelector } from 'constants/CSSClasses';
@@ -41,40 +41,45 @@ class ElementWizard extends React.Component {
   }
 
   save(ele) {
-    this.props.saveElement(ele);
+    const { curi, response, saveElement } = this.props;
+
+    saveElement(ele);
+    const { name } = response.params;
+    const pathname = curi.addons.pathname('Page', { name });
+    curi.history.push(pathname);
   }
 
   cancel() {
-    this.props.cancel();
+    const { curi, response } = this.props;
+    const { name } = response.params;
+    const pathname = curi.addons.pathname('Page', { name });
+    curi.history.push(pathname);
   }
 
   render() {
     const { current } = this.props;
 
     return (
-      <div className='frame'>
-        <Tree />
-        <Wizard
-          steps={steps}
-          initialData={{}}
-          staticData={{
-            parent: current
-          }}
-          save={this.save}
-          cancel={this.cancel}
-        />
-      </div>
+      <Wizard
+        steps={steps}
+        initialData={{}}
+        staticData={{
+          parent: current
+        }}
+        save={this.save}
+        cancel={this.cancel}
+      />
     );
   }
 
-  componentWillMount() {
+  componentDidMount() {
     const { current } = this.props;
     highlight(current.matches, currentSelector);
   }
 
-  componentWillUpdate(nextProps) {
+  componentDidUpdate() {
     unhighlight(currentSelector);
-    const { current } = nextProps;
+    const { current } = this.props;
     highlight(current.matches, currentSelector);
   }
 
@@ -84,12 +89,15 @@ class ElementWizard extends React.Component {
 }
 
 ElementWizard.propTypes = {
+  /* curious */
+  curi: PropTypes.object,
+  response: PropTypes.object,
+  /* connect */
   current: PropTypes.object,
   saveElement: PropTypes.func.isRequired,
-  cancel: PropTypes.func.isRequired
 };
 
-export default connect(
+export default curious(connect(
   state => {
     const { page } = state;
     return {
@@ -97,7 +105,6 @@ export default connect(
     };
   },
   {
-    saveElement,
-    cancel: showElementFrame
+    saveElement
   }
-)(ElementWizard);
+)(ElementWizard));

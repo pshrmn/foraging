@@ -20,9 +20,7 @@ function pageNames(pages) {
 
 class PageControls extends React.Component {
   handleDelete = () => {
-    /* eslint-disable no-console */
     const { curi, removePage, page } = this.props;
-    console.log("DELETE", this.props);
     const confirmed = window.confirm(`Are you sure you want to delete the page "${page.name}"?`);
     if (confirmed) {
       const pathname = curi.addons.pathname('Home');
@@ -32,9 +30,6 @@ class PageControls extends React.Component {
   }
 
   handleRename = () => {
-    /* eslint-disable no-console */
-    console.log('renaming the page');
-
     const name = promptName();
     const { pages, showMessage, renamePage, curi } = this.props;
     // do nothing if the user cancels, does not enter a name, or enter the same name as the current one

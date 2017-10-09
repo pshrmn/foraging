@@ -79,8 +79,6 @@ export default fullStore => next => action => {
   case ActionTypes.UPDATE_ELEMENT:
   case ActionTypes.SAVE_RULE:
   case ActionTypes.REMOVE_RULE:
-    /* eslint-disable no-console */
-    console.log("CHROME MIDDLEWARE", action);
     const retVal = next(action);
     const newState = fullStore.getState();
     const { page: newPageObj } = newState;

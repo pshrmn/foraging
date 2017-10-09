@@ -61,14 +61,14 @@ class ChooseOptional extends React.Component {
     );
   }
 
-  componentWillMount() {
+  componentDidMount() {
     highlightElements(this.props, this.state, this.props.highlightClass);
   }
 
-  componentWillUpdate(nextProps, nextState) {
+  componentDidUpdate(prevProps) {
     // remove the highlight based on previous highlightClass
-    unhighlight(this.props.highlightClass);
-    highlightElements(nextProps, nextState, nextProps.highlightClass);
+    unhighlight(prevProps.highlightClass);
+    highlightElements(this.props, this.state, this.props.highlightClass);
   }
 
   componentWillUnmount() {

@@ -4,9 +4,9 @@ import { levelNames } from 'helpers/page';
  * returns the currently selected element
  */
 export function currentElement(page) {
-  const { pages, pageIndex, elementIndex } = page;
-  const currentPage = pages[pageIndex];
-  return currentPage === undefined ? undefined : currentPage.elements[elementIndex];
+  const { pages, current, elementIndex } = page;
+  const currentPage = pages.find(p => p.name === current);
+  return currentPage && currentPage.elements[elementIndex];
 }
 
 /*
@@ -14,10 +14,10 @@ export function currentElement(page) {
  * or undefined if either the current element does not exist
  */
 export function currentParent(page) {
-  const { pages, pageIndex, elementIndex } = page;
-  const currentPage = pages[pageIndex];
-  const current = currentPage === undefined ? undefined : currentPage.elements[elementIndex];
-  return current === undefined ? undefined : currentPage.elements[current.parent];
+  const { pages, current, elementIndex } = page;
+  const currentPage = pages.find(p => p.name === current);
+  const currentElement = currentPage && currentPage.elements[elementIndex];
+  return currentElement && currentPage.elements[currentElement.parent];
 }
 
 /*
@@ -25,8 +25,9 @@ export function currentParent(page) {
  * the current element
  */
 export function takenNames(page) {
-  const current = currentElement(page);
-  const index = current.parent !== null ? current.parent : page.elementIndex;
-  const currentPage = page.pages[page.pageIndex].elements;
-  return levelNames(currentPage, index);
+  const { pages, current, elementIndex } = page;
+  const currentEle = currentElement(page);
+  const index = currentEle !== null ? currentEle.parent : elementIndex;
+  const currentPageElements = pages.find(p => p.name === current).elements;
+  return levelNames(currentPageElements, index);
 }

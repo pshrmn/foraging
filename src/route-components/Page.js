@@ -10,7 +10,7 @@ import { highlight, unhighlight } from 'helpers/markup';
 import { currentSelector } from 'constants/CSSClasses';
 
 class Page extends React.Component {
-  componentWillMount() {
+  componentDidMount() {
     unhighlight(currentSelector);
     if ( this.props.element ) {
       highlight(this.props.element.matches, currentSelector);

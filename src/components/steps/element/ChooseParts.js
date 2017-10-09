@@ -22,10 +22,16 @@ function setupHighlights(cssSelector, matches) {
 class ChooseParts extends React.Component {
   constructor(props) {
     super(props);
+
+    const { startData, staticData } = this.props;
+    const { parts } = startData;
+    const { parent } = staticData;
+    const fullSelector = parts.join('');
+
     this.state = {
-      parts: [],
-      eleCount: 0,
-      error: true
+      parts: parts.map(name => ({name: name, checked: true})),
+      eleCount: count(parent.matches, fullSelector),
+      error: false
     };
 
     this.nextHandler = this.nextHandler.bind(this);
@@ -77,20 +83,6 @@ class ChooseParts extends React.Component {
     });
   }
 
-  componentWillMount() {
-    const { startData, staticData } = this.props;
-    const { parts } = startData;
-    const { parent } = staticData;
-    const fullSelector = parts.join('');
-
-    setupHighlights(fullSelector, parent.matches);
-    this.setState({
-      parts: parts.map(name => ({name: name, checked: true})),
-      eleCount: count(parent.matches, fullSelector),
-      error: false
-    });
-  }
-
   render() {
     const { parts, eleCount, error } = this.state;
     const opts = parts.map((part, index) => {
@@ -127,6 +119,14 @@ class ChooseParts extends React.Component {
         />
       </form>
     );
+  }
+
+  componentDidMount() {
+    const { startData, staticData } = this.props;
+    const { parts } = startData;
+    const { parent } = staticData;
+    const fullSelector = parts.join('');
+    setupHighlights(fullSelector, parent.matches);
   }
 
   componentWillUnmount() {

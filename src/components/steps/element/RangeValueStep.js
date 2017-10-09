@@ -134,13 +134,13 @@ class RangeValueStep extends React.Component {
     );
   }
 
-  componentWillMount() {
+  componentDidMount() {
     highlightElements(this.props, this.state, this.props.highlightClass);
   }
 
-  componentWillUpdate(nextProps, nextState) {
-    unhighlight(this.props.highlightClass);
-    highlightElements(nextProps, nextState, this.props.highlightClass);
+  componentDidUpdate(prevProps) {
+    unhighlight(prevProps.highlightClass);
+    highlightElements(this.props, this.state, this.props.highlightClass);
   }
 
   componentWillUnmount() {

@@ -33,8 +33,6 @@ export default function page(state = {}, action) {
       ...pages,
       action.page
     ];
-    /* eslint-disable no-console */
-    console.log("NEW PAGES", newPages);
     return Object.assign({}, state, {
       pages: newPages,
       current: action.page.name,

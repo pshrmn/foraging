@@ -80,7 +80,7 @@ class ChooseType extends React.Component {
     );
   }
 
-  componentWillMount() {
+  componentDidMount() {
     const {
       highlight,
       highlightClass
@@ -88,13 +88,13 @@ class ChooseType extends React.Component {
     highlight(this.props, this.state, highlightClass);
   }
 
-  componentWillUpdate(nextProps, nextState) {
-    unhighlight(this.props.highlightClass);
+  componentDidUpdate(prevProps) {
+    unhighlight(prevProps.highlightClass);
     const {
       highlight,
       highlightClass
-    } = nextProps;
-    highlight(nextProps, nextState, highlightClass);
+    } = this.props;
+    highlight(this.props, this.state, highlightClass);
   }
 
   componentWillUnmount() {

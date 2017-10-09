@@ -87,14 +87,8 @@ class AllValueStep extends React.Component {
     );
   }
 
-  componentWillMount() {
+  componentDidMount() {
     highlightElements(this.props, this.state, this.props.highlightClass);
-  }
-
-  componentWillUpdate(nextProps, nextState) {
-    // remove the highlight based on previous highlightClass
-    unhighlight(this.props.highlightClass);
-    highlightElements(nextProps, nextState, nextProps.highlightClass);
   }
 
   componentWillUnmount() {
