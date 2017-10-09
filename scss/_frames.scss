@@ -9,23 +9,27 @@
   min-height: 200px;
   font-size: 16px;
 
-  text-align: left;
-  display: flex;
-  flex-flow: row nowrap;
-  justify-content: space-between;
-
-  > * {
-      flex-grow: 1;
-      margin: 0 15px;
-
-      &:first-child {
-          margin-left: 0;
-      }
-
-      &:last-child {
-          margin-right: 0;
-      }
+  
+  .content {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    text-align: left;
+    
+    > * {
+        flex-grow: 1;
+        margin: 0 15px;
+  
+        &:first-child {
+            margin-left: 0;
+        }
+  
+        &:last-child {
+            margin-right: 0;
+        }
+    }
   }
+
 
 
   ul {

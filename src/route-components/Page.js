@@ -10,8 +10,10 @@ const Page = ({ params }) => {
     <div className='frame'>
       <h1>Page {params.name}</h1>
       <PageControls params={params} />
-      <Tree />
-      <ElementCard />
+      <div className='content'>
+        <Tree />
+        <ElementCard />
+      </div>
     </div>
   );
 };
