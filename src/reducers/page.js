@@ -103,19 +103,6 @@ export default function page(state = {}, action) {
       })
     });
 
-  case types.SELECT_ELEMENT:
-    var { pages, current, elementIndex } = state;
-    var page = pages.find(p => p.name === current);
-    var selectorCount = page.elements.length;
-    var index = parseInt(action.index, 10);
-    // set to 0 when out of bounds
-    if ( isNaN(index) || index < 0 || index >= selectorCount) {
-      index = 0;
-    }
-    return Object.assign({}, state, {
-      elementIndex: index
-    });
-
   case types.UPDATE_ELEMENT:
     var { pages, current, elementIndex } = state;
     var currentPage = pages.map(p => p.name === current);
