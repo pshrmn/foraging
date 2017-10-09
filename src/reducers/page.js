@@ -116,35 +116,9 @@ export default function page(state = {}, action) {
       elementIndex: index
     });
 
-  case types.SAVE_ELEMENT:
-    var { pages, current, elementIndex } = state;
-    var currentPage = pages.find(p => p.name === current);
-    var currentSelector = currentPage.elements[elementIndex];
-    var currentCount = currentPage.elements.length;
-
-    // set parent/child/index values
-    var { element } = action;
-    element.parent = currentSelector.index;
-    element.index = currentCount;
-    currentSelector.childIndices.push(currentCount);
-
-    return Object.assign({}, state, {
-      pages: pages.map(p => {
-        if (p.name !== current) {
-          return p;
-        }
-        return {
-          ...p,
-          elements: currentPage.elements.concat([element])
-        };
-      }),
-      elementIndex: currentCount
-    });
-
   case types.UPDATE_ELEMENT:
     var { pages, current, elementIndex } = state;
     var currentPage = pages.map(p => p.name === current);
-    var currentSelector = currentPage.elements[elementIndex];
 
     var { index, newProps } = action;
 

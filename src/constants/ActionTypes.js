@@ -15,7 +15,6 @@ export const SET_MATCHES = 'SET_MATCHES';
 export const REFRESH_MATCHES = 'REFRESH_MATCHES';
 
 export const SELECT_ELEMENT = 'SELECT_ELEMENT';
-export const SAVE_ELEMENT = 'SAVE_ELEMENT';
 
 export const UPDATE_ELEMENT = 'UPDATE_ELEMENT';
 export const SAVE_RULE = 'SAVE_RULE';

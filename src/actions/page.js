@@ -59,13 +59,6 @@ export const selectElement = index => ({
   index
 });
 
-// add a new element selector, using the current element
-// selector as its parent
-export const saveElement = element => ({
-  type: types.SAVE_ELEMENT,
-  element: element
-});
-
 // update the properties of the element at index
 export const updateElement = (index, newProps) => ({
   type: types.UPDATE_ELEMENT,
