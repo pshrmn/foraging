@@ -47,12 +47,14 @@ class EditElementWizard extends React.Component {
     const parentElements = parent ? [document] : parent.matches;
     newElement.matches = select(parentElements, newElement.selector, newElement.spec, '.forager-holder');
 
-    page.elements[newElement.index] = newElement;
+    const newPage = {...page};
+
+    newPage.elements[newElement.index] = newElement;
 
     // TODO?: reselect children. Probably implement a "reselect" function to chain this. Currently, this
     // is being done by the "selectMiddleware", but maybe it should be done here instead...
 
-    updatePage(page);
+    updatePage(newPage);
     const { name } = response.params;
     const pathname = curi.addons.pathname('Page', { name });
     curi.history.push({

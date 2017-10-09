@@ -5,14 +5,14 @@ import { connect } from 'react-redux';
 import { currentPage } from 'helpers/store';
 import RuleWizard from 'components/wizards/RuleWizard';
 
-const AddSelector = ({ page, element }) => (
+const AddRule = ({ page, element }) => (
   <div className='frame'>
-    Add Selector
+    Add Rule
     <RuleWizard page={page} element={element} />
   </div>
 );
 
-AddSelector.propTypes = {
+AddRule.propTypes = {
   page: PropTypes.object,
   element: PropTypes.object
 };
@@ -27,4 +27,4 @@ export default connect(
       page
     };
   }
-)(AddSelector);
+)(AddRule);

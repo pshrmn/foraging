@@ -63,7 +63,7 @@ class Page extends React.Component {
         <div className='content'>
           <Tree current={this.state.index} select={this.select} />
           <ElementCard
-            element={this.state.element}
+            index={this.state.index}
             page={this.props.page}
             select={this.select}
           />

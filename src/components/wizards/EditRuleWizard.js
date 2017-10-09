@@ -4,12 +4,11 @@ import { connect } from 'react-redux';
 import { curious } from '@curi/react';
 
 import Wizard from 'simple-wizard-component';
-
 import {
   Attribute,
   Type,
   Name,
-  ConfirmSaveRule
+  ConfirmUpdateRule
 } from 'components/steps/rule';
 import Cycle from 'components/common/Cycle';
 
@@ -21,17 +20,13 @@ const steps = [
   Attribute,
   Type,
   Name,
-  ConfirmSaveRule
+  ConfirmUpdateRule
 ];
 
 /*
- * Attribute -> Type -> Name -> ConfirmSaveRule
- *
- * The RuleWizard is used to create a rule for an element. A Cycle is
- * used to cycle through the DOM elements that the element matches while
- * creating the rule.
+ * Attribute -> Type -> Name -> ConfirmUpdateRule
  */
-class RuleWizard extends React.Component {
+class EditRuleWizard extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -49,19 +44,18 @@ class RuleWizard extends React.Component {
   }
 
   save(rule) {
-    const { page, element, updatePage, curi, response } = this.props;
+    const { page, element, ruleIndex, updatePage, curi } = this.props;
     const newElement = {
       ...element,
-      rules: [...element.rules, rule]
+      rules: element.rules.map((r,i) => i === ruleIndex ? rule : r)
     };
     const newPage = {
       ...page,
-      elements: page.elements.map(e => e.index === element.index ? newElement : e)
+      elements: page.elements.map((e,i) => i === newElement.index ? newElement : e)
     };
     updatePage(newPage);
 
-    const { name } = response.params;
-    const pathname = curi.addons.pathname('Page', { name });
+    const pathname = curi.addons.pathname('Page', { name: page.name });
     curi.history.push({
       pathname,
       query: { element: element.index }
@@ -69,22 +63,29 @@ class RuleWizard extends React.Component {
   }
 
   cancel() {
-    const { curi, response } = this.props;
-    const { name } = response.params;
-    const pathname = curi.addons.pathname('Page', { name });
+    const { curi, page } = this.props;
+    const pathname = curi.addons.pathname('Page', { name: page.name });
     curi.history.push(pathname);
   }
 
   render() {
-    const { element, page } = this.props;
+    const { page, element, rule } = this.props;
     const { index } = this.state;
+    const { name, attr, type } = rule;
+
     return (
       <Wizard
         steps={steps}
-        initialData={{}}
-        staticData={{
+        initialData={{
           element,
+          index: 0,
+          name,
+          attr,
+          type
+        }}
+        staticData={{
           page,
+          element,
           current: element.matches[index]
         }}
         save={this.save}
@@ -115,13 +116,15 @@ class RuleWizard extends React.Component {
   }
 }
 
-RuleWizard.propTypes = {
+EditRuleWizard.propTypes = {
   element: PropTypes.object,
+  ruleIndex: PropTypes.number,
   page: PropTypes.object,
-  curi: PropTypes.object,
-  response: PropTypes.object,
+  rule: PropTypes.object,
   /* connect */
-  updatePage: PropTypes.func.isRequired
+  updatePage: PropTypes.func.isRequired,
+  /* curious */
+  curi: PropTypes.object
 };
 
 export default curious(connect(
@@ -129,4 +132,4 @@ export default curious(connect(
   {
     updatePage
   }
-)(RuleWizard));
+)(EditRuleWizard));

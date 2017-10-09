@@ -63,56 +63,6 @@ export default function page(state = {}, action) {
       })
     });
 
-  case types.REMOVE_RULE:
-    var { pages, current, elementIndex } = state;
-    var { index } = action;
-
-    var currentPage = pages.find(p => p.name === current);
-
-    return Object.assign({}, state, {
-      pages: pages.map(p => {
-        if (p.name !== current) {
-          return p;
-        }
-        return {
-          ...p,
-          elements: currentPage.elements.map(s => {
-            // remove the rule from the current element
-            if ( s !== null && s.index === elementIndex ) {
-              return Object.assign({}, s, {
-                rules: s.rules.filter((r,i) => i !== index)
-              });
-            }
-            return s;
-          })
-        };
-      })
-    });
-
-  case types.UPDATE_RULE:
-    var { pages, current, elementIndex } = state;
-    var { index, rule } = action;
-
-    var currentPage = pages.find(p => p.name === current);
-
-    return Object.assign({}, state, {
-      pages: pages.map(p => {
-        if (p.name === current) {
-          return p;
-        }
-        return {
-          ...p,
-          elements: currentPage.elements.map(s => {
-            // set the new name for the element matching elementIndex
-            if ( s !== null && s.index === elementIndex ) {
-              s.rules = s.rules.map((r,i) => i === index ? rule : r);
-            }
-            return s;
-          })
-        };
-      })
-    });
-
   default:
     return state;
   }

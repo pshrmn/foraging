@@ -38,17 +38,3 @@ export const updatePage = page => ({
 export const refreshMatches = () => ({
   type: types.REFRESH_MATCHES
 });
-
-/*
- * ELEMENT/RULE ACTIONS
- */
-export const removeRule = index => ({
-  type: types.REMOVE_RULE,
-  index
-});
-
-export const updateRule = (index, rule) => ({
-  type: types.UPDATE_RULE,
-  index,
-  rule
-});

@@ -11,8 +11,6 @@ export const UPDATE_PAGE = 'UPDATE_PAGE';
 
 // set the matches property of multiple elements
 export const REFRESH_MATCHES = 'REFRESH_MATCHES';
-export const REMOVE_RULE = 'REMOVE_RULE';
-export const UPDATE_RULE = 'UPDATE_RULE';
 
 /* general */
 // open and close the app

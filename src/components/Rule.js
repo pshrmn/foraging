@@ -1,24 +1,22 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { Link } from '@curi/react';
 
-import { NegButton, NeutralButton } from 'components/common/Buttons';
+import { NegButton } from 'components/common/Buttons';
 
-import {
-  removeRule,
-  showEditRuleWizard
-} from '../actions';
-
+import { updatePage } from '../actions';
 
 function Rule(props) {
   const {
     name,
     attr,
     type,
-    active = true,
     index,
-    removeRule,
-    updateRule
+    updatePage,
+    params,
+    page,
+    element
   } = props;
 
   return (
@@ -26,26 +24,47 @@ function Rule(props) {
       <span className='rule-name' title='name'>{name}</span>
       <span className='rule-attr' title='attribute (or text)'>{attr}</span>
       <span className='rule-type' title='data type'>{type}</span>
-      { active ? <NeutralButton text='Edit' click={() => { updateRule(index); }} /> : null }
-      { active ? <NegButton text='Delete' click={() => { removeRule(index); }} /> : null }
+      <Link
+        to='Edit Rule'
+        params={{ ...params, ruleIndex: index }}
+        anchor='button'
+      >
+        Edit
+      </Link>
+      <NegButton text='Delete' click={() => {
+        element.rules = element.rules.filter((r,i) => i !== index);
+        const newPage = {...page};
+        updatePage(newPage);
+      }} />
     </li>
   );
 }
 
 Rule.propTypes = {
-  removeRule: PropTypes.func.isRequired,
-  updateRule: PropTypes.func.isRequired,
   name: PropTypes.string.isRequired,
   attr: PropTypes.string.isRequired,
   type: PropTypes.string.isRequired,
-  active: PropTypes.bool,
-  index: PropTypes.number
+  index: PropTypes.number,
+  params: PropTypes.object,
+  /* connect */
+  updatePage: PropTypes.func.isRequired,
+  page: PropTypes.object,
+  element: PropTypes.object
 };
 
 export default connect(
-  null,
+  (state, ownProps) => {
+    const { name } = state.response.params;
+    const { index } = ownProps.params;
+    const { pages } = state.page;
+    const page = pages.find(p => p.name === name);
+    const element = page.elements[index];
+    return {
+      element,
+      page
+    };
+  },
   {
-    removeRule,
-    updateRule: showEditRuleWizard,
+    updatePage
   }
 )(Rule);

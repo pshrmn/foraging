@@ -46,12 +46,16 @@ class ElementWizard extends React.Component {
     // more setup
     ele.parent = parent.index;
     ele.index = page.elements.length;
-    page.elements.push(ele);
+
+    const newPage = {
+      ...page,
+      elements: [...page.elements, ele]
+    };
 
     const parentElements = parent ? [document] : parent.matches;
     ele.matches = select(parentElements, ele.selector, ele.spec, '.forager-holder');
 
-    updatePage(page);
+    updatePage(newPage);
     const { name } = response.params;
     const pathname = curi.addons.pathname('Page', { name });
     curi.history.push({

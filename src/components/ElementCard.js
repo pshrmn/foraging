@@ -13,9 +13,9 @@ import { removeElement } from 'helpers/page';
  */
 function ElementCard(props) {
   const {
-    element,
+    index,
     page,
-    active = true
+    element
   } = props;
 
   //const isRoot = element.index === 0;
@@ -28,12 +28,12 @@ function ElementCard(props) {
     );
   }
 
-  const params = { name: page.name, index: element.index };
+  const params = { name: page.name, index };
 
   return (
     <div className='info-box'>
       <div className='info'>
-        <Element active={active} {...element} />
+        <Element {...element} params={params} />
       </div>
       <div className='buttons'>
         <Link
@@ -84,16 +84,21 @@ function ElementCard(props) {
 }
 
 ElementCard.propTypes = {
-  element: PropTypes.object,
+  index: PropTypes.number,
   page: PropTypes.object,
-  active: PropTypes.bool,
   select: PropTypes.func,
   /* connect */
   updatePage: PropTypes.func,
+  element: PropTypes.object
 };
 
 export default connect(
-  null,
+  (state, ownProps) => {
+    const page = state.page.pages.find(p => p.name === state.response.params.name);
+    return {
+      element: page.elements[ownProps.index]
+    };
+  },
   {
     updatePage
   }

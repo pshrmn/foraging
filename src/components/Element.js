@@ -11,7 +11,7 @@ function Element(props) {
     rules,
     spec,
     optional = false,
-    active = true
+    params
   } = props;
 
   return (
@@ -22,7 +22,7 @@ function Element(props) {
       <div>
         {describeSpec(spec)}
       </div>
-      <RuleList rules={rules} active={active} />
+      <RuleList rules={rules} params={params} />
     </div>
   );
 }
@@ -32,20 +32,27 @@ Element.propTypes = {
   rules: PropTypes.array,
   spec: PropTypes.object,
   optional: PropTypes.bool,
-  active: PropTypes.bool
+  params: PropTypes.object
 };
 
-const RuleList = ({ rules, active }) => (
-  !rules.length ? null : (
-    <ul className='rules'>
-      { rules.map((r,i) => <Rule key={i} index={i} active={active} {...r} />) }
+const RuleList = ({ rules, params }) => (
+  !rules.length
+    ? null
+    : <ul className='rules'>
+      { rules.map((r,i) => (
+        <Rule
+          key={i}
+          index={i}
+          params={params}
+          {...r}
+        />
+      ))}
     </ul>
-  )
 );
 
 RuleList.propTypes = {
   rules: PropTypes.array,
-  active: PropTypes.bool.isRequired
+  params: PropTypes.object
 };
 
 export default Element;
