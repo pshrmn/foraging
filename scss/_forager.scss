@@ -41,6 +41,9 @@
   @import 'graph';
   @import 'wizard';
   @import 'topbar';
+  @import 'elementCard';
+  @import 'infoBox';
+  @import 'preview';
 
   &.hidden {
       display: none !important;

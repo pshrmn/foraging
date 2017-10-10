@@ -1,0 +1,28 @@
+.info-box {
+  display: flex;
+  flex-flow: column nowrap;
+  padding: 10px;
+  background: $light-gray;
+  border: 1px solid $gray;
+  min-height: 200px;
+
+  .info {
+
+      > div {
+          padding: 2px 0;
+      }
+
+      .line {
+          padding: 2px 0;
+      }
+
+      label {
+          margin-right: 5px;
+      }
+  }
+
+  .buttons {
+      // push the buttons to the bottom
+      margin: auto 0 0;
+  }
+}

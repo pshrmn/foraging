@@ -43,98 +43,41 @@
 
 }
 
-.wizard {
-  width: 350px;
-  min-height: 200px;
-}
-
-.preview {
-  pre {
-      white-space: pre-wrap;
-      word-break: break-all;
-      height: 200px;
-      overflow: scroll;
-      margin: 1em 0;
-      padding: 5px;
-      border-style: inset;
-      border-color: $black;
-      border-width: 1px;
-      border-left: 10px solid $dark-blue;
-      background: $light-gray;
-  }
-}
-
-.choices {
-  display: flex;
-  flex-wrap: wrap;
-
-}
-
 label.selected {
   background: $green;
   border-color: $dark-green;
 }
 
-.info-box {
-  display: flex;
-  flex-flow: column nowrap;
-  padding: 10px;
-  background: $light-gray;
-  border: 1px solid $gray;
-  min-height: 200px;
 
-  .info {
+.tile {
+    width: 300px;
+    max-height: 200px;
+    box-sizing: border-box;
+    padding: 10px;
+    display: inline-block;
+    line-height: 1.5em;
+    vertical-align: top;
+    margin-right: 10px;
+    
+    &.red {
+        background: $dark-red;
 
-      > div {
-          padding: 2px 0;
-      }
+        * {
+            color: $white;
+        }
+    }
 
-      .line {
-          padding: 2px 0;
-      }
+    &.gold {
+        background: $gold;
+    }
 
-      label {
-          margin-right: 5px;
-      }
-  }
+    li {
+        list-style: disc;
+        list-style-position: inside;
+    }
 
-  .buttons {
-      // push the buttons to the bottom
-      margin: auto 0 0;
-  }
-}
-
-
-.rules {
-  margin: 5px 0;
-
-  .rule {
-      height: inherit;
-      line-height: 1.1;
-      > * {
-          margin: 0 3px;
-      }
-  }
-}
-
-.rule-name {
-  font-weight: bold;
-}
-
-.rule-attr, .rule-type {
-  font-size: 0.9em;
-  padding: 2px;
-  border: 1px solid $black;
-}
-
-.rule-attr {
-  color: $blue;
-  background: $light-blue;
-  border-color: $blue;
-}
-
-.rule-type {
-  color: $dark-green;
-  background: $light-green;
-  border-color: $dark-green;
+    ul.long {
+        overflow-y: auto;
+        max-height: 150px;
+    }
 }

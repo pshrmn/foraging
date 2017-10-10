@@ -28,6 +28,9 @@
 }
 
 .wizard {
+    width: 350px;
+    min-height: 200px;
+
     label{
         font-weight: normal;
         margin-right: 15px;
@@ -37,4 +40,10 @@
         border: 1px solid $gray;
         background: $button-gray;
     }    
+}
+
+.choices {
+    display: flex;
+    flex-wrap: wrap;
+
 }

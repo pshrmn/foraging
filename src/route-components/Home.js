@@ -5,9 +5,9 @@ import { Link } from '@curi/react';
 
 const Home = ({ pages }) => (
   <div className='frame'>
-    <section>
-      <h2>Pages</h2>
-      <ul>
+    <section className='tile red'>
+      <h2>Saved Pages</h2>
+      <ul className='long'>
         {
           pages.map(page => (
             <li key={page.name}>
@@ -16,7 +16,18 @@ const Home = ({ pages }) => (
           ))
         }
       </ul>
-      <Link to='Add Page' anchor='button' className='pos'>Add a page</Link>
+      <Link to='Add Page' anchor='button'>Add a page</Link>
+    </section>
+    <section className='tile gold'>
+      <h2>Help</h2>
+      <ul>
+        <li>
+          <a href='https://www.pshrmn.com/tutorials/forager/'>Tutorial</a>
+        </li>
+        <li>
+          <a href='https://github.com/pshrmn/forager'>GitHub Repo</a>
+        </li>
+      </ul>
     </section>
   </div>
 );
