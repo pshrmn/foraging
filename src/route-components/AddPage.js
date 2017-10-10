@@ -57,7 +57,9 @@ class AddPage extends React.Component {
               ? null
               : <p className='warning'>This name is already in use.</p>
           }
-          <button>Add Page</button>
+          <div>
+            <button>Add Page</button>
+          </div>
         </form>
       </div>
     );
