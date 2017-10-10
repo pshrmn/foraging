@@ -10,6 +10,8 @@ import { closeForager } from 'actions';
 const DEBUG = process.env.NODE_ENV !== 'production';
 /* eslint-enable no-process-env */
 
+const logoSrc = chrome.runtime.getURL('/img/home-icon.png');
+
 const TopBar = ({ response, children, closeForager } ) => {
   const pathname = response
     ? response.location.pathname
@@ -18,7 +20,9 @@ const TopBar = ({ response, children, closeForager } ) => {
     <div className='topbar'>
       <div className='controls'>
         <div className='page-controls'>
-          <Link to='Home' anchor='button'>Forager</Link>
+          <Link to='Home' anchor='button' className='home'>
+            <img src={logoSrc} />orager
+          </Link>
           {children}
         </div>
         <div className='app-controls'>

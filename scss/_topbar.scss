@@ -3,6 +3,20 @@
     min-width: 650px;
     background: $dark-blue;
 
+    button.home {
+        background: $white !important;
+        color: $dark-blue  !important;
+        text-transform: none !important;
+        &:hover {
+            background: $white !important;
+            color: $dark-blue  !important;
+        }
+
+        img {
+            vertical-align: bottom;
+        }
+    }
+
     button{
         display: inline-block;
         line-height: 1.25 !important;
