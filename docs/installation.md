@@ -1,4 +1,4 @@
-#Installation
+# Installation
 
 Currently Forager is not on the Chrome Web Store, so it needs to be installed manually.
 

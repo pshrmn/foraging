@@ -1,6 +1,6 @@
-#Forager Documentation
+# Forager Documentation
 
-##Guide:
+## Guide:
 
 * [About](about.md)
 * [Installation](installation.md)
