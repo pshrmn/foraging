@@ -43,6 +43,7 @@ class ChooseElement extends React.Component {
     this.mouseout = this.mouseout.bind(this);
     this.click = this.click.bind(this);
     this.addEvents = this.addEvents.bind(this);
+    this.deleteSelected = this.deleteSelected.bind(this);
 
     this.setRadio = this.setRadio.bind(this);
     this.nextHandler = this.nextHandler.bind(this);
@@ -133,6 +134,30 @@ class ChooseElement extends React.Component {
     this.props.cancel();
   }
 
+  deleteSelected() {
+    const clickedSelector = this.state.selectors[this.state.checked];
+    if ( clickedSelector !== undefined ) {
+      const { staticData } = this.props;
+      const fullSelector = clickedSelector.join('');
+      const elements = select(
+        staticData.parent.matches,
+        fullSelector,
+        null,
+        '.forager-holder'
+      );
+
+      Array.from(elements).forEach(e => {
+        e.parentNode.removeChild(e);
+      });
+
+      this.setState({
+        checked: undefined,
+        selectors: [['*']],
+        count: 0
+      });
+    }
+  }
+
   render() {
     const { selectors, checked, eleCount, error } = this.state;
     return (
@@ -152,12 +177,23 @@ class ChooseElement extends React.Component {
             }
           </div>
           <h5>Count: {eleCount}</h5>
+
         </div>
         <Controls
           next={this.nextHandler}
           cancel={this.cancelHandler}
           error={error}
-        />
+        >
+          <button
+            type='button'
+            onClick={this.deleteSelected}
+            disabled={checked === undefined}
+            title={'Remove the selected nodes from the DOM. ' +
+                    'This can be useful when dealing with overlays that block the desired nodes.'}
+          >
+            Delete Selected
+          </button>
+        </Controls>
       </form>
     );
   }

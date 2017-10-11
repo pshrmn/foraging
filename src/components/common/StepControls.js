@@ -15,13 +15,15 @@ export default function Controls(props) {
     next,
     nextText = 'Next',
     cancel,
-    error = false
+    error = false,
+    children
   } = props;
   return (
     <div className='buttons'>
-      <NegButton text='Previous' click={previous} disabled={previous === undefined} />
+      <NegButton type='button' text='Previous' click={previous} disabled={previous === undefined} />
       <PosButton text={nextText} type='submit' click={next} disabled={error} />
-      <NegButton text='Cancel' click={cancel} />
+      <NegButton type='button' text='Cancel' click={cancel} />
+      { children }
     </div>
   );
 }
@@ -31,5 +33,6 @@ Controls.propTypes = {
   next: PropTypes.func,
   cancel: PropTypes.func,
   nextText: PropTypes.string,
-  error: PropTypes.bool
+  error: PropTypes.bool,
+  children: PropTypes.any
 };
