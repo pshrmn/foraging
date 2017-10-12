@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import Tree from 'components/tree/Tree';
-import ElementCard from 'components/ElementCard';
+import ElementCard from 'components/card/ElementCard';
 
 import { currentPage } from 'helpers/store';
 import { selectPage } from 'helpers/selection';

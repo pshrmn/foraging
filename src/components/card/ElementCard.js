@@ -3,10 +3,11 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Link } from '@curi/react';
 
-import Element from 'components/Element';
+import RuleList from './RuleList';
 import { NegButton } from 'components/common/Buttons';
 import { updatePage } from 'actions';
 import { removeElement } from 'helpers/page';
+import { describeSpec } from 'helpers/text';
 
 /*
  * An ElementCard is used to display a selector Element and its control functions
@@ -33,7 +34,15 @@ function ElementCard(props) {
   return (
     <div className='info-box'>
       <div className='info'>
-        <Element {...element} params={params} />
+        <div className='element'>
+          <div>
+            <span className='big bold'>{element.selector}</span>
+          </div>
+          <div>
+            {describeSpec(element.spec)} {element.optional ? <span>(optional)</span> : null}
+          </div>
+          <RuleList rules={element.rules} params={params} />
+        </div>
       </div>
       <div className='buttons'>
         <Link

@@ -5,7 +5,7 @@ import { Link } from '@curi/react';
 
 import { NegButton } from 'components/common/Buttons';
 
-import { updatePage } from '../actions';
+import { updatePage } from 'actions';
 
 function Rule(props) {
   const {
