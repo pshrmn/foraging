@@ -6,7 +6,7 @@ import { syncResponses } from '@curi/redux';
 import config from 'config';
 import store from 'store';
 
-import ConnectedNavigator from 'components/ConnectedNavigator';
+import CuriProvider from 'components/CuriProvider';
 import Forager from 'components/Forager';
 import { openForager, setPages } from 'actions';
 import { load as chromeLoad } from 'helpers/chrome';
@@ -38,9 +38,9 @@ if ( !document.querySelector('.forager-holder') ) {
 
       ReactDOM.render((
         <Provider store={store}>
-          <ConnectedNavigator config={config}>
+          <CuriProvider>
             <Forager />
-          </ConnectedNavigator>
+          </CuriProvider>
         </Provider>
       ), holder);
 
