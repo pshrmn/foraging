@@ -169,6 +169,9 @@ export const allSelect = s => s.every(ele => ele.tagName === 'SELECT');
 export function selectPage(page) {
   const matches = [];
   page.elements.forEach(element => {
+    if (element == null) {
+      return;
+    }
     const parentElements = element.parent === null ? [document] : matches[element.parent];
     element.matches = select(parentElements, element.selector, element.spec, '.forager-holder');
     matches[element.index] = element.matches;
