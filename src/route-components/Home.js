@@ -7,15 +7,19 @@ const Home = ({ pages }) => (
   <div className='frame'>
     <section className='tile red'>
       <h2>Saved Pages</h2>
-      <ul className='long'>
-        {
-          pages.map(page => (
-            <li key={page.name}>
-              <Link to='Page' params={{ name: page.name }}>{page.name}</Link>
-            </li>
-          ))
-        }
-      </ul>
+      {
+        pages.length
+          ? <ul className='long'>
+            {
+              pages.map(page => (
+                <li key={page.name}>
+                  <Link to='Page' params={{ name: page.name }}>{page.name}</Link>
+                </li>
+              ))
+            }
+          </ul>
+          : <p>You have no saved pages</p>
+      }
       <Link to='Add Page' anchor='button'>Add a page</Link>
     </section>
     <section className='tile gold'>

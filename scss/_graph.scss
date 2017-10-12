@@ -9,7 +9,8 @@
     svg {
         box-sizing: content-box;
         font-size: 14px;
-        background: $white;
+        background: $light-gray;
+        border: 1px solid $gray;
         display: block;
 
         .link {
@@ -28,7 +29,7 @@
 
         .node text {
             paint-order: stroke;
-            stroke: $white;
+            stroke: $light-gray;
             stroke-width: 3px;
             text-anchor: middle;
             fill: inherit;
