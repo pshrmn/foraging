@@ -24,6 +24,9 @@ class Page extends React.Component {
   }
 
   select = (index) => {
+    if (index === this.state.index) {
+      return;
+    }
     this.setState({
       index,
       element: this.props.page.elements[index]
