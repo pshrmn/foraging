@@ -43,7 +43,7 @@ class EditElementWizard extends React.Component {
 
     const parentIndex = element.parent && page.elements[element.parent];
     const parent = parentIndex != null ? page.elements[parentIndex]: {};
-    const parentElements = parent ? [document] : parent.matches;
+    const parentElements = parent ? parent.matches : [document];
     newElement.matches = select(parentElements, newElement.selector, newElement.spec, '.forager-holder');
 
     const newPage = {...page};
