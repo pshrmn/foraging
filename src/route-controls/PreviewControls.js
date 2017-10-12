@@ -32,7 +32,7 @@ class PreviewControls extends React.Component {
     console.log([
       'The current preview data can be accessed using the %c"pageData"%c variable.',
       'Make sure that the Forager extension\'s context is selected.',
-      '(This will be a string using the extension\'s ID that starts with "chrome-extensions://". Open the chrome://extensions tab and look for the Forager extension to determine the extension ID)'
+      '(The dropdown probably says "top" currently)'
     ].join(' '), 'font-weight: bold; font-size: 1.5em;', '');
     /* eslint-enable no-console */
     window.pageData = this.props.data.tree;
@@ -40,21 +40,6 @@ class PreviewControls extends React.Component {
 
   render() {
     return [
-      <PosButton
-        key='log'
-        text='Log to Console'
-        click={this.logHandler}
-      />,
-      <PosButton
-        key='pretty-log'
-        text='Pretty Log'
-        click={this.prettyLogHandler}
-      />,
-      <PosButton
-        key='variable'
-        text='Use as Variable'
-        click={this.varHandler}
-      />,
       <Link
         key='back'
         to='Page'
@@ -62,7 +47,25 @@ class PreviewControls extends React.Component {
         anchor='button'
       >
         Back
-      </Link>
+      </Link>,
+      <PosButton
+        key='log'
+        text='Log to Console'
+        title='Log the output to the dev tools console.'
+        click={this.logHandler}
+      />,
+      <PosButton
+        key='pretty-log'
+        text='Pretty Log'
+        title='Log the output to the dev tools console in a pretty printed format.'
+        click={this.prettyLogHandler}
+      />,
+      <PosButton
+        key='variable'
+        text='Use as Variable'
+        title='Store the preview data as a variable that is available in the dev tools console.'
+        click={this.varHandler}
+      />
     ];
   }
 }
