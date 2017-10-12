@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { curious } from '@curi/react';
 
 import { addPage } from 'actions';
 import { createElement } from 'helpers/page';
@@ -67,20 +66,20 @@ class AddPage extends React.Component {
 }
 
 AddPage.propTypes = {
-  /* curious */
-  curi: PropTypes.object,
   /* connect */
+  curi: PropTypes.object,
   takenNames: PropTypes.array,
   addPage: PropTypes.func
 };
 
-export default curious(connect(
+export default connect(
   state => {
     return {
-      takenNames: state.pages.map(p => p.name)
+      takenNames: state.pages.map(p => p.name),
+      curi: state.curi
     };
   },
   {
     addPage
   }
-)(AddPage));
+)(AddPage);

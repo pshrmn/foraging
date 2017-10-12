@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Link, curious } from '@curi/react';
+import { Link } from '@curi/react';
 import { showMessage } from 'expiring-redux-messages';
 
 import { PosButton, NegButton, NeutralButton } from 'components/common/Buttons';
@@ -91,9 +91,8 @@ class PageControls extends React.Component {
 }
 
 PageControls.propTypes = {
-  /* curious */
-  curi: PropTypes.object,
   /* connect */
+  curi: PropTypes.object,
   showMessage: PropTypes.func,
   renamePage: PropTypes.func,
   removePage: PropTypes.func,
@@ -102,14 +101,15 @@ PageControls.propTypes = {
   params: PropTypes.object
 };
 
-export default curious(connect(
+export default connect(
   state => {
-    const { response, pages } = state;
+    const { curi, response, pages } = state;
     const current = response.params.name;
     return {
       pages: pages,
       page: pages.find(p => p.name === current),
-      params: response.params
+      params: response.params,
+      curi
     };
   },
   {
@@ -117,4 +117,4 @@ export default curious(connect(
     renamePage,
     removePage
   }
-)(PageControls));
+)(PageControls);

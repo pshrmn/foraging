@@ -1,6 +1,6 @@
 import { createStore, combineReducers, applyMiddleware } from 'redux';
 import { messages, messagesMiddleware } from 'expiring-redux-messages';
-import { responseReducer } from '@curi/redux';
+import { responseReducer, curiReducer } from '@curi/redux';
 
 import { show, pages } from 'reducers';
 import chromeMiddleware from 'middleware/chromeMiddleware';
@@ -10,7 +10,8 @@ const reducer = combineReducers({
   show,
   pages,
   messages,
-  response: responseReducer
+  response: responseReducer,
+  curi: curiReducer
 });
 
 const initialState = {

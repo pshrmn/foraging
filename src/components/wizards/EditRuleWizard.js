@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { curious } from '@curi/react';
 
 import Wizard from 'simple-wizard-component';
 import {
@@ -123,13 +122,12 @@ EditRuleWizard.propTypes = {
   rule: PropTypes.object,
   /* connect */
   updatePage: PropTypes.func.isRequired,
-  /* curious */
   curi: PropTypes.object
 };
 
-export default curious(connect(
-  null,
+export default connect(
+  state => ({ curi: state.curi }),
   {
     updatePage
   }
-)(EditRuleWizard));
+)(EditRuleWizard);

@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { curious } from '@curi/react';
 
 import Wizard from 'simple-wizard-component';
 import {
@@ -106,16 +105,14 @@ class ElementWizard extends React.Component {
 ElementWizard.propTypes = {
   parent: PropTypes.object,
   page: PropTypes.object,
-  /* curious */
-  curi: PropTypes.object,
-  response: PropTypes.object,
-  /* connect */
   updatePage: PropTypes.func.isRequired,
+  curi: PropTypes.object,
+  response: PropTypes.object
 };
 
-export default curious(connect(
-  null,
+export default connect(
+  state => ({ curi: state.curi, response: state.response }),
   {
     updatePage
   }
-)(ElementWizard));
+)(ElementWizard);

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Link, curious } from '@curi/react';
+import { Link } from '@curi/react';
 import { showMessage } from 'expiring-redux-messages';
 
 import { PosButton, NegButton, NeutralButton } from 'components/common/Buttons';
@@ -87,21 +87,21 @@ PageControls.propTypes = {
   params: PropTypes.object,
   pages: PropTypes.array,
   page: PropTypes.object,
-  /* curious */
-  curi: PropTypes.object,
-  /* actions */
+  /* connect */
   showMessage: PropTypes.func,
   renamePage: PropTypes.func,
-  removePage: PropTypes.func
+  removePage: PropTypes.func,
+  curi: PropTypes.object
 };
 
-export default curious(connect(
+export default connect(
   state => {
-    const { response, pages } = state;
+    const { curi, response, pages } = state;
     const current = response.params.name;
     return {
       pages: pages,
-      page: pages.find(p => p.name === current)
+      page: pages.find(p => p.name === current),
+      curi
     };
   },
   {
