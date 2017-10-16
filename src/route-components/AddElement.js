@@ -5,14 +5,14 @@ import { connect } from 'react-redux';
 import { currentPage } from 'helpers/store';
 import ElementWizard from 'components/wizards/ElementWizard';
 
-const AddSelector = ({ page, element }) => (
+const AddElement = ({ page, element }) => (
   <div className='frame'>
     Add Element
     <ElementWizard page={page} parent={element} />
   </div>
 );
 
-AddSelector.propTypes = {
+AddElement.propTypes = {
   page: PropTypes.object,
   element: PropTypes.object
 };
@@ -27,4 +27,4 @@ export default connect(
       page
     };
   }
-)(AddSelector);
+)(AddElement);

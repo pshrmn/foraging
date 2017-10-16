@@ -9,9 +9,9 @@ import PageControls from 'route-controls/PageControls';
 import Preview from 'route-components/Preview';
 import PreviewControls from 'route-controls/PreviewControls';
 
-import AddSelector from 'route-components/AddSelector';
+import AddElement from 'route-components/AddElement';
 
-import EditSelector from 'route-components/EditSelector';
+import EditElement from 'route-components/EditElement';
 
 import AddRule from 'route-components/AddRule';
 
@@ -74,7 +74,7 @@ export default [
             name: 'Add Element',
             path: 'add',
             body: () => ({
-              main: AddSelector,
+              main: AddElement,
               controls: NoControls
             })
           },
@@ -82,7 +82,7 @@ export default [
             name: 'Edit Element',
             path: 'edit',
             body: () => ({
-              main: EditSelector,
+              main: EditElement,
               controls: NoControls
             })
           },

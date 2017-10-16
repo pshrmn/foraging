@@ -5,14 +5,14 @@ import { connect } from 'react-redux';
 import { currentPage } from 'helpers/store';
 import EditElementWizard from 'components/wizards/EditElementWizard';
 
-const EditSelector = ({ page, element }) => (
+const EditElement = ({ page, element }) => (
   <div className='frame'>
-    Edit Selector
+    Edit Element
     <EditElementWizard page={page} element={element} />
   </div>
 );
 
-EditSelector.propTypes = {
+EditElement.propTypes = {
   page: PropTypes.object,
   element: PropTypes.object
 };
@@ -27,4 +27,4 @@ export default connect(
       page
     };
   }
-)(EditSelector);
+)(EditElement);
