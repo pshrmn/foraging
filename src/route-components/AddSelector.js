@@ -7,7 +7,7 @@ import ElementWizard from 'components/wizards/ElementWizard';
 
 const AddSelector = ({ page, element }) => (
   <div className='frame'>
-    Add Selector
+    Add Element
     <ElementWizard page={page} parent={element} />
   </div>
 );

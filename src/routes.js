@@ -64,49 +64,48 @@ export default [
         }
       },
       {
-        name: 'Add Selector',
-        path: 'add/:index',
-        body: () => ({
-          main: AddSelector,
-          controls: NoControls
-        }),
+        name: 'Element',
+        path: 'element/:index',
         params: {
           index: n => parseInt(n, 10)
-        }
-      },
-      {
-        name: 'Edit Selector',
-        path: 'edit/:index',
-        body: () => ({
-          main: EditSelector,
-          controls: NoControls
-        }),
-        params: {
-          index: n => parseInt(n, 10)
-        }
-      },
-      {
-        name: 'Add Rule',
-        path: 'add-rule/:index',
-        body: () => ({
-          main: AddRule,
-          controls: NoControls
-        }),
-        params: {
-          index: n => parseInt(n, 10)
-        }
-      },
-      {
-        name: 'Edit Rule',
-        path: 'Edit-rule/:index/:ruleIndex',
-        body: () => ({
-          main: EditRule,
-          controls: NoControls
-        }),
-        params: {
-          index: n => parseInt(n, 10),
-          ruleIndex: n => parseInt(n, 10)
-        }
+        },
+        children: [
+          {
+            name: 'Add Element',
+            path: 'add',
+            body: () => ({
+              main: AddSelector,
+              controls: NoControls
+            })
+          },
+          {
+            name: 'Edit Element',
+            path: 'edit',
+            body: () => ({
+              main: EditSelector,
+              controls: NoControls
+            })
+          },
+          {
+            name: 'Add Rule',
+            path: 'add-rule',
+            body: () => ({
+              main: AddRule,
+              controls: NoControls
+            })
+          },
+          {
+            name: 'Edit Rule',
+            path: 'edit-rule/:ruleIndex',
+            body: () => ({
+              main: EditRule,
+              controls: NoControls
+            }),
+            params: {
+              ruleIndex: n => parseInt(n, 10)
+            }
+          }
+        ]
       }
     ]
   }

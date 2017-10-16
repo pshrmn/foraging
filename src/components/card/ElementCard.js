@@ -46,7 +46,7 @@ function ElementCard(props) {
       </div>
       <div className='buttons'>
         <Link
-          to='Add Selector'
+          to='Add Element'
           params={params}
           anchor='button'
           className='pos'
@@ -64,7 +64,7 @@ function ElementCard(props) {
           +Rule
         </Link>
         <Link
-          to='Edit Selector'
+          to='Edit Element'
           params={params}
           anchor='button'
           title="Edit this element's selector rules"
