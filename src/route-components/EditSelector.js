@@ -20,7 +20,7 @@ EditSelector.propTypes = {
 export default connect(
   state => {
     const { params } = state.response;
-    const index = parseInt(params.index);
+    const { index } = params;
     const page = currentPage(state);
     return {
       element: page.elements[index],

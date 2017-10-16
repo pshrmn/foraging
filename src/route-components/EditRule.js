@@ -22,8 +22,7 @@ EditRule.propTypes = {
 export default connect(
   state => {
     const { params } = state.response;
-    const index = parseInt(params.index);
-    const ruleIndex = parseInt(params.ruleIndex);
+    const { index, ruleIndex } = params;
     const page = currentPage(state);
     const element = page.elements[index];
     return {

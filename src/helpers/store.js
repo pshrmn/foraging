@@ -6,7 +6,7 @@ import { levelNames } from 'helpers/page';
 export function currentElement(state) {
   const page = currentPage(state);
   const { response } = state;
-  const index = parseInt(response.params.index, 10);
+  const { index } = response.params;
   return page && page.elements[index];
 }
 

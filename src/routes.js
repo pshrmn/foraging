@@ -69,7 +69,10 @@ export default [
         body: () => ({
           main: AddSelector,
           controls: NoControls
-        })
+        }),
+        params: {
+          index: n => parseInt(n, 10)
+        }
       },
       {
         name: 'Edit Selector',
@@ -77,7 +80,10 @@ export default [
         body: () => ({
           main: EditSelector,
           controls: NoControls
-        })
+        }),
+        params: {
+          index: n => parseInt(n, 10)
+        }
       },
       {
         name: 'Add Rule',
@@ -85,7 +91,10 @@ export default [
         body: () => ({
           main: AddRule,
           controls: NoControls
-        })
+        }),
+        params: {
+          index: n => parseInt(n, 10)
+        }
       },
       {
         name: 'Edit Rule',
@@ -93,7 +102,11 @@ export default [
         body: () => ({
           main: EditRule,
           controls: NoControls
-        })
+        }),
+        params: {
+          index: n => parseInt(n, 10),
+          ruleIndex: n => parseInt(n, 10)
+        }
       }
     ]
   }
