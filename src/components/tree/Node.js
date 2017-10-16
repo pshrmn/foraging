@@ -2,8 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { shortElement } from 'helpers/text';
-// import { highlight, unhighlight } from 'helpers/markup';
-//import { savedPreview } from 'constants/CSSClasses';
+import { highlight, unhighlight } from 'helpers/markup';
+import { savedPreview } from 'constants/CSSClasses';
 
 class Node extends React.Component {
   constructor(props) {
@@ -20,11 +20,11 @@ class Node extends React.Component {
   }
 
   handleMouseover() {
-    // highlight(this.props.data.matches, savedPreview);
+    highlight(this.props.data.matches, savedPreview);
   }
 
   handleMouseout() {
-    // unhighlight(savedPreview);
+    unhighlight(savedPreview);
   }
 
   render() {
@@ -75,7 +75,7 @@ class Node extends React.Component {
   }
 
   componentWillUnmount() {
-    // unhighlight(savedPreview);
+    unhighlight(savedPreview);
   }
 }
 

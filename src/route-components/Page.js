@@ -34,8 +34,6 @@ class Page extends React.Component {
   }
 
   componentDidMount() {
-    selectPage(this.props.page);
-
     unhighlight(currentSelector);
     if ( this.state.element ) {
       highlight(this.state.element.matches, currentSelector);
@@ -82,6 +80,7 @@ Page.propTypes = {
 export default connect(
   state => {
     const page = currentPage(state);
+    selectPage(page);
     return {
       response: state.response,
       page
