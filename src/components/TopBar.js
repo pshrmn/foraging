@@ -21,7 +21,7 @@ const TopBar = ({ response, children, closeForager } ) => {
     <div className='topbar'>
       <div className='controls'>
         <div className='page-controls'>
-          <Link to='Home' anchor='button' className='home'>
+          <Link to='Home' anchor='button' className='home' title='Go to the home page'>
             <img src={logoSrc} />orager
           </Link>
           {children}
