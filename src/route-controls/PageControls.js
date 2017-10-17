@@ -6,7 +6,7 @@ import { showMessage } from 'expiring-redux-messages';
 
 import { PosButton, NegButton, NeutralButton } from 'components/common/Buttons';
 import { validName } from 'helpers/text';
-import { upload } from 'helpers/chrome';
+import { upload as chromeUpload } from 'helpers/chrome';
 import { renamePage, removePage } from 'actions';
 
 function promptName() {
@@ -44,14 +44,14 @@ class PageControls extends React.Component {
   }
 
   upload = () => {
+    const { page, showMessage } = this.props;
     /* eslint-disable no-console */
-    upload(this.props.page)
+    chromeUpload(page)
       .then(() => {
-        console.log('Upload successful');
+        showMessage('Upload successful', 5000, 1);
       })
       .catch(err => {
-        console.log('Upload failed');
-        console.error(err);
+        showMessage(err, 5000, -1);
       });
     /* eslint-enable no-console */
   }
