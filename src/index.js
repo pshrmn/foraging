@@ -28,7 +28,15 @@ if ( !document.querySelector('.forager-holder') ) {
   // create the element that will hold the app
   const holder = document.createElement('div');
   holder.classList.add('forager-holder');
-  document.body.appendChild(holder);
+  const firstChild = document.body.children[0];
+  if (!firstChild) {
+    /* eslint-disable no-console */
+    console.error('Attempting to insert Forager into a page with no content');
+    /* eslint-enable no-console */
+    document.body.appendChild(holder);
+  } else {
+    document.body.insertBefore(holder, document.body.children[0]);
+  }
 
   Promise.all([chromeLoad(), config.ready()])
     .then(([ pages ]) => {

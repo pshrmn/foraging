@@ -22,13 +22,15 @@ const Cycle = ({ index, count, setIndex }) => {
     <div className='cycle'>
       <NeutralButton
         click={() => { setIndex(prevIndex); }}
-        text='<'
-      />
+      >
+        {'<'}
+      </NeutralButton>
       {index + 1} / {count}
       <NeutralButton
         click={() => { setIndex(nextIndex); }}
-        text='>'
-      />
+      >
+        {'>'}
+      </NeutralButton>
     </div>
   );
 };

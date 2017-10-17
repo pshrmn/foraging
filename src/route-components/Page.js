@@ -52,13 +52,11 @@ class Page extends React.Component {
   }
 
   render() {
-    const { response: { params } } = this.props;
     if (!this.props.page) {
       return null;
     }
     return (
       <div className='frame'>
-        <h1>Page {params.name}</h1>
         <div className='content'>
           <Tree current={this.state.index} select={this.select} />
           <ElementCard
@@ -80,7 +78,9 @@ Page.propTypes = {
 export default connect(
   state => {
     const page = currentPage(state);
-    selectPage(page);
+    if (page) {
+      selectPage(page);
+    }
     return {
       response: state.response,
       page

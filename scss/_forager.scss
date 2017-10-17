@@ -15,17 +15,13 @@
   z-index: 2147483637;
   position: fixed;
   left: 0;
-  bottom: 0;
-  min-width: 1000px;
+  top: 0;
+  width: 100vw;
   min-height: 30px;
-  background: $dark-blue;
   font-size: 16px;
   font-family: sans-serif;
   color: $black;
   text-align: left;
-  border-style: solid;
-  border-color: $dark-blue;
-  border-width: 1px 1px 0 1px;;
   box-sizing: border-box;
 
   * {

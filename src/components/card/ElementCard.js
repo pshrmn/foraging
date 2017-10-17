@@ -73,7 +73,6 @@ function ElementCard(props) {
           Edit
         </Link>
         <NegButton
-          text={isRoot ? 'Reset Element' : 'Remove Element'}
           click={() => {
             const { page, element, select, updatePage } = props;
             const confirmMessage = isRoot === 0
@@ -86,7 +85,9 @@ function ElementCard(props) {
               select(newElementIndex);
             }
           }}
-        />
+        >
+          {isRoot ? 'Reset Element' : 'Remove Element'}
+        </NegButton>
       </div>
     </div>
   );

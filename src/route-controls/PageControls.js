@@ -58,7 +58,9 @@ class PageControls extends React.Component {
 
   render() {
     const { params } = this.props;
+
     return [
+      <span key='page-name' className='page-name'>Page: {params.name}</span>,
       <Link
         key='preview'
         to='Preview'
@@ -70,22 +72,25 @@ class PageControls extends React.Component {
       </Link>,
       <PosButton
         key='upload'
-        text='Upload'
         click={this.upload}
         title="Upload the current page's rules to your server"
-      />,
+      >
+        Upload
+      </PosButton>,
       <NeutralButton
         key='rename'
-        text='Rename Page'
         click={this.handleRename}
         title='Rename the current page'
-      />,
+      >
+        Rename Page
+      </NeutralButton>,
       <NegButton
         key='delete'
-        text='Delete Page'
         click={this.handleDelete}
         title='Delete the current page'
-      />
+      >
+        Delete Page
+      </NegButton>
     ];
   }
 }

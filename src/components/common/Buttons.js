@@ -2,24 +2,18 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 export const PosButton = ({ classes, ...rest }) => (
-  <NeutralButton
-    {...rest}
-    classes={['pos'].concat(classes)}
-  />
+  <NeutralButton {...rest} classes={['pos'].concat(classes)} />
 );
 
 export const NegButton = ({ classes, ...rest }) => (
-  <NeutralButton
-    {...rest}
-    classes={['neg'].concat(classes)}
-  />
+  <NeutralButton {...rest} classes={['neg'].concat(classes)} />
 );
 
 const defaultClick = () => {};
 
 export const NeutralButton = (props) => {
   const {
-    text = '',
+    children = '',
     click = defaultClick,
     classes = [],
     title = '',
@@ -35,13 +29,13 @@ export const NeutralButton = (props) => {
       type={type}
       onClick={click}
     >
-      {text}
+      {children}
     </button>
   );
 };
 
 NeutralButton.propTypes = {
-  text: PropTypes.string,
+  children: PropTypes.any,
   click: PropTypes.func,
   classes: PropTypes.array,
   title: PropTypes.string,

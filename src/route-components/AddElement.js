@@ -7,7 +7,6 @@ import ElementWizard from 'components/wizards/ElementWizard';
 
 const AddElement = ({ page, element }) => (
   <div className='frame'>
-    Add Element
     <ElementWizard page={page} parent={element} />
   </div>
 );

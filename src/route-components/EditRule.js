@@ -7,7 +7,6 @@ import EditRuleWizard from 'components/wizards/EditRuleWizard';
 
 const EditRule = ({ page, element, rule, ruleIndex }) => (
   <div className='frame'>
-    Edit Rule
     <EditRuleWizard page={page} element={element} rule={rule} ruleIndex={ruleIndex} />
   </div>
 );

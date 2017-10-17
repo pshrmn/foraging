@@ -27,13 +27,14 @@ const TopBar = ({ response, children, closeForager } ) => {
         </div>
         <div className='app-controls'>
           <NegButton
-            text={String.fromCharCode(215)}
             classes={['transparent']}
             click={() => {
               document.body.classList.remove('foraging');
               closeForager();
             }}
-          />
+          >
+            {String.fromCharCode(215)}
+          </NegButton>
         </div>
       </div>
       {DEBUG

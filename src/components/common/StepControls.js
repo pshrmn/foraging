@@ -20,9 +20,26 @@ export default function Controls(props) {
   } = props;
   return (
     <div className='buttons'>
-      <NegButton type='button' text='Previous' click={previous} disabled={previous === undefined} />
-      <PosButton text={nextText} type='submit' click={next} disabled={error} />
-      <NegButton type='button' text='Cancel' click={cancel} />
+      <NegButton
+        type='button'
+        click={previous}
+        disabled={previous === undefined}
+      >
+        Previous
+      </NegButton>
+      <PosButton
+        type='submit'
+        click={next}
+        disabled={error}
+      >
+        {nextText}
+      </PosButton>
+      <NegButton
+        type='button'
+        click={cancel}
+      >
+        Cancel
+      </NegButton>
       { children }
     </div>
   );

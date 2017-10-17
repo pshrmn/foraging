@@ -50,22 +50,25 @@ class PreviewControls extends React.Component {
       </Link>,
       <PosButton
         key='log'
-        text='Log to Console'
         title='Log the output to the dev tools console.'
         click={this.logHandler}
-      />,
+      >
+        Log to Console
+      </PosButton>,
       <PosButton
         key='pretty-log'
-        text='Pretty Log'
         title='Log the output to the dev tools console in a pretty printed format.'
         click={this.prettyLogHandler}
-      />,
+      >
+      Pretty Log
+      </PosButton>,
       <PosButton
         key='variable'
-        text='Use as Variable'
         title='Store the preview data as a variable that is available in the dev tools console.'
         click={this.varHandler}
-      />
+      >
+        Use as Variable
+      </PosButton>
     ];
   }
 }

@@ -1,6 +1,5 @@
-import Home from 'route-components/Home';
+import HomeControls from 'route-controls/HomeControls';
 
-import AddPage from 'route-components/AddPage';
 import AddPageControls from 'route-controls/AddPageControls';
 
 import Page from 'route-components/Page';
@@ -10,33 +9,37 @@ import Preview from 'route-components/Preview';
 import PreviewControls from 'route-controls/PreviewControls';
 
 import AddElement from 'route-components/AddElement';
+import AddElementControls from 'route-controls/AddElementControls';
 
 import EditElement from 'route-components/EditElement';
+import EditElementControls from 'route-controls/EditElementControls';
 
 import AddRule from 'route-components/AddRule';
+import AddRuleControls from 'route-controls/AddRuleControls';
 
 import EditRule from 'route-components/EditRule';
+import EditRuleControls from 'route-controls/EditRuleControls';
 
 import store from 'store';
 import { fullGrow } from 'helpers/page';
 import { preview } from 'helpers/preview';
 
-const NoControls = () => null;
+const NullComponent = () => null;
 
 export default [
   {
     name: 'Home',
     path: '',
     body: () => ({
-      main: Home,
-      controls: NoControls
+      main: NullComponent,
+      controls: HomeControls
     })
   },
   {
     name: 'Add Page',
     path: 'add-page',
     body: () => ({
-      main: AddPage,
+      main: NullComponent,
       controls: AddPageControls
     })
   },
@@ -75,7 +78,7 @@ export default [
             path: 'add',
             body: () => ({
               main: AddElement,
-              controls: NoControls
+              controls: AddElementControls
             })
           },
           {
@@ -83,7 +86,7 @@ export default [
             path: 'edit',
             body: () => ({
               main: EditElement,
-              controls: NoControls
+              controls: EditElementControls
             })
           },
           {
@@ -91,7 +94,7 @@ export default [
             path: 'add-rule',
             body: () => ({
               main: AddRule,
-              controls: NoControls
+              controls: AddRuleControls
             })
           },
           {
@@ -99,7 +102,7 @@ export default [
             path: 'edit-rule/:ruleIndex',
             body: () => ({
               main: EditRule,
-              controls: NoControls
+              controls: EditRuleControls
             }),
             params: {
               ruleIndex: n => parseInt(n, 10)

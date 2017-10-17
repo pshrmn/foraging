@@ -7,7 +7,6 @@ import RuleWizard from 'components/wizards/RuleWizard';
 
 const AddRule = ({ page, element }) => (
   <div className='frame'>
-    Add Rule
     <RuleWizard page={page} element={element} />
   </div>
 );

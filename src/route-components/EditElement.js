@@ -7,7 +7,6 @@ import EditElementWizard from 'components/wizards/EditElementWizard';
 
 const EditElement = ({ page, element }) => (
   <div className='frame'>
-    Edit Element
     <EditElementWizard page={page} element={element} />
   </div>
 );

@@ -35,11 +35,15 @@ function Rule(props) {
       >
         Edit
       </Link>
-      <NegButton text='Delete' click={() => {
-        element.rules = element.rules.filter((r,i) => i !== index);
-        const newPage = {...page};
-        updatePage(newPage);
-      }} />
+      <NegButton
+        click={() => {
+          element.rules = element.rules.filter((r,i) => i !== index);
+          const newPage = {...page};
+          updatePage(newPage);
+        }}
+      >
+        Delete
+      </NegButton>
     </li>
   );
 }
