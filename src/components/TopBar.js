@@ -5,6 +5,7 @@ import { Link } from '@curi/react';
 
 import { NegButton } from 'components/common/Buttons';
 import { closeForager } from 'actions';
+import MessageBoard from 'components/MessageBoard';
 
 /* eslint-disable no-process-env */
 const DEBUG = process.env.NODE_ENV !== 'production';
@@ -37,6 +38,7 @@ const TopBar = ({ response, children, closeForager } ) => {
           </NegButton>
         </div>
       </div>
+      <MessageBoard />
       {DEBUG
         ? <div className='address-bar'>
           {pathname}

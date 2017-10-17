@@ -4,27 +4,28 @@ import { Link } from '@curi/react';
 import { connect } from 'react-redux';
 
 import { addPage } from 'actions';
+import { showMessage } from 'expiring-redux-messages';
 import { createElement } from 'helpers/page';
 
 
 class AddPageControls extends React.Component {
 
-  state = { name: '', allowed: true };
+  state = { name: '' };
 
   handleName = (event) => {
-    const name = event.target.value;
-    this.setState({
-      name,
-      allowed: name !== '' && this.props.takenNames.every(n => n !== name)
-    });
+    this.setState({ name: event.target.value });
   }
 
   addPage = (event) => {
     event.preventDefault();
-    const { curi, addPage } = this.props;
-    const { name, allowed } = this.state;
+    const { curi, addPage, showMessage, takenNames } = this.props;
+    const { name } = this.state;
 
-    if (!allowed) {
+    if (name === '') {
+      showMessage("Page name cannot be an empty string", 5000, -1);
+      return;
+    } else if (takenNames.some(n => n === name)) {
+      showMessage(`"${name}" is a duplicate name and cannot be used.`, 5000, -1);
       return;
     }
 
@@ -42,7 +43,7 @@ class AddPageControls extends React.Component {
   }
 
   render() {
-    const { allowed, name } = this.state;
+    const { name } = this.state;
     return  ([
       <input
         key='input'
@@ -51,9 +52,6 @@ class AddPageControls extends React.Component {
         onChange={this.handleName}
         placeholder='Add a new page'
       />,
-      allowed || name === ''
-        ? null
-        : <span key='warning' className='message neg'>This name is already in use.</span>,
       <button key='submit' type='button' onClick={this.addPage}>Add Page</button>,
       <Link key='cancel' to='Home' anchor='button' className='neg'>Cancel</Link>,
     ]);
@@ -64,7 +62,8 @@ AddPageControls.propTypes = {
   /* connect */
   curi: PropTypes.object,
   takenNames: PropTypes.array,
-  addPage: PropTypes.func
+  addPage: PropTypes.func,
+  showMessage: PropTypes.func
 };
 
 export default connect(
@@ -75,6 +74,7 @@ export default connect(
     };
   },
   {
-    addPage
+    addPage,
+    showMessage
   }
 )(AddPageControls);
