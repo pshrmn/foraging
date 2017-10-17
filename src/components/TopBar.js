@@ -31,6 +31,7 @@ const TopBar = ({ response, children, closeForager } ) => {
             classes={['transparent']}
             click={() => {
               document.body.classList.remove('foraging');
+              document.body.style.marginTop = 0;
               closeForager();
             }}
           >
