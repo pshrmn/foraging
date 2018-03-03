@@ -6,17 +6,17 @@
 [build]: https://travis-ci.org/pshrmn/gatherer
 
 
-Gather data from web pages. Works with pages created by [Forager](https://github.com/pshrmn/forager). For the data format, refer to that project's README.
+Gather data from web pages. Works with pages created by [Forager](https://github.com/pshrmn/foraging/forager). For the data format, refer to that project's README.
 
 ### Resources
 * [Tutorial](http://www.pshrmn.com/tutorials/gatherer/)
-* [Examples](https://github.com/pshrmn/gatherer-examples)
+* [Examples](https://github.com/pshrmn/foraging/gatherer-examples)
 
 ## Install
 
 Install gatherer using pip
 
-    pip install git+git://github.com/pshrmn/gatherer.git
+    pip install git+git://github.com/pshrmn/foraging/gatherer.git
 
 For Windows users, if installing `lxml` causes errors, download the wheel from the [Python Extension Packages for Windows](http://www.lfd.uci.edu/~gohlke/pythonlibs/#lxml) and place the wheel in your project. Pip install that file, then try the above gatherer installation.
 
@@ -104,7 +104,7 @@ fetch.get("http://www.example.com")
 ```
 
 ### Pages
-Pages are collections of rules to gather data from elements in a web page. For a better explanation of the makeup of a Page, read the README for [Forager](https://github.com/pshrmn/forager)
+Pages are collections of rules to gather data from elements in a web page. For a better explanation of the makeup of a Page, read the README for [Forager](https://github.com/pshrmn/foraging/forager)
 
 #### Page
 

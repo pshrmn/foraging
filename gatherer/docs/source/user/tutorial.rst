@@ -20,7 +20,7 @@ While the directory layout is not strict, generally speaking keeping a rules dir
   +-- data
       +-- subs.json
 
-If you uploaded the rules using `Granary <https://github.com/pshrmn/granary>`_, the ``rules/www_reddit_com`` directory will have been made for you. You only need to create the ``subreddit.py`` file and ``data`` directory.
+If you uploaded the rules using `Granary <https://github.com/pshrmn/foraging/granary>`_, the ``rules/www_reddit_com`` directory will have been made for you. You only need to create the ``subreddit.py`` file and ``data`` directory.
 
 If you are starting from here, you will need to create the ``subreddit.py`` file and ``data`` directory, as well as the ``rules`` directory and the `below JSON <#example-json>`_.
 

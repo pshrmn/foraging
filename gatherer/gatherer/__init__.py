@@ -2,7 +2,7 @@
 Gatherer
 ~~~~~~~~
 
-A tiny web scraping library. Pairs well with https://github.com/pshrmn/forager
+A tiny web scraping library. Pairs well with https://github.com/pshrmn/foraging/forager
 for creating rule sets to get structured data.
 
     >>> import json

@@ -11,7 +11,7 @@ When opening Forager, no pages will be selected.
 
 ## Before You Get Started
 
-One thing to keep in mind is that the page that you're seeing isn't necessarily the web page that [`Gatherer`](https://github.com/pshrmn/gatherer) (the library used to gather data using the rules we are creating) will see. Any extensions that you have running which modify the page won't be present when `Gatherer` makes a request. You will also have to make sure to authenticate with the server (using a `requests.Session`) if you need to make authenticated requests. When creating a `Page` you should log out and disable any extensions that are running (eg. Reddit Enhancement Suite) if you want to see what `Gatherer` will.
+One thing to keep in mind is that the page that you're seeing isn't necessarily the web page that [`Gatherer`](https://github.com/pshrmn/foraging/gatherer) (the library used to gather data using the rules we are creating) will see. Any extensions that you have running which modify the page won't be present when `Gatherer` makes a request. You will also have to make sure to authenticate with the server (using a `requests.Session`) if you need to make authenticated requests. When creating a `Page` you should log out and disable any extensions that are running (eg. Reddit Enhancement Suite) if you want to see what `Gatherer` will.
 
 ## Create Page
 
@@ -226,7 +226,7 @@ Once you have created rules for all of the selectors, it is time to upload the p
 
 ![completed page](img/completed-page.png)
 
-In order to upload, you need to have [`Granary`](https://github.com/pshrmn/granary) running. In the directory where you want the page uploaded to, start up the `Granary` server.
+In order to upload, you need to have [`Granary`](https://github.com/pshrmn/foraging/granary) running. In the directory where you want the page uploaded to, start up the `Granary` server.
 
 ```
 python -m granary.server
@@ -238,4 +238,4 @@ Uploading is as simple as clicking the `Upload` button.
 
 As long as the `Granary` server is running, the page should be saved as a json file in the `rules/<domain>` folder where the server is running (unless you specify a different location). (`domain` is the hostname of the website the page is created for, except with periods `.` replaced by underscores `_`)
 
-Once you have a page uploaded, it is time to use [`Gatherer`](https://github.com/pshrmn/gatherer) to collect the data.
+Once you have a page uploaded, it is time to use [`Gatherer`](https://github.com/pshrmn/foraging/gatherer) to collect the data.

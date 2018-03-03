@@ -65,7 +65,7 @@ session_backend
 phantom_backend
 +++++++++++++++
 
-``phantom_backend`` is used to make requests for dynamic data. It makes use of PhantomJS, which will load and execute any JavaScript for the page. In order to use the ``phantom_backend``, you need to provide it two paths: 1) the location of the PhantomJS executable and 2) the location of the PhantomJS script. The PhantomJS executable can be downloaded from the `PhantomJS <http://phantomjs.org/>`_ website. The PhantomJS script is a JavaScript file that will be run by PhantomJS to make the request. There is a simple ``html_text.js`` file in the `Gatherer <https://github.com/pshrmn/gatherer>`_ repository that can be used for this.
+``phantom_backend`` is used to make requests for dynamic data. It makes use of PhantomJS, which will load and execute any JavaScript for the page. In order to use the ``phantom_backend``, you need to provide it two paths: 1) the location of the PhantomJS executable and 2) the location of the PhantomJS script. The PhantomJS executable can be downloaded from the `PhantomJS <http://phantomjs.org/>`_ website. The PhantomJS script is a JavaScript file that will be run by PhantomJS to make the request. There is a simple ``html_text.js`` file in the `Gatherer <https://github.com/pshrmn/foraging/gatherer>`_ repository that can be used for this.
 
 While the ``requests_backend`` only downloads the main response to the request, the ``phantom_backend`` downloads the JavaScript and CSS files linked to in the web page. Unless your code needs access to dynamic content, it should prefer to use the ``requests_backend``.
 

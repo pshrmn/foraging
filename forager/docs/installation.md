@@ -2,7 +2,7 @@
 
 Currently Forager is not on the Chrome Web Store, so it needs to be installed manually.
 
-1. Clone the [repository](https://github.com/pshrmn/forager) into a directory.
+1. Clone the [repository](https://github.com/pshrmn/foraging/forager) into a directory.
 2. In Chrome open up the extensions page (Settings > Tools > Extensions)
 3. Click the "Pack extension..." button and navigate to the `forager` folder in the cloned repo. (If you've previously packed the extension, make sure to include the extension.pem so that packing creates an updated extension instead of a new one.)
 4. Open the folder where the packed extension (a `.crx` file) is located (that should be one folder above the extension folder)

@@ -1,10 +1,10 @@
 ##granary
 
-Web app that runs in conjunction with Forager chrome extension (https://github.com/pshrmn/forager) to get rules to be used in a crawler
+Web app that runs in conjunction with Forager chrome extension (https://github.com/pshrmn/foraging/forager) to get rules to be used in a crawler
 
 ###install
 
-    pip install git+git://github.com/pshrmn/granary.git
+    pip install git+git://github.com/pshrmn/foraging/granary.git
 
 ####usage
 

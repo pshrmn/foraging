@@ -1,6 +1,6 @@
 # Forager
 
-A Chrome extension to determine how to gather data from a web page. Built with [React](https://facebook.github.io/react/), [Redux](http://rackt.org/redux/index.html), and [d3](http://d3js.org/). Useful in conjunction with [Gatherer](https://github.com/pshrmn/gatherer).
+A Chrome extension to determine how to gather data from a web page. Built with [React](https://facebook.github.io/react/), [Redux](http://rackt.org/redux/index.html), and [d3](http://d3js.org/). Useful in conjunction with [Gatherer](https://github.com/pshrmn/foraging/gatherer).
 
 <img src="/preview/forager-ui-preview.gif" width="450"/>
 
@@ -136,4 +136,4 @@ To pack extension and use:
 
 ###### Uploading Pages
 
-Once you have completed creating a page, you will probably want to upload it to use with [Gatherer](https://github.com/pshrmn/gatherer). The easiest way to do this is to install [Granary](https://github.com/pshrmn/granary), which is a simple Flask server that listens for requests to `localhost:5000`.
+Once you have completed creating a page, you will probably want to upload it to use with [Gatherer](https://github.com/pshrmn/foraging/gatherer). The easiest way to do this is to install [Granary](https://github.com/pshrmn/foraging/granary), which is a simple Flask server that listens for requests to `localhost:5000`.

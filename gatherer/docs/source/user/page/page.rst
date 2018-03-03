@@ -22,7 +22,7 @@ Methods
 from_json(page_json)
 ++++++++++++++++++++
 
-A class method, ``from_json`` creates a new ``Page`` given a Python dict of the desired ``Page`` structure. This can be created using `Forager <https://github.com/pshrmn/forager>`_. If there is an error in creating the ``Page``, a ``ValueError`` will be raised.
+A class method, ``from_json`` creates a new ``Page`` given a Python dict of the desired ``Page`` structure. This can be created using `Forager <https://github.com/pshrmn/foraging/forager>`_. If there is an error in creating the ``Page``, a ``ValueError`` will be raised.
 
 .. code-block:: python
 
