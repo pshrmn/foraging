@@ -1,3 +1,3 @@
-#Gatherer Examples
+# Gatherer Examples
 
-A collection of example projects using [gatherer](https://github.com/pshrmn/gatherer)
+A collection of example projects using [gatherer](https://github.com/pshrmn/foraging/tree/mastergatherer)
