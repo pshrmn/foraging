@@ -1,0 +1,57 @@
+{
+  "name": "stadium",
+  "element": {
+    "selector": "body",
+    "spec": {
+      "type": "single",
+      "index": 0
+    },
+    "rules": [],
+    "optional": false,
+    "children": [
+      {
+        "selector": "span.geo-dms",
+        "spec": {
+          "type": "single",
+          "index": 0
+        },
+        "rules": [],
+        "optional": false,
+        "children": [
+          {
+            "selector": "span.latitude",
+            "spec": {
+              "type": "single",
+              "index": 0
+            },
+            "rules": [
+              {
+                "attr": "text",
+                "name": "latitude",
+                "type": "string"
+              }
+            ],
+            "optional": false,
+            "children": []
+          },
+          {
+            "selector": "span.longitude",
+            "spec": {
+              "type": "single",
+              "index": 0
+            },
+            "rules": [
+              {
+                "attr": "text",
+                "name": "longitude",
+                "type": "string"
+              }
+            ],
+            "optional": false,
+            "children": []
+          }
+        ]
+      }
+    ]
+  }  
+}

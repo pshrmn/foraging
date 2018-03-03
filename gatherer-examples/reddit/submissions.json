@@ -1,0 +1,120 @@
+{
+  "name": "submissions",
+  "element": {
+    "selector": "body",
+    "spec": {
+      "type": "single",
+      "index": 0
+    },
+    "rules": [],
+    "optional": false,
+    "children": [
+      {
+        "selector": "div.thing",
+        "spec": {
+          "type": "all",
+          "name": "submission"
+        },
+        "rules": [],
+        "optional": false,
+        "children": [
+          {
+            "selector": "div.score",
+            "spec": {
+              "type": "single",
+              "index": 1
+            },
+            "rules": [
+              {
+                "name": "score",
+                "attr": "text",
+                "type": "int"
+              }
+            ],
+            "optional": false,
+            "children": []
+          },
+          {
+            "selector": "a.title",
+            "spec": {
+              "type": "single",
+              "index": 0
+            },
+            "rules": [
+              {
+                "name": "title",
+                "attr": "text",
+                "type": "string"
+              },
+              {
+                "name": "url",
+                "attr": "href",
+                "type": "string"
+              }
+            ],
+            "optional": false,
+            "children": []
+          },
+          {
+            "selector": ".domain",
+            "spec": {
+              "type": "single",
+              "index": 0
+            },
+            "rules": [
+              {
+                "name": "domain",
+                "attr": "text",
+                "type": "string"
+              }
+            ],
+            "optional": false,
+            "children": []
+          },
+          {
+            "selector": "a.comments",
+            "spec": {
+              "type": "single",
+              "index": 0
+            },
+            "rules": [
+              {
+                "name": "comments_url",
+                "attr": "href",
+                "type": "string"
+              },
+              {
+                "name": "comment_count",
+                "attr": "text",
+                "type": "int"
+              }
+            ],
+            "optional": false,
+            "children": []
+          },
+          {
+            "selector": "a.author",
+            "spec": {
+              "type": "single",
+              "index": 0
+            },
+            "rules": [
+              {
+                "name": "submitter",
+                "attr": "text",
+                "type": "string"
+              },
+              {
+                "name": "submitter_url",
+                "attr": "href",
+                "type": "string"
+              }
+            ],
+            "optional": false,
+            "children": []
+          }
+        ]
+      }
+    ]
+  }    
+}
