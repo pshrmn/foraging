@@ -1,0 +1,33 @@
+.rules {
+  margin: 5px 0;
+
+  .rule {
+      height: inherit;
+      line-height: 1.1;
+      > * {
+          margin: 0 3px;
+      }
+  }
+}
+
+.rule-name {
+  font-weight: bold;
+}
+
+.rule-attr, .rule-type {
+  font-size: 0.9em;
+  padding: 2px;
+  border: 1px solid $black;
+}
+
+.rule-attr {
+  color: $blue;
+  background: $light-blue;
+  border-color: $blue;
+}
+
+.rule-type {
+  color: $dark-green;
+  background: $light-green;
+  border-color: $dark-green;
+}

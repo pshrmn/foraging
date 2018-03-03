@@ -1,0 +1,66 @@
+$transparent-red: rgba(255, 0, 0, 0.25);
+$transparent-gold: rgba(255, 215, 0, 0.25);
+$purple: rgb(30, 10, 63);
+$transparent-blue: rgba(69, 175, 204, 0.25);
+
+/*
+ * the selectable-element class is added to all children of the elements in the
+ * current element's element array. This signifies that a new Element can be
+ * created based on this html element.
+ */
+.selectable-element{
+    box-shadow: inset 1px 1px $purple, inset -1px -1px $purple !important;
+}
+
+img.selectable-element{
+    border: 1px dashed $purple !important;
+}
+
+/*
+ * the forager-highlight class is added while mousing over an element while
+ * creating a element in the HTMLFrame
+ */
+.forager-highlight{
+    background: rgba(46,130,158,0.5) !important;
+}
+
+img.forager-highlight{
+    opacity: 0.25 !important;
+}
+
+/*
+ * While creating an element, the query-check class is applied to all elements
+ * that match the element's css selector string (and are children of the current
+ * element's elements)
+ */
+.query-check{
+    background: $transparent-gold !important;
+    box-shadow: inset 0 0 1px $gold;
+}
+
+img.query-check, a.query-check > img{
+    border: 1px solid $transparent-gold !important;
+}
+
+/*
+ * This class is added when hovering over a node in the page's tree chart. All
+ * elements for the hovered node's elements will be given this class
+ */
+.saved-preview{
+    background: $transparent-red !important;
+}
+
+img.saved-preview{
+    border: 1px solid $transparent-red !important;    
+}
+
+/*
+ * This class is added to all elements of the current element
+ */
+.current-element{
+    background: $transparent-blue !important;
+}
+
+img.current-element{
+    border: 1px dotted $blue !important;
+}

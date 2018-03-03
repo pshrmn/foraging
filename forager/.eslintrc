@@ -1,0 +1,28 @@
+{
+  "parser": "babel-eslint",
+  "env": {
+    "browser": true,
+    "es6": true
+  },
+  "parserOptions": {
+    "sourceType": "module"
+  },
+  "plugins": [
+    "import",
+    "react"
+  ],
+  "globals": {
+    "chrome": true,
+    "process": false
+  },
+  "extends": [
+    "eslint:recommended",
+    "plugin:react/recommended"
+  ],
+  "rules": {
+    "indent": [2, 2],
+    "no-trailing-spaces": 2,
+    "semi": [2, "always"],
+    "no-case-declarations": 0
+  }
+}

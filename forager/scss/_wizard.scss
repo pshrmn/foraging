@@ -1,0 +1,49 @@
+.progress-bar {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+
+    .marker {
+        height: 10px;
+        background: $light-red;
+        flex-grow: 1;
+        border: 1px solid $white;
+
+        &.active {
+            background: $blue;
+        }
+
+        &.complete {
+            background: $green;
+        }
+
+        &:first-child {
+            border-radius: 5px 0 0 5px;
+        }
+
+        &:last-child {
+            border-radius: 0 5px 5px 0;
+        }
+    }
+}
+
+.wizard {
+    width: 500px;
+    min-height: 200px;
+
+    label{
+        font-weight: normal;
+        margin-right: 15px;
+        padding: 2px 3px;
+        border-radius: 3px;
+        word-break: break-all;
+        border: 1px solid $gray;
+        background: $button-gray;
+    }    
+}
+
+.choices {
+    display: flex;
+    flex-wrap: wrap;
+
+}

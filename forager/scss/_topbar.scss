@@ -1,0 +1,150 @@
+.topbar{
+    min-height: 31px;
+    min-width: 650px;
+    background: $dark-blue;
+
+    span {
+        color: $light-gray;
+
+        &.pos {
+            color: $green;
+        }
+    }
+
+    button.home {
+        background: $white !important;
+        color: $dark-blue  !important;
+        text-transform: none !important;
+        &:hover {
+            background: $white !important;
+            color: $dark-blue  !important;
+        }
+
+        img {
+            vertical-align: bottom;
+        }
+    }
+
+    button{
+        display: inline-block;
+        line-height: 1.25 !important;
+        min-height: 1.25em !important;
+        border-radius: 3px;
+        border-width: 1px;
+        border-style: solid;
+        box-shadow: none !important;
+
+        background: $dark-blue !important;
+
+        color: $button-gray !important;
+        border-color: $button-gray !important;
+        background: $dark-blue !important;
+
+        &:hover {
+            color: $dark-blue !important;
+            background: $button-gray !important;
+
+            &:disabled {
+                color: $button-gray !important;
+                background: $dark-blue !important;                
+            }
+        }
+
+        &.pos, &.pos:active, &.pos:focus {
+            color: $green !important;
+            border-color: $green !important;
+            background: $dark-blue !important;
+        }
+
+        &.pos:hover {
+            background: $green !important;
+            color: $dark-blue !important;
+
+          &:disabled {
+            background: $dark-blue !important;
+            color: $green !important;
+          }
+        }
+
+        &.neg, &.neg:active, &.neg:focus{
+            border-color: $red !important;
+            color: $red !important;
+            background: $dark-blue !important;
+        }
+
+        &.neg:hover {
+            background: $red !important;
+            color: $dark-blue !important;
+
+            &:disabled {
+            background: $dark-blue !important;
+            color: $red !important;
+          }
+        }
+
+        &:active {
+            border-style: inset !important;
+            color: $black !important;
+        }
+
+    }
+
+    select{
+        width: 150px;
+        min-height: 22px;
+        height: 22px;
+        border-radius: 2px;
+    }
+
+    .address-bar {
+        background: #fff;
+        padding: 3px 10px;
+    }
+}
+
+.page-controls {
+    display: inline-block;
+    color: $light-gray
+}
+
+.app-controls {
+    display: inline-block;
+    /* this pushes the .app-controls to the right edge */
+    margin-left: auto;
+    margin-right: 15px;
+    
+    button {
+        color: $white !important;
+        margin: 0 !important;
+
+        &:hover {
+            background: $dark-blue !important;
+        }
+    }
+}
+
+.controls {
+    display: flex;
+
+    .page-name {
+        color: $white;
+    }
+}
+
+.message-board {
+    margin: 0;
+    padding: 0;
+
+}
+
+.message {
+    color: $light-gray;
+
+    &.pos {
+        color: $green;
+    }
+
+    &.neg {
+        color: $red;
+    }
+}

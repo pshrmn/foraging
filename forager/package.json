@@ -1,0 +1,65 @@
+{
+  "name": "forager",
+  "version": "3.0.0",
+  "license": "MIT",
+  "author": "Paul Sherman",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/pshrmn/forager.git"
+  },
+  "scripts": {
+    "autoprefix": "postcss --use autoprefixer --autoprefixer.browsers \"last 2 versions\" forager/css/interface.css --dir forager/css/",
+    "css": "npm run sass & npm run autoprefix",
+    "build:dev": "npm run webpack:dev & npm run css",
+    "build:prod": "npm run webpack:prod & npm run css",
+    "sass": "node-sass scss/interface.scss -o forager/css",
+    "test": "cross-env NODE_PATH=src jest",
+    "coverage": "npm run test -- --coverage",
+    "webpack:dev": "webpack",
+    "webpack:prod": "cross-env BABEL_ENV=production webpack"
+  },
+  "devDependencies": {
+    "autoprefixer": "^7.1.5",
+    "babel-cli": "^6.18.0",
+    "babel-core": "^6.21.0",
+    "babel-eslint": "^8.0.1",
+    "babel-jest": "^21.2.0",
+    "babel-loader": "^7.1.2",
+    "babel-plugin-transform-react-remove-prop-types": "^0.4.9",
+    "babel-preset-es2015": "^6.18.0",
+    "babel-preset-react": "^6.16.0",
+    "babel-preset-stage-0": "^6.16.0",
+    "cross-env": "^5.0.5",
+    "eslint": "^4.8.0",
+    "eslint-loader": "^1.6.1",
+    "eslint-plugin-import": "^2.2.0",
+    "eslint-plugin-react": "^7.4.0",
+    "jest": "^21.2.1",
+    "node-sass": "^4.0.0",
+    "postcss-cli": "^4.1.1",
+    "react-test-renderer": "^16.0.0",
+    "redux-mock-store": "^1.2.1",
+    "webpack": "^3.6.0"
+  },
+  "dependencies": {
+    "@curi/core": "^1.0.0-beta.12",
+    "@curi/react": "^1.0.0-beta.10",
+    "@curi/redux": "^1.0.0-alpha.2",
+    "@hickory/in-memory": "^1.0.0-beta.1",
+    "d3-hierarchy": "^1.0.3",
+    "d3-path": "^1.0.3",
+    "expiring-redux-messages": "^0.3.0",
+    "prop-types": "^15.6.0",
+    "qs": "^6.5.1",
+    "react": "^16.0.0",
+    "react-dom": "^16.0.0",
+    "react-redux": "^5.0.1",
+    "redux": "^3.6.0",
+    "simple-wizard-component": "^0.7.2"
+  },
+  "jest": {
+    "modulePaths": [
+      "/src"
+    ]
+  }
+}

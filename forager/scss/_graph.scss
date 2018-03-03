@@ -1,0 +1,43 @@
+.tree {
+    background: $transparent;
+    box-sizing: border-box;
+    margin-right: 3px;
+    padding: 5px;
+    min-width: 500px;
+    min-height: 200px;
+
+    svg {
+        box-sizing: content-box;
+        font-size: 14px;
+        background: $light-gray;
+        border: 1px solid $gray;
+        display: block;
+
+        .link {
+          fill: none;
+          stroke: $dark-gray;
+        }
+
+        .node{
+            cursor: pointer;
+            fill: $dark-green;
+        }
+
+        .empty{
+            fill: $red;
+        }
+
+        .node text {
+            paint-order: stroke;
+            stroke: $light-gray;
+            stroke-width: 3px;
+            text-anchor: middle;
+            fill: inherit;
+        }
+
+        .current{
+            font-style: italic;
+            fill: $dark-gray;
+        }
+    }
+}
