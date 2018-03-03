@@ -1,0 +1,15 @@
+*.pyc
+__pycache__
+venv
+/rules
+cache/
+docs/build
+built
+dist
+gatherer.egg-info
+
+phantomjs
+phantomjs.exe
+ghostdriver.log
+
+!tests/test_cache/cache/
